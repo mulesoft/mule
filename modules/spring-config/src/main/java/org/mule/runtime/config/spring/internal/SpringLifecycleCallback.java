@@ -7,19 +7,12 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.config.spring.SpringRegistry;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
-import com.google.common.collect.TreeTraverser;
-
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A {@link RegistryLifecycleCallback} to be used with instances of {@link SpringRegistry}. For each object in which a
@@ -33,81 +26,22 @@ import java.util.Set;
  */
 class SpringLifecycleCallback extends RegistryLifecycleCallback<SpringRegistry> {
 
-  public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager) {
+  private final SpringRegistry springRegistry;
+
+  public SpringLifecycleCallback(RegistryLifecycleManager registryLifecycleManager,
+                                 SpringRegistry springRegistry) {
     super(registryLifecycleManager);
+    this.springRegistry = springRegistry;
   }
 
   @Override
   protected Collection<?> lookupObjectsForLifecycle(LifecycleObject lo) {
     Map<String, Object> objects = getSpringRegistry().lookupEntriesForLifecycle(lo.getType());
-
-    final DependencyNode root = new DependencyNode(null);
-
-    for (Map.Entry<String, Object> entry : objects.entrySet()) {
-      addDependency(root, entry.getKey(), entry.getValue());
-    }
-
-    Iterable<DependencyNode> orderedNodes = new TreeTraverser<DependencyNode>() {
-
-      @Override
-      public Iterable children(DependencyNode node) {
-        return node.getChilds();
-      }
-    }.postOrderTraversal(root);
-
-    List<Object> orderedObjects = new LinkedList<>();
-    for (DependencyNode node : orderedNodes) {
-      if (node == root) {
-        break;
-      }
-
-      orderedObjects.add(node.getValue());
-    }
-
-    return orderedObjects;
+    return springRegistry.getBeanDependencyResolver().resolveBeanDependencies(objects.keySet());
   }
 
   private SpringRegistry getSpringRegistry() {
     return (SpringRegistry) registryLifecycleManager.getLifecycleObject();
   }
 
-
-  private void addDependency(DependencyNode parent, String key, Object object) {
-    addDependency(parent, key, object, new HashSet<String>());
-  }
-
-  private void addDependency(DependencyNode parent, String key, Object object, Set<String> processedKeys) {
-    final DependencyNode node = new DependencyNode(object);
-    parent.addChild(node);
-
-    if (!processedKeys.contains(key)) {
-      processedKeys.add(key);
-      for (Map.Entry<String, Object> dependency : getSpringRegistry().getDependencies(key).entrySet()) {
-        addDependency(node, dependency.getKey(), dependency.getValue(), processedKeys);
-      }
-    }
-  }
-
-  private class DependencyNode {
-
-    private final Object value;
-    private final List<DependencyNode> childs = new LinkedList<>();
-
-    private DependencyNode(Object value) {
-      this.value = value;
-    }
-
-    public DependencyNode addChild(DependencyNode child) {
-      childs.add(child);
-      return this;
-    }
-
-    public List<DependencyNode> getChilds() {
-      return childs;
-    }
-
-    public Object getValue() {
-      return value;
-    }
-  }
 }

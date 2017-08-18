@@ -21,7 +21,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
@@ -35,7 +38,8 @@ import org.slf4j.Logger;
  * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<C> implements ConnectionProvider<C>, HasPoolingProfile, Lifecycle {
+public abstract class ConnectionProviderWrapper<C>
+    implements ConnectionProvider<C>, HasPoolingProfile, HasReconnectionConfig, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ConnectionProviderWrapper.class);
 
@@ -87,8 +91,11 @@ public abstract class ConnectionProviderWrapper<C> implements ConnectionProvider
   /**
    * @return a {@link RetryPolicyTemplate}
    */
-  public abstract RetryPolicyTemplate getRetryPolicyTemplate();
-
+  public RetryPolicyTemplate getRetryPolicyTemplate() {
+    return getReconnectionConfig()
+        .map(ReconnectionConfig::getRetryPolicyTemplate)
+        .orElseGet(NoRetryPolicyTemplate::new);
+  }
 
   @Override
   public void initialise() throws InitialisationException {
@@ -117,11 +124,5 @@ public abstract class ConnectionProviderWrapper<C> implements ConnectionProvider
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
     return empty();
-  }
-
-  public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate())
-        : connectionProvider;
   }
 }

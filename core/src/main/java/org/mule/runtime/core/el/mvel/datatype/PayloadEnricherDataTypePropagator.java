@@ -13,7 +13,7 @@ import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.Assignment;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * Propagates data type when payload is used as enrichment target
@@ -21,12 +21,12 @@ import org.mule.runtime.core.api.Event;
 public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
   @Override
-  protected boolean doPropagate(Event event, Event.Builder builder, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(InternalEvent event, InternalEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (node instanceof Assignment) {
       String assignmentVar = ((Assignment) node).getAssignmentVar();
 
       if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar)) {
-        builder.message(Message.builder(event.getMessage()).payload(typedValue.getValue())
+        builder.message(Message.builder(event.getMessage()).value(typedValue.getValue())
             .mediaType(typedValue.getDataType().getMediaType()).build());
         return true;
       }

@@ -25,14 +25,14 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
+import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -76,12 +76,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   /**
    * Creates a new instance
    *
-   * @param name this provider's name
-   * @param extensionModel the model that owns the {@code configurationModel}
-   * @param configurationModel the model for the returned configurations
-   * @param resolverSet the {@link ResolverSet} that provides the configuration's parameter values
+   * @param name                       this provider's name
+   * @param extensionModel             the model that owns the {@code configurationModel}
+   * @param configurationModel         the model for the returned configurations
+   * @param resolverSet                the {@link ResolverSet} that provides the configuration's parameter values
    * @param connectionProviderResolver a {@link ValueResolver} used to obtain a {@link ConnectionProvider}
-   * @param expirationPolicy the {@link ExpirationPolicy} for the unused instances
+   * @param expirationPolicy           the {@link ExpirationPolicy} for the unused instances
    */
   public DynamicConfigurationProvider(String name,
                                       ExtensionModel extensionModel,
@@ -108,16 +108,17 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   @Override
   public ConfigurationInstance get(Object event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve(from((Event) event));
+      ResolverSetResult result = resolverSet.resolve(from((InternalEvent) event));
       ResolverSetResult providerResult = null;
       if (connectionProviderResolver.getResolverSet().isPresent()) {
-        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((Event) event));
+        providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(from((InternalEvent) event));
       }
-      return getConfiguration(new Pair<>(result, providerResult), (Event) event);
+      return getConfiguration(new Pair<>(result, providerResult), (InternalEvent) event);
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, Event event)
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
+                                                 InternalEvent event)
       throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
@@ -137,7 +138,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
       // re-check in case some other thread beat us to it...
       configuration = cache.get(resolverSetResult);
       if (configuration == null) {
-        configuration = createConfiguration(resolverSetResult.getFirst(), event);
+        configuration = createConfiguration(resolverSetResult, event);
         cache.put(resolverSetResult, configuration);
       }
 
@@ -154,9 +155,22 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     stats.updateLastUsed();
   }
 
-  private ConfigurationInstance createConfiguration(ResolverSetResult result, Event event) throws MuleException {
-    ConfigurationInstance configuration = configurationInstanceFactory
-        .createConfiguration(getName(), result, ofNullable(connectionProviderResolver.resolve(from(event))));
+  private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, InternalEvent event)
+      throws MuleException {
+
+    ConfigurationInstance configuration;
+    ResolverSetResult connectionProviderValues = values.getSecond();
+    if (connectionProviderValues != null) {
+      configuration =
+          configurationInstanceFactory.createConfiguration(getName(),
+                                                           values.getFirst(),
+                                                           event,
+                                                           connectionProviderResolver,
+                                                           connectionProviderValues);
+    } else {
+      configuration = configurationInstanceFactory
+          .createConfiguration(getName(), values.getFirst(), event, ofNullable(connectionProviderResolver));
+    }
 
     registerConfiguration(configuration);
 

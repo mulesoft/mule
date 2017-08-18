@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.rules.ExpectedError.none;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -56,7 +56,7 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
       flowRunner("cureCancer").run();
       fail();
     } catch (MessagingException messagingException) {
-      assertThat(messagingException.getFailingMessageProcessor(), is(operation));
+      assertThat(messagingException.getFailingComponent(), is(operation));
       assertThat(messagingException.getEvent(), notNullValue());
     }
   }

@@ -26,7 +26,7 @@
         <body>
             <mule:set-payload value="bye bye"/>
         </body>
-        <output type="void"/>
+        <output type="string"/>
     </operation>
 
 

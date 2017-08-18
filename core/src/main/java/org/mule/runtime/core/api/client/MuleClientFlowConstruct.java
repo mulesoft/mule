@@ -7,10 +7,11 @@
 
 package org.mule.runtime.core.api.client;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -18,10 +19,12 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 
+import java.util.Optional;
+
 /**
  * Placeholder class which makes the default exception handler available.
  */
-public class MuleClientFlowConstruct implements FlowConstruct {
+public class MuleClientFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct {
 
   MuleContext muleContext;
 
@@ -46,8 +49,7 @@ public class MuleClientFlowConstruct implements FlowConstruct {
 
   @Override
   public MessagingExceptionHandler getExceptionListener() {
-    final MessagingExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler();
-    setFlowConstructIfNeeded(exceptionListener, this);
+    final MessagingExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler(empty());
     try {
       initialiseIfNeeded(exceptionListener, true, muleContext);
     } catch (InitialisationException e) {

@@ -16,12 +16,28 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(
-    providedExclusions = {"org.mule.tests:*:*:*:*", "com.mulesoft.compatibility.tests:*:*:*:*"},
-    testExclusions = {"org.mule.runtime:*:*:*:*", "org.mule.modules*:*:*:*:*", "org.mule.transports:*:*:*:*",
-        "org.mule.mvel:*:*:*:*", "org.mule.extensions:*:*:*:*", "com.mulesoft.mule.runtime*:*:*:*:*",
+    providedExclusions = {
+        "org.mule.tests:*:*:*:*",
+        "com.mulesoft.compatibility.tests:*:*:*:*"
+    },
+    testExclusions = {
+        "org.mule.runtime:*:*:*:*",
+        "org.mule.modules*:*:*:*:*",
+        "org.mule.transports:*:*:*:*",
+        "org.mule.mvel:*:*:*:*",
+        "org.mule.extensions:*:*:*:*",
+        "org.mule.connectors:*:*:*:*",
+        "org.mule.tests.plugin:*:*:*:*",
+        "com.mulesoft.mule.runtime*:*:*:*:*",
         "com.mulesoft.licm:*:*:*:*"
     },
-    testInclusions = {"*:*:jar:tests:*"})
+    testInclusions = {
+        "*:*:jar:tests:*",
+        "*:*:test-jar:*:*"
+    },
+    sharedRuntimeLibs = {
+        "org.mule.tests:mule-tests-unit"
+    })
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
 }

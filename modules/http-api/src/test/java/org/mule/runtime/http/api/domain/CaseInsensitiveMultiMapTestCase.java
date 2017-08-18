@@ -39,8 +39,8 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
     assertThat(insensitiveMultiMap.get(KEY_1), is(VALUE_1));
     assertThat(insensitiveMultiMap.get(KEY_1.toLowerCase()), is(VALUE_1));
-    assertThat(insensitiveMultiMap.get(KEY_2), is(VALUE_2));
-    assertThat(insensitiveMultiMap.get(KEY_2.toLowerCase()), is(VALUE_2));
+    assertThat(insensitiveMultiMap.get(KEY_2), is(VALUE_1));
+    assertThat(insensitiveMultiMap.get(KEY_2.toLowerCase()), is(VALUE_1));
 
     assertThat(insensitiveMultiMap.getAll(KEY_1), is(asList(VALUE_1)));
     assertThat(insensitiveMultiMap.getAll(KEY_1.toLowerCase()), is(asList(VALUE_1)));
@@ -61,7 +61,7 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
   public void aggregatesSameCaseKeys() {
     assertThat(multiMap.put("kEy", VALUE_1), nullValue());
     assertThat(multiMap.put("KeY", VALUE_2), is(VALUE_1));
-    assertThat(multiMap.get("key"), is(VALUE_2));
+    assertThat(multiMap.get("key"), is(VALUE_1));
     assertThat(multiMap.getAll("KEY"), is(asList(VALUE_1, VALUE_2)));
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.exception.MessagingException;
 
@@ -30,7 +30,7 @@ public interface SourceCompletionHandler {
    *
    * @param event            the result of the flow execution
    */
-  Publisher<Void> onCompletion(Event event, Map<String, Object> parameters);
+  Publisher<Void> onCompletion(InternalEvent event, Map<String, Object> parameters);
 
   /**
    * Invoked when a failure occurs during the flow processing
@@ -39,7 +39,7 @@ public interface SourceCompletionHandler {
    */
   Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters);
 
-  void onTerminate(Either<MessagingException, Event> eventOrException) throws Exception;
+  void onTerminate(Either<MessagingException, InternalEvent> eventOrException) throws Exception;
 
   /**
    * Resolves the set of parameters of the response function of the source against
@@ -48,7 +48,7 @@ public interface SourceCompletionHandler {
    * @param event the {@code Event} with the result of the successful flow processing.
    * @return the response function parameters with it's values.
    */
-  Map<String, Object> createResponseParameters(Event event) throws MessagingException;
+  Map<String, Object> createResponseParameters(InternalEvent event) throws MessagingException;
 
   /**
    * Resolves the set of parameters of the failure response function of the source against
@@ -57,6 +57,6 @@ public interface SourceCompletionHandler {
    * @param event the {@code Event} with the result of the failed flow processing.
    * @return the failed response function parameters with it's values.
    */
-  Map<String, Object> createFailureResponseParameters(Event event) throws MessagingException;
+  Map<String, Object> createFailureResponseParameters(InternalEvent event) throws MessagingException;
 
 }

@@ -10,9 +10,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
-
-import java.util.NoSuchElementException;
+import org.mule.runtime.core.api.InternalEvent;
 
 /**
  * Resolves data type for flow var when flowVars['x'] syntax is used
@@ -24,11 +22,10 @@ public class FlowVarExpressionDataTypeResolver extends AbstractVariableExpressio
   }
 
   @Override
-  protected DataType getVariableDataType(Event event, String propertyName) {
-    try {
-      return event.getVariable(propertyName).getDataType();
-    } catch (NoSuchElementException e) {
-      //there's no such flowVar, null will be returned
+  protected DataType getVariableDataType(InternalEvent event, String propertyName) {
+    if (event.getVariables().containsKey(propertyName)) {
+      return event.getVariables().get(propertyName).getDataType();
+    } else {
       return OBJECT;
     }
   }

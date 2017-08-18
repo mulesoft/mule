@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -23,7 +19,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -35,18 +30,11 @@ import reactor.core.publisher.Mono;
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
-  private RedeliveryExceeded redeliveryExceeded;
   private Integer maxRedeliveryAttempts;
-
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    initialiseIfNeeded(redeliveryExceeded);
     super.doInitialise(muleContext);
-  }
-
-  public void setRedeliveryExceeded(RedeliveryExceeded redeliveryExceeded) {
-    this.redeliveryExceeded = redeliveryExceeded;
   }
 
   public void setMaxRedeliveryAttempts(Integer maxRedeliveryAttempts) {
@@ -62,7 +50,12 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<Event, Event> beforeRouting(MessagingException exception) {
+  public boolean acceptsAll() {
+    return errorTypeMatcher == null && when == null;
+  }
+
+  @Override
+  protected Function<InternalEvent, InternalEvent> beforeRouting(MessagingException exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
       if (!isRedeliveryExhausted(exception)) {
@@ -74,13 +67,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    List<Processor> messageProcessors = new ArrayList<>(super.getOwnedMessageProcessors().size()
-        + (redeliveryExceeded == null ? 0 : redeliveryExceeded.getMessageProcessors().size()));
-    messageProcessors.addAll(super.getOwnedMessageProcessors());
-    if (redeliveryExceeded != null) {
-      messageProcessors.addAll(redeliveryExceeded.getMessageProcessors());
-    }
-    return messageProcessors;
+    return new ArrayList<>(super.getOwnedMessageProcessors());
   }
 
   private boolean isRedeliveryExhausted(Exception exception) {
@@ -88,14 +75,9 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<Event, Publisher<Event>> route(MessagingException exception) {
+  protected Function<InternalEvent, Publisher<InternalEvent>> route(MessagingException exception) {
     if (isRedeliveryExhausted(exception)) {
-      if (redeliveryExceeded != null) {
-        markExceptionAsHandled(exception);
-        return event -> just(event).transform(redeliveryExceeded);
-      } else {
-        logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
-      }
+      logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
     } else {
       return super.route(exception);
     }
@@ -103,7 +85,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Event processReplyTo(Event event, Exception e) {
+  protected InternalEvent processReplyTo(InternalEvent event, Exception e) {
     if (isRedeliveryExhausted(e)) {
       return super.processReplyTo(event, e);
     } else {
@@ -111,11 +93,4 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
-    if (redeliveryExceeded != null) {
-      redeliveryExceeded.setFlowConstruct(flowConstruct);
-    }
-  }
 }

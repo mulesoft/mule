@@ -41,7 +41,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -181,7 +181,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that flowVars work, returning null for non existent ones and it's value for those that do.")
   public void flowVars() throws MuleException {
-    Event.Builder eventBuilder = Event.builder(testEvent());
+    InternalEvent.Builder eventBuilder = InternalEvent.builder(testEvent());
     String flowVars = "vars.myVar";
     assertThat(expressionManager.evaluate(flowVars, eventBuilder.build()).getValue(), nullValue());
     String value = "Leda";
@@ -262,7 +262,9 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     when(mockFactory.create()).thenReturn(expressionLanguage);
 
     expressionManager = new DefaultExpressionManager(mockMuleContext, streamingManager);
-    final Event event = testEvent();
+    final InternalEvent event = testEvent();
+
+    when(streamingManager.manage(cursorProvider, event)).thenReturn(cursorProvider);
 
     expressionManager.evaluate("someExpression", event);
     verify(streamingManager).manage(cursorProvider, event);

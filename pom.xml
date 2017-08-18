@@ -135,13 +135,12 @@
         <activemqVersion>5.11.1</activemqVersion>
         <antVersion>1.9.6</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
-        <asmVersion>3.3.1</asmVersion>
-        <asmCommonsVersion>3.1</asmCommonsVersion>
         <aspectjVersion>1.8.10</aspectjVersion>
         <apacheHttpClientVersion>4.5.2</apacheHttpClientVersion>
         <awaitilityVersion>1.7.0</awaitilityVersion>
         <bouncycastleVersion>1.56</bouncycastleVersion>
         <c3p0Version>0.9.5.2</c3p0Version>
+        <cglibVersion>3.2.5</cglibVersion>
         <cometdVersion>6.1.26</cometdVersion>
         <commonsBeanUtilsVersion>1.9.3</commonsBeanUtilsVersion>
         <commonsExecVersion>1.2</commonsExecVersion>
@@ -156,8 +155,10 @@
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsNetVersion>3.5</commonsNetVersion>
         <commonsPoolVersion>1.6</commonsPoolVersion>
+        <commonsPool2Version>2.4.2</commonsPool2Version>
         <derbyVersion>10.11.1.1</derbyVersion>
         <dom4jVersion>1.6.1</dom4jVersion>
+        <eaioUuidVersion>3.4.0</eaioUuidVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
         <geronimoSpecsJ2eeVersion>2.0.0</geronimoSpecsJ2eeVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
@@ -168,7 +169,6 @@
         <guavaVersion>18.0</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.11</jacksonVersion>
-        <jackson2Version>2.4.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
@@ -187,7 +187,6 @@
         <mockitoVersion>1.10.19</mockitoVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <muleMvelVersion>2.1.9-MULE-012</muleMvelVersion>
-        <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
@@ -211,8 +210,8 @@
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <allureJunitVersion>2.0-BETA15</allureJunitVersion>
-        <allureReportVersion>2.2.1</allureReportVersion>
+        <allureJunitVersion>2.0-BETA16</allureJunitVersion>
+        <allureReportVersion>2.3.1</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
@@ -1105,36 +1104,6 @@
                 <artifactId>jaxen</artifactId>
                 <version>${jaxenVersion}</version>
             </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-jmx</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-impl</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-tools</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>mx4j</groupId>
-                <artifactId>mx4j-remote</artifactId>
-                <version>${mx4jVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>${asmVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm-commons</artifactId>
-                <version>${asmCommonsVersion}</version>
-            </dependency>
 
             <dependency>
                 <groupId>jboss</groupId>
@@ -1648,7 +1617,6 @@
                             <!-- Just propagate this variable due to surefire will not do this when forked vm for tests -->
                             <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
                             <maven.projectVersion>${project.version}</maven.projectVersion>
-                            <allure.profile.is.activated>true</allure.profile.is.activated>
                         </systemPropertyVariables>
                         <systemProperties>
                             <property>

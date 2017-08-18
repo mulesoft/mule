@@ -13,15 +13,24 @@
 
     <property name="aPropertyWithDoc" type="string" doc:description="Documentation for the property"/>
     <property name="aHiddenPropertyWithDoc" type="string" password="true" doc:description="Documentation for the hidden property"/>
+    <property name="aPropertyDisplayModel" type="string" displayName="A pretty name property" summary="a summary tooltip property" example="SOME_PROPERTY_SAMPLE_DATA"/>
+    <property name="aPropertyWithPlacement" type="string" order="42" tab="Not General Property"/>
 
     <operation name="operation-with-doc" doc:description="Documentation for the operation">
         <parameters>
             <parameter name="paramWithDoc" type="string" doc:description="Documentation for the parameter" />
             <parameter name="hiddenParamWithDoc" type="string" password="true" doc:description="Documentation for the hidden parameter" />
+            <parameter name="paramDisplayModel" type="string" displayName="A pretty name parameter" summary="a summary tooltip parameter" example="SOME_PARAMETER_SAMPLE_DATA"/>
+            <parameter name="paramWithPlacement" type="string" order="17" tab="Not General Parameter"/>
         </parameters>
         <body>
             <mule:set-payload value="hardcoded value"/>
         </body>
         <output type="string" doc:description="Documentation for the output"/>
+        <output-attributes type="string" doc:description="Documentation for the output attributes"/>
+        <errors>
+            <error type="CUSTOM_ERROR_HERE"/>
+            <error type="ANOTHER_CUSTOM_ERROR_HERE"/>
+        </errors>
     </operation>
 </module>

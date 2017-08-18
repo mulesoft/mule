@@ -6,17 +6,16 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-
 public interface ServerNotificationHandler {
 
-  void fireNotification(ServerNotification notification);
+  void fireNotification(Notification notification);
 
   boolean isNotificationDynamic();
 
   /**
    * @since 3.0
    */
-  boolean isListenerRegistered(ServerNotificationListener listener);
+  boolean isListenerRegistered(NotificationListener listener);
 
   /**
    * This returns a very "conservative" value - it is true if the notification or any subclass would be accepted. So if it returns
@@ -26,6 +25,6 @@ public interface ServerNotificationHandler {
    * @param notfnClass Either the notification class being generated or some superclass
    * @return false if there is no need to dispatch the notification
    */
-  boolean isNotificationEnabled(Class<? extends ServerNotification> notfnClass);
+  boolean isNotificationEnabled(Class<? extends Notification> notfnClass);
 
 }

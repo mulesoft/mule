@@ -12,10 +12,10 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -66,7 +66,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
   }
 
   @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName, Event event) {
+  public ConfigurationInstance getConfiguration(String configurationProviderName, InternalEvent event) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(event))
         .orElseThrow(() -> new IllegalArgumentException(
                                                         format(
@@ -76,7 +76,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
 
   @Override
   public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                          Event event) {
+                                                          InternalEvent event) {
     Optional<ConfigurationInstance> configuration = childExtensionManager.getConfiguration(extensionModel, componentModel, event);
 
     if (configuration.isPresent()) {

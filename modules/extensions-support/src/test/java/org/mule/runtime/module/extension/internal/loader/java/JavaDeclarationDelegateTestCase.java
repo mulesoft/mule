@@ -27,11 +27,11 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
-import static org.mule.runtime.module.extension.internal.resources.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
@@ -44,7 +44,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -52,9 +51,9 @@ import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
@@ -107,11 +106,9 @@ import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
+
 import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -121,6 +118,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -462,10 +464,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(35));
+    assertThat(extensionDeclaration.getOperations(), hasSize(30));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(9));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(14));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -488,10 +490,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, GET_MEDICAL_HISTORY, "");
     assertOperation(extensionDeclaration, GET_GRAMS_IN_STORAGE, "");
     assertOperation(extensionDeclaration, APPROVE_INVESTMENT, "");
-    assertOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION, "");
-    assertOperation(extensionDeclaration, EMPTY_PAGED_OPERATION, "");
-    assertOperation(extensionDeclaration, FAILING_PAGED_OPERATION, "");
-    assertOperation(extensionDeclaration, CONNECTION_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION, "");
+    assertOperation(withOperationsDeclaration, EMPTY_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, FAILING_PAGED_OPERATION, "");
+    assertOperation(withOperationsDeclaration, CONNECTION_PAGED_OPERATION, "");
     assertOperation(extensionDeclaration, PROCESS_INFO, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON, "");
     assertOperation(extensionDeclaration, PROCESS_WEAPON_LIST, "");
@@ -648,7 +650,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, IGNORED_OPERATION);
     assertThat(operation, is(nullValue()));
 
-    operation = getOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
+    operation = getOperation(withOperationsDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
     assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
     ArrayType outputType = (ArrayType) operation.getOutput().getType();
@@ -742,7 +744,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(source.getOutputAttributes().getType(), equalTo(TYPE_LOADER.load(Object.class)));
 
     ConfigurationDeclaration config = extensionDeclaration.getConfigurations().get(0);
-    assertThat(config.getMessageSources(), hasSize(2));
+    assertThat(config.getMessageSources(), hasSize(3));
     assertHeisenbergSource(config.getMessageSources().get(0), ASYNC_SOURCE_NAME, AsyncHeisenbergSource.class);
     assertHeisenbergSource(config.getMessageSources().get(1), SOURCE_NAME, HeisenbergSource.class);
   }
@@ -781,11 +783,11 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(param.getDefaultValue(), equalTo(defaultValue));
   }
 
-  private void assertConnected(ComponentDeclaration declaration, boolean connected) {
+  private void assertConnected(ExecutableComponentDeclaration declaration, boolean connected) {
     assertThat(declaration.isRequiresConnection(), is(connected));
   }
 
-  private void assertTransactional(ComponentDeclaration declaration, boolean transactional) {
+  private void assertTransactional(ExecutableComponentDeclaration declaration, boolean transactional) {
     assertThat(declaration.isTransactional(), is(transactional));
   }
 

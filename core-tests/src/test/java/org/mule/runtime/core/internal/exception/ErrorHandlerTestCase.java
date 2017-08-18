@@ -7,8 +7,11 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
@@ -24,33 +27,43 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
 @Story(ERROR_HANDLER)
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorHandlerTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Mock
   private MessagingExceptionHandlerAcceptor mockTestExceptionStrategy1;
@@ -59,7 +72,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   private DefaultMessagingExceptionHandlerAcceptor defaultMessagingExceptionHandler =
       spy(new DefaultMessagingExceptionHandlerAcceptor());
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private Event mockMuleEvent;
+  private InternalEvent mockMuleEvent;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
   @Mock
@@ -74,50 +87,55 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockError.getErrorType()).thenReturn(mockErrorType);
     when(mockMuleEvent.getError()).thenReturn(of(mockError));
     mockException = new MessagingException(mockMuleEvent, new Exception());
-    Event handledEvent = testEvent();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(true);
+    InternalEvent handledEvent = testEvent();
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy1.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
-    when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(true);
+    when(mockTestExceptionStrategy2.accept(any(InternalEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy2.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
   }
 
   @Test
   public void nonMatchThenCallDefault() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
-    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(defaultMessagingExceptionHandler);
+    when(mockMuleContext.getDefaultErrorHandler(any())).thenReturn(defaultMessagingExceptionHandler);
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setRootContainerName("root");
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
-    when(mockTestExceptionStrategy2.accept(any(Event.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(false);
+    when(mockTestExceptionStrategy2.accept(any(InternalEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(mockTestExceptionStrategy2, times(0)).apply(any(MessagingException.class));
-    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(Event.class));
+    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(InternalEvent.class));
   }
 
   @Test
   public void secondMatches() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(defaultMessagingExceptionHandler);
+    when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setRootContainerName("root");
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(Event.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(InternalEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(defaultMessagingExceptionHandler, times(0)).apply(any(MessagingException.class));
-    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(Event.class));
+    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(InternalEvent.class));
   }
 
-  @Test(expected = MuleRuntimeException.class)
+  @Test
   public void firstAcceptsAllMatches() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
     errorHandler.setMuleContext(mockMuleContext);
-    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(defaultMessagingExceptionHandler);
+    when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
     when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
+    errorHandler.setRootContainerName("root");
+    expectedException
+        .expectMessage(containsString("Only last exception strategy inside <error-handler> can accept any message."));
     errorHandler.initialise();
   }
 
@@ -125,9 +143,10 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   public void criticalIsNotHandled() throws Exception {
     when(mockErrorType.getParentErrorType()).thenReturn(CRITICAL_ERROR_TYPE);
     ErrorHandler errorHandler = new ErrorHandler();
-    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(defaultMessagingExceptionHandler);
+    when(mockMuleContext.getDefaultErrorHandler(empty())).thenReturn(defaultMessagingExceptionHandler);
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1)));
     errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setRootContainerName("root");
     errorHandler.initialise();
     errorHandler.handleException(mockException, mockMuleEvent);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
@@ -136,16 +155,42 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void defaultErrorHandler() throws InitialisationException {
-    final ErrorHandler defaultHandler = new ErrorHandlerFactory().createDefault();
+    final ErrorHandler defaultHandler = new ErrorHandlerFactory().createDefault(mock(NotificationDispatcher.class));
 
     assertThat(defaultHandler.getExceptionListeners(), hasSize(1));
     assertThat(defaultHandler.getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
   }
 
+  @Test
+  public void ifUserDefaultIsMissingCatchAllThenGetsInjectedOurDefault() throws Exception {
+    ErrorHandler errorHandler = new ErrorHandler();
+    List<MessagingExceptionHandlerAcceptor> handlerList = new LinkedList<>();
+    handlerList.add(mockTestExceptionStrategy1);
+    errorHandler.setExceptionListeners(handlerList);
+    errorHandler.setMuleContext(mockMuleContext);
+    errorHandler.setRootContainerName("root");
+    errorHandler.setName("myDefault");
+
+    when(mockMuleContext.getConfiguration().getDefaultErrorHandlerName()).thenReturn("myDefault");
+    when(mockMuleContext.getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(mock(NotificationDispatcher.class));
+    when(mockMuleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(mock(StreamingManager.class));
+    when(mockMuleContext.getDefaultErrorHandler(of("root"))).thenReturn(errorHandler);
+    errorHandler.initialise();
+
+    assertThat(errorHandler.getExceptionListeners(), hasSize(2));
+    assertThat(errorHandler.getExceptionListeners().get(0), is(mockTestExceptionStrategy1));
+    MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(1);
+    assertThat(injected, is(instanceOf(MessagingExceptionStrategyAcceptorDelegate.class)));
+    MessagingExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
+    assertThat(defaultHandler, is(instanceOf(ErrorHandler.class)));
+    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasSize(1));
+    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
+  }
+
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
 
     @Override
-    public boolean accept(Event event) {
+    public boolean accept(InternalEvent event) {
       return true;
     }
 
@@ -155,7 +200,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public Event handleException(MessagingException exception, Event event) {
+    public InternalEvent handleException(MessagingException exception, InternalEvent event) {
       exception.setHandled(true);
       return event;
     }

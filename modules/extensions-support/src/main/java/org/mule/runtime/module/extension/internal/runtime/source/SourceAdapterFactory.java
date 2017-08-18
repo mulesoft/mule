@@ -8,12 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -33,11 +34,13 @@ public class SourceAdapterFactory {
   private final CursorProviderFactory cursorProviderFactory;
   private final MuleContext muleContext;
 
-  public SourceAdapterFactory(ExtensionModel extensionModel, SourceModel sourceModel,
+  public SourceAdapterFactory(ExtensionModel extensionModel,
+                              SourceModel sourceModel,
                               ResolverSet sourceParameters,
                               ResolverSet successCallbackParameters,
                               ResolverSet errorCallbackParameters,
-                              CursorProviderFactory cursorProviderFactory, MuleContext muleContext) {
+                              CursorProviderFactory cursorProviderFactory,
+                              MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.sourceParameters = sourceParameters;
@@ -55,7 +58,9 @@ public class SourceAdapterFactory {
    * @return a new {@link SourceAdapter}
    */
   public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
-                                     SourceCallbackFactory sourceCallbackFactory) {
+                                     SourceCallbackFactory sourceCallbackFactory,
+                                     ComponentLocation location,
+                                     SourceConnectionManager connectionManager) {
     Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
     try {
       source = new SourceConfigurer(sourceModel, sourceParameters, muleContext).configure(source, configurationInstance);
@@ -66,6 +71,8 @@ public class SourceAdapterFactory {
                                configurationInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,
+                               location,
+                               connectionManager,
                                sourceParameters,
                                successCallbackParameters,
                                errorCallbackParameters);

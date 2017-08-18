@@ -7,14 +7,20 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+
+import java.util.Optional;
 
 /**
  * Helper class in charge of bind the Source connection to the current Transaction, if one is available.
@@ -26,23 +32,29 @@ public class TransactionSourceBinder {
 
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
+  private final MuleContext muleContext;
   private final TransactionBindingDelegate transactionBindingDelegate;
 
-  public TransactionSourceBinder(ExtensionModel extensionModel, ComponentModel componentModel) {
+  public TransactionSourceBinder(ExtensionModel extensionModel, ComponentModel componentModel, MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
+    this.muleContext = muleContext;
+
     transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
   }
 
-  public void bindToTransaction(TransactionConfig transactionConfig,
-                                ConfigurationInstance configurationInstance,
-                                ConnectionHandler connectionHandler)
+  public <T extends TransactionalConnection> Optional<ConnectionHandler<T>> bindToTransaction(TransactionConfig transactionConfig,
+                                                                                              ConfigurationInstance configurationInstance,
+                                                                                              ConnectionHandler connectionHandler)
 
       throws ConnectionException, TransactionException {
 
     if (!transactionConfig.isTransacted()) {
-      return;
+      return empty();
     }
+
+    Transaction tx = transactionConfig.getFactory().beginTransaction(muleContext);
+    tx.setTimeout(transactionConfig.getTimeout());
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)
         .orElseThrow(() -> new IllegalStateException(format(
@@ -51,6 +63,6 @@ public class TransactionSourceBinder {
                                                             extensionModel.getName())));
 
     final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
-    transactionBindingDelegate.getBoundResource(transactionConfig, txKey, () -> connectionHandler);
+    return Optional.of(transactionBindingDelegate.getBoundResource(transactionConfig, txKey, () -> connectionHandler));
   }
 }

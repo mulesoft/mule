@@ -8,31 +8,32 @@ package org.mule.runtime.core.internal.enricher;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.Event.builder;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.reactivestreams.Publisher;
 
 /**
  * The <code>Message Enricher</code> allows the current message to be augmented using data from a seperate resource.
@@ -63,15 +64,15 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
   private Processor enrichmentProcessor;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
-  protected Event enrich(Event currentEvent,
-                         Event enrichmentEvent,
-                         String sourceExpressionArg,
-                         String targetExpressionArg,
-                         ExtendedExpressionManager expressionManager) {
+  protected InternalEvent enrich(InternalEvent currentEvent,
+                                 InternalEvent enrichmentEvent,
+                                 String sourceExpressionArg,
+                                 String targetExpressionArg,
+                                 ExtendedExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
       sourceExpressionArg = "#[mel:payload:]";
     }
@@ -84,17 +85,17 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
-      Event.Builder eventBuilder = builder(currentEvent);
+      InternalEvent.Builder eventBuilder = builder(currentEvent);
       expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, getLocation(), typedValue);
       return eventBuilder.build();
     } else {
       return builder(currentEvent).message(Message.builder(currentEvent.getMessage())
-          .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
+          .value(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher)
         // Use flatMap and child context in order to handle null response and do nothing rather than complete response as empty
         // if enrichment processor drops event due to a filter for example.
@@ -104,7 +105,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
                 .defaultIfEmpty(event));
   }
 
-  protected Event enrich(final Event event, Event eventToEnrich) throws MuleException {
+  protected InternalEvent enrich(final InternalEvent event, InternalEvent eventToEnrich) throws MuleException {
     final ExtendedExpressionManager expressionManager = muleContext.getExpressionManager();
 
     if (event != null) {
@@ -116,9 +117,15 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
     return eventToEnrich;
   }
 
+  @Override
+  public void initialise() throws InitialisationException {
+    enrichmentProcessor = newChain(getProcessingStrategy(muleContext, getRootContainerName()),
+                                   enrichmentProcessor);
+    initialiseIfNeeded(this.enrichmentProcessor, muleContext);
+  }
+
   public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
-    this.enrichmentProcessor = newChain(enrichmentProcessor);
-    setMuleContextIfNeeded(this.enrichmentProcessor, muleContext);
+    this.enrichmentProcessor = enrichmentProcessor;
   }
 
   /**

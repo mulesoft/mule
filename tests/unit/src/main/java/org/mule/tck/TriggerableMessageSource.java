@@ -9,7 +9,7 @@ package org.mule.tck;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -20,11 +20,11 @@ public class TriggerableMessageSource extends AbstractAnnotatedObject implements
 
   protected Processor listener;
 
-  public Event trigger(Event event) throws MuleException {
+  public InternalEvent trigger(InternalEvent event) throws MuleException {
     return listener.process(event);
   }
 
-  public Publisher<Event> triggerAsync(Event event) {
+  public Publisher<InternalEvent> triggerAsync(InternalEvent event) {
     return just(event).transform(listener);
   }
 

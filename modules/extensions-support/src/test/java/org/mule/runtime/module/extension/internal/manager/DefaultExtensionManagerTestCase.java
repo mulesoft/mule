@@ -28,7 +28,6 @@ import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_METADATA_SERVICE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -45,21 +44,20 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -140,14 +138,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private OperationExecutor executor;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   private ClassLoader classLoader;
 
   private final Object configInstance = new Object();
 
   @Before
-  public void before() throws InitialisationException {
+  public void before() throws InitialisationException, RegistrationException {
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     extensionsManager.setMuleContext(muleContext);
     extensionsManager.initialise();
@@ -180,7 +178,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
     mockInterceptors(extension1ConfigurationModel, null);
     when(extension1ConfigurationModel.getOperationModels()).thenReturn(ImmutableList.of(extension1OperationModel));
-    when(extension1ConfigurationModel.getFunctionModels()).thenReturn(emptyList());
     when(extension1ConfigurationModel.getSourceModels()).thenReturn(ImmutableList.of());
     when(extension1ConfigurationModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
     when(connectionProviderModel.getAllParameterModels()).thenReturn(emptyList());
@@ -193,6 +190,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     when(extensionModel1.getOperationModel(EXTENSION1_OPERATION_NAME)).thenReturn(of(extension1OperationModel));
     when(extension1OperationModel.getName()).thenReturn(EXTENSION1_OPERATION_NAME);
     when(extensionModel1.getFunctionModels()).thenReturn(emptyList());
+    when(extensionModel1.getConstructModels()).thenReturn(emptyList());
     when(extension1ConfigurationInstance.getValue()).thenReturn(configInstance);
     when(extension1ConfigurationInstance.getModel()).thenReturn(extension1ConfigurationModel);
     when(extension1ConfigurationInstance.getName()).thenReturn(EXTENSION1_CONFIG_INSTANCE_NAME);
@@ -212,10 +210,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
 
     ConnectionManagerAdapter connectionManagerAdapter = mock(ConnectionManagerAdapter.class);
-    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
         .thenReturn(connectionManagerAdapter);
-    when(muleContext.getRegistry().get(OBJECT_METADATA_SERVICE)).thenReturn(mock(MuleMetadataService.class));
+    when(muleContext.getRegistry().lookupObject(MuleMetadataService.class)).thenReturn(mock(MuleMetadataService.class));
     when(muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).thenReturn(connectionManagerAdapter);
   }
 

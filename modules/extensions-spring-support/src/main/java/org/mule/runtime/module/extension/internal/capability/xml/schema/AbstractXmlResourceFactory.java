@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.util.NullDslResolvingContext;
+import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.util.Optional;
 import java.util.Properties;

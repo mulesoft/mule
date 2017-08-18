@@ -10,8 +10,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -22,17 +20,11 @@ import org.mule.runtime.core.api.source.MessageSource;
  * @since 4.0
  */
 public class SharedSource extends AbstractAnnotatedObject
-    implements MessageSource, Initialisable, MuleContextAware, FlowConstructAware {
+    implements MessageSource, Initialisable, MuleContextAware {
 
-  private FlowConstruct flowConstruct;
   private MuleContext muleContext;
   private SharedConfig config;
   private Processor listener;
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
 
   @Override
   public void setMuleContext(MuleContext context) {

@@ -11,19 +11,16 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingListener;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 
 import java.util.NoSuchElementException;
 
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConnectionManagementStrategy} which returns connections obtained from a {@link #pool}
@@ -32,10 +29,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
-  private static final String NULL_VALIDATION_RESULT_ERROR_MESSAGE =
-      "Error validating connection. ConnectionValidationResult can not be null";
 
   private final PoolingProfile poolingProfile;
   private final ObjectPool<C> pool;
@@ -66,28 +59,13 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   @Override
   public ConnectionHandler<C> getConnectionHandler() throws ConnectionException {
     try {
-      C connection = borrowConnection();
-      ConnectionValidationResult validationResult = connectionProvider.validate(connection);
-
-      if (validationResult == null) {
-        LOGGER.debug(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
-        pool.invalidateObject(connection);
-        throw new ConnectionException(NULL_VALIDATION_RESULT_ERROR_MESSAGE);
-      } else if (!validationResult.isValid()) {
-        pool.invalidateObject(connection);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Error validating connection: {}. Invalidating connection.", validationResult.getMessage());
-        }
-        throw new ConnectionException(validationResult.getMessage(), validationResult.getException());
-      }
-
-      return new PoolingConnectionHandler<>(connection, pool, poolingListener);
+      return new PoolingConnectionHandler<>(borrowConnection(), pool, poolingListener);
     } catch (ConnectionException e) {
       throw e;
     } catch (NoSuchElementException e) {
-      throw new ConnectionException("Connection pool is exhausted");
+      throw new ConnectionException("Connection pool is exhausted", e);
     } catch (Exception e) {
-      throw new ConnectionException("An exception was found trying to obtain a connection", e);
+      throw new ConnectionException("An exception was found trying to obtain a connection: " + e.getMessage(), e);
     }
   }
 

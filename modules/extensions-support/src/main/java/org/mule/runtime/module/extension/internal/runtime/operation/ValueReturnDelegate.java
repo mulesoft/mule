@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -44,8 +44,8 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
    * If the {@code value} is of any other type, then it's set as the payload of the outgoing message {@inheritDoc}
    */
   @Override
-  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return Event.builder(operationContext.getEvent())
+  public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+    return InternalEvent.builder(operationContext.getEvent())
         .message(toMessage(value, operationContext)).build();
   }
 }

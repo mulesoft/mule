@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 
@@ -27,9 +30,9 @@ public class FlowNotificationTextDebugger implements PipelineMessageNotification
 
   @Override
   public void onNotification(PipelineMessageNotification notification) {
-    if (notification.getAction() == PipelineMessageNotification.PROCESS_COMPLETE) {
+    if (notification.getAction().getActionId() == PROCESS_COMPLETE) {
       messageProcessingFlowTraceManager.onPipelineNotificationComplete(notification);
-    } else if (notification.getAction() == PipelineMessageNotification.PROCESS_START) {
+    } else if (notification.getAction().getActionId() == PROCESS_START) {
       messageProcessingFlowTraceManager.onPipelineNotificationStart(notification);
     }
   }

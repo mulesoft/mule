@@ -6,24 +6,28 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+import static org.mule.tck.processor.FlowAssert.addAssertion;
+
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.FlowAssertion;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-public class AssertionMessageProcessor extends AbstractAnnotatedObject implements Processor, Startable {
+public class AssertionMessageProcessor extends AbstractAnnotatedObject implements FlowAssertion, Processor, Startable {
 
   protected String expression = "#[true]";
   protected String message = "?";
@@ -34,8 +38,6 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
   public void setExpression(String expression) {
     this.expression = expression;
   }
-
-  protected int timeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
   private CountDownLatch latch;
 
@@ -50,11 +52,11 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
       throw new InvalidExpressionException(expression, result.errorMessage().orElse("Invalid exception"));
     }
     latch = new CountDownLatch(count);
-    FlowAssert.addAssertion(getLocation().getRootContainerName(), this);
+    addAssertion(getRootContainerName(), this);
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event == null) {
       return null;
     }
@@ -70,19 +72,24 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
    * <li>count was set & count processes were done => ok</li>
    * <li>count was set & count processes were not done => fail</li>
    * <li>count was not set & at least one processing were done => ok</li>
-   * 
+   *
    * @throws InterruptedException
    */
+  @Override
   public void verify() throws InterruptedException {
     if (countFailOrNullEvent()) {
-      fail(failureMessagePrefix() + "No message received or if count attribute was " + "set then it was no matched.");
+      if (needToMatchCount) {
+        fail(format("%sExpected count of %d but got %d.", failureMessagePrefix(), count, invocationCount));
+      } else {
+        fail(format("%sNo event was received.", failureMessagePrefix()));
+      }
     } else if (expressionFailed()) {
       fail(failureMessagePrefix() + "Expression " + expression + " evaluated false.");
     }
   }
 
   protected String failureMessagePrefix() {
-    String processorPath = "?";
+    String processorPath = this.getLocation().getLocation();
     return "Flow assertion '" + message + "' failed @ '" + processorPath + "'. ";
   }
 
@@ -111,14 +118,16 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
   }
 
   /**
-   * The semantics of the count are as follows: - count was set & count processes were done => ok - count was set & count
-   * processes were not done => fail - count was not set & at least one processing were done => ok
+   * The semantics of the count are as follows:
+   * - count was set & count processes were done => ok
+   * - count was set & count processes were not done => fail
+   * - count was not set & at least one processing were done => ok
    * 
    * @return
    * @throws InterruptedException
    */
   synchronized private boolean isProcessesCountCorrect() throws InterruptedException {
-    boolean countReached = latch.await(timeout, TimeUnit.MILLISECONDS);
+    boolean countReached = latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
     if (needToMatchCount) {
       return count == invocationCount;
     } else {

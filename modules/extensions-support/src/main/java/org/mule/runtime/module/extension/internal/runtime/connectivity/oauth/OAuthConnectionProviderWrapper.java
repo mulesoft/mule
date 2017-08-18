@@ -14,9 +14,9 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -48,9 +48,8 @@ public class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionPr
                                         OAuthConfig oauthConfig,
                                         Map<Field, String> callbackValues,
                                         ExtensionsOAuthManager oauthManager,
-                                        boolean disableValidation,
-                                        RetryPolicyTemplate retryPolicyTemplate) {
-    super(delegate, disableValidation, retryPolicyTemplate);
+                                        ReconnectionConfig reconnectionConfig) {
+    super(delegate, reconnectionConfig);
     this.oauthConfig = oauthConfig;
     this.oauthManager = oauthManager;
     authCodeStateSetter = getAuthCodeStateSetter(delegate);

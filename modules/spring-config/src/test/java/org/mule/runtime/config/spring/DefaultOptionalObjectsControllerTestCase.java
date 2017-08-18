@@ -11,6 +11,9 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.config.spring.internal.DefaultOptionalObjectsController;
+import org.mule.runtime.config.spring.internal.OptionalObjectsController;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

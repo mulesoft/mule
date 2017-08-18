@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.processor.chain;
 
+import static java.util.Optional.empty;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,8 +24,9 @@ import reactor.core.publisher.Mono;
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
  */
-public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
+public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
+  @Override
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
     return new SubFlowMessageProcessorChain(name, head, processors, processorForLifecycle);
@@ -32,26 +35,26 @@ public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcesso
   /**
    * Generates message processor identifiers specific for subflows.
    */
-  static class SubFlowMessageProcessorChain extends ExplicitMessageProcessorChain {
+  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
 
     private String subFlowName;
 
     SubFlowMessageProcessorChain(String name, Processor head, List<Processor> processors,
                                  List<Processor> processorsForLifecycle) {
-      super(name, head, processors, processorsForLifecycle);
+      super(name, empty(), head, processors, processorsForLifecycle);
       this.subFlowName = name;
     }
 
-    private Consumer<Event> pushSubFlowFlowStackElement() {
+    private Consumer<InternalEvent> pushSubFlowFlowStackElement() {
       return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
     }
 
-    private Consumer<Event> popSubFlowFlowStackElement() {
+    private Consumer<InternalEvent> popSubFlowFlowStackElement() {
       return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
           .transform(s -> super.apply(s)).doOnTerminate((event1, throwable) -> popSubFlowFlowStackElement().accept(event)));
     }

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.After;
@@ -26,7 +26,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
+    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, getDefaultCursorStreamProviderFactory(), muleContext);
   }
 
   @After
@@ -35,8 +35,8 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   }
 
   @Override
-  protected Message getOutputMessage(Event result) {
-    Message message = (Message) result.getVariable(TARGET).getValue();
+  protected Message getOutputMessage(InternalEvent result) {
+    Message message = (Message) result.getVariables().get(TARGET).getValue();
 
     assertThat(message, is(notNullValue()));
     return message;

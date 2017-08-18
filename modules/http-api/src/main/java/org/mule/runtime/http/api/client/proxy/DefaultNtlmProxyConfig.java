@@ -9,7 +9,7 @@ package org.mule.runtime.http.api.client.proxy;
 /**
  * Basic implementation of a {@link NtlmProxyConfig}. Instances can only be obtained through a {@link NtlmProxyConfigBuilder}.
  */
-class DefaultNtlmProxyConfig extends DefaultProxyConfig implements NtlmProxyConfig {
+class DefaultNtlmProxyConfig extends DefaultProxyConfig implements ProxyConfig.NtlmProxyConfig {
 
   private String ntlmDomain;
 

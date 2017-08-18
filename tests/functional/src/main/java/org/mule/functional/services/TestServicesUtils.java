@@ -7,8 +7,6 @@
 package org.mule.functional.services;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
-import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
-
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -50,7 +48,7 @@ public class TestServicesUtils {
         .compile("mule-module-service-mock-scheduler-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("schedulerService")
-        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.scheduler.MockSchedulerServiceProvider")
+        .withServiceProviderClass("org.mule.service.scheduler.MockSchedulerServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 
@@ -68,7 +66,7 @@ public class TestServicesUtils {
         .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageService")
-        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
+        .withServiceProviderClass("org.mule.service.el.MockExpressionLanguageFactoryServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 
@@ -85,7 +83,7 @@ public class TestServicesUtils {
         .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("http-service")
-        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.http.MockHttpServiceProvider")
+        .withServiceProviderClass("org.mule.service.http.MockHttpServiceProvider")
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();
   }
 }

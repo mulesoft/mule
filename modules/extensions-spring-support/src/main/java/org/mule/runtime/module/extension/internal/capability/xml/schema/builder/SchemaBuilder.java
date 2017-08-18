@@ -10,25 +10,30 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static java.util.Collections.singleton;
+import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.STRING;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.USE_OPTIONAL;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.USE_REQUIRED;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.XML_NAMESPACE;
+import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EE_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TRANSACTION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_OPTIONAL;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_REQUIRED;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -36,6 +41,9 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_NAMESPACE;
+import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
@@ -60,16 +68,18 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
-import org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants;
+import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.config.spring.internal.dsl.SchemaConstants;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.declaration.type.annotation.SubstitutionGroup;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.extension.api.util.ParameterModelComparator;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
-import org.mule.runtime.extension.internal.util.ParameterModelComparator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
@@ -88,18 +98,16 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 /**
  * Builder class to generate a XSD schema that describes a {@link ExtensionModel}
@@ -132,7 +140,6 @@ public final class SchemaBuilder {
 
   public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                         DslResolvingContext dslContext) {
-
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
@@ -215,10 +222,28 @@ public final class SchemaBuilder {
     return this;
   }
 
-  private SchemaBuilder importMuleNamespace() {
+  private Import createMuleImport() {
     Import muleSchemaImport = new Import();
     muleSchemaImport.setNamespace(CORE_NAMESPACE);
     muleSchemaImport.setSchemaLocation(MULE_SCHEMA_LOCATION);
+    return muleSchemaImport;
+  }
+
+  private SchemaBuilder importMuleNamespace() {
+    Import muleSchemaImport = createMuleImport();
+    schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
+    return this;
+  }
+
+  private Import createMuleEEImport() {
+    Import muleSchemaImport = new Import();
+    muleSchemaImport.setNamespace(EE_NAMESPACE);
+    muleSchemaImport.setSchemaLocation(EE_SCHEMA_LOCATION);
+    return muleSchemaImport;
+  }
+
+  private SchemaBuilder importMuleEENamespace() {
+    Import muleSchemaImport = createMuleEEImport();
     schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
     return this;
   }
@@ -230,6 +255,12 @@ public final class SchemaBuilder {
     schema.getIncludeOrImportOrRedefine().add(muleExtensionImport);
 
     return this;
+  }
+
+  private void importIfNotImported(Import newImport) {
+    if (!schema.getIncludeOrImportOrRedefine().contains(newImport)) {
+      schema.getIncludeOrImportOrRedefine().add(newImport);
+    }
   }
 
   private SchemaBuilder importTlsNamespace() {
@@ -372,8 +403,11 @@ public final class SchemaBuilder {
         String typeName = getId(enumType);
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
+        } else if (TransactionType.class.getName().equals(typeName)) {
+          attribute.setType(MULE_TRANSACTION_TYPE);
+          attribute.setDefault(LOCAL.name());
         } else {
-          attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + SchemaConstants.ENUM_TYPE_SUFFIX));
+          attribute.setType(new QName(schema.getTargetNamespace(), sanitizeName(typeName) + ENUM_TYPE_SUFFIX));
           registeredEnums.add(enumType);
         }
       }
@@ -394,23 +428,19 @@ public final class SchemaBuilder {
 
 
   /**
-   * Creates a {@link ExplicitGroup Choice} group that supports {@code refs} to both the {@code global} and {@code local}
-   * abstract elements for the given {@code type}.
-   * This is required in order to allow subtypes that support top-level declaration along with other subtypes that
-   * support only local declarations as childs.
+   * Creates a {@link ExplicitGroup Choice} group that supports {@code refs} to both the {@code global} and {@code local} abstract
+   * elements for the given {@code type}. This is required in order to allow subtypes that support top-level declaration along
+   * with other subtypes that support only local declarations as childs.
    * <p/>
    * For example, a resulting choice group for a type of name {@code TypeName} will look like:
    * <p>
-   * <xs:complexType>
-   * <xs:choice minOccurs="1" maxOccurs="1">
+   * <xs:complexType> <xs:choice minOccurs="1" maxOccurs="1">
    * <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
-   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element>
-   * </xs:choice>
-   * </xs:complexType>
+   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element> </xs:choice> </xs:complexType>
    * <p/>
    *
-   * @param typeDsl   {@link DslElementSyntax} of the referenced type
-   * @param type      the {@link MetadataType type} of the base element that will be referenced
+   * @param typeDsl {@link DslElementSyntax} of the referenced type
+   * @param type the {@link MetadataType type} of the base element that will be referenced
    * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
    * @param maxOccurs the maximum number of occurrences for this group
    * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
@@ -452,9 +482,9 @@ public final class SchemaBuilder {
   }
 
   /**
-   * Creates a {@code ref} to the abstract element of the given {@code type} based on its {@code typeDsl} declaration.
-   * Anywhere this ref element is used, the schema will allow to declare an xml element with a substitution group that matches
-   * the referenced abstract-element
+   * Creates a {@code ref} to the abstract element of the given {@code type} based on its {@code typeDsl} declaration. Anywhere
+   * this ref element is used, the schema will allow to declare an xml element with a substitution group that matches the
+   * referenced abstract-element
    * <p/>
    * For example, if we create this ref element to the type of name {@code TypeName}:
    * <p>
@@ -467,8 +497,8 @@ public final class SchemaBuilder {
    * <p>
    * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
    *
-   * @param typeDsl    {@link DslElementSyntax} of the referenced {@code type}
-   * @param type       {@link MetadataType} of the referenced {@code type}
+   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
+   * @param type {@link MetadataType} of the referenced {@code type}
    * @param isRequired whether or not the element element is required
    * @return the {@link TopLevelElement element} representing the reference
    */
@@ -678,7 +708,7 @@ public final class SchemaBuilder {
   void addInfrastructureParameters(ExtensionType extensionType, ParameterizedModel model, ExplicitGroup sequence) {
     model.getAllParameterModels().stream()
         .filter(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .sorted(Comparator.comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
+        .sorted(comparing(p -> p.getModelProperty(InfrastructureParameterModelProperty.class).get().getSequence()))
         .forEach(parameter -> {
           parameter.getModelProperty(QNameModelProperty.class)
               .map(QNameModelProperty::getValue)
@@ -707,5 +737,31 @@ public final class SchemaBuilder {
 
     complexType.getComplexContent().getExtension().setSequence(groupSequence);
     parentSequence.getParticle().add(objectFactory.createElement(groupElement));
+  }
+
+
+  QName resolveSubstitutionGroup(SubstitutionGroup userConfiguredSubstitutionGroup) {
+    String namespaceUri = getNamespaceUri(userConfiguredSubstitutionGroup.getPrefix());
+    return new QName(namespaceUri, userConfiguredSubstitutionGroup.getElement(), userConfiguredSubstitutionGroup.getPrefix());
+  }
+
+  String getNamespaceUri(String prefix) {
+    if (prefix.equals(CORE_PREFIX)) {
+      importIfNotImported(createMuleImport());
+      return CORE_NAMESPACE;
+    }
+    if (prefix.equals(EE_PREFIX)) {
+      importIfNotImported(createMuleEEImport());
+      return EE_NAMESPACE;
+    }
+    Optional<ExtensionModel> extensionModelFromPrefix = dslContext.getExtensions().stream()
+        .filter((extensionModel) -> prefix.equals(extensionModel.getXmlDslModel().getPrefix())).findFirst();
+    if (extensionModelFromPrefix.isPresent()) {
+      registerExtensionImport(extensionModelFromPrefix.get());
+      return extensionModelFromPrefix.get().getXmlDslModel().getNamespace();
+    }
+    throw new IllegalArgumentException(String
+        .format("prefix: %s inside substitutionGroup does not exist. It does not relate to any imported namespaces",
+                prefix));
   }
 }

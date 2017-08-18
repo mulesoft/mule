@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.time.Time;
 
 import java.util.Optional;
@@ -17,7 +19,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class DefaultExtensionConfig implements ExtensionConfig {
+public final class DefaultExtensionConfig extends AbstractAnnotatedObject implements ExtensionConfig {
 
   private Optional<Time> dynamicConfigExpirationFrequency = empty();
 

@@ -12,18 +12,20 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 public class TransactionalOperations {
 
+  @OutputResolver(output = TransactionalMetadataResolver.class)
   public TestTransactionalConnection getConnection(@Connection TestTransactionalConnection connection) {
     return connection;
   }
@@ -72,7 +74,7 @@ public class TransactionalOperations {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close(TestTransactionalConnection connection) throws MuleException {
 
       }
 

@@ -1,0 +1,336 @@
+{
+  "category": "COMMUNITY",
+  "configurations": [
+    {
+      "connectionProviders": [
+      ],
+      "description": "Default configuration",
+      "externalLibraryModels": [
+      ],
+      "messageSources": [
+      ],
+      "modelProperties": {
+      },
+      "name": "config",
+      "operations": [
+      ],
+      "parameterGroupModels": [
+        {
+          "description": "",
+          "exclusiveParametersModels": [
+          ],
+          "modelProperties": {
+          },
+          "name": "General",
+          "parameters": [
+            {
+              "description": "",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "elementReferences": [
+              ],
+              "expressionSupport": "SUPPORTED",
+              "hasDynamicType": false,
+              "isConfigOverride": false,
+              "layoutModel": {
+                "order": 1,
+                "password": false,
+                "query": false,
+                "text": false
+              },
+              "modelProperties": {
+              },
+              "name": "somePojo",
+              "required": true,
+              "role": "BEHAVIOUR",
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.substitutiongroup.extension.SomePojo"
+              }
+            },
+            {
+              "description": "",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "elementReferences": [
+              ],
+              "expressionSupport": "SUPPORTED",
+              "hasDynamicType": false,
+              "isConfigOverride": false,
+              "layoutModel": {
+                "order": 2,
+                "password": false,
+                "query": false,
+                "text": false
+              },
+              "modelProperties": {
+              },
+              "name": "muleSGPojo",
+              "required": true,
+              "role": "BEHAVIOUR",
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.substitutiongroup.extension.MuleSGPojo"
+              }
+            }
+          ],
+          "showInDsl": false
+        }
+      ]
+    }
+  ],
+  "connectionProviders": [
+  ],
+  "constructs": [
+  ],
+  "description": "",
+  "errors": [
+    {
+      "namespace": "SG",
+      "parent": {
+        "namespace": "MULE",
+        "parent": {
+          "namespace": "MULE",
+          "type": "ANY"
+        },
+        "type": "RETRY_EXHAUSTED"
+      },
+      "type": "RETRY_EXHAUSTED"
+    },
+    {
+      "namespace": "MULE",
+      "parent": {
+        "namespace": "MULE",
+        "type": "ANY"
+      },
+      "type": "CONNECTIVITY"
+    },
+    {
+      "namespace": "MULE",
+      "type": "ANY"
+    },
+    {
+      "namespace": "MULE",
+      "parent": {
+        "namespace": "MULE",
+        "type": "ANY"
+      },
+      "type": "RETRY_EXHAUSTED"
+    },
+    {
+      "namespace": "SG",
+      "parent": {
+        "namespace": "MULE",
+        "parent": {
+          "namespace": "MULE",
+          "type": "ANY"
+        },
+        "type": "CONNECTIVITY"
+      },
+      "type": "CONNECTIVITY"
+    }
+  ],
+  "externalLibraries": [
+  ],
+  "functions": [
+  ],
+  "importedTypes": [
+  ],
+  "messageSources": [
+  ],
+  "minMuleVersion": "4.0.0",
+  "modelProperties": {
+  },
+  "name": "substitutionGroup",
+  "operations": [
+  ],
+  "privilegedArtifacts": [
+  ],
+  "privilegedPackages": [
+  ],
+  "resources": [
+  ],
+  "subTypes": [
+  ],
+  "types": [
+    {
+      "annotations": {
+        "classInformation": {
+          "genericTypes": [
+          ],
+          "hasDefaultConstructor": true,
+          "implementedInterfaces": [
+          ],
+          "isAbstract": false,
+          "isFinal": false,
+          "isInstantiable": true,
+          "isInterface": false,
+          "parent": ""
+        },
+        "typeAlias": {
+          "value": "MuleSGPojo"
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false,
+          "substitutionGroup": {
+            "element": "abstract-shared-extension",
+            "prefix": "mule"
+          }
+        },
+        "typeId": "org.mule.test.substitutiongroup.extension.MuleSGPojo"
+      },
+      "fields": [
+        {
+          "annotations": {
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            },
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            }
+          },
+          "key": {
+            "name": "innerParameter"
+          },
+          "model": {
+            "annotations": {
+              "typeId": "boolean"
+            },
+            "type": "Boolean"
+          }
+        }
+      ],
+      "format": "java",
+      "type": "Object"
+    },
+    {
+      "annotations": {
+        "classInformation": {
+          "genericTypes": [
+          ],
+          "hasDefaultConstructor": true,
+          "implementedInterfaces": [
+          ],
+          "isAbstract": false,
+          "isFinal": false,
+          "isInstantiable": true,
+          "isInterface": false,
+          "parent": ""
+        },
+        "typeAlias": {
+          "value": "SomeExportedPojo"
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true,
+          "dslBaseType": {
+            "element": "org.mule.test.heisenberg.extension.model.Weapon",
+            "prefix": "heisenberg"
+          },
+          "substitutionGroup": {
+            "element": "global-abstract-weapon",
+            "prefix": "heisenberg"
+          }
+        },
+        "typeId": "org.mule.test.substitutiongroup.extension.SomeExportedPojo"
+      },
+      "fields": [
+        {
+          "annotations": {
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            },
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            }
+          },
+          "key": {
+            "name": "attribute"
+          },
+          "model": {
+            "annotations": {
+              "typeId": "boolean"
+            },
+            "type": "Boolean"
+          }
+        }
+      ],
+      "format": "java",
+      "type": "Object"
+    },
+    {
+      "annotations": {
+        "classInformation": {
+          "genericTypes": [
+          ],
+          "hasDefaultConstructor": true,
+          "implementedInterfaces": [
+          ],
+          "isAbstract": false,
+          "isFinal": false,
+          "isInstantiable": true,
+          "isInterface": false,
+          "parent": ""
+        },
+        "typeAlias": {
+          "value": "SomePojo"
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": false,
+          "dslBaseType": {
+            "element": "org.mule.test.heisenberg.extension.model.Weapon",
+            "prefix": "heisenberg"
+          },
+          "substitutionGroup": {
+            "element": "global-abstract-weapon",
+            "prefix": "heisenberg"
+          }
+        },
+        "typeId": "org.mule.test.substitutiongroup.extension.SomePojo"
+      },
+      "fields": [
+        {
+          "annotations": {
+            "default": "false",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            },
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            }
+          },
+          "key": {
+            "name": "attribute"
+          },
+          "model": {
+            "annotations": {
+              "typeId": "boolean"
+            },
+            "type": "Boolean"
+          }
+        }
+      ],
+      "format": "java",
+      "type": "Object"
+    }
+  ],
+  "vendor": "Mulesoft",
+  "version": "4.0.0-SNAPSHOT",
+  "xmlDsl": {
+    "namespace": "http://www.mulesoft.org/schema/mule/sg",
+    "prefix": "sg",
+    "schemaLocation": "http://www.mulesoft.org/schema/mule/sg/current/mule-sg.xsd",
+    "schemaVersion": "4.0.0-SNAPSHOT",
+    "xsdFileName": "mule-sg.xsd"
+  }
+}

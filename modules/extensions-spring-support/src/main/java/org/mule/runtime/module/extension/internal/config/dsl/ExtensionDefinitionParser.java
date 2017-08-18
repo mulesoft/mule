@@ -22,6 +22,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
@@ -821,11 +822,20 @@ public abstract class ExtensionDefinitionParser {
   private AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
                                                               ExpressionSupport expressionSupport, boolean required,
                                                               boolean acceptsReferences, Set<ModelProperty> modelProperties) {
-    AttributeDefinition.Builder definitionBuilder =
-        fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
-                                                      modelProperties, acceptsReferences))
-                                                          .withDefaultValue(defaultValue);
+    AttributeDefinition.Builder definitionBuilder;
 
+    if (acceptsReferences &&
+        expressionSupport == NOT_SUPPORTED &&
+        type instanceof ObjectType) {
+
+      definitionBuilder = fromSimpleReferenceParameter(name);
+    } else {
+      definitionBuilder =
+          fromSimpleParameter(name, value -> resolverOf(name, type, value, defaultValue, expressionSupport, required,
+                                                        modelProperties, acceptsReferences));
+    }
+
+    definitionBuilder.withDefaultValue(defaultValue);
     addParameter(key, definitionBuilder);
 
     return definitionBuilder;

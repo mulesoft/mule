@@ -8,17 +8,16 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.TRANSPORT_PARAM;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -27,7 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProvi
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
+import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.runtime.soap.api.client.SoapClient;
 
 /**
@@ -39,20 +38,14 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
 
   private final DefaultResolverSetBasedObjectBuilder<SoapServiceProvider> objectBuilder;
 
-  /**
-   * Creates a new instances which produces instances based on the given {@code providerModel} and {@code resolverSet}
-   *
-   * @param providerModel     the {@link ConnectionProviderModel} which describes the instances to be produced
-   * @param resolverSet       a {@link ResolverSet} to populate the values
-   * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case of none
-   *                          is provided
-   */
-  public SoapConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
-                                             PoolingProfile poolingProfile, boolean disableValidation,
-                                             RetryPolicyTemplate retryPolicyTemplate, ConnectionManagerAdapter connectionManager,
-                                             ExtensionModel extensionModel, MuleContext muleContext) {
+  public SoapConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
+                                             ResolverSet resolverSet,
+                                             PoolingProfile poolingProfile,
+                                             ReconnectionConfig reconnectionConfig,
+                                             ExtensionModel extensionModel,
+                                             MuleContext muleContext) {
     super(providerModel, getServiceProviderType(providerModel), resolverSet, poolingProfile,
-          disableValidation, retryPolicyTemplate, connectionManager, extensionModel, muleContext);
+          reconnectionConfig, extensionModel, muleContext);
     objectBuilder = new DefaultResolverSetBasedObjectBuilder<>(getServiceProviderType(providerModel), resolverSet);
   }
 
@@ -64,14 +57,14 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
    * @throws MuleException
    */
   @Override
-  public ConnectionProvider build(ResolverSetResult result) throws MuleException {
+  public Pair<ConnectionProvider<SoapClient>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     SoapServiceProvider serviceProvider = objectBuilder.build(result);
     MessageDispatcherProvider<? extends MessageDispatcher> transport = getCustomTransport(result);
     ConnectionProvider<ForwardingSoapClient> provider =
         new ForwardingSoapClientConnectionProvider(serviceProvider, transport, muleContext);
-    provider = new ReconnectableConnectionProviderWrapper<>(provider, disableValidation, retryPolicyTemplate);
-    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, muleContext, extensionModel, retryPolicyTemplate);
-    return provider;
+    provider = new ReconnectableConnectionProviderWrapper<>(provider, reconnectionConfig);
+    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig, muleContext);
+    return new Pair(provider, result);
   }
 
   private MessageDispatcherProvider<MessageDispatcher> getCustomTransport(ResolverSetResult resultSet) {

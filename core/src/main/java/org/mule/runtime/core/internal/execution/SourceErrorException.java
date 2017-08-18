@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 
@@ -25,25 +25,25 @@ public final class SourceErrorException extends MuleRuntimeException {
 
   private static final long serialVersionUID = 160215774280116876L;
 
-  private Event event;
+  private InternalEvent event;
   private ErrorType errorType;
   private MessagingException originalCause;
 
-  public SourceErrorException(Event event, ErrorType errorType, Throwable cause) {
+  public SourceErrorException(InternalEvent event, ErrorType errorType, Throwable cause) {
     super(cause);
     this.event = event;
     this.errorType = errorType;
     this.originalCause = null;
   }
 
-  public SourceErrorException(Event event, ErrorType errorType, Throwable cause, MessagingException originalCause) {
+  public SourceErrorException(InternalEvent event, ErrorType errorType, Throwable cause, MessagingException originalCause) {
     super(cause);
     this.event = event;
     this.errorType = errorType;
     this.originalCause = originalCause;
   }
 
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return event;
   }
 
@@ -56,7 +56,7 @@ public final class SourceErrorException extends MuleRuntimeException {
   }
 
   public MessagingException toMessagingException() {
-    return new MessagingException(Event.builder(getEvent())
+    return new MessagingException(InternalEvent.builder(getEvent())
         .error(ErrorBuilder.builder(getCause())
             .errorType(getErrorType())
             .build())

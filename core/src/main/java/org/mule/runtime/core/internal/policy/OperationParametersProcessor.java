@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.Map;
 
 /**
- * Implementation of this interfaces must provide functions to convert and {@link Event} to the response parameters of the success
+ * Implementation of this interfaces must provide functions to convert and {@link InternalEvent} to the response parameters of the success
  * and failure response functions.
  *
  * @since 4.0

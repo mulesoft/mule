@@ -6,11 +6,11 @@
  */
 package org.mule.test.metadata.extension.model.attribute;
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 
 import java.io.Serializable;
 
-@XmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class AnimalsOutputAttributes implements Serializable, AbstractOutputAttributes {
 
   private String outputId = "AnimalsOutputAttributes";

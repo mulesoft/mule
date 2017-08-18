@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.transformer.TransformerUtils;
+import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -100,7 +100,7 @@ public class DefaultTransformationService implements TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public Message applyTransformers(final Message message, final Event event,
+  public Message applyTransformers(final Message message, final InternalEvent event,
                                    final List<? extends Transformer> transformers)
       throws MuleException {
     return applyAllTransformers(message, event, transformers);
@@ -119,7 +119,7 @@ public class DefaultTransformationService implements TransformationService {
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public Message applyTransformers(final Message message, final Event event, final Transformer... transformers)
+  public Message applyTransformers(final Message message, final InternalEvent event, final Transformer... transformers)
       throws MuleException {
     return applyAllTransformers(message, event, asList(transformers));
   }
@@ -150,7 +150,7 @@ public class DefaultTransformationService implements TransformationService {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
-    return Message.builder(message).payload(getPayload(message, outputDataType, resolveEncoding(message))).build();
+    return Message.builder(message).value(getPayload(message, outputDataType, resolveEncoding(message))).build();
   }
 
   /**
@@ -191,7 +191,7 @@ public class DefaultTransformationService implements TransformationService {
     return "Payload is a stream of type: " + dataType.getType();
   }
 
-  private Message applyAllTransformers(final Message message, final Event event,
+  private Message applyAllTransformers(final Message message, final InternalEvent event,
                                        final List<? extends Transformer> transformers)
       throws MuleException {
     Message result = message;
@@ -260,7 +260,7 @@ public class DefaultTransformationService implements TransformationService {
     return skipConverter;
   }
 
-  private Message transformMessage(final Message message, final Event event, final Transformer transformer)
+  private Message transformMessage(final Message message, final InternalEvent event, final Transformer transformer)
       throws MessageTransformerException, TransformerException {
     Object result;
 
@@ -277,7 +277,7 @@ public class DefaultTransformationService implements TransformationService {
       // a new message instance. This issue goes away once transformers are cleaned up and always return event or
       // message. See MULE-9342
       Message messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
-      return Message.builder(messagePostTransform).payload(result)
+      return Message.builder(messagePostTransform).value(result)
           .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType())).build();
     }
   }

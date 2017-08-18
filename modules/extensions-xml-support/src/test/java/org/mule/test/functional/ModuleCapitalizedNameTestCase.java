@@ -9,7 +9,7 @@ package org.mule.test.functional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.junit.Test;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 public class ModuleCapitalizedNameTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -25,7 +25,7 @@ public class ModuleCapitalizedNameTestCase extends AbstractXmlExtensionMuleArtif
 
   @Test
   public void testSetPayloadHardcoded() throws Exception {
-    final Event muleEvent = flowRunner("testSetPayloadHardcodedFlow").run();
+    final InternalEvent muleEvent = flowRunner("testSetPayloadHardcodedFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 

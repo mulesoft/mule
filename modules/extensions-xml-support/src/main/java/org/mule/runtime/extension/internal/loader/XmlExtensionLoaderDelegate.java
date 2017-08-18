@@ -23,10 +23,10 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_T
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.config.spring.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
-import com.google.common.collect.ImmutableMap;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -41,29 +41,34 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.config.spring.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.OperationComponentModelModelProperty;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
-import org.mule.runtime.config.spring.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.core.component.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.core.component.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.processor.ConfigLine;
+import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.spring.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
+import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URL;
@@ -75,12 +80,16 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
  *
  * @since 4.0
  */
-final class XmlExtensionLoaderDelegate {
+public final class XmlExtensionLoaderDelegate {
 
   private static final String PARAMETER_NAME = "name";
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
@@ -102,8 +111,15 @@ final class XmlExtensionLoaderDelegate {
   private static final String MIN_MULE_VERSION = "minMuleVersion";
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
+  private static final String ORDER_ATTRIBUTE = "order";
+  private static final String TAB_ATTRIBUTE = "tab";
+  private static final String DISPLAY_NAME_ATTRIBUTE = "displayName";
+  private static final String SUMMARY_ATTRIBUTE = "summary";
+  private static final String EXAMPLE_ATTRIBUTE = "example";
+  private static final String ERROR_TYPE_ATTRIBUTE = "type";
   private static final String ROLE = "role";
   private static final String ATTRIBUTE_USE = "use";
+  private static final String NAMESPACE_SEPARATOR = ":";
 
   private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
 
@@ -125,35 +141,45 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private static final ComponentIdentifier OPERATION_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("operation").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("property").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("property").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameters").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("parameter").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("parameter").build();
   private static final ComponentIdentifier OPERATION_BODY_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("body").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("body").build();
   private static final ComponentIdentifier OPERATION_OUTPUT_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName("output").build();
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output").build();
+  private static final ComponentIdentifier OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("output-attributes").build();
+  private static final ComponentIdentifier OPERATION_ERRORS_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("errors").build();
+  private static final ComponentIdentifier OPERATION_ERROR_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("error").build();
   private static final ComponentIdentifier MODULE_IDENTIFIER =
-      ComponentIdentifier.builder().withNamespace(MODULE_NAMESPACE_NAME).withName(MODULE_NAMESPACE_NAME)
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name(MODULE_NAMESPACE_NAME)
           .build();
   public static final String XSD_SUFFIX = ".xsd";
   private static final String XML_SUFFIX = ".xml";
   private static final String TYPES_XML_SUFFIX = "-catalog" + XML_SUFFIX;
 
   private final String modulePath;
-  //TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
+  private final boolean validateXml;
+  // TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
+   * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as
+   *                   the packaging of a connector will previously validate it's XML.
    */
-  public XmlExtensionLoaderDelegate(String modulePath) {
+  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
+    this.validateXml = validateXml;
   }
 
   public void declare(ExtensionLoadingContext context) {
@@ -208,7 +234,7 @@ final class XmlExtensionLoaderDelegate {
       final Element typesDocument = TypesCatalogXmlLoader.parseRootElement(resourceCustomType);
       final Optional<XmlMatcher> match = match(typesDocument, TypesCatalogXmlLoader.ELEM_MULE);
       if (match.isPresent()) {
-        //TODO MULE-13214: then could be removed once MULE-13214 is done
+        // TODO MULE-13214: then could be removed once MULE-13214 is done
         TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
         typesCatalog = of(typesCatalogXmlLoader.load(resourceCustomType));
         typeResolver = getEmptyTypeResolver();
@@ -234,7 +260,8 @@ final class XmlExtensionLoaderDelegate {
   }
 
   private Document getModuleDocument(ExtensionLoadingContext context, URL resource) {
-    XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = schemaValidatingDocumentLoader();
+    XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
+        validateXml ? schemaValidatingDocumentLoader() : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
     try {
       final Set<ExtensionModel> extensions = new HashSet<>(context.getDslResolvingContext().getExtensions());
       return xmlConfigurationDocumentLoader.loadDocument(extensions, resource.getFile(), resource.openStream());
@@ -257,19 +284,20 @@ final class XmlExtensionLoaderDelegate {
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
     final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
+    final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
         .withMinMuleVersion(new MuleVersion(minMuleVersion))
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
-        .withXmlDsl(getXmlDslModel(moduleModel, name, version));
+        .withXmlDsl(xmlDslModel);
     declarer.withModelProperty(new XmlExtensionModelProperty());
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel);
     if (configurationDeclarer.isPresent()) {
-      loadOperationsFrom(configurationDeclarer.get(), moduleModel);
+      loadOperationsFrom(configurationDeclarer.get(), moduleModel, xmlDslModel);
     } else {
-      loadOperationsFrom(declarer, moduleModel);
+      loadOperationsFrom(declarer, moduleModel, xmlDslModel);
     }
   }
 
@@ -306,13 +334,13 @@ final class XmlExtensionLoaderDelegate {
     return empty();
   }
 
-  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel) {
+  private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel, XmlDslModel xmlDslModel) {
     moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
-        .forEach(operationModel -> extractOperationExtension(declarer, operationModel));
+        .forEach(operationModel -> extractOperationExtension(declarer, operationModel, xmlDslModel));
   }
 
-  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel) {
+  private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel, XmlDslModel xmlDslModel) {
     String operationName = assertValidName(operationModel.getNameAttribute());
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
@@ -324,8 +352,12 @@ final class XmlExtensionLoaderDelegate {
     operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
     operationDeclarer.describedAs(getDescription(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
-    extractOutputType(operationDeclarer, operationModel);
+    extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel);
+    extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel);
+    declareErrorModels(operationDeclarer, xmlDslModel, operationName, operationModel);
   }
+
+
 
   // TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
   private String assertValidName(String name) {
@@ -358,15 +390,38 @@ final class XmlExtensionLoaderDelegate {
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
     Map<String, String> parameters = param.getParameters();
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
-    LayoutModel layoutModel = parseBoolean(parameters.get(PASSWORD)) ? builder().asPassword().build()
-        : builder().build();
+    final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
+    if (parseBoolean(parameters.get(PASSWORD))) {
+      layoutModelBuilder.asPassword();
+    }
+    layoutModelBuilder.order(getOrder(parameters.get(ORDER_ATTRIBUTE)));
+    layoutModelBuilder.tabName(getTab(parameters.get(TAB_ATTRIBUTE)));
+
+    final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
+    displayModelBuilder.displayName(parameters.get(DISPLAY_NAME_ATTRIBUTE));
+    displayModelBuilder.summary(parameters.get(SUMMARY_ATTRIBUTE));
+    displayModelBuilder.example(parameters.get(EXAMPLE_ATTRIBUTE));
+
     MetadataType parameterType = extractType(receivedInputType);
 
     ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, parameters);
     parameterDeclarer.describedAs(getDescription(param))
-        .withLayout(layoutModel)
+        .withLayout(layoutModelBuilder.build())
+        .withDisplayModel(displayModelBuilder.build())
         .withRole(role)
         .ofType(parameterType);
+  }
+
+  private String getTab(String tab) {
+    return StringUtils.isBlank(tab) ? Placement.DEFAULT_TAB : tab;
+  }
+
+  private int getOrder(final String order) {
+    try {
+      return Integer.parseInt(order);
+    } catch (NumberFormatException e) {
+      return Placement.DEFAULT_ORDER;
+    }
   }
 
   /**
@@ -401,18 +456,20 @@ final class XmlExtensionLoaderDelegate {
             .defaultingTo(parameterDefaultValue);
   }
 
-  private void extractOutputType(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
-    ComponentModel outputComponentModel = componentModel.getInnerComponents()
+  private void extractOutputType(OutputDeclarer outputDeclarer, ComponentIdentifier componentIdentifier,
+                                 ComponentModel operationModel) {
+    Optional<ComponentModel> outputAttributesComponentModel = operationModel.getInnerComponents()
         .stream()
-        .filter(child -> child.getIdentifier().equals(OPERATION_OUTPUT_IDENTIFIER)).findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Having an operation without <output> is not supported"));
-
-    String receivedOutputType = outputComponentModel.getParameters().get(TYPE_ATTRIBUTE);
-    MetadataType metadataType = extractType(receivedOutputType);
-
-    operationDeclarer.withOutput().describedAs(getDescription(outputComponentModel))
-        .ofType(metadataType);
-    operationDeclarer.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+        .filter(child -> child.getIdentifier().equals(componentIdentifier)).findFirst();
+    //if tye element is absent, it will default to the VOID type
+    if (outputAttributesComponentModel.isPresent()) {
+      String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
+      final MetadataType metadataType = extractType(receivedOutputAttributeType);
+      outputDeclarer.describedAs(getDescription(outputAttributesComponentModel.get()))
+          .ofType(metadataType);
+    } else {
+      outputDeclarer.ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+    }
   }
 
   private MetadataType extractType(String receivedType) {
@@ -420,7 +477,8 @@ final class XmlExtensionLoaderDelegate {
     try {
       metadataType = typeResolver.resolveType(receivedType);
     } catch (TypeResolverException e) {
-      //TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old model
+      // TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old
+      // model
       if (typesCatalog.isPresent()) {
         metadataType = typesCatalog.get().resolveType(receivedType);
       }
@@ -436,5 +494,31 @@ final class XmlExtensionLoaderDelegate {
       throw new IllegalParameterModelDefinitionException(errorMessage);
     }
     return metadataType.get();
+  }
+
+  private void declareErrorModels(OperationDeclarer operationDeclarer, XmlDslModel xmlDslModel, String operationName,
+                                  ComponentModel operationModel) {
+    Optional<ComponentModel> optionalParametersComponentModel = operationModel.getInnerComponents()
+        .stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_ERRORS_IDENTIFIER)).findAny();
+    optionalParametersComponentModel.ifPresent(componentModel -> componentModel.getInnerComponents()
+        .stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
+        .forEach(param -> {
+          final String namespace = xmlDslModel.getPrefix().toUpperCase();
+          final String typeName = param.getParameters().get(ERROR_TYPE_ATTRIBUTE);
+          if (StringUtils.isBlank(typeName)) {
+            throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> with an empty 'type' attribute",
+                                                             operationName));
+          }
+          if (typeName.contains(NAMESPACE_SEPARATOR)) {
+            throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> [%s] that contains a reserved character [%s]",
+                                                             operationName, typeName,
+                                                             NAMESPACE_SEPARATOR));
+          }
+          operationDeclarer.withErrorModel(ErrorModelBuilder.newError(typeName, namespace)
+              .withParent(ErrorModelBuilder.newError(ANY).build())
+              .build());
+        }));
   }
 }

@@ -12,7 +12,7 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
-import org.mule.runtime.module.artifact.classloader.ResourceReleaser;
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

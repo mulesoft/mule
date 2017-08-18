@@ -8,7 +8,7 @@ package org.mule.runtime.deployment.model.api.artifact;
 
 import static java.lang.Thread.currentThread;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 /**
  * Implementation of this interface are responsible of processing the configuration files of a Mule artifact and create an

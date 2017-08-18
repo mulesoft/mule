@@ -24,7 +24,7 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.api.store.PartitionedPersistentObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;

@@ -17,7 +17,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
@@ -91,6 +91,7 @@ public class ExtensionConnectionSupplier {
     final Optional<ConfigurationInstance> configuration = executionContext.getConfiguration();
     Optional<ConnectionProvider> connectionProvider = configuration
         .map(ConfigurationInstance::getConnectionProvider)
+        .filter(Optional::isPresent)
         .map(Optional::get);
 
     if (!connectionProvider.isPresent()) {

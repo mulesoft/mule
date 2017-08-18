@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.internal.routing.EventToMessageSequenceSplittingStrategy;
@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   private EventToMessageSequenceSplittingStrategy strategy =
       new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(mock(ExpressionManager.class)));

@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

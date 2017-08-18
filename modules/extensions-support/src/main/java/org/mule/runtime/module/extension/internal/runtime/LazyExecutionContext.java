@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -79,7 +79,7 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   }
 
   @Override
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return resolvingContext.getEvent();
   }
 

@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
@@ -26,7 +26,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
 import java.util.Optional;
 
@@ -120,7 +119,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       if (requiresConnection) {
         return new ImplicitConnectionProviderValueResolver(name, extensionModel, configurationModel, muleContext);
       }
-      return new StaticConnectionProviderResolver(new StaticValueResolver<>(null));
+      return new StaticConnectionProviderResolver(null, null);
     });
   }
 

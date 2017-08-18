@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -52,7 +52,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
 
-    Event event = eventBuilder().message(of(payload)).build();
+    InternalEvent event = eventBuilder().message(of(payload)).build();
 
     assertMapKey(event, KEY, VALUE);
     payload.remove(KEY);
@@ -63,7 +63,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   public void nullKeyWhichGetsValueLater() throws Exception {
     Map<String, String> payload = new HashMap<>();
 
-    Event event = eventBuilder().message(of(payload)).build();
+    InternalEvent event = eventBuilder().message(of(payload)).build();
 
     assertMapKey(event, KEY, null);
 
@@ -75,13 +75,13 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     assertMapKey(eventBuilder().message(of(payload)).build(), key, expectedValue);
   }
 
-  private void assertMapKey(Event event, String key, Object expectedValue) throws Exception {
+  private void assertMapKey(InternalEvent event, String key, Object expectedValue) throws Exception {
     runExpressionAndExpect(String.format("#[mel:payload.%s]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[mel:payload['%s']]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[mel:payload.'%s']", key), expectedValue, event);
   }
 
-  private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {
+  private void runExpressionAndExpect(String expression, Object expectedValue, InternalEvent event) throws Exception {
     Object result = el.evaluate(expression, event, TEST_CONNECTOR_LOCATION).getValue();
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }

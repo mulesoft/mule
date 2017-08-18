@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
@@ -18,7 +19,8 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
@@ -30,22 +32,22 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.runtime.module.artifact.classloader.ChildFirstLookupStrategy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.util.JarExplorer;
-import org.mule.runtime.module.artifact.util.JarInfo;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
@@ -66,7 +68,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -84,9 +85,10 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderFactory {
 
+  private static final Logger LOGGER = getLogger(IsolatedClassLoaderFactory.class);
+
   private static final String APP_NAME = "app";
 
-  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
 
@@ -95,11 +97,14 @@ public class IsolatedClassLoaderFactory {
    *
    * @param extraBootPackages {@link List} of {@link String}s of extra boot packages to be appended to the container
    *        {@link ClassLoader}
+   * @param extraPrivilegedArtifacts {@link List} of {@link String}s of extra privileged artifacts. Each value needs to have the
+   *        form groupId:versionId.
    * @param artifactsUrlClassification the {@link ArtifactsUrlClassification} that defines the different {@link URL}s for each
    *        {@link ClassLoader}
    * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
    */
   public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
+                                                             Set<String> extraPrivilegedArtifacts,
                                                              ArtifactsUrlClassification artifactsUrlClassification) {
     JarInfo testJarInfo = getTestJarInfo(artifactsUrlClassification);
     Map<String, LookupStrategy> appExportedLookupStrategies = new HashMap<>();
@@ -114,7 +119,9 @@ public class IsolatedClassLoaderFactory {
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
     DefaultModuleRepository moduleRepository =
-        new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader()));
+        new DefaultModuleRepository(new TestContainerModuleDiscoverer(extraPrivilegedArtifacts,
+                                                                      new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class
+                                                                          .getClassLoader())));
 
     try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),
@@ -371,13 +378,19 @@ public class IsolatedClassLoaderFactory {
     ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
 
     return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
-                                       new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.emptySet())) {
+                                       new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
 
       @Override
       public URL findResource(String name) {
         URL url = super.findResource(name);
         if (url == null && getParent() != null) {
           url = getParent().getResource(name);
+          // Filter if it is not a resource from the jre
+          if (url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
+            return url;
+          } else {
+            return null;
+          }
         }
         return url;
       }
@@ -413,7 +426,7 @@ public class IsolatedClassLoaderFactory {
     }).collect(toSet());
     if (!containerProvidedPackages.isEmpty()) {
       exportedPackages.removeAll(containerProvidedPackages);
-      logger
+      LOGGER
           .warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by parent class loader: "
               + containerProvidedPackages);
     }
@@ -422,7 +435,7 @@ public class IsolatedClassLoaderFactory {
         parentExportedPackages.stream().filter(p -> exportedPackages.contains(p)).collect(toSet());
     if (!appProvidedPackages.isEmpty()) {
       exportedPackages.removeAll(appProvidedPackages);
-      logger.warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by the artifact owner: "
+      LOGGER.warn("Exported packages from plugin '" + pluginUrlClassification.getName() + "' are provided by the artifact owner: "
           + appProvidedPackages);
     }
     return exportedPackages;
@@ -471,9 +484,9 @@ public class IsolatedClassLoaderFactory {
    */
   private void logClassLoadingTrace(String message) {
     if (isVerboseClassLoading()) {
-      logger.info(message);
+      LOGGER.info(message);
     } else {
-      logger.debug(message);
+      LOGGER.debug(message);
     }
   }
 

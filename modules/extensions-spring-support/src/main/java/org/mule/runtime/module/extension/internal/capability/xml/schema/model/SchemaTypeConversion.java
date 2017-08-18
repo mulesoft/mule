@@ -7,25 +7,28 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_BOOLEAN;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_DATE_TIME;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_DECIMAL;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_DOUBLE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_INTEGER;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_LIST;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_LONG;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_MAP;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EXPRESSION_STRING;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.STRING;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_DECIMAL;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_INT;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_LONG;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_MAP;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_BOOLEAN;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_DATE_TIME;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_DECIMAL;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_DOUBLE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_INTEGER;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_LIST;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_LONG;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_MAP;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.EXPRESSION_STRING;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.STRING;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_BOOLEAN;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_DATE_TIME;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_DECIMAL;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_INT;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_LONG;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_MAP;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.SUBSTITUTABLE_NAME;
+
+import org.mule.metadata.api.annotation.IntAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -55,15 +58,23 @@ public final class SchemaTypeConversion {
 
       @Override
       public void visitNumber(NumberType numberType) {
-        Class<Number> type = JavaTypeUtils.getType(numberType);
-        if (anyOf(type, Integer.class, int.class)) {
-          qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);
-        } else if (anyOf(type, Double.class, double.class)) {
-          qName.set(dynamic ? EXPRESSION_DOUBLE : SUBSTITUTABLE_DECIMAL);
-        } else if (anyOf(type, Long.class, long.class)) {
-          qName.set(dynamic ? EXPRESSION_LONG : SUBSTITUTABLE_LONG);
+        if (getTypeId(numberType).isPresent()) {
+          Class<Number> type = JavaTypeUtils.getType(numberType);
+          if (anyOf(type, Integer.class, int.class)) {
+            qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);
+          } else if (anyOf(type, Double.class, double.class)) {
+            qName.set(dynamic ? EXPRESSION_DOUBLE : SUBSTITUTABLE_DECIMAL);
+          } else if (anyOf(type, Long.class, long.class)) {
+            qName.set(dynamic ? EXPRESSION_LONG : SUBSTITUTABLE_LONG);
+          } else {
+            qName.set(dynamic ? EXPRESSION_DECIMAL : SUBSTITUTABLE_DECIMAL);
+          }
         } else {
-          qName.set(dynamic ? EXPRESSION_DECIMAL : SUBSTITUTABLE_DECIMAL);
+          if (numberType.getAnnotation(IntAnnotation.class).isPresent()) {
+            qName.set(dynamic ? EXPRESSION_INTEGER : SUBSTITUTABLE_INT);
+          } else {
+            qName.set(dynamic ? EXPRESSION_DECIMAL : SUBSTITUTABLE_DECIMAL);
+          }
         }
       }
 
@@ -114,6 +125,7 @@ public final class SchemaTypeConversion {
 
         return false;
       }
+
     });
 
     return qName.get();

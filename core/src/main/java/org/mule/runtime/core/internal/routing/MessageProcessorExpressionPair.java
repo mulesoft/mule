@@ -9,26 +9,33 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A holder for a pair of MessageProcessor and an expression.
  */
 public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
-    implements FlowConstructAware, MuleContextAware, Lifecycle {
+    implements MuleContextAware, Lifecycle {
+
+  private final static Logger LOGGER = LoggerFactory.getLogger(MessageProcessorExpressionPair.class);
 
   private final String expression;
-  private final MessageProcessorChain messageProcessor;
+  private final Processor messageProcessor;
 
-  public MessageProcessorExpressionPair(String expression, MessageProcessorChain messageProcessor) {
+  public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
     requireNonNull(expression, "expression can't be null");
     requireNonNull(messageProcessor, "messageProcessor can't be null");
     this.expression = expression;
@@ -39,7 +46,7 @@ public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
     return expression;
   }
 
-  public MessageProcessorChain getMessageProcessor() {
+  public Processor getMessageProcessor() {
     return messageProcessor;
   }
 
@@ -52,33 +59,30 @@ public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
   // events to its members, without any control.
 
   @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    messageProcessor.setFlowConstruct(flowConstruct);
-  }
-
-  @Override
   public void setMuleContext(MuleContext context) {
-    messageProcessor.setMuleContext(context);
+    if (messageProcessor instanceof MuleContextAware) {
+      ((MuleContextAware) messageProcessor).setMuleContext(context);
+    }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    messageProcessor.initialise();
+    initialiseIfNeeded(messageProcessor);
   }
 
   @Override
   public void start() throws MuleException {
-    messageProcessor.start();
+    startIfNeeded(messageProcessor);
   }
 
   @Override
   public void stop() throws MuleException {
-    messageProcessor.stop();
+    stopIfNeeded(messageProcessor);
   }
 
   @Override
   public void dispose() {
-    messageProcessor.dispose();
+    disposeIfNeeded(messageProcessor, LOGGER);
   }
 
 }

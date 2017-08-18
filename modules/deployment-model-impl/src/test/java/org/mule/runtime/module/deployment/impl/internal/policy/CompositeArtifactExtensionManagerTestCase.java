@@ -21,10 +21,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -181,7 +181,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
 
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
@@ -203,7 +203,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
 
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
@@ -224,7 +224,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
 
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
@@ -247,7 +247,7 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
 
     CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
                                                                                                childExtensionManager);
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
 
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);

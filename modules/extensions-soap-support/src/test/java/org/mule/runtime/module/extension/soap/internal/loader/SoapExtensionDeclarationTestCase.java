@@ -19,8 +19,9 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
@@ -31,11 +32,9 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_DESC;
 import static org.mule.test.soap.extension.CalcioServiceProvider.CALCIO_ID;
-
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
-import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -44,12 +43,15 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors;
 import org.mule.runtime.soap.api.exception.error.SoapErrors;
 import org.mule.test.soap.extension.FootballSoapExtension;
+
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Test;
 
 public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDeclarationTestCase {
 
@@ -87,16 +89,18 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
   }
 
   private void assertErrorModels(Set<ErrorModel> errors) {
-    assertThat(errors, hasSize(13));
+    assertThat(errors, hasSize(12));
     ImmutableList<String> errorNames = ImmutableList.<String>builder()
         .addAll(of(SoapErrors.values()).map(Object::toString).collect(toList()))
         .addAll(of(ModuleErrors.values()).map(Object::toString).collect(toList()))
+        .add(ANY.name())
         .build();
     errors.forEach(e -> assertThat(e.getType(), isOneOf(errorNames.toArray())));
   }
 
   private void assertOperation(OperationModel operation) {
-    assertThat(operation.getOutput().getType(), is(instanceOf(UnionType.class)));
+    assertThat(operation.getOutput().getType(), is(instanceOf(ObjectType.class)));
+    assertThat(operation.getOutputAttributes().getType(), is(instanceOf(ObjectType.class)));
     assertErrorModels(operation.getErrorModels());
     assertThat(operation.getName(), is(OPERATION_NAME));
     assertThat(operation.getDescription(), is(OPERATION_DESCRIPTION));
@@ -108,8 +112,8 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
         new ParameterProber(TRANSPORT_HEADERS_PARAM, null, ObjectType.class, false),
         new ParameterProber(ATTACHMENTS_PARAM, null, ObjectType.class, false),
     };
-    // the `1` is added because the sdk adds the target parameter automatically
-    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 1));
+    // the `3` is added because the sdk adds the target, targetValue, and retryPolicy parameters automatically
+    assertThat(operation.getAllParameterModels(), hasSize(probers.length + 3));
     assertParameters(operation.getAllParameterModels(), probers);
   }
 }

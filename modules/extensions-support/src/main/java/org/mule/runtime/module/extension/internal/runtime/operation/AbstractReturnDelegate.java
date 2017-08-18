@@ -16,10 +16,11 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
@@ -60,14 +61,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   protected AbstractReturnDelegate(ComponentModel componentModel,
                                    CursorProviderFactory cursorProviderFactory,
                                    MuleContext muleContext) {
-    returnsListOfMessages = returnsListOfMessages(componentModel);
+    returnsListOfMessages = componentModel instanceof HasOutputModel && returnsListOfMessages((HasOutputModel) componentModel);
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
     final MediaType mediaType = resolveMediaType(value, operationContext);
-    final Event event = operationContext.getEvent();
+    final InternalEvent event = operationContext.getEvent();
 
     if (value instanceof Result) {
       return MessageUtils.toMessage((Result) value, mediaType, cursorProviderFactory, event);
@@ -78,7 +79,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
         value = toMessageIterator((Iterator<Result>) value, cursorProviderFactory, event);
       }
       return Message.builder()
-          .payload(streamingContent(value, cursorProviderFactory, event))
+          .value(streamingContent(value, cursorProviderFactory, event))
           .mediaType(mediaType)
           .build();
     }
@@ -92,7 +93,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * @param operationContext
    * @return
    */
-  private MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
+  protected MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
     Charset existingEncoding = getDefaultEncoding(muleContext);
     MediaType mediaType = null;
     if (value instanceof Result) {

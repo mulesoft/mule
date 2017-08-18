@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.Optional;
 

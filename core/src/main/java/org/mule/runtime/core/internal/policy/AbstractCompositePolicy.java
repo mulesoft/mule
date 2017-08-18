@@ -17,7 +17,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -66,7 +66,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
    * execution.
    */
-  public final Publisher<Event> processPolicies(Event operationEvent) {
+  public final Publisher<InternalEvent> processPolicies(InternalEvent operationEvent) {
     return just(operationEvent)
         .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall(), empty()));
   }
@@ -92,7 +92,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<Event> processNextOperation(Event event);
+  protected abstract Publisher<InternalEvent> processNextOperation(InternalEvent event);
 
   /**
    * Template method for executing a policy.
@@ -104,7 +104,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @return the result to use for the next policy in the chain.
    * @throws Exception if the execution of the policy fails.
    */
-  protected abstract Publisher<Event> processPolicy(Policy policy, Processor nextProcessor, Event event);
+  protected abstract Publisher<InternalEvent> processPolicy(Policy policy, Processor nextProcessor, InternalEvent event);
 
   /**
    * Inner class that implements the actually chaining of policies.
@@ -114,12 +114,12 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
     private int index = 0;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       return from(publisher)
           .then(event -> {
             checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");

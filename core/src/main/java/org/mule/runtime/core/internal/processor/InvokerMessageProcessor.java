@@ -23,8 +23,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.TemplateParser;
 import org.mule.runtime.core.api.util.TemplateParser.PatternInfo;
-import org.mule.runtime.core.transformer.TransformerTemplate;
+import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -131,8 +131,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
-    Event resultEvent = event;
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent resultEvent = event;
     Object[] args = evaluateArguments(event, arguments);
 
     if (LOGGER.isDebugEnabled()) {
@@ -150,7 +150,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     return resultEvent;
   }
 
-  protected Object[] evaluateArguments(Event event, List<?> argumentTemplates) throws MessagingException {
+  protected Object[] evaluateArguments(InternalEvent event, List<?> argumentTemplates) throws MessagingException {
     int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
     Object[] args = new Object[argSize];
     try {
@@ -167,7 +167,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
   }
 
   @SuppressWarnings("unchecked")
-  protected Object evaluateExpressionCandidate(Object expressionCandidate, Event event) throws TransformerException {
+  protected Object evaluateExpressionCandidate(Object expressionCandidate, InternalEvent event) throws TransformerException {
     if (expressionCandidate instanceof Collection<?>) {
       Collection<Object> collectionTemplate = (Collection<Object>) expressionCandidate;
       Collection<Object> newCollection = new ArrayList<>();
@@ -240,8 +240,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject implements 
     this.arguments = arguments;
   }
 
-  protected Event createResultEvent(Event event, Object result) throws MuleException {
-    Builder eventBuilder = Event.builder(event);
+  protected InternalEvent createResultEvent(InternalEvent event, Object result) throws MuleException {
+    Builder eventBuilder = InternalEvent.builder(event);
     if (result instanceof Message) {
       eventBuilder.message((Message) result);
     } else if (result != null) {

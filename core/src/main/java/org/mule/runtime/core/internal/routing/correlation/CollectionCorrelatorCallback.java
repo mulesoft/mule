@@ -9,14 +9,14 @@ package org.mule.runtime.core.internal.routing.correlation;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +45,15 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    * 
    * @param events the event group for this request
    * @return an aggregated message
-   * @throws AggregationException if the aggregation fails. in this scenario the whole event group
-   *         is removed and passed to the exception handler for this component
+   * @throws AggregationException if the aggregation fails. in this scenario the whole event group is removed and passed to the
+   *         exception handler for this component
    */
   @Override
-  public Event aggregateEvents(EventGroup events) throws AggregationException {
+  public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
     return events.getMessageCollectionEvent();
   }
 
-  protected MuleSession getMergedSession(Event[] events) {
+  protected MuleSession getMergedSession(InternalEvent[] events) {
     MuleSession session = new DefaultMuleSession(events[0].getSession());
     for (int i = 1; i < events.length; i++) {
       for (String name : events[i].getSession().getPropertyNamesAsSet()) {
@@ -64,12 +64,14 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
   }
 
   /**
-   * Creates a new EventGroup that will expect the number of events as returned by {@link GroupCorrelation#getGroupSize()}.
+   * Creates a new EventGroup that will expect the number of events as returned by {@link org.mule.runtime.core.api.message.GroupCorrelation#getGroupSize()}.
    */
   @Override
-  public EventGroup createEventGroup(Event event, Object groupId) {
+  public EventGroup createEventGroup(InternalEvent event, Object groupId) {
     return new EventGroup(groupId, muleContext,
-                          event.getGroupCorrelation() != null ? event.getGroupCorrelation().getGroupSize() : empty(),
+                          event.getGroupCorrelation().isPresent() ? event.getGroupCorrelation().get().getGroupSize().isPresent()
+                              ? Optional.of(event.getGroupCorrelation().get().getGroupSize().getAsInt())
+                              : empty() : Optional.empty(),
                           storePrefix);
   }
 

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -61,7 +61,7 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       return publisher -> from(publisher).handle((event, sink) -> {
         try {
-          Event result = just(event).transform(processor).block();
+          InternalEvent result = just(event).transform(processor).block();
           if (result != null) {
             sink.next(result);
           }

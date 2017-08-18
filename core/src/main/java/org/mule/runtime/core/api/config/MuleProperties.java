@@ -151,11 +151,8 @@ public class MuleProperties {
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
-  public static final String OBJECT_METADATA_SERVICE = "_muleMetadataService";
-  public static final String OBJECT_VALUE_PROVIDER_SERVICE = "_muleValueProviderService";
   public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";
   public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
-  public static final String OBJECT_CONNECTIVITY_TESTING_SERVICE = "_muleConnectivityTestingService";
   public static final String OBJECT_CONFIGURATION_COMPONENT_LOCATOR = "_muleConfigurationComponentLocator";
   public static final String OBJECT_CONFIGURATION_PROPERTIES = "_muleConfigurationAttributesResolver";
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
@@ -171,6 +168,9 @@ public class MuleProperties {
   public static final String OBJECT_SCHEDULER_POOLS_CONFIG = "_muleSchedulerPoolsConfig";
   public static final String OBJECT_SCHEDULER_BASE_CONFIG = "_muleSchedulerBaseConfig";
   public static final String OBJECT_CLUSTER_SERVICE = "_muleClusterService";
+  public static final String OBJECT_NOTIFICATION_DISPATCHER = "_muleNotificationDispatcher";
+  public static final String OBJECT_NOTIFICATION_LISTENER_REGISTRY = "_muleNotificationListenerRegistry";
+  public static final String OBJECT_TRANSACTION_FACTORY_LOCATOR = "_muleTransactionFactoryLocator";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

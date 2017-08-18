@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.AbstractLifecycleManager;
-import org.mule.runtime.core.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,10 +47,10 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     super(id, object);
     this.muleContext = muleContext;
 
-    registerPhases();
+    registerPhases(object);
   }
 
-  protected void registerPhases() {
+  protected void registerPhases(Registry object) {
     final RegistryLifecycleCallback<Object> callback = new RegistryLifecycleCallback<>(this);
     final LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
 

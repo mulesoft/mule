@@ -9,12 +9,12 @@ package org.mule.runtime.http.api.client.proxy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 /**
- * Builder of {@link NtlmProxyConfig}s. Instances can only be obtained using {@link NtlmProxyConfig#builder()}.
+ * Builder of {@link ProxyConfig.NtlmProxyConfig}s. Instances can only be obtained using {@link ProxyConfig.NtlmProxyConfig#builder()}.
  * At the very least, a host, port, username, password and NTLM domain must be provided.
  *
  * @since 4.0
  */
-public final class NtlmProxyConfigBuilder extends BaseProxyConfigBuilder<NtlmProxyConfig, NtlmProxyConfigBuilder> {
+public final class NtlmProxyConfigBuilder extends BaseProxyConfigBuilder<ProxyConfig.NtlmProxyConfig, NtlmProxyConfigBuilder> {
 
   private String ntlmDomain;
 
@@ -26,7 +26,7 @@ public final class NtlmProxyConfigBuilder extends BaseProxyConfigBuilder<NtlmPro
   }
 
   @Override
-  public NtlmProxyConfig build() {
+  public ProxyConfig.NtlmProxyConfig build() {
     checkArgument(username != null, "A username must be provided for an NTLM proxy.");
     checkArgument(password != null, "A password must be provided for an NTLM proxy.");
     return new DefaultNtlmProxyConfig(host, port, username, password, ntlmDomain);

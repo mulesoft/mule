@@ -10,7 +10,7 @@
 
     <operation name="integer-param-operation">
         <parameters>
-            <parameter name="integerParam" type="integer" defaultValue="11"/>
+            <parameter name="integerParam" type="number" defaultValue="11"/>
         </parameters>
         <body>
             <mule:set-payload value="some value"/>

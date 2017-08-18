@@ -10,26 +10,26 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.getAllStackTraces;
 import static java.util.Collections.sort;
+import static java.util.Optional.empty;
 import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -42,7 +42,13 @@ import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This implementation provides services to test code for
@@ -255,16 +261,16 @@ public abstract class AbstractMuleTestCase {
     }
   }
 
-  private Event _testEvent;
-  private Event _nullPayloadEvent;
+  private InternalEvent _testEvent;
+  private InternalEvent _nullPayloadEvent;
 
   /**
-   * Creates and caches a test {@link Event} instance for the scope of the current test method.
+   * Creates and caches a test {@link InternalEvent} instance for the scope of the current test method.
    *
    * @return test event.
    * @throws MuleException
    */
-  protected Event testEvent() throws MuleException {
+  protected InternalEvent testEvent() throws MuleException {
     if (_testEvent == null) {
       _testEvent = newEvent();
     }
@@ -272,13 +278,13 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Create a new {@link Event} for each invocation. Useful if multiple distinct event instances are needed in a single test
-   * method.
+   * Create a new {@link InternalEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
+   * test method.
    * 
    * @return new test event.
    * @throws MuleException
    */
-  protected Event newEvent() throws MuleException {
+  protected InternalEvent newEvent() throws MuleException {
     return getEventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
@@ -288,11 +294,11 @@ public abstract class AbstractMuleTestCase {
    * @return a event builder to use to build a test event
    * @throws MuleException
    */
-  protected Event.Builder getEventBuilder() throws MuleException {
+  protected InternalEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
-  protected Event nullPayloadEvent() throws MuleException {
+  protected InternalEvent nullPayloadEvent() throws MuleException {
     if (_nullPayloadEvent == null) {
       _nullPayloadEvent = eventBuilder().message(of(null)).build();
     }
@@ -335,6 +341,18 @@ public abstract class AbstractMuleTestCase {
       }
     }
     return false;
+  }
+
+  /**
+   * Utility method to add a mock component location.
+   * 
+   * @param annotatedObject object to add the location.
+   */
+  protected void addMockComponentLocation(AnnotatedObject annotatedObject) {
+    ComponentLocation componentLocation = mock(ComponentLocation.class, RETURNS_DEEP_STUBS);
+    Mockito.when(componentLocation.getLineInFile()).thenReturn(empty());
+    Mockito.when(componentLocation.getFileName()).thenReturn(empty());
+    annotatedObject.setAnnotations(Collections.singletonMap(LOCATION_KEY, componentLocation));
   }
 
   private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);

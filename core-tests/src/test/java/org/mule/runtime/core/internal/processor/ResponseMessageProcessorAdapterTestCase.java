@@ -9,10 +9,10 @@ package org.mule.runtime.core.internal.processor;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Test;
@@ -79,7 +79,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
   private static class ReturnNullMP implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return null;
     }
   }

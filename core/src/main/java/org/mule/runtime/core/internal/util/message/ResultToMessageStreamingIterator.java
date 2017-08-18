@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -25,11 +25,11 @@ final class ResultToMessageStreamingIterator implements StreamingIterator<Messag
 
   private final StreamingIterator<Result> delegate;
   private final CursorProviderFactory cursorProviderFactory;
-  private final Event event;
+  private final InternalEvent event;
 
   ResultToMessageStreamingIterator(StreamingIterator<Result> delegate,
                                    CursorProviderFactory cursorProviderFactory,
-                                   Event event) {
+                                   InternalEvent event) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
     this.event = event;

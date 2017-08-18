@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link ConnectionHandlerAdapter} to be used when a {@link TransactionalConnection} is participating on a transaction.
@@ -21,6 +25,8 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
  * @since 4.0
  */
 public final class TransactionalConnectionHandler<T extends TransactionalConnection> implements ConnectionHandlerAdapter<T> {
+
+  private static final Logger LOGGER = getLogger(TransactionalConnectionHandler.class);
 
   private final ExtensionTransactionalResource<T> resource;
 
@@ -45,9 +51,21 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
   /**
    * Does nothing since the connection shouldn't be released until the transaction is resolved
    */
-  @Override
-  public void release() {
 
+  @Override
+  public void release() {}
+
+  @Override
+  public void invalidate() {
+    try {
+      forceRollback();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn(format("Failed to rollback transaction while invalidating connection %s. %s", e, e.getMessage()), e);
+      }
+    } finally {
+      getConnectionHandler().invalidate();
+    }
   }
 
   /**
@@ -57,19 +75,27 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
    * @throws MuleException if anything goes wrong
    */
   @Override
-  public synchronized void close() throws MuleException {
-    ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
-    checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
+  public void close() throws MuleException {
+    try {
+      forceRollback();
+    } finally {
+      getConnectionHandler().close();
+    }
+  }
 
+  private void forceRollback() throws TransactionException {
     if (!resource.isTransactionResolved()) {
       try {
-        // TODO: MULE-8946 this methods should throw TransactionException
         resource.rollback();
       } catch (Exception e) {
         throw new TransactionException(e);
       }
     }
+  }
 
-    ((ConnectionHandlerAdapter) connectionHandler).close();
+  private ConnectionHandlerAdapter<T> getConnectionHandler() {
+    ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
+    checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
+    return (ConnectionHandlerAdapter<T>) connectionHandler;
   }
 }

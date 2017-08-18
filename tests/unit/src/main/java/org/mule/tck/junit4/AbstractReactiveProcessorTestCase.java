@@ -7,30 +7,38 @@
 package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
-
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.registry.RegistrationException;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or {@link Flow} that
- * implements both {@link Processor#process(Event)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
+ * implements both {@link Processor#process(InternalEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
  * approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
- * {@link #process(Processor, Event)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
+ * {@link #process(Processor, InternalEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleContextTestCase {
@@ -38,6 +46,9 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   protected Scheduler scheduler;
 
   protected Mode mode;
+
+  protected ConfigurationComponentLocator configurationComponentLocator =
+      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS.get());
 
   public AbstractReactiveProcessorTestCase(Mode mode) {
     this.mode = mode;
@@ -55,17 +66,42 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new ConfigurationBuilder() {
+
+      @Override
+      public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {}
+
+      @Override
+      public void configure(MuleContext muleContext) throws ConfigurationException {
+        try {
+          muleContext.getRegistry().registerObject(MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR,
+                                                   configurationComponentLocator);
+        } catch (RegistrationException e) {
+          throw new ConfigurationException(e);
+        }
+      }
+
+      @Override
+      public boolean isConfigured() {
+        return true;
+      }
+    });
+  }
+
+  @Override
   protected void doTearDown() throws Exception {
     scheduler.stop();
     super.doTearDown();
   }
 
   @Override
-  protected Event process(Processor processor, Event event) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event) throws Exception {
     return process(processor, event, true);
   }
 
-  protected Event process(Processor processor, Event event, boolean unwrapMessagingException) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event, boolean unwrapMessagingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
@@ -94,7 +130,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   public enum Mode {
     /**
-     * Test using {@link Processor#process(Event)} blocking API.
+     * Test using {@link Processor#process(InternalEvent)} blocking API.
      */
     BLOCKING,
     /**

@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.privileged.dsl;
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.config.spring.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 
 import java.util.Set;
 

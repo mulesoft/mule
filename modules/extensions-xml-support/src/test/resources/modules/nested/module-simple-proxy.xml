@@ -56,7 +56,6 @@
         <body>
             <simple-prefix:do-nothing/>
         </body>
-        <output type="void"/>
     </operation>
 
     <operation name="set-payload-param-value-appender">

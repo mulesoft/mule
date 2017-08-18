@@ -53,26 +53,27 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
@@ -80,6 +81,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -128,7 +130,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ResolverSetResult parameters;
 
-  protected Event event;
+  protected InternalEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected InternalMessage message;
@@ -171,11 +173,14 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected PolicyManager mockPolicyManager;
 
-  protected OperationMessageProcessor messageProcessor;
+  @Mock
+  private ExecutionContextAdapter<OperationModel> executionContext;
 
+  protected OperationMessageProcessor messageProcessor;
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
   protected String configurationName = CONFIG_NAME;
   protected String target = EMPTY;
+  protected String targetValue = "#[message]";
 
   protected OperationPolicy mockOperationPolicy;
 
@@ -268,6 +273,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
+    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(ReconnectionConfig.getDefault()));
     when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
 
     mockSubTypes(extensionModel);
@@ -283,20 +289,23 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
         mockOperationPolicy = mock(OperationPolicy.class);
         when(mockOperationPolicy.process(any()))
             .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
-                .execute((Map<String, Object>) invocationOnMock.getArguments()[2], (Event) invocationOnMock.getArguments()[1]));
+                .execute((Map<String, Object>) invocationOnMock.getArguments()[2],
+                         (InternalEvent) invocationOnMock.getArguments()[1]));
       }
       return mockOperationPolicy;
     });
 
+    when(executionContext.getRetryPolicyTemplate()).thenReturn(empty());
     when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
-    when(connectionManagerAdapter.getDefaultRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
     messageProcessor = setUpOperationMessageProcessor();
   }
 
-  protected Event configureEvent() throws Exception {
+  protected InternalEvent configureEvent() throws Exception {
     when(message.getPayload())
         .thenReturn(new TypedValue<>(TEST_PAYLOAD,
                                      DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
+    when(message.getAttributes())
+        .thenReturn(new TypedValue<>(null, DataType.builder().fromObject(null).build()));
     return eventBuilder().message(message).build();
   }
 

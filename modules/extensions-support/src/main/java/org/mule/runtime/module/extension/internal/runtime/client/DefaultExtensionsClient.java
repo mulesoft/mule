@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,17 +20,17 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.util.Pair;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.util.TemplateParser;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -40,13 +40,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionVal
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import reactor.core.publisher.Mono;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
+
+import reactor.core.publisher.Mono;
 
 
 /**
@@ -96,7 +96,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
     try {
-      Event process = processor.process(getInitialiserEvent(muleContext));
+      InternalEvent process = processor.process(getInitialiserEvent(muleContext));
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
       disposeProcessor(processor);
@@ -126,7 +126,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     }
   }
 
-  private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, Event event) {
+  private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, InternalEvent event) {
     LinkedHashMap<String, ValueResolver> values = new LinkedHashMap<>();
     parameters.forEach((name, value) -> {
       if (value instanceof ComplexParameter) {

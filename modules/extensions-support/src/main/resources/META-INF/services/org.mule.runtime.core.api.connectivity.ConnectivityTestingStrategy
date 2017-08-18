@@ -1,1 +1,1 @@
-org.mule.runtime.module.extension.internal.tooling.ExtensionConnectivityTestingStrategy
+org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy

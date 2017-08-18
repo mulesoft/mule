@@ -7,15 +7,15 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
-public class MessageProcessorNotification extends EnrichedServerNotification implements SynchronousServerEvent {
+public class MessageProcessorNotification extends EnrichedServerNotification {
 
   private static final long serialVersionUID = 1L;
 
@@ -27,17 +27,18 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     registerAction("message processor post invoke", MESSAGE_PROCESSOR_POST_INVOKE);
   }
 
-  private EventContext eventContext;
+  private InternalEventContext eventContext;
 
   public MessageProcessorNotification(EnrichedNotificationInfo notificationInfo, ComponentLocation componentLocation,
-                                      EventContext eventContext,
+                                      InternalEventContext eventContext,
                                       int action) {
     super(notificationInfo, action, componentLocation != null ? componentLocation.getRootContainerName() : null);
     this.eventContext = eventContext;
   }
 
-  public static MessageProcessorNotification createFrom(Event event, ComponentLocation componentLocation, Processor processor,
-                                                        MessagingException exceptionThrown, int action) {
+  public static MessageProcessorNotification createFrom(InternalEvent event, ComponentLocation componentLocation,
+                                                        AnnotatedObject processor, MessagingException exceptionThrown,
+                                                        int action) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, exceptionThrown, processor);
     return new MessageProcessorNotification(notificationInfo, componentLocation, event.getContext(), action);
   }
@@ -46,7 +47,7 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
     return (Processor) getComponent();
   }
 
-  public EventContext getEventContext() {
+  public InternalEventContext getEventContext() {
     return eventContext;
   }
 
@@ -62,8 +63,8 @@ public class MessageProcessorNotification extends EnrichedServerNotification imp
         + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
   }
 
-  // TODO: MULE-12626: remove when Studio uses interception API
-  public TypedValue evaluateExpression(ExpressionManager expressionManager, String script) {
-    return getInfo().evaluateExpression(expressionManager, script);
+  @Override
+  public boolean isSynchronous() {
+    return true;
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.registry;
 
-import org.mule.runtime.core.registry.TransientRegistry;
+import org.mule.runtime.core.internal.registry.TransientRegistry;
 
 /**
  * The parent interface for all object processors. Object processors can be registered in the Mule registry and fired at the

@@ -12,7 +12,9 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFromHierarchy;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -24,17 +26,18 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 public class RunnerConfiguration {
 
   private static final String PROVIDED_EXCLUSIONS = "providedExclusions";
-  private static final String PROVIDED_INCLUSIONS = "providedInclusions";
   private static final String TEST_EXCLUSIONS = "testExclusions";
   private static final String TEST_INCLUSIONS = "testInclusions";
   private static final String EXPORT_PLUGIN_CLASSES = "exportPluginClasses";
   private static final String SHARED_RUNTIME_LIBS = "sharedRuntimeLibs";
+  private static final String EXTRA_PRIVILEGED_ARTIFACTS = "extraPrivilegedArtifacts";
 
-  private List<String> providedExclusions;
-  private List<String> testExclusions;
-  private List<String> testInclusions;
-  private List<Class> exportPluginClasses;
-  private List<String> sharedRuntimeLibs;
+  private Set<String> providedExclusions;
+  private Set<String> testExclusions;
+  private Set<String> testInclusions;
+  private Set<Class> exportPluginClasses;
+  private Set<String> sharedRuntimeLibs;
+  private Set<String> extraPrivilegedArtifacts;
 
   private String loadedFromTestClass;
 
@@ -42,24 +45,28 @@ public class RunnerConfiguration {
     this.loadedFromTestClass = loadedFromTestClass.getName();
   }
 
-  public List<Class> getExportPluginClasses() {
+  public Set<Class> getExportPluginClasses() {
     return exportPluginClasses;
   }
 
-  public List<String> getProvidedExclusions() {
+  public Set<String> getProvidedExclusions() {
     return providedExclusions;
   }
 
-  public List<String> getSharedRuntimeLibs() {
+  public Set<String> getSharedRuntimeLibs() {
     return sharedRuntimeLibs;
   }
 
-  public List<String> getTestExclusions() {
+  public Set<String> getTestExclusions() {
     return testExclusions;
   }
 
-  public List<String> getTestInclusions() {
+  public Set<String> getTestInclusions() {
     return testInclusions;
+  }
+
+  public Set<String> getExtraPrivilegedArtifacts() {
+    return extraPrivilegedArtifacts;
   }
 
   /**
@@ -72,13 +79,14 @@ public class RunnerConfiguration {
     RunnerConfiguration runnerConfiguration = new RunnerConfiguration(klass);
     Class testClass = klass;
 
-    runnerConfiguration.providedExclusions = readAttribute(PROVIDED_EXCLUSIONS, testClass);
-    runnerConfiguration.testExclusions = readAttribute(TEST_EXCLUSIONS, testClass);
-    runnerConfiguration.testInclusions = readAttribute(TEST_INCLUSIONS, testClass);
+    runnerConfiguration.providedExclusions = new HashSet<>(readAttribute(PROVIDED_EXCLUSIONS, testClass));
+    runnerConfiguration.testExclusions = new HashSet<>(readAttribute(TEST_EXCLUSIONS, testClass));
+    runnerConfiguration.testInclusions = new HashSet<>(readAttribute(TEST_INCLUSIONS, testClass));
 
-    runnerConfiguration.exportPluginClasses = readAttribute(EXPORT_PLUGIN_CLASSES, testClass);
+    runnerConfiguration.exportPluginClasses = new HashSet<>(readAttribute(EXPORT_PLUGIN_CLASSES, testClass));
 
-    runnerConfiguration.sharedRuntimeLibs = readAttribute(SHARED_RUNTIME_LIBS, testClass);
+    runnerConfiguration.sharedRuntimeLibs = new HashSet<>(readAttribute(SHARED_RUNTIME_LIBS, testClass));
+    runnerConfiguration.extraPrivilegedArtifacts = new HashSet<>(readAttribute(EXTRA_PRIVILEGED_ARTIFACTS, testClass));
 
     return runnerConfiguration;
   }

@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -44,8 +44,8 @@ public class ExpressionLanguageComponent extends AbstractAnnotatedObject impleme
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
-    Event.Builder eventBuilder = Event.builder(event);
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
     expressionMgr.evaluate(expression, event, eventBuilder, getLocation());
     return eventBuilder.build();
   }

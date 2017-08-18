@@ -6,51 +6,50 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).
  */
-public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
+public class ListenerSubscriptionPair<N extends Notification> extends AbstractAnnotatedObject {
 
-  private final ServerNotificationListener listener;
-  private final Optional<String> subscription;
+  public final static String ANY_SELECTOR_STRING = "*";
+
+  private final NotificationListener<N> listener;
+  private final Predicate<N> selector;
 
   /**
    * For config - must be constructed using the setters
    */
   public ListenerSubscriptionPair() {
     listener = null;
-    subscription = empty();
+    selector = n -> true;
   }
 
-  public ListenerSubscriptionPair(ServerNotificationListener listener) {
+  public ListenerSubscriptionPair(NotificationListener<N> listener) {
     this.listener = listener;
-    subscription = empty();
+    selector = n -> true;
   }
 
-  public ListenerSubscriptionPair(ServerNotificationListener listener, String subscription) {
+  public ListenerSubscriptionPair(NotificationListener<N> listener, Predicate<N> selector) {
     this.listener = listener;
-    this.subscription = ofNullable(subscription);
+    this.selector = selector;
   }
 
-  public ServerNotificationListener getListener() {
+  public NotificationListener<N> getListener() {
     return listener;
   }
 
-  public Optional<String> getSubscription() {
-    return subscription;
+  public Predicate<N> getSelector() {
+    return selector;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(listener, subscription);
+    return Objects.hash(listener, selector);
   }
 
   @Override
@@ -63,12 +62,12 @@ public class ListenerSubscriptionPair extends AbstractAnnotatedObject {
     }
 
     ListenerSubscriptionPair other = (ListenerSubscriptionPair) obj;
-    return Objects.equals(listener, other.listener) && Objects.equals(subscription, other.subscription);
+    return Objects.equals(listener, other.listener) && Objects.equals(selector, other.selector);
   }
 
   @Override
   public String toString() {
-    return "ListenerSubscriptionPair [listener=" + listener + ", subscription=" + subscription + "]";
+    return "ListenerSubscriptionPair [listener=" + listener + ", selector=" + selector + "]";
   }
 
 }

@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 
-import java.time.Duration;
 import java.util.function.Consumer;
 
 /**
- * Used to dispatch {@link Event}'s asynchronously for processing. The result of asynchronous processing can be obtained by
- * subscribing to the {@link Event}'s {@link EventContext}.
+ * Used to dispatch {@link InternalEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained by
+ * subscribing to the {@link InternalEvent}'s {@link InternalEventContext}.
  * <p/>
  * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
  * handle this, i.e.
@@ -26,15 +25,15 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public interface Sink extends Consumer<Event> {
+public interface Sink extends Consumer<InternalEvent> {
 
   /**
-   * Submit the given {@link Event} for processing without a timeout. If the {@link Event} cannot be processed immediately due to
+   * Submit the given {@link InternalEvent} for processing without a timeout. If the {@link InternalEvent} cannot be processed immediately due to
    * back-pressure then this method will block until in can be processed.
    *
-   * @param event the {@link Event} to dispatch for processing
+   * @param event the {@link InternalEvent} to dispatch for processing
    */
   @Override
-  void accept(Event event);
+  void accept(InternalEvent event);
 
 }

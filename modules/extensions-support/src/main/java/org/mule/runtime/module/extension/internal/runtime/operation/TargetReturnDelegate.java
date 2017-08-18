@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
@@ -26,6 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapte
 final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   private final String target;
+  private final String targetValue;
 
   /**
    * {@inheritDoc}
@@ -33,17 +36,21 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
    * @param target the name of the variable in which the output message will be set
    */
   TargetReturnDelegate(String target,
+                       String targetValue,
                        ComponentModel componentModel,
                        CursorProviderFactory cursorProviderFactory,
                        MuleContext muleContext) {
     super(componentModel, cursorProviderFactory, muleContext);
     this.target = target;
+    this.targetValue = targetValue;
   }
 
   @Override
-  public Event asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return Event.builder(operationContext.getEvent())
-        .addVariable(target, toMessage(value, operationContext))
+  public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+    TypedValue result =
+        operationContext.getMuleContext().getExpressionManager()
+            .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
+    return InternalEvent.builder(operationContext.getEvent()).addVariable(this.target, result.getValue(), result.getDataType())
         .build();
   }
 }

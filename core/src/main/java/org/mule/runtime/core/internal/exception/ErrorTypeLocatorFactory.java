@@ -6,22 +6,23 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CLIENT_SECURITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.DUPLICATE_MESSAGE;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.EXPRESSION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.FATAL;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.NOT_PERMITTED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.OVERLOAD;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.ROUTING;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SERVER_SECURITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.STREAM_MAXIMUM_SIZE_EXCEEDED;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.UNKNOWN;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.VALIDATION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.DUPLICATE_MESSAGE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.NOT_PERMITTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.RETRY_EXHAUSTED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ROUTING;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SERVER_SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.STREAM_MAXIMUM_SIZE_EXCEEDED;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.routing.CompositeRoutingException;
 import org.mule.runtime.core.api.routing.DuplicateMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.ValidationException;
@@ -82,6 +84,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .addExceptionMapping(MuleFatalException.class, errorTypeRepository.getErrorType(FATAL).get())
+            .addExceptionMapping(CompositeRoutingException.class, errorTypeRepository.getErrorType(COMPOSITE_ROUTING).get())
             .build())
         .defaultError(unknown)
         .build();

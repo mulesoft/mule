@@ -22,7 +22,7 @@ import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -50,7 +50,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   private ServerNotificationManager eventNotificationHandler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private Event event;
+  private InternalEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
@@ -123,8 +123,8 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     final ComponentLocation location = mock(ComponentLocation.class);
     when(location.getParts()).thenReturn(Collections.singletonList(flowPart));
     when(location.getComponentIdentifier()).thenReturn(TypedComponentIdentifier.builder()
-        .withType(SOURCE)
-        .withIdentifier(buildFromStringRepresentation("http:listener"))
+        .type(SOURCE)
+        .identifier(buildFromStringRepresentation("http:listener"))
         .build());
     when(messageSource.getLocation()).thenReturn(location);
     final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
@@ -142,11 +142,11 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
 
     ConnectorMessageNotification notification = notificationCaptor.getValue();
     assertThat(notification.getComponent(), is(messageSource));
-    assertThat(notification.getAction(), is(action));
+    assertThat(notification.getAction().getActionId(), is(action));
     assertThat(notification.getComponent().getLocation(), is(location));
   }
 
-  private class TestServerNotification extends ServerNotification {
+  private class TestServerNotification extends AbstractServerNotification {
 
     public TestServerNotification() {
       super("", 0);

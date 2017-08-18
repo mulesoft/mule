@@ -6,26 +6,26 @@
  */
 package org.mule.runtime.core.api.execution;
 
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Map;
 
 /**
  * Provides a callback to add info entries to an exception just before logging/handling it.
- * 
+ *
  * When an exception is thrown in a message processor, implementations of this interface will be called in order to augment the
  * exception message with properties that can be helpful to an application developer troubleshooting that exception.
- * 
+ *
  * @since 3.8.0
  */
 public interface ExceptionContextProvider {
 
   /**
-   * 
+   *
    * @param notificationInfo
    * @return info entries to be added to the logged exception message
    */
-  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Processor lastProcessed);
+  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, AnnotatedObject lastProcessed);
 
 }

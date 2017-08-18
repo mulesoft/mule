@@ -9,6 +9,7 @@ package org.mule.functional.api.component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
@@ -16,14 +17,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.springframework.context.ApplicationContext;
-
-public class LifecycleObject implements Lifecycle {
+public class LifecycleObject extends AbstractAnnotatedObject implements Lifecycle {
 
   @Inject
   private MuleContext muleContext;
-  @Inject
-  private ApplicationContext applicationContext;
   @Inject
   private LifecycleObject otherLifecycleObject;
 
@@ -74,10 +71,6 @@ public class LifecycleObject implements Lifecycle {
 
   public LifecycleObject getOtherLifecycleObject() {
     return otherLifecycleObject;
-  }
-
-  public ApplicationContext getApplicationContext() {
-    return applicationContext;
   }
 
   public MuleContext getMuleContext() {

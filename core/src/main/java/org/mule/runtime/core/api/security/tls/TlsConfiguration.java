@@ -7,15 +7,20 @@
 package org.mule.runtime.core.api.security.tls;
 
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.runtime.api.lifecycle.CreateException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
 import org.mule.runtime.core.api.security.TlsIndirectKeyStore;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.internal.util.SecurityUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,9 +39,6 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Support for configuring TLS/SSL connections.
@@ -102,7 +104,8 @@ import org.slf4j.LoggerFactory;
  * works.
  * </p>
  */
-public final class TlsConfiguration implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore {
+public final class TlsConfiguration extends AbstractAnnotatedObject
+    implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore {
 
   public static final String DEFAULT_KEYSTORE = ".keystore";
   public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();

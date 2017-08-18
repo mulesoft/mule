@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -38,7 +39,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.loader.validator.NameClashModelValidator;
@@ -346,9 +347,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     when(group.getParameterModels()).thenReturn(asList(offending));
 
-    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), null, null,
-                                                       of(sourceCallbackModel), empty(), empty(), false, false, false, null,
-                                                       emptySet(), emptySet(), emptySet());
+    SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), emptyList(), null, null,
+                                                       of(sourceCallbackModel), empty(), empty(), false, false, false,
+                                                       null, emptySet(), emptySet(), emptySet());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }
@@ -494,7 +495,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ExtensionsTestUtils.validate(extensionModel, validator);
   }
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeDsl(allowTopLevelDefinition = true)
   private static class TopLevelTest {
 
     public TopLevelTest() {
@@ -508,7 +509,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeDsl(allowTopLevelDefinition = true)
   private static class TopLevelConfig {
 
     public TopLevelConfig() {
@@ -535,7 +536,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
-  @XmlHints(allowInlineDefinition = false)
   private static class NoChildTest {
 
     private String id;

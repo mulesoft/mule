@@ -30,9 +30,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.spring.dsl.model.ComponentLocationVisitor;
-import org.mule.runtime.config.spring.dsl.model.extension.xml.XmlExtensionModelProperty;
-import org.mule.runtime.config.spring.dsl.spring.ComponentModelHelper;
+import org.mule.runtime.config.spring.internal.dsl.model.ComponentLocationVisitor;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -195,10 +194,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   /**
    * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
-   * the macro expanded code, so that {@link ComponentModelHelper#isProcessor(org.mule.runtime.config.spring.dsl.model.ComponentModel)}
-   * can properly determine it's a processor.
-   * Notice it does not registers sources, neither configurations, parameters, etc. as those will be properly handled by the
-   * {@link ComponentLocationVisitor}.
+   * the macro expanded code, so that
+   * {@link org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper#isProcessor(org.mule.runtime.config.spring.dsl.model.ComponentModel)}
+   * can properly determine it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as
+   * those will be properly handled by the {@link ComponentLocationVisitor}.
    *
    * @param definitionBuilder builder to generate the {@link ComponentBuildingDefinition} from the operation.
    * @param extensionModel to introspect

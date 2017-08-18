@@ -14,7 +14,7 @@ package org.mule.runtime.core.api.context.notification;
  * 
  * @see CustomNotificationListener
  */
-public class CustomNotification extends ServerNotification {
+public class CustomNotification extends AbstractServerNotification {
 
   /**
    * Serial version

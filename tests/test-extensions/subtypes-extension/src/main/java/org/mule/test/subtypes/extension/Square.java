@@ -7,9 +7,9 @@
 package org.mule.test.subtypes.extension;
 
 
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 
-@XmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class Square extends ParentShape {
 
   private Integer side;

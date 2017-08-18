@@ -10,22 +10,22 @@ package org.mule.functional.junit4;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.hamcrest.object.IsCompatibleType.typeCompatibleWith;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.classloader.net.MuleArtifactUrlStreamHandler;
-import org.mule.runtime.module.artifact.classloader.net.MuleUrlStreamHandlerFactory;
-import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
+import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.MuleServiceManager;
 import org.mule.runtime.module.service.ReflectionServiceProviderResolutionHelper;
@@ -175,8 +175,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
     ConfigurationBuilder builder = super.getBuilder();
-    assertThat(builder.getClass(), typeCompatibleWith(SpringXmlConfigurationBuilder.class));
-    configureSpringXmlConfigurationBuilder((SpringXmlConfigurationBuilder) builder);
+    assertThat(builder.getClass().getName(), is("org.mule.runtime.config.spring.internal.SpringXmlConfigurationBuilder"));
+    configureSpringXmlConfigurationBuilder(builder);
     return builder;
   }
 
@@ -194,7 +194,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return service.isPresent() ? (T) service.get() : null;
   }
 
-  protected void configureSpringXmlConfigurationBuilder(SpringXmlConfigurationBuilder builder) {
+  protected void configureSpringXmlConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
   }
 

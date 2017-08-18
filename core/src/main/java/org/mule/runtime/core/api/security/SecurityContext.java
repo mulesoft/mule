@@ -13,17 +13,18 @@ import java.io.Serializable;
 /**
  * {@code SecurityContext} holds security information and is associated with the MuleSession.
  * 
- * @since 4.0
+ * @since 1.0
  */
 public interface SecurityContext extends Serializable {
+
+  /**
+   * @return the current {@link Authentication} in the context
+   */
+  Authentication getAuthentication();
 
   /**
    * @param authentication the {@link Authentication} to set in the current context
    */
   void setAuthentication(Authentication authentication);
 
-  /**
-   * @return the current {@link Authentication} in the context
-   */
-  Authentication getAuthentication();
 }

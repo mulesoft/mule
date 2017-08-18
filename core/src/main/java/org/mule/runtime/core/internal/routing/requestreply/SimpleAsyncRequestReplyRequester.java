@@ -14,12 +14,10 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.processor.Processor;
@@ -33,8 +31,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected Processor requestMessageProcessor;
 
   @Override
-  protected void sendAsyncRequest(Event event) throws MuleException {
-    event = Event.builder(event)
+  protected void sendAsyncRequest(InternalEvent event) throws MuleException {
+    event = InternalEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
             .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getRootContainerName())
             .build())
@@ -60,9 +58,6 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   @Override
   public void start() throws MuleException {
     if (replyMessageSource != null) {
-      if (replyMessageSource instanceof FlowConstructAware) {
-        ((FlowConstructAware) replyMessageSource).setFlowConstruct(this.flowConstruct);
-      }
       if (replyMessageSource instanceof Initialisable) {
         ((Initialisable) replyMessageSource).initialise();
       }
@@ -71,9 +66,6 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
       }
     }
     if (requestMessageProcessor != null) {
-      if (requestMessageProcessor instanceof FlowConstructAware) {
-        ((FlowConstructAware) requestMessageProcessor).setFlowConstruct(this.flowConstruct);
-      }
       if (requestMessageProcessor instanceof Initialisable) {
         ((Initialisable) requestMessageProcessor).initialise();
       }
@@ -114,12 +106,18 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
   public static class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
+    private final MessageSource source;
+
+    public AsyncReplyToPropertyRequestReplyReplier(MessageSource source) {
+      this.source = source;
+    }
+
     @Override
-    protected boolean shouldProcessEvent(Event event) {
+    protected boolean shouldProcessEvent(InternalEvent event) {
       // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
       MessageExchangePattern mep = REQUEST_RESPONSE;
-      if (flowConstruct instanceof Pipeline && ((Pipeline) flowConstruct).getSource() instanceof LegacyImmutableEndpoint) {
-        mep = ((LegacyImmutableEndpoint) ((Pipeline) flowConstruct).getSource()).getExchangePattern();
+      if (source instanceof LegacyImmutableEndpoint) {
+        mep = ((LegacyImmutableEndpoint) source).getExchangePattern();
       }
       return !mep.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
     }

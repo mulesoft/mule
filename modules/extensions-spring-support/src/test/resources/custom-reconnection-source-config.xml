@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+                          http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenberg"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="0"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER"
+                       enemies="#[mel:[]]">
+        <heisenberg:monthly-incomes>
+            <heisenberg:monthly-income value="12000"/>
+            <heisenberg:monthly-income value="500"/>
+        </heisenberg:monthly-incomes>
+        <heisenberg:known-addresses>
+            <heisenberg:known-address value="one address"/>
+        </heisenberg:known-addresses>
+    </heisenberg:config>
+
+    <flow name="successfulCustomReconnection" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:reconnectable-listen-payments config-ref="heisenberg" initialBatchNumber="-1" reconnectable="true">
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:reconnectable-listen-payments>
+
+        <set-payload value="100"/>
+    </flow>
+
+    <flow name="failingCustomReconnection" initialState="stopped">
+        <!--invalid initialBatchNumber with negative value -->
+        <heisenberg:reconnectable-listen-payments config-ref="heisenberg" initialBatchNumber="-1" reconnectable="false">
+            <heisenberg:success-info knownAddresses="#[[]]"/>
+            <heisenberg:error-info knownAddresses="#[[]]"/>
+        </heisenberg:reconnectable-listen-payments>
+
+        <set-payload value="100"/>
+    </flow>
+
+</mule>

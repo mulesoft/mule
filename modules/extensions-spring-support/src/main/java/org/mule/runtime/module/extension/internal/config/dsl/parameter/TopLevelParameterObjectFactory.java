@@ -12,14 +12,16 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -33,7 +35,7 @@ import org.slf4j.Logger;
  * placed in the mule registry.
  * <p>
  * The objects are parsed as a {@link ValueResolver}. If that resolver is not static, then a value is obtained using a default
- * {@link Event} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
+ * {@link InternalEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
  *
  * @since 4.0
  */
@@ -43,7 +45,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   private static final Logger LOGGER = getLogger(TopLevelParameterObjectFactory.class);
 
   private DefaultObjectBuilder builder;
-  private Class<Object> objectClass;
+  private Class<?> objectClass;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private String name;
@@ -53,10 +55,13 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     super(muleContext);
     this.classLoader = classLoader;
     this.objectType = type;
-    withContextClassLoader(classLoader, () -> {
-      objectClass = getType(type);
-      builder = new DefaultObjectBuilder(objectClass);
+
+    objectClass = withContextClassLoader(classLoader, () -> {
+      // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
+      // with the annotations stuff.
+      return addAnnotationsToClass(getType(type));
     });
+    builder = new DefaultObjectBuilder(objectClass);
   }
 
   @Override

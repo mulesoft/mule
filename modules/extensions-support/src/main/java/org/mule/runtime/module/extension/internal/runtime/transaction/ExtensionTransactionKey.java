@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 /**
  * The key used to bind a {@link ExtensionTransactionalResource} into a {@link Transaction}. Although logically speaking it is the

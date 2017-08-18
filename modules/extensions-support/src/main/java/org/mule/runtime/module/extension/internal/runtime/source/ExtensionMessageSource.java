@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.create;
+import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,8 +30,9 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.tx.TransactionType;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
@@ -43,8 +47,9 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
@@ -52,18 +57,14 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHan
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -71,8 +72,8 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource, ExceptionCallback,
-    ParameterizedSource {
+public class ExtensionMessageSource extends ExtensionComponent<SourceModel> implements MessageSource,
+    ExceptionCallback<ConnectionException>, ParameterizedSource, ConfiguredComponent {
 
   private static final Logger LOGGER = getLogger(ExtensionMessageSource.class);
 
@@ -86,7 +87,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final SourceAdapterFactory sourceAdapterFactory;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final ExceptionHandlerManager exceptionEnricherManager;
+  private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+
+  private final ExtensionTransactionFactory transactionFactory = new ExtensionTransactionFactory();
+
+  private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
+  private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
 
   private SourceAdapter sourceAdapter;
   private Scheduler retryScheduler;
@@ -111,16 +118,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private synchronized void createSource() throws Exception {
     if (sourceAdapter == null) {
       sourceAdapter =
-          sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)), createSourceCallbackFactory());
+          sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
+                                             createSourceCallbackFactory(),
+                                             getLocation(),
+                                             sourceConnectionManager);
       muleContext.getInjector().inject(sourceAdapter);
-      sourceAdapter.setFlowConstruct(flowConstruct);
-      sourceAdapter.setComponentLocation(getLocation());
     }
   }
 
   private void startSource() throws MuleException {
     try {
-      retryPolicyTemplate.execute(new SourceRetryCallback(), retryScheduler);
+      retryPolicyTemplate.execute(new StartSourceCallback(), retryScheduler);
     } catch (Throwable e) {
       if (e instanceof MuleException) {
         throw (MuleException) e;
@@ -135,27 +143,29 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       try {
         sourceAdapter.stop();
       } catch (Exception e) {
-        throw new DefaultMuleException(format("Found exception stopping source '%s' of flow '%s'", sourceAdapter.getName(),
-                                              flowConstruct.getName()),
+        throw new DefaultMuleException(format("Found exception stopping source '%s' of root component '%s'",
+                                              sourceAdapter.getName(),
+                                              getLocation().getRootContainerName()),
                                        e);
       }
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Optional<ConfigurationInstance> getConfigurationInstance() {
     return sourceAdapter.getConfigurationInstance();
-  }
-
-  public Optional<ConnectionHandler> getConnectionHandler() {
-    return sourceAdapter.getConnectionHandler();
   }
 
   private SourceCallbackFactory createSourceCallbackFactory() {
     return completionHandlerFactory -> DefaultSourceCallback.builder()
         .setExceptionCallback(this)
         .setSourceModel(sourceModel)
+        .setConfigurationInstance(getConfigurationInstance().orElse(null))
+        .setTransactionConfig(transactionConfig.get())
         .setSource(this)
-        .setFlowConstruct(flowConstruct)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setMuleContext(muleContext)
@@ -166,26 +176,54 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   @Override
-  public void onException(Throwable exception) {
-    exception = exceptionEnricherManager.process(exception);
-    Optional<ConnectionException> connectionException = extractConnectionException(exception);
-    if (connectionException.isPresent()) {
-      try {
-        LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Restarting...", sourceAdapter.getName(),
-                           flowConstruct.getName()),
-                    exception);
-        restart();
-      } catch (Throwable e) {
-        notifyExceptionAndShutDown(e);
+  public void onException(ConnectionException exception) {
+    if (!reconnecting.compareAndSet(false, true)) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug(format("Message source '%s' on root component '%s' threw a '%s' but a reconnection is already in progress. "
+                + "Exception was: %s"
+                + "No action will be taken since this is most likely a bug in the Source",
+                          sourceAdapter.getName(),
+                          getLocation().getRootContainerName(),
+                          ConnectionException.class.getSimpleName(),
+                          exception.getMessage()),
+                   exception);
+        return;
       }
-    } else {
-      notifyExceptionAndShutDown(exception);
+    }
+
+    LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
+                       sourceAdapter.getName(), getLocation().getRootContainerName()),
+                exception);
+
+    Mono<Void> reconnectionAction = sourceAdapter.getReconnectionAction(exception)
+        .map(p -> from(retryPolicyTemplate.applyPolicy(p)))
+        .orElseGet(() -> create(sink -> {
+          try {
+            restart();
+            sink.success();
+          } catch (Exception e) {
+            sink.error(e);
+          }
+        }));
+
+    reconnectionAction
+        .doOnSuccess(v -> onReconnectionSuccessful())
+        .doOnError(this::onReconnectionFailed)
+        .doAfterTerminate((v, e) -> reconnecting.set(false))
+        .subscribe();
+  }
+
+  private void onReconnectionSuccessful() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.warn("Message source '{}' on root component '{}' successfully reconnected",
+                  sourceAdapter.getName(), getLocation().getRootContainerName());
     }
   }
 
-  private void notifyExceptionAndShutDown(Throwable exception) {
-    LOGGER.error(format("Message source on flow '%s' threw exception. Shutting down it forever...",
-                        flowConstruct.getName()),
+  private void onReconnectionFailed(Throwable exception) {
+    LOGGER.error(format("Message source '%s' on root component '%s' could not be reconnected. Will be shutdown. %s",
+                        sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
                  exception);
     shutdown();
   }
@@ -197,14 +235,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         disposeSource();
         startSource();
       } else {
-        LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", sourceAdapter.getName(),
-                           flowConstruct.getName()));
+        LOGGER.warn(format("Message source '%s' on root component '%s' is stopped. Not doing restart", sourceAdapter.getName(),
+                           getLocation().getRootContainerName()));
       }
     }
   }
 
   @Override
   public void doStart() throws MuleException {
+    startIfNeeded(retryPolicyTemplate);
+
     if (retryScheduler == null) {
       retryScheduler = schedulerService.ioScheduler();
     }
@@ -221,6 +261,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   public void doStop() throws MuleException {
     synchronized (started) {
+      stopIfNeeded(retryPolicyTemplate);
       started.set(false);
       try {
         stopSource();
@@ -232,6 +273,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public void doDispose() {
+    disposeIfNeeded(retryPolicyTemplate, LOGGER);
     disposeSource();
   }
 
@@ -239,7 +281,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     try {
       stopIfNeeded(this);
     } catch (Exception e) {
-      LOGGER.error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), flowConstruct.getName()), e);
+      LOGGER
+          .error(format("Failed to stop source '%s' on flow '%s'", sourceAdapter.getName(), getLocation().getRootContainerName()),
+                 e);
     }
     disposeIfNeeded(this, LOGGER);
   }
@@ -266,11 +310,25 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     sourceAdapter = null;
   }
 
+  private TransactionConfig buildTransactionConfig() {
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+    transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
+    transactionConfig.setMuleContext(muleContext);
+    TransactionType transactionalType = sourceAdapter.getTransactionalType();
+    transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
+        .orElseThrow(() -> new IllegalStateException(format("Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
+                                                            transactionalType))));
+
+    return transactionConfig;
+  }
+
+  SourceConnectionManager getSourceConnectionManager() {
+    return sourceConnectionManager;
+  }
+
   private MessageProcessContext createProcessingContext() {
 
     return new MessageProcessContext() {
-
-      private final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
       @Override
       public boolean supportsAsynchronousProcessing() {
@@ -283,34 +341,18 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       @Override
-      public FlowConstruct getFlowConstruct() {
-        return flowConstruct;
-      }
-
-      @Override
       public Scheduler getFlowExecutionExecutor() {
         return flowTriggerScheduler;
       }
 
       @Override
       public Optional<TransactionConfig> getTransactionConfig() {
-        return sourceModel.isTransactional() ? of(buildTransactionConfig()) : empty();
+        return sourceModel.isTransactional() ? of(transactionConfig.get()) : empty();
       }
 
       @Override
       public ClassLoader getExecutionClassLoader() {
         return muleContext.getExecutionClassLoader();
-      }
-
-      private TransactionConfig buildTransactionConfig() {
-        MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-        transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
-        transactionConfig.setMuleContext(muleContext);
-
-        // TODO - MULE-12066 : Support XA transactions in SDK extensions at source level
-        transactionConfig.setFactory(TRANSACTION_FACTORY);
-
-        return transactionConfig;
       }
 
       @Override
@@ -320,7 +362,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     };
   }
 
-  private class SourceRetryCallback implements RetryCallback {
+  private class StartSourceCallback implements RetryCallback {
 
     @Override
     public void doWork(RetryContext context) throws Exception {
@@ -366,9 +408,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
         && !configurationProvider.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {
       throw new IllegalSourceException(format(
-                                              "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                              "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
                                                   + "The selected config does not support that operation.",
-                                              flowConstruct.getName(), sourceModel.getName(),
+                                              getLocation().getRootContainerName(), sourceModel.getName(),
                                               configurationProvider.getName()));
     }
   }
@@ -380,6 +422,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
+    initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+    sourceConnectionManager = new SourceConnectionManager(connectionManager);
     try {
       createSource();
     } catch (Exception e) {
@@ -389,19 +433,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   public Map<String, Object> getInitialisationParameters() {
-    final ValueResolvingContext ctx = from(MuleExtensionUtils.getInitialiserEvent());
-    Map<String, ValueResolver<?>> resolvers = sourceAdapterFactory.getSourceParameters().getResolvers();
-    return resolvers.entrySet().stream()
-        .collect(toImmutableMap(entry -> entry.getKey(), entry -> {
-          try {
-            return entry.getValue().resolve(ctx);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(createStaticMessage(format(
-                                                                      "Could not resolve parameter '%s' for message source at location '%s'",
-                                                                      entry.getKey()),
-                                                               getLocation().toString()),
-                                           e);
-          }
-        }));
+    try {
+      return copyOf(toMap(sourceAdapterFactory.getSourceParameters(), getInitialiserEvent()));
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Could not resolve parameters message source at location '%s'",
+                                                                getLocation().toString()),
+                                                         e));
+    }
   }
 }

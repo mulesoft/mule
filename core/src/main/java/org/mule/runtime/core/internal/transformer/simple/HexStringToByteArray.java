@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 

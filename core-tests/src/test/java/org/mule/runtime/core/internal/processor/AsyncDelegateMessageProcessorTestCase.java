@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
-import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,14 +18,13 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -82,9 +81,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void process() throws Exception {
-    Event request = testEvent();
+    InternalEvent request = testEvent();
 
-    Event result = process(messageProcessor, request);
+    InternalEvent result = process(messageProcessor, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
     request.getContext().success(result);
@@ -116,8 +115,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      Event request = testEvent();
-      Event result = process(messageProcessor, request);
+      InternalEvent request = testEvent();
+      InternalEvent result = process(messageProcessor, request);
 
       // Wait until processor in async is executed to allow assertions on sensed event
       asyncEntryLatch.countDown();
@@ -136,7 +135,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     flow = builder("flow", muleContext).processingStrategyFactory(new BlockingProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
-    messageProcessor.setFlowConstruct(flow);
 
     process();
   }
@@ -147,12 +145,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     flow = builder("flow", muleContext).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
     flow.initialise();
     flow.start();
-    messageProcessor.setFlowConstruct(flow);
 
     process();
   }
 
-  private void assertTargetEvent(Event request) {
+  private void assertTargetEvent(InternalEvent request) {
     // Assert that event is processed in async thread
     assertNotNull(target.sensedEvent);
     assertThat(request, not(sameInstance(target.sensedEvent)));
@@ -161,7 +158,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.thread, not(sameInstance(currentThread())));
   }
 
-  private void assertResponse(Event result) throws MuleException {
+  private void assertResponse(InternalEvent result) throws MuleException {
     // Assert that response is echoed by async and no exception is thrown in flow
     assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
@@ -169,28 +166,28 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   private AsyncDelegateMessageProcessor createAsyncDelegateMessageProcessor(Processor listener, FlowConstruct flowConstruct)
       throws Exception {
-    AsyncDelegateMessageProcessor mp = new AsyncDelegateMessageProcessor(newChain(listener), "thread");
-    mp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
-    mp.setFlowConstruct(flowConstruct);
+    AsyncDelegateMessageProcessor mp =
+        new AsyncDelegateMessageProcessor(newChain(of(flowConstruct.getProcessingStrategy()), listener), "thread");
+    mp.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(mp, true, muleContext);
     return mp;
   }
 
-  private void assertCompletionDone(EventContext parent) {
+  private void assertCompletionDone(InternalEventContext parent) {
     assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
   }
 
-  private void assertCompletionNotDone(EventContext child1) {
+  private void assertCompletionNotDone(InternalEventContext child1) {
     assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
   }
 
   class TestListener implements Processor {
 
-    Event sensedEvent;
+    InternalEvent sensedEvent;
     Thread thread;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       try {
         asyncEntryLatch.await();
       } catch (InterruptedException e) {

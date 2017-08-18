@@ -12,9 +12,11 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.mule.runtime.core.PropertyScope.INBOUND;
-import static org.mule.runtime.core.PropertyScope.OUTBOUND;
-import static org.mule.runtime.core.api.Event.getCurrentEvent;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.metadata.DataType.builder;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.api.util.ObjectUtils.getDouble;
@@ -23,6 +25,7 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -58,13 +61,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DefaultMessageBuilder
-    implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.AttributesBuilder,
-    InternalMessage.CollectionBuilder {
+    implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder {
 
-  private Object payload;
-  private DataType dataType;
-  private Object attributes;
-  private DataType attributesDataType;
+  private static final String INBOUND_NAME = "INBOUND";
+  private static final String OUTBOUND_NAME = "OUTBOUND";
+
+  private TypedValue payload = of(null);
+  private TypedValue attributes = of(null);
 
   private ExceptionPayload exceptionPayload;
 
@@ -97,10 +100,8 @@ public class DefaultMessageBuilder
 
   public DefaultMessageBuilder(org.mule.runtime.api.message.Message message) {
     requireNonNull(message);
-    this.payload = message.getPayload().getValue();
-    this.dataType = message.getPayload().getDataType();
-    this.attributes = message.getAttributes().getValue();
-    this.attributesDataType = message.getAttributes().getDataType();
+    this.payload = message.getPayload();
+    this.attributes = message.getAttributes();
 
     if (message instanceof InternalMessage) {
       copyMessageAttributes((InternalMessage) message);
@@ -108,50 +109,56 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder nullPayload() {
-    this.payload = null;
-    return this;
-  }
-
-  @Override
-  public InternalMessage.Builder payload(Object payload) {
+  public InternalMessage.Builder payload(TypedValue<?> payload) {
     this.payload = payload;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder mediaType(MediaType mediaType) {
-    this.dataType = DataType.builder().mediaType(mediaType).build();
+  public InternalMessage.Builder nullValue() {
+    this.payload = new TypedValue(null, resolveDataType(null));
     return this;
   }
 
   @Override
-  public InternalMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz) {
-    requireNonNull(payload);
-    this.payload = payload;
-    this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
+  public InternalMessage.Builder value(Object value) {
+    this.payload = new TypedValue(value, resolveDataType(value));
     return this;
   }
 
   @Override
-  public InternalMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz) {
-    requireNonNull(payload);
-    this.payload = payload;
-    this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
+  public InternalMessage.CollectionBuilder mediaType(MediaType mediaType) {
+    this.payload =
+        new TypedValue(payload.getValue(), builder(payload.getDataType()).mediaType(mediaType).build(), payload.getLength());
     return this;
   }
 
   @Override
-  public InternalMessage.CollectionBuilder collectionPayload(Object[] payload) {
+  public InternalMessage.CollectionBuilder streamValue(Iterator payload, Class<?> clazz) {
     requireNonNull(payload);
-    return collectionPayload(asList(payload), payload.getClass().getComponentType());
+    this.payload = new TypedValue(payload, builder().streamType(payload.getClass()).itemType(clazz).build());
+    return this;
+  }
+
+  @Override
+  public InternalMessage.CollectionBuilder collectionValue(Collection payload, Class<?> clazz) {
+    requireNonNull(payload);
+    this.payload = new TypedValue(payload, builder().collectionType(payload.getClass()).itemType(clazz).build());
+    return this;
+  }
+
+  @Override
+  public InternalMessage.CollectionBuilder collectionValue(Object[] payload) {
+    requireNonNull(payload);
+    return collectionValue(asList(payload), payload.getClass().getComponentType());
   }
 
   @Override
   public CollectionBuilder itemMediaType(MediaType mediaType) {
-    if (dataType instanceof DefaultCollectionDataType) {
-      dataType =
-          ((DataTypeBuilder.DataTypeCollectionTypeBuilder) DataType.builder(this.dataType)).itemMediaType(mediaType).build();
+    if (payload.getDataType() instanceof DefaultCollectionDataType) {
+      payload = new TypedValue(payload.getValue(),
+                               ((DataTypeBuilder.DataTypeCollectionTypeBuilder) builder(payload.getDataType()))
+                                   .itemMediaType(mediaType).build());
     } else {
       throw new IllegalStateException("Item MediaType cannot be set, because payload is not a collection");
     }
@@ -159,104 +166,111 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder nullAttributes() {
-    this.attributes = null;
-    return this;
-  }
-
-  @Override
-  public InternalMessage.Builder attributes(Object attributes) {
+  public InternalMessage.CollectionBuilder attributes(TypedValue<?> attributes) {
     this.attributes = attributes;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder attributesMediaType(MediaType mediaType) {
-    this.attributesDataType = DataType.builder().mediaType(mediaType).build();
+  public InternalMessage.CollectionBuilder nullAttributesValue() {
+    this.attributes = new TypedValue(null, resolveAttributesDataType(null));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload) {
+  public InternalMessage.CollectionBuilder attributesValue(Object value) {
+    this.attributes = new TypedValue(value, resolveAttributesDataType(value));
+    return this;
+  }
+
+  @Override
+  public InternalMessage.CollectionBuilder attributesMediaType(MediaType mediaType) {
+    this.attributes = new TypedValue(attributes.getValue(), builder(attributes.getDataType()).mediaType(mediaType).build(),
+                                     attributes.getLength());
+    return this;
+  }
+
+  @Override
+  public InternalMessage.CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload) {
     this.exceptionPayload = exceptionPayload;
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value) {
-    inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value) {
+    inboundProperties.put(key, new TypedValue(value, value != null ? fromObject(value) : OBJECT));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType) {
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, MediaType mediaType) {
     inboundProperties.put(key,
-                          new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+                          new TypedValue(value, builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType) {
+  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, DataType dataType) {
     inboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value) {
-    outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value) {
+    outboundProperties.put(key, new TypedValue(value, value != null ? fromObject(value) : OBJECT));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
-    outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
+    outboundProperties.put(key, new TypedValue(value, builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType) {
+  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, DataType dataType) {
     outboundProperties.put(key, new TypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeInboundProperty(String key) {
+  public InternalMessage.CollectionBuilder removeInboundProperty(String key) {
     inboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeOutboundProperty(String key) {
+  public InternalMessage.CollectionBuilder removeOutboundProperty(String key) {
     outboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addInboundAttachment(String key, DataHandler value) {
+  public InternalMessage.CollectionBuilder addInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder addOutboundAttachment(String key, DataHandler value) {
+  public InternalMessage.CollectionBuilder addOutboundAttachment(String key, DataHandler value) {
     outboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeInboundAttachment(String key) {
+  public InternalMessage.CollectionBuilder removeInboundAttachment(String key) {
     inboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder removeOutboundAttachment(String key) {
+  public InternalMessage.CollectionBuilder removeOutboundAttachment(String key) {
     outboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder inboundProperties(Map<String, Serializable> inboundProperties) {
+  public InternalMessage.CollectionBuilder inboundProperties(Map<String, Serializable> inboundProperties) {
     requireNonNull(inboundProperties);
     this.inboundProperties.clear();
     inboundProperties.forEach((s, serializable) -> addInboundProperty(s, serializable));
@@ -264,7 +278,7 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder outboundProperties(Map<String, Serializable> outboundProperties) {
+  public InternalMessage.CollectionBuilder outboundProperties(Map<String, Serializable> outboundProperties) {
     requireNonNull(outboundProperties);
     this.outboundProperties.clear();
     outboundProperties.forEach((s, serializable) -> addOutboundProperty(s, serializable));
@@ -272,14 +286,14 @@ public class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.Builder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
+  public InternalMessage.CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
     requireNonNull(inboundAttachments);
     this.inboundAttachments = new HashMap<>(inboundAttachments);
     return this;
   }
 
   @Override
-  public InternalMessage.Builder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
+  public InternalMessage.CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
     requireNonNull(outbundAttachments);
     this.outboundAttachments = new HashMap<>(outbundAttachments);
     return this;
@@ -287,25 +301,24 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage build() {
-    return new MessageImplementation(new TypedValue(payload, resolveDataType()),
-                                     new TypedValue(attributes, resolveAttributesDataType()),
+    return new MessageImplementation(payload, attributes,
                                      inboundProperties, outboundProperties, inboundAttachments,
                                      outboundAttachments, exceptionPayload);
   }
 
-  private DataType resolveDataType() {
-    if (dataType == null) {
-      return DataType.fromObject(payload);
+  private DataType resolveDataType(Object value) {
+    if (payload == null) {
+      return DataType.fromObject(value);
     } else {
-      return DataType.builder(dataType).fromObject(payload).build();
+      return DataType.builder(payload.getDataType()).fromObject(value).build();
     }
   }
 
-  private DataType resolveAttributesDataType() {
-    if (attributesDataType == null) {
-      return DataType.fromObject(attributes);
+  private DataType resolveAttributesDataType(Object value) {
+    if (attributes == null) {
+      return DataType.fromObject(value);
     } else {
-      return DataType.builder(attributesDataType).fromObject(attributes).build();
+      return DataType.builder(attributes.getDataType()).fromObject(value).build();
     }
   }
 
@@ -410,13 +423,13 @@ public class DefaultMessageBuilder
       try {
         if (!m.getInboundPropertyNames().isEmpty()) {
           Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
-          buf.append("    ").append(INBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
+          buf.append("    ").append(INBOUND_NAME).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
         }
 
         if (!m.getOutboundPropertyNames().isEmpty()) {
           Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
-          buf.append("    ").append(OUTBOUND.toString().toUpperCase()).append(" scoped properties:").append(lineSeparator());
+          buf.append("    ").append(OUTBOUND_NAME).append(" scoped properties:").append(lineSeparator());
           appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
         }
       } catch (IllegalArgumentException e) {
@@ -480,7 +493,7 @@ public class DefaultMessageBuilder
             contents = theContent;
           } else {
             try {
-              DataType source = DataType.fromObject(theContent);
+              DataType source = fromObject(theContent);
               Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
               if (transformer == null) {
                 throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
@@ -578,6 +591,7 @@ public class DefaultMessageBuilder
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current mulecontext.
+     * 
      * @param context the current muleContext instance
      * @throws MuleException if there is an error initializing
      */

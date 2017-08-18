@@ -66,4 +66,9 @@ final class PassThroughConnectionHandler<C> implements ConnectionHandlerAdapter<
       connectionProvider.disconnect(connection);
     }
   }
+
+  @Override
+  public void invalidate() {
+    release();
+  }
 }

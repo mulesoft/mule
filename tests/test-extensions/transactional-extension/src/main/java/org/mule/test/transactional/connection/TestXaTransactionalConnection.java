@@ -6,11 +6,13 @@
  */
 package org.mule.test.transactional.connection;
 
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.transaction.xa.XAResource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestXaTransactionalConnection implements TestTransactionalConnection, XATransactionalConnection {
 
@@ -24,17 +26,17 @@ public class TestXaTransactionalConnection implements TestTransactionalConnectio
   }
 
   @Override
-  public void begin() throws Exception {
+  public void begin() throws TransactionException {
     logger.debug("Begin Conn Transaction");
   }
 
   @Override
-  public void commit() throws Exception {
+  public void commit() throws TransactionException {
     logger.debug("Commit Conn Transaction");
   }
 
   @Override
-  public void rollback() throws Exception {
+  public void rollback() throws TransactionException {
     logger.debug("Rollback Conn Transaction");
   }
 

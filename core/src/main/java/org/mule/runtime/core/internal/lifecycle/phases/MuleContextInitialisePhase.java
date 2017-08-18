@@ -19,12 +19,11 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.internal.lifecycle.NotificationLifecycleObject;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
@@ -53,13 +52,13 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
     registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
 
     Set<LifecycleObject> orderedObjects = new LinkedHashSet<>();
-    orderedObjects.add(new NotificationLifecycleObject(StreamingManager.class));
-    orderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
-    orderedObjects.add(new NotificationLifecycleObject(Config.class));
-    orderedObjects.add(new NotificationLifecycleObject(LegacyConnector.class));
-    orderedObjects.add(new NotificationLifecycleObject(SecurityManager.class));
-    orderedObjects.add(new NotificationLifecycleObject(FlowConstruct.class));
-    orderedObjects.add(new NotificationLifecycleObject(Initialisable.class));
+    orderedObjects.add(new LifecycleObject(StreamingManager.class));
+    orderedObjects.add(new LifecycleObject(ConfigurationProvider.class));
+    orderedObjects.add(new LifecycleObject(Config.class));
+    orderedObjects.add(new LifecycleObject(LegacyConnector.class));
+    orderedObjects.add(new LifecycleObject(SecurityManager.class));
+    orderedObjects.add(new LifecycleObject(FlowConstruct.class));
+    orderedObjects.add(new LifecycleObject(Initialisable.class));
     setOrderedLifecycleObjects(orderedObjects);
     setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
         OutboundRouter.class, MuleContext.class});

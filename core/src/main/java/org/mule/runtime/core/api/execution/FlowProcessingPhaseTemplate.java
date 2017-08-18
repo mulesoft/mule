@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.exception.MessagingException;
 
@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.exception.MessagingException;
 public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate {
 
   /**
-   * @return a {@link Event} created from the original message
+   * @return a {@link InternalEvent} created from the original message
    */
-  Event getEvent() throws MuleException;
+  InternalEvent getEvent() throws MuleException;
 
   /**
    * @return the original message
@@ -27,27 +27,27 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate {
   Object getOriginalMessage() throws MuleException;
 
   /**
-   * Pre processing of the {@link Event} to route
+   * Pre processing of the {@link InternalEvent} to route
    *
    * @param muleEvent
    */
-  Event beforeRouteEvent(Event muleEvent) throws MuleException;
+  InternalEvent beforeRouteEvent(InternalEvent muleEvent) throws MuleException;
 
   /**
-   * Routes the {@link Event} through the processors chain
+   * Routes the {@link InternalEvent} through the processors chain
    *
-   * @param muleEvent {@link Event} created from the raw message of this context
-   * @return the response {@link Event}
+   * @param muleEvent {@link InternalEvent} created from the raw message of this context
+   * @return the response {@link InternalEvent}
    * @throws MuleException
    */
-  Event routeEvent(Event muleEvent) throws MuleException;
+  InternalEvent routeEvent(InternalEvent muleEvent) throws MuleException;
 
   /**
-   * Post processing of the routed {@link Event}
+   * Post processing of the routed {@link InternalEvent}
    *
    * @param muleEvent
    */
-  Event afterRouteEvent(Event muleEvent) throws MuleException;
+  InternalEvent afterRouteEvent(InternalEvent muleEvent) throws MuleException;
 
   /**
    * Call after successfully processing the message through the flow This method will always be called when the flow execution was
@@ -55,7 +55,7 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate {
    *
    * @param muleEvent
    */
-  void afterSuccessfulProcessingFlow(Event muleEvent) throws MuleException;
+  void afterSuccessfulProcessingFlow(InternalEvent muleEvent) throws MuleException;
 
 
   /**

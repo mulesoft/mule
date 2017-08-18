@@ -15,7 +15,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -30,6 +29,7 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -42,13 +42,13 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputAttachmentsTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputHeadersTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeKeysResolver;
-import org.mule.runtime.module.extension.soap.internal.metadata.InvokeOutputAttributesTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeOutputTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
-import org.mule.runtime.soap.api.message.SoapMultipartPayload;
+import org.mule.runtime.extension.api.soap.SoapAttributes;
+import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
 import java.util.Map;
@@ -110,18 +110,14 @@ public class SoapInvokeOperationDeclarer {
     DefaultMetadataResolverFactory factory = new DefaultMetadataResolverFactory(InvokeKeysResolver::new,
                                                                                 inputResolver.build(),
                                                                                 InvokeOutputTypeResolver::new,
-                                                                                InvokeOutputAttributesTypeResolver::new);
-    operation.withModelProperty(new MetadataResolverFactoryModelProperty(factory));
+                                                                                NullMetadataResolver::new);
+    operation.withModelProperty(new MetadataResolverFactoryModelProperty(() -> factory));
     operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP));
   }
 
   private void declareOutput(OperationDeclarer operation, ClassTypeLoader loader) {
-    UnionTypeBuilder output = TYPE_BUILDER.unionType();
-    output.id(Object.class.getName());
-    output.of().stringType();
-    output.of(loader.load(SoapMultipartPayload.class));
-    operation.withOutput().ofDynamicType(output.build());
-    operation.withOutputAttributes().ofDynamicType(TYPE_BUILDER.nullType().build());
+    operation.withOutput().ofDynamicType(loader.load(SoapOutputPayload.class));
+    operation.withOutputAttributes().ofType(loader.load(SoapAttributes.class));
   }
 
   /**

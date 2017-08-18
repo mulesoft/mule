@@ -6,11 +6,15 @@
  */
 package org.mule.tck.junit4;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -23,7 +27,8 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -31,12 +36,13 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
@@ -47,6 +53,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -61,12 +68,18 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+
+import javax.xml.namespace.QName;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -81,7 +94,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
-  public static final String REACTOR_BLOCK_TIMEOUT_EXCEPTION_MESSAGE = "Timeout on Mono blocking read";
 
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder;
   public Supplier<TestServicesConfigurationBuilder> testServicesConfigurationBuilderSupplier =
@@ -134,6 +146,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   private boolean disposeContextPerClass;
   private static boolean logConfigured;
+
+  private ConfigurationComponentLocator componentLocator = mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
 
   protected boolean isDisposeContextPerClass() {
     return disposeContextPerClass;
@@ -191,7 +205,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
             contextStartedLatch.get().countDown();
           }
         };
-    muleContext.registerListener(listener);
+    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(listener);
 
     muleContext.start();
 
@@ -225,9 +239,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       context = muleContext;
     } else {
       final ClassLoader executionClassLoader = getExecutionClassLoader();
-      final ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+      final ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
       try {
-        Thread.currentThread().setContextClassLoader(executionClassLoader);
+        currentThread().setContextClassLoader(executionClassLoader);
 
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         List<ConfigurationBuilder> builders = new ArrayList<>();
@@ -245,15 +259,21 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setObjectSerializer(getObjectSerializer());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
+        createTestFlow(context);
         recordSchedulersOnInit(context);
         if (!isGracefulShutdown()) {
           ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
         }
       } finally {
-        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
+        currentThread().setContextClassLoader(originalContextClassLoader);
       }
     }
     return context;
+  }
+
+  protected void createTestFlow(MuleContext context) {
+    when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build()))
+        .thenReturn(Optional.of(getFakeFlowConstruct(context)));
   }
 
   /**
@@ -299,7 +319,22 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder();
+    return new DefaultsConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) throws Exception {
+        super.doConfigure(muleContext);
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR, componentLocator);
+      }
+    };
+  }
+
+  protected FlowConstruct getFakeFlowConstruct(MuleContext context) {
+    try {
+      return getTestFlow(context);
+    } catch (MuleException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected String getConfigurationResources() {
@@ -424,11 +459,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         }
       }
     }
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
+    return InternalEvent.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 
   @Override
-  protected Event.Builder getEventBuilder() throws MuleException {
+  protected InternalEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
@@ -565,8 +600,17 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 
-  protected Event process(Processor processor, Event event) throws Exception {
+  protected InternalEvent process(Processor processor, InternalEvent event) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     return processor.process(event);
   }
+
+  public static Map<QName, Object> getAppleFlowComponentLocationAnnotations() {
+    return getFlowComponentLocationAnnotations(APPLE_FLOW);
+  }
+
+  protected static Map<QName, Object> getFlowComponentLocationAnnotations(String rootComponentName) {
+    return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, fromSingleComponent(rootComponentName)).build();
+  }
+
 }

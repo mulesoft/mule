@@ -13,25 +13,26 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-import org.hamcrest.Matcher;
-import org.junit.Before;
 
 import java.util.Set;
+
+import org.hamcrest.Matcher;
+import org.junit.Before;
 
 @ArtifactClassLoaderRunnerConfig(sharedRuntimeLibs = {"org.mule.tests:mule-tests-unit"})
 public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
 
-  private MuleValueProviderService valueProviderService;
+  private ValueProviderService valueProviderService;
 
   @Before
   public void setUp() throws RegistrationException {
-    valueProviderService = muleContext.getRegistry().lookupObject(MuleValueProviderService.class);
+    valueProviderService = muleContext.getRegistry().lookupObject(ValueProviderService.class);
   }
 
   @Override

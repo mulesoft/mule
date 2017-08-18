@@ -9,23 +9,35 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationException;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.context.notification.Notification.Action;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -37,20 +49,21 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleApplication implements Application {
 
@@ -67,9 +80,11 @@ public class DefaultMuleApplication implements Application {
 
   protected ArtifactClassLoader deploymentClassLoader;
   protected MuleContextListener muleContextListener;
-  private ServerNotificationListener<MuleContextNotification> statusListener;
+  private NotificationListener<MuleContextNotification> statusListener;
   private ArtifactContext artifactContext;
   private ApplicationPolicyProvider policyManager;
+
+  private NotificationListenerRegistry notificationRegistrer;
 
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
@@ -93,6 +108,7 @@ public class DefaultMuleApplication implements Application {
     }
   }
 
+  @Override
   public void setMuleContextListener(MuleContextListener muleContextListener) {
     checkArgument(muleContextListener != null, "setMuleContextListener cannot be null");
 
@@ -207,12 +223,12 @@ public class DefaultMuleApplication implements Application {
     doInit(true);
   }
 
-  protected void setArtifactContext(final ArtifactContext artifactContext) throws NotificationException {
+  protected void setArtifactContext(final ArtifactContext artifactContext) {
     this.artifactContext = artifactContext;
     setMuleContext(this.artifactContext.getMuleContext());
   }
 
-  private void setMuleContext(final MuleContext muleContext) throws NotificationException {
+  private void setMuleContext(final MuleContext muleContext) {
     statusListener = new MuleContextNotificationListener<MuleContextNotification>() {
 
       @Override
@@ -222,15 +238,20 @@ public class DefaultMuleApplication implements Application {
 
       @Override
       public void onNotification(MuleContextNotification notification) {
-        int action = notification.getAction();
-        if (action == MuleContextNotification.CONTEXT_INITIALISED || action == MuleContextNotification.CONTEXT_STARTED
-            || action == MuleContextNotification.CONTEXT_STOPPED || action == MuleContextNotification.CONTEXT_DISPOSED) {
+        Action action = notification.getAction();
+        if (new IntegerAction(CONTEXT_INITIALISED).equals(action) || new IntegerAction(CONTEXT_STARTED).equals(action)
+            || new IntegerAction(CONTEXT_STOPPED).equals(action) || new IntegerAction(CONTEXT_DISPOSED).equals(action)) {
           updateStatusFor(muleContext.getLifecycleManager().getCurrentPhase());
         }
       }
     };
 
-    muleContext.registerListener(statusListener);
+    try {
+      notificationRegistrer = muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
+    notificationRegistrer.registerListener(statusListener);
   }
 
   private void updateStatusFor(String phase) {
@@ -239,7 +260,7 @@ public class DefaultMuleApplication implements Application {
 
   private void setStatusToFailed() {
     if (artifactContext != null) {
-      artifactContext.getMuleContext().unregisterListener(statusListener);
+      notificationRegistrer.unregisterListener(statusListener);
     }
 
     status = ApplicationStatus.DEPLOYMENT_FAILED;
@@ -247,7 +268,7 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public MuleContext getMuleContext() {
-    return artifactContext.getMuleContext();
+    return artifactContext != null ? artifactContext.getMuleContext() : null;
   }
 
   @Override
@@ -257,17 +278,17 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public ConnectivityTestingService getConnectivityTestingService() {
-    return artifactContext.getConnectivityTestingService();
+    return (ConnectivityTestingService) artifactContext.getRegistry().lookupByName(CONNECTIVITY_TESTING_SERVICE_KEY).get();
   }
 
   @Override
   public MetadataService getMetadataService() {
-    return artifactContext.getMetadataService();
+    return (MetadataService) artifactContext.getRegistry().lookupByName(METADATA_SERVICE_KEY).get();
   }
 
   @Override
   public ValueProviderService getValueProviderService() {
-    return artifactContext.getValueProviderService();
+    return (ValueProviderService) artifactContext.getRegistry().lookupByName(VALUE_PROVIDER_SERVICE_KEY).get();
   }
 
   @Override

@@ -15,10 +15,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -102,13 +102,8 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     Optional<ErrorModel> anyExtensionError = errorModel.getParent();
     assertThat(anyExtensionError.isPresent(), is(true));
-    assertThat(anyExtensionError.get().getType(), is(ModuleErrors.ANY.getType()));
-    assertThat(anyExtensionError.get().getNamespace(), is(HEISENBERG));
-
-    Optional<ErrorModel> muleAnyError = anyExtensionError.get().getParent();
-    assertThat(muleAnyError.isPresent(), is(true));
-    assertThat(muleAnyError.get().getType(), is(ANY.getType()));
-    assertThat(muleAnyError.get().getNamespace(), is(MULE_NAMESPACE));
+    assertThat(anyExtensionError.get().getType(), is(ANY.getType()));
+    assertThat(anyExtensionError.get().getNamespace(), is(MULE_NAMESPACE));
   }
 
   @Test

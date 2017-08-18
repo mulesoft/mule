@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -32,7 +32,7 @@ public class DefaultErrorTypeRepositoryTestCase extends AbstractMuleTestCase {
 
   private ErrorTypeRepository errorTypeRepository = new DefaultErrorTypeRepository();
   private ComponentIdentifier MY_ERROR =
-      ComponentIdentifier.builder().withNamespace("ns").withName("name").build();
+      ComponentIdentifier.builder().namespace("ns").name("name").build();
 
   @Before
   public void setUp() {

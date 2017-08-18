@@ -14,12 +14,13 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.module.artifact.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModel;
-import org.mule.runtime.module.artifact.descriptor.ClassLoaderModelLoader;
-import org.mule.runtime.module.artifact.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
+import org.mule.runtime.module.service.ServiceClassLoaderModelLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   private DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader;
   private PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader;
+  private ServiceClassLoaderModelLoader serviceMavenClassLoaderModelLoader;
   private final MavenClientProvider mavenClientProvider;
   private MavenConfiguration mavenRuntimeConfig;
 
@@ -55,6 +57,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         new DeployableMavenClassLoaderModelLoader(mavenClient, mavenClientProvider.getLocalRepositorySuppliers());
     pluginMavenClassLoaderModelLoader =
         new PluginMavenClassLoaderModelLoader(mavenClient, mavenClientProvider.getLocalRepositorySuppliers());
+
+    serviceMavenClassLoaderModelLoader = new ServiceClassLoaderModelLoader();
   }
 
   @Override
@@ -86,6 +90,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
       } else if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
         return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+      } else if (serviceMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+        return serviceMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
       } else {
         throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
       }
@@ -97,7 +103,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
     return deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
-        || pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType);
+        || pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
+        || serviceMavenClassLoaderModelLoader.supportsArtifactType(artifactType);
   }
 
 }

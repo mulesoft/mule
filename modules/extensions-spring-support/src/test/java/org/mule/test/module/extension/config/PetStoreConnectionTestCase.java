@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -30,7 +30,7 @@ public abstract class PetStoreConnectionTestCase extends AbstractExtensionFuncti
     ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration("petstore", testEvent());
     assertThat(config, is(notNullValue()));
 
-    Event response = runFlow("getPets");
+    InternalEvent response = runFlow("getPets");
     List<String> pets = (List<String>) response.getMessage().getPayload().getValue();
     PetStoreConnector configValue = (PetStoreConnector) config.getValue();
     assertThat(pets, containsInAnyOrder(configValue.getPets().toArray()));

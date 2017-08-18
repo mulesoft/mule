@@ -8,7 +8,10 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
 import org.mule.test.runner.maven.MavenModelFactory;
 
@@ -16,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
@@ -35,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * {@link ClassLoader}</li>
  * <p/>
  * The object built by this builder is a {@link ArtifactClassLoaderHolder} that references the
- * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for the application, plugins and container.
+ * {@link ArtifactClassLoader} for the application, plugins and container.
  *
  * @since 4.0
  */
@@ -51,25 +55,26 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   private Artifact rootArtifact;
   private File pluginResourcesFolder;
-  private List<String> excludedArtifacts = newArrayList();
-  private List<String> providedExclusions = newArrayList();
-  private List<String> testExclusions = newArrayList();
-  private List<String> testInclusions = newArrayList();
-  private List<String> sharedPluginLibCoordinates = newArrayList();
-  private List<Class> exportPluginClasses = newArrayList();
+  private Set<String> excludedArtifacts = emptySet();
+  private Set<String> providedExclusions = emptySet();
+  private Set<String> testExclusions = emptySet();
+  private Set<String> testInclusions = emptySet();
+  private Set<String> sharedPluginLibCoordinates = emptySet();
+  private Set<String> extraPrivilegedArtifacts = emptySet();
+  private Set<Class> exportPluginClasses = emptySet();
   private boolean extensionMetadataGenerationEnabled = false;
-  private List<String> providedInclusions = newArrayList();
+  private Set<String> providedInclusions = emptySet();
   private List<URL> applicationUrls = newArrayList();
   private List<String> extraBootPackages;
 
   /**
-   * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
-   * added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   * Sets the {@link Set} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
+   * {@link ArtifactClassLoader}
    *
    * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setSharedPluginLibCoordinates(List<String> sharedPluginLibCoordinates) {
+  public ArtifactIsolatedClassLoaderBuilder setSharedPluginLibCoordinates(Set<String> sharedPluginLibCoordinates) {
     this.sharedPluginLibCoordinates = sharedPluginLibCoordinates;
     return this;
   }
@@ -126,7 +131,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    *        added as boot packages. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(List<String> excludedArtifacts) {
+  public ArtifactIsolatedClassLoaderBuilder setExcludedArtifacts(Set<String> excludedArtifacts) {
     this.excludedArtifacts = excludedArtifacts;
     return this;
   }
@@ -145,6 +150,19 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
+   * Sets the {@link List} of {@link String}s containing the extra privileged artifacts defined to be appended to the container in
+   * addition to the pre-defined ones.
+   *
+   * @param extraPrivilegedArtifacts {@link List} of {@link String}s containing the extra privileged artifacts defined to be
+   *        appended to the container in addition to the pre-defined ones.
+   * @return this
+   */
+  public ArtifactIsolatedClassLoaderBuilder setExtraPrivilegedArtifacts(Set<String> extraPrivilegedArtifacts) {
+    this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
+    return this;
+  }
+
+  /**
    * Sets Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * <p/>
@@ -153,52 +171,52 @@ public class ArtifactIsolatedClassLoaderBuilder {
    *        rootArtifact. In format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final List<String> providedExclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setProvidedExclusions(final Set<String> providedExclusions) {
     this.providedExclusions = providedExclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In format
+   * Sets the {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
-   * @param testExclusions {@link List} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
+   * @param testExclusions {@link Set} of exclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
    *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final List<String> testExclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setTestExclusions(final Set<String> testExclusions) {
     this.testExclusions = testExclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of inclusion Maven coordinates to be included from test dependencies of rootArtifact. In format
+   * Sets the {@link Set} of inclusion Maven coordinates to be included from test dependencies of rootArtifact. In format
    * {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    *
-   * @param testInclusions {@link List} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
+   * @param testInclusions {@link Set} of inclusion Maven coordinates to be excluded from test dependencies of rootArtifact. In
    *        format {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final List<String> testInclusions) {
+  public ArtifactIsolatedClassLoaderBuilder setTestInclusions(final Set<String> testInclusions) {
     this.testInclusions = testInclusions;
     return this;
   }
 
   /**
-   * Sets the {@link List} of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
+   * Sets the {@link Set} of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
    * for testing purposes only.
    *
-   * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
-   *                            for testing purposes only.
+   * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their
+   *        APIs, for testing purposes only.
    * @return this
    */
-  public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final List<Class> exportPluginClasses) {
+  public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final Set<Class> exportPluginClasses) {
     this.exportPluginClasses = exportPluginClasses;
     return this;
   }
 
   /**
-   * Sets to {@code true} if while building the a plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   * Sets to {@code true} if while building the a plugin {@link ArtifactClassLoader}
    * for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    *
    * @param extensionMetadataGenerationEnabled {@code boolean} to enable Extension metadata generation.
@@ -211,10 +229,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Sets a {@link List} of {@link URL}s to be appended to the application
-   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   * {@link ArtifactClassLoader} in addition to the ones classified.
    *
    * @param {@link List} of {@link URL}s to be appended to the application
-   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} in addition to the ones classified.
+   *        {@link ArtifactClassLoader} in addition to the ones classified.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setApplicationUrls(List<URL> applicationUrls) {
@@ -224,7 +242,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
 
   /**
    * Builds the {@link ArtifactClassLoaderHolder} with the
-   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s for application, plugins and container.
+   * {@link ArtifactClassLoader}s for application, plugins and container.
    *
    * @return a {@link ArtifactClassLoaderHolder} as output of the classification process.
    * @throws {@link IOException} if there was an error while creating the classification context
@@ -255,7 +273,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
     }
 
     ArtifactsUrlClassification artifactsUrlClassification = classPathClassifier.classify(context);
-    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), artifactsUrlClassification);
+    return isolatedClassLoaderFactory.createArtifactClassLoader(context.getExtraBootPackages(), extraPrivilegedArtifacts,
+                                                                artifactsUrlClassification);
   }
 
   /**

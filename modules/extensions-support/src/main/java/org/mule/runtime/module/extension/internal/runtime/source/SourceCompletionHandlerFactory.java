@@ -22,5 +22,5 @@ public interface SourceCompletionHandlerFactory {
    * @param context a {@link SourceCallbackContext}
    * @return a new {@link SourceCompletionHandler}
    */
-  SourceCompletionHandler createCompletionHandler(SourceCallbackContext context);
+  SourceCompletionHandler createCompletionHandler(SourceCallbackContextAdapter context);
 }

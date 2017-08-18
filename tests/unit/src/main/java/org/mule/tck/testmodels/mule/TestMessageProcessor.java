@@ -10,7 +10,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectUtils;
 
@@ -31,10 +31,10 @@ public class TestMessageProcessor extends AbstractAnnotatedObject implements Pro
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
-      return Event.builder(event)
-          .message(Message.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue() + ":" + label)
+      return InternalEvent.builder(event)
+          .message(Message.builder(event.getMessage()).value(event.getMessage().getPayload().getValue() + ":" + label)
               .build())
           .build();
     }

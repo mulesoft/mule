@@ -54,7 +54,20 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
-                    <xsd:element ref="output" minOccurs="1" maxOccurs="1"/>
+                    <xsd:element ref="output" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="output-attributes" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element name="errors" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Collection of errors that might be thrown by the current operation.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element ref="error" minOccurs="1" maxOccurs="unbounded"/>
+                            </xsd:sequence>
+                        </xsd:complexType>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" use="required">
                     <xsd:annotation>
@@ -63,6 +76,22 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="error" type="errorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defined error for the current operation.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="errorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="xsd:string" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -84,6 +113,11 @@
                 <xsd:attribute name="type" use="required" type="xsd:string"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
                 <xsd:attribute name="role" type="roleParameterType" default="BEHAVIOUR"/>
+                <xsd:attribute name="summary" type="xsd:string" use="optional"/>
+                <xsd:attribute name="example" type="xsd:string" use="optional"/>
+                <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
+                <xsd:attribute name="order" type="xsd:int" use="optional"/>
+                <xsd:attribute name="tab" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -97,6 +131,22 @@
     </xsd:element>
 
     <xsd:complexType name="outputType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:annotatedType">
+                <xsd:attribute name="type" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="output-attributes" type="outputAttributesType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines the attribute's output of the operation if exists, void otherwise.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="outputAttributesType">
         <xsd:complexContent>
             <xsd:extension base="mule:annotatedType">
                 <xsd:attribute name="type" type="xsd:string"/>
@@ -120,6 +170,11 @@
                 <xsd:attribute name="use" type="useType" default="AUTO"/>
                 <xsd:attribute name="type" type="xsd:string" use="required"/>
                 <xsd:attribute name="password" type="xsd:boolean" default="false"/>
+                <xsd:attribute name="summary" type="xsd:string" use="optional"/>
+                <xsd:attribute name="example" type="xsd:string" use="optional"/>
+                <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
+                <xsd:attribute name="order" type="xsd:int" use="optional"/>
+                <xsd:attribute name="tab" type="xsd:string" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

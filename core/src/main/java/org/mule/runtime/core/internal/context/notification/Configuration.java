@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notificationListenerSubscriptionAlreadyRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyIsNotSupportedType;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.toClass;
 
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,25 +33,25 @@ public class Configuration {
 
   protected static Logger logger = LoggerFactory.getLogger(Configuration.class);
   // map from interface to collection of events
-  private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
+  private Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaceToTypes =
       new HashMap<>();
   private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<>();
-  private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<>();
-  private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<>();
+  private Set<Class<? extends NotificationListener>> disabledInterfaces = new HashSet<>();
+  private Set<Class<? extends Notification>> disabledNotificationTypes = new HashSet<>();
   private volatile boolean dirty = true;
   private Policy policy;
 
-  public synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface,
-                                              Class<? extends ServerNotification> type) {
+  public synchronized void addInterfaceToType(Class<? extends NotificationListener> iface,
+                                              Class<? extends Notification> type) {
     dirty = true;
-    if (!ServerNotification.class.isAssignableFrom(type)) {
-      throw new IllegalArgumentException(CoreMessages.propertyIsNotSupportedType("type", ServerNotification.class, type)
+    if (!Notification.class.isAssignableFrom(type)) {
+      throw new IllegalArgumentException(propertyIsNotSupportedType("type", Notification.class, type)
           .getMessage());
     }
     if (!interfaceToTypes.containsKey(iface)) {
-      interfaceToTypes.put(iface, new HashSet<Class<? extends ServerNotification>>());
+      interfaceToTypes.put(iface, new HashSet<Class<? extends Notification>>());
     }
-    Set<Class<? extends ServerNotification>> events = interfaceToTypes.get(iface);
+    Set<Class<? extends Notification>> events = interfaceToTypes.get(iface);
     events.add(type);
     if (logger.isDebugEnabled()) {
       logger.debug("Registered event type: " + type);
@@ -62,8 +63,7 @@ public class Configuration {
    * @param interfaceToTypes map from interace to a particular event
    * @throws ClassNotFoundException if the interface is a key, but the corresponding class cannot be loaded
    */
-  public synchronized void addAllInterfaceToTypes(
-                                                  Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes)
+  public synchronized void addAllInterfaceToTypes(Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaceToTypes)
       throws ClassNotFoundException {
     dirty = true;
 
@@ -79,7 +79,7 @@ public class Configuration {
     }
   }
 
-  public synchronized void removeListener(ServerNotificationListener listener) {
+  public synchronized void removeListener(NotificationListener listener) {
     dirty = true;
     Set<ListenerSubscriptionPair> toRemove = new HashSet<>();
     for (Object element : listenerSubscriptionPairs) {
@@ -94,16 +94,16 @@ public class Configuration {
   synchronized void removeAllListeners(Collection listeners) {
     dirty = true;
     for (Iterator listener = listeners.iterator(); listener.hasNext();) {
-      removeListener((ServerNotificationListener) listener.next());
+      removeListener((NotificationListener) listener.next());
     }
   }
 
-  public synchronized void disableInterface(Class<? extends ServerNotificationListener> iface) {
+  public synchronized void disableInterface(Class<? extends NotificationListener> iface) {
     dirty = true;
     disabledInterfaces.add(iface);
   }
 
-  public synchronized void disabledAllInterfaces(Collection<Class<? extends ServerNotificationListener>> interfaces)
+  public synchronized void disabledAllInterfaces(Collection<Class<? extends NotificationListener>> interfaces)
       throws ClassNotFoundException {
     dirty = true;
     for (Object element : interfaces) {
@@ -111,7 +111,7 @@ public class Configuration {
     }
   }
 
-  public synchronized void disableType(Class<? extends ServerNotification> type) {
+  public synchronized void disableType(Class<? extends Notification> type) {
     dirty = true;
     disabledNotificationTypes.add(type);
   }
@@ -137,12 +137,12 @@ public class Configuration {
 
   // for tests -------------------------------
 
-  public Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> getInterfaceToTypes() {
-    return Collections.unmodifiableMap(interfaceToTypes);
+  public Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> getInterfaceToTypes() {
+    return unmodifiableMap(interfaceToTypes);
   }
 
   public Set<ListenerSubscriptionPair> getListeners() {
-    return Collections.unmodifiableSet(listenerSubscriptionPairs);
+    return unmodifiableSet(listenerSubscriptionPairs);
   }
 
 }

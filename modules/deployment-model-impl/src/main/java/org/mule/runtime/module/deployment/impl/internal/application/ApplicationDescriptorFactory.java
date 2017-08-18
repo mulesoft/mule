@@ -9,25 +9,22 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
-import static org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
+import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Creates artifact descriptor for application
@@ -43,12 +40,9 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected String getDescriptorFileName() {
-    return MULE_ARTIFACT_JSON_DESCRIPTOR;
-  }
-
-  @Override
-  protected void doDescriptorConfig(MuleApplicationModel artifactModel, ApplicationDescriptor descriptor) {
+  protected void doDescriptorConfig(MuleApplicationModel artifactModel, ApplicationDescriptor descriptor,
+                                    File artifactLocation) {
+    super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
     artifactModel.getDomain().ifPresent(domain -> {
       descriptor.setDomain(domain);
     });
@@ -57,8 +51,8 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected ApplicationDescriptor createArtifactDescriptor(String name) {
-    return new ApplicationDescriptor(name);
+  protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name) {
+    return new ApplicationDescriptor(artifactLocation.getName());
   }
 
   @Override
@@ -77,19 +71,11 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected MuleApplicationModel deserializeArtifactModel(InputStream stream) throws IOException {
-    return new MuleApplicationModelJsonSerializer().deserialize(IOUtils.toString(stream));
+  protected AbstractMuleArtifactModelJsonSerializer<MuleApplicationModel> getMuleArtifactModelJsonSerializer() {
+    return new MuleApplicationModelJsonSerializer();
   }
 
-  protected File getAppLibFolder(ApplicationDescriptor descriptor) {
-    return MuleFoldersUtil.getAppLibFolder(descriptor.getName());
-  }
-
-  protected File getAppSharedLibsFolder(ApplicationDescriptor descriptor) {
-    return MuleFoldersUtil.getAppSharedLibsFolder(descriptor.getName());
-  }
-
-  protected File getAppClassesFolder(ApplicationDescriptor descriptor) {
+  private File getAppClassesFolder(ApplicationDescriptor descriptor) {
     return MuleFoldersUtil.getAppClassesFolder(descriptor.getName());
   }
 

@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.core.api.message.GroupCorrelation.of;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A router that breaks up the current message onto smaller parts and sends them to the same destination. The Destination service
@@ -34,13 +36,13 @@ public class MessageChunkSplitter extends AbstractSplitter {
   }
 
   @Override
-  protected boolean isSplitRequired(Event event) {
+  protected boolean isSplitRequired(InternalEvent event) {
     return messageSize != 0;
   }
 
   @Override
-  protected List<?> splitMessage(Event event) throws RoutingException {
-    List<Event> messageParts = new ArrayList<>();
+  protected List<?> splitMessage(InternalEvent event) throws RoutingException {
+    List<InternalEvent> messageParts = new ArrayList<>();
     byte[] data;
     try {
       data = event.getMessageAsBytes(muleContext);
@@ -64,8 +66,8 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final Event childEvent = Event.builder(event).message(Message.builder(message).payload(buffer).build())
-          .groupCorrelation(new GroupCorrelation(parts, count)).build();
+      final InternalEvent childEvent = InternalEvent.builder(event).message(Message.builder(message).value(buffer).build())
+          .groupCorrelation(Optional.of(of(count, parts))).build();
 
       messageParts.add(childEvent);
     }

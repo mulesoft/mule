@@ -51,7 +51,7 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.module.extension.soap.internal.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
+            "typeId": "org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
             "classInformation": {
               "hasDefaultConstructor": true,
               "isInterface": false,
@@ -108,6 +108,22 @@
           "executionType": "BLOCKING",
           "errors": [
             {
+              "type": "SOAP_FAULT",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "ENCODING",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
               "type": "CONNECTIVITY",
               "namespace": "MULE",
               "parent": {
@@ -116,35 +132,7 @@
               }
             },
             {
-              "type": "ANY",
-              "namespace": "MULE"
-            },
-            {
-              "type": "TIMEOUT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOAP_FAULT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "ANY",
+              "type": "INVALID_WSDL",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
@@ -152,28 +140,8 @@
               }
             },
             {
-              "type": "CANNOT_DISPATCH",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "BAD_REQUEST",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
+              "type": "ANY",
+              "namespace": "MULE"
             },
             {
               "type": "RETRY_EXHAUSTED",
@@ -188,6 +156,14 @@
               }
             },
             {
+              "type": "BAD_RESPONSE",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
               "type": "RETRY_EXHAUSTED",
               "namespace": "MULE",
               "parent": {
@@ -196,15 +172,19 @@
               }
             },
             {
-              "type": "BAD_RESPONSE",
+              "type": "BAD_REQUEST",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "CANNOT_DISPATCH",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
               }
             },
             {
@@ -220,217 +200,116 @@
               }
             },
             {
-              "type": "INVALID_WSDL",
+              "type": "TIMEOUT",
               "namespace": "RAM",
               "parent": {
                 "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "ENCODING",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "RAM",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
+                "namespace": "MULE"
               }
             }
           ],
           "output": {
             "type": {
               "format": "java",
-              "type": "Union",
+              "type": "Object",
               "annotations": {
-                "typeId": "java.lang.Object"
+                "typeId": "org.mule.runtime.extension.api.soap.SoapOutputPayload",
+                "classInformation": {
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "typeAlias": {
+                  "value": "SoapOutputPayload"
+                }
               },
-              "of": [
+              "fields": [
                 {
-                  "type": "String"
+                  "key": {
+                    "name": "attachments"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.util.Map",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "org.mule.runtime.api.metadata.TypedValue"
+                        ]
+                      }
+                    },
+                    "open": {
+                      "type": "Binary",
+                      "annotations": {
+                        "typeId": "java.io.InputStream"
+                      }
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
                 },
                 {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "org.mule.runtime.soap.api.message.SoapMultipartPayload",
-                    "classInformation": {
-                      "hasDefaultConstructor": false,
-                      "isInterface": false,
-                      "isInstantiable": false,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [
-                        "org.mule.runtime.api.message.MultiPartPayload"
-                      ],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "SoapMultipartPayload"
+                  "key": {
+                    "name": "body"
+                  },
+                  "model": {
+                    "type": "Binary",
+                    "annotations": {
+                      "typeId": "java.io.InputStream"
                     }
                   },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "attachments"
-                      },
-                      "model": {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.util.Map",
-                          "classInformation": {
-                            "hasDefaultConstructor": false,
-                            "isInterface": true,
-                            "isInstantiable": false,
-                            "isAbstract": true,
-                            "isFinal": false,
-                            "implementedInterfaces": [],
-                            "parent": "",
-                            "genericTypes": [
-                              "java.lang.String",
-                              "java.io.InputStream"
-                            ]
-                          }
-                        },
-                        "open": {
-                          "type": "Binary",
-                          "annotations": {
-                            "typeId": "java.io.InputStream"
-                          }
-                        },
-                        "fields": []
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                },
+                {
+                  "key": {
+                    "name": "headers"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.util.Map",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.String"
+                        ]
                       }
                     },
-                    {
-                      "key": {
-                        "name": "body"
-                      },
-                      "model": {
-                        "type": "Binary",
-                        "annotations": {
-                          "typeId": "java.io.InputStream"
-                        }
-                      },
+                    "open": {
+                      "type": "String",
                       "annotations": {
-                        "visibility": "READ_ONLY"
+                        "typeId": "java.lang.String"
                       }
                     },
-                    {
-                      "key": {
-                        "name": "namedParts"
-                      },
-                      "model": {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.util.Map",
-                          "classInformation": {
-                            "hasDefaultConstructor": false,
-                            "isInterface": true,
-                            "isInstantiable": false,
-                            "isAbstract": true,
-                            "isFinal": false,
-                            "implementedInterfaces": [],
-                            "parent": "",
-                            "genericTypes": [
-                              "java.lang.String",
-                              "org.mule.runtime.api.message.Message"
-                            ]
-                          }
-                        },
-                        "open": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.message.Message",
-                            "classInformation": {
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [
-                                "java.io.Serializable"
-                              ],
-                              "parent": "",
-                              "genericTypes": []
-                            },
-                            "typeAlias": {
-                              "value": "Message"
-                            }
-                          },
-                          "fields": []
-                        },
-                        "fields": []
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "partNames"
-                      },
-                      "model": {
-                        "type": "Array",
-                        "annotations": {
-                          "typeId": "java.util.List"
-                        },
-                        "item": {
-                          "type": "String",
-                          "annotations": {
-                            "typeId": "java.lang.String"
-                          }
-                        }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    },
-                    {
-                      "key": {
-                        "name": "parts"
-                      },
-                      "model": {
-                        "type": "Array",
-                        "annotations": {
-                          "typeId": "java.util.List"
-                        },
-                        "item": {
-                          "type": "Object",
-                          "annotations": {
-                            "typeId": "org.mule.runtime.api.message.Message",
-                            "classInformation": {
-                              "hasDefaultConstructor": false,
-                              "isInterface": true,
-                              "isInstantiable": false,
-                              "isAbstract": true,
-                              "isFinal": false,
-                              "implementedInterfaces": [
-                                "java.io.Serializable"
-                              ],
-                              "parent": "",
-                              "genericTypes": []
-                            },
-                            "typeAlias": {
-                              "value": "Message"
-                            }
-                          },
-                          "fields": []
-                        }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    }
-                  ]
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
                 }
               ]
             },
@@ -441,16 +320,80 @@
           "outputAttributes": {
             "type": {
               "format": "java",
-              "type": "Null"
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.runtime.extension.api.soap.SoapAttributes",
+                "classInformation": {
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": true,
+                  "implementedInterfaces": [
+                    "java.io.Serializable"
+                  ],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "typeAlias": {
+                  "value": "SoapAttributes"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "protocolHeaders"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "java.util.Map",
+                      "classInformation": {
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.String"
+                        ]
+                      }
+                    },
+                    "open": {
+                      "type": "String",
+                      "annotations": {
+                        "typeId": "java.lang.String"
+                      }
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "visibility": "READ_ONLY"
+                  }
+                }
+              ]
             },
-            "hasDynamicType": true,
+            "hasDynamicType": false,
             "description": "",
             "modelProperties": {}
           },
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotypes": [],
+          "stereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            }
+          ],
+          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -730,11 +673,174 @@
                   },
                   "description": "The name of a variable on which the operation\u0027s output will be placed",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "typeId": "java.lang.String"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
               "showInDsl": false,
               "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Union",
+                    "annotations": {
+                      "typeId": "java.lang.Object",
+                      "typeAlias": {
+                        "value": "ReconnectionStrategy"
+                      }
+                    },
+                    "of": [
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "count"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Integer",
+                                "default": "2"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How many reconnection attempts to make"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "java.lang.Object",
+                          "typeAlias": {
+                            "value": "reconnect-forever"
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "frequency"
+                            },
+                            "model": {
+                              "type": "Number",
+                              "annotations": {
+                                "int": {},
+                                "typeId": "java.lang.Long",
+                                "default": "2000"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "How often (in ms) to reconnect"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "elementReferences": [],
+                  "name": "reconnectionStrategy",
+                  "description": "A retry strategy in case of connectivity errors",
+                  "modelProperties": {
+                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                        "localPart": "abstract-reconnection-strategy",
+                        "prefix": "mule"
+                      }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
+                    }
+                  }
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Connection",
               "description": "",
               "modelProperties": {}
             }
@@ -963,106 +1069,127 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "Union",
+                    "type": "Object",
                     "annotations": {
                       "typeId": "java.lang.Object",
                       "typeAlias": {
-                        "value": "ReconnectionStrategy"
+                        "value": "Reconnection"
                       }
                     },
-                    "of": [
+                    "fields": [
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect"
+                        "key": {
+                          "name": "failsDeployment"
+                        },
+                        "model": {
+                          "type": "Boolean",
+                          "annotations": {
+                            "typeId": "java.lang.Boolean",
+                            "default": "false"
                           }
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "count"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Integer",
-                                "default": "2"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How many reconnection attempts to make"
-                              }
-                            }
-                          },
-                          {
-                            "key": {
-                              "name": "blocking"
-                            },
-                            "model": {
-                              "type": "Boolean",
-                              "annotations": {
-                                "typeId": "java.lang.Boolean",
-                                "default": "true"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "If false, the reconnection strategy will run in a separate, non-blocking thread"
-                              }
-                            }
+                        "annotations": {
+                          "description": {
+                            "value": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy"
                           }
-                        ]
+                        }
                       },
                       {
-                        "type": "Object",
-                        "annotations": {
-                          "typeId": "java.lang.Object",
-                          "typeAlias": {
-                            "value": "reconnect-forever"
-                          }
+                        "key": {
+                          "name": "reconnectionStrategy"
                         },
-                        "fields": [
-                          {
-                            "key": {
-                              "name": "frequency"
-                            },
-                            "model": {
-                              "type": "Number",
-                              "annotations": {
-                                "int": {},
-                                "typeId": "java.lang.Long",
-                                "default": "2000"
-                              }
-                            },
-                            "annotations": {
-                              "description": {
-                                "value": "How often (in ms) to reconnect"
-                              }
+                        "model": {
+                          "type": "Union",
+                          "annotations": {
+                            "typeId": "java.lang.Object",
+                            "typeAlias": {
+                              "value": "ReconnectionStrategy"
                             }
+                          },
+                          "of": [
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "name": "count"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Integer",
+                                      "default": "2"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How many reconnection attempts to make"
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Object",
+                              "annotations": {
+                                "typeId": "java.lang.Object",
+                                "typeAlias": {
+                                  "value": "reconnect-forever"
+                                }
+                              },
+                              "fields": [
+                                {
+                                  "key": {
+                                    "name": "frequency"
+                                  },
+                                  "model": {
+                                    "type": "Number",
+                                    "annotations": {
+                                      "int": {},
+                                      "typeId": "java.lang.Long",
+                                      "default": "2000"
+                                    }
+                                  },
+                                  "annotations": {
+                                    "description": {
+                                      "value": "How often (in ms) to reconnect"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "The reconnection strategy to use"
                           }
-                        ]
+                        }
                       }
                     ]
                   },
@@ -1083,51 +1210,18 @@
                     "tabName": "Advanced"
                   },
                   "elementReferences": [],
-                  "name": "reconnectionStrategy",
-                  "description": "A retry strategy in case of connectivity errors",
+                  "name": "reconnection",
+                  "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
-                        "localPart": "abstract-reconnection-strategy",
+                        "localPart": "reconnection",
                         "prefix": "mule"
                       }
                     },
                     "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
-                    }
-                  }
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "tabName": "Advanced"
-                  },
-                  "elementReferences": [],
-                  "name": "disableValidation",
-                  "description": "Disables connection validation",
-                  "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 4
                     }
                   }
                 },
@@ -1347,7 +1441,6 @@
         }
       ],
       "messageSources": [],
-      "functions": [],
       "name": "config",
       "description": "Default configuration",
       "modelProperties": {}
@@ -1355,9 +1448,18 @@
   ],
   "operations": [],
   "functions": [],
+  "constructs": [],
   "connectionProviders": [],
   "messageSources": [],
   "errors": [
+    {
+      "type": "SOAP_FAULT",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
     {
       "type": "CONNECTIVITY",
       "namespace": "MULE",
@@ -1371,31 +1473,7 @@
       "namespace": "MULE"
     },
     {
-      "type": "TIMEOUT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "SOAP_FAULT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ANY",
+      "type": "BAD_RESPONSE",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
@@ -1403,27 +1481,27 @@
       }
     },
     {
-      "type": "CANNOT_DISPATCH",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
       "type": "BAD_REQUEST",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "ENCODING",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
+      }
+    },
+    {
+      "type": "INVALID_WSDL",
+      "namespace": "RAM",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
       }
     },
     {
@@ -1447,15 +1525,11 @@
       }
     },
     {
-      "type": "BAD_RESPONSE",
+      "type": "CANNOT_DISPATCH",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     },
     {
@@ -1471,27 +1545,11 @@
       }
     },
     {
-      "type": "INVALID_WSDL",
+      "type": "TIMEOUT",
       "namespace": "RAM",
       "parent": {
         "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ENCODING",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "RAM",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
+        "namespace": "MULE"
       }
     }
   ],

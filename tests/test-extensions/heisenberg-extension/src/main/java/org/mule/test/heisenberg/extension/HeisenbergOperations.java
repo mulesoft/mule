@@ -8,9 +8,8 @@ package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.model.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -22,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -50,7 +50,7 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
-import javax.inject.Inject;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -58,6 +58,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 
 public class HeisenbergOperations implements Disposable {
@@ -158,6 +160,7 @@ public class HeisenbergOperations implements Disposable {
     return builder.toString();
   }
 
+  @OutputResolver(output = HeisenbergOutputResolver.class)
   public ExtensionManager getInjectedExtensionManager() {
     return extensionManager;
   }
@@ -233,19 +236,23 @@ public class HeisenbergOperations implements Disposable {
     return sales;
   }
 
+  @OutputResolver(output = HeisenbergOutputResolver.class)
   public ParameterResolver<Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
     return weapon;
   }
 
+  @OutputResolver(output = HeisenbergOutputResolver.class)
   public ParameterResolver<List<Weapon>> processWeaponList(@Optional ParameterResolver<List<Weapon>> weapons) {
     return weapons;
   }
 
+  @OutputResolver(output = HeisenbergOutputResolver.class)
   public ParameterResolver<Weapon> processWeaponWithDefaultValue(@Optional(
       defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
     return weapon;
   }
 
+  @OutputResolver(output = HeisenbergOutputResolver.class)
   public ParameterResolver<List<Weapon>> processWeaponListWithDefaultValue(@Optional(
       defaultValue = "#[payload]") ParameterResolver<List<Weapon>> weapons) {
     return weapons;

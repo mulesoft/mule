@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.keygenerator;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -27,7 +27,7 @@ public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator, MuleC
   private MuleContext muleContext;
 
   @Override
-  public String generateKey(Event event) {
+  public String generateKey(InternalEvent event) {
     try {
       byte[] bytesOfMessage = event.getMessageAsBytes(muleContext);
       MessageDigest md = MessageDigest.getInstance("SHA-256");

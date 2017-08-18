@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -33,8 +33,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
-    final Event testEvent = testEvent();
-    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent);
+    final InternalEvent testEvent = testEvent();
+    when(messageProcessor.process(any(InternalEvent.class))).thenReturn(testEvent);
   }
 
   @Test
@@ -43,12 +43,12 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     resolver.setMuleContext(muleContext);
     NestedProcessor nestedProcessor = resolver.resolve(ValueResolvingContext.from(testEvent()));
     Object response = nestedProcessor.process();
-    assertThat((String) response, is(TEST_PAYLOAD));
+    assertThat(response, is(TEST_PAYLOAD));
 
-    ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
+    ArgumentCaptor<InternalEvent> captor = ArgumentCaptor.forClass(InternalEvent.class);
     verify(messageProcessor).process(captor.capture());
 
-    Event capturedEvent = captor.getValue();
+    InternalEvent capturedEvent = captor.getValue();
     assertThat(capturedEvent, is(testEvent()));
   }
 

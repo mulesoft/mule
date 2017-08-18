@@ -6,14 +6,14 @@
  */
 package org.mule.functional.util.http;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 /**
  * Simple HTTP server implementation for testing purposes.
@@ -30,6 +30,10 @@ public class SimpleHttpServer {
 
   public HttpMessage getLastHttpRequest() {
     return httpRequests.getLast();
+  }
+
+  public HttpMessage getHttpRequest(int index) {
+    return httpRequests.get(index);
   }
 
   private SimpleHttpServer(int port) {

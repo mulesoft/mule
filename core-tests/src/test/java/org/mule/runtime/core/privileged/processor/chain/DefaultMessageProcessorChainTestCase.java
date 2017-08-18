@@ -38,46 +38,42 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
+import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -87,6 +83,11 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -172,7 +173,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingMP mp3 = getAppendingMP("3");
     builder.chain(mp1, mp2, nullmp, mp3);
 
-    Event requestEvent = getTestEventUsingFlow("0");
+    InternalEvent requestEvent = getTestEventUsingFlow("0");
     assertNull(process(builder.build(), requestEvent));
 
     // mp1
@@ -206,7 +207,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingMP mp3 = getAppendingMP("3");
     builder.chain(mp1, mp2, voidmp, mp3);
 
-    Event requestEvent = getTestEventUsingFlow("0");
+    InternalEvent requestEvent = getTestEventUsingFlow("0");
     assertEquals("0123", process(builder.build(), requestEvent).getMessage().getPayload().getValue());
 
     // mp1
@@ -469,7 +470,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         new DefaultMessageProcessorChainBuilder().chain(getAppendingMP("a"), getAppendingMP("b"), new ReturnVoidMP())
             .build();
     nested.setMuleContext(muleContext);
-    builder.chain(getAppendingMP("1"), event -> nested.process(Event.builder(event)
+    builder.chain(getAppendingMP("1"), event -> nested.process(InternalEvent.builder(event)
         .message(event.getMessage()).flow(flow).build()), getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
   }
@@ -548,7 +549,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mp2 = new AppendingInterceptingMP("2");
     Processor chain = builder.chain(mp1, mp2).build();
     ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
@@ -567,7 +567,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mpb = new AppendingInterceptingMP("b");
     Processor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
     ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((FlowConstructAware) chain).setFlowConstruct(mock(FlowConstruct.class));
     ((Lifecycle) chain).initialise();
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
@@ -582,7 +581,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testNoneIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
-    Event restul = process(builder.build(), getTestEventUsingFlow(""));
+    InternalEvent restul = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("MessageProcessorMessageProcessorMessageProcessor", restul.getMessage().getPayload().getValue());
   }
 
@@ -590,7 +589,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testAllIntercepting() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestIntercepting(), new TestIntercepting());
-    Event restul = process(builder.build(), getTestEventUsingFlow(""));
+    InternalEvent restul = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor",
                  restul.getMessage().getPayload().getValue());
   }
@@ -600,7 +599,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(), new TestIntercepting(),
                   new TestNonIntercepting(), new TestNonIntercepting());
-    Event restul = process(builder.build(), getTestEventUsingFlow(""));
+    InternalEvent restul = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
                  restul.getMessage().getPayload().getValue());
   }
@@ -608,10 +607,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testMixStaticFactoryt() throws Exception {
     MessageProcessorChain chain =
-        newChain(new TestIntercepting(), new TestNonIntercepting(),
+        newChain(empty(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(),
                  new TestNonIntercepting());
-    Event restul = process(chain, getTestEventUsingFlow(""));
+    InternalEvent restul = process(chain, getTestEventUsingFlow(""));
     assertEquals("InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
                  restul.getMessage().getPayload().getValue());
   }
@@ -621,7 +620,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
                   new TestNonIntercepting(), new TestIntercepting());
-    Event restul = process(builder.build(), getTestEventUsingFlow(""));
+    InternalEvent restul = process(builder.build(), getTestEventUsingFlow(""));
     assertEquals("MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
                  restul.getMessage().getPayload().getValue());
   }
@@ -629,11 +628,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testMix2StaticFactory() throws Exception {
     MessageProcessorChain chain =
-        newChain(new TestNonIntercepting(), new TestIntercepting(),
-                 new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
+        newChain(empty(), new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
                  new TestIntercepting());
-    Event result = process(chain, getTestEventUsingFlow(""));
-    assertEquals("MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
+    InternalEvent result = process(chain, getTestEventUsingFlow(""));
+    assertEquals("MessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
                  result.getMessage().getPayload().getValue());
   }
 
@@ -654,7 +652,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         new ResponseMessageProcessorAdapter(getAppendingMP("c"));
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(
-                  getAppendingMP("1"), newChain(getAppendingMP("a"),
+                  getAppendingMP("1"), newChain(empty(), getAppendingMP("a"),
                                                 responseMessageProcessorAdapter, getAppendingMP("b")),
                   getAppendingMP("2"));
     assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01abc2"));
@@ -666,7 +664,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     final ResponseMessageProcessorAdapter innerResponseMessageProcessorAdapter =
         new ResponseMessageProcessorAdapter(getAppendingMP("4"));
     final ResponseMessageProcessorAdapter responseMessageProcessorAdapter =
-        new ResponseMessageProcessorAdapter(newChain(innerResponseMessageProcessorAdapter, getAppendingMP("3")));
+        new ResponseMessageProcessorAdapter(newChain(empty(), innerResponseMessageProcessorAdapter, getAppendingMP("3")));
     builder.chain(getAppendingMP("1"), responseMessageProcessorAdapter, getAppendingMP("2"));
     process(builder.build(), getTestEventUsingFlow("0"));
     assertThat(process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01234"));
@@ -675,7 +673,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testNestedResponseProcessorEndOfChain() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    final MessageProcessorChain chain = newChain(singletonList(getAppendingMP("1")));
+    final MessageProcessorChain chain = newChain(empty(), singletonList(getAppendingMP("1")));
     final ResponseMessageProcessorAdapter responseMessageProcessorAdapter = new ResponseMessageProcessorAdapter(chain);
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(responseMessageProcessorAdapter);
@@ -686,19 +684,19 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testAll() throws Exception {
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
-    scatterGatherRouter.addRoute(getAppendingMP("1"));
-    scatterGatherRouter.addRoute(getAppendingMP("2"));
-    scatterGatherRouter.addRoute(getAppendingMP("3"));
-    scatterGatherRouter.setFlowConstruct(flow);
+    scatterGatherRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    scatterGatherRouter
+        .setRoutes(asList(newChain(empty(), getAppendingMP("1")), newChain(empty(), getAppendingMP("2")),
+                          newChain(empty(), getAppendingMP("3"))));
     initialiseIfNeeded(scatterGatherRouter, true, muleContext);
     scatterGatherRouter.start();
 
-    Event event = getTestEventUsingFlow("0");
-    final MessageProcessorChain chain = newChain(singletonList(scatterGatherRouter));
-    Message result = process(chain, Event.builder(event).message(event.getMessage()).build()).getMessage();
-    assertThat(result.getPayload().getValue(), instanceOf(List.class));
-    List<Message> resultMessage = (List<Message>) result.getPayload().getValue();
-    assertThat(resultMessage.stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(),
+    InternalEvent event = getTestEventUsingFlow("0");
+    final MessageProcessorChain chain = newChain(empty(), singletonList(scatterGatherRouter));
+    Message result = process(chain, InternalEvent.builder(event).message(event.getMessage()).build()).getMessage();
+    assertThat(result.getPayload().getValue(), instanceOf(Map.class));
+    Map<String, Message> resultMessage = (Map<String, Message>) result.getPayload().getValue();
+    assertThat(resultMessage.values().stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(),
                is(equalTo(new String[] {"01", "02", "03"})));
 
     scatterGatherRouter.stop();
@@ -708,12 +706,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Test
   public void testChoice() throws Exception {
     ChoiceRouter choiceRouter = new ChoiceRouter();
+    choiceRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
-    choiceRouter.addRoute("true", newChain(getAppendingMP("1")));
-    choiceRouter.addRoute("true", newChain(getAppendingMP("2")));
-    choiceRouter.addRoute("true", newChain(getAppendingMP("3")));
+    choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("1")));
+    choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("2")));
+    choiceRouter.addRoute("true", newChain(empty(), getAppendingMP("3")));
+    initialiseIfNeeded(choiceRouter, muleContext);
 
-    assertThat(process(newChain(choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01"));
+    assertThat(process(newChain(empty(), choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
+               equalTo("01"));
   }
 
   @Test
@@ -749,12 +750,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   @Override
-  protected Event process(Processor messageProcessor, Event event) throws Exception {
+  protected InternalEvent process(Processor messageProcessor, InternalEvent event) throws Exception {
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(muleContext);
-    }
-    if (messageProcessor instanceof FlowConstructAware) {
-      ((FlowConstructAware) messageProcessor).setFlowConstruct(flow);
     }
     try {
       return super.process(messageProcessor, event);
@@ -770,22 +768,21 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   static class TestNonIntercepting implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
-      return Event.builder(event).message(of(event.getMessage().getPayload().getValue() + "MessageProcessor")).build();
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      return InternalEvent.builder(event).message(of(event.getMessage().getPayload().getValue() + "MessageProcessor")).build();
     }
   }
 
   static class TestIntercepting extends AbstractInterceptingMessageProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
-      return processNext(Event.builder(event)
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      return processNext(InternalEvent.builder(event)
           .message(of(event.getMessage().getPayload().getValue() + "InterceptingMessageProcessor")).build());
     }
   }
 
   private void assertLifecycle(AppendingInterceptingMP mp) {
-    assertTrue(mp.flowConstuctInjected);
     assertTrue(mp.muleContextInjected);
     assertTrue(mp.initialised);
     assertTrue(mp.started);
@@ -808,13 +805,13 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     }
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       nonBlockingProcessorsExecuted.incrementAndGet();
       return super.process(event);
     }
   }
 
-  class AppendingMP implements Processor, Lifecycle, FlowConstructAware, MuleContextAware {
+  class AppendingMP implements Processor, Lifecycle, MuleContextAware {
 
     String appendString;
     boolean muleContextInjected;
@@ -823,21 +820,22 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     boolean started;
     boolean stopped;
     boolean disposed;
-    Event event;
-    Event resultEvent;
+    InternalEvent event;
+    InternalEvent resultEvent;
 
     public AppendingMP(String append) {
       this.appendString = append;
     }
 
     @Override
-    public Event process(final Event event) throws MuleException {
+    public InternalEvent process(final InternalEvent event) throws MuleException {
       return innerProcess(event);
     }
 
-    private Event innerProcess(Event event) {
+    private InternalEvent innerProcess(InternalEvent event) {
       this.event = event;
-      Event result = Event.builder(event).message(of(event.getMessage().getPayload().getValue() + appendString)).build();
+      InternalEvent result =
+          InternalEvent.builder(event).message(of(event.getMessage().getPayload().getValue() + appendString)).build();
       this.resultEvent = result;
       return result;
     }
@@ -872,17 +870,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       this.muleContextInjected = true;
     }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      this.flowConstuctInjected = true;
-    }
   }
 
-  class AppendingInterceptingMP extends AbstractInterceptingMessageProcessor implements FlowConstructAware, Lifecycle {
+  class AppendingInterceptingMP extends AbstractInterceptingMessageProcessor implements Lifecycle {
 
     String appendString;
     boolean muleContextInjected;
-    boolean flowConstuctInjected;
     boolean initialised;
     boolean started;
     boolean stopped;
@@ -900,12 +893,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     }
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<Event> apply(Publisher<Event> publisher) {
+    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
       if (stopProcessing) {
         return publisher;
       } else {
@@ -920,12 +913,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       }
     }
 
-    private Event appendAfter(Event after) {
-      return Event.builder(after).message(of(after.getMessage().getPayload().getValue() + "after" + appendString)).build();
+    private InternalEvent appendAfter(InternalEvent after) {
+      return InternalEvent.builder(after).message(of(after.getMessage().getPayload().getValue() + "after" + appendString))
+          .build();
     }
 
-    private Event appendBefore(Event before) {
-      return Event.builder(before).message(of(before.getMessage().getPayload().getValue() + "before" + appendString)).build();
+    private InternalEvent appendBefore(InternalEvent before) {
+      return InternalEvent.builder(before).message(of(before.getMessage().getPayload().getValue() + "before" + appendString))
+          .build();
     }
 
     @Override
@@ -959,19 +954,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       super.setMuleContext(context);
     }
 
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      this.flowConstuctInjected = true;
-      super.setFlowConstruct(flowConstruct);
-    }
   }
 
   static class ReturnNullMP implements Processor {
 
-    Event event;
+    InternalEvent event;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       this.event = event;
       return null;
     }
@@ -980,17 +970,17 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   static class ReturnNullInterceptongMP extends AbstractInterceptingMessageProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return null;
     }
   }
 
   private static class ReturnVoidMP implements Processor {
 
-    Event event;
+    InternalEvent event;
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       this.event = event;
       return event;
     }
@@ -999,27 +989,29 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   static class ReturnVoidMPInterceptongMP extends AbstractInterceptingMessageProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       return event;
     }
   }
 
-  protected Event getTestEventUsingFlow(Object data) {
-    Event event = mock(Event.class);
-    EventContext eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+  protected InternalEvent getTestEventUsingFlow(Object data) {
+    InternalEvent event = mock(InternalEvent.class);
+    InternalEventContext eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
     Message message = of(data);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getMessage()).thenReturn(message);
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.getError()).thenReturn(empty());
     when(event.getContext()).thenReturn(eventContext);
+    when(event.getContext()).thenReturn(eventContext);
+    when(event.getAuthentication()).thenReturn(empty());
     return event;
   }
 
-  public static class ExceptionThrowingMessageProcessor implements Processor {
+  public static class ExceptionThrowingMessageProcessor implements Processor, InternalProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       throw new IllegalStateException();
     }
   }

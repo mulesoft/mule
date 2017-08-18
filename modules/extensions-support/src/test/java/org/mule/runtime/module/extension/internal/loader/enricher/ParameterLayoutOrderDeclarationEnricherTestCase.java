@@ -9,9 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -35,12 +34,14 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -91,7 +92,8 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     assertThat(layoutModel.isPresent(), is(true));
     LayoutModel layoutModel1 = layoutModel.get();
     Integer order = layoutModel1.getOrder().orElse(null);
-    assertThat("expecting parameter at position [" + expectedOrder + "] but was at [" + order + "]", order, is(expectedOrder));
+    assertThat("expecting parameter [" + parameterName + "] at position [" + expectedOrder + "] but was at [" + order + "]",
+               order, is(expectedOrder));
   }
 
   @Operations(OrderedOperations.class)
@@ -371,6 +373,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
   public static class MixedSourceOrderWithCallbacks extends Source<Apple, Object> {
 
     @Parameter
+    @Placement(order = 1)
     String paramOne;
 
     @Override
@@ -389,7 +392,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
 
     @OnError
-    public void onError(String paramTwo) {
+    public void onError(@Placement(order = 2) String paramTwo) {
 
     }
   }

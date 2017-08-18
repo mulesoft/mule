@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter;
 
@@ -20,20 +20,19 @@ import org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter;
 public class FirstSuccessful extends AbstractOutboundRouter {
 
   private RoutingStrategy routingStrategy;
-  private String failureExpression = DEFAULT_FAILURE_EXPRESSION;
 
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
     routingStrategy =
-        new FirstSuccessfulRoutingStrategy(flowConstruct, failureExpression, (route, event) -> doProcessRoute(route, event));
+        new FirstSuccessfulRoutingStrategy(this::doProcessRoute);
   }
 
   /**
    * Route the given event to one of our targets
    */
   @Override
-  public Event route(Event event) throws MuleException {
+  public InternalEvent route(InternalEvent event) throws MuleException {
     try {
       return routingStrategy.route(event, getRoutes());
     } catch (RoutingFailedException e) {
@@ -42,16 +41,7 @@ public class FirstSuccessful extends AbstractOutboundRouter {
   }
 
   @Override
-  public boolean isMatch(Event event, Event.Builder builder) throws MuleException {
+  public boolean isMatch(InternalEvent event, InternalEvent.Builder builder) throws MuleException {
     return true;
-  }
-
-  /**
-   * Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-   *
-   * @param failureExpression
-   */
-  public void setFailureExpression(String failureExpression) {
-    this.failureExpression = failureExpression;
   }
 }

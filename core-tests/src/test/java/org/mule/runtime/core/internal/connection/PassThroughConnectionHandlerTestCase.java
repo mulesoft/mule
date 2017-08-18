@@ -55,6 +55,11 @@ public class PassThroughConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void invalidate() throws Exception {
+    doTwiceDisconnectOnce(managedConnection::invalidate);
+  }
+
+  @Test
   public void close() throws Exception {
     doTwiceDisconnectOnce(() -> {
       try {

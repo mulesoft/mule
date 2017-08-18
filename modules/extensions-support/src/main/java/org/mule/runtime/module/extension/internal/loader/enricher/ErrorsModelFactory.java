@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.runtime.extension.api.error.MuleErrors.CRITICAL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.ANY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -132,9 +133,12 @@ public class ErrorsModelFactory {
   private void addType(ErrorTypeDefinition<?> errorType,
                        Graph<ErrorTypeDefinition, Pair<ErrorTypeDefinition, ErrorTypeDefinition>> graph) {
     graph.addVertex(errorType);
-    ErrorTypeDefinition parentErrorType = errorType.getParent().orElse(ANY);
-    graph.addVertex(parentErrorType);
-    graph.addEdge(errorType, parentErrorType);
+    String type = errorType.getType();
+    if (!ANY.name().equals(type) && !CRITICAL.name().equals(type)) {
+      ErrorTypeDefinition parentErrorType = errorType.getParent().orElse((ANY));
+      graph.addVertex(parentErrorType);
+      graph.addEdge(errorType, parentErrorType);
+    }
   }
 
   private void detectCycleReferences(DefaultDirectedGraph<?, ?> graph) {
@@ -160,6 +164,6 @@ public class ErrorsModelFactory {
   }
 
   private void initErrorModelMap(Map<String, ErrorModel> errorModelMap) {
-    errorModelMap.put(toIdentifier(MuleErrors.ANY), newError(MuleErrors.ANY.getType(), MULE).build());
+    errorModelMap.put(toIdentifier(ANY), newError(ANY.getType(), MULE).build());
   }
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.functional.listener;
 
+import org.mule.runtime.core.api.context.notification.Notification;
+
 /**
  * Callback represents an operation to be executed upon notification receive by a test listener such as
  * {@link org.mule.functional.listener.ExceptionListener} or {@link org.mule.functional.listener.FlowExecutionListener}
@@ -15,8 +17,8 @@ package org.mule.functional.listener;
 public interface Callback<T> {
 
   /**
-   * @param source is the source value of the {@link org.mule.runtime.core.api.context.notification.ServerNotification} received
-   *        by the notification listener that executes this callback
+   * @param source is the source value of the {@link Notification} received by the notification listener that executes this
+   *        callback
    */
   public void execute(final T source);
 }

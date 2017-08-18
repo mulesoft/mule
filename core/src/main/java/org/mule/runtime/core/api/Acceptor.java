@@ -12,11 +12,11 @@ package org.mule.runtime.core.api;
 public interface Acceptor {
 
   /**
-   * @param event {@link Event} to route through exception handler
+   * @param event {@link InternalEvent} to route through exception handler
    * @return true if this {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} should handler exception false
    *         otherwise
    */
-  boolean accept(Event event);
+  boolean accept(InternalEvent event);
 
   /**
    * @return true if accepts any message, false otherwise.

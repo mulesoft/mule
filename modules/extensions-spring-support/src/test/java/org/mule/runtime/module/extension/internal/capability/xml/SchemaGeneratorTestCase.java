@@ -15,28 +15,29 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaGenerator;
 import org.mule.runtime.module.extension.internal.loader.enricher.JavaXmlDeclarationEnricher;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalInnerPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.MapConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.StringListConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.TestConnector;
-import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
+import org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.function.extension.WeaveFunctionExtension;
@@ -47,19 +48,14 @@ import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.soap.extension.FootballSoapExtension;
+import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,6 +66,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -125,6 +126,9 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
                                                                                                HeisenbergExtension.class,
                                                                                                "heisenberg.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
+                                                                                               SubstitutionGroupExtension.class,
+                                                                                               "substitutiongroup.xsd"),
+                                                                   new SchemaGeneratorTestUnit(javaLoader,
                                                                                                TransactionalExtension.class,
                                                                                                "tx-ext.xsd"),
                                                                    new SchemaGeneratorTestUnit(javaLoader,
@@ -177,7 +181,25 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
   public void generate() throws Exception {
     XmlDslModel languageModel = extensionUnderTest.getXmlDslModel();
     String schema = generator.generate(extensionUnderTest, languageModel, new SchemaTestDslContext());
-    compareXML(expectedSchema, schema);
+    try {
+      compareXML(expectedSchema, schema);
+    } catch (Throwable t) {
+      // utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away
+      // with anything. First check why the generated json is different and make sure you're not introducing any bugs.
+      // This should never be commited as true
+      boolean fixInputFiles = false;
+
+      if (fixInputFiles) {
+        File root = new File(getResourceAsUrl("schemas/" + expectedXSD, getClass()).toURI()).getParentFile()
+            .getParentFile().getParentFile().getParentFile();
+        File testDir = new File(root, "src/test/resources/schemas");
+        File target = new File(testDir, expectedXSD);
+        stringToFile(target.getAbsolutePath(), schema);
+
+        System.out.println(expectedXSD + " fixed");
+      }
+      throw t;
+    }
   }
 
   private static class SchemaTestDslContext implements DslResolvingContext {

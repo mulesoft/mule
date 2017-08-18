@@ -17,9 +17,10 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
@@ -41,7 +42,9 @@ public final class OperationMessageProcessorBuilder {
   private ConfigurationProvider configurationProvider;
   private Map<String, ?> parameters;
   private String target;
+  private String targetValue;
   private CursorProviderFactory cursorProviderFactory;
+  private RetryPolicyTemplate retryPolicyTemplate;
 
   public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
                                           OperationModel operationModel,
@@ -84,8 +87,18 @@ public final class OperationMessageProcessorBuilder {
     return this;
   }
 
+  public OperationMessageProcessorBuilder setTargetValue(String targetValue) {
+    this.targetValue = targetValue;
+    return this;
+  }
+
   public OperationMessageProcessorBuilder setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
     this.cursorProviderFactory = cursorProviderFactory;
+    return this;
+  }
+
+  public OperationMessageProcessorBuilder setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
+    this.retryPolicyTemplate = retryPolicyTemplate;
     return this;
   }
 
@@ -100,17 +113,21 @@ public final class OperationMessageProcessorBuilder {
         OperationMessageProcessor processor;
         if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
-              new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                 cursorProviderFactory, extensionManager, policyManager,
+              new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                                 resolverSet,
+                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  extensionConnectionSupplier);
         } else if (supportsOAuth(extensionModel)) {
           processor =
-              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                 cursorProviderFactory, extensionManager, policyManager,
+              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                                 resolverSet,
+                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  oauthManager);
         } else {
-          processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, resolverSet,
-                                                    cursorProviderFactory, extensionManager, policyManager);
+          processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                                    resolverSet,
+                                                    cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                                    policyManager);
         }
         // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
         muleContext.getInjector().inject(processor);

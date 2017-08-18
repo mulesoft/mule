@@ -15,12 +15,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.spring.NotificationConfig.DisabledNotificationConfig;
-import org.mule.runtime.config.spring.NotificationConfig.EnabledNotificationConfig;
+import org.mule.runtime.config.spring.internal.ServerNotificationManagerConfigurator;
+import org.mule.runtime.config.spring.internal.NotificationConfig.DisabledNotificationConfig;
+import org.mule.runtime.config.spring.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
+import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.util.Pair;
@@ -54,7 +55,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     configurator = new ServerNotificationManagerConfigurator();
     configurator.setMuleContext(context);
     final ApplicationContext springContext = mock(ApplicationContext.class);
-    doReturn(new String[0]).when(springContext).getBeanNamesForType(ServerNotificationListener.class, false, true);
+    doReturn(new String[0]).when(springContext).getBeanNamesForType(NotificationListener.class, false, true);
     configurator.setApplicationContext(springContext);
   }
 
@@ -151,14 +152,14 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     configurator.initialise();
   }
 
-  public static class CompliantNotification extends ServerNotification {
+  public static class CompliantNotification extends AbstractServerNotification {
 
     public CompliantNotification(Object message, int action) {
       super(message, action);
     }
   }
 
-  public static class CompliantNotificationListener implements ServerNotificationListener<CompliantNotification> {
+  public static class CompliantNotificationListener implements NotificationListener<CompliantNotification> {
 
     @Override
     public void onNotification(CompliantNotification notification) {

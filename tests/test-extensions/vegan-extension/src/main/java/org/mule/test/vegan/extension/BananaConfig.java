@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -33,6 +34,7 @@ public class BananaConfig extends EasyToEatConfig {
   @NullSafe
   private HealthyFood healthyFood;
 
+  @OutputResolver(output = FruitMetadataResolver.class)
   public HealthyFood getHealthyFood() {
     return healthyFood;
   }

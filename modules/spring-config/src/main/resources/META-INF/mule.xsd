@@ -351,6 +351,14 @@
         </xsd:choice>
     </xsd:group>
 
+    <xsd:element name="route" type="messageProcessorChainType">
+        <xsd:annotation>
+            <xsd:documentation>
+                One of n routes in a router such as scatter-gather, first-successful or round-robin.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -382,6 +390,13 @@
     <xsd:complexType name="topLevelProcessorType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="name" type="substitutableName" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the message processor in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -393,13 +408,6 @@
                 <xsd:sequence>
                     <xsd:group ref="propertiesGroup"/>
                 </xsd:sequence>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor in the registry.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -546,13 +554,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="name" type="substitutableName" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the message processor in the registry.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -773,12 +774,11 @@
     <xsd:simpleType name="transactionType">
         <xsd:annotation>
             <xsd:documentation>
-                Transaction types supported. Availability will depend on the runtime version, though STANDARD is always available.
+                Transaction types supported. Availability will depend on the runtime version, though LOCAL is always available.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="LOCAL"/>
-            <xsd:enumeration value="MULTI"/>
             <xsd:enumeration value="XA"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -827,13 +827,6 @@
     <xsd:complexType name="abstractTransformerType">
         <xsd:complexContent>
             <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="returnClass" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -1312,6 +1305,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="TIMEOUT">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when timeout is produced.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>
@@ -1382,6 +1382,28 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractReconnectNotifierType"/>
+
+    <xsd:element name="reconnection" type="reconnectionConfigType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the default reconnection behaviour for a connected component.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="reconnectionConfigType">
+        <xsd:sequence>
+            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="failsDeployment" type="substitutableBoolean" default="false" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>When the application is deployed, a connectivity test is performed on all connectors. If set to
+                    true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
 
     <xsd:element name="reconnect" type="reconnectSimpleStrategyType"
                  substitutionGroup="abstract-reconnection-strategy">
@@ -2039,25 +2061,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-
-    <xsd:element name="base64-encoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that base64 encodes a string or byte array message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="base64-decoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that base64 decodes a message to give an array of bytes.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -2197,21 +2200,44 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="parse-template" type="parseTemplateTransformerType" substitutionGroup="abstract-transformer">
+    <xsd:element name="parse-template" type="parseTemplateProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that parses a template in a given location
+                A transformer that parses a template defined inline
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="parseTemplateTransformerType">
+    <xsd:complexType name="parseTemplateProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="location" type="xsd:string" use="required">
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element name="content" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Template to be processed
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="location" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="target" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Variable where to save processed payload
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="targetValue" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Expression to apply to the output when saved to a target
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2284,54 +2310,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="bean-builder-transformer" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that uses expressions to configure a simple bean object.  The user can specify a bean class or factory to create and one or more expressions that are used to configure properties on the bean.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="abstractTransformerType">
-                    <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-                        <xsd:element name="bean-property">
-                            <xsd:complexType>
-                                <xsd:attribute name="property-name" type="xsd:string" use="required">
-                                    <xsd:annotation>
-                                        <xsd:documentation>
-                                            The name of the bean property
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:attribute>
-                                <xsd:attributeGroup ref="expressionAttributes"/>
-                                <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
-                                    <xsd:annotation>
-                                        <xsd:documentation>If the expression evaluates to null, whether to continue to the next expression without error.
-                                        </xsd:documentation>
-                                    </xsd:annotation>
-                                </xsd:attribute>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                    <xsd:attribute name="beanClass" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The bean class to create
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                    <xsd:attribute name="beanFactory-ref" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                A Bean factory to use when creating the bean object.  The factory must implement {{org.mule.runtime.core.api.object.ObjectFactory}}.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
 
     <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -2732,7 +2710,7 @@
                  substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. Otherwise, a 'FILTERED' error is generated.
+                Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. Note that the ID used can be generated from the message using an expression defined in the 'idExpression' attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3091,7 +3069,7 @@
         <xsd:complexContent>
             <xsd:extension base="abstractRoutingMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
+                    <xsd:element ref="route" minOccurs="1" maxOccurs="unbounded"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -3117,13 +3095,6 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="processorWithAtLeastOneTargetType">
-                    <xsd:attribute name="failureExpression" type="xsd:string">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -3156,14 +3127,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="failureExpression" type="xsd:string" use="optional">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Specifies an expression that when evaluated determines if the processing of one a route was a failure or not.
-                                If no expression is specified, only exceptions will be considered as processing failures.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -3179,61 +3142,58 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:sequence>
-                        <xsd:element name="custom-aggregation-strategy" type="aggregationStrategyType" minOccurs="0" maxOccurs="1">
+                        <xsd:element ref="route" minOccurs="2" maxOccurs="unbounded"/>
+                        <xsd:element ref="abstract-fork-join-strategy" minOccurs="0" maxOccurs="1">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    Allows customizing the logic used for aggregation the events back together.
+                                    Strategy that determines how multiple routes should be processed and how their results are aggregated.
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="2" maxOccurs="unbounded"/>
                     </xsd:sequence>
-                    <xsd:attribute name="parallel" type="substitutableBoolean" default="true">
+                    <xsd:attribute name="timeout" type="substitutableLong">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Whether the configured routes will run in parallel (default is true).
+                                Sets a timeout in milliseconds for each route. The default behaviour is that of no timeout.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="timeout" type="substitutableLong" use="optional" default="0">
+                    <xsd:attribute name="maxConcurrency" type="substitutableInt">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout. 
+                                The maximum concurrency. This value determines the maximum level of parallelism that will be used by this router. By default all routes will run in parallel (assuming available resources) but this can be limited or sequential behaviour achieved via the use of this attribute.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="target" type="substitutableString">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="targetValue" type="expressionString" default="#[payload]"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
-    <xsd:complexType name="aggregationStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedType">
-                <xsd:attribute name="class" type="substitutableClass" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The canonical name of a class that implements
-                            org.mule.runtime.core.api.routing.AggregationStrategy.
-                            Such a class is required to have a default constructor.
-                            This property cannot be set at the same time as 'ref'
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="ref" type="xsd:string" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to a registered bean that implements
-                            org.mule.runtime.core.api.routing.AggregationStrategy.
-                            This property cannot be set at the same time as 'class'
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    
-	
+
+    <xsd:element name="abstract-fork-join-strategy" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for route resolver elements, which return a set of routes.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="collect-list" substitutionGroup="abstract-fork-join-strategy">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="annotatedType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
                  type="processorWithAtLeastOneTargetType">
         <xsd:annotation>

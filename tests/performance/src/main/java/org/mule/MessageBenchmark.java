@@ -36,7 +36,7 @@ public class MessageBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Message createMessageWithDataType() {
-    return Message.builder().payload(PAYLOAD).mediaType(MediaType.TEXT).build();
+    return Message.builder().value(PAYLOAD).mediaType(MediaType.TEXT).build();
   }
 
   @Benchmark
@@ -56,12 +56,12 @@ public class MessageBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Message mutateMessagePayload() {
-    return Message.builder(message).payload(VALUE).build();
+    return Message.builder(message).value(VALUE).build();
   }
 
   @Benchmark
   public Message mutateMessagePayloadWithDataType() {
-    return Message.builder(message).payload(VALUE).mediaType(MediaType.TEXT).build();
+    return Message.builder(message).value(VALUE).mediaType(MediaType.TEXT).build();
   }
 
   @Benchmark
@@ -149,7 +149,7 @@ public class MessageBenchmark extends AbstractBenchmark {
   }
 
   private Message createMuleMessageWithProperties(int numProperties) {
-    Builder builder = InternalMessage.builder().payload(PAYLOAD);
+    Builder builder = InternalMessage.builder().value(PAYLOAD);
     for (int i = 1; i <= numProperties; i++) {
       builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
     }

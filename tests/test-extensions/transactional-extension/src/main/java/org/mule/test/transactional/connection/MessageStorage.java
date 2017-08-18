@@ -8,7 +8,7 @@ package org.mule.test.transactional.connection;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Queue;
@@ -21,7 +21,7 @@ public class MessageStorage implements Processor {
   public static Throwable exception;
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     event.getError().ifPresent(theError -> exception = theError.getCause());
     TypedValue<Object> payload = event.getMessage().getPayload();
     if (payload.getValue() != null) {

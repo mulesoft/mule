@@ -9,7 +9,7 @@ package org.mule.test.module.extension.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.Collection;

@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -26,43 +26,43 @@ public class ModuleWithPropertiesTestCase extends AbstractXmlExtensionMuleArtifa
 
   @Test
   public void testSetPayloadHardcodedFromModuleFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadHardcodedFromModuleFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadHardcodedFromModuleFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("hardcoded value from module"));
   }
 
   @Test
   public void testSetPayloadParamFromModuleFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadParamFromModuleFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadParamFromModuleFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload from module"));
   }
 
   @Test
   public void testSetPayloadConfigParamFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadConfigParamFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadConfigParamFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("some config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadConfigDefaultParamFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadConfigDefaultParamFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadConfigDefaultParamFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("some default-config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadConfigDefaultPropertyUseOptionalFlow() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadConfigDefaultPropertyUseOptionalFlow").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadConfigDefaultPropertyUseOptionalFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("some default-config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadAddParamAndPropertyValues() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValues").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadAddParamAndPropertyValues").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("a parameter value some config-value-parameter"));
   }
 
   @Test
   public void testSetPayloadConfigOptionalProperty() throws Exception {
-    Event muleEvent = flowRunner("testSetPayloadConfigOptionalProperty").run();
+    InternalEvent muleEvent = flowRunner("testSetPayloadConfigOptionalProperty").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 }

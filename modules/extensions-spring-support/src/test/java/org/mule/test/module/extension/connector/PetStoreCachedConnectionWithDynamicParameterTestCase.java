@@ -6,15 +6,16 @@
  */
 package org.mule.test.module.extension.connector;
 
+import static javax.xml.bind.DatatypeConverter.parseDateTime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 
 import java.util.Calendar;
 
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 public class PetStoreCachedConnectionWithDynamicParameterTestCase extends AbstractExtensionFunctionalTestCase {
@@ -35,7 +36,7 @@ public class PetStoreCachedConnectionWithDynamicParameterTestCase extends Abstra
         .withVariable(USERNAME, "john")
         .withVariable(PASSWORD, "doe")
         .withVariable(DATE,
-                      ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime("2008-09-15T15:53:23+05:00").toDate())
+                      parseDateTime("2008-09-15T15:53:23+05:00").getTime())
         .run().getMessage().getPayload().getValue();
 
     assertThat(client.getUsername(), is("john"));
@@ -50,7 +51,7 @@ public class PetStoreCachedConnectionWithDynamicParameterTestCase extends Abstra
     client = (PetStoreClient) flowRunner(FLOW_NAME)
         .withVariable(USERNAME, "john")
         .withVariable(PASSWORD, "doe")
-        .withVariable(DATE, ISODateTimeFormat.dateTimeParser().withOffsetParsed().parseDateTime("2017-02-10").toDate())
+        .withVariable(DATE, parseDateTime("2017-02-10").getTime())
         .run().getMessage().getPayload().getValue();
 
     assertThat(client.getUsername(), is("john"));

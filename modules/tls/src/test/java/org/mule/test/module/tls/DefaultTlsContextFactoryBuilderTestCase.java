@@ -39,17 +39,17 @@ public class DefaultTlsContextFactoryBuilderTestCase extends AbstractMuleTestCas
   @Test
   public void buildsContext() throws Exception {
     TlsContextFactory contextFactory = builder
-        .setEnabledCipherSuites("TLS_SOMETHING")
-        .setEnabledProtocols("TLSv1.1")
-        .setKeyStorePath("serverKeystore")
-        .setKeyStorePassword("mulepassword")
-        .setKeyAlias("muleserver")
-        .setKeyPassword("mulepassword")
-        .setKeyStoreAlgorithm("PKIX")
-        .setTrustStorePath("trustStore")
-        .setTrustStorePassword("mulepassword")
-        .setTrustStoreType("jceks")
-        .setInsecureTrustStore(true)
+        .enabledCipherSuites("TLS_SOMETHING")
+        .enabledProtocols("TLSv1.1")
+        .keyStorePath("serverKeystore")
+        .keyStorePassword("mulepassword")
+        .keyAlias("muleserver")
+        .keyPassword("mulepassword")
+        .keyStoreAlgorithm("PKIX")
+        .trustStorePath("trustStore")
+        .trustStorePassword("mulepassword")
+        .trustStoreType("jceks")
+        .insecureTrustStore(true)
         .build();
 
     assertThat(contextFactory.getEnabledProtocols(), is(arrayContaining("TLSv1.1")));
@@ -79,21 +79,21 @@ public class DefaultTlsContextFactoryBuilderTestCase extends AbstractMuleTestCas
   public void failsWhenFileNotFound() throws Exception {
     expectedException.expect(CreateException.class);
     expectedException.expectMessage("Resource aPath could not be found");
-    builder.setTrustStorePath("aPath").build();
+    builder.trustStorePath("aPath").build();
   }
 
   @Test
   public void failsWhenStorePasswordIsWrong() throws Exception {
     expectedException.expect(CreateException.class);
     expectedException.expectMessage("Unable to initialise TLS configuration");
-    builder.setKeyStorePath("serverKeystore").setKeyStorePassword("zaraza").setKeyPassword("mulepassword").build();
+    builder.keyStorePath("serverKeystore").keyStorePassword("zaraza").keyPassword("mulepassword").build();
   }
 
   @Test
   public void failsWhenKeyPasswordIsWrong() throws Exception {
     expectedException.expect(CreateException.class);
     expectedException.expectMessage("Unable to initialise TLS configuration");
-    builder.setKeyStorePath("serverKeystore").setKeyStorePassword("mulepassword").setKeyPassword("zaraza").build();
+    builder.keyStorePath("serverKeystore").keyStorePassword("mulepassword").keyPassword("zaraza").build();
   }
 
 }

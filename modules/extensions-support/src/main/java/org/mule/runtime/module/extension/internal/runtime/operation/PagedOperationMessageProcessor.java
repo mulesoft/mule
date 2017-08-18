@@ -6,28 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.just;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
-
-import reactor.core.publisher.Mono;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which supports auto paging by the means of a
@@ -43,43 +38,28 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
                                         OperationModel operationModel,
                                         ConfigurationProvider configurationProvider,
                                         String target,
+                                        String targetValue,
                                         ResolverSet resolverSet,
                                         CursorProviderFactory cursorProviderFactory,
+                                        RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
                                         ExtensionConnectionSupplier connectionSupplier) {
-    super(extensionModel, operationModel, configurationProvider, target, resolverSet, cursorProviderFactory,
-          extensionManager, policyManager);
+    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
+          retryPolicyTemplate, extensionManager, policyManager);
     this.connectionSupplier = connectionSupplier;
   }
 
   @Override
-  protected Mono<Event> doProcess(Event event, ExecutionContextAdapter<OperationModel> operationContext) {
-    try {
-      Event resultEvent = super.doProcess(event, operationContext).block();
-      PagingProvider<?, ?> pagingProvider = getTarget()
-          .map(target -> getPagingProvider(
-                                           (Message) resultEvent.getVariable(target).getValue()))
-          .orElseGet(() -> getPagingProvider(resultEvent.getMessage()));
-
-      if (pagingProvider == null) {
-        throw new IllegalStateException("Obtained paging delegate cannot be null");
-      }
-
-      Producer<?> producer =
-          new PagingProviderProducer(pagingProvider, operationContext.getConfiguration().get(),
-                                     operationContext, connectionSupplier);
-      Consumer<?> consumer = new ListConsumer(producer);
-
-      return just(returnDelegate.asReturnValue(new ConsumerStreamingIterator<>(consumer), operationContext));
-    } catch (Exception e) {
-      return error(e);
-    } catch (Throwable t) {
-      return error(wrapFatal(t));
+  protected InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
+    if (value == null) {
+      throw new IllegalStateException("Obtained paging delegate cannot be null");
     }
-  }
 
-  private PagingProvider getPagingProvider(Message message) {
-    return (PagingProvider) message.getPayload().getValue();
+    Producer<?> producer =
+        new PagingProviderProducer((PagingProvider) value, operationContext.getConfiguration().get(),
+                                   operationContext, connectionSupplier);
+    Consumer<?> consumer = new ListConsumer(producer);
+    return super.asReturnValue(operationContext, new ConsumerStreamingIterator<>(consumer));
   }
 }

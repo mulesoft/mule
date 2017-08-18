@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.core.api.config.builders;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderNoMatching;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuilder;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -82,7 +84,7 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         String className = (String) props.get(extension);
 
         if (className == null || !ClassUtils.isClassOnPath(className, this.getClass())) {
-          throw new ConfigurationException(CoreMessages.configurationBuilderNoMatching(createConfigResourcesString()));
+          throw new ConfigurationException(configurationBuilderNoMatching(createConfigResourcesString()));
         }
 
         ConfigResource[] constructorArg = new ConfigResource[configs.size()];
@@ -92,8 +94,8 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
         if (parentContext != null && cb instanceof ParentMuleContextAwareConfigurationBuilder) {
           ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext);
         } else if (parentContext != null) {
-          throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-              .format("ConfigurationBuilder %s does not support domain context", cb.getClass().getCanonicalName())));
+          throw new MuleRuntimeException(createStaticMessage(format("ConfigurationBuilder %s does not support domain context",
+                                                                    cb.getClass().getCanonicalName())));
         }
         cb.configure(muleContext);
       }

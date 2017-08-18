@@ -30,6 +30,6 @@ public interface SoapRequest extends SoapMessage {
    * @return an empty Soap Request with no content for the requested operation.
    */
   static SoapRequest empty(String operation) {
-    return builder().withOperation(operation).build();
+    return builder().operation(operation).build();
   }
 }

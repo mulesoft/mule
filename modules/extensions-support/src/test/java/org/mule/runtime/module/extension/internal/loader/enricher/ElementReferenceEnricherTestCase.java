@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.CONFIG;
 import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.FLOW;
 import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;

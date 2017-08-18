@@ -350,7 +350,7 @@ public class ComponentBuildingDefinition<T> {
           || (definition.keyTypeConverter.isPresent() && componentType.isPresent() && isMapType(componentType.get())),
                  KEY_TYPE_CONVERTER_AND_NO_MAP_TYPE);
       definition.componentIdentifier =
-          builder().withName(identifier).withNamespace(namespace).build();
+          builder().name(identifier).namespace(namespace).build();
       return definition;
     }
 

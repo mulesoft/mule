@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.container.internal.ExportedServiceMatcher.like;
 
-import org.mule.runtime.module.artifact.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.CompilerUtils;

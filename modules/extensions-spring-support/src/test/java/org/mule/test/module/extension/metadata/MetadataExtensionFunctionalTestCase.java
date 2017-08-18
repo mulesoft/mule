@@ -31,6 +31,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -40,11 +41,10 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
-import org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder;
+import org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -127,7 +127,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
 
   protected MetadataType personType;
   protected Location location;
-  protected Event event;
+  protected InternalEvent event;
   protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
@@ -150,7 +150,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   @Before
   public void setup() throws Exception {
     event = eventBuilder().message(of("")).build();
-    metadataService = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    metadataService = muleContext.getRegistry().lookupObject(MetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 
@@ -218,16 +218,16 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     }
   }
 
-  void assertExpectedOutput(ComponentModel model, Type payloadType, Type attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, Type payloadType, Type attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), TYPE_LOADER.load(payloadType),
                          TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, Type attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, MetadataType payloadType, Type attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, TYPE_LOADER.load(attributesType));
   }
 
-  void assertExpectedOutput(ComponentModel model, MetadataType payloadType, MetadataType attributesType) {
+  void assertExpectedOutput(ExecutableComponentModel model, MetadataType payloadType, MetadataType attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, attributesType);
   }
 

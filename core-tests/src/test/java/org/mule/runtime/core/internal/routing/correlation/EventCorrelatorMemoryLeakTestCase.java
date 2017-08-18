@@ -16,16 +16,18 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -41,7 +43,7 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
   private PartitionableObjectStore<EventGroup> partitionableObjectStore = mock(PartitionableObjectStore.class);
   private ObjectStore<Long> objectStore = mock(ObjectStore.class);
   private final FlowConstruct flowConstruct = mock(FlowConstruct.class);
-  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleContext muleContext = mockContextWithServices();
   private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
   private EventGroup eventGroup = mock(EventGroup.class);
   private int countOfEventGroups = 0;
@@ -57,7 +59,7 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testEventGroupFreedInRoutingException() throws Exception {
-    Event event = mock(Event.class);
+    InternalEvent event = mock(InternalEvent.class);
     try {
       eventCorrelator.process(event);
       fail("Routing Exception must be catched.");
@@ -72,7 +74,7 @@ public class EventCorrelatorMemoryLeakTestCase extends AbstractMuleTestCase {
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(partitionableObjectStore.retrieve(any(String.class), any(String.class)))
         .thenThrow(ObjectDoesNotExistException.class);
-    when(eventCorrelatorCallback.createEventGroup(any(Event.class), any(Object.class))).thenReturn(eventGroup);
+    when(eventCorrelatorCallback.createEventGroup(any(InternalEvent.class), any(Object.class))).thenReturn(eventGroup);
     when(eventCorrelatorCallback.aggregateEvents(any(EventGroup.class))).thenThrow(RoutingException.class);
     when(eventCorrelatorCallback.shouldAggregateEvents(any(EventGroup.class))).thenReturn(true);
   }

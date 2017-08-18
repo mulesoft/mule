@@ -20,7 +20,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
-import org.mule.runtime.core.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 
 /**
  * @deprecated as of 3.7.0 since {@link RegistryBroker} also is
@@ -33,7 +33,7 @@ public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
   }
 
   @Override
-  protected void registerPhases() {
+  protected void registerPhases(Registry registry) {
     RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
     LifecycleCallback<AbstractRegistryBroker> emptyCallback = new EmptyLifecycleCallback<>();
     registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), emptyCallback);

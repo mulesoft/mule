@@ -14,10 +14,10 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
-import static org.mule.runtime.config.spring.dsl.api.xml.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
@@ -31,6 +31,8 @@ import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.extension.api.declaration.type.TypeUtils;
+import org.mule.runtime.extension.api.declaration.type.annotation.DslBaseType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -43,13 +45,14 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
-import javax.xml.namespace.QName;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ObjectType}
@@ -88,7 +91,10 @@ final class ObjectTypeSchemaDelegate {
       if (builder.isImported(type)) {
         addImportedTypeElement(paramSyntax, description, type, all, required);
       } else {
-        if (paramSyntax.isWrapped()) {
+        if (TypeUtils.getSubstitutionGroup(type).isPresent()) {
+          declareRefToType(type, paramSyntax, description, all, required);
+          registerAbstractElement(type, paramSyntax);
+        } else if (paramSyntax.isWrapped()) {
           declareRefToType(type, paramSyntax, description, all, required);
         } else {
           declareTypeInline(type, paramSyntax, description, all, required);
@@ -260,7 +266,7 @@ final class ObjectTypeSchemaDelegate {
       return registeredComplexTypesHolders.get(typeId).getComplexType();
     }
 
-    QName base = getComplexTypeBase(baseType);
+    QName base = getComplexTypeBase(type, baseType);
     Collection<ObjectFieldType> fields;
     if (baseType == null) {
       fields = type.getFields();
@@ -280,13 +286,16 @@ final class ObjectTypeSchemaDelegate {
   /**
    * @return the {@link QName} of the {@code base} type for which the new {@link ComplexType} declares an {@code extension}
    */
-  private QName getComplexTypeBase(ObjectType baseType) {
+  private QName getComplexTypeBase(ObjectType type, ObjectType baseType) {
     Optional<DslElementSyntax> baseDsl = builder.getDslResolver().resolve(baseType);
-    if (!baseDsl.isPresent()) {
-      return MULE_ABSTRACT_EXTENSION_TYPE;
+    if (baseDsl.isPresent()) {
+      return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
     }
-
-    return new QName(baseDsl.get().getNamespace(), getBaseTypeName(baseType), baseDsl.get().getPrefix());
+    Optional<DslBaseType> base = TypeUtils.getBaseType(type);
+    if (base.isPresent()) { //means that the baseType was defined by the user
+      return new QName(builder.getNamespaceUri(base.get().getPrefix()), base.get().getType(), base.get().getPrefix());
+    }
+    return MULE_ABSTRACT_EXTENSION_TYPE;
   }
 
   private ComplexType declarePojoAsType(ObjectType metadataType, QName base, String description,
@@ -328,7 +337,6 @@ final class ObjectTypeSchemaDelegate {
       childElements.forEach(p -> all.getParticle().add(objectFactory.createElement(p)));
       extension.setSequence(all);
     }
-
     return complexType;
   }
 
@@ -366,7 +374,7 @@ final class ObjectTypeSchemaDelegate {
     }
 
     QName typeQName = getTypeQName(typeDsl, type);
-    TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, baseType);
+    TopLevelElement abstractElement = registerAbstractElement(type, typeQName, typeDsl, baseType);
     if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped()) ||
         !builder.getTypesMapping().getSuperTypes(type).isEmpty()) {
       registerConcreteGlobalElement(typeDsl, description, abstractElement.getName(), typeQName);
@@ -378,10 +386,14 @@ final class ObjectTypeSchemaDelegate {
   }
 
   TopLevelElement registerAbstractElement(MetadataType type, DslElementSyntax typeDsl) {
-    return registerAbstractElement(getTypeQName(typeDsl, type), typeDsl, null);
+    QName typeQName = getTypeQName(typeDsl, type);
+    TopLevelElement abstractElement = registerAbstractElement(type, typeQName, typeDsl, null);
+
+    return abstractElement;
   }
 
-  private TopLevelElement registerAbstractElement(QName typeQName, DslElementSyntax typeDsl, ObjectType baseType) {
+  private TopLevelElement registerAbstractElement(MetadataType type, QName typeQName, DslElementSyntax typeDsl,
+                                                  ObjectType baseType) {
     TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getPrefix() + getAbstractElementName(typeDsl));
     if (element != null) {
       return element;
@@ -403,6 +415,10 @@ final class ObjectTypeSchemaDelegate {
       QName substitutionGroup = getAbstractElementSubstitutionGroup(typeDsl, baseDsl);
       abstractElement.setSubstitutionGroup(substitutionGroup);
     }
+    //If user defined, substitutionGroup will be overridden
+    TypeUtils.getSubstitutionGroup(type)
+        .ifPresent((substitutionGroup) -> abstractElement
+            .setSubstitutionGroup(builder.resolveSubstitutionGroup(substitutionGroup)));
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
     registeredGlobalElementTypes.put(typeDsl.getPrefix() + getAbstractElementName(typeDsl), abstractElement);

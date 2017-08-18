@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

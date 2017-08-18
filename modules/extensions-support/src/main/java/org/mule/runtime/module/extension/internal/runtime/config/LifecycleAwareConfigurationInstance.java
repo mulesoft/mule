@@ -26,29 +26,31 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationStats;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.Interceptable;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.NoConnectivityTest;
+
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
@@ -72,6 +74,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private final String name;
   private final ConfigurationModel model;
   private final Object value;
+  private final ConfigurationState configurationState;
   private final Optional<ConnectionProvider> connectionProvider;
 
   private ConfigurationStats configurationStats;
@@ -80,18 +83,18 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private TimeSupplier timeSupplier;
 
   @Inject
-  private MuleContext muleContext;
-
-  @Inject
   private LockFactory lockFactory;
 
   @Inject
   private SchedulerService schedulerService;
 
   @Inject
+  private NotificationDispatcher notificationFirer;
+
+  @Inject
   private ConnectionManagerAdapter connectionManager;
 
-  private Lock testConnectivityLock;
+  private volatile Lock testConnectivityLock;
   private Scheduler retryScheduler;
 
   private volatile boolean initialized = false;
@@ -108,12 +111,17 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @param interceptors the {@link List} of {@link Interceptor interceptors} that applies
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
-  public LifecycleAwareConfigurationInstance(String name, ConfigurationModel model, Object value,
-                                             List<Interceptor> interceptors, Optional<ConnectionProvider> connectionProvider) {
+  public LifecycleAwareConfigurationInstance(String name,
+                                             ConfigurationModel model,
+                                             Object value,
+                                             ConfigurationState configurationState,
+                                             List<Interceptor> interceptors,
+                                             Optional<ConnectionProvider> connectionProvider) {
     super(interceptors);
     this.name = name;
     this.model = model;
     this.value = value;
+    this.configurationState = configurationState;
     this.connectionProvider = connectionProvider;
   }
 
@@ -176,27 +184,40 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
 
     RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
-
+    ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
     RetryCallback retryCallback = new RetryCallback() {
 
       @Override
       public void doWork(RetryContext context) throws Exception {
-        final boolean lockAcquired = testConnectivityLock.tryLock();
-        if (lockAcquired) {
-          LOGGER.info("Doing testConnectivity() for config " + getName());
-          try {
-            ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
-            if (result.isValid()) {
-              context.setOk();
-            } else {
-              context.setFailed(result.getException());
-              throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+        Lock lock = testConnectivityLock;
+        if (lock != null) {
+          final boolean lockAcquired = lock.tryLock();
+          if (lockAcquired) {
+            LOGGER.info("Doing testConnectivity() for config " + getName());
+            try {
+              ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
+              if (result.isValid()) {
+                context.setOk();
+              } else {
+                if ((reconnectionConfig.isFailsDeployment())) {
+                  context.setFailed(result.getException());
+                  throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()),
+                                                result.getException());
+                } else {
+                  if (LOGGER.isInfoEnabled()) {
+                    LOGGER
+                        .info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: ",
+                                     getName(), result.getMessage()),
+                              result.getException());
+                  }
+                }
+              }
+            } finally {
+              lock.unlock();
             }
-          } finally {
-            testConnectivityLock.unlock();
+          } else {
+            LOGGER.warn("There is a testConnectivity() already running for config " + getName());
           }
-        } else {
-          LOGGER.warn("There is a testConnectivity() already running for config " + getName());
         }
       }
 
@@ -243,7 +264,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
         }
         super.stop();
       } finally {
-        muleContext.fireNotification(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
+        notificationFirer.dispatch(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
       }
     }
   }
@@ -317,6 +338,11 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   public ConfigurationStats getStatistics() {
     checkState(configurationStats != null, "can't get statistics before initialise() is invoked");
     return configurationStats;
+  }
+
+  @Override
+  public ConfigurationState getState() {
+    return configurationState;
   }
 
   private void initStats() {

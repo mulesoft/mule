@@ -48,12 +48,10 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-api</artifactId>
-            <version>${muleMavenClientApi}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
-            <version>${muleMavenClientImpl}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -143,6 +141,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <classifier>mule-service</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
@@ -186,7 +190,6 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commonsCollectionsVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

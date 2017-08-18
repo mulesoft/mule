@@ -54,8 +54,10 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
+import org.mule.runtime.config.spring.api.dsl.model.DslElementModel;
+import org.mule.runtime.config.spring.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -324,8 +326,8 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.getContainedElements().size(), is(2));
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
     assertThat(element.findElement(builder()
-        .withName("my-camel-case-name")
-        .withNamespace("mockns")
+        .name("my-camel-case-name")
+        .namespace("mockns")
         .build()).get().getConfiguration().get()
         .getValue().get(), is("#[{field: value}]"));
     assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
@@ -369,7 +371,7 @@ public class DeclarationElementModelFactoryTestCase {
   }
 
 
-  @XmlHints(allowTopLevelDefinition = true)
+  @TypeDsl(allowTopLevelDefinition = true)
   public static class ComplexTypePojo {
 
     @Parameter

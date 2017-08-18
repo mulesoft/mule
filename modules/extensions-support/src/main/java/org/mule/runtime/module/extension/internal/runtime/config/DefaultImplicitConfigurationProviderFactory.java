@@ -16,13 +16,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
@@ -54,7 +54,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
   @Override
   public ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
                                                                    ConfigurationModel implicitConfigurationModel,
-                                                                   Event event,
+                                                                   InternalEvent event,
                                                                    MuleContext muleContext) {
     if (implicitConfigurationModel == null || !canBeUsedImplicitly(implicitConfigurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()

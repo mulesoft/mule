@@ -9,11 +9,13 @@ package org.mule.runtime.core.api.source.polling;
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledFuture;
-
-import org.mule.runtime.api.scheduler.Scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +25,18 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.5.0, moved from {@link org.mule.runtime.modules.schedulers.cron.CronSchedulerFactory}.
  */
+@Alias("cron")
 public class CronScheduler extends PeriodicScheduler {
 
   private static final Logger logger = LoggerFactory.getLogger(CronScheduler.class);
 
   private static final String TZ_GMT_ID = "GMT";
 
+  @Parameter
   private String expression;
 
+  @Parameter
+  @Optional
   private String timeZone;
 
   @Override

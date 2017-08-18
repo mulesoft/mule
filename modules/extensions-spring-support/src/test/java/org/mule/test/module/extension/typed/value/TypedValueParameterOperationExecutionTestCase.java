@@ -13,7 +13,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.test.typed.value.extension.extension.TypedValueParameterOperations.THIS_IS_A_DEFAULT_STRING;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -138,28 +138,28 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void typedValueForStringInsidePojo() throws Exception {
-    Event event = flowRunner("typedValueForStringInsidePojo").run();
+    InternalEvent event = flowRunner("typedValueForStringInsidePojo").run();
     DifferedKnockableDoor value = (DifferedKnockableDoor) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getAddress(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueForContentOnNullSafePojoWithDefaultValue() throws Exception {
-    Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValue").run();
+    InternalEvent event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValue").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo() throws Exception {
-    Event event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo").run();
+    InternalEvent event = flowRunner("typedValueForContentOnNullSafePojoWithDefaultValueWithOutDefiningPojo").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
   }
 
   @Test
   public void typedValueOnContentOnNullSafeWithExplicitValues() throws Exception {
-    Event event = flowRunner("typedValueOnContentOnNullSafeWithExplicitValues").run();
+    InternalEvent event = flowRunner("typedValueOnContentOnNullSafeWithExplicitValues").run();
     VeganProductInformation value = (VeganProductInformation) event.getMessage().getPayload().getValue();
     assertTypedValue(value.getDescription(), STRING_VALUE, WILDCARD, null);
     assertTypedValue(value.getBrandName(), STRING_VALUE, WILDCARD, null);
@@ -168,7 +168,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void typedValueForObject() throws Exception {
-    Event event = flowRunner("typedValueForObject").keepStreamsOpen().run();
+    InternalEvent event = flowRunner("typedValueForObject").keepStreamsOpen().run();
     TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();
     InputStream content = (InputStream) jsonObject.getValue();
     assertThat(IOUtils.toString(content), is(JSON_OBJECT));
@@ -177,7 +177,7 @@ public class TypedValueParameterOperationExecutionTestCase extends AbstractTyped
 
   @Test
   public void typedValueForInputStream() throws Exception {
-    Event event = flowRunner("typedValueForInputStream").run();
+    InternalEvent event = flowRunner("typedValueForInputStream").run();
     TypedValue jsonObject = (TypedValue) event.getMessage().getPayload().getValue();
     assertThat(IOUtils.toString((InputStream) jsonObject.getValue()), is(JSON_OBJECT));
     assertThat(jsonObject.getDataType(), is(like(jsonObject.getDataType().getType(), APPLICATION_JSON, UTF8)));

@@ -15,8 +15,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 
 import java.util.HashSet;
 import java.util.List;

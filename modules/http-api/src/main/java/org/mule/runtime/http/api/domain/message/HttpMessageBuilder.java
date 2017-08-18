@@ -75,7 +75,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   }
 
   /**
-   * Returns the value of a given HTTP request. If there are several then the last will be return.
+   * Returns the value of a given HTTP request. If there are several then the first will be return.
    * Use {@link #getHeaderValues(String)} instead if all values are required.
    *
    * @param name the name of the desired HTTP header

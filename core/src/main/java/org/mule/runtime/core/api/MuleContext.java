@@ -13,15 +13,13 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
-import org.mule.runtime.core.api.context.notification.NotificationException;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -41,7 +39,6 @@ import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -49,6 +46,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.TransactionManager;
@@ -99,45 +97,6 @@ public interface MuleContext extends Lifecycle {
   boolean isDisposed();
 
   boolean isDisposing();
-
-  /**
-   * Registers an intenal server event listener. The listener will be notified when a particular event happens within the server.
-   * Typically this is not an event in the same sense as an MuleEvent (although there is nothing stopping the implementation of
-   * this class triggering listeners when a MuleEvent is received).
-   * <p/>
-   * The types of notifications fired is entirely defined by the implementation of this class
-   *
-   * @param l the listener to register
-   */
-  void registerListener(ServerNotificationListener l) throws NotificationException;
-
-  /**
-   * Registers an intenal server event listener. The listener will be notified when a particular event happens within the server.
-   * Typically this is not an event in the same sense as an MuleEvent (although there is nothing stopping the implementation of
-   * this class triggering listeners when a MuleEvent is received).
-   * <p/>
-   * The types of notifications fired is entirely defined by the implementation of this class
-   *
-   * @param l the listener to register
-   * @param resourceIdentifier a particular resource name for the given type of listener For example, the resourceName could be
-   *        the name of a service if the listener was a ServiceNotificationListener
-   */
-  void registerListener(ServerNotificationListener l, String resourceIdentifier) throws NotificationException;
-
-  /**
-   * Unregisters a previously registered listener. If the listener has not already been registered, this method should return
-   * without exception
-   *
-   * @param l the listener to unregister
-   */
-  void unregisterListener(ServerNotificationListener l);
-
-  /**
-   * Fires a server notification to all regiistered listeners
-   *
-   * @param notification the notification to fire
-   */
-  void fireNotification(ServerNotification notification);
 
   /**
    * Sets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
@@ -283,7 +242,7 @@ public interface MuleContext extends Lifecycle {
    * @return default exception strategy. If no default error handler was configured it returns one with a catch all
    *         <on-error-propagate> element.
    */
-  MessagingExceptionHandler getDefaultErrorHandler();
+  MessagingExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName);
 
   /**
    * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource

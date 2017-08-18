@@ -9,12 +9,10 @@ package org.mule.runtime.config.builders;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.spring.MuleArtifactContext;
-import org.mule.runtime.config.spring.OptionalObjectsController;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.spring.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -22,6 +20,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.ServletContext;
@@ -47,7 +46,7 @@ import org.springframework.web.context.support.ServletContextResource;
  * <li>ServletContext resources should be relative to the webapp root directory and start with '/'.
  * <li>Classpath resources should be in the webapp classpath and should not start with '/'.
  * 
- * @see org.mule.runtime.config.spring.SpringXmlConfigurationBuilder
+ * @see org.mule.runtime.config.spring.internal.SpringXmlConfigurationBuilder
  */
 public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBuilder {
 
@@ -65,7 +64,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
 
   public WebappMuleXmlConfigurationBuilder(ServletContext servletContext, String[] configResources)
       throws ConfigurationException {
-    super(configResources, emptyMap(), APP);
+    super(configResources, emptyMap(), APP, false);
     context = servletContext;
   }
 
@@ -92,23 +91,33 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
   }
 
   @Override
-  protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                                           ArtifactDeclaration artifactDeclaration,
-                                                           OptionalObjectsController optionalObjectsController,
-                                                           Optional<ConfigurationProperties> parentConfigurationPropertiesResolver) {
-    Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
-
-    return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, artifactDeclaration,
-                                   optionalObjectsController, empty(), emptyMap(), APP,
-                                   resolveContextArtifactPluginClassLoaders());
+  protected ConfigResource[] resolveArtifactConfigResources() {
+    try {
+      return preProcessResources(artifactConfigResources);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
-  private Resource[] preProcessResources(ConfigResource[] configResources) {
-    Resource[] configServletContextResources = new Resource[configResources.length];
+  private ConfigResource[] preProcessResources(ConfigResource[] configResources) throws IOException {
+    ConfigResource[] configServletContextResources = new ConfigResource[configResources.length];
     for (int i = 0; i < configResources.length; i++) {
-      configServletContextResources[i] = new ServletContextOrClassPathResource(context, configResources[i].getResourceName());
+      configServletContextResources[i] =
+          new ConfigResource(configResources[i].getResourceName(),
+                             new ServletContextOrClassPathResource(context, configResources[i].getResourceName())
+                                 .getInputStream());
     }
     return configServletContextResources;
+  }
+
+  @Override
+  protected Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
+    return empty();
+  }
+
+  @Override
+  public Map<String, String> getArtifactProperties() {
+    return emptyMap();
   }
 
   /**

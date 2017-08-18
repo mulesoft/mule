@@ -26,12 +26,11 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.Aggregator;
-import org.mule.runtime.core.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
@@ -49,14 +48,13 @@ import org.slf4j.Logger;
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
-    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable, Disposable {
+    implements Initialisable, MuleContextAware, Aggregator, Startable, Stoppable, Disposable {
 
   private static final Logger LOGGER = getLogger(AbstractAggregator.class);
 
   public static final int MAX_PROCESSED_GROUPS = 50000;
 
   protected EventCorrelator eventCorrelator;
-  protected MuleContext muleContext;
 
   private long timeout = 0;
   private boolean failOnTimeout = true;
@@ -80,7 +78,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     initProcessedGroupsObjectStore();
     initEventGroupsObjectStore();
 
-    eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, muleContext, flowConstruct,
+    eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, muleContext, getFlowConstruct(),
                                           eventGroupsObjectStore, storePrefix, processedGroupsObjectStore);
 
     eventCorrelator.setTimeout(timeout);
@@ -145,16 +143,11 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
     }
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
   protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
   @Override
-  public Event process(Event event) throws MuleException {
-    Event result = eventCorrelator.process(event);
+  public InternalEvent process(InternalEvent event) throws MuleException {
+    InternalEvent result = eventCorrelator.process(event);
     if (result == null) {
       return null;
     }
@@ -162,7 +155,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
@@ -194,7 +187,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
-  public void setEventGroupsObjectStore(PartitionableObjectStore<Event> eventGroupsObjectStore) {
+  public void setEventGroupsObjectStore(PartitionableObjectStore<InternalEvent> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
         new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
   }

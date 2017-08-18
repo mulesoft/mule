@@ -29,7 +29,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -100,14 +99,6 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(invalidParameterModel.isRequired()).thenReturn(true);
     when(invalidParameterModel.getName()).thenReturn("url");
     when(invalidParameterModel.getDefaultValue()).thenReturn("default");
-    mockParameters(operationModel, invalidParameterModel);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToListWithoutPluralName() {
-    when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
-    when(invalidParameterModel.getName()).thenReturn("thing");
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
   }

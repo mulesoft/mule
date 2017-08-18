@@ -18,7 +18,7 @@ import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.security.DefaultMuleSecurityManager;
+import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 
 import java.util.List;
 
@@ -47,7 +47,6 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
     Authentication authResult = manager.authenticate(authentication);
 
     SecurityContext context = manager.createSecurityContext(authResult);
-    context.setAuthentication(authResult);
     session.setSecurityContext(context);
   }
 

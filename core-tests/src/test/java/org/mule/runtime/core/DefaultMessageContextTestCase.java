@@ -6,18 +6,21 @@
  */
 package org.mule.runtime.core;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +42,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Mock
   private FlowConstruct flow;
 
-  private EventContext executionContext;
-  private EventContext executionContextWithCorrelation;
+  private InternalEventContext executionContext;
+  private InternalEventContext executionContextWithCorrelation;
 
   @Before
   public void before() {
@@ -55,7 +58,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Test
   public void noCorrelationIdInContext() {
     final Message message = of(TEST_PAYLOAD);
-    final Event event = Event.builder(executionContext).message(message).flow(flow).build();
+    final InternalEvent event = InternalEvent.builder(executionContext).message(message).flow(flow).build();
 
     assertThat(event.getCorrelationId(), is(GENERATED_CORRELATION_ID));
   }
@@ -63,7 +66,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Test
   public void correlationIdInContext() {
     final Message message = of(TEST_PAYLOAD);
-    final Event event = Event.builder(executionContextWithCorrelation).message(message).flow(flow).build();
+    final InternalEvent event = InternalEvent.builder(executionContextWithCorrelation).message(message).flow(flow).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }
@@ -71,8 +74,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Test
   public void overrideCorrelationIdInContext() {
     final Message message = of(TEST_PAYLOAD);
-    final Event event = Event.builder(executionContextWithCorrelation).message(message).flow(flow)
-        .groupCorrelation(new GroupCorrelation(null, null)).build();
+    final InternalEvent event = InternalEvent.builder(executionContextWithCorrelation).message(message).flow(flow)
+        .groupCorrelation(empty()).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }
@@ -80,9 +83,9 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   @Test
   public void overrideCorrelationIdInContextSequence() {
     final Message message = of(TEST_PAYLOAD);
-    final Event event =
-        Event.builder(executionContextWithCorrelation).message(message).correlationId(CUSTOM_CORRELATION_ID).flow(flow)
-            .groupCorrelation(new GroupCorrelation(null, 6)).build();
+    final InternalEvent event =
+        InternalEvent.builder(executionContextWithCorrelation).message(message).correlationId(CUSTOM_CORRELATION_ID).flow(flow)
+            .groupCorrelation(Optional.of(GroupCorrelation.of(6))).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }

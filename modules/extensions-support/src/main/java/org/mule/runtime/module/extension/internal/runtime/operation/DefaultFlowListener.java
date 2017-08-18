@@ -11,7 +11,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 
@@ -24,8 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementatio of {@link FlowListener}.
  * <p>
- * It uses an {@link Event}'s response {@link Publisher} to suscribe to the event
- * termination and execute the necessary logic.
+ * It uses an {@link InternalEvent}'s response {@link Publisher} to suscribe to the event termination and execute the necessary logic.
  *
  * @since 4.0
  */
@@ -45,7 +44,7 @@ public class DefaultFlowListener implements FlowListener {
    *
    * @param event the event on which the operation is being executed.
    */
-  public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, Event event) {
+  public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, InternalEvent event) {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     from(event.getContext().getResponsePublisher()).doAfterTerminate((responseEvent, t) -> onTerminate(responseEvent, t))
@@ -79,7 +78,7 @@ public class DefaultFlowListener implements FlowListener {
     onComplete = handler;
   }
 
-  private void onTerminate(Event event, Throwable error) {
+  private void onTerminate(InternalEvent event, Throwable error) {
     try {
       if (event != null && successConsumer != null) {
         try {

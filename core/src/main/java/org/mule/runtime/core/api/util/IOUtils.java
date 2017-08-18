@@ -7,13 +7,10 @@
 package org.mule.runtime.core.api.util;
 
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.api.message.ds.InputStreamDataSource;
 import org.mule.runtime.core.api.message.ds.StringDataSource;
@@ -39,8 +36,6 @@ import javax.activation.FileDataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-// @ThreadSafe
 
 /**
  * Mule input/output utilities.
@@ -313,41 +308,6 @@ public class IOUtils {
       dh = new DataHandler(object, contentType != null ? contentType.toString() : null);
     }
     return dh;
-  }
-
-  /**
-   * Transforms an Object into a {@link org.mule.runtime.api.message.Message} to be used in a {@link MultiPartPayload}.
-   *
-   * @param name the name of the attachment being handled
-   * @param object the attachment to be handled
-   * @param contentType the Content-Type of the attachment that is being handled
-   * @return a {@link org.mule.runtime.api.message.Message} of the corresponding attachment
-   * @throws IOException if the transformation fails.
-   */
-  public static Message toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
-    final Message.Builder builder;
-
-    if (object instanceof File) {
-      builder = Message.builder().payload(new FileInputStream((File) object));
-    } else if (object instanceof URL) {
-      builder = Message.builder().payload(((URL) object).openStream());
-    } else if (object instanceof String) {
-      builder = Message.builder().payload(object);
-      if (contentType == null || MediaType.ANY.matches(contentType)) {
-        builder.mediaType(MediaType.TEXT);
-      }
-    } else {
-      builder = Message.builder().payload(object);
-    }
-
-    if (contentType != null && !MediaType.ANY.matches(contentType)) {
-      builder.mediaType(contentType);
-    } else {
-      final DataHandler dataHandler = toDataHandler(name, object, contentType);
-      builder.mediaType(MediaType.parse(dataHandler.getContentType()));
-    }
-
-    return builder.attributes(new PartAttributes(name)).build();
   }
 
   public static void ifInputStream(Object value, CheckedConsumer<InputStream> consumer) throws NotAnInputStreamException {

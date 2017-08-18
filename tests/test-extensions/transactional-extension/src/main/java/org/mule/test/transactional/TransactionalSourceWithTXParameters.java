@@ -6,6 +6,7 @@
  */
 package org.mule.test.transactional;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 public class TransactionalSourceWithTXParameters extends Source<SourceTransactionalAction, Object> {
 
   @Connection
-  private TestTransactionalConnection connection;
+  private ConnectionProvider<TestTransactionalConnection> connection;
 
   @Parameter
   private SourceTransactionalAction txAction;

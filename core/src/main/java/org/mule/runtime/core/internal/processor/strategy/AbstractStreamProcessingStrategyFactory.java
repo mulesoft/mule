@@ -23,7 +23,7 @@ import static reactor.util.concurrent.WaitStrategy.sleeping;
 import static reactor.util.concurrent.WaitStrategy.yielding;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -137,7 +137,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
-      WorkQueueProcessor<Event> processor =
+      WorkQueueProcessor<InternalEvent> processor =
           WorkQueueProcessor.share(ringBufferSchedulerSupplier.get(), bufferSize, waitStrategy.getReactorWaitStrategy(), false);
       List<Disposable> disposables = new ArrayList<>();
       for (int i = 0; i < (maxConcurrency < subscribers ? maxConcurrency : subscribers); i++) {

@@ -8,16 +8,17 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.processor.Processor;
 
-public class TestNotSerializableMessageProcessor implements Processor {
+public class TestNotSerializableMessageProcessor extends AbstractAnnotatedObject implements Processor {
 
   public TestNotSerializableMessageProcessor() {
     super();
   }
 
   @Override
-  public Event process(Event event) throws MuleException {
+  public InternalEvent process(InternalEvent event) throws MuleException {
     return event;
   }
 }

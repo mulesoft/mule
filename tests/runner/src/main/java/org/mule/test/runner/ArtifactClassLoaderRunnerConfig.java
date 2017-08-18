@@ -7,6 +7,8 @@
 
 package org.mule.test.runner;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -47,7 +49,7 @@ public @interface ArtifactClassLoaderRunnerConfig {
 
   /**
    * Runtime libraries in the format of {@code <groupId>:<artifactId>} to be added as shared libraries to
-   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}. These artifacts have to be declared as {@code test}
+   * {@link ArtifactClassLoader}. These artifacts have to be declared as {@code test}
    * scope dependencies for the rootArtifact.
    * <p/>
    * Be aware that only the artifact would be added as shared libraries, it will not include its dependencies.
@@ -91,5 +93,14 @@ public @interface ArtifactClassLoaderRunnerConfig {
    *         {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}.
    */
   String[] testInclusions() default {};
+
+  /**
+   * Artifacts to be included as privileged artifacts for the all the modules. In format {@code [groupId]:[artifactId].
+   * <p/>
+   * This allows to add test plugins as privileged artifacts without having to modify the mule-module.properties of each module.
+   *
+   * @return Artifacts to be included as privileged artifacts. In format {@code [groupId]:[artifactId].
+   */
+  String[] extraPrivilegedArtifacts() default {};
 
 }

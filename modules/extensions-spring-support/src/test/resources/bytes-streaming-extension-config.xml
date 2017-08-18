@@ -15,9 +15,9 @@
 
     <flow name="rewind">
         <flow-ref name="toStream" />
-        <marvel:read-stream config-ref="drStrange" target="firstRead" />
+        <marvel:read-stream config-ref="drStrange" target="firstRead" targetValue="#[message]"/>
         <marvel:seek-stream config-ref="drStrange" position="0" />
-        <marvel:read-stream config-ref="drStrange" target="secondRead" />
+        <marvel:read-stream config-ref="drStrange" target="secondRead" targetValue="#[message]"/>
     </flow>
 
     <flow name="consumeGeneratedStream">

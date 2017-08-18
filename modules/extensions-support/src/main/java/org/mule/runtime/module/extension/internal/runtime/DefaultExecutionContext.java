@@ -9,21 +9,23 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
@@ -49,12 +51,12 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
-  private final Event event;
+  private final InternalEvent event;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
-  private final FlowConstruct flowConstruct;
   private final ComponentLocation location;
+  private final RetryPolicyTemplate retryPolicyTemplate;
 
   /**
    * Creates a new instance with the given state
@@ -62,22 +64,22 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * @param configuration         the {@link ConfigurationInstance} that the operation will use
    * @param parameters            the parameters that the operation will use
    * @param componentModel        the {@link ComponentModel} for the component being executed
-   * @param event                 the current {@link Event}
+   * @param event                 the current {@link InternalEvent}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
-   * @param flowConstruct                  the {@link FlowConstruct} which owns the executing component
    * @param location              the {@link ComponentLocation location} of the executing component
+   * @param retryPolicyTemplate   the reconnection strategy to use in case of connectivity problems
    * @param muleContext           the current {@link MuleContext}
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
                                  Map<String, Object> parameters,
                                  M componentModel,
-                                 Event event,
+                                 InternalEvent event,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
-                                 FlowConstruct flowConstruct,
                                  ComponentLocation location,
+                                 RetryPolicyTemplate retryPolicyTemplate,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -88,9 +90,11 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.muleContext = muleContext;
-    this.flowConstruct = flowConstruct;
     this.location = location;
-    transactionConfig = new LazyValue<>(() -> componentModel.isTransactional() ? of(buildTransactionConfig()) : empty());
+    this.retryPolicyTemplate = retryPolicyTemplate;
+
+    final boolean isTransactional = isTransactional(componentModel);
+    this.transactionConfig = new LazyValue<>(() -> isTransactional ? of(buildTransactionConfig()) : empty());
   }
 
   /**
@@ -153,7 +157,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public Event getEvent() {
+  public InternalEvent getEvent() {
     return event;
   }
 
@@ -208,13 +212,16 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public FlowConstruct getFlowConstruct() {
-    return flowConstruct;
-  }
-
-  @Override
   public ComponentLocation getComponentLocation() {
     return location;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<RetryPolicyTemplate> getRetryPolicyTemplate() {
+    return ofNullable(retryPolicyTemplate);
   }
 
   private TransactionConfig buildTransactionConfig() {
@@ -247,5 +254,9 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
         .stream()
         .filter(p -> p.getModelProperty(TransactionalActionModelProperty.class).isPresent())
         .findAny();
+  }
+
+  private boolean isTransactional(M componentModel) {
+    return componentModel instanceof ExecutableComponentModel && ((ExecutableComponentModel) componentModel).isTransactional();
   }
 }

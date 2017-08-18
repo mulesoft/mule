@@ -39,6 +39,7 @@
         <module>rick-and-morty-extension</module>
         <module>weave-function-extension</module>
         <module>values-extension</module>
+        <module>substitution-group-extension</module>
     </modules>
 
     <build>

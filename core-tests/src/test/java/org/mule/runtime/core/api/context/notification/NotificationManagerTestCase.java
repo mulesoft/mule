@@ -54,7 +54,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
   }
 
   protected void registerDefaultListeners() {
-    manager.addListenerSubscription(listener1, "id1");
+    manager.addListenerSubscription(listener1, notification -> "id1".equals(notification.getResourceIdentifier()));
     manager.addListener(listener2);
   }
 

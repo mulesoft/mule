@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 
 /**
  * Creates {@link PolicyTemplateClassLoaderBuilder} for application artifacts.

@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getNonMuleException;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeLifecycle;
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.ReflectionUtils.withName;
+
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.core.api.lifecycle.LifecycleObject;
 import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.lifecycle.LifecycleObject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,9 +27,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is can be configured
@@ -43,7 +47,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
   protected transient final Logger logger = LoggerFactory.getLogger(DefaultLifecyclePhase.class);
   private Class<?> lifecycleClass;
   private final Method lifecycleMethod;
-  private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<LifecycleObject>(6);
+  private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<>(6);
   private Class<?>[] ignorredObjectTypes;
   private final String name;
   private final String oppositeLifecyclePhase;
@@ -52,8 +56,8 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
   public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, String oppositeLifecyclePhase) {
     this.name = name;
     this.lifecycleClass = lifecycleClass;
-    // DefaultLifecyclePhase interface only has one method
-    lifecycleMethod = lifecycleClass.getMethods()[0];
+    Set<Method> lifecycleMethodsCandidate = getAllMethods(lifecycleClass, withName(name));
+    lifecycleMethod = lifecycleMethodsCandidate.isEmpty() ? null : lifecycleMethodsCandidate.iterator().next();
     this.oppositeLifecyclePhase = oppositeLifecyclePhase;
   }
 
@@ -83,8 +87,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
     if (ignorredObjectTypes == null) {
       return false;
     } else {
-      for (int i = 0; i < ignorredObjectTypes.length; i++) {
-        Class<?> ignorredObjectType = ignorredObjectTypes[i];
+      for (Class<?> ignorredObjectType : ignorredObjectTypes) {
         if (ignorredObjectType.isAssignableFrom(type)) {
           return true;
         }
@@ -141,7 +144,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
   @Override
   public void registerSupportedPhase(String phase) {
     if (supportedPhases == null) {
-      supportedPhases = new HashSet<String>();
+      supportedPhases = new HashSet<>();
     }
     supportedPhases.add(phase);
   }
@@ -192,8 +195,8 @@ public class DefaultLifecyclePhase implements LifecyclePhase {
       }
 
       // Need to get the cause of the MuleException so the LifecycleException wraps a non-mule exception
-      throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o),
-                                   ExceptionHelper.getNonMuleException(t), o);
+      throw new LifecycleException(failedToInvokeLifecycle(lifecycleMethod.getName(), o),
+                                   getNonMuleException(t), o);
     }
   }
 

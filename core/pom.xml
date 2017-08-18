@@ -116,7 +116,7 @@
         <dependency>
             <groupId>com.github.stephenc.eaio-uuid</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.4.0</version>
+            <version>${eaioUuidVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -152,14 +152,6 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-commons</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.mule.mvel</groupId>
             <artifactId>mule-mvel2</artifactId>
         </dependency>
@@ -190,9 +182,15 @@
         </dependency>
 
         <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>${cglibVersion}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>2.4.2</version>
+            <version>${commonsPool2Version}</version>
         </dependency>
 
         <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->

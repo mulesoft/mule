@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,8 +22,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.lang.reflect.Method;
@@ -36,7 +35,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ReflectiveExpressionFunctionExecutor implements MuleContextAware, Lifecycle, FunctionExecutor {
+public class ReflectiveExpressionFunctionExecutor implements Lifecycle, FunctionExecutor {
 
   private static final Logger LOGGER = getLogger(ReflectiveExpressionFunctionExecutor.class);
 
@@ -46,8 +45,6 @@ public class ReflectiveExpressionFunctionExecutor implements MuleContextAware, L
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
   private final List<FunctionParameter> functionParameters;
-
-  private MuleContext muleContext;
 
   public ReflectiveExpressionFunctionExecutor(FunctionModel model, DataType returnType,
                                               List<FunctionParameter> functionParameters, Method method,
@@ -93,11 +90,6 @@ public class ReflectiveExpressionFunctionExecutor implements MuleContextAware, L
   @Override
   public void dispose() {
     disposeIfNeeded(componentInstance, LOGGER);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
   }
 
 }

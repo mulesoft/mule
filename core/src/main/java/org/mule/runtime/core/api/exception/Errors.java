@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.exception;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CLIENT_SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.COMPOSITE_ROUTING_ERROR;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
@@ -28,6 +29,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESP
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.TIMEOUT_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
@@ -44,6 +46,11 @@ public abstract class Errors {
   public static final class Identifiers {
 
     // HANDLEABLE
+
+    /**
+     * Wild card that matches with any error and is on top of the error hierarchy for those that allow handling
+     */
+    public static final String ANY_IDENTIFIER = "ANY";
 
     /**
      * Indicates that a problem occurred when transforming a value
@@ -87,6 +94,11 @@ public abstract class Errors {
     public static final String CONNECTIVITY_ERROR_IDENTIFIER = "CONNECTIVITY";
 
     /**
+     * Indicates that the maximum size allowed for a stream has been exceeded.
+     */
+    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
+
+    /**
      * Indicates a security type problem occurred, eg: invalid credentials, expired token, etc.
      */
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
@@ -107,7 +119,23 @@ public abstract class Errors {
     public static final String NOT_PERMITTED_ERROR_IDENTIFIER = "NOT_PERMITTED";
 
     /**
-     * Indicates that an error occurred in the source of the flow processing a successful response.
+     * Indicates that a timeout occurred during processing.
+     */
+    public static final String TIMEOUT_ERROR_IDENTIFIER = "TIMEOUT";
+
+    /**
+     * Indicates one or more errors occurred during routing.
+     */
+    public static final String COMPOSITE_ROUTING_ERROR = "COMPOSITE_ROUTING";
+
+    /**
+     * Indicates that an error occurred in the source of a flow.
+     */
+    public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
+
+    /**
+     * Indicates that an error occurred in the source of the flow processing a successful response. Can only be propagated since
+     * sources have already executed successful path.
      */
     public static final String SOURCE_RESPONSE_ERROR_IDENTIFIER = "SOURCE_RESPONSE";
 
@@ -121,37 +149,29 @@ public abstract class Errors {
      */
     public static final String SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_RESPONSE_GENERATE";
 
+    // UNHANDLEABLE BUT AVAILABLE
+
     /**
-     * Wild card that matches with any error
+     * Indicates that an error occurred in the source of the flow sending an error response. Configured error handling will not
+     * execute since sources have already executed failing path.
      */
-    public static final String ANY_IDENTIFIER = "ANY";
+    public static final String SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_SEND";
 
-    public static final String STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER = "STREAM_MAXIMUM_SIZE_EXCEEDED";
-
-    // UNHANDLEABLE
+    /**
+     * Indicates that an error occurred in the source of the flow generating the parameters of an error response. Configured error
+     * handling will not execute since sources have already executed failing path.
+     */
+    public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 
     /**
      * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
      */
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
 
-    /**
-     * Indicates that an error occurred in the source of the flow.
-     */
-    public static final String SOURCE_ERROR_IDENTIFIER = "SOURCE";
+    // UNHANDLEABLE
 
     /**
-     * Indicates that an error occurred in the source of the flow sending an error response.
-     */
-    public static final String SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_SEND";
-
-    /**
-     * Indicates that an error occurred in the source of the flow generating the parameters of an error response.
-     */
-    public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
-
-    /**
-     * Indicates that a severe error occurred. Cannot be handled. Other unhandleable errors should go under it.
+     * Indicates that a severe error occurred. Cannot be handled. Top of the error hierarchy for those that do not allow handling.
      */
     public static final String CRITICAL_IDENTIFIER = "CRITICAL";
 
@@ -168,57 +188,68 @@ public abstract class Errors {
 
   public static final class ComponentIdentifiers {
 
-    public static final ComponentIdentifier ANY =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(ANY_IDENTIFIER).build();
-    public static final ComponentIdentifier CRITICAL =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CRITICAL_IDENTIFIER).build();
-    public static final ComponentIdentifier TRANSFORMATION =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier EXPRESSION =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier VALIDATION =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(VALIDATION_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier DUPLICATE_MESSAGE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(DUPLICATE_MESSAGE_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
-        .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier RETRY_EXHAUSTED = builder()
-        .withNamespace(CORE_NAMESPACE_NAME).withName(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier ROUTING =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(ROUTING_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier CONNECTIVITY =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CONNECTIVITY_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SECURITY =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SECURITY_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier CLIENT_SECURITY =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SERVER_SECURITY =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SERVER_SECURITY_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier NOT_PERMITTED =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(NOT_PERMITTED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier OVERLOAD =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(OVERLOAD_ERROR_IDENTIFIER).build();
+    public static final class Handleable {
 
-    public static final ComponentIdentifier SOURCE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SOURCE_RESPONSE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SOURCE_RESPONSE_GENERATE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SOURCE_RESPONSE_SEND =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_GENERATE =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier ANY =
+          builder().namespace(CORE_NAMESPACE_NAME).name(ANY_IDENTIFIER).build();
+      public static final ComponentIdentifier TRANSFORMATION =
+          builder().namespace(CORE_NAMESPACE_NAME).name(TRANSFORMATION_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier EXPRESSION =
+          builder().namespace(CORE_NAMESPACE_NAME).name(EXPRESSION_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier VALIDATION =
+          builder().namespace(CORE_NAMESPACE_NAME).name(VALIDATION_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier DUPLICATE_MESSAGE =
+          builder().namespace(CORE_NAMESPACE_NAME).name(DUPLICATE_MESSAGE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
+          .namespace(CORE_NAMESPACE_NAME).name(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier RETRY_EXHAUSTED = builder()
+          .namespace(CORE_NAMESPACE_NAME).name(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier ROUTING =
+          builder().namespace(CORE_NAMESPACE_NAME).name(ROUTING_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier CONNECTIVITY =
+          builder().namespace(CORE_NAMESPACE_NAME).name(CONNECTIVITY_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SECURITY =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SECURITY_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier CLIENT_SECURITY =
+          builder().namespace(CORE_NAMESPACE_NAME).name(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SERVER_SECURITY =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SERVER_SECURITY_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier NOT_PERMITTED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(NOT_PERMITTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier TIMEOUT =
+          builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier COMPOSITE_ROUTING =
+          builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
+      public static final ComponentIdentifier UNKNOWN =
+          builder().namespace(CORE_NAMESPACE_NAME).name(UNKNOWN_ERROR_IDENTIFIER).build();
 
-    public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
-    public static final ComponentIdentifier FATAL =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(FATAL_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE_RESPONSE =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE_RESPONSE_GENERATE =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE_RESPONSE_SEND =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_GENERATE =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
 
-    public static final ComponentIdentifier UNKNOWN =
-        builder().withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build();
+    }
+
+    public static final class Unhandleable {
+
+      public static final ComponentIdentifier CRITICAL =
+          builder().namespace(CORE_NAMESPACE_NAME).name(CRITICAL_IDENTIFIER).build();
+      public static final ComponentIdentifier OVERLOAD =
+          builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier FATAL =
+          builder().namespace(CORE_NAMESPACE_NAME).name(FATAL_ERROR_IDENTIFIER).build();
+
+    }
 
   }
 }

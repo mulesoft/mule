@@ -6,26 +6,31 @@
  */
 package org.mule.test.module.extension.streaming;
 
-import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
-import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.Event;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.apache.commons.collections.IteratorUtils;
+import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;
+  private static final String MY_STREAM_VAR = "myStreamVar";
   private List<String> data;
 
   @Override
@@ -46,6 +51,25 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Description("Consume an object stream")
   public void getObjectStream() throws Exception {
     assertStreamMatchesData("getStream");
+  }
+
+  @Test
+  @Description("Stores an object stream in a variable leaving without modifying the original payload")
+  public void getObjectStreamWithTargetValue() throws Exception {
+    InternalEvent event = flowRunner("getStreamWithTargetValue").withPayload(data).run();
+    assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(String.class)));
+    assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), equalTo(data.get(0)));
+  }
+
+  @Test
+  @Description("Stores an object stream in a variable leaving without modifying the original payload")
+  public void getObjectStreamWithTargetVariable() throws Exception {
+    InternalEvent event = flowRunner("getStreamWithTarget").keepStreamsOpen().withPayload(data).run();
+    assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(CursorIteratorProvider.class)));
+    assertThat(IteratorUtils.toList(((CursorIteratorProvider) event.getVariables().get(MY_STREAM_VAR).getValue()).openCursor()),
+               equalTo(data));
+    assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(data));
   }
 
   @Test
@@ -73,7 +97,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   }
 
   private List<String> getStream(String flowName) throws Exception {
-    Event result = flowRunner(flowName)
+    InternalEvent result = flowRunner(flowName)
         .withPayload(data)
         .run();
 

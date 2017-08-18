@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -34,7 +34,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
   private ExpressionMuleEventKeyGenerator keyGenerator;
   private InternalMessage message;
   private MuleContext muleContext;
-  private Event event;
+  private InternalEvent event;
   private ExtendedExpressionManager expressionManager;
 
   @Before
@@ -45,7 +45,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
     message = mock(InternalMessage.class);
 
-    event = mock(Event.class);
+    event = mock(InternalEvent.class);
     when(event.getMessage()).thenReturn(message);
 
     keyGenerator = new ExpressionMuleEventKeyGenerator();

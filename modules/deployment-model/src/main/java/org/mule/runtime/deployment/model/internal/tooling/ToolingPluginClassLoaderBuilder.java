@@ -9,17 +9,19 @@ package org.mule.runtime.deployment.model.internal.tooling;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableList;
 
@@ -107,6 +109,26 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
       throw new DeploymentException(createStaticMessage(format("The parent of the current owner must be of type '%s' but found '%s'",
                                                                RegionClassLoader.class.getName(), parent.getClass().getName())));
     }
-    return new ToolingPluginArtifactClassLoader((RegionClassLoader) parent, artifactPluginDescriptor);
+    final RegionClassLoader regionClassLoader = (RegionClassLoader) parent;
+    return new ToolingArtifactClassLoader(regionClassLoader,
+                                          getPluginArtifactClassLoader(artifactPluginDescriptor,
+                                                                       regionClassLoader.getArtifactPluginClassLoaders()));
   }
+
+  /**
+   * @param artifactPluginDescriptor to look for within the collection of {@link ArtifactClassLoader}s
+   * @param artifactPluginClassLoaders plugins class loaders to look for, at least one of them must contain the {@code pluginDescriptor}.
+   * @return the {@link ArtifactClassLoader} that was generated for the {@code artifactPluginDescriptor}
+   * @throws PluginResolutionError if the plugin wasn't found in the collection of {@code artifactPluginClassLoaders}
+   */
+  protected static ArtifactClassLoader getPluginArtifactClassLoader(ArtifactPluginDescriptor artifactPluginDescriptor,
+                                                                    List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    return artifactPluginClassLoaders.stream()
+        .filter(artifactClassLoader -> artifactClassLoader.getArtifactId()
+            .endsWith(PLUGIN_CLASSLOADER_IDENTIFIER + artifactPluginDescriptor.getName()))
+        .findFirst()
+        .orElseThrow(() -> new PluginResolutionError(format("Cannot generate a tooling ClassLoader as the region ClassLoader is missing the plugin '%s'",
+                                                            artifactPluginDescriptor.getName())));
+  }
+
 }

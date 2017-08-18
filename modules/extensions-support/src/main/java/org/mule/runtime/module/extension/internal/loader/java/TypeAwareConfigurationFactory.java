@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 
@@ -35,7 +37,12 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
     checkArgument(configurationType != null, "configuration type cannot be null");
     checkArgument(extensionClassLoader != null, "extensionClassLoader type cannot be null");
     checkInstantiable(configurationType);
-    this.configurationType = configurationType;
+
+    this.configurationType = withContextClassLoader(extensionClassLoader, () -> {
+      // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
+      // with the annotations stuff.
+      return addAnnotationsToClass(configurationType);
+    });
     this.extensionClassLoader = extensionClassLoader;
   }
 

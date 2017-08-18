@@ -14,17 +14,23 @@ import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleH
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.component.InternalComponent;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,16 +42,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext.
  * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
-public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware {
+public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an

@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
@@ -23,13 +23,13 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
   public Thread responseThread;
 
   @Override
-  protected Event processRequest(Event event) throws MuleException {
+  protected InternalEvent processRequest(InternalEvent event) throws MuleException {
     requestThread = Thread.currentThread();
     return super.processRequest(event);
   }
 
   @Override
-  protected Event processResponse(Event response) throws MuleException {
+  protected InternalEvent processResponse(InternalEvent response) throws MuleException {
     responseThread = Thread.currentThread();
     return super.processRequest(response);
   }

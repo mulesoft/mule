@@ -8,6 +8,7 @@ package org.mule.test.functional;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -15,8 +16,8 @@ import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.extension.internal.loader.XmlExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.HashMap;
@@ -27,8 +28,6 @@ import java.util.Set;
 
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
- *
- * TODO MULE-10982(fernandezlautaro): implement a testing framework for XML based connectors.
  *
  * @since 4.0
  */
@@ -57,7 +56,6 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
     return modulePath == null ? new String[] {} : new String[] {modulePath};
   }
 
-  // TODO(fernandezlautaro): MULE-10982 implement a testing framework for XML based connectors
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
@@ -65,18 +63,18 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
-        DefaultExtensionManager extensionManager;
+        ExtensionManager extensionManager;
         if (muleContext.getExtensionManager() == null) {
-          extensionManager = new DefaultExtensionManager();
+          extensionManager = createDefaultExtensionManager();
           ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
         }
-        extensionManager = (DefaultExtensionManager) muleContext.getExtensionManager();
+        extensionManager = muleContext.getExtensionManager();
         initialiseIfNeeded(extensionManager, muleContext);
 
         registerXmlExtensions(extensionManager);
       }
 
-      private void registerXmlExtensions(DefaultExtensionManager extensionManager) {
+      private void registerXmlExtensions(ExtensionManager extensionManager) {
         final Set<ExtensionModel> extensions = new HashSet<>();
         for (String modulePath : getModulePaths()) {
           Map<String, Object> params = new HashMap<>();

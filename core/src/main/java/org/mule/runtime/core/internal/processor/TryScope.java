@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorWithinTransaction;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createScopeTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
@@ -21,26 +21,26 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processWithC
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 
-import java.util.List;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -54,17 +54,18 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
   private MessagingExceptionHandler messagingExceptionHandler;
+  private List<Processor> processors;
 
   @Override
-  public Event process(final Event event) throws MuleException {
+  public InternalEvent process(final InternalEvent event) throws MuleException {
     if (nestedChain == null) {
       return event;
     } else {
-      ExecutionTemplate<Event> executionTemplate =
+      ExecutionTemplate<InternalEvent> executionTemplate =
           createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      ExecutionCallback<Event> processingCallback = () -> {
+      ExecutionCallback<InternalEvent> processingCallback = () -> {
         try {
-          Event e = processToApply(event, p -> from(p)
+          InternalEvent e = processToApply(event, p -> from(p)
               .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
                                                           messagingExceptionHandler)));
           return e;
@@ -84,7 +85,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   }
 
   @Override
-  public Publisher<Event> apply(Publisher<Event> publisher) {
+  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     if (nestedChain == null) {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
@@ -128,15 +129,16 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
-    this.nestedChain = newChain(processors);
+    this.processors = processors;
   }
 
   @Override
   public void initialise() throws InitialisationException {
+    this.nestedChain =
+        newChain(MessageProcessors.getProcessingStrategy(muleContext, getRootContainerName()), processors);
     if (messagingExceptionHandler == null) {
-      messagingExceptionHandler = muleContext.getDefaultErrorHandler();
+      messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerName()));
     }
-    setFlowConstructIfNeeded(messagingExceptionHandler, flowConstruct);
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     super.initialise();
   }

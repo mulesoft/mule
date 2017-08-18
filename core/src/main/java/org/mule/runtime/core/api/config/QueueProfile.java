@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -15,7 +16,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will behave
  */
-public class QueueProfile {
+public class QueueProfile extends AbstractAnnotatedObject {
 
   private int maxOutstandingMessages = 0;
   private boolean persistent;
@@ -39,7 +40,7 @@ public class QueueProfile {
 
   /**
    * This specifies the number of messages that can be queued before it starts blocking.
-   * 
+   *
    * @return the max number of messages that will be queued
    */
   public int getMaxOutstandingMessages() {
@@ -48,7 +49,7 @@ public class QueueProfile {
 
   /**
    * This specifies the number of messages that can be queued before it starts blocking.
-   * 
+   *
    * @param maxOutstandingMessages the max number of messages that will be queued
    */
   public void setMaxOutstandingMessages(int maxOutstandingMessages) {

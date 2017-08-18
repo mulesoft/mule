@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing.correlation;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
@@ -34,7 +34,7 @@ public interface EventCorrelatorCallback {
    * @throws AggregationException if the aggregation fails. in this scenario the whole event group is removed and passed to the
    *         exception handler for this component
    */
-  public Event aggregateEvents(EventGroup events) throws RoutingException;
+  public InternalEvent aggregateEvents(EventGroup events) throws RoutingException;
 
 
   /**
@@ -44,5 +44,5 @@ public interface EventCorrelatorCallback {
    * @param event the current event
    * @return a new event group of a fixed size
    */
-  public EventGroup createEventGroup(Event event, Object id);
+  public EventGroup createEventGroup(InternalEvent event, Object id);
 }

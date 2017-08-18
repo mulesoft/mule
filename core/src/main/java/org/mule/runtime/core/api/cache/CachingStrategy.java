@@ -9,22 +9,18 @@ package org.mule.runtime.core.api.cache;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static reactor.core.publisher.Flux.from;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-
 /**
- * Defines a way to process a {@link Event} using a cache.
+ * Defines a way to process a {@link InternalEvent} using a cache.
  */
 public interface CachingStrategy {
 
   /**
-   * Processes a {@link Event} using a caching schema. Uses a message processor to process the request when it is not found in the
+   * Processes a {@link InternalEvent} using a caching schema. Uses a message processor to process the request when it is not found in the
    * cache or when it must be processed without using the cache.
    * <p/>
    * Different calls to this method using the same request does not implies that the same instance will be returned. Each
@@ -35,7 +31,7 @@ public interface CachingStrategy {
    * @return a response for the request that could be obtained using the cache.
    * @throws MuleException
    */
-  Event process(Event request, Processor messageProcessor) throws MuleException;
+  InternalEvent process(InternalEvent request, Processor messageProcessor) throws MuleException;
 
 
   /**

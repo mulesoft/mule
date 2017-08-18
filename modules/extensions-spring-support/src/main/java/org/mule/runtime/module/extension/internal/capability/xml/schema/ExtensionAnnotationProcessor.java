@@ -13,16 +13,24 @@ import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-
 import com.google.common.collect.ImmutableMap;
-import com.sun.tools.javac.code.Attribute;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.MethodSymbol;
-import com.sun.tools.javac.code.Symbol.VarSymbol;
-
+import org.apache.commons.lang3.StringUtils;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -31,18 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
-
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.util.ElementFilter;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension
@@ -130,9 +126,12 @@ public final class ExtensionAnnotationProcessor {
     return builder.build();
   }
 
-  public TypeElement getSuperclassElement(Element element) {
-    if (element instanceof Symbol.ClassSymbol) {
-      return (TypeElement) ((Symbol.ClassSymbol) element).getSuperclass().asElement();
+  private TypeElement getSuperclassElement(Element element) {
+    if (element instanceof TypeElement) {
+      TypeMirror superclass = ((TypeElement) element).getSuperclass();
+      if (superclass instanceof DeclaredType) {
+        return ((TypeElement) ((DeclaredType) superclass).asElement());
+      }
     }
     return null;
   }
@@ -163,29 +162,27 @@ public final class ExtensionAnnotationProcessor {
       }
     });
 
-    parseOperationParameterGroups(processingEnv, (MethodSymbol) element, parameters);
+    parseOperationParameterGroups(processingEnv, (ExecutableElement) element, parameters);
     return new MethodDocumentation(stripTags(parsedComment.toString()), parameters);
   }
 
   /**
-   * Traverses the arguments of {@code methodElement} and for each argument annotated with {@link ParameterGroup} it invokes
+   * Traverses the arguments of {@code method} and for each argument annotated with {@link ParameterGroup} it invokes
    * {@link #getOperationParameterGroupDocumentation(TypeElement, Map, ProcessingEnvironment)}
    *
-   * @param processingEnv the current {@link ProcessingEnvironment}
-   * @param methodElement the operation method being processed
-   * @param parameterDocs a {@link Map} which keys are attribute names and values are their documentation
+   * @param env the current {@link ProcessingEnvironment}
+   * @param method the operation method being processed
+   * @param docs a {@link Map} which keys are attribute names and values are their documentation
    */
-  private void parseOperationParameterGroups(ProcessingEnvironment processingEnv, MethodSymbol methodElement,
-                                             Map<String, String> parameterDocs) {
-    for (VarSymbol parameterSymbol : methodElement.getParameters()) {
-      for (Attribute.Compound compound : parameterSymbol.getAnnotationMirrors()) {
+  private void parseOperationParameterGroups(ProcessingEnvironment env, ExecutableElement method, Map<String, String> docs) {
+    for (VariableElement variable : method.getParameters()) {
+      for (AnnotationMirror compound : variable.getAnnotationMirrors()) {
         DeclaredType annotationType = compound.getAnnotationType();
         if (annotationType != null) {
-          Class annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), processingEnv).get();
+          Class annotationClass = classFor((TypeElement) compound.getAnnotationType().asElement(), env).get();
           if (ParameterGroup.class.isAssignableFrom(annotationClass)) {
             try {
-              getOperationParameterGroupDocumentation((TypeElement) processingEnv.getTypeUtils()
-                  .asElement(parameterSymbol.asType()), parameterDocs, processingEnv);
+              getOperationParameterGroupDocumentation((TypeElement) env.getTypeUtils().asElement(variable.asType()), docs, env);
             } catch (Exception e) {
               throw new RuntimeException(e);
             }

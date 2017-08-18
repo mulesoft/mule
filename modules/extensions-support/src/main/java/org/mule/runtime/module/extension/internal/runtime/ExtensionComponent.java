@@ -21,9 +21,10 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.CONNECTION_FAILURE;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -44,10 +45,8 @@ import org.mule.runtime.api.resolving.ExtensionResolvingContext;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -58,10 +57,11 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.resolving.DefaultExtensionResolvingContext;
+import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -89,7 +89,7 @@ import java.util.function.Function;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractAnnotatedObject
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider, FlowConstructAware,
+    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
@@ -106,7 +106,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected final ClassLoader classLoader;
   private CursorProviderFactory cursorProviderFactory;
-  protected FlowConstruct flowConstruct;
 
   protected MuleContext muleContext;
 
@@ -117,7 +116,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected StreamingManager streamingManager;
 
   @Inject
+  protected TransactionFactoryLocator transactionFactoryLocator;
+
+  @Inject
   private MuleMetadataService metadataService;
+
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -315,11 +320,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
   }
 
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
-  }
-
   protected <R> R runWithMetadataContext(Function<MetadataContext, R> metadataContextFunction)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = getMetadataContext();
@@ -337,7 +337,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
-    Event fakeEvent = getInitialiserEvent(muleContext);
+    InternalEvent fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -358,16 +358,16 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private ExtensionResolvingContext getResolvingContext() throws ValueResolvingException, ConnectionException {
-    Event fakeEvent = getInitialiserEvent(muleContext);
+    InternalEvent fakeEvent = getInitialiserEvent(muleContext);
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
     return new DefaultExtensionResolvingContext(configuration, connectionManager, typeLoader);
   }
 
   /**
-   * @param event a {@link Event}
-   * @return a configuration instance for the current component with a given {@link Event}
+   * @param event a {@link InternalEvent}
+   * @return a configuration instance for the current component with a given {@link InternalEvent}
    */
-  protected Optional<ConfigurationInstance> getConfiguration(Event event) {
+  protected Optional<ConfigurationInstance> getConfiguration(InternalEvent event) {
     if (!requiresConfig.get()) {
       return empty();
     }
@@ -376,8 +376,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return of(configurationProvider.get())
           .map(provider -> ofNullable(provider.get(event)))
           .orElseThrow(() -> new IllegalModelDefinitionException(format(
-                                                                        "Flow '%s' contains a reference to config '%s' but it doesn't exists",
-                                                                        flowConstruct.getName(), configurationProvider)));
+                                                                        "Root component '%s' contains a reference to config '%s' but it doesn't exists",
+                                                                        getLocation().getRootContainerName(),
+                                                                        configurationProvider)));
     }
 
     return extensionManager.getConfigurationProvider(extensionModel, componentModel)
@@ -411,8 +412,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
     if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.get().getName())) {
       throw new InitialisationException(
-                                        createStaticMessage(format("Flow '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-                                            + "Expressions are not allowed as config references", flowConstruct.getName(),
+                                        createStaticMessage(format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                                            + "Expressions are not allowed as config references",
+                                                                   getLocation().getRootContainerName(),
                                                                    hyphenize(componentModel.getName()),
                                                                    configurationProvider)),
                                         this);
@@ -427,6 +429,4 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public ExtensionModel getExtensionModel() {
     return extensionModel;
   }
-
-
 }

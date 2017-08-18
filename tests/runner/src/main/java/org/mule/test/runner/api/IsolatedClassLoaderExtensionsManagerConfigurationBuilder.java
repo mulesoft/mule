@@ -15,20 +15,19 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
@@ -89,7 +88,6 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    */
   private ExtensionManager createExtensionManager(final MuleContext muleContext) throws InitialisationException {
     if (muleContext.getExtensionManager() != null) {
-      // TODO MULE-10982: implement a testing framework for XML based connectors, for now we workaround the current generation of the ExtensionManager if it was already created (see org.mule.test.operation.AbstractXmlExtensionMuleArtifactFunctionalTestCase)
       return muleContext.getExtensionManager();
     }
     ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);

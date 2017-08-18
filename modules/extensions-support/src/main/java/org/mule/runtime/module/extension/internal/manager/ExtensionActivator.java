@@ -83,27 +83,25 @@ final class ExtensionActivator implements Startable, Stoppable {
   }
 
   private void registerExpressionFunctions(ExtensionModel extensionModel) {
-    if (!extensionModel.getFunctionModels().isEmpty()
-        || extensionModel.getConfigurationModels().stream().anyMatch(c -> !c.getFunctionModels().isEmpty())) {
+    if (extensionModel.getFunctionModels().isEmpty()) {
+      return;
+    }
 
-      ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(
-                                                                                  new ModuleNamespace(capitalize(extensionModel
-                                                                                      .getXmlDslModel().getPrefix())));
+    ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(
+                                                                                new ModuleNamespace(capitalize(extensionModel
+                                                                                    .getXmlDslModel().getPrefix())));
 
-      registerExpressionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
-      registerExpressionFunctions(extensionModel.getConfigurationModels().stream().flatMap(c -> c.getFunctionModels().stream()),
-                                  moduleBuilder);
-      try {
-        final BindingContext bindingContext = new DefaultBindingContextBuilder()
-            .addModule(moduleBuilder.build()).build();
+    registerExpressionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
+    try {
+      final BindingContext bindingContext = new DefaultBindingContextBuilder()
+          .addModule(moduleBuilder.build()).build();
 
-        muleContext.getRegistry()
-            .registerObject(extensionModel.getName() + "GlobalBindingContextProvider",
-                            (GlobalBindingContextProvider) () -> bindingContext);
+      muleContext.getRegistry()
+          .registerObject(extensionModel.getName() + "GlobalBindingContextProvider",
+                          (GlobalBindingContextProvider) () -> bindingContext);
 
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
-      }
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
   }
 

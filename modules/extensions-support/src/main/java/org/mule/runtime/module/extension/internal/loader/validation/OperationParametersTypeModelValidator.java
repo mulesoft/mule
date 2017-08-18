@@ -14,7 +14,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
@@ -26,14 +26,14 @@ import java.util.Set;
 /**
  * Validates that all {@link OperationModel operations} parameters are from a valid type.
  * <p>
- * A valid type is considered to be one that is not an {@link Event} nor a {@link Message}
+ * A valid type is considered to be one that is not an {@link InternalEvent} nor a {@link Message}
  *
  * @since 4.0
  */
 public class OperationParametersTypeModelValidator implements ExtensionModelValidator {
 
   private final Set<String> forbiddenTypes = ImmutableSet.<String>builder()
-      .add(Event.class.getName())
+      .add(InternalEvent.class.getName())
       .add(Message.class.getName())
       .build();
 

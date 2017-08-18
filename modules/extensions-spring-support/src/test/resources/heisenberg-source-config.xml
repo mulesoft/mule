@@ -8,7 +8,6 @@
                           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
-                       
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"

@@ -16,8 +16,8 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -40,12 +40,12 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = eventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", "bar").build();
+    InternalEvent testEvent = eventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", "bar").build();
 
-    final Builder builder = Event.builder(testEvent);
+    final Builder builder = InternalEvent.builder(testEvent);
     dataTypePropagator.propagate(testEvent, builder, new TypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-    assertThat(builder.build().getVariable("foo").getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(builder.build().getVariables().get("foo").getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
 
     testEvent().getSession().setProperty("foo", "bar");
 
-    final Builder builder = Event.builder(testEvent());
+    final Builder builder = InternalEvent.builder(testEvent());
     dataTypePropagator.propagate(testEvent(), builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
     assertThat(builder.build().getSession().getPropertyDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));

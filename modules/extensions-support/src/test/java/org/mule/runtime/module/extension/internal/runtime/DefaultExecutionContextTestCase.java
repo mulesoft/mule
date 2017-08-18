@@ -7,23 +7,26 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -32,7 +35,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +63,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private ResolverSetResult resolverSetResult;
 
   @Mock
-  private Event event;
+  private InternalEvent event;
 
   @Mock
   private MuleContext muleContext;
@@ -73,13 +75,16 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private CursorProviderFactory<Object> cursorProviderFactory;
 
   @Mock
-  private Flow flow;
-
-  @Mock
   private ComponentLocation location;
 
   @Mock
   private StreamingManager streamingManager;
+
+  @Mock
+  private ConfigurationState configurationState;
+
+  @Mock
+  private RetryPolicyTemplate retryPolicyTemplate;
 
   private Object configurationInstance = new Object();
   private ConfigurationInstance configuration;
@@ -88,15 +93,21 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    configuration = new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, configurationInstance, emptyList(),
-                                                            Optional.empty());
+    configuration =
+        new LifecycleAwareConfigurationInstance(CONFIG_NAME,
+                                                configurationModel,
+                                                configurationInstance,
+                                                configurationState,
+                                                emptyList(),
+                                                empty());
     Map<String, Object> parametersMap = new HashMap<>();
     parametersMap.put(PARAM_NAME, VALUE);
     when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, streamingManager, flow, location, muleContext);
+                                      event, cursorProviderFactory, streamingManager, location, retryPolicyTemplate,
+                                      muleContext);
   }
 
   @Test
@@ -141,7 +152,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getFlowConstruct() {
-    assertThat(flow, is(operationContext.getFlowConstruct()));
+  public void getRetryPolicyTemplate() {
+    assertThat(operationContext.getRetryPolicyTemplate().get(), is(sameInstance(retryPolicyTemplate)));
   }
 }

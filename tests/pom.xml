@@ -26,6 +26,8 @@
         <module>test-policies</module>
         <module>test-services</module>
         <module>runner</module>
+        <module>integration</module>
+        <module>parsers-plugin</module>
     </modules>
 
     <build>

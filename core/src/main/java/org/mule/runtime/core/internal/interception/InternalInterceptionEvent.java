@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.interception;
 
 import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
 
 /**
- * Adds support for compatibility attribues of the {@link Event} to {@link InterceptionEvent}.
+ * Adds support for compatibility attribues of the {@link InternalEvent} to {@link InterceptionEvent}.
  *
  * @since 4.0
  */

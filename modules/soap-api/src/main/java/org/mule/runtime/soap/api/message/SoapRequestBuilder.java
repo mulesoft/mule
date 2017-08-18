@@ -28,47 +28,47 @@ public class SoapRequestBuilder {
 
   SoapRequestBuilder() {}
 
-  public SoapRequestBuilder withContent(InputStream content) {
+  public SoapRequestBuilder content(InputStream content) {
     this.content = content;
     return this;
   }
 
-  public SoapRequestBuilder withContent(String content) {
+  public SoapRequestBuilder content(String content) {
     this.content = new ByteArrayInputStream(content.getBytes());
     return this;
   }
 
-  public SoapRequestBuilder withSoapHeaders(Map<String, String> soapHeaders) {
+  public SoapRequestBuilder soapHeaders(Map<String, String> soapHeaders) {
     this.soapHeaders.putAll(soapHeaders);
     return this;
   }
 
-  public SoapRequestBuilder withTransportHeader(String key, String value) {
+  public SoapRequestBuilder transportHeader(String key, String value) {
     this.transportHeaders.put(key, value);
     return this;
   }
 
-  public SoapRequestBuilder withTransportHeaders(Map<String, String> headers) {
+  public SoapRequestBuilder transportHeaders(Map<String, String> headers) {
     this.transportHeaders.putAll(headers);
     return this;
   }
 
-  public SoapRequestBuilder withAttachment(String name, SoapAttachment attachment) {
+  public SoapRequestBuilder attachment(String name, SoapAttachment attachment) {
     this.attachments.put(name, attachment);
     return this;
   }
 
-  public SoapRequestBuilder withAttachments(Map<String, SoapAttachment> attachments) {
+  public SoapRequestBuilder attachments(Map<String, SoapAttachment> attachments) {
     this.attachments.putAll(attachments);
     return this;
   }
 
-  public SoapRequestBuilder ofContentType(MediaType contentType) {
+  public SoapRequestBuilder contentType(MediaType contentType) {
     this.contentType = contentType;
     return this;
   }
 
-  public SoapRequestBuilder withOperation(String operation) {
+  public SoapRequestBuilder operation(String operation) {
     this.operation = operation;
     return this;
   }

@@ -6,7 +6,7 @@
  */
 package org.mule.test.runner.utils;
 
-import org.mule.runtime.core.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.util.Collection;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -80,12 +80,12 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
   StreamingManager getStreamingManager();
 
   /**
-   * @return The {@link FlowConstruct} that contains the executing component
-   */
-  FlowConstruct getFlowConstruct();
-
-  /**
    * @return The {@link ComponentLocation} of the executing component
    */
   ComponentLocation getComponentLocation();
+
+  /**
+   * @return The reconnection strategy to use in case of connectivity problems
+   */
+  Optional<RetryPolicyTemplate> getRetryPolicyTemplate();
 }

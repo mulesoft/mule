@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -24,9 +23,10 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +56,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile defaultPoolingProfile;
   private final ConnectionManagementStrategyFactory managementStrategyFactory;
+  private final ReconnectionConfig defaultReconnectionConfig = ReconnectionConfig.getDefault();
 
   /**
    * Creates a new instance
@@ -82,7 +83,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
     ConnectionManagementStrategy<C> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
 
-    ConnectionManagementStrategy<C> previous = null;
+    ConnectionManagementStrategy<C> previous;
 
     writeLock.lock();
     try {
@@ -103,7 +104,17 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
   public <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider) {
     return connectionProvider instanceof ConnectionProviderWrapper
         ? ((ConnectionProviderWrapper) connectionProvider).getRetryPolicyTemplate()
-        : getDefaultRetryPolicyTemplate();
+        : defaultReconnectionConfig.getRetryPolicyTemplate();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+    return connectionProvider instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) connectionProvider).getReconnectionConfig().orElse(defaultReconnectionConfig)
+        : defaultReconnectionConfig;
   }
 
   /**
@@ -256,14 +267,6 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
   @Override
   public void start() throws MuleException {
     startIfNeeded(retryPolicyTemplate);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public RetryPolicyTemplate getDefaultRetryPolicyTemplate() {
-    return retryPolicyTemplate;
   }
 
   /**

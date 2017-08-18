@@ -6,14 +6,14 @@
  */
 package org.mule.test.module.tls;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.hamcrest.core.Is;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -40,9 +39,6 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void createTlsPropertiesFile() throws Exception {
-
-    // TODO MULE-10805: It's ignored when Allure is used because it fails with the Allure Surefire listener
-    assumeThat(System.getProperty("allure.profile.is.activated", "false"), Is.is(equalTo("false")));
 
     PrintWriter writer = new PrintWriter(getTlsPropertiesFile(), "UTF-8");
     writer.println("enabledCipherSuites=" + getFileEnabledCipherSuites());
@@ -70,7 +66,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failIfTrustStoreIsNonexistent() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     expectedException.expect(IOException.class);
     expectedException.expectMessage(containsString("Resource non-existent-trust-store could not be found"));
     tlsContextFactory.setTrustStorePath("non-existent-trust-store");
@@ -78,7 +74,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void useConfigFileIfDefaultProtocolsAndCipherSuites() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.setEnabledCipherSuites("DEFAULT");
     tlsContextFactory.setEnabledProtocols("default");
     tlsContextFactory.initialise();
@@ -89,7 +85,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void overrideConfigFile() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.setEnabledCipherSuites("TLS_DHE_DSS_WITH_AES_128_CBC_SHA");
     tlsContextFactory.setEnabledProtocols("TLSv1.1");
     tlsContextFactory.initialise();
@@ -105,7 +101,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failIfProtocolsDoNotMatchConfigFile() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.setEnabledProtocols("TLSv1,SSLv3");
     expectedException.expect(InitialisationException.class);
     expectedException.expectMessage(containsString("protocols are invalid"));
@@ -114,7 +110,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failIfCipherSuitesDoNotMatchConfigFile() throws Exception {
-    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    DefaultTlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     tlsContextFactory.setEnabledCipherSuites("SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA");
     expectedException.expect(InitialisationException.class);
     expectedException.expectMessage(containsString("cipher suites are invalid"));
@@ -123,7 +119,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cannotMutateEnabledProtocols() throws InitialisationException {
-    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     initialiseIfNeeded(tlsContextFactory);
     tlsContextFactory.getEnabledProtocols()[0] = "TLSv1";
     assertThat(tlsContextFactory.getEnabledProtocols(), arrayWithSize(2));
@@ -132,7 +128,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cannotMutateEnabledCipherSuites() throws InitialisationException {
-    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory();
+    TlsContextFactory tlsContextFactory = new DefaultTlsContextFactory(emptyMap());
     initialiseIfNeeded(tlsContextFactory);
     tlsContextFactory.getEnabledCipherSuites()[0] = "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256";
     assertThat(tlsContextFactory.getEnabledCipherSuites(), arrayWithSize(2));

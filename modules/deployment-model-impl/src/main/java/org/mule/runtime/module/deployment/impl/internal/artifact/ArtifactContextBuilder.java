@@ -18,9 +18,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROV
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -39,14 +41,14 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderRepository;
-import org.mule.runtime.module.artifact.serializer.ArtifactObjectSerializer;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
+import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainMuleContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
+import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -284,7 +286,7 @@ public class ArtifactContextBuilder {
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
    *        components from the configuration will be created on demand when requested. For instance, when using
    *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *        {@link org.mule.runtime.core.api.connectivity.ConnectivityTestingService#testConnection(Location)} will cause the
+   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the
    *        creation of the component requested to do test connectivity, if it was not already created. when false, the
    *        application will be created completely at startup.
    * @return the builder
@@ -387,6 +389,11 @@ public class ArtifactContextBuilder {
           @Override
           public boolean isConfigured() {
             return isConfigured;
+          }
+
+          @Override
+          public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
+            // Nothing to do
           }
         });
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();

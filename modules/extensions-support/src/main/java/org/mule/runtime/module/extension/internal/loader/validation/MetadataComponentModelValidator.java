@@ -16,13 +16,17 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.isNullResolver;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ExecutableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -39,7 +43,6 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -47,6 +50,7 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +83,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         validateComponent(model);
       }
 
-      private void validateComponent(ComponentModel model) {
+      private void validateComponent(ExecutableComponentModel model) {
         validateMetadataReturnType(extensionModel, model, problemsReporter);
         MetadataResolverFactory resolverFactory = MuleExtensionUtils.getMetadataResolverFactory(model);
         validateMetadataOutputAttributes(model, resolverFactory, problemsReporter);
@@ -162,7 +166,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
 
   }
 
-  private void validateMetadataOutputAttributes(ComponentModel component, MetadataResolverFactory resolverFactory,
+  private void validateMetadataOutputAttributes(ExecutableComponentModel component, MetadataResolverFactory resolverFactory,
                                                 ProblemsReporter problemsReporter) {
     if (isVoid(component.getOutputAttributes().getType())
         && !(resolverFactory.getOutputAttributesResolver() instanceof NullMetadataResolver)
@@ -174,15 +178,15 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
   }
 
 
-  private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel component,
+  private void validateMetadataReturnType(ExtensionModel extensionModel, ExecutableComponentModel component,
                                           ProblemsReporter problemsReporter) {
     if (MuleExtensionUtils.getMetadataResolverFactory(component).getOutputResolver() instanceof NullMetadataResolver) {
       component.getOutput().getType().accept(new MetadataTypeVisitor() {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          objectType.getOpenRestriction().ifPresent(t -> failIfTypeIsObject(component, extensionModel, t, problemsReporter));
-          failIfTypeIsObject(component, extensionModel, objectType, problemsReporter);
+          objectType.getOpenRestriction().ifPresent(t -> checkValidType(component, extensionModel, t, problemsReporter));
+          checkValidType(component, extensionModel, objectType, problemsReporter);
         }
 
         @Override
@@ -228,16 +232,46 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     }
   }
 
-  private void failIfTypeIsObject(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType type,
+  private void failIfTypeIsObject(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
+                                  String componentTypeName, Class<?> type,
                                   ProblemsReporter problemsReporter) {
-    if (Object.class.equals(getType(type))) {
-      String componentTypeName = getComponentModelTypeName(componentModel);
+    if (Object.class.equals(type)) {
       problemsReporter
           .addError(new Problem(extensionModel,
-                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Operations and Sources with "
-                                    + "return type such as Object or Map (or a collection of any of those) must have defined a not null OutputTypeResolver",
+                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return a type "
+                                    + "such as Object or Map (or a collection of any of those) must have defined an OutputResolver",
                                        extensionModel.getName(), componentTypeName, componentModel.getName(),
-                                       ExtensionMetadataTypeUtils.getId(type))));
+                                       getId(metadataType))));
     }
+  }
+
+  private void failIfTypeIsInterface(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
+                                     String componentTypeName, Class<?> type,
+                                     ProblemsReporter problemsReporter) {
+    if (isInvalidInterface(metadataType, type)) {
+      problemsReporter
+          .addError(new Problem(extensionModel,
+                                format("Extension '%s' specifies a/an %s named '%s' with type '%s' as return type. Components that return an interface "
+                                    + "(or a collection of interfaces) must have defined an OutputResolver",
+                                       extensionModel.getName(), componentTypeName, componentModel.getName(),
+                                       getId(metadataType))));
+    }
+  }
+
+  private void checkValidType(ComponentModel componentModel, ExtensionModel extensionModel, MetadataType metadataType,
+                              ProblemsReporter problemsReporter) {
+    String componentTypeName = getComponentModelTypeName(componentModel);
+    Class<?> type = getType(metadataType);
+    failIfTypeIsObject(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+    failIfTypeIsInterface(componentModel, extensionModel, metadataType, componentTypeName, type, problemsReporter);
+  }
+
+  private boolean isInvalidInterface(MetadataType metadataType, Class<?> type) {
+    return (type.isInterface() &&
+        metadataType instanceof ObjectType &&
+        !isMap(metadataType) &&
+        !type.equals(Message.class) &&
+        // TODO: MULE-11774: Temporal fix. Find proper solution
+        !getType(metadataType).equals(Serializable.class));
   }
 }

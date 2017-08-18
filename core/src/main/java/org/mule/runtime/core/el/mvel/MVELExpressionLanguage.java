@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.el.mvel;
 
-import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -16,6 +14,10 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.MEL_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+
+import static java.util.Collections.singletonMap;
+
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
@@ -29,10 +31,11 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
@@ -58,7 +61,7 @@ import javax.inject.Inject;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor, Initialisable {
+public class MVELExpressionLanguage extends AbstractAnnotatedObject implements ExtendedExpressionLanguageAdaptor, Initialisable {
 
   public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 
@@ -127,7 +130,8 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
     return (T) evaluateInternal(expression, context);
   }
 
-  public <T> T evaluateUntyped(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public <T> T evaluateUntyped(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                               ComponentLocation componentLocation,
                                Map<String, Object> vars) {
     if (event == null) {
       return evaluateUntyped(expression, vars);
@@ -149,7 +153,8 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                     ComponentLocation componentLocation,
                      Object object) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
@@ -157,7 +162,8 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public void enrich(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                     ComponentLocation componentLocation,
                      TypedValue typedValue) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
@@ -171,7 +177,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, ComponentLocation componentLocation,
+  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, componentLocation, bindingContext);
@@ -180,7 +186,7 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, Event event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, bindingContext);
     return MVELSplitDataIterator.createFrom(evaluate.getValue());
@@ -193,30 +199,33 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, BindingContext context) {
-    return evaluate(expression, event, Event.builder(event), null, context);
+  public TypedValue evaluate(String expression, InternalEvent event, BindingContext context) {
+    return evaluate(expression, event, InternalEvent.builder(event), null, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, BindingContext context)
+  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event, BindingContext context)
       throws ExpressionRuntimeException {
     return evaluate(expression, expectedOutputType, event, null, context, false);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, Event event, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event,
+                             ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     return evaluate(expression, event, componentLocation, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, ComponentLocation componentLocation, BindingContext bindingContext) {
-    return evaluate(expression, event, Event.builder(event), componentLocation, bindingContext);
+  public TypedValue evaluate(String expression, InternalEvent event, ComponentLocation componentLocation,
+                             BindingContext bindingContext) {
+    return evaluate(expression, event, InternalEvent.builder(event), componentLocation, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, Event event, Event.Builder eventBuilder, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+                             ComponentLocation componentLocation,
                              BindingContext bindingContext) {
     expression = removeExpressionMarker(expression);
     Map<String, Object> bindingMap = bindingContext.identifiers().stream().collect(toMap(id -> id,
@@ -337,7 +346,8 @@ public class MVELExpressionLanguage implements ExtendedExpressionLanguageAdaptor
     this.globalFunctionsFile = globalFunctionsFile;
   }
 
-  protected VariableResolverFactory createVariableVariableResolverFactory(Event event, Event.Builder eventBuilder) {
+  protected VariableResolverFactory createVariableVariableResolverFactory(InternalEvent event,
+                                                                          InternalEvent.Builder eventBuilder) {
     if (autoResolveVariables) {
       return new VariableVariableResolverFactory(parserConfiguration, muleContext, event, eventBuilder);
     } else {

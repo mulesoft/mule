@@ -6,51 +6,37 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-
-import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.execution.ExecutionTemplate;
-import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessingManager;
-import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Default implementation of {@link SourceCallback}.
- * Instances are to be created through the {@link #builder()} method.
+ * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
  *
  * @param <T> the generic type of the output values of the generated results
  * @param <A> the generic type of the attributes of the generated results
  * @since 4.0
  */
-class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
-
-  private static final String UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE =
-      "Unable to start a transaction from the Source '%s' of the extension '%s' without a %s";
-
+class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
   /**
    * A Builder to create instance of {@link DefaultSourceCallback}
@@ -70,6 +56,16 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
       return this;
     }
 
+    public Builder<T, A> setConfigurationInstance(ConfigurationInstance configurationInstance) {
+      product.configurationInstance = configurationInstance;
+      return this;
+    }
+
+    public Builder<T, A> setTransactionConfig(TransactionConfig transactionConfig) {
+      product.transactionConfig = transactionConfig;
+      return this;
+    }
+
     public Builder<T, A> setListener(Processor listener) {
       product.listener = listener;
       return this;
@@ -85,12 +81,7 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
       return this;
     }
 
-    public Builder<T, A> setFlowConstruct(FlowConstruct flowConstruct) {
-      product.flowConstruct = flowConstruct;
-      return this;
-    }
-
-    public Builder<T, A> setExceptionCallback(ExceptionCallback exceptionCallback) {
+    public Builder<T, A> setExceptionCallback(ExceptionCallback<ConnectionException> exceptionCallback) {
       product.exceptionCallback = exceptionCallback;
       return this;
     }
@@ -117,7 +108,6 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
 
     public SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
-      checkArgument(product.flowConstruct, "flowConstruct");
       checkArgument(product.exceptionCallback, "exceptionCallback");
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
       checkArgument(product.processContextSupplier, "processContextSupplier");
@@ -128,7 +118,7 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
       checkArgument(product.muleContext, "muleContext");
 
       product.transactionSourceBinder =
-          new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel);
+          new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel, product.muleContext);
 
       return product;
     }
@@ -147,15 +137,16 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
   }
 
   private SourceModel sourceModel;
+  private ConfigurationInstance configurationInstance;
   private Processor listener;
   private MuleContext muleContext;
   private ExtensionMessageSource messageSource;
-  private FlowConstruct flowConstruct;
-  private ExceptionCallback exceptionCallback;
+  private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
   private Supplier<MessageProcessContext> processContextSupplier;
   private SourceCompletionHandlerFactory completionHandlerFactory;
   private CursorProviderFactory cursorProviderFactory;
+  private TransactionConfig transactionConfig;
   private boolean returnsListOfMessages = false;
   private TransactionSourceBinder transactionSourceBinder;
 
@@ -174,53 +165,20 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
    */
   @Override
   public void handle(Result<T, A> result, SourceCallbackContext context) {
+    checkArgument(context instanceof SourceCallbackContextAdapter, "The supplied context was not created through this callback, "
+        + "you naughty developer");
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
     SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorProviderFactory, returnsListOfMessages);
     Message message = of(resultAdapter);
 
-    Optional<TransactionConfig> transactionConfig = messageProcessContext.getTransactionConfig();
-
-    if (transactionConfig.isPresent()) {
-      executeFlowTransactionally(context, messageProcessContext, message, transactionConfig.get());
-    } else {
-      executeFlow(context, messageProcessContext, message);
-    }
-  }
-
-  private void executeFlowTransactionally(SourceCallbackContext context, MessageProcessContext messageProcessContext,
-                                          Message message, TransactionConfig transactionConfig) {
-    ExecutionTemplate<Event> executionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
-
-    ConnectionHandler connectionHandler = messageSource.getConnectionHandler()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE,
-                                                                               sourceModel.getName(),
-                                                                               messageSource.getExtensionModel().getName(),
-                                                                               "connection"))));
-    ConfigurationInstance configurationInstance = messageSource.getConfigurationInstance()
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(UNABLE_TO_START_TX_ERROR_MSG_TEMPLATE,
-                                                                               sourceModel.getName(),
-                                                                               messageSource.getExtensionModel().getName(),
-                                                                               "configuration"))));
-
-    try {
-      executionTemplate.execute(() -> {
-        transactionSourceBinder.bindToTransaction(transactionConfig,
-                                                  configurationInstance,
-                                                  connectionHandler);
-
-        executeFlow(context, messageProcessContext, message);
-        return null;
-      });
-    } catch (Exception e) {
-      onSourceException(e);
-    }
+    executeFlow(context, messageProcessContext, message);
   }
 
   private void executeFlow(SourceCallbackContext context, MessageProcessContext messageProcessContext, Message message) {
     messageProcessingManager.processMessage(
                                             new ModuleFlowProcessingTemplate(message, listener, completionHandlerFactory
-                                                .createCompletionHandler(context)),
+                                                .createCompletionHandler((SourceCallbackContextAdapter) context)),
                                             messageProcessContext);
   }
 
@@ -228,8 +186,8 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
    * {@inheritDoc}
    */
   @Override
-  public void onSourceException(Throwable exception) {
-    exceptionCallback.onException(exception);
+  public void onConnectionException(ConnectionException e) {
+    exceptionCallback.onException(e);
   }
 
   /**
@@ -237,6 +195,38 @@ class DefaultSourceCallback<T, A> implements SourceCallback<T, A> {
    */
   @Override
   public SourceCallbackContext createContext() {
-    return new DefaultSourceCallbackContext(this);
+    return new DefaultSourceCallbackContext(this, muleContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TransactionSourceBinder getTransactionSourceBinder() {
+    return transactionSourceBinder;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConfigurationInstance getConfigurationInstance() {
+    return configurationInstance;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TransactionConfig getTransactionConfig() {
+    return transactionConfig;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SourceConnectionManager getSourceConnectionManager() {
+    return messageSource.getSourceConnectionManager();
   }
 }

@@ -7,25 +7,27 @@
 package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import org.mule.functional.api.component.FlowAssert;
-import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
+
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.After;
+import org.mule.tck.processor.FlowAssert;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.After;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -63,17 +65,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ConfigurationBuilder getBuilder() throws Exception {
     String configResources = getConfigResources();
     if (configResources != null) {
-      return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP);
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP);
     }
-    String[] multipleConfigResources = getConfigFiles();
-    return new SpringXmlConfigurationBuilder(multipleConfigResources, emptyMap(), APP);
+    return createConfigurationBuilder(getConfigFiles(), emptyMap(), APP);
   }
 
   /**
@@ -153,7 +154,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  protected Event runFlow(String flowName) throws Exception {
+  protected InternalEvent runFlow(String flowName) throws Exception {
     return flowRunner(flowName).run();
   }
 

@@ -23,7 +23,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONEN
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.INPUT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_ATTRIBUTES;
-import static org.mule.runtime.module.extension.internal.metadata.MultilevelMetadataKeyBuilder.newKey;
+import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
@@ -35,7 +35,6 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,6 +54,8 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
   private static final String CONFIGURATION_CANNOT_BE_DYNAMIC = "Configuration used for Metadata fetch cannot be dynamic";
   private static final String NO_DYNAMIC_KEY_AVAILABLE = "Component [%s] is not a MetadataKeyProvider";
   private static final String DYNAMIC_CONFIG = "dynamic-config";
+  private static final String INVALID_COMPONENT_EXCEPTION_CLASSNAME =
+      "org.mule.runtime.core.internal.metadata.InvalidComponentIdException";
 
   public MetadataNegativeTestCase(ResolutionType resolutionType) {
     super(resolutionType);
@@ -101,7 +102,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_OBJECT_FOUND, location.toString()),
                           COMPONENT_NOT_FOUND,
-                          InvalidComponentIdException.class.getName(),
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME,
                           COMPONENT,
                           "");
   }
@@ -116,7 +117,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_OBJECT_FOUND, location),
                           COMPONENT_NOT_FOUND,
-                          InvalidComponentIdException.class.getName(),
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME,
                           COMPONENT);
   }
 
@@ -128,7 +129,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_OBJECT_FOUND, location),
                           COMPONENT_NOT_FOUND,
-                          InvalidComponentIdException.class.getName(), COMPONENT);
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME, COMPONENT);
   }
 
   @Test
@@ -138,7 +139,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertFailureResult(result, 1);
     assertMetadataFailure(result.getFailures().get(0),
                           NOT_A_METADATA_PROVIDER, NO_DYNAMIC_METADATA_AVAILABLE,
-                          InvalidComponentIdException.class.getName(), COMPONENT);
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME, COMPONENT);
   }
 
   @Test
@@ -150,7 +151,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_OBJECT_FOUND, NON_EXISTING_CONFIG),
                           COMPONENT_NOT_FOUND,
-                          InvalidComponentIdException.class.getName(), COMPONENT);
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME, COMPONENT);
   }
 
   @Test
@@ -162,7 +163,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           format(NO_DYNAMIC_KEY_AVAILABLE, location),
                           NO_DYNAMIC_METADATA_AVAILABLE,
-                          InvalidComponentIdException.class.getName(), COMPONENT);
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME, COMPONENT);
   }
 
   @Test
@@ -172,7 +173,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     assertMetadataFailure(result.getFailures().get(0),
                           NOT_A_METADATA_PROVIDER,
                           NO_DYNAMIC_METADATA_AVAILABLE,
-                          InvalidComponentIdException.class.getName(), COMPONENT);
+                          INVALID_COMPONENT_EXCEPTION_CLASSNAME, COMPONENT);
   }
 
   @Test

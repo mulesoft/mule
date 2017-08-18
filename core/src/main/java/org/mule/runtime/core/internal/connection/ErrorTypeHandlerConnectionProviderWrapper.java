@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -19,14 +20,15 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.util.Optional;
 
 /**
- * {@link ConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link this#connect()} and the
- * failed {@link ConnectionValidationResult} from the {@link this#validate(Object)}, this wrapper consumes these outputs and if a
+ * {@link ConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link #connect()} and the
+ * failed {@link ConnectionValidationResult} from the {@link #validate(Object)}, this wrapper consumes these outputs and if a
  * {@link ErrorTypeDefinition} is provided transforms it and communicates the proper {@link ErrorType}
  *
  * @param <C>
@@ -36,14 +38,16 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
 
   private final ErrorTypeRepository errorTypeRepository;
   private final String prefix;
-  private final RetryPolicyTemplate retryPolicyTemplate;
+  private final ReconnectionConfig reconnectionConfig;
 
-  public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider, MuleContext muleContext,
-                                                   ExtensionModel extensionModel, RetryPolicyTemplate retryPolicyTemplate) {
+  public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider,
+                                                   ExtensionModel extensionModel,
+                                                   ReconnectionConfig reconnectionConfig,
+                                                   MuleContext muleContext) {
     super(connectionProvider);
     this.errorTypeRepository = muleContext.getErrorTypeRepository();
     this.prefix = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
-    this.retryPolicyTemplate = retryPolicyTemplate;
+    this.reconnectionConfig = reconnectionConfig;
   }
 
   /**
@@ -95,8 +99,20 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
   @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     final ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate()
-        : retryPolicyTemplate;
+    return delegate instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate()
+        : super.getRetryPolicyTemplate();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
+    final ConnectionProvider<C> delegate = getDelegate();
+    return delegate instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) delegate).getReconnectionConfig()
+        : ofNullable(reconnectionConfig);
   }
 
   /**
@@ -125,6 +141,6 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
   }
 
   private ComponentIdentifier getIdentifier(ErrorTypeDefinition errorType) {
-    return builder().withName(errorType.getType()).withNamespace(prefix).build();
+    return builder().name(errorType.getType()).namespace(prefix).build();
   }
 }

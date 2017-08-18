@@ -19,19 +19,22 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
@@ -39,23 +42,24 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
+
+import org.reactivestreams.Publisher;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
-
-import org.reactivestreams.Publisher;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 import reactor.core.publisher.Mono;
 
@@ -74,15 +78,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final ProcessingStrategy processingStrategy;
 
   private volatile boolean canProcessMessage = false;
-  private final Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
+  private final Cache<String, InternalEventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   private volatile Sink sink;
   private final int maxConcurrency;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<MessagingExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                          int maxConcurrency) {
-    super(name, muleContext, exceptionListener, initialState);
+                          int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
+    super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
     this.source = source;
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency;
@@ -106,6 +110,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected MessageProcessorChain createPipeline() throws MuleException {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'" + getName() + "' processor chain");
+    if (processingStrategy != null) {
+      builder.setProcessingStrategy(processingStrategy);
+    }
     configurePreProcessors(builder);
     configureMessageProcessors(builder);
     configurePostProcessors(builder);
@@ -114,8 +121,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   /**
    * A fallback method for creating a {@link ProcessingStrategyFactory} to be used in case the user hasn't specified one through
-   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the
-   * {@link ProcessingStrategyFactory} class name system property
+   * either , through {@link MuleConfiguration#getDefaultProcessingStrategyFactory()} or the {@link ProcessingStrategyFactory}
+   * class name system property
    *
    * @return a {@link DirectProcessingStrategyFactory}
    */
@@ -175,21 +182,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       source.setListener(new Processor() {
 
         @Override
-        public Event process(Event event) throws MuleException {
+        public InternalEvent process(InternalEvent event) throws MuleException {
           return processToApply(event, this);
         }
 
         @Override
-        public Publisher<Event> apply(Publisher<Event> publisher) {
+        public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
           return from(publisher)
               .doOnNext(assertStarted())
-              .<Event>handle((event, handleSink) -> {
+              .<InternalEvent>handle((event, handleSink) -> {
                 try {
                   getSink().accept(event);
                   handleSink.next(event);
                 } catch (RejectedExecutionException ree) {
                   event.getContext()
-                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree, this), this, getMuleContext()));
+                      .error(updateMessagingExceptionWithError(new MessagingException(event, ree,
+                                                                                      AbstractPipeline.this),
+                                                               AbstractPipeline.this,
+                                                               getMuleContext()));
                 }
               })
               .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
@@ -201,7 +211,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     injectFlowConstructMuleContext(pipeline);
     initialiseIfInitialisable(source);
     initialiseIfInitialisable(pipeline);
-
   }
 
   protected ReactiveProcessor processFlowFunction() {
@@ -253,7 +262,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  public Consumer<Event> assertStarted() {
+  public Consumer<InternalEvent> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
         throw propagate(new MessagingException(event,
@@ -289,7 +298,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   @Override
-  public Map<String, EventContext> getSerializationEventContextCache() {
+  public Map<String, InternalEventContext> getSerializationEventContextCache() {
     return eventContextCache.asMap();
   }
 
@@ -298,24 +307,24 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return maxConcurrency;
   }
 
-  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalMessageProcessor {
+  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                            PROCESS_END));
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                    PROCESS_END));
       return event;
     }
   }
 
-  private class ProcessorStartCompleteProcessor implements Processor, InternalMessageProcessor {
+  private class ProcessorStartCompleteProcessor implements Processor, InternalProcessor {
 
     @Override
-    public Event process(Event event) throws MuleException {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                            PROCESS_START));
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
+                                                    PROCESS_START));
 
       long startTime = currentTimeMillis();
 
@@ -325,7 +334,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
           .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
           .doOnError(throwable -> !(throwable instanceof MessagingException),
                      throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
-                                                                                        this instanceof Processor ? this : null))
+                                                                                        AbstractPipeline.this))
 
           )
           .doOnTerminate((result, throwable) -> event.getContext().getProcessingTime()
@@ -335,12 +344,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       return event;
     }
 
-    private void fireCompleteNotification(Event event, MessagingException messagingException) {
-      getMuleContext().getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
-                                                            AbstractPipeline.this, PROCESS_COMPLETE));
+    private void fireCompleteNotification(InternalEvent event, MessagingException messagingException) {
+      try {
+        getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
+            .dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
+                                                      AbstractPipeline.this, PROCESS_COMPLETE));
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
-
   }
 
 }
