@@ -78,7 +78,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
 
   private ClassLoaderModel createClassLoaderModel(File artifactFolder) {
     try {
-      return new ServiceClassLoaderModelLoader().load(artifactFolder, Collections.emptyMap(), ArtifactType.SERVICE);
+      return new LibFolderClassLoaderModelLoader().load(artifactFolder, Collections.emptyMap(), ArtifactType.SERVICE);
     } catch (InvalidDescriptorLoaderException e) {
       throw new IllegalStateException("Cannot load classloader model for service", e);
     }

@@ -8,6 +8,7 @@
 package org.mule.runtime.module.service;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLUGIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -26,11 +27,12 @@ import java.util.Map;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
- * This class is responsible for loading the {@link ClassLoaderModelLoader} for a service artifact.
+ * This class is responsible for loading the {@link ClassLoaderModelLoader} for artifacts that uses a lib folder to store
+ * dependencies, like {@link ArtifactType#SERVICE} and {@link ArtifactType#SERVER_PLUGIN}
  *
  * @since 4.0
  */
-public class ServiceClassLoaderModelLoader implements ClassLoaderModelLoader {
+public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   static final String CLASSES_FOLDER = "classes";
   static final String LIB_FOLDER = "lib";
@@ -109,6 +111,6 @@ public class ServiceClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   @Override
   public boolean supportsArtifactType(ArtifactType artifactType) {
-    return SERVICE.equals(artifactType);
+    return SERVICE.equals(artifactType) || SERVER_PLUGIN.equals(artifactType);
   }
 }

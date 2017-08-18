@@ -20,7 +20,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
-import org.mule.runtime.module.service.ServiceClassLoaderModelLoader;
+import org.mule.runtime.module.service.LibFolderClassLoaderModelLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   private DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader;
   private PluginMavenClassLoaderModelLoader pluginMavenClassLoaderModelLoader;
-  private ServiceClassLoaderModelLoader serviceMavenClassLoaderModelLoader;
+  private LibFolderClassLoaderModelLoader libFolderClassLoaderModelLoader;
   private final MavenClientProvider mavenClientProvider;
   private MavenConfiguration mavenRuntimeConfig;
 
@@ -58,7 +58,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
     pluginMavenClassLoaderModelLoader =
         new PluginMavenClassLoaderModelLoader(mavenClient, mavenClientProvider.getLocalRepositorySuppliers());
 
-    serviceMavenClassLoaderModelLoader = new ServiceClassLoaderModelLoader();
+    libFolderClassLoaderModelLoader = new LibFolderClassLoaderModelLoader();
   }
 
   @Override
@@ -90,8 +90,8 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
         return deployableMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
       } else if (pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
         return pluginMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
-      } else if (serviceMavenClassLoaderModelLoader.supportsArtifactType(artifactType)) {
-        return serviceMavenClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
+      } else if (libFolderClassLoaderModelLoader.supportsArtifactType(artifactType)) {
+        return libFolderClassLoaderModelLoader.load(artifactFile, attributes, artifactType);
       } else {
         throw new IllegalStateException(format("Artifact type %s not supported", artifactType));
       }
@@ -104,7 +104,7 @@ public class MavenClassLoaderModelLoader implements ClassLoaderModelLoader {
   public boolean supportsArtifactType(ArtifactType artifactType) {
     return deployableMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
         || pluginMavenClassLoaderModelLoader.supportsArtifactType(artifactType)
-        || serviceMavenClassLoaderModelLoader.supportsArtifactType(artifactType);
+        || libFolderClassLoaderModelLoader.supportsArtifactType(artifactType);
   }
 
 }
