@@ -51,7 +51,6 @@ public class SftpServer
         sshdServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser")));
         sshdServer.setSubsystemFactories(Arrays.<NamedFactory<Command>> asList(factory));
         sshdServer.setCommandFactory(new ScpCommandFactory());
-        sshdServer.setShellFactory(new ProcessShellFactory());
         sshdServer.setPasswordAuthenticator(passwordAuthenticator);
     }
 
