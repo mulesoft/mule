@@ -206,4 +206,10 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     router.process(InternalEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
   }
 
+  @Test
+  @Description("Delay errors is always true for scatter-gather currently.")
+  public void defaultDelayErrors() throws Exception {
+    assertThat(router.isDelayErrors(), equalTo(true));
+  }
+
 }

@@ -82,6 +82,8 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
                 return result;
               }
             })
+            // Required due to lack of decent support for error-handling in reactor. See
+            // https://github.com/reactor/reactor-core/issues/629.
             .onErrorMap(throwable -> !(throwable instanceof MessagingException),
                         throwable -> new MessagingException(event, throwable, this)));
   }

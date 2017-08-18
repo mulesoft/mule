@@ -19,6 +19,7 @@ import static reactor.core.publisher.Flux.fromIterable;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
@@ -47,12 +48,15 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter {
 
   @Override
   protected Consumer<InternalEvent> onEvent() {
-    return event -> {
-      validateMessageIsNotConsumable(event.getMessage());
-      if (isEmpty(routes)) {
-        propagateWrappingFatal(new RoutePathNotFoundException(noEndpointsForRouter(), null));
-      }
-    };
+    return event -> validateMessageIsNotConsumable(event.getMessage());
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    super.initialise();
+    if (routes.size() < 2) {
+      throw new InitialisationException(noEndpointsForRouter(), null);
+    }
   }
 
   @Override

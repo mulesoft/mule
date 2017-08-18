@@ -229,7 +229,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(foreach.getNestedComponents().size(), is(1));
     assertThat(foreach.getNestedComponents().get(0), instanceOf(NestedChainModel.class));
 
-    assertThat(foreach.getAllParameterModels(), hasSize(5));
+    assertThat(foreach.getAllParameterModels(), hasSize(4));
 
     ParameterModel collection = foreach.getAllParameterModels().get(0);
     assertThat(collection.getName(), is("collection"));
@@ -255,8 +255,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(counter.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(counter.getType(), instanceOf(DefaultStringType.class));
     assertThat(counter.isRequired(), is(false));
-
-    assertErrorType(foreach.getAllParameterModels().get(4), "ignoreErrorType");
   }
 
   @Test
