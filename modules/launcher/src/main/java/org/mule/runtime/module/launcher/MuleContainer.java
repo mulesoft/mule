@@ -9,8 +9,6 @@ package org.mule.runtime.module.launcher;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-
-import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
 import org.mule.runtime.api.exception.ExceptionHelper;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,6 +23,7 @@ import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
+import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
@@ -83,6 +82,10 @@ public class MuleContainer {
 
   static {
     if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null) {
+      // We need to force the creation of a logger before we can change the manager factory.
+      // This is because if not, any logger that will be acquired by MuleLog4jContextFactory code
+      // will fail since it will try to use a null factory.
+      LoggerFactory.getLogger("triggerDefaultFactoryCreation");
       // We need to set this property so log4j uses the same context factory everywhere
       System.setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
       log4jContextFactory = new MuleLog4jContextFactory();
