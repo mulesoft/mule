@@ -6,6 +6,8 @@
  */
 package org.mule.transport.email.functional;
 
+import static javax.mail.Message.RecipientType.BCC;
+import static javax.mail.Message.RecipientType.CC;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -34,6 +36,7 @@ public class SmtpEndpointAttributesTestCase extends AbstractEmailFunctionalTestC
 
     private static final CountDownLatch latch = new CountDownLatch(3);
     private static final List<Message> processedMessages = new ArrayList<>();
+
     public SmtpEndpointAttributesTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, STRING_MESSAGE, "smtp", configResources);
@@ -62,8 +65,8 @@ public class SmtpEndpointAttributesTestCase extends AbstractEmailFunctionalTestC
 
     private void assertMessage (Message message, String messageId) throws Exception
     {
-        Address[]  ccAddresses = message.getRecipients(Message.RecipientType.CC);
-        Address[]  bccAddresses = message.getRecipients(Message.RecipientType.BCC);
+        Address[]  ccAddresses = message.getRecipients(CC);
+        Address[]  bccAddresses = message.getRecipients(BCC);
         assertThat(message.getContent(), is((Object) (messageId + "-payload")));
         assertThat(ccAddresses[0].toString(), is (messageId + "-cc@example.com"));
         assertThat(bccAddresses[0].toString(), is(messageId + "-bcc@example.com" ));
@@ -73,8 +76,8 @@ public class SmtpEndpointAttributesTestCase extends AbstractEmailFunctionalTestC
 
     private void assertMessageWithNullValues(Message message, String messageId) throws Exception
     {
-        Address[]  ccAddresses = message.getRecipients(Message.RecipientType.CC);
-        Address[]  bccAddresses = message.getRecipients(Message.RecipientType.BCC);
+        Address[]  ccAddresses = message.getRecipients(CC);
+        Address[]  bccAddresses = message.getRecipients(BCC);
         assertThat(message.getContent(), is((Object) (messageId + "-payload")));
         assertThat(ccAddresses, is(nullValue()));
         assertThat(bccAddresses, is(nullValue()));
