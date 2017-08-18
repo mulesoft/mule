@@ -40,11 +40,11 @@ import org.reactivestreams.Publisher;
 public interface ForkJoinStrategy {
 
   /**
-   * Processes n routing pairs and aggregate the result as defined in the strategy implementation.
+   * Processes {@code n} routing pairs and aggregates the result as defined in the strategy implementation.
    * 
    * @param original the original event
-   * @param routingPairs the routing paris to be
-   * @return
+   * @param routingPairs the routing paris to be processed
+   * @return the aggregated result of processing the routing pairs
    */
   Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> routingPairs);
 

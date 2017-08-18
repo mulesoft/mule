@@ -61,14 +61,14 @@ import reactor.core.publisher.Mono;
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
-  private static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
+  private static final String DEFAULT_ROOT_MESSAGE_PROPERTY = "rootMessage";
   private static final Logger LOGGER = getLogger(Foreach.class);
 
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPIT_EXPRESSION;
   private int batchSize = 1;
   private SplittingStrategy<InternalEvent, Iterator<TypedValue<?>>> splittingStrategy;
-  private String rootMessageVariableName;
+  private String rootMessageVariableName = DEFAULT_ROOT_MESSAGE_PROPERTY;
   private String counterVariableName;
   private MessageProcessorChain nestedChain;
 
@@ -82,33 +82,29 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     return from(publisher).flatMap(originalEvent -> {
 
       // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
-      final String parentMessageProp = rootMessageVariableName != null ? rootMessageVariableName : ROOT_MESSAGE_PROPERTY;
       final Object previousCounterVar = originalEvent.getVariables().containsKey(counterVariableName)
           ? originalEvent.getVariables().get(counterVariableName).getValue()
           : null;
       final Object previousRootMessageVar =
-          originalEvent.getVariables().containsKey(parentMessageProp)
-              ? originalEvent.getVariables().get(parentMessageProp).getValue()
+          originalEvent.getVariables().containsKey(rootMessageVariableName)
+              ? originalEvent.getVariables().get(rootMessageVariableName).getValue()
               : null;
 
       final InternalEvent requestEvent =
-          builder(originalEvent).addVariable(parentMessageProp, originalEvent.getMessage()).build();
+          builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
+
       return splitAndProcess(requestEvent)
           .map(result -> {
             final Builder responseBuilder = builder(result).message(originalEvent.getMessage());
-
-            // Restore original rootMessage/count variables.
-            if (previousCounterVar != null) {
-              responseBuilder.addVariable(counterVariableName, previousCounterVar);
-            } else {
-              responseBuilder.removeVariable(counterVariableName);
-            }
-            if (previousRootMessageVar != null) {
-              responseBuilder.addVariable(parentMessageProp, previousRootMessageVar);
-            } else {
-              responseBuilder.removeVariable(parentMessageProp);
-            }
+            restoreVariables(previousCounterVar, previousRootMessageVar, responseBuilder);
             return responseBuilder.build();
+          })
+          .onErrorMap(MessagingException.class, me -> {
+            // Restore variables in case of error also
+            InternalEvent.Builder exceptionEventBuilder = builder(me.getEvent());
+            restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
+            me.setProcessedEvent(exceptionEventBuilder.build());
+            return me;
           })
           // Required due to lack of decent support for error-handling in reactor. See
           // https://github.com/reactor/reactor-core/issues/629.
@@ -117,23 +113,44 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     });
   }
 
+  private void restoreVariables(Object previousCounterVar, Object previousRootMessageVar, Builder responseBuilder) {
+    // Restore original rootMessage/count variables.
+    if (previousCounterVar != null) {
+      responseBuilder.addVariable(counterVariableName, previousCounterVar);
+    } else {
+      responseBuilder.removeVariable(counterVariableName);
+    }
+    if (previousRootMessageVar != null) {
+      responseBuilder.addVariable(rootMessageVariableName, previousRootMessageVar);
+    } else {
+      responseBuilder.removeVariable(rootMessageVariableName);
+    }
+  }
+
   private Flux<InternalEvent> splitAndProcess(InternalEvent request) {
     AtomicInteger count = new AtomicInteger();
-    return fromIterable(() -> splittingStrategy.split(request))
-        .transform(p -> batchSize > 1 ? from(p).buffer(batchSize).map(typedValueListToTypedValue()) : p)
-        .reduce(just(request),
-                (internalEventFlux, typedValue) -> Mono.from(internalEventFlux)
-                    .map(e -> {
-                      Builder partEventBuilder = builder(e);
-                      if (typedValue.getValue() instanceof Message) {
-                        partEventBuilder.message((Message) typedValue.getValue());
-                      } else {
-                        partEventBuilder.message(Message.builder().payload(typedValue).build());
-                      }
-                      return partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build();
-                    })
-                    .transform(nestedChain))
-        .flatMapMany(identity());
+    return fromIterable(
+                        // Split into sequence of TypedValue
+                        () -> splittingStrategy.split(request))
+                            // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to TypedValue<List<T>>.
+                            .transform(p -> batchSize > 1 ? from(p).buffer(batchSize).map(typedValueListToTypedValue()) : p)
+                            // For each TypedValue part process the nested chain using the event from the previous part.
+                            .reduce(just(request),
+                                    (internalEventFlux, typedValue) -> Mono.from(internalEventFlux)
+                                        .map(e -> {
+                                          Builder partEventBuilder = builder(e);
+                                          if (typedValue.getValue() instanceof Message) {
+                                            // If value is a Message then use it directly conserving attributes and properties.
+                                            partEventBuilder.message((Message) typedValue.getValue());
+                                          } else {
+                                            // Otherwise create a new message
+                                            partEventBuilder.message(Message.builder().payload(typedValue).build());
+                                          }
+                                          return partEventBuilder.addVariable(counterVariableName, count.incrementAndGet())
+                                              .build();
+                                        })
+                                        .transform(nestedChain))
+                            .flatMapMany(identity());
   }
 
   /*
