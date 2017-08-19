@@ -230,23 +230,23 @@
         <muleMetadataModelVersion>1.0.0-FD.4</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <muleHttpConnectorTestVersion>0.8.3-SNAPSHOT</muleHttpConnectorTestVersion>
-        <muleSocketsConnectorTestVersion>0.8.3-SNAPSHOT</muleSocketsConnectorTestVersion>
-        <muleFileConnectorTestVersion>0.8.3-SNAPSHOT</muleFileConnectorTestVersion>
-        <muleJmsConnectorTestVersion>0.8.3-SNAPSHOT</muleJmsConnectorTestVersion>
+        <muleHttpConnectorTestVersion>0.8.2</muleHttpConnectorTestVersion>
+        <muleSocketsConnectorTestVersion>0.8.2</muleSocketsConnectorTestVersion>
+        <muleFileConnectorTestVersion>0.8.2</muleFileConnectorTestVersion>
+        <muleJmsConnectorTestVersion>0.8.2</muleJmsConnectorTestVersion>
 
-        <muleFileCommonsTestVersion>0.8.3-SNAPSHOT</muleFileCommonsTestVersion>
+        <muleFileCommonsTestVersion>0.8.2</muleFileCommonsTestVersion>
 
         <muleHttpServiceTestVersion>1.0.0-BETA.x-SNAPSHOT</muleHttpServiceTestVersion>
         <muleSchedulerServiceTestVersion>1.0.0-BETA.x-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.0.0-BETA.x-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.0.0-FD.4</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-FD.4</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-FD.4</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-FD.4</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-FD.4</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-FD.4</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -278,9 +278,9 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.0.0-BETA.x-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-BETA.x-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-BETA.x-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-FD.4</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-FD.4</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-FD.4</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
