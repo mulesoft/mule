@@ -220,7 +220,7 @@
         <allureJunitVersion>1.4.23.HOTFIX1</allureJunitVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-BETA.x-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.0.0-BETA.6</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-BETA.6</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-BETA.x-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-BETA.x-SNAPSHOT</muleMavenClientApi>
