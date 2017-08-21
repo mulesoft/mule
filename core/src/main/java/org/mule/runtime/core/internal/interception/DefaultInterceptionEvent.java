@@ -38,8 +38,7 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   private InternalEvent.Builder interceptedOutput;
 
   public DefaultInterceptionEvent(InternalEvent interceptedInput) {
-    this.interceptedInput = interceptedInput;
-    this.interceptedOutput = InternalEvent.builder(interceptedInput);
+    reset(interceptedInput);
   }
 
   @Override
@@ -153,5 +152,10 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
    */
   public InternalEvent getInterceptionResult() {
     return interceptedInput;
+  }
+
+  public void reset(InternalEvent newEvent) {
+    this.interceptedInput = newEvent;
+    this.interceptedOutput = InternalEvent.builder(newEvent);
   }
 }

@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExecutableComponentModel;
@@ -51,7 +53,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
-  private final InternalEvent event;
+  private InternalEvent event;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
@@ -161,6 +163,12 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     return event;
   }
 
+  @Override
+  public void changeEvent(InternalEvent updated) {
+    requireNonNull(event);
+    event = updated;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -196,6 +204,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   /**
    * {@inheritDoc}
    */
+  @Override
   public Optional<TransactionConfig> getTransactionConfig() {
     return transactionConfig.get();
   }

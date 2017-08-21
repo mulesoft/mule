@@ -21,7 +21,7 @@ import java.util.Optional;
 
 /**
  * Base helper class to use when decorating {@link ExecutionContextAdapter}s.
- * 
+ *
  * @since 4.0
  */
 public abstract class AbstractExecutionContextAdapterDecorator<M extends ComponentModel> implements ExecutionContextAdapter<M> {
@@ -35,6 +35,11 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   @Override
   public InternalEvent getEvent() {
     return decorated.getEvent();
+  }
+
+  @Override
+  public void changeEvent(InternalEvent updated) {
+    decorated.changeEvent(updated);
   }
 
   @Override

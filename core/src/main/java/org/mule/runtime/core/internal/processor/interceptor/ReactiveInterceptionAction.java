@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorFromFailingProcessor;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.interception.InterceptionAction;
@@ -16,11 +17,13 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+
+import org.slf4j.Logger;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -31,38 +34,57 @@ import java.util.concurrent.CompletableFuture;
  */
 class ReactiveInterceptionAction implements InterceptionAction {
 
-  private MuleContext muleContext;
+  private static final Logger LOGGER = getLogger(ReactiveInterceptionAction.class);
+
+  private ErrorTypeLocator errorTypeLocator;
 
   private Processor processor;
   private ReactiveProcessor next;
   private DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next, Processor processor, MuleContext muleContext) {
+                                    ReactiveProcessor next, Processor processor, ErrorTypeLocator errorTypeLocator) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
     this.processor = processor;
-    this.muleContext = muleContext;
+    this.errorTypeLocator = errorTypeLocator;
   }
 
   @Override
   public CompletableFuture<InterceptionEvent> proceed() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Called proceed() for processor {}", ((AnnotatedObject) processor).getLocation().getLocation());
+    }
+
     return just(interceptionEvent.resolve())
         .transform(next)
-        .map(event -> new DefaultInterceptionEvent(event))
+        .map(event -> {
+          interceptionEvent.reset(event);
+          return interceptionEvent;
+        })
         .cast(InterceptionEvent.class)
         .toFuture();
   }
 
   @Override
   public CompletableFuture<InterceptionEvent> skip() {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Called skip() for processor {}", ((AnnotatedObject) processor).getLocation().getLocation());
+    }
+
     interceptionEvent.resolve();
     return completedFuture(interceptionEvent);
   }
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
-    Error newError = getErrorFromFailingProcessor(null, (AnnotatedObject) processor, cause, muleContext.getErrorTypeLocator());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Called fail() for processor {} with cause {} ({})", ((AnnotatedObject) processor).getLocation().getLocation(),
+                   cause.getClass(), cause.getMessage());
+    }
+
+    Error newError = getErrorFromFailingProcessor(null, (AnnotatedObject) processor, cause, errorTypeLocator);
+
     interceptionEvent.setError(newError.getErrorType(), cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
     completableFuture
@@ -72,6 +94,11 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(ErrorType errorType) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Called fail() for processor {} with errorType {}", ((AnnotatedObject) processor).getLocation().getLocation(),
+                   errorType.getIdentifier());
+    }
+
     Throwable cause = new InterceptionException("");
     interceptionEvent.setError(errorType, cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();

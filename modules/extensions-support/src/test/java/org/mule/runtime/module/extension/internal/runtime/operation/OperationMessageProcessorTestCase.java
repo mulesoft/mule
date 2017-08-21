@@ -46,6 +46,7 @@ import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataReso
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -59,7 +60,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.ParametersResolverProcessor.ParametersResolverProcessorResult;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.el.DefaultExpressionManager;
@@ -75,17 +75,18 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.tck.size.SmallTest;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -367,18 +368,19 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void precalculateExecutionContext() throws MuleException {
-    ParametersResolverProcessorResult resolveParameters = messageProcessor.resolveParameters(event);
+    final AtomicReference<PrecalculatedExecutionContextAdapter> context = new AtomicReference<>();
 
-    assertThat(resolveParameters.getContext(), instanceOf(PrecalculatedExecutionContextAdapter.class));
-    final PrecalculatedExecutionContextAdapter context =
-        (PrecalculatedExecutionContextAdapter) spy(resolveParameters.getContext());
+    messageProcessor.resolveParameters(InternalEvent.builder(event), (params, ctx) -> {
+      assertThat(ctx, instanceOf(PrecalculatedExecutionContextAdapter.class));
+      context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
+    });
 
     messageProcessor.process(InternalEvent.builder(event)
-        .internalParameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context))
+        .internalParameters(singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context.get()))
         .build());
 
     verify(operationExecutor).execute(any(ExecutionContext.class));
-    messageProcessor.disposeResolvedParameters(context);
+    messageProcessor.disposeResolvedParameters(context.get());
   }
 
   @Test
