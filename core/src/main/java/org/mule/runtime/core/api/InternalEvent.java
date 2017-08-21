@@ -504,10 +504,10 @@ public interface InternalEvent extends Serializable, Event {
     CurrentEventHolder.currentEvent.set(event);
     if (event == null) {
       ThreadContext.remove("correlationId");
-      ThreadContext.remove("originatingFlowName");
+      ThreadContext.remove("originatingLocation");
     } else {
       ThreadContext.put("correlationId", event.getCorrelationId());
-      ThreadContext.put("originatingFlowName", event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getName());
+      ThreadContext.put("originatingLocation", event.getContext().getOriginatingLocation().getLocation());
     }
   }
 

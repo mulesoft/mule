@@ -2,7 +2,7 @@
 <Configuration shutdownHook="disable">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%-5p %d [%t] %c: %m%n"/>
+            <PatternLayout pattern="%-5p %d [%t] [%X{originatingLocation} %X{correlationId}] %c: %m%n"/>
         </Console>
     </Appenders>
 
