@@ -30,8 +30,7 @@ public interface ParametersResolverProcessor {
    * @param afterConfigurer the action to perform after resolving the parameters on the builder.
    * @throws MuleException for any exception that occurs while resolving the parameters
    */
-  void resolveParameters(InternalEvent.Builder eventBuilder,
-                         BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
+  void resolveParameters(InternalEvent.Builder eventBuilder, BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
       throws MuleException;
 
   /**
