@@ -748,53 +748,6 @@
               "name": "counterVariableName",
               "description": "Property name used to store the number of message being iterated.",
               "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "typeId": "java.lang.String",
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "ANY",
-                      "REDELIVERY_EXHAUSTED",
-                      "TRANSFORMATION",
-                      "EXPRESSION",
-                      "SECURITY",
-                      "CLIENT_SECURITY",
-                      "SERVER_SECURITY",
-                      "ROUTING",
-                      "CONNECTIVITY",
-                      "RETRY_EXHAUSTED"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "ignoreErrorType",
-              "displayModel": {
-                "displayName": "Ignore Error Type"
-              },
-              "description": "A comma separated list of error types that should be handled, so that items that cause them when being processed are ignored, rather than propagating the error. This is useful to use validations inside this component.",
-              "modelProperties": {}
             }
           ],
           "exclusiveParametersModels": [],
