@@ -108,7 +108,6 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
             super(endpoint);
         }
 
-
         @Override
         boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
         {

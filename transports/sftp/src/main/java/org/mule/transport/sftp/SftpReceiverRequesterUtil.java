@@ -96,7 +96,7 @@ public class SftpReceiverRequesterUtil
 
             if (sizeCheckDelayMs > 0)
             {
-                 stableFiles = getStableFiles(files, client, sizeCheckDelayMs);
+                stableFiles = getStableFiles(files, client, sizeCheckDelayMs);
             }
 
 
@@ -106,8 +106,6 @@ public class SftpReceiverRequesterUtil
 
             for (String file : files)
             {
-
-
                 // Skip if no match.
                 // Note, Mule also uses this filter. We use the filter here because
                 // we don't want to
@@ -368,19 +366,19 @@ public class SftpReceiverRequesterUtil
      * @return true if the file has changed
      * @throws Exception Error
      */
-    protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, List <String> stableFiles)
-        throws Exception
+    protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, List<String> stableFiles)
+            throws Exception
     {
 
         if (fileAge > 0 && stableFiles != null)
         {
             return isOldFile(fileName, client, fileAge) && stableFiles.contains(fileName);
         }
-        else if(stableFiles == null)
+        else if (stableFiles == null)
         {
             return isOldFile(fileName, client, fileAge);
         }
-        else if(fileAge <= 0)
+        else if (fileAge <= 0)
         {
             return stableFiles.contains(fileName);
         }

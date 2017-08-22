@@ -92,17 +92,16 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
         assertThat(completedFiles[0], is(stableFile));
     }
 
-
     /**
      * Verifies an unstable file (i.e. a file whose size doesn't change) is not returned when fileAge is disabled.
      */
     @Test
     public void testNotReturnUnstableFile() throws Exception
     {
-        final String stableFile = "file1";
+        final String unstableFile = "file1";
         when(connector.getFileAge()).thenReturn(-1L);
-        when(sftpClient.listFiles()).thenReturn(new String[] {stableFile});
-        when(sftpClient.getSize(stableFile)).thenReturn(1024L, 2048L);
+        when(sftpClient.listFiles()).thenReturn(new String[] {unstableFile});
+        when(sftpClient.getSize(unstableFile)).thenReturn(1024L, 2048L);
         SftpReceiverRequesterUtil requesterUtil = new TestSftpReceiverRequesterUtil(endpoint);
         String[] completedFiles = requesterUtil.getAvailableFiles(false);
         assertThat(completedFiles.length, is(0));
@@ -149,16 +148,16 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
     @Test
     public void testReturnsAgedAndStableFile() throws Exception
     {
-        final String stableFileAndAgedFile = "file1";
+        final String stableAndAgedFile = "file1";
         when(connector.getCheckFileAge()).thenReturn(true);
         when(connector.getFileAge()).thenReturn(20L);
-        when(sftpClient.listFiles()).thenReturn(new String[] {stableFileAndAgedFile});
-        when(sftpClient.getSize(stableFileAndAgedFile)).thenReturn(1024L);
-        when(sftpClient.getLastModifiedTime(stableFileAndAgedFile)).thenReturn(1L);
+        when(sftpClient.listFiles()).thenReturn(new String[] {stableAndAgedFile});
+        when(sftpClient.getSize(stableAndAgedFile)).thenReturn(1024L);
+        when(sftpClient.getLastModifiedTime(stableAndAgedFile)).thenReturn(1L);
         SftpReceiverRequesterUtil requesterUtil = new TestSftpReceiverRequesterUtil(endpoint);
         String[] completedFiles = requesterUtil.getAvailableFiles(false);
         assertThat(completedFiles.length, is(1));
-        assertThat(completedFiles[0], is(stableFileAndAgedFile));
+        assertThat(completedFiles[0], is(stableAndAgedFile));
     }
 
     /**
@@ -184,12 +183,12 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
     @Test
     public void testNotReturnStableButNotAgedFile() throws Exception
     {
-        final String agedButUnstableFile = "file1";
+        final String stableButNotAgeFile = "file1";
         when(connector.getCheckFileAge()).thenReturn(true);
         when(connector.getFileAge()).thenReturn(20L);
-        when(sftpClient.listFiles()).thenReturn(new String[] {agedButUnstableFile});
-        when(sftpClient.getSize(agedButUnstableFile)).thenReturn(1024L);
-        when(sftpClient.getLastModifiedTime(agedButUnstableFile)).thenReturn(System.currentTimeMillis() * 2);
+        when(sftpClient.listFiles()).thenReturn(new String[] {stableButNotAgeFile});
+        when(sftpClient.getSize(stableButNotAgeFile)).thenReturn(1024L);
+        when(sftpClient.getLastModifiedTime(stableButNotAgeFile)).thenReturn(System.currentTimeMillis() * 2);
         SftpReceiverRequesterUtil requesterUtil = new TestSftpReceiverRequesterUtil(endpoint);
         String[] completedFiles = requesterUtil.getAvailableFiles(false);
         assertThat(completedFiles.length, is(0));
