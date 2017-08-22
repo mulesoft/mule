@@ -14,44 +14,8 @@
     </description>
     
     <properties>
-        <springCglibVersion>3.2.2</springCglibVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Build a jar with cglib shaded for spring -->
-                            <artifactSet>
-                                <includes>
-                                    <include>cglib:cglib</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>net.sf.cglib</pattern>
-                                    <shadedPattern>org.springframework.cglib</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.objectweb.asm</pattern>
-                                    <shadedPattern>org.springframework.asm</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>        
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
@@ -85,16 +49,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${springCglibVersion}</version>
-        </dependency>
-        <!--// TODO(pablo.kraan): MULE-12496: explicitly adding ant dependency to workaround the issue -->
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
         </dependency>
 
         <!-- Unit tests -->
