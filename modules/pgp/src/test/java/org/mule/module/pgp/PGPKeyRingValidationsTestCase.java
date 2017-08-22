@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.module.pgp.i18n.PGPMessages.noFileKeyFound;
-import org.mule.api.lifecycle.InitialisationException;
+
 import org.mule.module.pgp.exception.MissingPGPKeyException;
 
 import org.junit.Test;
@@ -26,17 +26,17 @@ public class PGPKeyRingValidationsTestCase
         pgpKeyRing.setPublicKeyRingFileName("incorrectPath");
         try
         {
-            pgpKeyRing.initialise();
+            pgpKeyRing.getPublicKey("xx");
             fail("InitialisationException should be triggered because public key file doesn't exist");
         }
-        catch (InitialisationException initialisationException)
+        catch (MissingPGPKeyException missingPGPKeyException)
         {
-            assertThat(initialisationException.getMessage(), is(noFileKeyFound("incorrectPath").getMessage()));
+            assertThat(missingPGPKeyException.getMessage(), is(noFileKeyFound("incorrectPath").getMessage()));
         }
     }
 
     @Test
-    public void testInvalidSecretKeyRingFileName() throws Exception
+    public void testInvalidSecretKeyRingFileName()
     {
         pgpKeyRing.setSecretKeyRingFileName("incorrectPath");
         try

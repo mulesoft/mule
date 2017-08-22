@@ -12,15 +12,11 @@ import static org.mule.module.pgp.util.BouncyCastleUtil.KEY_FINGERPRINT_CALCULAT
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.NoSuchProviderException;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;

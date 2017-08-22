@@ -6,19 +6,16 @@
  */
 package org.mule.module.pgp.exception;
 
-import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>MissingSecretPGPKeyException</code> is the exception in case a decrypt
- * operation is attempted without a secret private key
+ * <code>MissingSecretPGPKeyException</code> is the exception in case data
+ * regarding the pgp keys is necessary but no provided in the configuration.
  */
-public class MissingPGPKeyException extends MuleException
+public class MissingPGPKeyException extends MuleRuntimeException
 {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -9046743821025012843L;
 
     /**
@@ -27,5 +24,10 @@ public class MissingPGPKeyException extends MuleException
     public MissingPGPKeyException(Message message)
     {
         super(message);
+    }
+
+    public MissingPGPKeyException(Throwable cause)
+    {
+        super(cause);
     }
 }

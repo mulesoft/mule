@@ -139,10 +139,8 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
 
         MuleMessage message = event.getMessage();
-
-        PGPPublicKey userKeyBundle = keyManager.getPublicKey((String)getCredentialsAccessor().getCredentials(
-            event));
-
+        final String userId = (String) getCredentialsAccessor().getCredentials(event);
+        PGPPublicKey userKeyBundle = keyManager.getPublicKey(userId);
         final PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
 
         try

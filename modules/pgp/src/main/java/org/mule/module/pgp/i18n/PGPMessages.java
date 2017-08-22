@@ -60,6 +60,15 @@ public class PGPMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 11);
     }
 
+    public static Message noKeyIdFound(String id)
+    {
+        return factory.createMessage(BUNDLE_PATH, 12, id);
+    }
+
+    public static Message noPublicKeyDefined()
+    {
+        return factory.createMessage(BUNDLE_PATH, 13);
+    }
 }
 
 

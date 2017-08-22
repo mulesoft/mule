@@ -7,6 +7,7 @@
 package org.mule.module.pgp;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
@@ -16,14 +17,18 @@ public interface PGPKeyRing
 
     /**
      * @return the PGPSecretKey obtained from the secretAliasId if it was defined. Otherwise, null.
-     * @throws Exception
      */
-    PGPSecretKey getConfiguredSecretKey() throws Exception;
+    PGPSecretKey getConfiguredSecretKey();
 
     PGPPublicKey getPublicKey(String principalId);
 
     /**
      * @return all the secretKeys found in the secretKeyFile.
      */
-    PGPSecretKeyRingCollection getSecretKeys ();
+    PGPSecretKeyRingCollection getSecretKeys();
+
+    /**
+     * @return all the publicKeys found in the publicSecretKeyFile.
+     */
+    PGPPublicKeyRingCollection getPublicKeys();
 }

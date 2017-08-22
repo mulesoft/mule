@@ -6,18 +6,19 @@
  */
 package org.mule.module.pgp;
 
-import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.net.URL;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.junit.Test;
+
 public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
 {
+
     @Test
     public void testClientKey()
     {
@@ -26,7 +27,7 @@ public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
     }
 
     @Test
-    public void testServerKey() throws Exception
+    public void testServerKey()
     {
         PGPSecretKey serverKey = keyManager.getConfiguredSecretKey();
         assertNotNull(serverKey);
