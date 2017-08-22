@@ -87,10 +87,10 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
           throw new ConfigurationException(configurationBuilderNoMatching(createConfigResourcesString()));
         }
 
-        ConfigResource[] constructorArg = new ConfigResource[configs.size()];
-        System.arraycopy(configs.toArray(), 0, constructorArg, 0, configs.size());
         ConfigurationBuilder cb = (ConfigurationBuilder) ClassUtils
-            .instantiateClass(className, new Object[] {constructorArg, getArtifactProperties(), artifactType});
+            .instantiateClass(className, new Object[] {
+                configs.stream().map(ConfigResource::getResourceName).toArray(String[]::new), getArtifactProperties(),
+                artifactType, false});
         if (parentContext != null && cb instanceof ParentMuleContextAwareConfigurationBuilder) {
           ((ParentMuleContextAwareConfigurationBuilder) cb).setParentContext(parentContext);
         } else if (parentContext != null) {
