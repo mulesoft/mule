@@ -9,15 +9,15 @@ package org.mule.runtime.core.internal.execution;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 
-import java.util.Map;
-
 import org.reactivestreams.Publisher;
+
+import java.util.Map;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -68,11 +68,15 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
   Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters);
 
   /**
+   * Template method to be executed after the flow completes it's execution including any policy that may be applied.
+   * <p/>
+   * This method will always be executed and the {@code either} parameter will indicate the result of the execution.
+   * 
    * @param either that communicates the result of the flow execution.
    *        <ul>
    *        <li>{@link InternalEvent} if the execution finished correctly</li>
    *        <li>{@link MessagingException} if an error occurred during the execution</li>
    *        </ul>
    */
-  void sendAfterTerminateResponseToClient(Either<MessagingException, InternalEvent> either);
+  void afterPhaseExecution(Either<MessagingException, InternalEvent> either);
 }
