@@ -45,9 +45,6 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +54,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -182,11 +181,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
-                         if (!throwable.getEvent().getError().isPresent()) {
-                           // just in case anything in processor chain itself fails. We still have to create Error earlier on
-                           // though, so it's available in interceptors.
-                           throwable = resolveMessagingException(processor).apply(throwable);
-                         }
+                         throwable = resolveMessagingException(processor).apply(throwable);
                          return Mono.from(event.getContext().error(throwable)).then(Mono.empty());
                        })));
 

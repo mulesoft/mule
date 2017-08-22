@@ -20,9 +20,6 @@ public class EnrichedNotificationInfo {
   private Exception exception;
   private FlowCallStack flowCallStack;
 
-  // TODO: MULE-12626: remove when Studio uses interception API
-  InternalEvent internalEvent;
-
   /**
    * Extract information from the event and exception to provide notification data.
    *

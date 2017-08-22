@@ -25,6 +25,7 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -46,6 +47,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -63,11 +65,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.apache.commons.collections.CollectionUtils;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
-import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -75,6 +73,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * An adapter for {@link Source} which acts as a bridge with {@link ExtensionMessageSource}. It also propagates lifecycle and
@@ -84,6 +88,7 @@ import java.util.Set;
  */
 public final class SourceAdapter implements Startable, Stoppable, Initialisable {
 
+  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
   private final ExtensionModel extensionModel;
@@ -111,7 +116,6 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
                        Optional<ConfigurationInstance> configurationInstance,
                        CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
-                       ComponentLocation componentLocation,
                        SourceConnectionManager connectionManager,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
@@ -122,7 +126,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
-    this.componentLocation = componentLocation;
+    this.componentLocation = source.getLocation();
     this.connectionManager = connectionManager;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
@@ -232,7 +236,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (Exception e) {
-        throw new MessagingException(event, e);
+        throw createSourceException(event, e);
       }
     }
 
@@ -242,7 +246,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
       } catch (Exception e) {
-        throw new MessagingException(event, e);
+        throw createSourceException(event, e);
       }
     }
   }
@@ -415,5 +419,12 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
         .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
         .findAny()
         .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(defaultName);
+  }
+
+  private MessagingException createSourceException(InternalEvent event, Throwable cause) {
+
+    MessagingException messagingException = new MessagingException(event, cause, source);
+
+    return exceptionResolver.resolve(source, messagingException, muleContext);
   }
 }

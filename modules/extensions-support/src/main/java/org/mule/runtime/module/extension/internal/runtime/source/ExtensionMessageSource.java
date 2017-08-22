@@ -120,7 +120,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       sourceAdapter =
           sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
                                              createSourceCallbackFactory(),
-                                             getLocation(),
+                                             getAnnotations(),
                                              sourceConnectionManager);
       muleContext.getInjector().inject(sourceAdapter);
     }

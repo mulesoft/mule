@@ -47,7 +47,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -507,7 +506,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              of(configurationInstance),
                              new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
-                             mock(ComponentLocation.class),
                              mock(SourceConnectionManager.class),
                              null, callbackParameters, null);
   }
