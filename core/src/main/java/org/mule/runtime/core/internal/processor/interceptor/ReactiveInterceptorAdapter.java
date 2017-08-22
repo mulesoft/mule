@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
+import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
@@ -181,8 +183,9 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     }
   }
 
-  private Map<String, Object> getResolvedParams(final InternalEvent eventWithResolvedParams) {
-    return (Map<String, Object>) eventWithResolvedParams.getInternalParameters().get(INTERCEPTION_RESOLVED_PARAMS);
+  private Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
+    return (Map<String, ProcessorParameterValue>) eventWithResolvedParams.getInternalParameters()
+        .get(INTERCEPTION_RESOLVED_PARAMS);
   }
 
   private Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Processor component,
@@ -245,16 +248,20 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private InternalEvent resolveParameters(InternalEvent event, Processor processor, Map<String, String> parameters) {
-    Map<String, Object> resolvedParameters = new HashMap<>();
+    Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
-      Object value;
-      String paramValue = entry.getValue();
-      if (expressionManager.isExpression(paramValue)) {
-        value = expressionManager.evaluate(paramValue, event, ((AnnotatedObject) processor).getLocation()).getValue();
-      } else {
-        value = valueOf(paramValue);
-      }
-      resolvedParameters.put(entry.getKey(), value);
+      String providedValue = entry.getValue();
+      resolvedParameters.put(entry.getKey(), new DefaultProcessorParameterValue(entry.getKey(), providedValue, () -> {
+        // By using a lambda here the evaluation is deferred until it is actually needed.
+        // This not only avoids evaluating expressions which result may not be used, but also avoids
+        // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
+        // implementation
+        if (expressionManager.isExpression(providedValue)) {
+          return expressionManager.evaluate(providedValue, event, ((AnnotatedObject) processor).getLocation()).getValue();
+        } else {
+          return valueOf(providedValue);
+        }
+      }));
     }
 
     InternalEvent.Builder builder = InternalEvent.builder(event);
@@ -262,7 +269,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     if (processor instanceof ParametersResolverProcessor) {
       try {
         ((ParametersResolverProcessor) processor).resolveParameters(builder, (params, context) -> {
-          resolvedParameters.putAll(params);
+          resolvedParameters.putAll(params.entrySet().stream()
+              .collect(toMap(e -> e.getKey(), e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue()))));
           Map<String, Object> interceptionEventParams = new HashMap<>();
           interceptionEventParams.put(INTERCEPTION_RESOLVED_CONTEXT, context);
           interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);

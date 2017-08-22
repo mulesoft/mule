@@ -12,6 +12,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -47,6 +48,7 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
+import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -55,6 +57,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -80,6 +83,7 @@ import org.mockito.verification.VerificationMode;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -165,7 +169,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         event.message(Message.of(TEST_PAYLOAD));
       }
     });
@@ -223,7 +227,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
@@ -253,7 +258,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
@@ -286,7 +292,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.skip();
@@ -316,7 +323,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.skip();
         return supplyAsync(() -> {
@@ -352,7 +360,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.fail(errorTypeMock);
@@ -386,7 +395,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.fail(cause);
@@ -417,7 +427,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         throw expectedException;
       }
     });
@@ -475,7 +485,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         throw expectedException;
       }
@@ -505,7 +516,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         throw expectedException;
@@ -536,7 +548,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
@@ -571,7 +584,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.proceed().thenApplyAsync(e -> {
           throw expectedException;
@@ -605,7 +619,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.skip();
         return supplyAsync(() -> {
@@ -640,7 +655,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.skip().thenApplyAsync(e -> {
           throw expectedException;
@@ -700,7 +716,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.skip();
       }
@@ -729,7 +746,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         event.message(Message.of(TEST_PAYLOAD));
       }
     });
@@ -765,7 +782,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         event.message(Message.of(TEST_PAYLOAD));
       }
     });
@@ -861,7 +878,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
@@ -898,7 +916,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         event.message(Message.of(TEST_PAYLOAD));
         return action.proceed();
@@ -931,7 +950,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
@@ -968,7 +988,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.proceed().thenApplyAsync(e -> {
           e.message(Message.of(TEST_PAYLOAD));
@@ -1005,7 +1026,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         return supplyAsync(() -> {
@@ -1042,7 +1064,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.proceed().thenApplyAsync(e -> {
           e.message(Message.of(TEST_PAYLOAD));
@@ -1078,7 +1101,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         throw expectedException;
       }
     });
@@ -1112,7 +1135,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public void before(ComponentLocation location, Map<String, Object> parameters, InterceptionEvent event) {
+      public void before(ComponentLocation location, Map<String, ProcessorParameterValue> parameters, InterceptionEvent event) {
         throw expectedException;
       }
     });
@@ -1210,7 +1233,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         throw expectedException;
       }
@@ -1245,7 +1269,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         throw expectedException;
       }
@@ -1278,7 +1303,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         throw expectedException;
@@ -1314,7 +1340,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         action.proceed();
         throw expectedException;
@@ -1347,7 +1374,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.skip();
       }
@@ -1380,7 +1408,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {
 
       @Override
-      public CompletableFuture<InterceptionEvent> around(ComponentLocation location, Map<String, Object> parameters,
+      public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
+                                                         Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
         return action.skip();
       }
@@ -1480,6 +1509,38 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
   }
 
+  @Test
+  public void paramWithErrorExpression() throws Exception {
+    AnnotatedObject annotatedProcessor = (AnnotatedObject) processor;
+    Map<QName, Object> annotations = new HashMap<>(annotatedProcessor.getAnnotations());
+    Map<String, String> params = new HashMap<>((Map<String, String>) annotations.get(ANNOTATION_PARAMETERS));
+    params.put("errorExpr", "#[notAnExpression]");
+    annotations.put(ANNOTATION_PARAMETERS, params);
+    ((AnnotatedObject) processor).setAnnotations(annotations);
+
+    ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
+    startFlowWithInterceptors(interceptor);
+
+    process(flow, eventBuilder().message(Message.of("")).build());
+
+    if (useMockInterceptor) {
+      InOrder inOrder = inOrder(processor, interceptor);
+
+      inOrder.verify(interceptor)
+          .before(any(),
+                  mapArgWithErrorEntry("errorExpr", instanceOf(ExpressionRuntimeException.class)/* "#[notAnExpression]" */),
+                  any());
+      inOrder.verify(interceptor)
+          .around(any(),
+                  mapArgWithErrorEntry("errorExpr", instanceOf(ExpressionRuntimeException.class)/* "#[notAnExpression]" */),
+                  any(), any());
+      inOrder.verify(processor).process(any());
+      inOrder.verify(interceptor).after(any(), any(), any());
+
+      verifyParametersResolvedAndDisposed(times(1));
+    }
+  }
+
   private void verifyParametersResolvedAndDisposed(final VerificationMode times) {
     if (processor instanceof OperationProcessorInApp) {
       verify((OperationProcessorInApp) processor, times).resolveParameters(any(), any());
@@ -1540,7 +1601,23 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     @Override
     public void resolveParameters(InternalEvent.Builder eventBuilder,
                                   BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer) {
-      afterConfigurer.accept(singletonMap("operationParam", "operationParamValue"), executionContext);
+      afterConfigurer.accept(singletonMap("operationParam", new ProcessorParameterValue() {
+
+        @Override
+        public String parameterName() {
+          return "operationParam";
+        }
+
+        @Override
+        public String providedValue() {
+          return "operationParamValue";
+        }
+
+        @Override
+        public Object resolveValue() {
+          return "operationParamValue";
+        }
+      }), executionContext);
     }
 
     @Override
@@ -1555,8 +1632,73 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     return new DefaultComponentLocation(of("flowName"), singletonList(new DefaultLocationPart("0", of(part), empty(), empty())));
   }
 
-  private static Map<String, Object> mapArgWithEntry(String key, Object value) {
-    return (Map<String, Object>) argThat(hasEntry(key, value));
+  private static Map<String, ProcessorParameterValue> mapArgWithEntry(String key, Object value) {
+    return mapArgWithEntry(key, new ProcessorParameterValueMatcher(equalTo(value)));
+  }
+
+  private static Map<String, ProcessorParameterValue> mapArgWithErrorEntry(String key, Matcher<Throwable> errorMatcher) {
+    return mapArgWithEntry(key, new ProcessorParameterValueErrorMatcher(errorMatcher));
+  }
+
+  private static Map<String, ProcessorParameterValue> mapArgWithEntry(String key, Matcher<ProcessorParameterValue> valueMatcher) {
+    return (Map<String, ProcessorParameterValue>) argThat(hasEntry(equalTo(key), valueMatcher));
+  }
+
+  private static final class ProcessorParameterValueMatcher extends TypeSafeMatcher<ProcessorParameterValue> {
+
+    private Matcher<Object> resolvedValueMatcher;
+    private Throwable thrown;
+
+    public ProcessorParameterValueMatcher(Matcher<Object> resolvedValueMatcher) {
+      this.resolvedValueMatcher = resolvedValueMatcher;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      if (thrown != null) {
+        description.appendText("but resolvedValue() was ");
+        resolvedValueMatcher.describeTo(description);
+      } else {
+        description.appendText("but resolvedValue() threw ");
+        description.appendValue(thrown);
+      }
+    }
+
+    @Override
+    protected boolean matchesSafely(ProcessorParameterValue item) {
+      try {
+        return resolvedValueMatcher.matches(item.resolveValue());
+      } catch (Throwable e) {
+        thrown = e;
+        return false;
+      }
+    }
+
+  }
+
+  private static final class ProcessorParameterValueErrorMatcher extends TypeSafeMatcher<ProcessorParameterValue> {
+
+    private Matcher<Throwable> resolutionErrorMatcher;
+
+    public ProcessorParameterValueErrorMatcher(Matcher<Throwable> resolutionErrorMatcher) {
+      this.resolutionErrorMatcher = resolutionErrorMatcher;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      resolutionErrorMatcher.describeTo(description);
+    }
+
+    @Override
+    protected boolean matchesSafely(ProcessorParameterValue item) {
+      try {
+        item.resolveValue();
+        return false;
+      } catch (Throwable t) {
+        return resolutionErrorMatcher.matches(t);
+      }
+    }
+
   }
 
   private static final class EventPayloadMatcher extends TypeSafeMatcher<InternalEvent> {
