@@ -23,6 +23,8 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -78,6 +80,9 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(event.getMessage()).thenReturn(message);
     when(event.getError()).thenReturn(Optional.empty());
     when(context.getErrorTypeLocator()).thenReturn(locator);
+
+    when(message.getPayload()).thenReturn(new TypedValue<>(null, DataType.STRING));
+    when(message.getAttributes()).thenReturn(new TypedValue<>(null, DataType.STRING));
   }
 
   @Test

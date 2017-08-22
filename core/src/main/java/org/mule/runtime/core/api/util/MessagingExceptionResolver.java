@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public final class MessagingExceptionResolver {
    *
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link InternalEvent}
    */
-  public MessagingException resolve(AnnotatedObject annotatedObject, MessagingException me, MuleContext context) {
+  public MessagingException resolve(final AnnotatedObject annotatedObject, final MessagingException me, MuleContext context) {
     ErrorTypeLocator locator = context.getErrorTypeLocator();
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(annotatedObject, me, locator);
 
@@ -80,7 +81,9 @@ public final class MessagingExceptionResolver {
       ((MessagingException) root).setProcessedEvent(event);
       return ((MessagingException) root);
     } else {
-      return enrich(new MessagingException(event, root, failingComponent), failingComponent, event, context);
+      MessagingException result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
+          : new MessagingException(event, root, failingComponent);
+      return enrich(result, failingComponent, event, context);
     }
   }
 
@@ -117,7 +120,9 @@ public final class MessagingExceptionResolver {
   private MessagingException updateCurrent(MessagingException me, AnnotatedObject processor, MuleContext context) {
     InternalEvent errorEvent = createErrorEvent(me.getEvent(), processor, me, context.getErrorTypeLocator());
     AnnotatedObject failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
-    MessagingException updated = new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
+    MessagingException updated =
+        me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
+            : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
     return enrich(updated, failingProcessor, errorEvent, context);
   }
 
@@ -150,7 +155,7 @@ public final class MessagingExceptionResolver {
     return me;
   }
 
-  private static boolean isCriticalMuleError(ErrorType type) {
+  private boolean isCriticalMuleError(ErrorType type) {
     return type.getNamespace().equals(CORE_NAMESPACE_NAME) && type.getIdentifier().equals(CRITICAL_IDENTIFIER);
   }
 }
