@@ -55,7 +55,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
         if (encryptionAlgorithm == null)
         {
-            encryptionAlgorithm = EncryptionAlgorithm.CAST5.toString();
+            encryptionAlgorithm = EncryptionAlgorithm.AES_256.toString();
         }
 
         try
