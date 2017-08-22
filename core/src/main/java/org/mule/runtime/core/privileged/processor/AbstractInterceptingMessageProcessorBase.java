@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -43,7 +43,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
   }
 
   public FlowConstruct getFlowConstruct() {
-    return getFromAnnotatedObject(muleContext.getConfigurationComponentLocator(), this);
+    return getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
   }
 
   public final Processor getListener() {

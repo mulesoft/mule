@@ -11,8 +11,8 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
-import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
@@ -158,7 +158,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
    */
   @Override
   public void initialise() throws InitialisationException {
-    this.flowConstruct = getFromAnnotatedObject(muleContext.getConfigurationComponentLocator(), this);
+    this.flowConstruct = getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
     createScheduler();
   }
 

@@ -10,9 +10,10 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.InternalEvent.builder;
-import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,12 +22,12 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.CompositeRoutingException;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
@@ -53,7 +54,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
-  private FlowConstruct flowConstruct;
+  private ProcessingStrategy processingStrategy;
   private ForkJoinStrategyFactory forkJoinStrategyFactory;
   private ForkJoinStrategy forkJoinStrategy;
   private long timeout = Long.MAX_VALUE;
@@ -109,7 +110,9 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    flowConstruct = getFromAnnotatedObject(componentLocator, this);
+    processingStrategy = getFromAnnotatedObject(componentLocator, this)
+        .map(flow -> flow.getProcessingStrategy())
+        .orElse(DIRECT_PROCESSING_STRATEGY_INSTANCE);
     expressionManager = muleContext.getExpressionManager();
     timeoutScheduler = schedulerService.cpuLightScheduler();
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
@@ -117,7 +120,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
 
     forkJoinStrategy =
-        forkJoinStrategyFactory.createForkJoinStrategy(flowConstruct.getProcessingStrategy(), maxConcurrency,
+        forkJoinStrategyFactory.createForkJoinStrategy(processingStrategy, maxConcurrency,
                                                        isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType);
   }
 
