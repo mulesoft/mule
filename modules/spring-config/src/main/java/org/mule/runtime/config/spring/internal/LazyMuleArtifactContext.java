@@ -17,6 +17,7 @@ import static org.mule.runtime.config.spring.internal.LazyValueProviderService.N
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -102,26 +103,28 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   }
 
   private void applyLifecycle(List<String> createdComponentModels) {
-    if (muleContext.isInitialised()) {
-      for (String createdComponentModelName : createdComponentModels) {
-        Object object = muleContext.getRegistry().get(createdComponentModelName);
-        try {
-          initialiseIfNeeded(object, true, muleContext);
-        } catch (InitialisationException e) {
-          throw new RuntimeException(e);
+    muleContext.withLifecycleLock(() -> {
+      if (muleContext.isInitialised()) {
+        for (String createdComponentModelName : createdComponentModels) {
+          Object object = muleContext.getRegistry().get(createdComponentModelName);
+          try {
+            initialiseIfNeeded(object, true, muleContext);
+          } catch (InitialisationException e) {
+            throw new RuntimeException(e);
+          }
         }
       }
-    }
-    if (muleContext.isStarted()) {
-      for (String createdComponentModelName : createdComponentModels) {
-        Object object = muleContext.getRegistry().get(createdComponentModelName);
-        try {
-          startIfNeeded(object);
-        } catch (MuleException e) {
-          throw new RuntimeException(e);
+      if (muleContext.isStarted()) {
+        for (String createdComponentModelName : createdComponentModels) {
+          Object object = muleContext.getRegistry().get(createdComponentModelName);
+          try {
+            startIfNeeded(object);
+          } catch (MuleException e) {
+            throw new RuntimeException(e);
+          }
         }
       }
-    }
+    });
   }
 
   @Override

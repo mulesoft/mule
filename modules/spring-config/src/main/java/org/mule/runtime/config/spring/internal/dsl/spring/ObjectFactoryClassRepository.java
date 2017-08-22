@@ -13,21 +13,18 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
+import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.cglib.proxy.Callback;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.springframework.beans.factory.SmartFactoryBean;
-
-import org.springframework.cglib.proxy.Callback;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -45,9 +42,8 @@ import org.springframework.cglib.proxy.MethodInterceptor;
  */
 public class ObjectFactoryClassRepository {
 
-  private Cache<ComponentBuildingDefinition, Class<ObjectFactory>> objectFactoryClassCache = CacheBuilder.newBuilder().build();
-  private List<Class> createdClasses = new LinkedList<>();
-
+  private Cache<ComponentBuildingDefinition, Class<ObjectFactory>> objectFactoryClassCache = CacheBuilder.newBuilder()
+      .removalListener(notification -> registerStaticCallbacks((Class<ObjectFactory>) notification.getValue(), null)).build();
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -100,7 +96,6 @@ public class ObjectFactoryClassRepository {
     }
     enhancer.setUseCache(false);
     Class<ObjectFactory> factoryBeanClass = enhancer.createClass();
-    createdClasses.add(factoryBeanClass);
     registerStaticCallbacks(factoryBeanClass, new Callback[] {
         (MethodInterceptor) (obj, method, args, proxy) -> {
           if (method.getName().equals("isSingleton")) {
@@ -131,7 +126,7 @@ public class ObjectFactoryClassRepository {
    * leak in CGLIB
    */
   public void destroy() {
-    createdClasses.stream().forEach(clazz -> registerStaticCallbacks(clazz, null));
+    objectFactoryClassCache.invalidateAll();
   }
 
 }
