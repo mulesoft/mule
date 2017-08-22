@@ -88,7 +88,7 @@ import org.slf4j.Logger;
  */
 public final class SourceAdapter implements Startable, Stoppable, Initialisable {
 
-  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
+  private static final MessagingExceptionResolver EXCEPTION_RESOLVER = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
   private final ExtensionModel extensionModel;
@@ -422,9 +422,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   }
 
   private MessagingException createSourceException(InternalEvent event, Throwable cause) {
-
     MessagingException messagingException = new MessagingException(event, cause, source);
 
-    return exceptionResolver.resolve(source, messagingException, muleContext);
+    return EXCEPTION_RESOLVER.resolve(source, messagingException, muleContext);
   }
 }

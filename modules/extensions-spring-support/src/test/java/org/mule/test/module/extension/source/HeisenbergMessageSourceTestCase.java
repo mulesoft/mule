@@ -19,6 +19,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.tck.probe.PollingProber.probe;
@@ -30,13 +31,13 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
@@ -170,7 +171,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
 
-    MessagingException me = (MessagingException) Exceptions.unwrap(optionalError.get().getCause());
+    MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
     Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                       containsString("sourceWithInvalidSuccessAndErrorParameters/source"));
     Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:listen-payments"));
@@ -206,7 +207,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
 
-    MessagingException me = (MessagingException) Exceptions.unwrap(optionalError.get().getCause());
+    MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
     Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                       containsString("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt/source"));
     Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:listen-payments"));
