@@ -24,6 +24,7 @@ public class SmtpConnector extends AbstractMailConnector
     public static final String DEFAULT_SMTP_HOST = "localhost";
     public static final int DEFAULT_SMTP_PORT = 25;
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
+    public static final String DEFAULT_SUBJECT_VALUE  = "[No Subject]";
 
     /**
      * Holds value of bcc addresses.
@@ -43,7 +44,7 @@ public class SmtpConnector extends AbstractMailConnector
     /**
      * Holds value of default subject
      */
-    private String defaultSubject = "[No Subject]";
+    private String defaultSubject = DEFAULT_SUBJECT_VALUE;
 
     /**
      * Holds value of the from address.
