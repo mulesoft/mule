@@ -10,16 +10,17 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.DefaultEventContext.fireAndForgetChild;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.construct.FlowConstruct.getFromAnnotatedObject;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -32,6 +33,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -39,7 +41,6 @@ import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -63,6 +64,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
+  @Inject
+  private Registry registry;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private FlowConstruct flowConstruct;
@@ -83,7 +86,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void initialise() throws InitialisationException {
-    flowConstruct = getFromAnnotatedObject(componentLocator, this);
+    Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
+    if (rootContainer instanceof FlowConstruct) {
+      flowConstruct = (FlowConstruct) rootContainer;
+    }
     if (delegate == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
     }
@@ -136,7 +142,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private ReactiveProcessor scheduleAsync(Processor delegate) {
     if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
       // If an async processing strategy is in use then use it to schedule async
-      return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(delegate));
+      return publisher -> from(publisher).transform(flowConstruct.getProcessingStrategy().onPipeline(delegate));
     } else {
       // Otherwise schedule async processing using IO pool.
       return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
