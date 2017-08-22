@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-calling-operations-within-module-with-cycles"
+        minMuleVersion="4.1.0"
+        prefix="modified-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles"
+        xmlns:tns="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles/current/mule-modified-prefix.xsd">
+
+    <operation name="op1">
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:op1 />
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

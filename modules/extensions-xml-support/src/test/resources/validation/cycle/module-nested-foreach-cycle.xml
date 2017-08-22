@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-calling-operations-within-module-with-cycles"
+        minMuleVersion="4.1.0"
+        prefix="modified-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles"
+        xmlns:tns="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module-with-cycles/current/mule-modified-prefix.xsd">
+
+
+    <operation name="foreach-op1">
+        <parameters>
+            <parameter name="amount" type="number"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="collected" value="" />
+            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+                <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+                <tns:foreach-op2 op1Parameter="#[payload]"/>
+            </mule:foreach>
+            <mule:set-payload value="#[vars.collected]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="foreach-op2">
+        <parameters>
+            <parameter name="amount" type="number"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="collected" value="" />
+            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+                <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+                <mule:foreach collection="#[(parameters.amount to 1) as Array]">
+                    <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+                    <tns:foreach-op1 op1Parameter="#[payload]"/>
+                </mule:foreach>
+            </mule:foreach>
+            <mule:set-payload value="#[vars.collected]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

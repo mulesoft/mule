@@ -407,6 +407,18 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     }
   }
 
+  @Test
+  public void testModuleCallingOperationsWithinModule() {
+    String modulePath = "modules/module-calling-operations-within-module.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
+    assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
+    assertThat(extensionModel.getConfigurationModels().size(), is(0));
+    assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
+    assertThat(extensionModel.getOperationModels().size(), is(18));
+  }
+
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
    *  simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.

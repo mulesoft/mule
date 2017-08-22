@@ -81,9 +81,6 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
       DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
       factory.setNamespaceAware(namespaceAware);
-      //http://apache.org/xml/features/continue-after-fatal-error
-      //com.sun.org.apache.xerces.internal.impl.XMLErrorReporter.CONTINUE_AFTER_FATAL_ERROR      Constants.XERCES_FEATURE_PREFIX + Constants.CONTINUE_AFTER_FATAL_ERROR_FEATURE
-      //      factory.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true); //TODO lautaro horrible hack :(
       if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
         factory.setValidating(true);
         if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {

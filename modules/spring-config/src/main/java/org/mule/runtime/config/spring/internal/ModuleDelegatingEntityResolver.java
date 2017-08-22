@@ -9,7 +9,9 @@ package org.mule.runtime.config.spring.internal;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -42,7 +44,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
-  private Set<ExtensionModel> extensions;
+  private final Set<ExtensionModel> extensions;
   private final EntityResolver springEntityResolver;
   private final EntityResolver muleEntityResolver;
   private Map<String, String> customSchemaMappings;
@@ -100,8 +102,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     }
     if (inputSource == null) {
       if (checkedEntities.get(systemId) != null) {
-        //TODO MULE-13317 add XSD for the current module lautaro mmmmmm
-        //        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
+        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
       } else {
         checkedEntities.put(systemId, true);
       }

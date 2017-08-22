@@ -7,14 +7,17 @@
 package org.mule.test.functional;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.test.runner.RunnerDelegateTo;
 
-//TODO MULE-13317 lautaro make this one parameterized with a proxy connector
-//TODO MULE-13317 lautaro make test to validate circular depenencies break before trying to macro expand, it will create an overflow otherwise
-//@RunnerDelegateTo(Parameterized.class)
+import java.util.Collection;
+
+@RunnerDelegateTo(Parameterized.class)
 public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String HARDCODED_VALUE = "hardcoded value";
@@ -25,22 +28,24 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   private static final String SECOND_PART = " connector content";
 
 
-  //  @Parameterized.Parameter
-  public String configFile = "flows/flows-using-module-calling-operations-within-module.xml";
+  @Parameterized.Parameter
+  public String configFile;
 
-  //  @Parameterized.Parameter(1)
-  public String[] paths = new String[] {"modules/module-calling-operations-within-module.xml"};
+  @Parameterized.Parameter(1)
+  public String[] paths;
 
-  //  @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
-  //  public static Collection<Object[]> data() {
-  //    return asList(new Object[][] {
-  //        // simple scenario
-  //        {"flows/flows-using-module-simple.xml", new String[] {"modules/module-simple.xml"}},
-  //        // nested modules scenario
-  //        {"flows/nested/flows-using-module-simple-proxy.xml",
-  //            new String[] {"modules/module-simple.xml", "modules/nested/module-simple-proxy.xml"}}
-  //    });
-  //  }
+  @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        // simple scenario
+        {"flows/flows-using-module-calling-operations-within-module.xml",
+            new String[] {"modules/module-calling-operations-within-module.xml"}},
+        // nested modules scenario
+        {"flows/nested/flows-using-module-calling-operations-within-module-proxy.xml",
+            new String[] {"modules/module-calling-operations-within-module.xml",
+                "modules/nested/module-calling-operations-within-module-proxy.xml"}}
+    });
+  }
 
   @Override
   protected String[] getModulePaths() {
