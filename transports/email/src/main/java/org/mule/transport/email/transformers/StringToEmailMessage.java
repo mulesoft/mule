@@ -161,7 +161,11 @@ public class StringToEmailMessage extends AbstractMessageTransformer
         String value = message.getOutboundProperty(propName);
         if (value == null)
         {
-            value = message.getInvocationProperty(propName, defaultValue);
+            value = (String) endpoint.getProperty(propName);
+            if (value == null)
+            {
+                value = defaultValue;
+            }
         }
         return evaluate(value, message);
     }
