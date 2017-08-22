@@ -15,8 +15,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.ServiceClassLoaderModelLoader.CLASSES_FOLDER;
-import static org.mule.runtime.module.service.ServiceClassLoaderModelLoader.LIB_FOLDER;
+import static org.mule.runtime.module.service.LibFolderClassLoaderModelLoader.CLASSES_FOLDER;
+import static org.mule.runtime.module.service.LibFolderClassLoaderModelLoader.LIB_FOLDER;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -28,13 +28,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ServiceClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
+public class LibFolderClassLoaderModelLoaderTestCase extends AbstractMuleTestCase {
 
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
 
   @Rule
   public TemporaryFolder serviceFolder = new TemporaryFolder();
-  private ServiceClassLoaderModelLoader classLoaderModelLoader = new ServiceClassLoaderModelLoader();
+  private LibFolderClassLoaderModelLoader classLoaderModelLoader = new LibFolderClassLoaderModelLoader();
   private ServiceDescriptor descriptor;
 
   @Before
