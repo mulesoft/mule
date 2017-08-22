@@ -132,8 +132,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(false, true, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
-    assertThat(HeisenbergSource.error, empty());
+    assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
+    assertThat(HeisenbergSource.error, not(empty()));
 
     assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
   }
@@ -145,8 +145,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
           () -> assertState(true, true, true));
 
-    assertThat(HeisenbergSource.terminateStatus, is(SUCCESS));
-    assertThat(HeisenbergSource.error, empty());
+    assertThat(HeisenbergSource.terminateStatus, is(ERROR_BODY));
+    assertThat(HeisenbergSource.error, not(empty()));
 
     assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
   }

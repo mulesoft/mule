@@ -187,7 +187,9 @@ public class ModuleFlowProcessingPhase
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        flowConstruct, MESSAGE_ERROR_RESPONSE);
       return sendErrorResponse(failureResult.getMessagingException(), event -> failureResult.getErrorResponseParameters().get(),
-                               ctx);
+                               ctx)
+                                   .doOnSuccess(v -> onTerminate(ctx.terminateConsumer,
+                                                                 left(failureResult.getMessagingException())));
     };
   }
 
@@ -201,7 +203,7 @@ public class ModuleFlowProcessingPhase
     return when(just(messagingException).flatMapMany(flowConstruct.getExceptionListener()).last()
         .onErrorResume(e -> empty()),
                 sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx)
-                    .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, right(see.getEvent())))).then();
+                    .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, left(messagingException)))).then();
   }
 
   /*
@@ -221,8 +223,7 @@ public class ModuleFlowProcessingPhase
             .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
                 .onErrorMap(e -> new SourceErrorException(builder(messagingException.getEvent())
                     .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
-                                                          sourceErrorResponseSendErrorType, e))
-                .doOnSuccess(v -> onTerminate(ctx.terminateConsumer, left(messagingException)));
+                                                          sourceErrorResponseSendErrorType, e));
       } catch (Exception e) {
         return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
       }
@@ -245,7 +246,7 @@ public class ModuleFlowProcessingPhase
 
   private Consumer<Either<MessagingException, InternalEvent>> getTerminateConsumer(MessageSource messageSource,
                                                                                    ModuleFlowProcessingPhaseTemplate template) {
-    return eventOrException -> template.sendAfterTerminateResponseToClient(eventOrException.mapLeft(messagingException -> {
+    return eventOrException -> template.afterPhaseExecution(eventOrException.mapLeft(messagingException -> {
       messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
                                                             muleContext.getErrorTypeLocator()));
       return messagingException;
