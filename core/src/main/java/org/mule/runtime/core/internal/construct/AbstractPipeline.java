@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -49,15 +48,18 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.reactivestreams.Publisher;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -240,7 +242,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
     startIfStartable(processingStrategy);
     sink = processingStrategy.createSink(this, processFlowFunction());
-    startIfStartable(pipeline);
+    //TODO MULE-13360: PhaseErrorLifecycleInterceptor is not being applied when AbstractPipeline doStart fails
+    try {
+      startIfStartable(pipeline);
+    } catch (MuleException e) {
+      // If the pipeline couldn't be started we would need to stop the processingStrategy (if possible) in order to avoid leaks
+      doStop();
+      throw e;
+    }
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
