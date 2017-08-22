@@ -8,10 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -30,7 +28,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,13 +55,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
     expectedException.expect(IllegalModelDefinitionException.class);
     expectedException.expectMessage(containsString("requires a connection of type"));
     validate(InvalidConnectionTypeProviderTestConnector.class);
-  }
-
-  @Test
-  public void invalidTransactionalProvider() {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage(contains("Transactional connections cannot be produced by cached providers"));
-    validate(InvalidTransactionalProviderConnector.class);
   }
 
   @Test
@@ -115,12 +105,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
   @Operations(ValidTestOperations.class)
   @ConnectionProviders({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidConfigConnectionProvider.class})
   public static class InvalidConfigConnectionProviderTestConnector {
-
-  }
-
-  @Extension(name = "invalidTransactionalProvider")
-  @ConnectionProviders({TestConnectionProvider.class, TestConnectionProvider2.class, InvalidTransactionalProvider.class})
-  public static class InvalidTransactionalProviderConnector {
 
   }
 
@@ -212,24 +196,6 @@ public class ConnectionProviderModelValidatorTestCase extends AbstractMuleTestCa
   }
 
   public static class ValidTransactionalProvider implements PoolingConnectionProvider<TransactionalConnection> {
-
-    @Override
-    public TransactionalConnection connect() throws ConnectionException {
-      return mock(TransactionalConnection.class);
-    }
-
-    @Override
-    public void disconnect(TransactionalConnection connection) {
-
-    }
-
-    @Override
-    public ConnectionValidationResult validate(TransactionalConnection connection) {
-      return success();
-    }
-  }
-
-  public static class InvalidTransactionalProvider implements CachedConnectionProvider<TransactionalConnection> {
 
     @Override
     public TransactionalConnection connect() throws ConnectionException {

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,25 +17,19 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
-import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,7 +57,6 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
 
       @Override
       public void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-        validateTransactions(model, problemsReporter);
         if (owner instanceof ConfigurationModel) {
           configLevelConnectionProviders.put((ConfigurationModel) owner, model);
         } else {
@@ -77,21 +69,6 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
 
     validateGlobalConnectionTypes(extensionModel, globalConnectionProviders, problemsReporter);
     validateConfigLevelConnectionTypes(configLevelConnectionProviders, problemsReporter);
-  }
-
-  private void validateTransactions(ConnectionProviderModel connectionProviderModel, ProblemsReporter problemsReporter) {
-    Class<ConnectionProvider> providerType = (Class<ConnectionProvider>) connectionProviderModel
-        .getModelProperty(ImplementingTypeModelProperty.class).map(ImplementingTypeModelProperty::getType).orElse(null);
-
-    final Class<?> connectionType = MuleExtensionUtils.getConnectionType(connectionProviderModel);
-    if (providerType != null && CachedConnectionProvider.class.isAssignableFrom(providerType)
-        && TransactionalConnection.class.isAssignableFrom(connectionType)) {
-      problemsReporter
-          .addError(new Problem(connectionProviderModel, format("Cached connection provider '%s' provides transactional "
-              + "connections. Transactional connections cannot be produced by cached providers, since the "
-              + "same connection cannot join two different transactions at once",
-                                                                connectionProviderModel.getName())));
-    }
   }
 
   private void validateGlobalConnectionTypes(ExtensionModel extensionModel,
