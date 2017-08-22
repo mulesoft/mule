@@ -15,7 +15,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +42,7 @@ public class SftpReceiverRequesterUtil
         this.endpoint = endpoint;
         this.connector = (SftpConnector) endpoint.getConnector();
 
-        sftpUtil = new SftpUtil(endpoint);
+        sftpUtil = createSftpUtil(endpoint);
 
         if (endpoint.getFilter() instanceof FilenameFilter)
         {
@@ -83,17 +85,29 @@ public class SftpReceiverRequesterUtil
 
             logger.debug("fileAge : " + fileAge);
 
-            // Get size check parameter
-            long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
 
             String[] files = client.listFiles();
 
+            // Get size check parameter
+            long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
+
+            // The files that has the same size after the sizeCheckDelay.
+            List<String> stableFiles = null;
+
+            if (sizeCheckDelayMs > 0)
+            {
+                 stableFiles = getStableFiles(files, client, sizeCheckDelayMs);
+            }
+
+
             // Only return files that have completely been written and match
             // fileExtension
-            List<String> completedFiles = new ArrayList<String>(files.length);
+            List<String> completedFiles = new ArrayList<>(files.length);
 
             for (String file : files)
             {
+
+
                 // Skip if no match.
                 // Note, Mule also uses this filter. We use the filter here because
                 // we don't want to
@@ -110,7 +124,7 @@ public class SftpReceiverRequesterUtil
                 {
                     // See if the file is still growing (either by age or size),
                     // leave it alone if it is
-                    if (canProcessFile(file, client, fileAge, sizeCheckDelayMs))
+                    if (canProcessFile(file, client, fileAge, stableFiles))
                     {
                         // logger.debug("marking file [" + files[i] +
                         // "] as in transit.");
@@ -140,6 +154,24 @@ public class SftpReceiverRequesterUtil
             {
                 connector.releaseClient(endpoint, client);
             }
+        }
+    }
+
+    /**
+     * Allows to check if an SFTP Connection can be established.
+     * @throws Exception if the connection can not be established.
+     */
+    public void checkSFTPConnection () throws Exception
+    {
+        SftpClient client = null;
+
+        try
+        {
+            client = connector.createSftpClient(endpoint);
+        }
+        finally
+        {
+            connector.releaseClient(endpoint, client);
         }
     }
 
@@ -333,70 +365,94 @@ public class SftpReceiverRequesterUtil
      * @param client instance of StftClient
      * @param fileAge How old the file should be to be considered "old" and not
      *            changed
-     * @param sizeCheckDelayMs Wait time (in ms) between size-checks to determine if
-     *            a file is ready to be processed.
      * @return true if the file has changed
      * @throws Exception Error
      */
-    protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs)
+    protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, List <String> stableFiles)
         throws Exception
     {
-        if (fileAge > 0 && !isOldFile(fileName, client, fileAge))
-        {
-            return false;
-        }
 
-        if (sizeCheckDelayMs > 0 && isSizeModified(fileName, client, sizeCheckDelayMs))
+        if (fileAge > 0 && stableFiles != null)
         {
-            return false;
+            return isOldFile(fileName, client, fileAge) && stableFiles.contains(fileName);
+        }
+        else if(stableFiles == null)
+        {
+            return isOldFile(fileName, client, fileAge);
+        }
+        else if(fileAge <= 0)
+        {
+            return stableFiles.contains(fileName);
         }
 
         return true;
     }
 
-    private boolean isSizeModified(String fileName, SftpClient client, long sizeCheckDelayMs) throws IOException, InterruptedException
+    List<String> getStableFiles(String[] fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
     {
-        try
+        List <String> stableFiles = new ArrayList<>(fileNames.length);
+        Map<String, Long> sizes = new HashMap<>();
+
+        if (logger.isDebugEnabled())
         {
-            if (logger.isDebugEnabled())
+            logger.debug("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
+        }
+
+        for (String fileName : fileNames)
+        {
+            try
             {
-                logger.debug("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
+                long size = client.getSize(fileName);
+                sizes.put(fileName, size);
             }
-
-            long fileSize1 = client.getSize(fileName);
-            Thread.sleep(sizeCheckDelayMs);
-            long fileSize2 = client.getSize(fileName);
-
-            if (fileSize1 == fileSize2)
+            catch (IOException e)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("File is stable (not growing), ready for retrieval: " + fileName);
+                    logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
                 }
             }
-            else
+        }
+
+        Thread.sleep(sizeCheckDelayMs);
+
+
+        for (Map.Entry<String, Long> entry : sizes.entrySet())
+        {
+            String fileName = entry.getKey();
+            Long fileSize1 = entry.getValue();
+            try
+            {
+                long fileSize2 = client.getSize(fileName);
+                if (fileSize1.equals(fileSize2))
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("File is stable (not growing), ready for retrieval: " + fileName);
+                    }
+                    stableFiles.add(fileName);
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("File is growing, deferring retrieval: " + fileName);
+                    }
+                }
+            }
+            catch (IOException e)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("File is growing, deferring retrieval: " + fileName);
+                    logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
                 }
-                return true;
             }
-            return false;
         }
-        catch (IOException e)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
-            }
 
-            // Assumes the file size has changed
-            return true;
-        }
+        return stableFiles;
     }
 
-    private boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
+    boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
     {
         try
         {
@@ -434,4 +490,10 @@ public class SftpReceiverRequesterUtil
             return false;
         }
     }
+
+    protected SftpUtil createSftpUtil (ImmutableEndpoint endpoint)
+    {
+        return new SftpUtil(endpoint);
+    }
+
 }

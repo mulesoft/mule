@@ -21,6 +21,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -133,12 +134,11 @@ public class SftpConnectionReturnedToPoolOnErrorTestCase extends AbstractSftpFun
         }
 
         @Override
-        protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs) throws Exception
+        protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, List<String> stableFiles) throws Exception
         {
             sftpServerStopReq.countDown();
             sftpServerStopped.await();
-
-            return super.canProcessFile(fileName, client, fileAge, sizeCheckDelayMs);
+            return super.canProcessFile(fileName, client, fileAge, stableFiles);
         }
 
         @Override

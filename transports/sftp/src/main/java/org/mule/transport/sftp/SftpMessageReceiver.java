@@ -305,7 +305,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                         {
                             logger.debug("Trying to connect/reconnect to SFTP server " + endpoint.getEndpointURI());
                         }
-                        sftpRRUtil.getAvailableFiles(false);
+                        sftpRRUtil.checkSFTPConnection();
                         if (logger.isDebugEnabled())
                         {
                             logger.debug("Successfully connected/reconnected to SFTP server " + endpoint.getEndpointURI());
