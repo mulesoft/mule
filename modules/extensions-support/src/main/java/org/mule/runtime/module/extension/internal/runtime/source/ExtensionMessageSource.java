@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -58,13 +59,15 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-import org.slf4j.Logger;
-import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import reactor.core.publisher.Mono;
 
 /**
  * A {@link MessageSource} which connects the Extensions API with the Mule runtime by connecting a {@link Source} with a flow
@@ -120,7 +123,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       sourceAdapter =
           sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
                                              createSourceCallbackFactory(),
-                                             getAnnotations(),
+                                             this,
                                              sourceConnectionManager);
       muleContext.getInjector().inject(sourceAdapter);
     }

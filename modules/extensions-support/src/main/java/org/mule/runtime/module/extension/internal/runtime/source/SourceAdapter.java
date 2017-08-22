@@ -94,6 +94,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Source source;
+  private final ExtensionMessageSource extensionMessageSource;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
   private final Optional<FieldSetter<Object, ConnectionProvider>> connectionSetter;
@@ -112,7 +113,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private MuleContext muleContext;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
-                       Source source,
+                       Source source, ExtensionMessageSource extensionMessageSource,
                        Optional<ConfigurationInstance> configurationInstance,
                        CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
@@ -123,10 +124,11 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
+    this.extensionMessageSource = extensionMessageSource;
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
-    this.componentLocation = source.getLocation();
+    this.componentLocation = extensionMessageSource.getLocation();
     this.connectionManager = connectionManager;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
@@ -422,8 +424,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   }
 
   private MessagingException createSourceException(InternalEvent event, Throwable cause) {
-    MessagingException messagingException = new MessagingException(event, cause, source);
+    MessagingException messagingException = new MessagingException(event, cause, extensionMessageSource);
 
-    return EXCEPTION_RESOLVER.resolve(source, messagingException, muleContext);
+    return EXCEPTION_RESOLVER.resolve(extensionMessageSource, messagingException, muleContext);
   }
 }

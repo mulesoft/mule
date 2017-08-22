@@ -174,7 +174,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
     Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                       containsString("sourceWithInvalidSuccessAndErrorParameters/source"));
-    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:listen-payments"));
+    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
   }
 
   @Test
@@ -210,7 +210,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
     Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
                       containsString("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt/source"));
-    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:listen-payments"));
+    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
   }
 
   @Test

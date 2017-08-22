@@ -19,10 +19,7 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
-import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.namespace.QName;
 
 /**
  * A factory for {@link SourceAdapter} instances
@@ -62,16 +59,16 @@ public class SourceAdapterFactory {
    */
   public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
                                      SourceCallbackFactory sourceCallbackFactory,
-                                     Map<QName, Object> annotations,
+                                     ExtensionMessageSource extensionMessageSource,
                                      SourceConnectionManager connectionManager) {
     Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
     try {
       source = new SourceConfigurer(sourceModel, sourceParameters, muleContext).configure(source, configurationInstance);
-      source.setAnnotations(annotations);
 
       return new SourceAdapter(extensionModel,
                                sourceModel,
                                source,
+                               extensionMessageSource,
                                configurationInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,
