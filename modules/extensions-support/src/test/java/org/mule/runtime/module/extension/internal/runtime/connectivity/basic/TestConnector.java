@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.api.meta.ExpressionSupport;
 
-@Extension(name = "Basic", description = "Basic Test connector")
+@Extension(name = "Basic")
 @Operations(VoidOperations.class)
 @ConnectionProviders(TestConnectionProvider.class)
 public class TestConnector {

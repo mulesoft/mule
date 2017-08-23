@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import java.util.List;
 
-@Extension(name = "petstore", description = "PetStore Test connector")
+@Extension(name = "petstore")
 @Operations({PetStoreOperations.class, PetStoreOperationsWithFailures.class, PetStoreFailingOperations.class})
 @ConnectionProviders({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class,
     TransactionalPetStoreConnectionProvider.class, PooledPetStoreConnectionProviderWithFailureInvalidConnection.class,

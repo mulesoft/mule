@@ -53,8 +53,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-@Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
-    minMuleVersion = "4.1")
+@Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT, minMuleVersion = "4.1")
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
 @Extensible(alias = "heisenberg-empire")
 @OnException(HeisenbergConnectionExceptionEnricher.class)

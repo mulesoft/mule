@@ -7,7 +7,6 @@
 package org.mule.test.soap.extension;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -21,7 +20,7 @@ import java.util.List;
 
 @Alias("base")
 @Soap({LaLigaServiceProvider.class, CalcioServiceProvider.class})
-@Extension(name = "soap", description = "Soap Connect Test Extension")
+@Extension(name = "soap")
 public class FootballSoapExtension implements SoapServiceProvider {
 
   public static final String LEAGUES_ID = "leagues";

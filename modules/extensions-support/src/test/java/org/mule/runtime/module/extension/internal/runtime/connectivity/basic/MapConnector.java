@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 
 import java.util.Map;
 
-@Extension(name = "Map", description = "Map Test connector")
+@Extension(name = "Map")
 @Operations(VoidOperations.class)
 public class MapConnector {
 

@@ -19,7 +19,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -38,7 +37,11 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescr
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
-import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -46,9 +49,8 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
+
+import org.junit.Test;
 
 @SmallTest
 public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationProcessorTestCase {
@@ -141,7 +143,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
       if (declaration == null) {
-        ExtensionDescriptionDocumenter declarer = new ExtensionDescriptionDocumenter(processingEnv, roundEnv);
+        ExtensionDescriptionDocumenter documenter = new ExtensionDescriptionDocumenter(processingEnv, roundEnv);
         Set<? extends Element> extensionElements = roundEnv.getElementsAnnotatedWith(Extension.class);
         assertThat(extensionElements, hasSize(1));
         Element extension = extensionElements.iterator().next();
@@ -150,7 +152,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
         DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(TestExtensionWithDocumentation.class,
                                                                                    "1.0.0-dev");
         declaration = loader.declare(ctx).getDeclaration();
-        declarer.document(declaration, (TypeElement) extension);
+        documenter.document(declaration, (TypeElement) extension);
       }
       return false;
     }

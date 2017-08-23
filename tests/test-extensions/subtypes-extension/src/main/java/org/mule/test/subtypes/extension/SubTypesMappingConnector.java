@@ -22,7 +22,7 @@ import org.mule.test.vegan.extension.VeganCookBook;
 import java.util.List;
 import java.util.Map;
 
-@Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
+@Extension(name = "SubtypesConnector")
 @Operations(SubTypesTestOperations.class)
 @Sources(SubtypesSource.class)
 @ConnectionProviders(SubTypesConnectionProvider.class)

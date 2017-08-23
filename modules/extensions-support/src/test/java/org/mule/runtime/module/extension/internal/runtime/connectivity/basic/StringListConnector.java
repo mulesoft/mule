@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 
 import java.util.List;
 
-@Extension(name = "StringList", description = "List Test connector")
+@Extension(name = "StringList")
 @Operations(VoidOperations.class)
 public class StringListConnector {
 

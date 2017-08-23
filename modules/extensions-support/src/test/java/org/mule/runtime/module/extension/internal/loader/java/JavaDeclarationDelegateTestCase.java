@@ -34,7 +34,6 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -459,7 +458,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration, is(notNullValue()));
 
     assertThat(extensionDeclaration.getName(), is(expectedName));
-    assertThat(extensionDeclaration.getDescription(), is(EXTENSION_DESCRIPTION));
     assertThat(extensionDeclaration.getVersion(), is(MULE_VERSION));
   }
 
@@ -807,32 +805,32 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(HeisenbergExtension.class.isAssignableFrom(implementingTypeModelProperty.getType()), is(true));
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Configurations(HeisenbergExtension.class)
   @ConnectionProviders(HeisenbergConnectionProvider.class)
   public static class HeisenbergPointer extends HeisenbergExtension {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Configurations({HeisenbergExtension.class, NamedHeisenbergAlternateConfig.class})
   public static class HeisenbergPointerPlusExternalConfig {
 
   }
 
-  @Configuration(name = EXTENDED_CONFIG_NAME, description = EXTENDED_CONFIG_DESCRIPTION)
+  @Configuration(name = EXTENDED_CONFIG_NAME)
   @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class})
   public static class NamedHeisenbergAlternateConfig extends HeisenbergAlternateConfig {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations({DuplicateConfigOperation.class})
   public static class HeisenbergWithInvalidOperation extends HeisenbergExtension {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   public static class HeisenbergWithParameterGroupAsOptional extends HeisenbergExtension {
 
     @ParameterGroup(name = "personalInfo")
@@ -841,45 +839,45 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   public static class HeisenbergWithRecursiveParameterGroup extends HeisenbergExtension {
 
     @ParameterGroup(name = "recursive")
     private RecursiveParameterGroup group;
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations(HeisenbergAlternateConfig.class)
   @Configurations(HeisenbergAlternateConfig.class)
   public static class HeisenbergWithSameOperationsAndConfigs extends HeisenbergExtension {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Configurations(HeisenbergIsolatedConfig.class)
   public static class HeisenbergWithOperationsPointingToExtension extends HeisenbergExtension {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations(HeisenbergExtension.class)
   public static class HeisenbergWithOperationsPointingToExtensionAndDefaultConfig extends HeisenbergExtension {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations({HeisenbergExtension.class, GenericlessMessageOperation.class})
   public static class HeisenbergWithGenericlessMessageOperation {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations({HeisenbergExtension.class, ListOfResultsOperations.class})
   public static class HeisenbergWithListOfResultOperations {
 
   }
 
-  @Extension(name = OTHER_HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = OTHER_HEISENBERG)
   @Operations({HeisenbergExtension.class})
   public static class HeisenbergWithParameterGroupDefaultName {
 
