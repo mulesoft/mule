@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-calling-operations-within-module="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module/current/mule-modified-prefix.xsd">
+
+    <flow name="testSetPayloadThruInternalSetPayloadHardcodedValue">
+        <module-calling-operations-within-module:set-payload-thru-internal-set-payload-hardcoded-value />
+    </flow>
+
+    <flow name="testSetPayloadThruInternalSetPayloadHardcodedValueTwoTimes">
+        <module-calling-operations-within-module:set-payload-thru-internal-set-payload-hardcoded-value-two-times />
+    </flow>
+
+    <flow name="testSetPayloadThruInternalSetPayloadParamValue">
+        <module-calling-operations-within-module:set-payload-thru-internal-set-payload-param-value exposedParameter="#[vars.simpleParameter]" />
+    </flow>
+
+    <flow name="testSetPayloadContentThruInternalSetPayloadParamValue">
+        <module-calling-operations-within-module:set-payload-content-thru-internal-set-payload-param-value>
+            <module-calling-operations-within-module:exposed-content>#[vars.firstPart ++ vars.secondPart]</module-calling-operations-within-module:exposed-content>
+        </module-calling-operations-within-module:set-payload-content-thru-internal-set-payload-param-value>
+    </flow>
+
+    <flow name="testSetPayloadThruInternalSetPayloadUsingContentParameter">
+        <module-calling-operations-within-module:set-payload-thru-internal-set-payload-using-content-parameter exposedParameter="#[vars.simpleParameter]" />
+    </flow>
+
+    <flow name="testSetPayloadContentThruInternalSetPayloadUsingContentParameter">
+        <module-calling-operations-within-module:set-payload-content-thru-internal-set-payload-using-content-parameter>
+            <module-calling-operations-within-module:exposed-content>#[vars.firstPart ++ vars.secondPart]</module-calling-operations-within-module:exposed-content>
+        </module-calling-operations-within-module:set-payload-content-thru-internal-set-payload-using-content-parameter>
+    </flow>
+
+    <flow name="testSetPayloadThruInternalSetPayloadUsingContentAndPrimaryAndSimpleParameter">
+        <module-calling-operations-within-module:set-payload-thru-internal-set-payload-using-content-and-primary-and-simple-parameter exposedParameter1="#[vars.simpleParameter]">
+            <module-calling-operations-within-module:exposed-content>#[vars.firstPart]</module-calling-operations-within-module:exposed-content>
+            <module-calling-operations-within-module:exposed-primary>#[vars.secondPart]</module-calling-operations-within-module:exposed-primary>
+        </module-calling-operations-within-module:set-payload-thru-internal-set-payload-using-content-and-primary-and-simple-parameter>
+    </flow>
+
+    <flow name="testSetPayloadThruNestedMadness">
+        <module-calling-operations-within-module:set-payload-thru-nested-madness exposedParameter="#[vars.simpleParameter]" />
+    </flow>
+
+    <flow name="testSetPayloadThruNestedMadnessPipingItThreeTimes">
+        <module-calling-operations-within-module:set-payload-thru-nested-madness-piping-it-three-times exposedParameter="#[vars.simpleParameter]" />
+    </flow>
+
+    <flow name="testSetPayloadThruNestedMadnessPipingWithForeach">
+        <module-calling-operations-within-module:set-payload-thru-nested-madness-piping-with-foreach amount="#[vars.amount]" />
+    </flow>
+
+    <flow name="testSetPayloadThruNestedMadnessPipingWithNestedForeachs">
+        <module-calling-operations-within-module:set-payload-thru-nested-madness-piping-with-nested-foreachs amount="#[vars.amount]" />
+    </flow>
+</mule>

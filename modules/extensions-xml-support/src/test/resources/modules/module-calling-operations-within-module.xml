@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-calling-operations-within-module"
+        minMuleVersion="4.1.0"
+        prefix="modified-prefix"
+        namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module"
+        xmlns:tns="http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module http://www.mulesoft.org/schema/a/different/path/mule/module-calling-operations-within-module/current/mule-modified-prefix.xsd">
+
+    <operation name="set-payload-thru-internal-set-payload-hardcoded-value">
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-hardcoded-value />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-internal-set-payload-hardcoded-value-two-times">
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-hardcoded-value />
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-hardcoded-value />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-internal-set-payload-param-value">
+        <parameters>
+            <parameter name="exposedParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-param-value aParameter="#[parameters.exposedParameter]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-content-thru-internal-set-payload-param-value">
+        <parameters>
+            <parameter name="exposed-content" type="string" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-param-value aParameter="#[parameters['exposed-content']]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-internal-set-payload-using-content-parameter">
+        <parameters>
+            <parameter name="exposedParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-using-content-parameter>
+                <tns:content>#[parameters.exposedParameter]</tns:content>
+            </tns:internal-set-payload-using-content-parameter>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-content-thru-internal-set-payload-using-content-parameter">
+        <parameters>
+            <parameter name="exposed-content" type="string" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-set-payload-using-content-parameter>
+                <tns:content>#[parameters['exposed-content']]</tns:content>
+            </tns:internal-set-payload-using-content-parameter>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-internal-set-payload-using-content-and-primary-and-simple-parameter">
+        <parameters>
+            <parameter name="exposedParameter1" type="string"/>
+            <parameter name="exposed-content" type="string" role="CONTENT"/>
+            <parameter name="exposed-primary" type="string" role="PRIMARY"/>
+        </parameters>
+        <body>
+            <tns:internal-set-payload-using-content-and-primary-and-simple-parameter parameter1="#[parameters.exposedParameter1]">
+                <tns:content>#[parameters['exposed-content']]</tns:content>
+                <tns:primary>#[parameters['exposed-primary']]</tns:primary>
+            </tns:internal-set-payload-using-content-and-primary-and-simple-parameter>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-nested-madness">
+        <parameters>
+            <parameter name="exposedParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-op1 op1Parameter="#[parameters.exposedParameter]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-nested-madness-piping-it-three-times">
+        <parameters>
+            <parameter name="exposedParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-op1 op1Parameter="#[parameters.exposedParameter]"/>
+            <tns:internal-op1 op1Parameter="#[payload]"/>
+            <tns:internal-op1 op1Parameter="#[payload]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-nested-madness-piping-with-foreach">
+        <parameters>
+            <parameter name="amount" type="number"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="collected" value="" />
+            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+                <tns:internal-op1 op1Parameter="#[payload]"/>
+                <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+            </mule:foreach>
+            <mule:set-payload value="#[vars.collected]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="set-payload-thru-nested-madness-piping-with-nested-foreachs">
+        <parameters>
+            <parameter name="amount" type="number"/>
+        </parameters>
+        <body>
+            <mule:set-variable variableName="collected" value="" />
+            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+                <tns:internal-op1 op1Parameter="#[payload]"/>
+                <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+                <mule:foreach collection="#[(parameters.amount to 1) as Array]">
+                    <tns:internal-op1 op1Parameter="#[payload]"/>
+                    <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
+                </mule:foreach>
+            </mule:foreach>
+            <mule:set-payload value="#[vars.collected]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+
+    <!--
+    INTERNAL OPERATIONS BELOW.
+    Despite being seen from the outside of this <module> boundary (smart connector' <operation>s don't have "private" visibility),
+    they are all meant to be used through a proxy method for testing purposes, and that's why all of them start with the
+    "internal-" prefix.
+    -->
+    <operation name="internal-set-payload-hardcoded-value">
+        <body>
+            <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-set-payload-param-value">
+        <parameters>
+            <parameter name="aParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-set-payload-using-content-parameter">
+        <parameters>
+            <parameter name="content" type="string" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.content]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-set-payload-using-content-and-primary-and-simple-parameter">
+        <parameters>
+            <parameter name="parameter1" type="string"/>
+            <parameter name="content" type="string" role="CONTENT"/>
+            <parameter name="primary" type="string" role="PRIMARY"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#['attribute value:[' ++ parameters.parameter1 ++ '], value of content:[' ++ parameters.content ++ '], value of primary:[' ++ parameters.primary ++ ']']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-op1">
+        <parameters>
+            <parameter name="op1Parameter" type="string"/>
+        </parameters>
+        <body>
+            <tns:internal-op2 op2Parameter="#['{op1 breadcrum, we need to go deeper..' ++ parameters.op1Parameter ++ '}']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-op2">
+        <parameters>
+            <parameter name="op2Parameter" type="string"/>
+        </parameters>
+        <body>
+            <tns:internal-op3 op3Parameter="#['{op2 breadcrum, we need to go deeper..' ++ parameters.op2Parameter ++ '}']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-op3">
+        <parameters>
+            <parameter name="op3Parameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#['{op3, we will stop calling operations here (any user calling more than 3 nested operations can go and code it in Java) ' ++ parameters.op3Parameter ++ '}']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>

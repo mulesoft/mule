@@ -8,23 +8,10 @@ package org.mule.runtime.config.spring.internal;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
-
+import org.apache.commons.io.IOUtils;
 import org.mule.runtime.config.spring.internal.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Stack;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
 import org.springframework.beans.factory.xml.DocumentLoader;
 import org.springframework.util.xml.XmlValidationModeDetector;
@@ -39,6 +26,16 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Stack;
 
 /**
  * Alternative to Spring's default document loader that uses <b>SAX</b> to add metadata to the <b>DOM</b> elements that are the
@@ -84,7 +81,6 @@ final public class MuleDocumentLoader implements DocumentLoader {
 
       DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
       factory.setNamespaceAware(namespaceAware);
-
       if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
         factory.setValidating(true);
         if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
