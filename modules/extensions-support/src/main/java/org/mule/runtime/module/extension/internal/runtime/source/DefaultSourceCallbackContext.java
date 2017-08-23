@@ -21,6 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTra
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XaTransactionHandle;
 
+import javax.transaction.TransactionManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -69,9 +70,14 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                     sourceCallback.getConfigurationInstance(),
                                                                     connectionHandler);
 
-      transactionHandle = connection instanceof XATransactionalConnection
-          ? new XaTransactionHandle(muleContext.getTransactionManager())
-          : new DefaultTransactionHandle((TransactionalConnection) connection);
+      if (connection instanceof XATransactionalConnection) {
+        TransactionManager transactionManager = muleContext.getTransactionManager();
+        transactionHandle = transactionManager != null
+            ? new XaTransactionHandle(transactionManager)
+            : new DefaultTransactionHandle((TransactionalConnection) connection);
+      } else {
+        transactionHandle = new DefaultTransactionHandle((TransactionalConnection) connection);
+      }
     }
 
     return transactionHandle;
