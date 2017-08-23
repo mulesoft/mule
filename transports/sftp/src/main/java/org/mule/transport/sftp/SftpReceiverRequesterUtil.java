@@ -6,6 +6,7 @@
  */
 package org.mule.transport.sftp;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
@@ -351,7 +352,7 @@ public class SftpReceiverRequesterUtil
             throws Exception
     {
 
-        if (checkFileAge && fileAge > 0)
+        if (checkFileAge)
         {
             return isOldFile(fileName, client, fileAge);
         }
@@ -395,7 +396,6 @@ public class SftpReceiverRequesterUtil
         return stableFiles;
     }
 
-
     private Map <String, Long> getFileTimeStamps(List <String> fileNames, SftpClient client)
     {
         Map<String, Long> sizes = new HashMap<>();
@@ -404,14 +404,13 @@ public class SftpReceiverRequesterUtil
         {
             try
             {
-                long size = client.getSize(fileName);
-                sizes.put(fileName, size);
+                sizes.put(fileName, client.getSize(fileName));
             }
             catch (IOException e)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(String.format("Cannot check if size of file '%s' was modified or not", fileName));
+                    logger.debug(format("Cannot check if size of file '%s' was modified or not", fileName));
                 }
             }
         }
@@ -450,7 +449,7 @@ public class SftpReceiverRequesterUtil
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug(String.format("Cannot check if age of file '%s' is old enough", fileName));
+                logger.debug(format("Cannot check if age of file '%s' is old enough", fileName));
             }
 
             // Assumes the file is not old enough
