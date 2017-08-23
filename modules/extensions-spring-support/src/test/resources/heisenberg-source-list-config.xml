@@ -26,7 +26,7 @@
 
     <flow name="source">
         <heisenberg:dea-radio />
-        <custom-processor class="org.mule.test.module.extension.source.ListOfMessagesSourceTestCase" />
+        <custom-processor class="org.mule.test.module.extension.source.ListOfMessagesSourceTestCase$ListProcessor" />
     </flow>
 
 </mule>

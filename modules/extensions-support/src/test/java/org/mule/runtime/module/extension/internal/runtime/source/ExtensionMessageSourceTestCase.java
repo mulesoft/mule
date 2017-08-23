@@ -47,6 +47,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -69,6 +70,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -204,6 +206,10 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
 
+    sourceAdapter = createSourceAdapter();
+
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
+
     mockExceptionEnricher(sourceModel, null);
     when(sourceModel.requiresConnection()).thenReturn(true);
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
@@ -246,10 +252,6 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(messageProcessContext.getTransactionConfig()).thenReturn(empty());
 
     messageSource = getNewExtensionMessageSourceInstance();
-
-    sourceAdapter = createSourceAdapter(messageSource);
-
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
 
     sourceCallback = spy(DefaultSourceCallback.builder()
         .setSourceModel(sourceModel)
@@ -313,7 +315,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void sourceIsInstantiatedOnce() throws Exception {
     initialise();
     start();
-    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any());
+    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), any());
   }
 
   @Test
@@ -499,16 +501,17 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     return exhaustedBecauseOf(sameInstance(cause));
   }
 
-  private SourceAdapter createSourceAdapter(ExtensionMessageSource messageSource) {
+  private SourceAdapter createSourceAdapter() {
     return new SourceAdapter(extensionModel,
                              sourceModel,
                              source,
-                             messageSource,
                              of(configurationInstance),
                              new NullCursorStreamProviderFactory(new SimpleByteBufferManager(), streamingManager),
                              sourceCallbackFactory,
+                             mock(ComponentLocation.class),
                              mock(SourceConnectionManager.class),
-                             null, callbackParameters, null);
+                             null, callbackParameters, null,
+                             mock(MessagingExceptionResolver.class));
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Matcher<Throwable> causeMatcher) {
@@ -531,9 +534,9 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void getMetadataKeyIdObjectValue() throws Exception {
     final String person = "person";
     source = new DummySource(person);
+    sourceAdapter = createSourceAdapter();
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
     messageSource = getNewExtensionMessageSourceInstance();
-    sourceAdapter = createSourceAdapter(messageSource);
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
     messageSource.initialise();
     messageSource.start();
     final Object metadataKeyValue = messageSource.getParameterValueResolver().getParameterValue(METADATA_KEY);

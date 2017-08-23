@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -59,8 +61,9 @@ public class SourceAdapterFactory {
    */
   public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
                                      SourceCallbackFactory sourceCallbackFactory,
-                                     ExtensionMessageSource extensionMessageSource,
-                                     SourceConnectionManager connectionManager) {
+                                     ComponentLocation location,
+                                     SourceConnectionManager connectionManager,
+                                     MessagingExceptionResolver exceptionResolver) {
     Source source = MuleExtensionUtils.getSourceFactory(sourceModel).createSource();
     try {
       source = new SourceConfigurer(sourceModel, sourceParameters, muleContext).configure(source, configurationInstance);
@@ -68,14 +71,15 @@ public class SourceAdapterFactory {
       return new SourceAdapter(extensionModel,
                                sourceModel,
                                source,
-                               extensionMessageSource,
                                configurationInstance,
                                cursorProviderFactory,
                                sourceCallbackFactory,
+                               location,
                                connectionManager,
                                sourceParameters,
                                successCallbackParameters,
-                               errorCallbackParameters);
+                               errorCallbackParameters,
+                               exceptionResolver);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",
                                                                 sourceModel.getName())),

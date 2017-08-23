@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -123,8 +124,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       sourceAdapter =
           sourceAdapterFactory.createAdapter(getConfiguration(getInitialiserEvent(muleContext)),
                                              createSourceCallbackFactory(),
-                                             this,
-                                             sourceConnectionManager);
+                                             getLocation(),
+                                             sourceConnectionManager,
+                                             new MessagingExceptionResolver(this));
       muleContext.getInjector().inject(sourceAdapter);
     }
   }

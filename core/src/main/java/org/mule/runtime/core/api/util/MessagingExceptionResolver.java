@@ -40,7 +40,13 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class MessagingExceptionResolver {
+public class MessagingExceptionResolver {
+
+  private final AnnotatedObject component;
+
+  public MessagingExceptionResolver(AnnotatedObject component) {
+    this.component = component;
+  }
 
   /**
    * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an
@@ -55,19 +61,19 @@ public final class MessagingExceptionResolver {
    *
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link InternalEvent}
    */
-  public MessagingException resolve(final AnnotatedObject annotatedObject, final MessagingException me, MuleContext context) {
+  public MessagingException resolve(final MessagingException me, MuleContext context) {
     ErrorTypeLocator locator = context.getErrorTypeLocator();
-    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(annotatedObject, me, locator);
+    Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
 
     if (!rootCause.isPresent()) {
-      return updateCurrent(me, annotatedObject, context);
+      return updateCurrent(me, component, context);
     }
 
     Throwable root = rootCause.get().getFirst();
     ErrorType rootErrorType = rootCause.get().getSecond();
-    AnnotatedObject failingComponent = getFailingProcessor(me, root).orElse(annotatedObject);
+    AnnotatedObject failingComponent = getFailingProcessor(me, root).orElse(component);
 
-    ErrorType errorType = getErrorMappings(annotatedObject)
+    ErrorType errorType = getErrorMappings(component)
         .stream()
         .filter(m -> m.match(rootErrorType))
         .findFirst()

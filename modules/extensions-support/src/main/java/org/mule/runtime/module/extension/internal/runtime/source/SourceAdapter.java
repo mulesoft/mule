@@ -88,13 +88,11 @@ import org.slf4j.Logger;
  */
 public final class SourceAdapter implements Startable, Stoppable, Initialisable {
 
-  private static final MessagingExceptionResolver EXCEPTION_RESOLVER = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
   private final Source source;
-  private final ExtensionMessageSource extensionMessageSource;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
   private final Optional<FieldSetter<Object, ConnectionProvider>> connectionSetter;
@@ -105,6 +103,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private final ResolverSet errorCallbackParameters;
   private final ComponentLocation componentLocation;
   private final SourceConnectionManager connectionManager;
+  private final MessagingExceptionResolver exceptionResolver;
 
   @Inject
   private StreamingManager streamingManager;
@@ -113,26 +112,28 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   private MuleContext muleContext;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
-                       Source source, ExtensionMessageSource extensionMessageSource,
+                       Source source,
                        Optional<ConfigurationInstance> configurationInstance,
                        CursorProviderFactory cursorProviderFactory,
                        SourceCallbackFactory sourceCallbackFactory,
+                       ComponentLocation componentLocation,
                        SourceConnectionManager connectionManager,
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
-                       ResolverSet errorCallbackParameters) {
+                       ResolverSet errorCallbackParameters,
+                       MessagingExceptionResolver exceptionResolver) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.source = source;
-    this.extensionMessageSource = extensionMessageSource;
     this.cursorProviderFactory = cursorProviderFactory;
     this.configurationInstance = configurationInstance;
     this.sourceCallbackFactory = sourceCallbackFactory;
-    this.componentLocation = extensionMessageSource.getLocation();
+    this.componentLocation = componentLocation;
     this.connectionManager = connectionManager;
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
+    this.exceptionResolver = exceptionResolver;
     this.configurationSetter = fetchConfigurationField();
     this.connectionSetter = fetchConnectionProviderField();
   }
@@ -424,8 +425,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
   }
 
   private MessagingException createSourceException(InternalEvent event, Throwable cause) {
-    MessagingException messagingException = new MessagingException(event, cause, extensionMessageSource);
+    MessagingException messagingException = new MessagingException(event, cause);
 
-    return EXCEPTION_RESOLVER.resolve(extensionMessageSource, messagingException, muleContext);
+    return exceptionResolver.resolve(messagingException, muleContext);
   }
 }

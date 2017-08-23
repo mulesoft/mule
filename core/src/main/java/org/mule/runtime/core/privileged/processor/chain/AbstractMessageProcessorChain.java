@@ -65,7 +65,6 @@ import reactor.core.publisher.Mono;
  */
 abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
-  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private final String name;
@@ -189,11 +188,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private MessagingException resolveException(AnnotatedObject processor, InternalEvent event, Throwable throwable) {
-    return exceptionResolver.resolve(processor, new MessagingException(event, throwable, processor), muleContext);
+    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
+    return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
-    return exception -> exceptionResolver.resolve(((AnnotatedObject) processor), exception, muleContext);
+    if (processor instanceof AnnotatedObject) {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((AnnotatedObject) processor);
+      return exception -> exceptionResolver.resolve(exception, muleContext);
+    } else {
+      return exception -> exception;
+    }
   }
 
   private Consumer<InternalEvent> preNotification(Processor processor) {

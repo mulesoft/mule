@@ -38,9 +38,6 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +48,9 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
  *
@@ -60,7 +60,6 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
 
-  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final String INTERCEPTION_COMPONENT = "core:interceptionComponent";
 
   private static final String AROUND_METHOD_NAME = "around";
@@ -292,7 +291,10 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private MessagingException createMessagingException(InternalEvent event, Throwable cause, AnnotatedObject processor) {
-    return exceptionResolver.resolve(processor, new MessagingException(event, cause, processor), muleContext);
+    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
+    MessagingException me = new MessagingException(event, cause, processor);
+
+    return exceptionResolver.resolve(me, muleContext);
   }
 
 }

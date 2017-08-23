@@ -7,6 +7,7 @@
 package org.mule.test.transactional.connection;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,7 +15,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class MessageStorage implements Processor {
+public class MessageStorage extends AbstractAnnotatedObject implements Processor {
 
   public static Queue<TestTransactionalConnection> messages = new ConcurrentLinkedQueue<>();
 

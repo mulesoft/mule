@@ -69,7 +69,7 @@ import reactor.core.publisher.Mono;
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
 
-  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
+  private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
 
   private final MessageSource source;
   private final List<Processor> processors;
@@ -196,7 +196,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                   handleSink.next(event);
                 } catch (RejectedExecutionException ree) {
                   MessagingException me = new MessagingException(event, ree, AbstractPipeline.this);
-                  event.getContext().error(exceptionResolver.resolve(AbstractPipeline.this, me, getMuleContext()));
+                  event.getContext().error(exceptionResolver.resolve(me, getMuleContext()));
                 }
               })
               .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
