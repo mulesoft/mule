@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -64,7 +65,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
           .forEach(config -> findMatchingConfiguration(declaration, config)
               .ifPresent(configDeclaration -> configDocumenter.document(configDeclaration, config)));
     } else {
-      configDocumenter.document(declaration.getConfigurations().get(0), extensionElement);
+      declaration.getConfigurations().get(0).setDescription(DEFAULT_CONFIG_DESCRIPTION);
     }
   }
 
