@@ -2,14 +2,14 @@
   "name": "SchedulerStopped",
   "minMuleVersion": "4.0.0",
   "classLoaderModelLoaderDescriptor": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {
       "exportedPackages": [],
       "exportedResources": []
     }
   },
   "bundleDescriptorLoader": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {}
   }
 }

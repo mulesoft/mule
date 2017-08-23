@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -44,7 +44,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   @Override
   public String getId() {
-    return MAVEN;
+    return MULE_LOADER_ID;
   }
 
   @Override

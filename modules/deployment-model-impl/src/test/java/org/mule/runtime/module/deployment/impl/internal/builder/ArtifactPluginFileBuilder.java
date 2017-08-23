@@ -21,7 +21,7 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
@@ -120,7 +120,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       builder.setName(getArtifactId())
           .setMinMuleVersion("4.0.0");
       MuleArtifactLoaderDescriptorBuilder classLoaderModelDescriber = builder.withClassLoaderModelDescriber()
-          .setId(MAVEN);
+          .setId(MULE_LOADER_ID);
       if (properties.containsKey(EXPORTED_CLASS_PACKAGES_PROPERTY)) {
         classLoaderModelDescriber.addProperty(EXPORTED_PACKAGES,
                                               ((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
@@ -138,7 +138,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
                                               ((String) properties.get(EXPORTED_RESOURCE_PROPERTY)).split(","));
       }
 
-      builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+      builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
       mulePluginModel = builder.build();
     }

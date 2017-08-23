@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -75,7 +75,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
-    when(descriptorLoaderRepository.get(MAVEN, PLUGIN, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(MULE_LOADER_ID, PLUGIN, ClassLoaderModelLoader.class))
         .thenReturn(new PluginMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(
                                                                                                 newMavenConfigurationBuilder()
                                                                                                     .localMavenRepositoryLocation(mavenClientProvider
@@ -102,7 +102,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     MulePluginModel.MulePluginModelBuilder builder = new MulePluginModel.MulePluginModelBuilder();
     builder.withClassLoaderModelDescriber()
-        .setId("maven")
+        .setId("mule")
         .build();
     Map<String, Object> attributes = new HashMap<>();
     attributes.put(GROUP_ID, "org.mule.test");

@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
@@ -99,8 +99,8 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     serviceDescriptor.deleteOnExit();
     MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
     serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
-    serviceModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
-    serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    serviceModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(serviceDescriptor)) {

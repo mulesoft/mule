@@ -11,7 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
@@ -55,7 +55,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
     builder.setName(extensionModel.getName())
         .setMinMuleVersion(extensionModel.getMinMuleVersion().toCompleteNumericVersion());
     builder.withClassLoaderModelDescriber()
-        .setId(MAVEN)
+        .setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())
         .addProperty(EXPORTED_RESOURCES, exportCollector.getExportedResources())
         .addProperty(PRIVILEGED_EXPORTED_PACKAGES, exportCollector.getPrivilegedExportedPackages())
@@ -67,7 +67,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
         // should not require version
         .addProperty("version", extensionModel.getVersion());
 
-    builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
     return of(new GeneratedResource(MULE_ARTIFACT_JSON_DESCRIPTOR, descriptorJson.getBytes()));
   }

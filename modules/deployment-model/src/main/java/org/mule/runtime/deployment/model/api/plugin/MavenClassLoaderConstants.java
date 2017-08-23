@@ -20,7 +20,8 @@ public final class MavenClassLoaderConstants {
   /**
    * ID used to populate a {@link MuleArtifactLoaderDescriptor#getId()}
    */
-  public static final String MAVEN = "maven";
+  // TODO(pablo.kraan): loader - move this constant somewhere else
+  public static final String MULE_LOADER_ID = "mule";
 
   /**
    * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of the

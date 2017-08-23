@@ -2,7 +2,7 @@
   "name": "Mule functional test plugin (TCK)",
   "minMuleVersion": "4.0.0",
   "classLoaderModelLoaderDescriptor": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {
       "exportedPackages": [
         "org.mule.functional.api.component",
@@ -17,7 +17,7 @@
     }
   },
   "bundleDescriptorLoader": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {}
   }
 }
