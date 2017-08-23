@@ -74,9 +74,9 @@ public interface Artifact<D extends ArtifactDescriptor>
     MuleContext getMuleContext();
     
     /**
-     * Sets the configuration management properties
+     * Sets the deployment properties
      * 
-     * @param configurationManagementProperties
+     * @param deploymentProperties deployment properties
      */
-    void setConfigurationManagementProperties(Properties configurationManagementProperties);
+    void setDeploymentProperties(Properties deploymentProperties);
 }

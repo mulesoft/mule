@@ -6,14 +6,12 @@
  */
 package org.mule.module.launcher.application;
 
-import static java.io.File.separator;
-import static org.mule.util.FileUtils.newFile;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.MuleContextNotificationListener;
@@ -21,13 +19,11 @@ import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.builders.ExtensionsManagerConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.module.launcher.ConfigurationManagamentAware;
+import org.mule.module.launcher.DeploymentPropertiesUtils;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -45,8 +41,6 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,7 +51,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultMuleApplication extends ConfigurationManagamentAware implements Application
+public class DefaultMuleApplication implements Application
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
@@ -72,7 +66,7 @@ public class DefaultMuleApplication extends ConfigurationManagamentAware impleme
     private Domain domain;
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
-    private Properties configurationManagementProperties;
+    private Properties deploymentProperties;
 
     public DefaultMuleApplication(ApplicationDescriptor descriptor, ApplicationClassLoaderFactory applicationClassLoaderFactory, Domain domain)
     {
@@ -80,7 +74,7 @@ public class DefaultMuleApplication extends ConfigurationManagamentAware impleme
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
         this.domain = domain;
-        this.configurationManagementProperties = descriptor.getConfigurationManagementProperties();
+        this.deploymentProperties = descriptor.getDeploymentProperties();
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     }
 
@@ -213,7 +207,7 @@ public class DefaultMuleApplication extends ConfigurationManagamentAware impleme
                     muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
 
-                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor, configurationManagementProperties);
+                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor, deploymentProperties);
                 MuleContext muleContext = muleContextFactory.createMuleContext(builders, applicationContextBuilder);
                 setMuleContext(muleContext);
             }
@@ -273,23 +267,18 @@ public class DefaultMuleApplication extends ConfigurationManagamentAware impleme
         // Add the app.home variable to the context
         File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName());
         appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
-
-        File muleDataPath = new File(MuleFoldersUtil.getExecutionFolder(), getArtifactName());
-
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
-
-        setConfigurationManagementProperties(manageConfigurationManagementPersistence(muleDataPath.getAbsolutePath(), getConfigurationManagementProperties()));
         
-        return new SimpleConfigurationBuilder(merge(appProperties, getConfigurationManagementProperties()));
+        return new SimpleConfigurationBuilder(merge(appProperties, getDeploymentProperties()));
     }
 
 
 
-    private Map<String, String> merge(Map<String, String> properties, Properties configurationManagementProperties)
+    private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties)
     {
         Map<String, String> mergedProperties = new HashMap<String, String>();
         mergedProperties.putAll(properties);
-        for (Map.Entry<Object, Object> entry : configurationManagementProperties.entrySet())
+        for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet())
         {
             mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
         }        
@@ -454,15 +443,15 @@ public class DefaultMuleApplication extends ConfigurationManagamentAware impleme
         muleContext = null;
     }
 
-    public Properties getConfigurationManagementProperties()
+    public Properties getDeploymentProperties()
     {
-        return configurationManagementProperties;
+        return deploymentProperties;
     }
 
     @Override
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        this.configurationManagementProperties = configurationManagementProperties;        
+        this.deploymentProperties = deploymentProperties;        
     }
 
 }

@@ -22,7 +22,9 @@ import java.util.Properties;
 public interface ArchiveDeployer<T extends Artifact>
 {
 
-    T deployPackagedArtifact(String zip, Properties configurationManagementProperties) throws DeploymentException;
+    T deployPackagedArtifact(String zip, Properties deploymentProperties) throws DeploymentException;
+    
+    T deployPackagedArtifact(String zip) throws DeploymentException;
 
     T deployExplodedArtifact(String artifactDir) throws DeploymentException;
 
@@ -42,7 +44,7 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void redeploy(T artifact) throws DeploymentException;
 
-    void redeploy(T artifact, Properties configurationManagementProperties) throws DeploymentException;
+    void redeploy(T artifact, Properties deploymentProperties) throws DeploymentException;
 
     Map<URL, Long> getArtifactsZombieMap();
 
@@ -52,7 +54,7 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void deployArtifact(T artifact) throws DeploymentException;
     
-    void deployArtifact(T artifact, Properties configurationManagementPropertires) throws DeploymentException;
+    void deployArtifact(T artifact, Properties deploymentProperties) throws DeploymentException;
 
     T deployPackagedArtifact(URL domainArchiveUrl, Properties appProperties) throws DeploymentException;
 

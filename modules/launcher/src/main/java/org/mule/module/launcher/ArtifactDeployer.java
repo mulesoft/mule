@@ -44,18 +44,4 @@ public interface ArtifactDeployer<T extends Artifact>
      */
     void undeploy(final T artifact);
 
-    /**
-     * Deploys an artifact using the configuration management properties
-     *
-     * The deployer executes the artifact installation
-     * phases until the artifact is deployed
-     * After this method call the Artifact will be installed in the container
-     * and started.
-     *
-     * @param artifact artifact to be deployed
-     * 
-     * @param configurationManagementProperties the configuration management properties.
-     */
-    void deploy(T artifact, Properties configurationManagementProperties);
-
 }

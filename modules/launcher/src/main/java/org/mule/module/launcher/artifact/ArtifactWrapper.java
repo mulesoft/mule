@@ -25,7 +25,7 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
 {
 
     private T delegate;
-    
+
     protected ArtifactWrapper(T artifact) throws IOException
     {
         this.delegate = artifact;
@@ -164,8 +164,8 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
     }
 
     @Override
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        getDelegate().setConfigurationManagementProperties(configurationManagementProperties);
+        getDelegate().setDeploymentProperties(deploymentProperties);
     }
 }

@@ -25,7 +25,8 @@ public class DomainMuleContextBuilderTestCase extends AbstractMuleTestCase
     @Test
     public void createsContainerConfiguration() throws Exception
     {
-        DomainMuleContextBuilder builder = new DomainMuleContextBuilder("test", new Properties());
+        DomainMuleContextBuilder builder = new DomainMuleContextBuilder("test");
+        builder.setDeploymentProperties(new Properties());
 
         MuleConfiguration muleConfiguration = builder.getMuleConfiguration();
 

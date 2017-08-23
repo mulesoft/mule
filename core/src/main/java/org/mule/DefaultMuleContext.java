@@ -206,7 +206,7 @@ public class DefaultMuleContext implements MuleContext
      */
     private ArtifactType artifactType;
     
-    private Properties configurationManagementProperties = new Properties();
+    private Properties deploymentProperties;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1239,15 +1239,15 @@ public class DefaultMuleContext implements MuleContext
     }
 
     @Override
-    public Properties getConfigurationManamentProperties()
+    public Properties getDeploymentProperties()
     {
-        return configurationManagementProperties;
+        return deploymentProperties;
     }
 
     @Override
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.deploymentProperties = deploymentProperties;
         
     }
 }

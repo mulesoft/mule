@@ -19,11 +19,6 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    public void deploy(Artifact artifact)
-    {
-        deploy(artifact, new Properties());
-    }
-
     public void undeploy(Artifact artifact)
     {
         try
@@ -69,9 +64,8 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
     }
 
     @Override
-    public void deploy(Artifact artifact, Properties configurationManagementProperties)
+    public void deploy(Artifact artifact)
     {
-        artifact.setConfigurationManagementProperties(configurationManagementProperties);
         try
         {
             artifact.install();

@@ -28,9 +28,11 @@ public interface ArtifactFactory<T extends Artifact>
      * Creates an Artifact
      *
      * @param artifactName artifact identifier
+     * @param deploymentProperties deployment properties
+     * 
      * @return the newly created Artifact
      */
-    T createArtifact(String artifactName, Properties configurationManagementProperties) throws IOException;
+    T createArtifact(String artifactName, Properties deploymentProperties) throws IOException;
 
     /**
      * @return the directory of the Artifact. Usually this directory contains the Artifact resources

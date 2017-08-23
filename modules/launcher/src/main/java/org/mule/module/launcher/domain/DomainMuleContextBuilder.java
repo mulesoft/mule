@@ -38,10 +38,9 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder
 
     private final String domainId;
 
-    public DomainMuleContextBuilder(String domainId, Properties configurationManagementProperties)
+    public DomainMuleContextBuilder(String domainId)
     {
         this.domainId = domainId;
-        this.configurationManagementProperties = configurationManagementProperties;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private String[] absoluteResourcePaths;
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
-    private Properties configurationManagementProperties = new Properties();
+    private Properties deploymentProperties = new Properties();
     
     private File logConfigFile;
 
@@ -160,13 +160,13 @@ public class ApplicationDescriptor extends ArtifactDescriptor
         this.packagesToScan = packages;
     }
 
-    public Properties getConfigurationManagementProperties()
+    public Properties getDeploymentProperties()
     {
-        return configurationManagementProperties;
+        return deploymentProperties;
     }
 
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.deploymentProperties = deploymentProperties;
     }
 }

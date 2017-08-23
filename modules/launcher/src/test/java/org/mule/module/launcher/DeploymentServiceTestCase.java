@@ -182,10 +182,10 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     public DynamicPort httpPortAlternative = new DynamicPort("httpPortAlternative");
 
     @Rule
-    public DynamicPort configurationManagementPort = new DynamicPort("configurationManagementPort");
+    public DynamicPort deploymentPropertiesPort = new DynamicPort("deploymentPropertiesPort");
 
     @Rule
-    public DynamicPort configurationManagementPortOverriden = new DynamicPort("configurationManagementPortOverriden");
+    public DynamicPort deploymentPropertiesOverriddenPort = new DynamicPort("deploymentPropertiesOverriddenPort");
 
     public DeploymentServiceTestCase(boolean parallelDeployment)
     {
@@ -334,12 +334,6 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
-    @Test
-    public void deployAppZipWithConfigurationManagementProperties() throws Exception
-    {
-        
-    }
-    
     @Test
     public void deploysBrokenAppZipOnStartup() throws Exception
     {
@@ -792,24 +786,24 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void deployDomainWithConfigurationManagementProperties() throws Exception
+    public void deployDomainWithDeploymentProperties() throws Exception
     {
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("httpPort", httpPortAlternative.getValue());
-        deploymentService.deployDomain(sharedHttpDomainFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties);        
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put("httpPort", httpPortAlternative.getValue());
+        deploymentService.deployDomain(sharedHttpDomainFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);        
         DefaultHttpListenerConfig httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");        
         assertThat(httpListenerConfig.getPort(), equalTo(httpPortAlternative.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPortAlternative.getValue());
         
-        // Redeploys without configuration management (remains the same, as it takes the configuration management from the persisted file)
+        // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
         deploymentService.redeployDomain(sharedHttpDomainFileBuilder.getId());
         httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");
         assertThat(httpListenerConfig.getPort(), equalTo(httpPortAlternative.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPortAlternative.getValue());
         
-        // Redeploy with new configuration management properties
-        configurationManagementProperties.put("httpPort", httpPort.getValue());
-        deploymentService.redeployDomain(sharedHttpDomainFileBuilder.getId(), configurationManagementProperties);
+        // Redeploy with new deployment properties
+        deploymentProperties.put("httpPort", httpPort.getValue());
+        deploymentService.redeployDomain(sharedHttpDomainFileBuilder.getId(), deploymentProperties);
         httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");
         assertThat(httpListenerConfig.getPort(), equalTo(httpPort.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPort.getValue());
@@ -1469,25 +1463,25 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
-    public void propertiesAreOverridenByConfigurationManagementProperties() throws Exception
+    public void propertiesAreOverridenByDeploymentProperties() throws Exception
     {
         System.setProperty(PORT_PROPERTY_NAME, SYSTEM_PROPERTY_PORT);
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put(PORT_PROPERTY_NAME, configurationManagementPort.getValue());
-        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties); 
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
+        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties); 
         assertMuleContextCreated(applicationDeploymentListener, dummyAppDescriptorWithPropsFileBuilder.getId());
-        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, configurationManagementPort.getValue());
+        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
         DefaultHttpListenerConfig httpListenerConfig = testDeploymentListener.getMuleContext().getRegistry().get("listenerConfig");        
-        assertThat(httpListenerConfig.getPort(), equalTo(configurationManagementPort.getNumber()));
+        assertThat(httpListenerConfig.getPort(), equalTo(deploymentPropertiesPort.getNumber()));
     }
     
     @Test
-    public void propertiesInSpringFileAreResolvedIntoConfigurationManagementProperties() throws Exception
+    public void propertiesInSpringFileAreResolvedIntoDeploymentProperties() throws Exception
     {
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("someValue", "DUMMY_VALUE");
-        deploymentService.deploy(springPropertyAppFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties);
-        assertPropertiesInConfigurationFileAreOverriden(testDeploymentListener, "APP_HOME", "DUMMY_VALUE");
+        Properties deploymentPropertiees = new Properties();
+        deploymentPropertiees.put("someValue", "DUMMY_VALUE");
+        deploymentService.deploy(springPropertyAppFileBuilder.getArtifactFile().toURI().toURL(), deploymentPropertiees);
+        assertDeploymentPropertiesFileAreOverriden(testDeploymentListener, "APP_HOME", "DUMMY_VALUE");
     }
 
     @Test
@@ -1496,64 +1490,64 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
         assertPropertyValue(testDeploymentListener, "prop1", "value1");                
 
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("prop1", "DUMMY_VALUE");
-        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), configurationManagementProperties);
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put("prop1", "DUMMY_VALUE");
+        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
     }
     
     @Test
     public void propsAreMantainedInRedeployThenChangedWhenNewPropertiesAreSet() throws Exception
     {
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("prop1", "DUMMY_VALUE");
-        deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties);
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put("prop1", "DUMMY_VALUE");
+        deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
 
         deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId());
         assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");
         
-        configurationManagementProperties.clear();
-        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), configurationManagementProperties);
+        deploymentProperties.clear();
+        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "prop1", "value1");        
     }
     
     @Test
-    public void cascadingPropsAreOverridenIntoConfigurationThenTakesGlobalpropertyOnRedeployManagementProperties() throws Exception
+    public void cascadingPropsAreOverridenIntoConfigurationThenTakesGlobalpropertyOnRedeployWithDeploymentProperties() throws Exception
     {
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("prop1", "DUMMY_VALUE");
-        deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties);
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put("prop1", "DUMMY_VALUE");
+        deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
 
-        configurationManagementProperties.clear();
-        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), configurationManagementProperties);
+        deploymentProperties.clear();
+        deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "prop1", "value1");        
     }
 
     
     @Test
-    public void propertiesInFileAreOverriddenIntoConfigurationManagementProperties() throws Exception
+    public void propertiesInFileAreOverriddenIntoDeploymentProperties() throws Exception
     {
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put("myCustomProp", "DUMMY_VALUE");
-        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties);
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put("myCustomProp", "DUMMY_VALUE");
+        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
         assertPropertyValue(testDeploymentListener, "myCustomProp", "DUMMY_VALUE");
     }
 
     @Test
-    public void applicationsWithTheSameSystemPropertiesOverridesConfigurationManagementProperty() throws Exception
+    public void applicationsWithTheSameSystemPropertiesOverridesDeploymentPropertiesSeparately() throws Exception
     {
         System.setProperty("myCustomProp", "WRONG_VALUE");
-        Properties configurationManagementProperties1 = new Properties();
-        configurationManagementProperties1.put("myCustomProp", "DUMMY_VALUE");
-        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties1);
+        Properties deploymentProperties1 = new Properties();
+        deploymentProperties1.put("myCustomProp", "DUMMY_VALUE");
+        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties1);
         MuleContext muleContextApp1 = testDeploymentListener.getMuleContext();
 
-        Properties configurationManagementProperties2 = new Properties();
-        configurationManagementProperties2.put("port", configurationManagementPort.getValue());
-        configurationManagementProperties2.put("myCustomProp", "DUMMY_VALUE2");
-        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties2);
+        Properties deploymentProperties2 = new Properties();
+        deploymentProperties2.put("port", deploymentPropertiesPort.getValue());
+        deploymentProperties2.put("myCustomProp", "DUMMY_VALUE2");
+        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties2);
         MuleContext muleContextApp2 = testDeploymentListener.getMuleContext();
         
         assertThat((String) muleContextApp1.getRegistry().get("myCustomProp"), equalTo("DUMMY_VALUE"));
@@ -1575,11 +1569,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return "Properties were not overriden by the configuration management properties";
+                return "Properties were not overriden by the deployment properties";
             }
         });
     }
-    private void assertPropertiesInConfigurationFileAreOverriden(final TestDeploymentListener listener, final String oropertyName, String propertyValue)
+    private void assertDeploymentPropertiesFileAreOverriden(final TestDeploymentListener listener, final String oropertyName, String propertyValue)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
         prober.check(new JUnitProbe()
@@ -1595,23 +1589,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
             @Override
             public String describeFailure()
             {
-                return "File properties were not overriden by the configuration management properties";
+                return "File properties were not overriden by the deployment properties";
             }
         });
     }
 
     @Test
-    public void propertiesAreChangedInRedeployByConfigurationManagementProperties() throws Exception
+    public void propertiesAreChangedInRedeployByDeploymentProperties() throws Exception
     {
         System.setProperty(PORT_PROPERTY_NAME, SYSTEM_PROPERTY_PORT);
-        Properties configurationManagementProperties = new Properties();
-        configurationManagementProperties.put(PORT_PROPERTY_NAME, configurationManagementPort.getValue());
-        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), configurationManagementProperties); 
+        Properties deploymentProperties = new Properties();
+        deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
+        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties); 
         assertMuleContextCreated(applicationDeploymentListener, dummyAppDescriptorWithPropsFileBuilder.getId());
-        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, configurationManagementPort.getValue());
-        configurationManagementProperties.put(PORT_PROPERTY_NAME, configurationManagementPortOverriden.getValue());
-        deploymentService.redeploy(testDeploymentListener.getArtifactName(), configurationManagementProperties);
-        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, configurationManagementPortOverriden.getValue());
+        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
+        deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesOverriddenPort.getValue());
+        deploymentService.redeploy(testDeploymentListener.getArtifactName(), deploymentProperties);
+        assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, deploymentPropertiesOverriddenPort.getValue());
     }
 
     @Test

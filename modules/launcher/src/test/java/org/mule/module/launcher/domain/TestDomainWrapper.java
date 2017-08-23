@@ -23,12 +23,12 @@ public class TestDomainWrapper implements Domain
     private Domain delegate;
     private boolean failOnPurpose;
     private boolean failOnDispose;
-    private Properties configurationManagementProperties;
+    private Properties deploymentProperties;
 
-    public TestDomainWrapper(Domain delegate, Properties configurationManagementProperties)
+    public TestDomainWrapper(Domain delegate, Properties deploymentProperties)
     {
         this.delegate = delegate;
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.deploymentProperties = deploymentProperties;
     }
 
     public TestDomainWrapper(Domain delegate)
@@ -132,8 +132,8 @@ public class TestDomainWrapper implements Domain
     }
 
     @Override
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.deploymentProperties = deploymentProperties;
     }
 }

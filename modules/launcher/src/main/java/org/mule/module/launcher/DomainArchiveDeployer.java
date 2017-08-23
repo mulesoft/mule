@@ -39,20 +39,18 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     private final ArchiveDeployer<Domain> domainDeployer;
     private final DeploymentService deploymentService;
     private final ArchiveDeployer<Application> applicationDeployer;
-    private final Properties configurationManagementProperties; 
 
-    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService, Properties configurationManagementProperties)
+    public DomainArchiveDeployer(ArchiveDeployer<Domain> domainDeployer, ArchiveDeployer<Application> applicationDeployer, DeploymentService deploymentService)
     {
         this.domainDeployer = domainDeployer;
         this.applicationDeployer = applicationDeployer;
         this.deploymentService = deploymentService;
-        this.configurationManagementProperties = configurationManagementProperties;
     }
 
     @Override
-    public Domain deployPackagedArtifact(String zip, Properties configurationManagementProperties) throws DeploymentException
+    public Domain deployPackagedArtifact(String zip, Properties deploymentProperties) throws DeploymentException
     {
-        Domain domain = domainDeployer.deployPackagedArtifact(zip, configurationManagementProperties);
+        Domain domain = domainDeployer.deployPackagedArtifact(zip, deploymentProperties);
         deployBundledAppsIfDomainWasCreated(domain);
         return domain;
     }
@@ -73,9 +71,9 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
-    public Domain deployPackagedArtifact(URL artifactAchivedUrl, Properties configurationManagementProperties)
+    public Domain deployPackagedArtifact(URL artifactAchivedUrl, Properties deploymentProperties)
     {
-        Domain domain = domainDeployer.deployPackagedArtifact(artifactAchivedUrl, configurationManagementProperties);
+        Domain domain = domainDeployer.deployPackagedArtifact(artifactAchivedUrl, deploymentProperties);
         deployBundledAppsIfDomainWasCreated(domain);
         return domain;
     }
@@ -126,7 +124,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public void redeploy(Domain artifact) throws DeploymentException
     {
-        redeploy(artifact, new Properties());
+        redeploy(artifact, null);
     }
 
     @Override
@@ -194,7 +192,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
-    public void redeploy(Domain artifact, Properties configurationManagementProperties) throws DeploymentException
+    public void redeploy(Domain artifact, Properties deploymentProperties) throws DeploymentException
     {
         Collection<Application> domainApplications = findApplicationsAssociated(artifact);
         for (Application domainApplication : domainApplications)
@@ -203,7 +201,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
         }
         try
         {
-            domainDeployer.redeploy(artifact, configurationManagementProperties);
+            domainDeployer.redeploy(artifact, deploymentProperties);
         }
         catch (DeploymentException e)
         {
@@ -214,7 +212,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
         {
             try
             {
-                applicationDeployer.deployArtifact(domainApplication, configurationManagementProperties);
+                applicationDeployer.deployArtifact(domainApplication, deploymentProperties);
             }
             catch (Exception e)
             {
@@ -227,8 +225,14 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     }
 
     @Override
-    public void deployArtifact(Domain artifact, Properties configurationManagementPropertires) throws DeploymentException
+    public void deployArtifact(Domain artifact, Properties deploymentProperties) throws DeploymentException
     {
-        domainDeployer.deployArtifact(artifact, configurationManagementPropertires);
+        domainDeployer.deployArtifact(artifact, deploymentProperties);
+    }
+
+    @Override
+    public Domain deployPackagedArtifact(String zip) throws DeploymentException
+    {
+        return deployPackagedArtifact(zip, null);
     }
 }

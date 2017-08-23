@@ -96,7 +96,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected SplashScreen shutdownScreen;
     
-    protected Properties configurationManagementProperties;
+    private Properties deploymentProperties;
     
     /**
      * {@inheritDoc}
@@ -108,7 +108,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
         muleContext.setWorkManager(injectMuleContextIfRequired(getWorkManager(), muleContext));
         muleContext.setworkListener(getWorkListener());
-        muleContext.setConfigurationManagementProperties(getConfigurationManagementProperties());
+        muleContext.setDeploymentProperties(getDeploymentProperties());
         muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
         muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
         muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
@@ -130,14 +130,14 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
         return muleContext;
     }
 
-    private Properties getConfigurationManagementProperties()
+    private Properties getDeploymentProperties()
     {
-        if (configurationManagementProperties == null)
+        if (deploymentProperties == null)
         {
-            configurationManagementProperties = new Properties();
+            setDeploymentProperties(new Properties());
         }
             
-        return configurationManagementProperties;
+        return deploymentProperties;
     }
 
     protected DefaultMuleContext createDefaultMuleContext()
@@ -353,5 +353,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
                ", workManager=" + workManager +
                ", workListener=" + workListener +
                ", notificationManager=" + notificationManager + "}";
+    }
+
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;
     }
 }

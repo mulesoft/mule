@@ -99,11 +99,11 @@ public class PropertyPlaceholderProcessor extends PropertyPlaceholderConfigurer 
     @Override
     protected String resolvePlaceholder(String placeholder, Properties props, int systemPropertiesMode)
     {
-        String configurationManagementValue = (String) muleContext.getConfigurationManamentProperties().get(placeholder);
+        String deploymentProperty = (String) muleContext.getDeploymentProperties().get(placeholder);
         
-        if (configurationManagementValue != null)
+        if (deploymentProperty != null)
         {
-            return configurationManagementValue;
+            return deploymentProperty;
         }
         
         return super.resolvePlaceholder(placeholder, props, systemPropertiesMode);

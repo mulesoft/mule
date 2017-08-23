@@ -26,10 +26,10 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
 {
     protected ApplicationDescriptor desc;
     
-    public ApplicationMuleContextBuilder(ApplicationDescriptor desc, Properties configurationManagementProperties)
+    public ApplicationMuleContextBuilder(ApplicationDescriptor desc, Properties deploymentProperties)
     {
         this.desc = desc;
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.setDeploymentProperties(deploymentProperties);
     }
     
     public ApplicationMuleContextBuilder(ApplicationDescriptor desc)

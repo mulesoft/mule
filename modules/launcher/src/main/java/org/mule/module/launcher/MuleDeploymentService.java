@@ -94,7 +94,7 @@ public class MuleDeploymentService implements DeploymentService
         this.domainDeployer = new DomainArchiveDeployer(
                 new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
                                              new DomainDeploymentTemplate(applicationDeployer, this)),
-                applicationDeployer, this, new Properties());
+                applicationDeployer, this);
         this.domainDeployer.setDeploymentListener(domainDeploymentListener);
         if (useParallelDeployment())
         {
@@ -275,14 +275,14 @@ public class MuleDeploymentService implements DeploymentService
     }
     
     @Override
-    public void deployDomain(final URL domainArchiveUrl, final Properties appProperties) throws IOException
+    public void deployDomain(final URL domainArchiveUrl, final Properties deploymentProperties) throws IOException
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
             public void execute()
             {
-                domainDeployer.deployPackagedArtifact(domainArchiveUrl, appProperties);
+                domainDeployer.deployPackagedArtifact(domainArchiveUrl, deploymentProperties);
             }
         });
     }
@@ -295,14 +295,14 @@ public class MuleDeploymentService implements DeploymentService
     }
     
     @Override
-    public void redeployDomain(final String domainName, final Properties appProperties)
+    public void redeployDomain(final String domainName, final Properties deploymentProperties)
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
             public void execute()
             {
-                domainDeployer.redeploy(findDomain(domainName), appProperties);
+                domainDeployer.redeploy(findDomain(domainName), deploymentProperties);
             }
         });
     }
@@ -393,21 +393,22 @@ public class MuleDeploymentService implements DeploymentService
     }
 
     @Override
-    public void deploy(final URL appArchiveUrl, final Properties appProperties) throws IOException
+    public void deploy(final URL appArchiveUrl, final Properties deploymentProperties) throws IOException
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
             public void execute()
             {
-                applicationDeployer.deployPackagedArtifact(appArchiveUrl, appProperties);
+                applicationDeployer.deployPackagedArtifact(appArchiveUrl, deploymentProperties);
             }
         });        
     }
 
     @Override
-    public void redeploy(final String artifactName, final Properties appProperties)
+    public void redeploy(final String artifactName, final Properties deploymentProperties)
     {
+
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
@@ -415,7 +416,7 @@ public class MuleDeploymentService implements DeploymentService
             {
                 try
                 {
-                    applicationDeployer.redeploy(findApplication(artifactName), appProperties);
+                    applicationDeployer.redeploy(findApplication(artifactName), deploymentProperties);
                 }
                 catch (DeploymentException e)
                 {

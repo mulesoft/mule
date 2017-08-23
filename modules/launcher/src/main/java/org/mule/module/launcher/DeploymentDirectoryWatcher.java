@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -164,7 +165,7 @@ public class DeploymentDirectoryWatcher implements Runnable
 
                         if (applicationFile.exists() && applicationFile.isFile())
                         {
-                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX, null);
+                            applicationArchiveDeployer.deployPackagedArtifact(app + ZIP_FILE_SUFFIX);
                         }
                         else
                         {

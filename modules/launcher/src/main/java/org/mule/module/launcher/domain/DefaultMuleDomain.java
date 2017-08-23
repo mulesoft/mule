@@ -19,7 +19,7 @@ import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.module.launcher.ConfigurationManagamentAware;
+import org.mule.module.launcher.DeploymentPropertiesUtils;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -49,7 +49,7 @@ import java.util.Scanner;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DefaultMuleDomain extends ConfigurationManagamentAware implements Domain
+public class DefaultMuleDomain implements Domain
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
@@ -60,7 +60,7 @@ public class DefaultMuleDomain extends ConfigurationManagamentAware implements D
     private MuleContext muleContext;
     private DeploymentListener deploymentListener;
     private ArtifactClassLoader deploymentClassLoader;
-    private Properties configurationManagementProperties;
+    private Properties deploymentProperties;
 
     private File configResourceFile;
 
@@ -178,7 +178,7 @@ public class DefaultMuleDomain extends ConfigurationManagamentAware implements D
                     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
 
                     // We need to add this builder before spring so that we can override the configuration management properties
-                    builders.add(createConfigurationBuilderFromConfigurationManagementProperties());
+                    builders.add(createConfigurationBuilderFromDeploymentProperties());
 
                     // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                     addAnnotationsConfigBuilderIfPresent(builders);
@@ -190,7 +190,8 @@ public class DefaultMuleDomain extends ConfigurationManagamentAware implements D
                     {
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                     }
-                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(descriptor.getName(), configurationManagementProperties);
+                    DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(descriptor.getName());
+                    domainMuleContextBuilder.setDeploymentProperties(deploymentProperties);
                     muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
                 }
             }
@@ -363,11 +364,9 @@ public class DefaultMuleDomain extends ConfigurationManagamentAware implements D
         }
     }
 
-    protected ConfigurationBuilder createConfigurationBuilderFromConfigurationManagementProperties() throws IOException
+    protected ConfigurationBuilder createConfigurationBuilderFromDeploymentProperties() throws IOException
     {
-        File muleDataPath = new File(MuleFoldersUtil.getExecutionFolder(), getArtifactName());
-        setConfigurationManagementProperties(manageConfigurationManagementPersistence(muleDataPath.getAbsolutePath(), configurationManagementProperties));        
-        return new SimpleConfigurationBuilder(configurationManagementProperties);
+        return new SimpleConfigurationBuilder(deploymentProperties);
     }
 
     public boolean containsSharedResources()
@@ -376,8 +375,8 @@ public class DefaultMuleDomain extends ConfigurationManagamentAware implements D
     }
 
     @Override
-    public void setConfigurationManagementProperties(Properties configurationManagementProperties)
+    public void setDeploymentProperties(Properties deploymentProperties)
     {
-        this.configurationManagementProperties = configurationManagementProperties;
+        this.deploymentProperties = deploymentProperties;
     }
 }

@@ -586,19 +586,19 @@ public class DefaultBeanAssembler implements BeanAssembler
     public String resolvePlaceholder(String value)
     {
         MuleContext context = MuleArtifactContext.getCurrentMuleContext().get();
-        String configurationManagementValue = getConfigurationManagementValue(value, context);
+        String deploymentPropertyResolvedValue = getDeploymentPropertyResolvedValue(value, context);
         
-        return configurationManagementValue;        
+        return deploymentPropertyResolvedValue;        
     }
 
-    private String getConfigurationManagementValue(String value, MuleContext context)
+    private String getDeploymentPropertyResolvedValue(String value, MuleContext context)
     {
-        String configurationManagementValue = null;
+        String deploymentPropertyResolvedValue = null;
         if (isPlaceholder(value))
         {
-            configurationManagementValue = (String) context.getConfigurationManamentProperties().get(extractName(value));
+            deploymentPropertyResolvedValue = (String) context.getDeploymentProperties().get(extractName(value));
         }
-        return configurationManagementValue;
+        return deploymentPropertyResolvedValue;
     }
 
     private String extractName(String value)
