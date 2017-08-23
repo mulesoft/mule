@@ -15,7 +15,7 @@
     <sftp:connector name="sftpPooledConnector"
                     pollingFrequency="1000"
                     autoDelete="false"
-                    sizeCheckWaitTime="1"
+                    fileAge="1"
                     maxConnectionPoolSize="1"
                     duplicateHandling="throwException" tempDirInbound="archive" useTempFileTimestampSuffix="true">
         <receiver-threading-profile maxThreadsActive="1"/>

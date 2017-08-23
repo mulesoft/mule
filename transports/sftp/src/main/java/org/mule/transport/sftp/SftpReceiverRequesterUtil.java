@@ -117,7 +117,18 @@ public class SftpReceiverRequesterUtil
                     continue;
                 }
 
-                if (canProcessFile(file, client, checkFileAge, fileAge))
+                if (checkFileAge)
+                {
+                    if(isOldFile(file, client, fileAge))
+                    {
+                        completedFiles.add(file);
+                        if (onlyGetTheFirstOne)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
                 {
                     completedFiles.add(file);
                     if (onlyGetTheFirstOne)
@@ -125,6 +136,7 @@ public class SftpReceiverRequesterUtil
                         break;
                     }
                 }
+
             }
             return completedFiles.toArray(new String[completedFiles.size()]);
         }
@@ -337,28 +349,6 @@ public class SftpReceiverRequesterUtil
         return new SftpFileArchiveInputStream(archiveFile, is);
     }
 
-    /**
-     * Evaluate if a file meets the conditions to be processed.
-     *
-     * @param fileName The name of the file to evaluate
-     * @param client instance of SftpClient
-     * @param checkFileAge indicates if the fileAge condition should be evaluated.
-     * @param fileAge How old the file should be to be considered "old" and not
-     *            changed
-     * @return true if the file meets the conditions to be processed.
-     * @throws Exception Error
-     */
-    protected boolean canProcessFile(String fileName, SftpClient client, boolean checkFileAge, long fileAge)
-            throws Exception
-    {
-
-        if (checkFileAge)
-        {
-            return isOldFile(fileName, client, fileAge);
-        }
-
-        return true;
-    }
 
     /**
      * Filters the given files evaluating if their size changed after <code>sizeCheckDelayMs</code>.

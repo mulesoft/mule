@@ -134,11 +134,19 @@ public class SftpConnectionReturnedToPoolOnErrorTestCase extends AbstractSftpFun
         }
 
         @Override
-        protected boolean canProcessFile(String fileName, SftpClient client, boolean checkFileAge, long fileAge) throws Exception
+        boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
         {
             sftpServerStopReq.countDown();
-            sftpServerStopped.await();
-            return super.canProcessFile(fileName, client, checkFileAge, fileAge);
+            try
+            {
+                sftpServerStopped.await();
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("InterruptedException was thrown");
+            }
+            return super.isOldFile(fileName, client, fileAge);
         }
 
         @Override
