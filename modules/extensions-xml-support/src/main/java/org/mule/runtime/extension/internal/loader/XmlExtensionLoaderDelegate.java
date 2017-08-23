@@ -80,8 +80,6 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableMap;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -98,10 +96,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -321,10 +315,7 @@ public final class XmlExtensionLoaderDelegate {
     ComponentModelReader componentModelReader =
         new ComponentModelReader(new DefaultConfigurationPropertiesResolver(empty(),
                                                                             new SystemPropertiesConfigurationProvider()));
-    // TODO MULE-12291: we would, ideally, leave either the relative path (modulePath) or the URL to the current config file,
-    // rather than just the name of the file (which will be useless from a tooling POV)
-    final String configFileName = modulePath.substring(modulePath.lastIndexOf("/") + 1);
-    return componentModelReader.extractComponentDefinitionModel(parseModule.get(), configFileName);
+    return componentModelReader.extractComponentDefinitionModel(parseModule.get(), modulePath);
   }
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument) {
