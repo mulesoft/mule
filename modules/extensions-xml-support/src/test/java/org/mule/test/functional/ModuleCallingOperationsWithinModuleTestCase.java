@@ -34,17 +34,27 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   @Parameterized.Parameter(1)
   public String[] paths;
 
-  @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
+  @Parameterized.Parameter(2)
+  public boolean shouldValidate;
+
+  @Parameterized.Parameters(name = "{index}: Running tests for {0} (validating XML [{2}])")
   public static Collection<Object[]> data() {
-    return asList(new Object[][] {
-        // simple scenario
-        {"flows/flows-using-module-calling-operations-within-module.xml",
-            new String[] {"modules/module-calling-operations-within-module.xml"}},
-        // nested modules scenario
-        {"flows/nested/flows-using-module-calling-operations-within-module-proxy.xml",
-            new String[] {"modules/module-calling-operations-within-module.xml",
-                "modules/nested/module-calling-operations-within-module-proxy.xml"}}
-    });
+    return asList(getSimpleScenario(false),
+                  getSimpleScenario(false),
+                  getNestedModulesScenario(true),
+                  getNestedModulesScenario(true));
+  }
+
+  private static Object[] getSimpleScenario(boolean shouldValidate) {
+    return new Object[] {"flows/flows-using-module-calling-operations-within-module.xml",
+        new String[] {"modules/module-calling-operations-within-module.xml"}, shouldValidate};
+  }
+
+  private static Object[] getNestedModulesScenario(boolean shouldValidate) {
+    return new Object[] {"flows/nested/flows-using-module-calling-operations-within-module-proxy.xml",
+        new String[] {"modules/module-calling-operations-within-module.xml",
+            "modules/nested/module-calling-operations-within-module-proxy.xml"},
+        shouldValidate};
   }
 
   @Override
@@ -55,6 +65,11 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   @Override
   protected String getConfigFile() {
     return configFile;
+  }
+
+  @Override
+  protected boolean shouldValidateXml() {
+    return shouldValidate;
   }
 
   @Test

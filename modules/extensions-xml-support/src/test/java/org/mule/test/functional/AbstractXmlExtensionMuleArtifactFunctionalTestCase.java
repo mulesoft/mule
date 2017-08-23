@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.HashMap;
@@ -79,6 +80,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         for (String modulePath : getModulePaths()) {
           Map<String, Object> params = new HashMap<>();
           params.put(XmlExtensionModelLoader.RESOURCE_XML, modulePath);
+          params.put(XmlExtensionModelLoader.VALIDATE_XML, shouldValidateXml());
           final DslResolvingContext dslResolvingContext = getDefault(extensions);
           final ExtensionModel extensionModel =
               new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), dslResolvingContext, params);
@@ -89,6 +91,18 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         }
       }
     });
+  }
+
+  /**
+   * Flag to make the {@link XmlExtensionLoaderDelegate} pick between different implementations when loading the XML resource.
+   * Ideally, the implementation without validation will be ran only in runtime, while the validation one will be picked up while
+   * packaging the connector.
+   *
+   * @return false if we are trying to simulate a run of smart connector already packaged, false if we are testing how compiling
+   * a smart connector through maven should be.
+   */
+  protected boolean shouldValidateXml() {
+    return false;
   }
 
 }
