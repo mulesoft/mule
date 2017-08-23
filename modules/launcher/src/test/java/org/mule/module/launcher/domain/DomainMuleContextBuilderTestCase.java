@@ -9,9 +9,12 @@ package org.mule.module.launcher.domain;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -23,6 +26,7 @@ public class DomainMuleContextBuilderTestCase extends AbstractMuleTestCase
     public void createsContainerConfiguration() throws Exception
     {
         DomainMuleContextBuilder builder = new DomainMuleContextBuilder("test");
+        builder.setDeploymentProperties(new Properties());
 
         MuleConfiguration muleConfiguration = builder.getMuleConfiguration();
 

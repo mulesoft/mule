@@ -8,6 +8,7 @@ package org.mule.module.launcher.application;
 
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -22,6 +23,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.module.launcher.DeploymentPropertiesUtils;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
@@ -29,6 +31,7 @@ import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.DisposableClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleDeploymentService;
+import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.artifact.MuleContextDeploymentListener;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -38,9 +41,12 @@ import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,6 +66,7 @@ public class DefaultMuleApplication implements Application
     private Domain domain;
     protected DeploymentListener deploymentListener;
     private ServerNotificationListener<MuleContextNotification> statusListener;
+    private Properties deploymentProperties;
 
     public DefaultMuleApplication(ApplicationDescriptor descriptor, ApplicationClassLoaderFactory applicationClassLoaderFactory, Domain domain)
     {
@@ -199,8 +206,9 @@ public class DefaultMuleApplication implements Application
                     muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                 }
 
-                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor);
-                setMuleContext(muleContextFactory.createMuleContext(builders, applicationContextBuilder));
+                ApplicationMuleContextBuilder applicationContextBuilder = new ApplicationMuleContextBuilder(descriptor, deploymentProperties);
+                MuleContext muleContext = muleContextFactory.createMuleContext(builders, applicationContextBuilder);
+                setMuleContext(muleContext);
             }
         }
         catch (Exception e)
@@ -250,7 +258,7 @@ public class DefaultMuleApplication implements Application
         status = ApplicationStatus.DEPLOYMENT_FAILED;
     }
 
-    protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties()
+    protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties() throws IOException
     {
         // Load application properties first since they may be needed by other configuration builders
         final Map<String, String> appProperties = descriptor.getAppProperties();
@@ -258,10 +266,23 @@ public class DefaultMuleApplication implements Application
         // Add the app.home variable to the context
         File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName());
         appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
-
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getArtifactName());
+        
+        return new SimpleConfigurationBuilder(merge(appProperties, getDeploymentProperties()));
+    }
 
-        return new SimpleConfigurationBuilder(appProperties);
+
+
+    private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties)
+    {
+        Map<String, String> mergedProperties = new HashMap<String, String>();
+        mergedProperties.putAll(properties);
+        for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet())
+        {
+            mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
+        }        
+        
+        return mergedProperties;
     }
 
     protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception
@@ -419,6 +440,17 @@ public class DefaultMuleApplication implements Application
 
         muleContext.dispose();
         muleContext = null;
+    }
+
+    public Properties getDeploymentProperties()
+    {
+        return deploymentProperties;
+    }
+
+    @Override
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;        
     }
 
 }

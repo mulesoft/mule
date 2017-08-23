@@ -15,6 +15,7 @@ import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 
 import java.io.File;
+import java.util.Properties;
 
 public class TestDomainWrapper implements Domain
 {
@@ -22,6 +23,13 @@ public class TestDomainWrapper implements Domain
     private Domain delegate;
     private boolean failOnPurpose;
     private boolean failOnDispose;
+    private Properties deploymentProperties;
+
+    public TestDomainWrapper(Domain delegate, Properties deploymentProperties)
+    {
+        this.delegate = delegate;
+        this.deploymentProperties = deploymentProperties;
+    }
 
     public TestDomainWrapper(Domain delegate)
     {
@@ -121,5 +129,11 @@ public class TestDomainWrapper implements Domain
     public void setFailOnDispose()
     {
         this.failOnDispose = true;
+    }
+
+    @Override
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;
     }
 }

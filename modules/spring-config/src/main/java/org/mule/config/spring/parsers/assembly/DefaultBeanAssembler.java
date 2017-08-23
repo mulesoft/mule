@@ -6,6 +6,9 @@
  */
 package org.mule.config.spring.parsers.assembly;
 
+import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_PREFIX;
+import static org.springframework.util.SystemPropertyUtils.PLACEHOLDER_SUFFIX;
+
 import org.mule.api.AnnotatedObject;
 import org.mule.api.MuleContext;
 import org.mule.config.spring.MuleArtifactContext;
@@ -579,5 +582,32 @@ public class DefaultBeanAssembler implements BeanAssembler
         return false;
     }
 
+    @Override
+    public String resolvePlaceholder(String value)
+    {
+        MuleContext context = MuleArtifactContext.getCurrentMuleContext().get();
+        String deploymentPropertyResolvedValue = getDeploymentPropertyResolvedValue(value, context);
+        
+        return deploymentPropertyResolvedValue;        
+    }
 
+    private String getDeploymentPropertyResolvedValue(String value, MuleContext context)
+    {
+        String deploymentPropertyResolvedValue = null;
+        if (isPlaceholder(value))
+        {
+            deploymentPropertyResolvedValue = (String) context.getDeploymentProperties().get(extractName(value));
+        }
+        return deploymentPropertyResolvedValue;
+    }
+
+    private String extractName(String value)
+    {
+        return value.substring(value.indexOf(PLACEHOLDER_PREFIX) + 2, value.indexOf(PLACEHOLDER_SUFFIX));
+    }
+
+    private boolean isPlaceholder(String value)
+    {
+        return value.indexOf(PLACEHOLDER_PREFIX) != -1 && value.indexOf(PLACEHOLDER_SUFFIX) != -1 && value.indexOf(PLACEHOLDER_PREFIX) < value.indexOf(PLACEHOLDER_SUFFIX);
+    }
 }

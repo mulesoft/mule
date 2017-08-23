@@ -87,6 +87,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -204,6 +205,8 @@ public class DefaultMuleContext implements MuleContext
      * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
      */
     private ArtifactType artifactType;
+    
+    private Properties deploymentProperties;
 
     /**
      * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1233,5 +1236,23 @@ public class DefaultMuleContext implements MuleContext
             }
         }
         return exceptionContextProviders;
+    }
+
+    @Override
+    public Properties getDeploymentProperties()
+    {
+        return deploymentProperties;
+    }
+
+    /**
+     * Sets the deployment properties so that beans as well as
+     * application properties are overridden.
+     * 
+     * @since 3.9.0
+     */
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;
+        
     }
 }

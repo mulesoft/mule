@@ -38,7 +38,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     @Override
     protected void doSetUp() throws Exception
     {
-        application = new DefaultMuleApplication(null, null, null);
+        application = new DefaultMuleApplication(new ApplicationDescriptor(), null, null);
         application.setMuleContext(muleContext);
     }
 

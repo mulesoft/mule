@@ -6,10 +6,14 @@
  */
 package org.mule.module.launcher.application;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.module.launcher.domain.DefaultDomainFactory;
 import org.mule.module.launcher.domain.MuleDomainClassLoaderRepository;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Creates a {@link ApplicationFactory} that returns {@link TestApplicationWrapper}
@@ -27,7 +31,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory
     }
 
     @Override
-    public Application createArtifact(String appName) throws IOException
+    public Application createArtifact(String artifactName) throws IOException
+    {
+        return createArtifact(artifactName, ofNullable(new Properties()));
+    }
+    
+    @Override
+    public Application createArtifact(String appName, Optional<Properties> deploymentProperties) throws IOException
     {
         Application app = super.createArtifact(appName);
 

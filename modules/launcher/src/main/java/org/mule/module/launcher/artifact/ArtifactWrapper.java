@@ -13,6 +13,7 @@ import org.mule.module.launcher.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Decorates the target deployer to properly switch out context classloader for deployment
@@ -160,5 +161,11 @@ public class ArtifactWrapper<T extends Artifact<D>, D extends ArtifactDescriptor
     private interface ArtifactAction
     {
         void execute();
+    }
+
+    @Override
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        getDelegate().setDeploymentProperties(deploymentProperties);
     }
 }

@@ -6,10 +6,14 @@
  */
 package org.mule.module.launcher.domain;
 
+import static java.util.Optional.empty;
+import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.module.launcher.descriptor.ArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+
 import org.mule.module.launcher.DeploymentListener;
+import org.mule.module.launcher.application.builder.DefaultMuleDomainBuilder;
 import org.mule.module.launcher.descriptor.DomainDescriptor;
 import org.mule.module.launcher.descriptor.DomainDescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyDomainDescriptor;
@@ -19,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 public class DefaultDomainFactory implements DomainFactory
 {
@@ -47,7 +53,7 @@ public class DefaultDomainFactory implements DomainFactory
     }
 
     @Override
-    public Domain createArtifact(String artifactName) throws IOException
+    public Domain createArtifact(String artifactName, Optional<Properties> deploymentProperties) throws IOException
     {
         if (domains.containsKey(artifactName))
         {
@@ -58,11 +64,20 @@ public class DefaultDomainFactory implements DomainFactory
             throw new IllegalArgumentException("Mule application name may not contain spaces: " + artifactName);
         }
         DomainDescriptor descriptor = findDomain(artifactName);
-        DefaultMuleDomain defaultMuleDomain = new DefaultMuleDomain(domainClassLoaderRepository, descriptor);
+        DefaultMuleDomain defaultMuleDomain = createDefaultMuleDomain(domainClassLoaderRepository, descriptor, deploymentProperties);
         defaultMuleDomain.setDeploymentListener(deploymentListener);
         DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
         domains.put(artifactName, domainWrapper);
         return domainWrapper;
+    }
+
+    private DefaultMuleDomain createDefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, DomainDescriptor descriptor, Optional<Properties> deploymentProperties) throws IOException
+    {
+        DefaultMuleDomainBuilder builder = new DefaultMuleDomainBuilder();
+        builder.setDescriptor(descriptor);
+        builder.setDomainClassLoaderRepository(domainClassLoaderRepository);
+        builder.setDeploymentProperties(resolveDeploymentProperties(descriptor.getName(), deploymentProperties));
+        return builder.buildDomain();
     }
 
     private DomainDescriptor findDomain(String domainName) throws IOException
@@ -103,5 +118,12 @@ public class DefaultDomainFactory implements DomainFactory
     public void start(DomainWrapper domainWrapper)
     {
         domains.put(domainWrapper.getArtifactName(), domainWrapper);
+    }
+
+    @Override
+    public Domain createArtifact(String artifactName) throws IOException
+    {
+        Optional<Properties> properties = empty();
+        return createArtifact(artifactName, properties);
     }
 }

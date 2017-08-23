@@ -93,5 +93,7 @@ public interface BeanAssembler
      * @param flag The flag to set
      */
     void setBeanFlag(String flag);
+    
+    String resolvePlaceholder(String value);
 
 }

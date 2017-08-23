@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.descriptor;
 
+import static java.util.Optional.empty; 
 import org.mule.module.launcher.plugin.PluginDescriptor;
 
 import java.io.File;
@@ -13,6 +14,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 
@@ -35,7 +38,8 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private String[] absoluteResourcePaths;
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
-
+    private Optional<Properties> deploymentProperties = empty();
+    
     private File logConfigFile;
 
     private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
@@ -158,4 +162,13 @@ public class ApplicationDescriptor extends ArtifactDescriptor
         this.packagesToScan = packages;
     }
 
+    public Optional<Properties> getDeploymentProperties()
+    {
+        return deploymentProperties;
+    }
+
+    public void setDeploymentProperties(Optional<Properties> deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;
+    }
 }

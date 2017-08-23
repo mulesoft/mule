@@ -7,6 +7,7 @@
 package org.mule.module.launcher.domain;
 
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -15,13 +16,16 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.DomainMuleContextAwareConfigurationBuilder;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
+import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.module.launcher.DeploymentPropertiesUtils;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.MuleDeploymentService;
+import org.mule.module.launcher.MuleFoldersUtil;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.NullDeploymentListener;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
@@ -33,11 +37,13 @@ import org.mule.util.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
@@ -54,6 +60,7 @@ public class DefaultMuleDomain implements Domain
     private MuleContext muleContext;
     private DeploymentListener deploymentListener;
     private ArtifactClassLoader deploymentClassLoader;
+    private Properties deploymentProperties;
 
     private File configResourceFile;
 
@@ -170,10 +177,13 @@ public class DefaultMuleDomain implements Domain
                 {
                     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
 
+                    // We need to add this builder before spring so that we can override the configuration management properties
+                    builders.add(createConfigurationBuilderFromDeploymentProperties());
+
                     // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
                     addAnnotationsConfigBuilderIfPresent(builders);
-
                     builders.add(cfgBuilder);
+
 
                     DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                     if (deploymentListener != null)
@@ -181,6 +191,7 @@ public class DefaultMuleDomain implements Domain
                         muleContextFactory.addListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
                     }
                     DomainMuleContextBuilder domainMuleContextBuilder = new DomainMuleContextBuilder(descriptor.getName());
+                    domainMuleContextBuilder.setDeploymentProperties(deploymentProperties);
                     muleContext = muleContextFactory.createMuleContext(builders, domainMuleContextBuilder);
                 }
             }
@@ -353,8 +364,19 @@ public class DefaultMuleDomain implements Domain
         }
     }
 
+    protected ConfigurationBuilder createConfigurationBuilderFromDeploymentProperties() throws IOException
+    {
+        return new SimpleConfigurationBuilder(deploymentProperties);
+    }
+
     public boolean containsSharedResources()
     {
         return this.muleContext != null;
+    }
+
+    @Override
+    public void setDeploymentProperties(Properties deploymentProperties)
+    {
+        this.deploymentProperties = deploymentProperties;
     }
 }

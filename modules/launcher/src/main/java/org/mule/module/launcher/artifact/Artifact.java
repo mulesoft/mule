@@ -12,6 +12,7 @@ import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.descriptor.ArtifactDescriptor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
@@ -71,4 +72,11 @@ public interface Artifact<D extends ArtifactDescriptor>
      * @return MuleContext created from the artifact configurations files.
      */
     MuleContext getMuleContext();
+    
+    /**
+     * Sets the deployment properties
+     * 
+     * @param deploymentProperties deployment properties
+     */
+    void setDeploymentProperties(Properties deploymentProperties);
 }

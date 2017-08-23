@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.Properties;
 
@@ -80,6 +81,14 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
     void deploy(URL appArchiveUrl) throws IOException;
 
     /**
+     * Undeploys and redeploys an application with the properties provided.
+     *
+     * @param artifactName then name of the application to redeploy
+     * @param deploymentProperties the properties to override
+     */
+    void redeploy(String artifactName, Properties deploymentProperties);
+    
+    /**
      * Deploys an applications bundled as a zip from a given URL and sets the provided appProperties.
      *
      * @param appArchiveUrl
@@ -92,15 +101,9 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      * Undeploys and redeploys an application
      *
      * @param artifactName then name of the application to redeploy
+     * @throws IOException 
      */
     void redeploy(String artifactName);
-
-    /**
-     * Undeploys and redeploys an applications and applies the provided appProperties.
-     * @param artifactName
-     * @param appProperties
-     */
-    void redeploy(String artifactName, Properties appProperties) throws IOException;
 
     /**
      * Undeploys a domain from the mule container
@@ -118,11 +121,28 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
     void deployDomain(URL domainArchiveUrl) throws IOException;
 
     /**
+     * Deploys a domain bundled as a zip from the given URL to the mule container
+     *
+     * @param domainArchiveUrl location of the zip domain file
+     * @param appProperties the properties to override
+     * @throws IOException
+     */
+    void deployDomain(URL domainArchiveUrl, Properties appProperties) throws IOException;
+
+    /**
      * Undeploys and redeploys a domain
      *
      * @param domainName then name of the domain to redeploy
      */
     void redeployDomain(String domainName);
+
+    /**
+     * Undeploys and redeploys a domain
+     *
+     * @param domainName then name of the domain to redeploy
+     * @param deploymentProperties the properties to override
+     */
+    void redeployDomain(String domainName, Properties deploymentProperties);
 
     void start();
 

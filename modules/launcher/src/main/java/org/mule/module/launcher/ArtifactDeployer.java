@@ -10,6 +10,7 @@ import org.mule.module.launcher.artifact.Artifact;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Properties;
 
 /**
  * Deployes and Undeploys artifacts in the container.

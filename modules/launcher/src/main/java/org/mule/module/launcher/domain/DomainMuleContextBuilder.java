@@ -28,6 +28,8 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 
+import java.util.Properties;
+
 /**
  * Builder for domain MuleContext instance.
  */
