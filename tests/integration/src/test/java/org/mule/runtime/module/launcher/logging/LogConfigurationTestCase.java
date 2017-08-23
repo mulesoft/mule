@@ -84,6 +84,15 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   }
 
   @Test
+  public void honorLog4jConfigFileWithNoAppenderForApp() throws Exception {
+    muleServer.start();
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(APP_NAME).definedBy("log/empty-config.xml")
+        .usingResource("log/log4j-config-no-appender.xml", "log4j2-test.xml");
+    muleServer.deploy(applicationFileBuilder.getArtifactFile().toURI().toURL(), APP_NAME);
+    ensureOnlyDefaultAppender();
+  }
+
+  @Test
   public void honorLog4jConfigFileForAppInDomain() throws Exception {
     muleServer.start();
 
