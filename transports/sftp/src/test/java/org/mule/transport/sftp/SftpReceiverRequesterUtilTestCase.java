@@ -49,7 +49,6 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
     @Mock
     private SftpUtil sftpUtil;
 
-
     @Before
     public void setUp() throws Exception
     {
