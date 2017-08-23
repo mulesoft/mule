@@ -16,6 +16,7 @@ import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POL
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.concurrent.Latch;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
-public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase implements Processor {
+public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static AtomicReference<List<Message>> capturedPayload = new AtomicReference<>(null);
   private static Latch latch = new Latch();
@@ -44,15 +45,6 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
     super.doTearDown();
   }
 
-  @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
-    List<Message> payload = (List<Message>) event.getMessage().getPayload().getValue();
-    if (capturedPayload.compareAndSet(null, payload)) {
-      latch.release();
-    }
-    return event;
-  }
-
   @Test
   public void listenMessages() throws Exception {
     assertThat(latch.await(5, SECONDS), is(true));
@@ -63,6 +55,18 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
     for (Message message : payload) {
       assertThat(message.getPayload().getValue(), is(instanceOf(String.class)));
       assertThat(message.getAttributes().getValue(), is(instanceOf(DEAOfficerAttributes.class)));
+    }
+  }
+
+  public static class ListProcessor extends AbstractAnnotatedObject implements Processor {
+
+    @Override
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      List<Message> payload = (List<Message>) event.getMessage().getPayload().getValue();
+      if (capturedPayload.compareAndSet(null, payload)) {
+        latch.release();
+      }
+      return event;
     }
   }
 }

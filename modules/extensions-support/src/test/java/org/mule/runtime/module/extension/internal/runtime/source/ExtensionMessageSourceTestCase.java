@@ -70,6 +70,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -207,7 +208,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
 
     mockExceptionEnricher(sourceModel, null);
     when(sourceModel.requiresConnection()).thenReturn(true);
@@ -314,7 +315,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   public void sourceIsInstantiatedOnce() throws Exception {
     initialise();
     start();
-    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any());
+    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), any());
   }
 
   @Test
@@ -509,7 +510,8 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
                              sourceCallbackFactory,
                              mock(ComponentLocation.class),
                              mock(SourceConnectionManager.class),
-                             null, callbackParameters, null);
+                             null, callbackParameters, null,
+                             mock(MessagingExceptionResolver.class));
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Matcher<Throwable> causeMatcher) {
@@ -533,7 +535,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     final String person = "person";
     source = new DummySource(person);
     sourceAdapter = createSourceAdapter();
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any())).thenReturn(sourceAdapter);
     messageSource = getNewExtensionMessageSourceInstance();
     messageSource.initialise();
     messageSource.start();

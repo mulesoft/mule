@@ -45,9 +45,6 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +54,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -66,7 +65,6 @@ import reactor.core.publisher.Mono;
  */
 abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
-  private static final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver();
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private final String name;
@@ -182,11 +180,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
-                         if (!throwable.getEvent().getError().isPresent()) {
-                           // just in case anything in processor chain itself fails. We still have to create Error earlier on
-                           // though, so it's available in interceptors.
-                           throwable = resolveMessagingException(processor).apply(throwable);
-                         }
+                         throwable = resolveMessagingException(processor).apply(throwable);
                          return Mono.from(event.getContext().error(throwable)).then(Mono.empty());
                        })));
 
@@ -194,11 +188,17 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private MessagingException resolveException(AnnotatedObject processor, InternalEvent event, Throwable throwable) {
-    return exceptionResolver.resolve(processor, new MessagingException(event, throwable, processor), muleContext);
+    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
+    return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
-    return exception -> exceptionResolver.resolve(((AnnotatedObject) processor), exception, muleContext);
+    if (processor instanceof AnnotatedObject) {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((AnnotatedObject) processor);
+      return exception -> exceptionResolver.resolve(exception, muleContext);
+    } else {
+      return exception -> exception;
+    }
   }
 
   private Consumer<InternalEvent> preNotification(Processor processor) {
