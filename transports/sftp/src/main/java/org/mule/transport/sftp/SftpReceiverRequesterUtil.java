@@ -86,14 +86,12 @@ public class SftpReceiverRequesterUtil
 
             logger.debug("fileAge : " + fileAge);
 
-
             List<String> files = asList(client.listFiles());
 
             // Get size check parameter
             long sizeCheckDelayMs = sftpUtil.getSizeCheckWaitTime();
 
             // The files that has the same size after the sizeCheckDelay.
-
             if (sizeCheckDelayMs > 0)
             {
                 files = getStableFiles(files, client, sizeCheckDelayMs);
@@ -339,7 +337,7 @@ public class SftpReceiverRequesterUtil
     }
 
     /**
-     * Evaluate if the file meets the conditions to be processed.
+     * Evaluate if a file meets the conditions to be processed.
      *
      * @param fileName The name of the file to evaluate
      * @param client instance of SftpClient
@@ -362,7 +360,7 @@ public class SftpReceiverRequesterUtil
     }
 
     /**
-     * Filters the given files evaluating if their size change after <code>sizeCheckDelayMs</code>.
+     * Filters the given files evaluating if their size changed after <code>sizeCheckDelayMs</code>.
      *
      * @param fileNames the name of the files to evaluate
      * @param client an SftpClient
