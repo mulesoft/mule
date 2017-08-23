@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.http.api.domain.message.request;
 
-import org.mule.runtime.http.api.domain.HttpProtocol;
+import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -55,17 +56,11 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
 
   @Override
   public Collection<String> getHeaderNames() {
-    if (headers == null) {
-      return new ArrayList<>();
-    }
     return headers.keySet();
   }
 
   @Override
   public String getHeaderValue(String headerName) {
-    if (headers == null) {
-      return null;
-    }
     return headers.get(headerName);
   }
 
@@ -84,8 +79,20 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
     return uri;
   }
 
+  @Override
   public MultiMap<String, String> getQueryParams() {
     return queryParams;
+  }
+
+  @Override
+  public String toString() {
+    return "DefaultHttpRequest {" + lineSeparator()
+        + "  uri: " + uri + "," + lineSeparator()
+        + "  path: " + path + "," + lineSeparator()
+        + "  method: " + method + "," + lineSeparator()
+        + "  headers: " + headers.toString() + "," + lineSeparator()
+        + "  queryParams: " + queryParams.toString() + lineSeparator()
+        + "}";
   }
 
 }
