@@ -17,10 +17,12 @@ import static org.mule.runtime.config.spring.internal.LazyValueProviderService.N
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
@@ -34,12 +36,13 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -48,7 +51,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer {
+public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentTaskExecutor {
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -125,18 +128,24 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   }
 
   @Override
-  public void initializeComponent(Location location) {
-    withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+  public <T, E extends Exception> T withContext(Location location, Callable<T> callable) throws E {
+    return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                                componentBuildingDefinitionRegistry);
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(dependencyResolver);
+      try {
+        ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
+        createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
 
-      // First unregister any already initialized/started component
-      unregisterComponents(dependencyResolver.resolveComponentModelDependencies());
-
-      ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
-      createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+        return tryExpecting(RuntimeException.class, callable, e -> {
+          throw new MuleRuntimeException(e);
+        });
+      } finally {
+        if (minimalApplicationModelGenerator != null) {
+          unregisterComponents(dependencyResolver.resolveComponentModelDependencies());
+        }
+      }
     });
   }
 

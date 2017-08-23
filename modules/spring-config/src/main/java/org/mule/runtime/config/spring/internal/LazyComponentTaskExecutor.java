@@ -7,23 +7,25 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+
+import java.util.concurrent.Callable;
 
 /**
- * Initializer for the creation of lazy resources.
+ * Evaluates a {@link Callable} on a lazy configuration.
  *
  * @since 4.0
  */
-public interface LazyComponentInitializer {
+public interface LazyComponentTaskExecutor {
 
   /**
-   * Calling this method guarantees that the requested component from the configuration will be created.
+   * Calling this method guarantees that the requested component with its dependencies from the configuration will be created, initialized and
+   * after the task is completed the requested component and dependencies will be disposed.
    * <p/>
    * The requested component must exists in the configuration.
    *
    * @param location the location of the configuration component.
-   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   * @throws E if there's a problem executing the task.
    */
-  void initializeComponent(Location location);
+  <T, E extends Exception> T withContext(Location location, Callable<T> callable) throws E;
 
 }
