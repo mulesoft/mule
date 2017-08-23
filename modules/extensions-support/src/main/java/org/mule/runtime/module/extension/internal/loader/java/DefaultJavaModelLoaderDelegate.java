@@ -113,7 +113,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .fromVendor(extension.vendor())
             .withCategory(extension.category())
             .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
-            .describedAs(extension.description())
             .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
     parseExternalLibs(extensionElement, declarer);

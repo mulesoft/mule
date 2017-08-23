@@ -68,6 +68,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * @param documentation the extension documentation with its corresponding description.
    */
   private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {
+    declaration.setDescription(documentation.getExtension().getDescription());
     new DeclarationWalker() {
 
       @Override

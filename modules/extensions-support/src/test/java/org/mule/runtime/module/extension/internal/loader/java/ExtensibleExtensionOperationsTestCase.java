@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
@@ -60,20 +59,20 @@ public class ExtensibleExtensionOperationsTestCase extends AbstractJavaExtension
     assertThat(modelProperty.getType(), is(sameInstance(propertyType)));
   }
 
-  @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = HEISENBERG)
   @Operations(ExtensibleExtensionOperation.class)
   @Extensible
   public static class ExtensibleExtension {
 
   }
 
-  @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = HEISENBERG)
   @Operations({ClassLevelExtensionOfOperation.class, MethodLevelExtensionOfOperation.class})
   public static class ExtendingExtension {
 
   }
 
-  @Extension(name = HEISENBERG, description = EXTENSION_DESCRIPTION)
+  @Extension(name = HEISENBERG)
   @Operations({MethodLevelExtensionOfOperation.class, ExtensibleExtensionOperation.class})
   @Extensible
   public static class ExtensibleExtendingExtension {

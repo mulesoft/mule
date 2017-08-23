@@ -20,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.loader.enricher.Enriche
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.EXTENSION;
 import static org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes.OPERATION;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -125,13 +124,13 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
   @ErrorTypes(CyclicErrorTypes.class)
-  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @Extension(name = "Heisenberg")
   public static class HeisenbergWithCyclicErrorTypes extends HeisenbergExtension {
 
   }
 
 
-  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @Extension(name = "Heisenberg")
   @Operations(InvalidErrorOperations.class)
   @ErrorTypes(HeisenbergErrors.class)
   public static class HeisenbergWithNotMappedErrorType extends HeisenbergExtension {
@@ -139,14 +138,14 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
 
-  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @Extension(name = "Heisenberg")
   @ErrorTypes(OrphanErrorTypes.class)
   public static class HeisenbergWithOrphanErrors extends HeisenbergExtension {
 
   }
 
 
-  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @Extension(name = "Heisenberg")
   @ErrorTypes(LevelErrorTypes.class)
   @Throws(ExtensionLevelErrorTypeProvider.class)
   @Operations(OperationWithThrows.class)
@@ -155,7 +154,7 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
   }
 
 
-  @Extension(name = "Heisenberg", description = EXTENSION_DESCRIPTION)
+  @Extension(name = "Heisenberg")
   @ErrorTypes(LevelErrorTypes.class)
   @Throws(ExtensionLevelErrorTypeProvider.class)
   @Operations(OperationWithOutThrows.class)

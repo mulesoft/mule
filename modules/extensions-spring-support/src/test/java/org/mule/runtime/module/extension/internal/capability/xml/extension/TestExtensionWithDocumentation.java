@@ -11,9 +11,9 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 /**
- * This is some documentation.
+ * Test Extension Description
  */
-@Extension(name = "documentation", description = "Test Extension Description")
+@Extension(name = "documentation")
 @Configurations({TestDocumentedConfig.class, TestAnotherDocumentedConfig.class})
 @Xml(namespace = "namespaceLocation", prefix = "documentation")
 public class TestExtensionWithDocumentation {

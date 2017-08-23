@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.ExpressionSupport;
 
 import java.util.List;
 
-@Extension(name = "List", description = "List Test connector")
+@Extension(name = "List")
 @Operations(VoidOperations.class)
 public class ListConnector {
 
