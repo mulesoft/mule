@@ -1244,7 +1244,12 @@ public class DefaultMuleContext implements MuleContext
         return deploymentProperties;
     }
 
-    @Override
+    /**
+     * Sets the deployment properties so that beans as well as
+     * application properties are overridden.
+     * 
+     * @since 3.9.0
+     */
     public void setDeploymentProperties(Properties deploymentProperties)
     {
         this.deploymentProperties = deploymentProperties;

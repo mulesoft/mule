@@ -12,6 +12,7 @@ import org.mule.module.launcher.artifact.ArtifactFactory;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -22,7 +23,7 @@ import java.util.Properties;
 public interface ArchiveDeployer<T extends Artifact>
 {
 
-    T deployPackagedArtifact(String zip, Properties deploymentProperties) throws DeploymentException;
+    T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException;
     
     T deployPackagedArtifact(String zip) throws DeploymentException;
 
@@ -44,7 +45,7 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void redeploy(T artifact) throws DeploymentException;
 
-    void redeploy(T artifact, Properties deploymentProperties) throws DeploymentException;
+    void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
     Map<URL, Long> getArtifactsZombieMap();
 
@@ -54,8 +55,8 @@ public interface ArchiveDeployer<T extends Artifact>
 
     void deployArtifact(T artifact) throws DeploymentException;
     
-    void deployArtifact(T artifact, Properties deploymentProperties) throws DeploymentException;
+    void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
-    T deployPackagedArtifact(URL domainArchiveUrl, Properties appProperties) throws DeploymentException;
+    T deployPackagedArtifact(URL domainArchiveUrl, Optional<Properties> appProperties) throws DeploymentException;
 
 }

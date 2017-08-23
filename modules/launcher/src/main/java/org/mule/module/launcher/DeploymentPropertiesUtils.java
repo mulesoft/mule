@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -46,21 +47,21 @@ public class DeploymentPropertiesUtils
      * @return deployment properties 
      * @throws IOException
      */
-    public static Properties resolveDeploymentProperties(String artifactName, Properties deploymentProperties) throws IOException
+    public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties) throws IOException
     {
         File file = new File(getExecutionFolder(), artifactName);
         String workingDirectory = file.getAbsolutePath();
         String deploymentPropertiesPath = workingDirectory + separator + DEPLOYTMENT_PROPERTIES_DIRECTORY;
 
-        if (deploymentProperties == null)
+        if (!deploymentProperties.isPresent())
         {
             return getDeploymentProperties(deploymentPropertiesPath);
         }
 
         initDeploymentPropertiesDirectory(deploymentPropertiesPath);
-        persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties);
+        persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get());
         
-        return deploymentProperties; 
+        return deploymentProperties.get(); 
     }
     
     /**

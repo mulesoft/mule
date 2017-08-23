@@ -74,7 +74,6 @@ public class DefaultMuleApplication implements Application
         this.applicationClassLoaderFactory = applicationClassLoaderFactory;
         this.deploymentListener = new NullDeploymentListener();
         this.domain = domain;
-        this.deploymentProperties = descriptor.getDeploymentProperties();
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     }
 

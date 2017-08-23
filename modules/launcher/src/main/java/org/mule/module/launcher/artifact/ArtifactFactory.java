@@ -8,6 +8,7 @@ package org.mule.module.launcher.artifact;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -32,7 +33,7 @@ public interface ArtifactFactory<T extends Artifact>
      * 
      * @return the newly created Artifact
      */
-    T createArtifact(String artifactName, Properties deploymentProperties) throws IOException;
+    T createArtifact(String artifactName, Optional<Properties> deploymentProperties) throws IOException;
 
     /**
      * @return the directory of the Artifact. Usually this directory contains the Artifact resources

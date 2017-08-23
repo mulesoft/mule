@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.domain;
 
+import static java.util.Optional.empty;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class DefaultDomainFactory implements DomainFactory
@@ -51,7 +53,7 @@ public class DefaultDomainFactory implements DomainFactory
     }
 
     @Override
-    public Domain createArtifact(String artifactName, Properties deploymentProperties) throws IOException
+    public Domain createArtifact(String artifactName, Optional<Properties> deploymentProperties) throws IOException
     {
         if (domains.containsKey(artifactName))
         {
@@ -69,7 +71,7 @@ public class DefaultDomainFactory implements DomainFactory
         return domainWrapper;
     }
 
-    private DefaultMuleDomain createDefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, DomainDescriptor descriptor, Properties deploymentProperties) throws IOException
+    private DefaultMuleDomain createDefaultMuleDomain(DomainClassLoaderRepository domainClassLoaderRepository, DomainDescriptor descriptor, Optional<Properties> deploymentProperties) throws IOException
     {
         DefaultMuleDomainBuilder builder = new DefaultMuleDomainBuilder();
         builder.setDescriptor(descriptor);
@@ -121,6 +123,7 @@ public class DefaultDomainFactory implements DomainFactory
     @Override
     public Domain createArtifact(String artifactName) throws IOException
     {
-        return createArtifact(artifactName, null);
+        Optional<Properties> properties = empty();
+        return createArtifact(artifactName, properties);
     }
 }

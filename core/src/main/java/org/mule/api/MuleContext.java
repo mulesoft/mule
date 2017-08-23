@@ -395,13 +395,5 @@ public interface MuleContext extends Lifecycle
      * @since 3.9.0
      */
     Properties getDeploymentProperties();
-
-    /**
-     * Sets the deployment properties so that beans as well as
-     * application properties are overridden.
-     * 
-     * @since 3.9.0
-     */
-    void setDeploymentProperties(Properties configurationManagementProperties);
 }
 

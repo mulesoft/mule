@@ -80,18 +80,6 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      */
     void deploy(URL appArchiveUrl) throws IOException;
 
-    
-    /**
-     * Deploys an application bundled as a zip from the give URL to the mule container.
-     * It overrides the application properties with the ones provided. 
-     * 
-     * @param appArchiveUri location of the zip application file
-     * @param deploymentProperties properties to override
-     * @throws IOException
-     */
-    void deploy(URL appArchiveUri, Properties deploymentProperties) throws IOException;
-    
-    
     /**
      * Undeploys and redeploys an application with the properties provided.
      *
@@ -116,13 +104,6 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
      * @throws IOException 
      */
     void redeploy(String artifactName);
-
-    /**
-     * Undeploys and redeploys an applications and applies the provided appProperties.
-     * @param artifactName
-     * @param appProperties
-     */
-    void redeploy(String artifactName, Properties appProperties) throws IOException;
 
     /**
      * Undeploys a domain from the mule container

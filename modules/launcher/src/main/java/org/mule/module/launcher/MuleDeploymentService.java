@@ -6,14 +6,14 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Optional.empty;
 import static java.lang.System.getProperties;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
-import java.util.Properties;
-import org.apache.commons.lang.NotImplementedException;
+import static java.util.Optional.ofNullable;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationClassLoaderFactory;
@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -234,25 +235,15 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void deploy(final URL appArchiveUrl) throws IOException
     {
-        deploy(appArchiveUrl, null);
-    }
-
-    @Override
-    public void deploy(final URL appArchiveUrl, final Properties properties) throws IOException
-    {
-        throw new NotImplementedException();
+        Optional<Properties> properties = empty();
+        deploy(appArchiveUrl, properties);
     }
 
     @Override
     public void redeploy(final String artifactName)
     {
-        redeploy(artifactName, null);
-    }
-
-    @Override
-    public void redeploy(final String artifactName, final Properties properties)
-    {
-        throw new NotImplementedException();
+        Optional<Properties> properties = empty();
+        redeploy(artifactName, properties);
     }
 
     @Override
@@ -271,11 +262,11 @@ public class MuleDeploymentService implements DeploymentService
     @Override
     public void deployDomain(final URL domainArchiveUrl) throws IOException
     {
-        deployDomain(domainArchiveUrl, null);
+        Optional<Properties> properties = empty();
+        deployDomain(domainArchiveUrl, properties);
     }
-    
-    @Override
-    public void deployDomain(final URL domainArchiveUrl, final Properties deploymentProperties) throws IOException
+
+    private void deployDomain(final URL domainArchiveUrl, final Optional<Properties> deploymentProperties) throws IOException
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
@@ -287,15 +278,21 @@ public class MuleDeploymentService implements DeploymentService
         });
     }
 
+    @Override
+    public void deployDomain(final URL domainArchiveUrl, final Properties deploymentProperties) throws IOException
+    {
+        deployDomain(domainArchiveUrl, ofNullable(deploymentProperties));
+    }
+
 
     @Override
     public void redeployDomain(final String domainName)
     {
-        redeployDomain(domainName, null);
+        Optional<Properties> properties = empty();
+        redeployDomain(domainName, properties);
     }
-    
-    @Override
-    public void redeployDomain(final String domainName, final Properties deploymentProperties)
+
+    private void redeployDomain(final String domainName, final Optional<Properties> deploymentProperties)
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
@@ -305,6 +302,12 @@ public class MuleDeploymentService implements DeploymentService
                 domainDeployer.redeploy(findDomain(domainName), deploymentProperties);
             }
         });
+    }
+    
+    @Override
+    public void redeployDomain(final String domainName, final Properties deploymentProperties)
+    {
+        redeployDomain(domainName, ofNullable(deploymentProperties));
     }
 
 
@@ -392,8 +395,7 @@ public class MuleDeploymentService implements DeploymentService
         }
     }
 
-    @Override
-    public void deploy(final URL appArchiveUrl, final Properties deploymentProperties) throws IOException
+    private void deploy(final URL appArchiveUrl, final Optional<Properties> deploymentProperties) throws IOException
     {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
@@ -404,11 +406,15 @@ public class MuleDeploymentService implements DeploymentService
             }
         });        
     }
-
+    
     @Override
-    public void redeploy(final String artifactName, final Properties deploymentProperties)
+    public void deploy(final URL appArchiveUrl, final Properties deploymentProperties) throws IOException
     {
+        deploy(appArchiveUrl, ofNullable(deploymentProperties));
+    }
 
+    private void redeploy(final String artifactName, final Optional<Properties> deploymentProperties)
+    {
         executeSynchronized(new SynchronizedDeploymentAction()
         {
             @Override
@@ -427,5 +433,11 @@ public class MuleDeploymentService implements DeploymentService
                 }
             }
         });
+    }
+    
+    @Override
+    public void redeploy(final String artifactName, final Properties deploymentProperties)
+    {
+        redeploy(artifactName, ofNullable(deploymentProperties));
     }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -277,7 +279,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             try
             {
-                applicationArchiveDeployer.deployPackagedArtifact(zip, null);
+                applicationArchiveDeployer.deployPackagedArtifact(zip);
             }
             catch (Exception e)
             {
@@ -487,7 +489,8 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             try
             {
-                domainArchiveDeployer.deployPackagedArtifact(zip, null);
+                Optional<Properties> properties = empty();
+                domainArchiveDeployer.deployPackagedArtifact(zip, properties);
             }
             catch (Exception e)
             {

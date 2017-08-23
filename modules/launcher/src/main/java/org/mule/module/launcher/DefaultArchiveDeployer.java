@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.util.SplashScreen.miniSplash;
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
@@ -66,7 +68,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     }
 
     @Override
-    public T deployPackagedArtifact(String zip, Properties deploymentProperties) throws DeploymentException
+    public T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         URL url;
         File artifactZip;
@@ -144,7 +146,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         return artifactFactory.getArtifactDir();
     }
 
-    public T deployPackagedArtifact(URL artifactAchivedUrl, Properties deploymentProperties) throws DeploymentException
+    public T deployPackagedArtifact(URL artifactAchivedUrl, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         T artifact;
 
@@ -239,7 +241,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         this.deploymentListener = deploymentListener;
     }
 
-    private T deployPackagedArtifact(final URL artifactUrl, String artifactName, Properties deploymentProperties) throws IOException
+    private T deployPackagedArtifact(final URL artifactUrl, String artifactName, Optional<Properties> deploymentProperties) throws IOException
     {
         ZombieFile zombieFile = artifactZombieMap.get(artifactName);
         if (zombieFile != null)
@@ -309,7 +311,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void deployArtifact(T artifact) throws DeploymentException
     {
-        deployArtifact(artifact, null);
+        Optional<Properties> properties = empty();
+        deployArtifact(artifact, properties);
     }
 
     private void addZombieApp(Artifact artifact)
@@ -409,13 +412,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         }
     }
 
-
-    private T installFrom(URL url) throws IOException
-    {
-        return installFrom(url, null);
-    }
-    
-    private T installFrom(URL url, Properties deploymentProperties) throws IOException
+    private T installFrom(URL url, Optional<Properties> deploymentProperties) throws IOException
     {
         String artifactName = artifactArchiveInstaller.installArtifact(url);
         return artifactFactory.createArtifact(artifactName, deploymentProperties);
@@ -424,7 +421,8 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void redeploy(T artifact) throws DeploymentException
     {
-        redeploy(artifact, null);
+        Optional<Properties> properties = empty();
+        redeploy(artifact, properties);
     }
 
     private static class ZombieFile
@@ -465,7 +463,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     }
 
     @Override
-    public void redeploy(T artifact, Properties deploymentProperties) throws DeploymentException
+    public void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         if (logger.isInfoEnabled())
         {
@@ -515,7 +513,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     }
 
     @Override
-    public void deployArtifact(T artifact, Properties deploymentProperties) throws DeploymentException
+    public void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         try
         {
@@ -552,6 +550,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public T deployPackagedArtifact(String zip) throws DeploymentException
     {
-        return deployPackagedArtifact(zip, null);
+        Optional<Properties> properties = empty();
+        return deployPackagedArtifact(zip, properties);
     }
 }

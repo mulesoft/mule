@@ -19,6 +19,7 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +45,7 @@ public class DefaultApplicationFactory implements ApplicationFactory
         this.deploymentListener = deploymentListener;
     }
 
-    public Application createArtifact(String appName, Properties deploymentProperties) throws IOException
+    public Application createArtifact(String appName, Optional<Properties> deploymentProperties) throws IOException
     {
         if (appName.contains(" "))
         {
@@ -104,5 +105,4 @@ public class DefaultApplicationFactory implements ApplicationFactory
         builder.setDescriptor(descriptor);
         return builder.buildApplication();
     }
-
 }
