@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import org.mule.runtime.api.meta.DescribedObject;
@@ -33,12 +34,15 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
+import org.mule.runtime.module.extension.internal.capability.xml.extension.single.config.TestExtensionWithDocumentationAndSingleConfig;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -51,16 +55,54 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @SmallTest
+@RunWith(Parameterized.class)
 public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationProcessorTestCase {
+
+  private static final String MULTIPLE_CONFIGS = "multipleConfigs";
+  private static final String SINGLE_CONFIG = "singleConfig";
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {
+        {MULTIPLE_CONFIGS,
+            TestExtensionWithDocumentation.class,
+            "/META-INF/documentation-extension-descriptions.xml",
+            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension"},
+        {SINGLE_CONFIG,
+            TestExtensionWithDocumentationAndSingleConfig.class,
+            "/META-INF/documentationwithsingleconfig-extension-descriptions.xml",
+            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension/single/config"},
+    });
+  }
+
+  private final String name;
+  private final Class<?> extensionClass;
+  private final String expectedProductPath;
+  private final String sourcePath;
+
+  public ExtensionDescriptionDocumenterTestCase(String name, Class<?> extensionClass, String expectedProductPath,
+                                                String sourcePath) {
+    this.name = name;
+    this.extensionClass = extensionClass;
+    this.expectedProductPath = expectedProductPath;
+    this.sourcePath = sourcePath;
+  }
+
+  @Override
+  protected String getSourceFilesLocation() {
+    return sourcePath;
+  }
 
   @Test
   public void persistDocumentation() throws Exception {
-    InputStream in = getClass().getResourceAsStream("/META-INF/documentation-extension-descriptions.xml");
+    InputStream in = getClass().getResourceAsStream(expectedProductPath);
     assertThat(in, is(notNullValue()));
     String expectedXml = IOUtils.toString(in);
-    TestProcessor processor = new TestProcessor();
+    TestProcessor processor = new TestProcessor(extensionClass);
     doCompile(processor);
     ExtensionDocumentationResourceGenerator generator = new ExtensionDocumentationResourceGenerator();
     GeneratedResource resource = generator.generateResource(processor.getExtensionModel())
@@ -72,7 +114,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   public void loadDocumentationFromFile() throws Exception {
     ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(),
                                                                      getDefault(emptySet()));
-    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(TestExtensionWithDocumentation.class, "1.0.0-dev");
+    DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
     loader.declare(ctx);
     ExtensionDescriptionsEnricher enricher = new ExtensionDescriptionsEnricher();
     enricher.enrich(ctx);
@@ -83,14 +125,22 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
   @Test
   public void describeDescriptions() throws Exception {
-    TestProcessor processor = new TestProcessor();
+    TestProcessor processor = new TestProcessor(extensionClass);
     doCompile(processor);
     assertDescriptions(processor.getExtensionModel());
   }
 
   private void assertDescriptions(ExtensionModel declaration) {
-    assertDescription(declaration, "Test Extension Description");
     List<ConfigurationModel> configurations = declaration.getConfigurationModels();
+
+    if (isSingleConfigTest()) {
+      assertDescription(declaration, "Test Extension Description with single config");
+      assertThat(configurations, hasSize(1));
+      assertThat(configurations.get(0).getDescription(), is(DEFAULT_CONFIG_DESCRIPTION));
+      return;
+    }
+
+    assertDescription(declaration, "Test Extension Description");
     assertThat(configurations, hasSize(2));
     ConfigurationModel first = configurations.get(1);
     assertDescription(first, "This is some Config documentation.");
@@ -137,20 +187,26 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   @SupportedOptions(EXTENSION_VERSION)
   private class TestProcessor extends AbstractProcessor {
 
+    private final Class<?> extensionClass;
     private ExtensionDeclaration declaration;
     private DefaultExtensionLoadingContext ctx;
+
+    public TestProcessor(Class<?> extensionClass) {
+      this.extensionClass = extensionClass;
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
       if (declaration == null) {
         ExtensionDescriptionDocumenter documenter = new ExtensionDescriptionDocumenter(processingEnv, roundEnv);
-        Set<? extends Element> extensionElements = roundEnv.getElementsAnnotatedWith(Extension.class);
-        assertThat(extensionElements, hasSize(1));
-        Element extension = extensionElements.iterator().next();
+        Element extension = roundEnv.getElementsAnnotatedWith(Extension.class).stream()
+            .filter(element -> element.getSimpleName().contentEquals(extensionClass.getSimpleName()))
+            .findFirst()
+            .get();
+
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
-        DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(TestExtensionWithDocumentation.class,
-                                                                                   "1.0.0-dev");
+        DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
         declaration = loader.declare(ctx).getDeclaration();
         documenter.document(declaration, (TypeElement) extension);
       }
@@ -171,4 +227,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     return ops.stream().filter(operationModel -> operationModel.getName().equals(opeName)).findAny().orElse(null);
   }
 
+  private boolean isSingleConfigTest() {
+    return SINGLE_CONFIG.equals(name);
+  }
 }
