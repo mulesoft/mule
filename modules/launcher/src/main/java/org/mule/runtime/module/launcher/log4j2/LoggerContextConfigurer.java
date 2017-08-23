@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -185,18 +186,13 @@ final class LoggerContextConfigurer {
 
     if (context.getConfigLocation() == null) {
       addDefaultAppender(context, logFile.getAbsolutePath());
-    } else if (isUrlInsideDirectory(context.getConfigFile(), MuleContainerBootstrapUtils.getMuleConfDir())
-        && !hasFileAppender(context)
+    } else if (!hasFileAppender(context) && isUrlInsideDirectory(context.getConfigFile(), getMuleConfDir())
         || context.getConfiguration().getAppenders().isEmpty()) {
       // If the artifact logging is configured using the global config file and there is no file appender for the artifact, then
-      // configure a default one. Same if there is no appended configured
-      addDefaultAppenderWithNoConsole(context, logFile);
+      // configure a default one. Same if there is no appender configured
+      addDefaultAppender(context, logFile.getAbsolutePath());
+      removeConsoleAppender(context);
     }
-  }
-
-  private void addDefaultAppenderWithNoConsole(MuleLoggerContext context, File logFile) {
-    addDefaultAppender(context, logFile.getAbsolutePath());
-    removeConsoleAppender(context);
   }
 
   private void removeConsoleAppender(LoggerContext context) {
