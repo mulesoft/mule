@@ -12,9 +12,10 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-@Extension(
-    name = "Privileged",
-    description = "Extension for testing purposes")
+/**
+ * Extension for testing purposes
+ */
+@Extension(name = "Privileged")
 @Operations({PrivilegedOperation.class})
 public class PrivilegedExtension {
 

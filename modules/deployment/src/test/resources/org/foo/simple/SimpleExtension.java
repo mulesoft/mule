@@ -14,9 +14,10 @@ import org.mule.runtime.service.test.FooService;
 
 import javax.inject.Inject;
 
-@Extension(
-    name = "Simple",
-    description = "Extension for testing purposes")
+/**
+ * Extension for testing purposes
+ */
+@Extension(name = "Simple")
 @Operations({SimpleOperation.class})
 public class SimpleExtension {
 
