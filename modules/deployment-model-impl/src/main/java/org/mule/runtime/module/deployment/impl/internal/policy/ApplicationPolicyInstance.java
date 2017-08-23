@@ -11,6 +11,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 
 import java.util.Optional;
 
@@ -28,6 +29,11 @@ public interface ApplicationPolicyInstance extends Initialisable, Disposable {
    * @return order that must be used to apply the policy
    */
   int getOrder();
+
+  /**
+   * @return policy template from which the instance will be created
+   */
+  PolicyTemplate getPolicyTemplate();
 
   /**
    * @return policy to intercept the source execution

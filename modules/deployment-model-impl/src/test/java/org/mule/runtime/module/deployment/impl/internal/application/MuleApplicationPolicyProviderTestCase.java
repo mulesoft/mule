@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,11 +49,14 @@ import org.junit.rules.ExpectedException;
 @SmallTest
 public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase {
 
-  private static final String POLICY_NAME = "testPolicy";
+  private static final String POLICY_NAME1 = "testPolicy1";
+  private static final String POLICY_NAME2 = "testPolicy2";
   private static final String POLICY_ID1 = "policyId1";
   private static final String POLICY_ID2 = "policyId2";
+  private static final String POLICY_ID3 = "policyId3";
   private static final int ORDER_POLICY1 = 1;
   private static final int ORDER_POLICY2 = 2;
+  private static final int ORDER_POLICY3 = 3;
 
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory = mock(PolicyInstanceProviderFactory.class);
   private final PolicyTemplateFactory policyTemplateFactory = mock(PolicyTemplateFactory.class);
@@ -64,15 +68,21 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
       new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap(), mock(File.class));
   private final PolicyParametrization parametrization2 =
       new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap(), mock(File.class));
-  private final PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_NAME);
+  private final PolicyParametrization parametrization3 =
+      new PolicyParametrization(POLICY_ID3, pointcut, ORDER_POLICY3, emptyMap(), mock(File.class));
+  private final PolicyTemplateDescriptor policyTemplateDescriptor1 = new PolicyTemplateDescriptor(POLICY_NAME1);
+  private final PolicyTemplateDescriptor policyTemplateDescriptor2 = new PolicyTemplateDescriptor(POLICY_NAME2);
   private final PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
-  private PolicyTemplate policyTemplate = mock(PolicyTemplate.class);
+  private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
+  private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
   private final ApplicationPolicyInstance applicationPolicyInstance1 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance2 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstance3 = mock(ApplicationPolicyInstance.class);
   private final Policy policy1 = mock(Policy.class, POLICY_ID1);
   private final Policy policy2 = mock(Policy.class, POLICY_ID2);
   private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
-  private ArtifactClassLoader policyClassLoader = mock(ArtifactClassLoader.class);
+  private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
+  private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -82,35 +92,52 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     policyProvider.setApplication(application);
     when(application.getRegionClassLoader()).thenReturn(regionClassLoader);
 
-    policyClassLoader = null;
-    when(policyTemplate.getArtifactClassLoader()).thenReturn(policyClassLoader);
+    policyClassLoader1 = null;
+    when(policyTemplate1.getArtifactClassLoader()).thenReturn(policyClassLoader1);
+    when(policyTemplate2.getArtifactClassLoader()).thenReturn(policyClassLoader2);
 
-    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor)).thenReturn(policyTemplate);
+    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor1)).thenReturn(policyTemplate1);
+    when(policyTemplateFactory.createArtifact(application, policyTemplateDescriptor2)).thenReturn(policyTemplate2);
     when(applicationPolicyInstance1.getPointcut()).thenReturn(pointcut);
     when(applicationPolicyInstance1.getOrder()).thenReturn(ORDER_POLICY1);
     when(applicationPolicyInstance1.getOperationPolicy()).thenReturn(of(policy1));
     when(applicationPolicyInstance1.getSourcePolicy()).thenReturn(of(policy1));
+    when(applicationPolicyInstance1.getPolicyTemplate()).thenReturn(policyTemplate1);
 
     when(applicationPolicyInstance2.getPointcut()).thenReturn(pointcut);
     when(applicationPolicyInstance2.getOrder()).thenReturn(ORDER_POLICY2);
     when(applicationPolicyInstance2.getOperationPolicy()).thenReturn(of(policy2));
     when(applicationPolicyInstance2.getSourcePolicy()).thenReturn(of(policy2));
+    when(applicationPolicyInstance2.getPolicyTemplate()).thenReturn(policyTemplate1);
 
-    when(policyInstanceProviderFactory.create(application, policyTemplate, parametrization1)).thenReturn(
-                                                                                                         applicationPolicyInstance1);
-    when(policyInstanceProviderFactory.create(application, policyTemplate, parametrization2)).thenReturn(
-                                                                                                         applicationPolicyInstance2);
+    when(applicationPolicyInstance3.getPointcut()).thenReturn(pointcut);
+    when(applicationPolicyInstance3.getOrder()).thenReturn(ORDER_POLICY3);
+    when(applicationPolicyInstance3.getOperationPolicy()).thenReturn(empty());
+    when(applicationPolicyInstance3.getSourcePolicy()).thenReturn(empty());
+    when(applicationPolicyInstance3.getPolicyTemplate()).thenReturn(policyTemplate2);
 
-    policyTemplateDescriptor.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME).setGroupId("test")
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization1)).thenReturn(
+                                                                                                          applicationPolicyInstance1);
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization2)).thenReturn(
+                                                                                                          applicationPolicyInstance2);
+    when(policyInstanceProviderFactory.create(application, policyTemplate2, parametrization3)).thenReturn(
+                                                                                                          applicationPolicyInstance3);
+
+    policyTemplateDescriptor1.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME1).setGroupId("test")
         .setVersion("1.0").build());
-    when(policyTemplate.getDescriptor()).thenReturn(policyTemplateDescriptor);
+    policyTemplateDescriptor2.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME2).setGroupId("test")
+        .setVersion("2.0").build());
+
+    when(policyTemplate1.getDescriptor()).thenReturn(policyTemplateDescriptor1);
+    when(policyTemplate2.getDescriptor()).thenReturn(policyTemplateDescriptor2);
+
   }
 
   @Test
   public void addsOperationPolicy() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -122,7 +149,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPolicyWithPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -133,8 +160,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPoliciesInOrder() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -147,8 +174,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPoliciesDisordered() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -161,8 +188,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPoliciesWithAlwaysAcceptingPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -174,8 +201,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   @Test
   public void addsOperationPoliciesWithAlwaysRejectingPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false).thenReturn(false);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -186,8 +213,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPoliciesWithPointCutAcceptingThenRejecting() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(false);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -199,8 +226,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsOperationPoliciesWithPointCutRejectingThenAccepting() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findOperationParameterizedPolicies(policyPointcutParameters);
 
@@ -212,7 +239,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePolicy() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -224,7 +251,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePolicyWithPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -235,8 +262,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePoliciesInOrder() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -249,8 +276,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePoliciesDisordered() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -263,8 +290,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePoliciesWithAlwaysAcceptingPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -276,8 +303,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   @Test
   public void addsSourcePoliciesWithAlwaysRejectingPointCut() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false).thenReturn(false);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -288,8 +315,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePoliciesWithPointCutAcceptingThenRejecting() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(true).thenReturn(false);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -301,8 +328,8 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   public void addsSourcePoliciesWithPointCutRejectingThenAccepting() throws Exception {
     when(pointcut.matches(policyPointcutParameters)).thenReturn(false).thenReturn(true);
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(policyPointcutParameters);
 
@@ -312,41 +339,52 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
 
   @Test
   public void reusesPolicyTemplates() throws Exception {
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
-    verify(policyTemplateFactory).createArtifact(application, policyTemplateDescriptor);
+    verify(policyTemplateFactory).createArtifact(application, policyTemplateDescriptor1);
   }
 
   @Test
   public void maintainsPolicyTemplatesWhileUsed() throws Exception {
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     assertThat(policyProvider.removePolicy(parametrization1.getId()), is(true));
-    verify(policyTemplate, never()).dispose();
+    verify(policyTemplate1, never()).dispose();
   }
 
   @Test
   public void disposesPolicyTemplatesWhenNotUsedAnymore() throws Exception {
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization2);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
 
     assertThat(policyProvider.removePolicy(parametrization1.getId()), is(true));
     assertThat(policyProvider.removePolicy(parametrization2.getId()), is(true));
 
-    verify(policyTemplate).dispose();
-    verify(regionClassLoader).removeClassLoader(policyClassLoader);
+    verify(policyTemplate1).dispose();
+    verify(regionClassLoader).removeClassLoader(policyClassLoader1);
+  }
+
+  @Test
+  public void disposesPolicyTemplatesWhenNotUsedAnymoreMultipleTemplates() throws Exception {
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor2, parametrization3);
+
+    assertThat(policyProvider.removePolicy(parametrization3.getId()), is(true));
+
+    verify(policyTemplate2).dispose();
+    verify(regionClassLoader).removeClassLoader(policyClassLoader2);
   }
 
   @Test
   public void detectsDuplicatePolicyId() throws Exception {
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
 
     expectedException.expect(PolicyRegistrationException.class);
     expectedException.expectMessage(createPolicyRegistrationError(POLICY_ID1));
     expectedException.expectCause(isA(IllegalArgumentException.class));
 
-    policyProvider.addPolicy(policyTemplateDescriptor, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
   }
 }
