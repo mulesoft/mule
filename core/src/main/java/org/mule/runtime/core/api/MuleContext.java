@@ -185,7 +185,7 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * Returns the date when the server was started.
-   * 
+   *
    * @return the date when the server was started.
    */
   long getStartDate();
@@ -199,6 +199,15 @@ public interface MuleContext extends Lifecycle {
   boolean isStopping();
 
   boolean isStarting();
+
+  /**
+   * Runs a command synchronized by the lock for the context's lifecycle.
+   * <p>
+   * Use this method to run code that depends on this context's lifecycle state not changing while the command is running.
+   *
+   * @param command the command to run with the lock for this conext's lifecycle taken.
+   */
+  void withLifecycleLock(Runnable command);
 
   MuleClient getClient();
 
@@ -290,14 +299,14 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * @return the callbacks for notifying when a flow call from another flow is started or completed.
-   * 
+   *
    * @since 3.8.0
    */
   FlowTraceManager getFlowTraceManager();
 
   /**
    * @return the providers for additional context information for exceptions.
-   * 
+   *
    * @since 3.8.0
    */
   Collection<ExceptionContextProvider> getExceptionContextProviders();
@@ -335,7 +344,7 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * @return a unique identifier for this context.
-   * 
+   *
    * @since 4.0
    */
   String getId();
