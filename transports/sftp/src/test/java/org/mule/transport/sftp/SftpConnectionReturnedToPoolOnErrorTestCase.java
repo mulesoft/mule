@@ -134,11 +134,11 @@ public class SftpConnectionReturnedToPoolOnErrorTestCase extends AbstractSftpFun
         }
 
         @Override
-        protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, List<String> stableFiles) throws Exception
+        protected boolean canProcessFile(String fileName, SftpClient client, boolean checkFileAge, long fileAge) throws Exception
         {
             sftpServerStopReq.countDown();
             sftpServerStopped.await();
-            return super.canProcessFile(fileName, client, fileAge, stableFiles);
+            return super.canProcessFile(fileName, client, checkFileAge, fileAge);
         }
 
         @Override

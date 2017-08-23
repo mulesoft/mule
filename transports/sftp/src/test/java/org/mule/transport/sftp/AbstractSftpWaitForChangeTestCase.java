@@ -119,7 +119,7 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         }
 
         @Override
-        protected List<String> getStableFiles(String[] fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
+        protected List<String> getStableFiles(List<String> fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
         {
             deleteSftpFile(FILE1_NAME);
             return super.getStableFiles(fileNames, client, sizeCheckDelayMs);
