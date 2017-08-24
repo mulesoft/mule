@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +125,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void dispose() {
     super.dispose();
+    if(store instanceof ObjectStorePartition) {
+      try {
+        ((ObjectStorePartition) store).close();
+      } catch (ObjectStoreException e) {
+        logger.warn("error closing object store: " + e.getMessage(), e);
+      }
+    }
     if (store != null) {
       disposeIfNeeded(store, logger);
       store = null;
