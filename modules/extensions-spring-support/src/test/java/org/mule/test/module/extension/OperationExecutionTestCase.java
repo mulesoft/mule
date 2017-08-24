@@ -32,6 +32,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -261,6 +262,14 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     String response = getPayloadAsString(runFlow("knockStaticInlineDoor").getMessage());
     assertKnockedDoor(response, "Inline Skyler");
   }
+
+  @Test
+  public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    runFlow("knockWithNullDoor");
+  }
+
 
   @Test
   public void operationWithDynamicInlinePojoParameter() throws Exception {

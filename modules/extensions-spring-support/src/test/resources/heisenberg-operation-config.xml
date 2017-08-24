@@ -153,6 +153,10 @@
         <heisenberg:knock knockedDoor="door"/>
     </flow>
 
+    <flow name="knockWithNullDoor">
+        <heisenberg:knock knockedDoor="#[null]"/>
+    </flow>
+
     <flow name="knockDynamicTopLevelDoor">
         <heisenberg:knock knockedDoor="dynamicDoor"/>
     </flow>

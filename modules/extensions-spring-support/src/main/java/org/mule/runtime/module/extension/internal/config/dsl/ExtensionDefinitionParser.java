@@ -92,6 +92,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredExpressionParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
@@ -640,15 +641,18 @@ public abstract class ExtensionDefinitionParser {
 
     ValueResolver resolver;
 
-    final Class<Object> expectedClass = getType(expectedType);
+    final Class<Object> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 
-    boolean isExpression = isExpression(value, parser);
-
-    resolver = isExpression
-        ? getExpressionBasedValueResolver(expectedType, (String) value, modelProperties, expectedClass)
-        : getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,
-                                 expectedClass);
-
+    if (isExpression(value, parser)) {
+      final String expression = (String) value;
+      resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
+      if (required) {
+        resolver = new RequiredExpressionParameterValueResolverWrapper(resolver, parameterName, expression);
+      }
+    } else {
+      resolver = getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,
+                                        expectedClass);
+    }
 
     if (resolver.isDynamic() && expressionSupport == NOT_SUPPORTED) {
       throw new IllegalArgumentException(
