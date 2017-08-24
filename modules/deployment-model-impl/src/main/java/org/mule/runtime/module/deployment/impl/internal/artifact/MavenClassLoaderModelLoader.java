@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;

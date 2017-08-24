@@ -4,28 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.plugin;
+package org.mule.runtime.deployment.model.api.artifact;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 
 /**
- * Constants to be consumed across modules to generate and consume a proper {@link MulePluginModel} when working with
+ * Constants to be consumed across modules to generate and consume a proper {@link org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel} when working with
  * the {@link MulePluginModel#getExtensionModelLoaderDescriptor()}.
  *
  * @since 4.0
  */
-public final class MavenClassLoaderConstants {
+public final class ArtifactDescriptorConstants {
 
   /**
-   * ID used to populate a {@link MuleArtifactLoaderDescriptor#getId()}
+   * Default descriptor loader ID for Mule artifacts
    */
-  // TODO(pablo.kraan): loader - move this constant somewhere else
   public static final String MULE_LOADER_ID = "mule";
 
   /**
-   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of the
-   * current plugin.
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported packages of a given artifact.
    */
   public static final String EXPORTED_PACKAGES = "exportedPackages";
 
@@ -34,8 +32,7 @@ public final class MavenClassLoaderConstants {
   public static final String PRIVILEGED_ARTIFACTS_IDS = "privilegedArtifactIds";
 
   /**
-   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of the
-   * current plugin.
+   * Property to fill the {@link MuleArtifactLoaderDescriptor#getAttributes()} which defines the exported resources of a given artifact.
    */
   public static final String EXPORTED_RESOURCES = "exportedResources";
 
