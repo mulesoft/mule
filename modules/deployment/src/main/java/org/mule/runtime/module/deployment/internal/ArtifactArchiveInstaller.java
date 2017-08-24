@@ -98,13 +98,13 @@ public class ArtifactArchiveInstaller {
   }
 
   /**
-   * Desintalls an artifact from the mule container installation.
+   * Uninstalls an artifact from the Mule container installation.
    *
    * It will remove the artifact folder and the anchor file related
    * 
-   * @param artifactName name of the artifact to be uninstall.
+   * @param artifactName name of the artifact to be uninstalled.
    */
-  public void desinstallArtifact(final String artifactName) {
+  void uninstallArtifact(final String artifactName) {
     try {
       final File artifactDir = new File(artifactParentDir, artifactName);
       deleteDirectory(artifactDir);
@@ -126,7 +126,7 @@ public class ArtifactArchiveInstaller {
     return new File(artifactParentDir, String.format("%s%s", artifactName, MuleDeploymentService.ARTIFACT_ANCHOR_SUFFIX));
   }
 
-  public void createAnchorFile(String artifactName) throws IOException {
+  void createAnchorFile(String artifactName) throws IOException {
     // save artifact's state in the marker file
     File marker = getArtifactAnchorFile(artifactName);
     writeStringToFile(marker, ANCHOR_FILE_BLURB);
