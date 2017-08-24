@@ -28,11 +28,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Contains reusable methods not directly related to usage of the jsch sftp library
  * (they can be found in the class SftpClient).
- * 
+ *
  * @author Magnus Larsson
  */
 public class SftpReceiverRequesterUtil
 {
+
     private transient Log logger = LogFactory.getLog(getClass());
 
     private final SftpConnector connector;
@@ -120,7 +121,7 @@ public class SftpReceiverRequesterUtil
 
                 if (checkFileAge)
                 {
-                    if(isOldFile(file, client, fileAge))
+                    if (isOldFile(file, client, fileAge))
                     {
                         completedFiles.add(file);
                         if (onlyGetTheFirstOne)
@@ -224,7 +225,7 @@ public class SftpReceiverRequesterUtil
             String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
 
             SftpInputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
-                endpoint);
+                                                     endpoint);
 
             // TODO ML FIX. Refactor to util-class...
             int idx = fileName.lastIndexOf('/');
@@ -241,7 +242,7 @@ public class SftpReceiverRequesterUtil
             else
             {
                 return archiveFileUsingTempDirs(archive, archiveTmpReceivingDir, archiveTmpSendingDir, is,
-                    fileNamePart, archiveFile);
+                                                fileNamePart, archiveFile);
             }
         }
 
@@ -283,8 +284,10 @@ public class SftpReceiverRequesterUtil
                 logger.info("Creates " + archiveTmpReceivingFolder.getAbsolutePath());
             }
             if (!archiveTmpReceivingFolder.mkdirs())
+            {
                 throw new IOException("Failed to create archive-tmp-receiving-folder: "
                                       + archiveTmpReceivingFolder);
+            }
         }
 
         File archiveTmpSendingFolder = FileUtils.newFile(archive + '/' + archiveTmpSendingDir);
@@ -296,8 +299,10 @@ public class SftpReceiverRequesterUtil
                 logger.info("Creates " + archiveTmpSendingFolder.getAbsolutePath());
             }
             if (!archiveTmpSendingFolder.mkdirs())
+            {
                 throw new IOException("Failed to create archive-tmp-sending-folder: "
                                       + archiveTmpSendingFolder);
+            }
         }
 
         if (logger.isInfoEnabled())
@@ -334,7 +339,9 @@ public class SftpReceiverRequesterUtil
                 logger.info("Creates " + archiveFolder.getAbsolutePath());
             }
             if (!archiveFolder.mkdirs())
+            {
                 throw new IOException("Failed to create archive-folder: " + archiveFolder);
+            }
         }
 
         if (logger.isInfoEnabled())
@@ -354,15 +361,15 @@ public class SftpReceiverRequesterUtil
     /**
      * Filters the given files evaluating if their size changed after <code>sizeCheckDelayMs</code>.
      *
-     * @param fileNames the name of the files to evaluate
-     * @param client an SftpClient
+     * @param fileNames        the name of the files to evaluate
+     * @param client           an SftpClient
      * @param sizeCheckDelayMs the delay time in milliseconds.
      * @return a list with the files whose size didn't change after the <code>sizeCheckDelayMs<code/>.
      * @throws InterruptedException if the thread is interrupted during the delay.
      */
-    List<String> getStableFiles(List <String> fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
+    List<String> getStableFiles(List<String> fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
     {
-        List <String> stableFiles = new ArrayList<>(fileNames.size());
+        List<String> stableFiles = new ArrayList<>(fileNames.size());
         Map<String, Long> fileSizesBeforeDelay = getFileTimeStamps(fileNames, client);
         sleep(sizeCheckDelayMs);
         Map<String, Long> fileSizesAfterDelay = getFileTimeStamps(fileNames, client);
@@ -380,7 +387,7 @@ public class SftpReceiverRequesterUtil
         return stableFiles;
     }
 
-    private Map <String, Long> getFileTimeStamps(List <String> fileNames, SftpClient client)
+    private Map<String, Long> getFileTimeStamps(List<String> fileNames, SftpClient client)
     {
         Map<String, Long> sizes = new HashMap<>();
 
@@ -447,7 +454,7 @@ public class SftpReceiverRequesterUtil
      * @param endpoint necessary to create the SftpUtil instance.
      * @return an SFTPUtil instance.
      */
-    protected SftpUtil createSftpUtil (ImmutableEndpoint endpoint)
+    protected SftpUtil createSftpUtil(ImmutableEndpoint endpoint)
     {
         return new SftpUtil(endpoint);
     }
