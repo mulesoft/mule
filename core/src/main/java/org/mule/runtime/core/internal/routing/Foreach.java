@@ -167,19 +167,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                  input -> TypedValue.of(input));
     } else if (DEFAULT_SPIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
       // Support EventBuilderConfigurerIterator currently used by Batch Module
-      EventBuilderConfigurerIterator configurerIterator = (EventBuilderConfigurerIterator) payloadValue;
-      return new Iterator<TypedValue<?>>() {
-
-        @Override
-        public boolean hasNext() {
-          return configurerIterator.hasNext();
-        }
-
-        @Override
-        public TypedValue<?> next() {
-          return TypedValue.of(configurerIterator.nextEventBuilderConfigurer());
-        }
-      };
+      return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
     } else {
       return splittingStrategy.split(request);
     }
@@ -238,4 +226,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     this.counterVariableName = counterVariableName;
   }
 
+  private static class EventBuilderConfigurerIteratorWrapper implements Iterator<TypedValue<?>> {
+
+    private final EventBuilderConfigurerIterator configurerIterator;
+
+    public EventBuilderConfigurerIteratorWrapper(EventBuilderConfigurerIterator configurerIterator) {
+      this.configurerIterator = configurerIterator;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return configurerIterator.hasNext();
+    }
+
+    @Override
+    public TypedValue<?> next() {
+      return TypedValue.of(configurerIterator.nextEventBuilderConfigurer());
+    }
+  }
 }
