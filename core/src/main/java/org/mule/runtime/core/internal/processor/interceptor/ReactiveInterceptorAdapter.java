@@ -38,6 +38,9 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -47,9 +50,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -172,7 +172,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
             if (t instanceof MessagingException) {
               throw new CompletionException(t);
             } else {
-              throw new CompletionException(createMessagingException(eventWithResolvedParams, t.getCause(),
+              throw new CompletionException(createMessagingException(eventWithResolvedParams,
+                                                                     t instanceof CompletionException ? t.getCause() : t,
                                                                      ((AnnotatedObject) component)));
             }
           })
