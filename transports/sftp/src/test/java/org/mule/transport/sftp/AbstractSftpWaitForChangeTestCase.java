@@ -19,7 +19,7 @@ import org.mule.tck.probe.Prober;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -109,14 +109,20 @@ public abstract class AbstractSftpWaitForChangeTestCase extends AbstractSftpFunc
         }
 
         @Override
-        protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs) throws Exception
+        boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
         {
             if (FILE1_NAME.equals(fileName))
             {
-                deleteSftpFile(fileName);
+                deleteSftpFile(FILE1_NAME);
             }
+            return super.isOldFile(fileName, client, fileAge);
+        }
 
-            return super.canProcessFile(fileName, client, fileAge, sizeCheckDelayMs);
+        @Override
+        protected List<String> getStableFiles(List<String> fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
+        {
+            deleteSftpFile(FILE1_NAME);
+            return super.getStableFiles(fileNames, client, sizeCheckDelayMs);
         }
 
         @Override
