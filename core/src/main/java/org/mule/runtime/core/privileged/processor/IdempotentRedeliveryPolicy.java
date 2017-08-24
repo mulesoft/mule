@@ -125,7 +125,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void dispose() {
     super.dispose();
-    if(store instanceof ObjectStorePartition) {
+    if (store instanceof ObjectStorePartition) {
       try {
         ((ObjectStorePartition) store).close();
       } catch (ObjectStoreException e) {
