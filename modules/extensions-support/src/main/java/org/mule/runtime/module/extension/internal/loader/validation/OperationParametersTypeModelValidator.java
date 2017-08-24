@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -50,14 +50,14 @@ public class OperationParametersTypeModelValidator implements ExtensionModelVali
               problemsReporter
                   .addError(new Problem(model, format("Operation '%s' contains parameter '%s' of type '%s' which is forbidden",
                                                       model.getName(), parameterModel.getName(),
-                                                      getTypeId(parameterType).get())));
+                                                      getId(parameterType).get())));
             }
           }
         });
       }
 
       private boolean isForbiddenType(MetadataType parameterType) {
-        return getTypeId(parameterType).map(forbiddenTypes::contains).orElse(false);
+        return getId(parameterType).map(forbiddenTypes::contains).orElse(false);
       }
 
     }.walk(extensionModel);

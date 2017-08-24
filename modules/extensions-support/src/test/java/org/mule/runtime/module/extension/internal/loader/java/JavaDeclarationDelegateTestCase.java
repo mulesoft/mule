@@ -31,6 +31,7 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DEFAULT_CONNECTION_PROVIDER_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
@@ -43,6 +44,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -398,8 +400,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertParameter(parameters, "recipe", "",
                     TYPE_BUILDER.objectType()
-                        .id(Map.class.getName())
-                        .openWith(TYPE_BUILDER.numberType().id(Long.class.getName()))
+                        .openWith(TYPE_BUILDER.numberType().integer().with(new ClassInformationAnnotation(Long.class)))
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Long.class)))
                         .build(),
                     false, SUPPORTED, null);
@@ -408,7 +409,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertParameter(parameters, "nextDoor", "", toMetadataType(KnockeableDoor.class), false, SUPPORTED, null);
     assertParameter(parameters, "candidateDoors", "",
-                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                    TYPE_BUILDER.objectType()
                         .openWith((objectTypeBuilder(KnockeableDoor.class)).build())
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, KnockeableDoor.class)))
                         .build(),
@@ -425,33 +426,34 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "worksAtDEA", "", toMetadataType(boolean.class), false, SUPPORTED, valueOf(TRUE));
     assertParameter(parameters, "lovesMinerals", "", toMetadataType(boolean.class), true, SUPPORTED, null);
 
-    assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, TYPE_BUILDER.numberType().id(Long.class.getName())),
+    assertParameter(parameters, "monthlyIncomes", "", arrayOf(List.class, longTypeBuilder()),
                     true, SUPPORTED, null);
     assertParameter(parameters, "labeledRicin", "",
-                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                    TYPE_BUILDER.objectType()
                         .openWith(objectTypeBuilder(Ricin.class))
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Ricin.class)))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "deathsBySeasons", "",
-                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                    TYPE_BUILDER.objectType()
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, List.class)))
                         .openWith(TYPE_BUILDER.arrayType()
-                            .id(List.class.getName())
-                            .of(TYPE_BUILDER.stringType()
-                                .id(String.class
-                                    .getName())))
+                            .of(TYPE_BUILDER.stringType()))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "weaponValueMap", "",
-                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                    TYPE_BUILDER.objectType()
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Weapon.class)))
                         .openWith(TYPE_LOADER.load(Weapon.class))
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "healthProgressions", "",
-                    TYPE_BUILDER.arrayType().id(List.class.getName()).of(TYPE_LOADER.load(HealthStatus.class)).build(), false,
+                    TYPE_BUILDER.arrayType().of(TYPE_LOADER.load(HealthStatus.class)).build(), false,
                     SUPPORTED, null);
+  }
+
+  private NumberTypeBuilder longTypeBuilder() {
+    return TYPE_BUILDER.numberType().integer().with(new ClassInformationAnnotation(Long.class));
   }
 
   private void assertExtensionProperties(ExtensionDeclaration extensionDeclaration, String expectedName) {
@@ -622,7 +624,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     operation = getOperation(extensionDeclaration, GET_MEDICAL_HISTORY);
     assertParameter(operation.getAllParameters(), "healthByYear", "",
-                    TYPE_BUILDER.objectType().id(Map.class.getName())
+                    TYPE_BUILDER.objectType()
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, HealthStatus.class)))
                         .openWith(TYPE_LOADER.load(HealthStatus.class))
                         .build(),
@@ -775,10 +777,20 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertThat(param.getName(), equalTo(name));
     assertThat(param.getDescription(), equalTo(description));
-    assertThat(param.getType(), is(metadataType));
+    assertParameterType(metadataType, param);
     assertThat(param.isRequired(), is(required));
     assertThat(param.getExpressionSupport(), is(expressionSupport));
     assertThat(param.getDefaultValue(), equalTo(defaultValue));
+  }
+
+  private void assertParameterType(MetadataType metadataType, ParameterDeclaration param) {
+    ClassInformationAnnotation typeInfo = metadataType.getAnnotation(ClassInformationAnnotation.class).orElse(null);
+    if (typeInfo != null) {
+      ClassInformationAnnotation paramTypeInfo = param.getType().getAnnotation(ClassInformationAnnotation.class).orElse(null);
+      assertThat(typeInfo.getClassname(), equalTo(paramTypeInfo.getClassname()));
+    } else {
+      assertThat(getId(metadataType), equalTo(getId(param.getType())));
+    }
   }
 
   private void assertConnected(ExecutableComponentDeclaration declaration, boolean connected) {
@@ -795,7 +807,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private MetadataType listOfString() {
-    return TYPE_BUILDER.arrayType().id(List.class.getName()).of(TYPE_BUILDER.stringType().id(String.class.getName())).build();
+    return TYPE_BUILDER.arrayType().of(TYPE_BUILDER.stringType()).with(new ClassInformationAnnotation(List.class)).build();
   }
 
   protected void assertModelProperties(ExtensionDeclaration extensionDeclaration) {

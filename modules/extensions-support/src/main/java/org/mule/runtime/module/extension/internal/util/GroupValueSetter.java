@@ -26,9 +26,6 @@ import java.util.List;
  * An implementation of {@link ValueSetter} for parameter groups. Parameter groups are a set of parameters defined inside a Pojo
  * in order to reference them as a group and avoid code repetition. The parameter groups are defined by applying the
  * {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} annotation to a field.
- * <p/>
- * This {@link ValueSetter} knows how to map a {@link ResolverSetResult} to an object which acts as a group. Because group nesting
- * is allowed, this class is a composite with a {@link #childSetters} collection.
  *
  * @since 3.7.0
  */

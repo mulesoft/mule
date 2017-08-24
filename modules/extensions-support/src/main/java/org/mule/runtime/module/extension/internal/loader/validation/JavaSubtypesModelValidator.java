@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -43,8 +44,12 @@ public final class JavaSubtypesModelValidator implements ExtensionModelValidator
                                            ProblemsReporter problemsReporter) {
     List<String> abstractSubtypes = new LinkedList<>();
     for (Set<ObjectType> subtypes : typesMapping.values()) {
-      abstractSubtypes.addAll(subtypes.stream().filter(s -> !isInstantiable(s))
-          .map(ExtensionMetadataTypeUtils::getId).collect(toList()));
+      abstractSubtypes.addAll(subtypes.stream()
+          .filter(s -> !isInstantiable(s))
+          .map(ExtensionMetadataTypeUtils::getId)
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .collect(toList()));
     }
 
     if (!abstractSubtypes.isEmpty()) {

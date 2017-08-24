@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.util.Pair;
+import org.mule.runtime.api.util.Pair;
 
 import java.util.Map;
 

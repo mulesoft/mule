@@ -412,7 +412,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(Iterator.class.getName()));
+    assertThat(getId(param).get(), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, TYPE_LOADER.load(Animal.class));
   }
 
@@ -423,7 +423,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(Iterator.class.getName()));
+    assertThat(getId(param).get(), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, personType);
   }
 
@@ -589,7 +589,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor<OperationModel> descriptor = result.get();
     MetadataType param = descriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertThat(getId(param), is(List.class.getName()));
+    assertThat(getId(param).get(), is(List.class.getName()));
     return param;
   }
 

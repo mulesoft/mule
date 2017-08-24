@@ -613,7 +613,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private void createObjectValueFromType(ObjectType objectType, ParameterObjectValue.Builder objectValue, ConfigLine config,
                                          DslElementSyntax paramDsl) {
 
-    objectValue.ofType(getId(objectType));
+    getId(objectType).ifPresent(objectValue::ofType);
     copyExplicitAttributes(config.getConfigAttributes(), objectValue);
 
     config.getChildren().forEach(fieldConfig -> objectType.getFields().stream()

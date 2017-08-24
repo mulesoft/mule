@@ -24,18 +24,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.TypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.metadata.message.MessageMetadataType;
@@ -68,9 +68,9 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
@@ -129,15 +129,16 @@ public final class ExtensionsTestUtils {
   }
 
   public static ArrayType arrayOf(Class<? extends Collection> clazz, TypeBuilder itemType) {
-    ArrayTypeBuilder arrayTypeBuilder = TYPE_BUILDER.arrayType();
-    arrayTypeBuilder.id(clazz.getName());
-    arrayTypeBuilder.of(itemType);
-
-    return arrayTypeBuilder.build();
+    return TYPE_BUILDER.arrayType()
+        .of(itemType)
+        .with(new ClassInformationAnnotation(clazz))
+        .build();
   }
 
-  public static ObjectType dictionaryOf(Class<? extends Map> clazz, TypeBuilder<?> valueTypeBuilder) {
-    return TYPE_BUILDER.objectType().id(clazz.getName()).openWith(valueTypeBuilder).build();
+  public static ObjectType dictionaryOf(TypeBuilder<?> valueTypeBuilder) {
+    return TYPE_BUILDER.objectType().openWith(valueTypeBuilder)
+        .with(new ClassInformationAnnotation(Map.class))
+        .build();
   }
 
   public static TypeBuilder<?> objectTypeBuilder(Class<?> clazz) {
@@ -171,7 +172,7 @@ public final class ExtensionsTestUtils {
 
   public static void assertMessageType(MetadataType type, MetadataType payloadType, MetadataType attributesType) {
     assertThat(type, is(instanceOf(MessageMetadataType.class)));
-    assertThat(getTypeId(type).get(), is(Message.class.getName()));
+    assertThat(getId(type).get(), is(Message.class.getName()));
 
     MessageMetadataType messageType = (MessageMetadataType) type;
     assertThat(messageType.getPayloadType().get(), equalTo(payloadType));
@@ -180,7 +181,7 @@ public final class ExtensionsTestUtils {
 
   public static void assertMessageType(MetadataType type, Matcher payloadMatch, Matcher attributesMatcher) {
     assertThat(type, is(instanceOf(MessageMetadataType.class)));
-    assertThat(getTypeId(type).get(), is(Message.class.getName()));
+    assertThat(getId(type).get(), is(Message.class.getName()));
 
     MessageMetadataType messageType = (MessageMetadataType) type;
     assertThat(messageType.getPayloadType().get(), payloadMatch);
@@ -386,7 +387,6 @@ public final class ExtensionsTestUtils {
   public static void assertType(MetadataType metadataType, Class<?> expectedRawType,
                                 Class<? extends MetadataType> typeQualifier) {
     assertThat(metadataType, is(instanceOf(typeQualifier)));
-    assertThat(expectedRawType.isAssignableFrom(getType(metadataType)), is(true));
-
+    getType(metadataType).ifPresent(type -> assertThat(expectedRawType.isAssignableFrom(type), is(true)));
   }
 }

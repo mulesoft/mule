@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -124,7 +124,7 @@ final public class ExportedArtifactsCollector {
   }
 
   private void collectManuallyExportedPackages() {
-    extensionModel.getTypes().forEach(c -> exportedClasses.add(getType(c)));
+    extensionModel.getTypes().forEach(t -> getType(t).ifPresent(exportedClasses::add));
   }
 
   private void collectDefault() {

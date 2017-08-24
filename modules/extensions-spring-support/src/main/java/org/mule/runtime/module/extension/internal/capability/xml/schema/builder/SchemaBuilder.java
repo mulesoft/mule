@@ -98,8 +98,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,6 +106,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 /**
  * Builder class to generate a XSD schema that describes a {@link ExtensionModel}
@@ -400,7 +401,7 @@ public final class SchemaBuilder {
       private void visitEnum(StringType enumType) {
         attribute.setName(name);
 
-        String typeName = getId(enumType);
+        String typeName = getTypeId(enumType);
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
           attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else if (TransactionType.class.getName().equals(typeName)) {
@@ -478,7 +479,7 @@ public final class SchemaBuilder {
   }
 
   private String getTypeId(MetadataType type) {
-    return getId(type);
+    return getId(type).get();
   }
 
   /**

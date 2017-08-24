@@ -28,11 +28,13 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
+import org.mule.metadata.api.builder.StringTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.CollectionDataType;
@@ -157,11 +159,11 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     assertField("fruitLikeList", arrayOf(List.class, objectTypeBuilder(Fruit.class)), exposedFields);
     assertField("wildCardList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
     assertField("rawList", arrayOf(List.class, objectTypeBuilder(Object.class)), exposedFields);
-    assertField("wildCardMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class)),
+    assertField("wildCardMap", dictionaryOf(objectTypeBuilder(Object.class)),
                 exposedFields);
-    assertField("rawMap", dictionaryOf(Map.class, objectTypeBuilder(Object.class)),
+    assertField("rawMap", dictionaryOf(objectTypeBuilder(Object.class)),
                 exposedFields);
-    assertField("fruitLikeMap", dictionaryOf(Map.class, objectTypeBuilder(Fruit.class)),
+    assertField("fruitLikeMap", dictionaryOf(objectTypeBuilder(Fruit.class)),
                 exposedFields);
   }
 
@@ -172,8 +174,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     ArrayTypeBuilder arrayTypeBuilder = BaseTypeBuilder.create(JAVA)
         .arrayType()
-        .id(listClass.getName());
-    arrayTypeBuilder.of().numberType().id(Integer.class.getName());
+        .with(new ClassInformationAnnotation(listClass));
+    arrayTypeBuilder.of().numberType().integer();
 
     CollectionDataType dataType = (CollectionDataType) toDataType(arrayTypeBuilder.build());
 
@@ -189,7 +191,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     ObjectTypeBuilder objectTypeBuilder = BaseTypeBuilder
         .create(JAVA)
         .objectType()
-        .id(mapClass.getName());
+        .with(new ClassInformationAnnotation(Map.class));
+
     objectTypeBuilder.openWith().objectType().id(dateClass.getName());
 
     MapDataType dataType = (MapDataType) toDataType(objectTypeBuilder.build());
@@ -215,16 +218,13 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getDataTypeFromString() {
-    Class<String> stringClass = String.class;
-
-    ObjectTypeBuilder objectTypeBuilder = BaseTypeBuilder
+    StringTypeBuilder typeBuilder = BaseTypeBuilder
         .create(JAVA)
-        .objectType()
-        .id(stringClass.getName());
+        .stringType();
 
-    DataType dataType = toDataType(objectTypeBuilder.build());
+    DataType dataType = toDataType(typeBuilder.build());
 
-    assertThat(dataType.getType(), is(equalTo(stringClass)));
+    assertThat(dataType.getType(), is(equalTo(String.class)));
   }
 
   private void assertField(String name, MetadataType metadataType, Collection<Field> fields) {

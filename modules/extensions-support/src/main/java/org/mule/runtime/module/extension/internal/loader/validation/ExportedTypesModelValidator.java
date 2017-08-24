@@ -10,7 +10,8 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -25,7 +26,6 @@ import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.api.util.NameUtils;
 
 import java.util.Collection;
 import java.util.Set;
@@ -78,8 +78,12 @@ public final class ExportedTypesModelValidator implements ExtensionModelValidato
       return;
     }
 
-    String componentTypeName = NameUtils.getComponentModelTypeName(model);
-    Class<?> parameterType = getType(parameterMetadataType);
+    Class<?> parameterType = getType(parameterMetadataType).orElse(null);
+    if (parameterType == null) {
+      return;
+    }
+
+    String componentTypeName = getComponentModelTypeName(model);
     parameterMetadataType.accept(new MetadataTypeVisitor() {
 
       @Override

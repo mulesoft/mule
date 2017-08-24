@@ -54,7 +54,6 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Before;
@@ -112,19 +111,17 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private BaseTypeBuilder baseTypeBuilder = BaseTypeBuilder.create(JAVA);
 
   private MetadataType childTestList = baseTypeBuilder.arrayType()
-      .id(ArrayList.class.getName()).of(toMetadataType(ChildTest.class)).build();
+      .of(toMetadataType(ChildTest.class)).build();
 
   private MetadataType topLevelTestList = baseTypeBuilder.arrayType()
-      .id(ArrayList.class.getName()).of(toMetadataType(TopLevelTest.class)).build();
+      .of(toMetadataType(TopLevelTest.class)).build();
 
   private MetadataType childTestMap = baseTypeBuilder.objectType()
-      .id(HashMap.class.getName())
       .openWith(toMetadataType(ChildTest.class))
       .with(new ClassInformationAnnotation(HashMap.class, asList(String.class, ChildTest.class)))
       .build();
 
   private MetadataType topLevelMap = baseTypeBuilder.objectType()
-      .id(HashMap.class.getName())
       .openWith(toMetadataType(TopLevelTest.class))
       .with(new ClassInformationAnnotation(HashMap.class, asList(String.class, TopLevelTest.class)))
       .build();

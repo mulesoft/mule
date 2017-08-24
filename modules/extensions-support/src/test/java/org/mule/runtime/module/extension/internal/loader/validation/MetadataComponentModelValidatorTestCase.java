@@ -58,8 +58,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -244,7 +242,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     visitableMock(operationModel, sourceModel);
 
     dictionaryType = typeBuilder.objectType()
-        .id(HashMap.class.getName())
         .openWith(toMetadataType(Object.class))
         .build();
   }
@@ -290,7 +287,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   @Test
   public void operationReturnsDictionaryTypeWithPojoValue() {
     dictionaryType = typeBuilder.objectType()
-        .id(HashMap.class.getName())
         .openWith(toMetadataType(Apple.class)).build();
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
     mockMetadataResolverFactory(sourceModel,
@@ -342,7 +338,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void sourceReturnsArrayTypeOfObjectWithoutDefinedOutputResolver() {
-    arrayType = typeBuilder.arrayType().id(ArrayList.class.getName()).of(toMetadataType(Object.class)).build();
+    arrayType = typeBuilder.arrayType().of(toMetadataType(Object.class)).build();
     exception.expect(IllegalModelDefinitionException.class);
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", arrayType, false, emptySet()));
     validate(extensionModel, validator);
@@ -350,7 +346,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void sourceReturnsArrayTypeOfDictionaryWithObjectValue() {
-    arrayType = typeBuilder.arrayType().id(ArrayList.class.getName()).of(dictionaryType).build();
+    arrayType = typeBuilder.arrayType().of(dictionaryType).build();
     exception.expect(IllegalModelDefinitionException.class);
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", arrayType, false, emptySet()));
     validate(extensionModel, validator);
