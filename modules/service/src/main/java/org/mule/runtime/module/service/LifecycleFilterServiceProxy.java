@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterface
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.container.api.ServiceInvocationHandler;
+import org.mule.runtime.container.api.MuleInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
  * Proxies a {@link Service} instance to filter invocations of lifecycle methods from {@link Startable} and {@link Stoppable}
  * interfaces.
  */
-public class LifecycleFilterServiceProxy extends ServiceInvocationHandler {
+public class LifecycleFilterServiceProxy extends MuleInvocationHandler<Service> {
 
   /**
    * Creates a new proxy for the provided service instance.

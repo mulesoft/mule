@@ -21,35 +21,36 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Extends {@link InvocationHandler} to provide and expose metadata about the inner {@link Service} implementation.
+ * Extends {@link InvocationHandler} to provide and expose metadata about the inner object implementation.
  * <p>
- * This allows for nested {@link Service} {@link Proxy}ies to work as expected.
+ * This allows for nested object {@link Proxy}ies to work as expected.
  * 
  * @since 4.0
  */
-public abstract class ServiceInvocationHandler implements InvocationHandler {
+public abstract class MuleInvocationHandler<T> implements InvocationHandler {
 
-  private final Service service;
+  private final T innerObject;
 
   /**
    * Creates a new proxy for the provided service instance.
    *
-   * @param service service instance to wrap. Non null.
+   * @param innerObject object instance to wrap. Non null.
    */
-  protected ServiceInvocationHandler(Service service) {
-    checkArgument(service != null, "service cannot be null");
-    this.service = service;
+  protected MuleInvocationHandler(T innerObject) {
+    checkArgument(innerObject != null, "service cannot be null");
+    this.innerObject = innerObject;
   }
 
   /**
    * @return the methods declared in the implementation of the proxied service.
    */
-  protected Method[] getServiceImplementationDeclaredMethods() {
-    if (isProxyClass(getService().getClass()) && getInvocationHandler(getService()) instanceof ServiceInvocationHandler) {
-      return ((ServiceInvocationHandler) getInvocationHandler(getService())).getServiceImplementationDeclaredMethods();
+  protected Method[] getImplementationDeclaredMethods() {
+    if (isProxyClass(getProxiedObject().getClass())
+        && getInvocationHandler(getProxiedObject()) instanceof MuleInvocationHandler) {
+      return ((MuleInvocationHandler) getInvocationHandler(getProxiedObject())).getImplementationDeclaredMethods();
     } else {
       List<Method> methods = new LinkedList<>();
-      Class<?> clazz = getService().getClass();
+      Class<?> clazz = getProxiedObject().getClass();
       while (clazz != Object.class) {
         methods.addAll(asList(clazz.getDeclaredMethods()));
         clazz = clazz.getSuperclass();
@@ -65,11 +66,12 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
    * See {@link InvocationHandler#invoke(Object, Method, Object[])}
    */
   protected Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
-    if (isProxyClass(getService().getClass()) && getInvocationHandler(getService()) instanceof ServiceInvocationHandler) {
-      return ((ServiceInvocationHandler) getInvocationHandler(getService())).invoke(getService(), method, args);
+    if (isProxyClass(getProxiedObject().getClass())
+        && getInvocationHandler(getProxiedObject()) instanceof MuleInvocationHandler) {
+      return getInvocationHandler(getProxiedObject()).invoke(getProxiedObject(), method, args);
     } else {
       try {
-        return method.invoke(getService(), args);
+        return method.invoke(getProxiedObject(), args);
       } catch (InvocationTargetException ite) {
         // Unwrap target exception to ensure InvocationTargetException (in case of unchecked exceptions) or
         // UndeclaredThrowableException (in case of checked exceptions) is not thrown by Service instead of target exception.
@@ -79,9 +81,9 @@ public abstract class ServiceInvocationHandler implements InvocationHandler {
   }
 
   /**
-   * The proxied {@link Service}.
+   * The proxied object.
    */
-  protected Service getService() {
-    return service;
+  protected T getProxiedObject() {
+    return innerObject;
   }
 }
