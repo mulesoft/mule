@@ -496,7 +496,7 @@ public class SftpConnector extends AbstractInboundEndpointNameableConnector
     public void setFileAge(long fileAge)
     {
         this.fileAge = fileAge;
-        if(fileAge > 0)
+        if (fileAge > 0)
         {
             this.checkFileAge = true;
         }

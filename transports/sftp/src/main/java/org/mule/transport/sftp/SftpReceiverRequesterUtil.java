@@ -7,6 +7,7 @@
 package org.mule.transport.sftp;
 
 import static java.lang.String.format;
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.transport.sftp.notification.SftpNotifier;
@@ -150,7 +151,7 @@ public class SftpReceiverRequesterUtil
     }
 
     /**
-     * Allows to check if an SFTP Connection can be established.
+     * Checks if an SFTP Connection can be established.
      *
      * @throws Exception if the connection can not be established.
      */
@@ -357,20 +358,13 @@ public class SftpReceiverRequesterUtil
      * @param client an SftpClient
      * @param sizeCheckDelayMs the delay time in milliseconds.
      * @return a list with the files whose size didn't change after the <code>sizeCheckDelayMs<code/>.
-     * @throws InterruptedException
+     * @throws InterruptedException if the thread is interrupted during the delay.
      */
     List<String> getStableFiles(List <String> fileNames, SftpClient client, long sizeCheckDelayMs) throws InterruptedException
     {
         List <String> stableFiles = new ArrayList<>(fileNames.size());
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Perform size check with a delay of: " + sizeCheckDelayMs + " ms.");
-        }
-
-
         Map<String, Long> fileSizesBeforeDelay = getFileTimeStamps(fileNames, client);
-        Thread.sleep(sizeCheckDelayMs);
+        sleep(sizeCheckDelayMs);
         Map<String, Long> fileSizesAfterDelay = getFileTimeStamps(fileNames, client);
 
         for (Map.Entry<String, Long> sizeEntry : fileSizesBeforeDelay.entrySet())
@@ -400,7 +394,7 @@ public class SftpReceiverRequesterUtil
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug(format("Cannot check if size of file '%s' was modified or not", fileName));
+                    logger.debug(format("Cannot get the size of file '%s'", fileName));
                 }
             }
         }
