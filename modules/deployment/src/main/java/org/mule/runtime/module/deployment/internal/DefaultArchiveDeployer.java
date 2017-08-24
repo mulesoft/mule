@@ -346,7 +346,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
       artifacts.remove(artifact);
       deployer.undeploy(artifact);
-      artifactArchiveInstaller.desinstallArtifact(artifact.getArtifactName());
+      artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
 
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
