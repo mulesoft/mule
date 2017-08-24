@@ -8,18 +8,19 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.DefaultEventContext.fireAndForgetChild;
+import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
-import static org.mule.runtime.core.internal.util.ProcessingStrategyUtils.isSynchronousProcessing;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,7 +31,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
@@ -68,7 +68,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private Registry registry;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
-  private FlowConstruct flowConstruct;
+  private ProcessingStrategy processingStrategy;
 
   protected MessageProcessorChain delegate;
   private Scheduler scheduler;
@@ -88,7 +88,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void initialise() throws InitialisationException {
     Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
     if (rootContainer instanceof FlowConstruct) {
-      flowConstruct = (FlowConstruct) rootContainer;
+      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+    } else {
+      processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
     }
     if (delegate == null) {
       throw new InitialisationException(objectIsNull("delegate message processor"), this);
@@ -133,6 +135,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .transform(scheduleAsync(delegate))
                     .doOnNext(event -> fireAsyncCompleteNotification(event, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), e))
+                    .doOnError(throwable -> logger
+                        .warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
+                            + " . To handle this error include a <try> scope in the <async> scope.",
+                              throwable))
                     .subscribe(event -> asyncRequest.getContext().success(event),
                                throwable -> asyncRequest.getContext().error(throwable))))
             .subscribe(requestUnbounded()));
@@ -140,9 +146,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
 
   private ReactiveProcessor scheduleAsync(Processor delegate) {
-    if (!isSynchronousProcessing(flowConstruct) && flowConstruct instanceof Pipeline) {
+    if (!processingStrategy.isSynchronous()) {
       // If an async processing strategy is in use then use it to schedule async
-      return publisher -> from(publisher).transform(flowConstruct.getProcessingStrategy().onPipeline(delegate));
+      return publisher -> from(publisher).transform(processingStrategy.onPipeline(delegate));
     } else {
       // Otherwise schedule async processing using IO pool.
       return publisher -> from(publisher).transform(delegate).subscribeOn(reactorScheduler);
@@ -152,7 +158,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private InternalEvent asyncEvent(InternalEvent event) {
     // Clone event, make it async and remove ReplyToHandler
     return InternalEvent
-        .builder(fireAndForgetChild(event.getContext(), ofNullable(getLocation())), event)
+        .builder(child(event.getContext(), ofNullable(getLocation())), event)
         .replyToHandler(null)
         .session(new DefaultMuleSession(event.getSession())).build();
   }
