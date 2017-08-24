@@ -12251,7 +12251,7 @@
           "type": "Array",
           "annotations": {
             "classInformation": {
-              "classname": "[[I",
+              "classname": "int[][]",
               "hasDefaultConstructor": false,
               "isInterface": false,
               "isInstantiable": false,
@@ -12269,7 +12269,7 @@
             "type": "Array",
             "annotations": {
               "classInformation": {
-                "classname": "[I",
+                "classname": "int[]",
                 "hasDefaultConstructor": false,
                 "isInterface": false,
                 "isInstantiable": false,
@@ -12338,7 +12338,7 @@
                 "type": "Array",
                 "annotations": {
                   "classInformation": {
-                    "classname": "[[I",
+                    "classname": "int[][]",
                     "hasDefaultConstructor": false,
                     "isInterface": false,
                     "isInstantiable": false,
@@ -12356,7 +12356,7 @@
                   "type": "Array",
                   "annotations": {
                     "classInformation": {
-                      "classname": "[I",
+                      "classname": "int[]",
                       "hasDefaultConstructor": false,
                       "isInterface": false,
                       "isInstantiable": false,
@@ -20169,7 +20169,7 @@
                   "type": "Array",
                   "annotations": {
                     "classInformation": {
-                      "classname": "[Ljava.lang.StackTraceElement;",
+                      "classname": "java.lang.StackTraceElement[]",
                       "hasDefaultConstructor": false,
                       "isInterface": false,
                       "isInstantiable": false,
@@ -20289,7 +20289,7 @@
                   "type": "Array",
                   "annotations": {
                     "classInformation": {
-                      "classname": "[Ljava.lang.Throwable;",
+                      "classname": "java.lang.Throwable[]",
                       "hasDefaultConstructor": false,
                       "isInterface": false,
                       "isInstantiable": false,
@@ -20345,7 +20345,7 @@
             "type": "Array",
             "annotations": {
               "classInformation": {
-                "classname": "[Ljava.lang.StackTraceElement;",
+                "classname": "java.lang.StackTraceElement[]",
                 "hasDefaultConstructor": false,
                 "isInterface": false,
                 "isInstantiable": false,
@@ -20465,7 +20465,7 @@
             "type": "Array",
             "annotations": {
               "classInformation": {
-                "classname": "[Ljava.lang.Throwable;",
+                "classname": "java.lang.Throwable[]",
                 "hasDefaultConstructor": false,
                 "isInterface": false,
                 "isInstantiable": false,
@@ -20540,7 +20540,7 @@
                     "type": "Array",
                     "annotations": {
                       "classInformation": {
-                        "classname": "[Ljava.lang.StackTraceElement;",
+                        "classname": "java.lang.StackTraceElement[]",
                         "hasDefaultConstructor": false,
                         "isInterface": false,
                         "isInstantiable": false,
@@ -23572,7 +23572,7 @@
       "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes",
         "classInformation": {
-          "classname": "org.mule.test.heisenberg.extension.model.Weapon$WeaponAttributes",
+          "classname": "org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
