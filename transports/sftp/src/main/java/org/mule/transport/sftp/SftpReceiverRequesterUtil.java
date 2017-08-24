@@ -155,7 +155,7 @@ public class SftpReceiverRequesterUtil
      *
      * @throws Exception if the connection can not be established.
      */
-    void checkSFTPConnection () throws Exception
+    void checkSFTPConnection() throws Exception
     {
         SftpClient client = null;
 
