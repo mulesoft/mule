@@ -21,6 +21,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -133,12 +134,19 @@ public class SftpConnectionReturnedToPoolOnErrorTestCase extends AbstractSftpFun
         }
 
         @Override
-        protected boolean canProcessFile(String fileName, SftpClient client, long fileAge, long sizeCheckDelayMs) throws Exception
+        boolean isOldFile(String fileName, SftpClient client, long fileAge) throws IOException
         {
             sftpServerStopReq.countDown();
-            sftpServerStopped.await();
-
-            return super.canProcessFile(fileName, client, fileAge, sizeCheckDelayMs);
+            try
+            {
+                sftpServerStopped.await();
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("InterruptedException was thrown");
+            }
+            return super.isOldFile(fileName, client, fileAge);
         }
 
         @Override
