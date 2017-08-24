@@ -10,13 +10,14 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.extension.api.dsl.syntax.resources.spi.SchemaResourceFactory;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.DelegatingEntityResolver;
@@ -35,7 +36,7 @@ import java.util.Set;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate to our custom resolver, then if not found will try to
- * generate the XSDs from the extensions (through {@link SchemaResourceFactory}), and finally fall back to Spring's
+ * generate the XSDs from the extensions (through {@link }), and finally fall back to Spring's
  * {@link DelegatingEntityResolver}.
  *
  * @since 4.0
@@ -49,15 +50,15 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private final EntityResolver muleEntityResolver;
   private Map<String, String> customSchemaMappings;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
-  private Optional<SchemaResourceFactory> extensionSchemaFactory;
+  private Optional<ExtensionSchemaGenerator> extensionSchemaFactory;
   private Map<String, Boolean> checkedEntities; // It saves already checked entities so that if the resolution already failed
-                                                // once, it will raise and exception and not loop failing over and over again.
+  // once, it will raise and exception and not loop failing over and over again.
 
   /**
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
    *
    * @param extensions fallback set to dynamically generate schemas from {@link ExtensionModel} if the current
-   *        {@link #muleEntityResolver} and {@link #springEntityResolver} delegates return null when resolving the entity.
+   *                   {@link #muleEntityResolver} and {@link #springEntityResolver} delegates return null when resolving the entity.
    */
   public ModuleDelegatingEntityResolver(Set<ExtensionModel> extensions) {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -69,8 +70,8 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     ServiceRegistry spiServiceRegistry = new SpiServiceRegistry();
     // TODO(fernandezlautaro): MULE-11024 until the implementation is moved up to extensions-api, we need to work with Optional to
     // avoid breaking the mule testing framework (cannot add the dependency, as it will imply a circular dependency)
-    final Collection<SchemaResourceFactory> schemaResourceFactories =
-        spiServiceRegistry.lookupProviders(SchemaResourceFactory.class, getClass().getClassLoader());
+    final Collection<ExtensionSchemaGenerator> schemaResourceFactories =
+      spiServiceRegistry.lookupProviders(ExtensionSchemaGenerator.class, getClass().getClassLoader());
     if (schemaResourceFactories.isEmpty()) {
       extensionSchemaFactory = empty();
     } else if (schemaResourceFactories.size() == 1) {
@@ -80,7 +81,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       // spiServiceRegistry.lookupProvider(SchemaResourceFactory.class, getClass().getClassLoader()) (notice the method name
       // chance from #lookupProviders to #lookupProvider)
       throw new IllegalArgumentException(format("There are '%s' providers for '%s' when there must be 1 or zero.",
-                                                schemaResourceFactories.size(), SchemaResourceFactory.class.getName()));
+                                                schemaResourceFactories.size(), ExtensionSchemaGenerator.class.getName()));
     }
   }
 
@@ -115,8 +116,8 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     // TODO(fernandezlautaro): MULE-11024 once implemented, remove the extensionSchemaFactory.isPresent() from the `if` statement
     if (extensionSchemaFactory.isPresent()) {
       Optional<ExtensionModel> extensionModel = extensions.stream()
-          .filter(em -> systemId.equals(em.getXmlDslModel().getSchemaLocation()))
-          .findAny();
+                                                  .filter(em -> systemId.equals(em.getXmlDslModel().getSchemaLocation()))
+                                                  .findAny();
       if (extensionModel.isPresent()) {
         InputStream schema = getSchemaFromExtension(extensionModel.get());
         inputSource = new InputSource(schema);
@@ -134,13 +135,11 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
    * @return the bytes that represent the schema for the {@code extensionModel}
    */
   private InputStream getSchemaFromExtension(ExtensionModel extensionModel) {
-    Optional<GeneratedResource> generatedResource =
-        extensionSchemaFactory.get().generateResource(extensionModel,
-                                                      DslResolvingContext.getDefault(extensions));
-    if (!generatedResource.isPresent()) {
-      throw new IllegalStateException(format("There were no schema generators available when trying to work with the extension '%s'",
-                                             extensionModel.getName()));
-    }
-    return new ByteArrayInputStream(generatedResource.get().getContent());
+    String generatedResource = extensionSchemaFactory
+                                 .map(f -> f.generate(extensionModel, DslResolvingContext.getDefault(extensions)))
+                                 .orElseThrow(
+                                   () -> new IllegalStateException("There were no schema generators available when trying to work with the extension '"
+                                                                     + extensionModel.getName() + "'"));
+    return new ByteArrayInputStream(generatedResource.getBytes());
   }
 }

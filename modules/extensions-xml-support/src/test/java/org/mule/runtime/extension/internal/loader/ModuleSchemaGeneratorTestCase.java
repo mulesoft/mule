@@ -15,8 +15,14 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.XSD_SUFFIX;
+
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
@@ -25,20 +31,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.SchemaXmlResourceFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -58,7 +56,7 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameter(2)
   public String extensionName;
 
-  private SchemaXmlResourceFactory schemaXmlResourceFactory;
+  private DefaultExtensionSchemaGenerator extensionSchemaFactory;
 
   @Parameterized.Parameters(name = "{index}: Validating xsd for {2}")
   public static Collection<Object[]> data() {
@@ -101,15 +99,13 @@ public class ModuleSchemaGeneratorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws IOException {
-    schemaXmlResourceFactory = new SchemaXmlResourceFactory();
+    extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
   }
 
   @Test
   public void generateXsd() throws Exception {
-    Optional<GeneratedResource> generatedResource = schemaXmlResourceFactory.generateResource(extensionModel);
-
-    String schema = new String(generatedResource.get().getContent());
-    compareXML(expectedXSD, schema);
+    String generatedSchema = extensionSchemaFactory.generate(extensionModel, getDefault(emptySet()));
+    compareXML(expectedXSD, generatedSchema);
   }
 
   private void compareXML(String expected, String actual) throws Exception {

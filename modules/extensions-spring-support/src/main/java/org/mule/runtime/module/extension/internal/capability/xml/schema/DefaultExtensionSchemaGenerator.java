@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
+
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -18,34 +20,32 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
-
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 
 /**
- * Generator class that takes a {@link ExtensionModel} with a {@link XmlDslModel} and returns a XSD schema as a String
+ * Default {@link ExtensionSchemaGenerator} implementation.
+ * <p>
+ * Generates an XSD using the {@link ExtensionModel} and the {@link XmlDslModel}.
  *
- * @since 3.7.0
+ * @since 4.0
  */
-public class SchemaGenerator {
+public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator {
 
-  private void validate(ExtensionModel extensionModel, XmlDslModel xmlDslModel) {
-    checkArgument(extensionModel != null, "extension cannot be null");
-    checkArgument(xmlDslModel != null, "xml model property cannot be null");
-    checkState(!StringUtils.isBlank(xmlDslModel.getPrefix()), "xml model property cannot provide a blank namespace");
-  }
-
-  public String generate(ExtensionModel extensionModel, XmlDslModel xmlDslModel, DslResolvingContext dslContext) {
+  /**
+   * {@inheritDoc}
+   */
+  public String generate(ExtensionModel extensionModel, DslResolvingContext dslContext) {
+    XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
     validate(extensionModel, xmlDslModel);
     SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlDslModel, dslContext);
 
@@ -75,6 +75,12 @@ public class SchemaGenerator {
     schemaBuilder.registerEnums();
 
     return renderSchema(schemaBuilder.build());
+  }
+
+  private void validate(ExtensionModel extensionModel, XmlDslModel xmlDslModel) {
+    checkArgument(extensionModel != null, "extension cannot be null");
+    checkArgument(xmlDslModel != null, "xml model property cannot be null");
+    checkState(!StringUtils.isBlank(xmlDslModel.getPrefix()), "xml model property cannot provide a blank namespace");
   }
 
   private String renderSchema(Schema schema) {

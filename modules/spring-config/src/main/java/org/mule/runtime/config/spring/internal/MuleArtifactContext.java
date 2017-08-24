@@ -267,8 +267,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     List<ConfigFile> configFiles = new ArrayList<>();
-    recursivelyResolveConfigFiles(initialConfigFiles, configFiles).stream()
-        .forEach(applicationConfigBuilder::addConfigFile);
+    recursivelyResolveConfigFiles(initialConfigFiles, configFiles).forEach(applicationConfigBuilder::addConfigFile);
 
     applicationConfigBuilder.setApplicationName(muleContext.getConfiguration().getId());
     return applicationConfigBuilder.build();

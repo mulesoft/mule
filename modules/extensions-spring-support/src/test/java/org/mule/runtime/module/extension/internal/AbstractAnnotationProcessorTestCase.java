@@ -19,22 +19,5 @@ import java.util.List;
 
 public class AbstractAnnotationProcessorTestCase extends AbstractMuleTestCase {
 
-  protected Iterable<JavaFileObject> testSourceFiles() throws Exception {
-    // this will be xxx/target/test-classes
-    File folder = new File(getClass().getClassLoader().getResource("").getPath().toString());
-    // up to levels
-    folder = folder.getParentFile().getParentFile();
-    folder = new File(folder, getSourceFilesLocation());
-    File[] files = folder.listFiles((dir, name) -> name.endsWith(".java"));
-    assertThat(files, is(notNullValue()));
-    List<JavaFileObject> javaFileObjects = new ArrayList<>(files.length);
-    for (File file : files) {
-      javaFileObjects.add(JavaFileObjects.forResource(file.toURI().toURL()));
-    }
-    return javaFileObjects;
-  }
 
-  protected String getSourceFilesLocation() {
-    return "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension";
-  }
 }

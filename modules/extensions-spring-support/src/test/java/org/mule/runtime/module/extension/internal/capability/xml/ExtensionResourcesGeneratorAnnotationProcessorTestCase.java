@@ -6,37 +6,37 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import static com.google.common.truth.Truth.assert_;
-import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
-import org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
 import org.mule.tck.size.SmallTest;
-
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteSource;
-
-import java.io.StringReader;
-
-import javax.tools.StandardLocation;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
 import net.sf.saxon.xpath.XPathFactoryImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
 
 @SmallTest
-public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractAnnotationProcessorTestCase {
+public class ExtensionResourcesGeneratorAnnotationProcessorTestCase {
 
   private static final String GROUP_PARAMETER_1 = "Group parameter 1";
   private static final String GROUP_PARAMETER_2 = "Group parameter 2";
@@ -59,13 +59,15 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
     ByteSource byteSource = mock(ByteSource.class);
     when(byteSource.contentEquals(byteSourceCaptor.capture())).thenReturn(true);
 
-    assert_().about(javaSources()).that(testSourceFiles()).withCompilerOptions("-Aextension.version=1.0.0-dev")
-        .processedWith(new ExtensionResourcesGeneratorAnnotationProcessor()).compilesWithoutError().and()
-        .generatesFileNamed(StandardLocation.SOURCE_OUTPUT, "", "mule-documentation.xsd").withContents(byteSource);
-
-    ByteSource generatedByteSource = byteSourceCaptor.getValue();
-    assertThat(generatedByteSource, is(notNullValue()));
-    String generatedSchema = IOUtils.toString(generatedByteSource.openStream());
+    DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+    ExtensionModel model = loader.loadExtensionModel(TestExtensionWithDocumentation.class.getClassLoader(),
+                                                     DslResolvingContext.getDefault(emptySet()),
+                                                     ImmutableMap.<String, Object>builder()
+                                                         .put(TYPE_PROPERTY_NAME, TestExtensionWithDocumentation.class.getName())
+                                                         .put(VERSION, "4.0.0")
+                                                         .build());
+    String generatedSchema = new DefaultExtensionSchemaGenerator().generate(model, DslResolvingContext.getDefault(emptySet()));
+    assertThat(generatedSchema, is(notNullValue()));
 
     assertXpath(generatedSchema, "//xs:attribute[@name='configParameter']/xs:annotation/xs:documentation", "Config parameter");
     assertXpath(generatedSchema, "//xs:attribute[@name='configParameterWithComplexJavadoc']/xs:annotation/xs:documentation",

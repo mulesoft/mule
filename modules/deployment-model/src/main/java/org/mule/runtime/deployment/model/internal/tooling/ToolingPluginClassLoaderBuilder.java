@@ -96,7 +96,7 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
   }
 
   @Override
-  public ArtifactClassLoader build() throws IOException {
+  public ToolingArtifactClassLoader build() throws IOException {
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver
