@@ -71,7 +71,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     // TODO(fernandezlautaro): MULE-11024 until the implementation is moved up to extensions-api, we need to work with Optional to
     // avoid breaking the mule testing framework (cannot add the dependency, as it will imply a circular dependency)
     final Collection<ExtensionSchemaGenerator> schemaResourceFactories =
-      spiServiceRegistry.lookupProviders(ExtensionSchemaGenerator.class, getClass().getClassLoader());
+        spiServiceRegistry.lookupProviders(ExtensionSchemaGenerator.class, getClass().getClassLoader());
     if (schemaResourceFactories.isEmpty()) {
       extensionSchemaFactory = empty();
     } else if (schemaResourceFactories.size() == 1) {
@@ -116,8 +116,8 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     // TODO(fernandezlautaro): MULE-11024 once implemented, remove the extensionSchemaFactory.isPresent() from the `if` statement
     if (extensionSchemaFactory.isPresent()) {
       Optional<ExtensionModel> extensionModel = extensions.stream()
-                                                  .filter(em -> systemId.equals(em.getXmlDslModel().getSchemaLocation()))
-                                                  .findAny();
+          .filter(em -> systemId.equals(em.getXmlDslModel().getSchemaLocation()))
+          .findAny();
       if (extensionModel.isPresent()) {
         InputStream schema = getSchemaFromExtension(extensionModel.get());
         inputSource = new InputSource(schema);
@@ -136,10 +136,10 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
    */
   private InputStream getSchemaFromExtension(ExtensionModel extensionModel) {
     String generatedResource = extensionSchemaFactory
-                                 .map(f -> f.generate(extensionModel, DslResolvingContext.getDefault(extensions)))
-                                 .orElseThrow(
-                                   () -> new IllegalStateException("There were no schema generators available when trying to work with the extension '"
-                                                                     + extensionModel.getName() + "'"));
+        .map(f -> f.generate(extensionModel, DslResolvingContext.getDefault(extensions)))
+        .orElseThrow(
+                     () -> new IllegalStateException("There were no schema generators available when trying to work with the extension '"
+                         + extensionModel.getName() + "'"));
     return new ByteArrayInputStream(generatedResource.getBytes());
   }
 }

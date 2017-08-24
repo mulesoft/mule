@@ -72,14 +72,14 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-      {MULTIPLE_CONFIGS,
-        TestExtensionWithDocumentation.class,
-        "/META-INF/documentation-extension-descriptions.xml",
-        "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension"},
-      {SINGLE_CONFIG,
-        TestExtensionWithDocumentationAndSingleConfig.class,
-        "/META-INF/documentationwithsingleconfig-extension-descriptions.xml",
-        "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension/single/config"},
+        {MULTIPLE_CONFIGS,
+            TestExtensionWithDocumentation.class,
+            "/META-INF/documentation-extension-descriptions.xml",
+            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension"},
+        {SINGLE_CONFIG,
+            TestExtensionWithDocumentationAndSingleConfig.class,
+            "/META-INF/documentationwithsingleconfig-extension-descriptions.xml",
+            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension/single/config"},
     });
   }
 
@@ -105,7 +105,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     doCompile(processor);
     ExtensionDocumentationResourceGenerator generator = new ExtensionDocumentationResourceGenerator();
     GeneratedResource resource = generator.generateResource(processor.getExtensionModel())
-                                   .orElseThrow(() -> new RuntimeException("No Documentation Generated"));
+        .orElseThrow(() -> new RuntimeException("No Documentation Generated"));
     compareXML(expectedXml, new String(resource.getContent()));
   }
 
@@ -178,7 +178,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
   private void doCompile(TestProcessor processor) throws Exception {
     assert_().about(javaSources()).that(testSourceFiles()).withCompilerOptions("-Aextension.version=1.0.0-dev")
-      .processedWith(processor).compilesWithoutError();
+        .processedWith(processor).compilesWithoutError();
   }
 
   @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
@@ -199,9 +199,9 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
       if (declaration == null) {
         ExtensionDescriptionDocumenter documenter = new ExtensionDescriptionDocumenter(processingEnv, roundEnv);
         Element extension = roundEnv.getElementsAnnotatedWith(Extension.class).stream()
-                              .filter(element -> element.getSimpleName().contentEquals(extensionClass.getSimpleName()))
-                              .findFirst()
-                              .get();
+            .filter(element -> element.getSimpleName().contentEquals(extensionClass.getSimpleName()))
+            .findFirst()
+            .get();
 
         assertThat(extension, instanceOf(TypeElement.class));
         ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(), getDefault(emptySet()));
