@@ -31,17 +31,17 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
     @Test
     public void sanitizedUrl()
     {
-        withXmlElement(annotatedObject, "<sftp:outbound-endpoint url=\"sftp://muletest:muletest@localhost:22198/~/testdir");
+        withXmlElement(annotatedObject, "<sftp:outbound-endpoint url=\"sftp://muletest:muletest@localhost:22198/~/testdir\"");
         String sanitized = getSourceXML(annotatedObject);
-        assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
+        assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir\""));
     }
 
     @Test
     public void sanitizedAddress()
     {
-        withXmlElement(annotatedObject, "<sftp:outbound-endpoint address=\"sftp://muletest:muletest@localhost:22198/~/testdir");
+        withXmlElement(annotatedObject, "<sftp:outbound-endpoint address=\"sftp://muletest:muletest@localhost:22198/~/testdir\"");
         String sanitized = getSourceXML(annotatedObject);
-        assertThat(sanitized, equalTo("<sftp:outbound-endpoint address=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
+        assertThat(sanitized, equalTo("<sftp:outbound-endpoint address=\"sftp://<<credentials>>@localhost:22198/~/testdir\""));
     }
 
     @Test
@@ -50,7 +50,22 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
         withXmlElement(annotatedObject, "<sftp:config username=\"user\" password=\"pass\" />");
         String sanitized = getSourceXML(annotatedObject);
         assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
+    }
 
+    @Test
+    public void sanitizedAddressWithSpecialCharacters()
+    {
+        withXmlElement(annotatedObject, "<sftp:outbound-endpoint address=\"sftp://muletest\\@:muletest\\@@localhost:22198/~/testdir\"");
+        String sanitized = getSourceXML(annotatedObject);
+        assertThat(sanitized, equalTo("<sftp:outbound-endpoint address=\"sftp://<<credentials>>@localhost:22198/~/testdir\""));
+    }
+
+    @Test
+    public void sanitizedPasswordAttributeWithSpecialCharacters()
+    {
+        withXmlElement(annotatedObject, "<sftp:config username=\"user\" password=\"pass\\@\" />");
+        String sanitized = getSourceXML(annotatedObject);
+        assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
     }
 
     private void withXmlElement(AnnotatedObject annotatedObject, String value)

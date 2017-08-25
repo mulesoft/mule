@@ -6,8 +6,7 @@
  */
 package org.mule;
 
-import static org.mule.api.util.CredentialsMaskUtil.maskUrlPassword;
-import static org.mule.api.util.CredentialsMaskUtil.BARE_URL_PATTERN;
+import static org.mule.api.util.CredentialsMaskUtil.maskURICredentials;
 import static org.mule.util.UUID.UUID_LENGTH;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -731,7 +730,7 @@ public class DefaultMuleEvent implements MuleEvent, ThreadSafeAccess, Deserializ
         buf.append(", stop processing=").append(isStopFurtherProcessing());
         if (messageSourceURI != null)
         {
-            buf.append(", ").append(maskUrlPassword(messageSourceURI.toString(), BARE_URL_PATTERN));
+            buf.append(", ").append(maskURICredentials(messageSourceURI));
         }
 
         return buf.toString();

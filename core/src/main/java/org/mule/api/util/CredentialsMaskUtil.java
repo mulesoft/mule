@@ -10,15 +10,15 @@ package org.mule.api.util;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
 
+import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CredentialsMaskUtil
 {
 
-    public static final Pattern BARE_URL_PATTERN = compile("[a-z]*://([^@]*)@");
-    public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
-    public static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
+    public static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^\"]*)\"");
+    public static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^\"]*)\"");
     public static final Pattern PASSWORD_PATTERN = compile("password=\"([^\"]*)\"");
     public static final Pattern PASSWORD_PATTERN_NO_QUOTES = compile("password=([^\\s;]+)");
     public static final Pattern USER_PATTERN_NO_QUOTES = compile("user=([^\\s;]+)");
@@ -30,7 +30,7 @@ public class CredentialsMaskUtil
     private static final String PASSWORD_URL_PREFIX = "password=";
     
     /**
-     * masks url credentials
+     * masks URI credentials
      * 
      * @param input input for credentials to be masked
      * 
@@ -44,7 +44,7 @@ public class CredentialsMaskUtil
         Matcher matcher = PASSWORD_PATTERN.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
-            input = input.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
+            input = input.replace(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(PASSWORD_MASK));
         }
         input = maskUrlPassword(input, PASSWORD_PATTERN);
 
@@ -65,6 +65,29 @@ public class CredentialsMaskUtil
     }
 
     /**
+     * Masks credentials in URI
+     * 
+     * @param uri URI to mask
+     * 
+     * @return input with password masked
+     */
+    public static String maskURICredentials(URI uri)
+    {
+        String authority = uri.getAuthority();
+        if (!authority.contains("@"))
+        {
+            return uri.toString(); 
+        }
+        
+        return uri.toString().replace(getAuthorityCredentials(authority), PASSWORD_MASK);
+    }
+
+    private static String getAuthorityCredentials(String authority)
+    {
+        return authority.substring(0, authority.lastIndexOf("@"));
+    }
+
+    /**
      * masks user and password in input
      * 
      * @param input input for user and password to be masked
@@ -75,8 +98,8 @@ public class CredentialsMaskUtil
      */
     public static String maskUrlUserAndPassword(String input, Pattern passwordPattern, Pattern userPattern)
     {
-        String inputMasked = maskUrlPattern(input, passwordPattern, PASSWORD_MASK, PASSWORD_URL_PREFIX);
-        return maskUrlPattern(inputMasked, userPattern, USER_MASK, USER_URL_PREFIX);
+        String inputMasked = maskCredentialPattern(input, passwordPattern, PASSWORD_MASK, PASSWORD_URL_PREFIX);
+        return maskCredentialPattern(inputMasked, userPattern, USER_MASK, USER_URL_PREFIX);
     }
 
     /**
@@ -99,9 +122,25 @@ public class CredentialsMaskUtil
         Matcher matcher = pattern.matcher(input);
         if (matcher.find() && matcher.groupCount() > 0)
         {
+            String groupToMask = matcher.group(1);
+            
+            if (groupToMask.contains("@"))
+            {
+                input = input.replace(prefix + getAuthorityCredentials(matcher.group(1)), prefix + mask);
+            }
+            
+        }
+        return input;
+    }
+    
+    private static String maskCredentialPattern(String input, Pattern pattern, String mask, String prefix) {
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find() && matcher.groupCount() > 0)
+        {
             input = input.replaceAll(prefix + matcher.group(1), prefix + mask);
         }
         return input;
 
     }
+
 }
