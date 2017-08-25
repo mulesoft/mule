@@ -23,14 +23,17 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +102,15 @@ public class MessagingExceptionResolver {
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();
     }
-    return Optional.ofNullable(errors.get(0));
+    // We look if there is a more specific error in the chain that matches with the root error (is child or has the same error)
+    SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(0).getSecond());
+    Reference<Pair<Throwable, ErrorType>> result = new Reference<>();
+    errors.forEach(p -> {
+      if (matcher.match(p.getSecond())) {
+        result.set(p);
+      }
+    });
+    return Optional.ofNullable(result.get());
   }
 
   private List<Pair<Throwable, ErrorType>> collectErrors(AnnotatedObject obj, MessagingException me, ErrorTypeLocator locator) {
