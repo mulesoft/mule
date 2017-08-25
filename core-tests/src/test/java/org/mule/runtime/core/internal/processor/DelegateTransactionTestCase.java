@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -20,7 +20,7 @@ import org.junit.Test;
 public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
   private static final int DEFAULT_TX_TIMEOUT = 2;
-  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private MuleContext mockMuleContext = mockMuleContext();
 
   @Test
   public void defaultTxTimeout() {

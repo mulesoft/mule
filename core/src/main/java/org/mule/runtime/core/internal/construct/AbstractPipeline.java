@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -49,6 +50,8 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
+import org.reactivestreams.Publisher;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -58,7 +61,6 @@ import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -70,6 +72,8 @@ import reactor.core.publisher.Mono;
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
 
   private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
+
+  private final NotificationDispatcher notificationFirer;
 
   private final MessageSource source;
   private final List<Processor> processors;
@@ -87,6 +91,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
+
+    try {
+      notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
+
     this.source = source;
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency;
@@ -315,9 +326,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {
-      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
-          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                    PROCESS_END));
+      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
+                                                                 AbstractPipeline.this, PROCESS_END));
       return event;
     }
   }
@@ -327,9 +337,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {
-      getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
-          .dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this), AbstractPipeline.this,
-                                                    PROCESS_START));
+      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
+                                                                 AbstractPipeline.this, PROCESS_START));
 
       long startTime = currentTimeMillis();
 
@@ -350,13 +359,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     private void fireCompleteNotification(InternalEvent event, MessagingException messagingException) {
-      try {
-        getMuleContext().getRegistry().lookupObject(NotificationDispatcher.class)
-            .dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
-                                                      AbstractPipeline.this, PROCESS_COMPLETE));
-      } catch (RegistrationException e) {
-        throw new MuleRuntimeException(e);
-      }
+      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
+                                                                 AbstractPipeline.this, PROCESS_COMPLETE));
     }
   }
 

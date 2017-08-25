@@ -52,6 +52,7 @@ public class MuleContextUtils {
     try {
       final MuleRegistry registry = muleContext.getRegistry();
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
+      doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
