@@ -82,7 +82,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       value = streamingContent(value, cursorProviderFactory, event);
 
       Message.Builder messageBuilder;
-      if (returnsListOfMessages) {
+
+      //TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
+      // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
+      if (returnsListOfMessages && value instanceof Collection) {
         messageBuilder = Message.builder().collectionValue((Collection) value, Message.class);
       } else {
         messageBuilder = Message.builder().value(value);
