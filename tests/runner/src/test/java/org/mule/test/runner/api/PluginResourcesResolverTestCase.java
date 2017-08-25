@@ -17,9 +17,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -66,11 +66,11 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   public void resolvePluginResourcesForMulePlugin() throws Exception {
     MulePluginModelBuilder builder = new MulePluginModelBuilder();
     builder.withClassLoaderModelDescriber()
-        .setId("maven")
+        .setId("mule")
         .addProperty(EXPORTED_PACKAGES, newArrayList(ORG_MULE_TEST_RUNNER, ORG_MULE_TEST_RUNNER_API))
         .addProperty(EXPORTED_RESOURCES, newArrayList(META_INF_RESOURCE_PROPERTIES, META_INF_ANOTHER_RESOURCE_PROPERTIES))
         .build();
-    builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     MulePluginModel mulePluginModel = builder
         .setName("samplePlugin")
         .setMinMuleVersion("4.0.0")

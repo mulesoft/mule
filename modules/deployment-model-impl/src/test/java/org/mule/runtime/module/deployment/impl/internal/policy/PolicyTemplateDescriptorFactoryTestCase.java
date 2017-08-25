@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
@@ -102,7 +102,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
     MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
-    when(descriptorLoaderRepository.get(MAVEN, POLICY, ClassLoaderModelLoader.class))
+    when(descriptorLoaderRepository.get(MULE_LOADER_ID, POLICY, ClassLoaderModelLoader.class))
         .thenReturn(new DeployableMavenClassLoaderModelLoader(mavenClientProvider.createMavenClient(newMavenConfigurationBuilder()
             .localMavenRepositoryLocation(mavenClientProvider
                 .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
@@ -176,7 +176,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   public void readsPlugin() throws Exception {
     MulePolicyModelBuilder policyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    policyModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
+    policyModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
 
     ArtifactPluginFileBuilder plugin1 = new ArtifactPluginFileBuilder("plugin1");
     ArtifactPluginFileBuilder plugin2 = new ArtifactPluginFileBuilder("plugin2");

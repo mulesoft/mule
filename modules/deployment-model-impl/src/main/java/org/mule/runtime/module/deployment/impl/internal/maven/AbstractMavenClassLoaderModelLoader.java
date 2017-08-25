@@ -18,11 +18,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_ARTIFACTS_IDS;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
 import static org.mule.tools.api.packager.ContentGenerator.createClassLoaderModelFromJson;
 import org.apache.maven.model.Model;
@@ -32,7 +32,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -78,7 +78,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   @Override
   public String getId() {
-    return MAVEN;
+    return MULE_LOADER_ID;
   }
 
   /**
@@ -94,7 +94,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
    *
    * @param artifactFile {@link File} where the current plugin to work with.
    * @param attributes a set of attributes to work with, where the current implementation of this class will look for
-   *        {@link MavenClassLoaderConstants#EXPORTED_PACKAGES} and {@link MavenClassLoaderConstants#EXPORTED_RESOURCES}
+   *        {@link ArtifactDescriptorConstants#EXPORTED_PACKAGES} and {@link ArtifactDescriptorConstants#EXPORTED_RESOURCES}
    * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
    */
   @Override

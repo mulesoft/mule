@@ -2,7 +2,7 @@
   "name": "Mule parsers test plugin",
   "minMuleVersion": "4.0.0",
   "classLoaderModelLoaderDescriptor": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {
       "exportedPackages": [
         "org.mule.tests.parsers.api",
@@ -14,7 +14,7 @@
     }
   },
   "bundleDescriptorLoader": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {}
   }
 }

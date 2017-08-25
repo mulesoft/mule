@@ -9,7 +9,7 @@
   "name": "Heisenberg",
   "minMuleVersion": "4.1.0",
   "classLoaderModelLoaderDescriptor": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {
       "privilegedExportedPackages": [],
       "privilegedArtifactIds": [],
@@ -29,7 +29,7 @@
     }
   },
   "bundleDescriptorLoader": {
-    "id": "maven",
+    "id": "mule",
     "attributes": {}
   }
 }

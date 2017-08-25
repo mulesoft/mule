@@ -17,8 +17,8 @@ import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -169,11 +169,11 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
       String[] configFiles = configs.split(",");
       muleApplicationModelBuilder.setConfigs(asList(configFiles));
     });
-    muleApplicationModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
+    muleApplicationModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
     exportedResources.ifPresent(resources -> {
       muleApplicationModelBuilder.withClassLoaderModelDescriber().addProperty(EXPORTED_RESOURCES, resources.split(","));
     });
-    muleApplicationModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    muleApplicationModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     String applicationDescriptorContent = new MuleApplicationModelJsonSerializer().serialize(muleApplicationModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(applicationDescriptor)) {
       fileWriter.write(applicationDescriptorContent);

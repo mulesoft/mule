@@ -16,8 +16,8 @@ import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.plugin.MavenClassLoaderConstants.MAVEN;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
@@ -150,11 +150,11 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
       String[] configFiles = configs.split(",");
       MuleDomainModelBuilder.setConfigs(asList(configFiles));
     });
-    MuleDomainModelBuilder.withClassLoaderModelDescriber().setId(MAVEN);
+    MuleDomainModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
     exportedResources.ifPresent(resources -> {
       MuleDomainModelBuilder.withClassLoaderModelDescriber().addProperty(EXPORTED_RESOURCES, resources.split(","));
     });
-    MuleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MAVEN, emptyMap()));
+    MuleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     String applicationDescriptorContent = new MuleDomainModelJsonSerializer().serialize(MuleDomainModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(domainDescriptor)) {
       fileWriter.write(applicationDescriptorContent);
