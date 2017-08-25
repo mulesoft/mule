@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -26,11 +27,11 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -160,7 +161,10 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void operationWhichReturnsListOfMessages() throws Exception {
-    List<Message> enemies = (List<Message>) runFlow("getAllEnemies").getMessage().getPayload().getValue();
+    TypedValue<List<Message>> payload = runFlow("getAllEnemies").getMessage().getPayload();
+    assertThat(MULE_MESSAGE_COLLECTION.isCompatibleWith(payload.getDataType()), is(true));
+
+    List<Message> enemies = payload.getValue();
     HeisenbergExtension heisenberg = getConfig(HEISENBERG);
 
     assertThat(enemies, hasSize(heisenberg.getEnemies().size()));
