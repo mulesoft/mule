@@ -225,7 +225,7 @@
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <springVersion>4.1.9.RELEASE</springVersion>
         <springSecurityVersion>4.0.4.RELEASE</springSecurityVersion>
-        <sshCoreVersion>1.0.0</sshCoreVersion>
+        <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <staxApiVersion>3.1.4</staxApiVersion>
         <staxonVersion>1.2</staxonVersion>

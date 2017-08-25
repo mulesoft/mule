@@ -21,6 +21,9 @@ import org.junit.Test;
 
 public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
 {
+
+    private static final String TEST_ERROR_MESSAGE = "Error during login to muletest1@localhost: UnknownHostKey: localhost. RSA key fingerprint is ";
+
     @Override
     protected String getConfigFile()
     {
@@ -37,7 +40,7 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         }
         catch (IOException e)
         {
-            assertThat(e.getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertThat(e.getMessage(), startsWith(TEST_ERROR_MESSAGE));
         }
     }
 
@@ -51,7 +54,7 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertThat(e.getCause().getMessage(), startsWith(TEST_ERROR_MESSAGE));
         }
     }
 
@@ -65,7 +68,7 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertThat(e.getCause().getMessage(), startsWith(TEST_ERROR_MESSAGE));
         }
     }
 
@@ -79,7 +82,7 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertThat(e.getCause().getMessage(), startsWith(TEST_ERROR_MESSAGE));
         }
     }
 
@@ -93,7 +96,7 @@ public class SftpKnownHostsTestCase extends AbstractSftpFunctionalTestCase
         }
         catch (MessagingException e)
         {
-            assertThat(e.getCause().getMessage(), startsWith("Error during login to muletest1@localhost: UnknownHostKey: localhost. DSA key fingerprint is "));
+            assertThat(e.getCause().getMessage(), startsWith(TEST_ERROR_MESSAGE));
         }
     }
 
