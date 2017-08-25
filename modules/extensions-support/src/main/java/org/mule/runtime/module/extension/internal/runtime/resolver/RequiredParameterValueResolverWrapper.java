@@ -43,9 +43,9 @@ public class RequiredParameterValueResolverWrapper<T> extends AbstractValueResol
     T value = super.resolve(context);
     if (value == null) {
       throw new IllegalArgumentException(String.format(
-          "Required parameter '%s' was assigned with value '%s' which resolved to null. Required parameters need to be "
+                                                       "Required parameter '%s' was assigned with value '%s' which resolved to null. Required parameters need to be "
                                                            + "assigned with non null values",
-          parameterName, literalValue));
+                                                       parameterName, literalValue));
     }
 
     return value;
