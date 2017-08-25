@@ -8,11 +8,9 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -46,8 +44,6 @@ public class ApplicationDescriptorFactory
     artifactModel.getDomain().ifPresent(domain -> {
       descriptor.setDomain(domain);
     });
-
-    File appClassesFolder = getAppClassesFolder(descriptor);
   }
 
   @Override
@@ -70,11 +66,7 @@ public class ApplicationDescriptorFactory
     return new MuleApplicationModelJsonSerializer();
   }
 
-  private File getAppClassesFolder(ApplicationDescriptor descriptor) {
-    return MuleFoldersUtil.getAppClassesFolder(descriptor.getName());
-  }
-
-  public void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile) {
+  void setApplicationProperties(ApplicationDescriptor desc, File appPropsFile) {
     // ugh, no straightforward way to convert a HashTable to a map
     Map<String, String> m = new HashMap<>();
 

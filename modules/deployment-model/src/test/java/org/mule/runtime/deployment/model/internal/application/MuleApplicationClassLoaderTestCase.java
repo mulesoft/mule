@@ -16,12 +16,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -68,7 +67,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   private MuleSharedDomainClassLoader domainCL;
   private MuleApplicationClassLoader appCL;
   private File domainDir;
-  private File classesDir;
+  private File appFolder;
   private File jarFile;
 
   @Before
@@ -78,12 +77,12 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
     final List<URL> urls = new LinkedList<>();
 
-    classesDir = getAppClassesFolder(APP_NAME);
-    assertThat(classesDir.mkdirs(), is(true));
+    appFolder = getAppFolder(APP_NAME);
+    assertThat(appFolder.mkdirs(), is(true));
     // Add isolated resources in classes dir
-    FileUtils.stringToFile(new File(classesDir, RESOURCE_IN_CLASSES_AND_JAR).getAbsolutePath(), "Some text");
-    FileUtils.stringToFile(new File(classesDir, RESOURCE_JUST_IN_CLASSES).getAbsolutePath(), "Some text");
-    urls.add(classesDir.toURI().toURL());
+    FileUtils.stringToFile(new File(appFolder, RESOURCE_IN_CLASSES_AND_JAR).getAbsolutePath(), "Some text");
+    FileUtils.stringToFile(new File(appFolder, RESOURCE_JUST_IN_CLASSES).getAbsolutePath(), "Some text");
+    urls.add(appFolder.toURI().toURL());
 
     // Add jar file with resources in lib dir
     File libDir = getAppLibFolder(APP_NAME);
@@ -98,7 +97,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     // Add isolated resources in domain dir
     domainDir = MuleFoldersUtil.getDomainFolder(DOMAIN_NAME);
     assertThat(domainDir.mkdirs(), is(true));
-    FileUtils.stringToFile(new File(new File(domainDir, "classes"), RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
+    FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
     mockStatic(MuleArtifactClassLoader.class);
     when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
@@ -110,7 +109,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
 
     final ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
     ClassLoaderModel classLoaderModel = new ClassLoaderModel.ClassLoaderModelBuilder(applicationDescriptor.getClassLoaderModel())
-        .containing(MuleFoldersUtil.getAppClassesFolder(APP_NAME).toURI().toURL()).build();
+        .containing(getAppFolder(APP_NAME).toURI().toURL()).build();
     applicationDescriptor.setClassLoaderModel(classLoaderModel);
     appCL = new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, domainCL, null, urls,
                                            mock(ClassLoaderLookupPolicy.class), emptyList());
@@ -143,7 +142,7 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   private void assertLoadedFromClassesDir(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("file", resource.getProtocol());
-    assertTrue(resource.toURI().toString().contains(classesDir.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(appFolder.getAbsolutePath()));
   }
 
   private void assertLoadedFromJarFile(URL resource) throws URISyntaxException {

@@ -37,11 +37,13 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class LibFolderClassLoaderModelLoader implements ClassLoaderModelLoader {
 
+  // TODO(pablo.kraan): packager - review this
   static final String CLASSES_FOLDER = "classes";
   static final String LIB_FOLDER = "lib";
 
   private static final Set<ArtifactType> supportedTypes = new HashSet<>(asList(SERVICE, SERVER_PLUGIN));
 
+  // TODO(pablo.kraan): packager - review this
   private static final String CLASSES_DIR = "classes";
   private static final String LIB_DIR = "lib";
   private static final String JAR_FILE = "*.jar";

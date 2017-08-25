@@ -123,7 +123,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   public T containingClass(File classFile, String alias) {
     checkImmutable();
     checkArgument(classFile != null, "Class file cannot be null");
-    resources.add(new ZipResource(classFile.getAbsolutePath(), "classes/" + alias));
+    resources.add(new ZipResource(classFile.getAbsolutePath(), alias));
 
     return getThis();
   }
@@ -204,6 +204,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     ZipResource result = null;
 
     if (!props.isEmpty()) {
+      // TODO(pablo.kraan): packager - check this
       File classesFolder = new File(getTempFolder(), "classes");
       classesFolder.mkdirs();
       final File applicationPropertiesFile = new File(classesFolder, propertiesFileName);

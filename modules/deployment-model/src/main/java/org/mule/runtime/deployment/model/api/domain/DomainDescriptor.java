@@ -10,7 +10,6 @@ import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
 import com.google.common.collect.ImmutableList;
 
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -20,8 +19,6 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_DOMAIN_NAME = "default";
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
-  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION =
-      Paths.get("classes", DEFAULT_CONFIGURATION_RESOURCE).toString();
 
   /**
    * Creates a new domain descriptor

@@ -24,11 +24,10 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR;
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel.NULL_CLASSLOADER_MODEL;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory.invalidBundleDescriptorLoaderIdError;
@@ -145,7 +144,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder);
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
-    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(new File(tempFolder, CLASSES_DIR).toString()));
+    assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[1]).getPath(),
                equalTo(new File(tempFolder, LIB_DIR + separator + JAR_FILE_NAME).toString()));
   }

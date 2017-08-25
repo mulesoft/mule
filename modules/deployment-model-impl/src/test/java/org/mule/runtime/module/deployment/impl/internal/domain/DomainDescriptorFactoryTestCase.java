@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -62,10 +61,5 @@ public class DomainDescriptorFactoryTestCase
                                     createDescriptorLoaderRepository());
 
     return artifactDescriptorFactory.create(getArtifactFolder());
-  }
-
-  @Override
-  protected File getArtifactClassesFolder() {
-    return getDomainClassesFolder(ARTIFACT_NAME);
   }
 }

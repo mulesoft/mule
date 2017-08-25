@@ -12,12 +12,10 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -73,7 +71,7 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private File createDomainResource(String domainName, String resourceFile) throws Exception {
-    final File file = new File(getDomainClassesFolder(domainName), resourceFile);
+    final File file = new File(getDomainFolder(domainName), resourceFile);
     assertThat(FileUtils.createFile(file.getAbsolutePath()).exists(), is(true));
 
     return file;

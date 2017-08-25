@@ -14,7 +14,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.container.api.MuleFoldersUtil.CLASSES_FOLDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
@@ -29,7 +28,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -62,7 +60,6 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -343,7 +340,7 @@ public class DefaultMuleApplication implements Application {
   @Override
   public File[] getResourceFiles() {
     return descriptor.getConfigResources().stream()
-        .map(configFile -> new File(getLocation(), Paths.get(CLASSES_FOLDER, configFile).toString()))
+        .map(configFile -> new File(getLocation(), configFile))
         .collect(Collectors.toList())
         .toArray(new File[descriptor.getConfigResources().size()]);
   }

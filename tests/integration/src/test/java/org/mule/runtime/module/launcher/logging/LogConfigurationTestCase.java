@@ -96,6 +96,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   public void honorLog4jConfigFileForAppInDomain() throws Exception {
     muleServer.start();
 
+    // TODO(pablo.kraan): packager - check this
     File domainFile = new DomainFileBuilder(DOMAIN_NAME)
         .definedBy("log/empty-domain-with-log4j/empty-domain-config.xml")
         .containingResource("log/empty-domain-with-log4j/log4j2-test.xml", "classes/log4j2-test.xml")

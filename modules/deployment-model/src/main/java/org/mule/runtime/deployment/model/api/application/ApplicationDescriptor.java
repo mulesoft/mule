@@ -16,7 +16,6 @@ import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
-  public static final String DEFAULT_CONFIGURATION_RESOURCE_LOCATION = Paths.get("classes", "mule-config.xml").toString();
   public static final String REPOSITORY_FOLDER = "repository";
   public static final String PROPERTY_DOMAIN = "domain";
 
