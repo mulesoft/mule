@@ -270,7 +270,6 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     runFlow("knockWithNullDoor");
   }
 
-
   @Test
   public void operationWithDynamicInlinePojoParameter() throws Exception {
     assertDynamicDoor("knockDynamicInlineDoor");
