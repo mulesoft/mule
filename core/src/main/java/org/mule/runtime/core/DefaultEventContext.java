@@ -130,31 +130,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
    * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
    * not complete the parent context
-   * <p/>
-   * This implementation performs its own error-handling using the closest available error handler in parent contexts and should
-   * be used solely for async fire-and-forget processing that does not impact the main flow.
-   *
-   * @param parent the parent context
-   * @param componentLocation he location of the component that creates the child context and operates on result if available.
-   * @return a new child context
-   */
-  public static InternalEventContext fireAndForgetChild(InternalEventContext parent,
-                                                        Optional<ComponentLocation> componentLocation) {
-    InternalEventContext context = parent;
-    MessagingExceptionHandler exceptionHandler = NULL_EXCEPTION_HANDLER;
-    while (context != null && exceptionHandler == NULL_EXCEPTION_HANDLER) {
-      exceptionHandler = context instanceof AbstractEventContext ? ((AbstractEventContext) context).getExceptionHandler()
-          : NULL_EXCEPTION_HANDLER;
-      context = context.getParentContext().orElse(null);
-    }
-    return child(parent, componentLocation, exceptionHandler);
-  }
-
-  /**
-   * Builds a new child execution context from a parent context. A child context delegates all getters to the parent context but
-   * has it's own completion lifecycle. Completion of the child context will not cause the parent context to complete. This is
-   * typically used in {@code flow-ref} type scenarios where a the referenced Flow should complete the child context, but should
-   * not complete the parent context
    *
    * @param parent the parent context
    * @param componentLocation the location of the component that creates the child context and operates on result if available.
