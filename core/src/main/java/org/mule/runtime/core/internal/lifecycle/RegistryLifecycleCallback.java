@@ -24,12 +24,12 @@ import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
 
 /**
  * An implementation of {@link LifecycleCallback} for applying {@link Registry} lifecycles

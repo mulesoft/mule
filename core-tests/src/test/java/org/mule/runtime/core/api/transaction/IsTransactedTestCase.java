@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.transaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,7 +23,7 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   @Test
   public void testIsTransacted() throws Exception {
     MuleTransactionConfig cfg = new MuleTransactionConfig();
-    TestTransaction testTx = new TestTransaction(null);
+    TestTransaction testTx = new TestTransaction(mockMuleContext());
 
     cfg.setAction(TransactionConfig.ACTION_NEVER);
     assertFalse(cfg.isTransacted());

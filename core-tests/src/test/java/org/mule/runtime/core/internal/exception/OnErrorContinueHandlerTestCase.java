@@ -11,9 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -25,6 +23,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -36,8 +35,6 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -62,7 +59,6 @@ import io.qameta.allure.Story;
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
   protected MuleContext muleContext = mockContextWithServices();
-  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
 
   @Rule
   public ExpectedException expectedException = none();
@@ -74,12 +70,10 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private Message muleMessage = of("");
 
-  @Mock
-  private StreamingManager mockStreamingManager;
   @Spy
-  private TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
+  private TestTransaction mockTransaction = new TestTransaction(muleContext);
   @Spy
-  private TestTransaction mockXaTransaction = new TestTransaction(mockMuleContext, true);
+  private TestTransaction mockXaTransaction = new TestTransaction(muleContext, true);
 
   private Flow flow;
 
@@ -98,11 +92,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     flow.initialise();
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
-    onErrorContinueHandler.setMuleContext(mockMuleContext);
+    onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
 
-    final MuleRegistry registry = mockMuleContext.getRegistry();
-    doReturn(mockStreamingManager).when(registry).lookupObject(StreamingManager.class);
     when(muleContext.getRegistry().lookupFlowConstruct(anyString()).getProcessingStrategy())
         .thenReturn(flow.getProcessingStrategy());
 

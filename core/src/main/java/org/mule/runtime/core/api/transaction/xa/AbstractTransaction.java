@@ -23,10 +23,10 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
 
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
 
 /**
  * This base class provides low level features for transactions.
@@ -40,9 +40,15 @@ public abstract class AbstractTransaction implements Transaction {
   protected int timeout;
 
   protected MuleContext muleContext;
+  private final NotificationDispatcher notificationFirer;
 
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
+    try {
+      notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   @Override
@@ -113,21 +119,21 @@ public abstract class AbstractTransaction implements Transaction {
 
   /**
    * Really begin the transaction. Note that resources are enlisted yet.
-   * 
+   *
    * @throws TransactionException
    */
   protected abstract void doBegin() throws TransactionException;
 
   /**
    * Commit the transaction on the underlying resource
-   * 
+   *
    * @throws TransactionException
    */
   protected abstract void doCommit() throws TransactionException;
 
   /**
    * Rollback the transaction on the underlying resource
-   * 
+   *
    * @throws TransactionException
    */
   protected abstract void doRollback() throws TransactionException;
@@ -139,11 +145,7 @@ public abstract class AbstractTransaction implements Transaction {
    */
   protected void fireNotification(TransactionNotification notification) {
     // TODO profile this piece of code
-    try {
-      muleContext.getRegistry().lookupObject(NotificationDispatcher.class).dispatch(notification);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
+    notificationFirer.dispatch(notification);
   }
 
   @Override
