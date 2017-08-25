@@ -27,7 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class RequiredExpressionParameterValueResolverWrapperTestCase extends AbstractValueResolverWrapperTestCase<Object> {
+public class RequiredParameterValueResolverWrapperTestCase extends AbstractValueResolverWrapperTestCase<Object> {
 
   private static final String PARAMETER_NAME = "requiredParam";
   private static final String EXPRESSION = "#[someExpression]";
@@ -40,7 +40,7 @@ public class RequiredExpressionParameterValueResolverWrapperTestCase extends Abs
 
   @Override
   protected AbstractValueResolverWrapper<Object> createWrapper(ValueResolver<Object> delegate) {
-    return new RequiredExpressionParameterValueResolverWrapper<>(delegate, PARAMETER_NAME, EXPRESSION);
+    return new RequiredParameterValueResolverWrapper<>(delegate, PARAMETER_NAME, EXPRESSION);
   }
 
   @Override

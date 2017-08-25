@@ -92,7 +92,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredExpressionParameterValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
@@ -647,7 +647,7 @@ public abstract class ExtensionDefinitionParser {
       final String expression = (String) value;
       resolver = getExpressionBasedValueResolver(expectedType, expression, modelProperties, expectedClass);
       if (required) {
-        resolver = new RequiredExpressionParameterValueResolverWrapper(resolver, parameterName, expression);
+        resolver = new RequiredParameterValueResolverWrapper(resolver, parameterName, expression);
       }
     } else {
       resolver = getStaticValueResolver(parameterName, expectedType, value, defaultValue, modelProperties, acceptsReferences,

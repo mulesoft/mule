@@ -18,24 +18,24 @@ import org.mule.runtime.api.exception.MuleException;
  * @param <T> the generic type of the resolved values
  * @since 4.0
  */
-public class RequiredExpressionParameterValueResolverWrapper<T> extends AbstractValueResolverWrapper<T> {
+public class RequiredParameterValueResolverWrapper<T> extends AbstractValueResolverWrapper<T> {
 
   private final String parameterName;
-  private final String expression;
+  private final String literalValue;
 
   /**
    * Creates a new instance
    *
    * @param delegate      the wrapped {@link ValueResolver}
    * @param parameterName the name of the parameter this resolver is associated to
-   * @param expression    the evaluated expression
+   * @param literalValue    the evaluated expression
    */
-  public RequiredExpressionParameterValueResolverWrapper(ValueResolver<T> delegate,
-                                                         String parameterName,
-                                                         String expression) {
+  public RequiredParameterValueResolverWrapper(ValueResolver<T> delegate,
+                                               String parameterName,
+                                               String literalValue) {
     super(delegate);
     this.parameterName = parameterName;
-    this.expression = expression;
+    this.literalValue = literalValue;
   }
 
   @Override
@@ -43,9 +43,9 @@ public class RequiredExpressionParameterValueResolverWrapper<T> extends Abstract
     T value = super.resolve(context);
     if (value == null) {
       throw new IllegalArgumentException(String.format(
-                                                       "Required parameter '%s' was assigned with expression '%s' which resolved to null. Required parameters need to be "
+          "Required parameter '%s' was assigned with value '%s' which resolved to null. Required parameters need to be "
                                                            + "assigned with non null values",
-                                                       parameterName, expression));
+          parameterName, literalValue));
     }
 
     return value;
