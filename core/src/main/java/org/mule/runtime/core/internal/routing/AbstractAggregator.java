@@ -87,6 +87,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   protected void initProcessedGroupsObjectStore() {
     if (processedGroupsObjectStore == null) {
+      //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
       processedGroupsObjectStore = new ProvidedObjectStoreWrapper<>(null, internalProcessedGroupsObjectStoreFactory());
     }
   }
@@ -105,6 +106,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected void initEventGroupsObjectStore() throws InitialisationException {
     try {
       if (eventGroupsObjectStore == null) {
+        //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
         eventGroupsObjectStore = new ProvidedPartitionableObjectStoreWrapper(null, internalEventsGroupsObjectStoreSupplier());
       }
       eventGroupsObjectStore.open(storePrefix + ".expiredAndDispatchedGroups");
@@ -184,11 +186,13 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   public void setProcessedGroupsObjectStore(ObjectStore<Long> processedGroupsObjectStore) {
     this.processedGroupsObjectStore =
+        //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
   public void setEventGroupsObjectStore(PartitionableObjectStore<InternalEvent> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
+        //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
         new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());
   }
 

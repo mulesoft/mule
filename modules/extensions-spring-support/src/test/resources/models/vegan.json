@@ -1717,12 +1717,37 @@
                       },
                       {
                         "key": {
-                          "name": "object-store-ref"
+                          "name": "objectStore"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": []
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
                         },
                         "annotations": {
+                          "elementReference": {
+                            "elementReference": {
+                              "namespace": "os",
+                              "name": "object-store",
+                              "type": "OBJECT_STORE"
+                            }
+                          },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
                           }
@@ -2274,12 +2299,37 @@
                       },
                       {
                         "key": {
-                          "name": "object-store-ref"
+                          "name": "objectStore"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": []
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
                         },
                         "annotations": {
+                          "elementReference": {
+                            "elementReference": {
+                              "namespace": "os",
+                              "name": "object-store",
+                              "type": "OBJECT_STORE"
+                            }
+                          },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
                           }
@@ -4605,12 +4655,37 @@
                       },
                       {
                         "key": {
-                          "name": "object-store-ref"
+                          "name": "objectStore"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": []
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
                         },
                         "annotations": {
+                          "elementReference": {
+                            "elementReference": {
+                              "namespace": "os",
+                              "name": "object-store",
+                              "type": "OBJECT_STORE"
+                            }
+                          },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
                           }
@@ -6134,12 +6209,37 @@
                       },
                       {
                         "key": {
-                          "name": "object-store-ref"
+                          "name": "objectStore"
                         },
                         "model": {
-                          "type": "String"
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "org.mule.runtime.api.store.ObjectStore",
+                            "classInformation": {
+                              "classname": "org.mule.runtime.api.store.ObjectStore",
+                              "hasDefaultConstructor": false,
+                              "isInterface": true,
+                              "isInstantiable": false,
+                              "isAbstract": true,
+                              "isFinal": false,
+                              "implementedInterfaces": [],
+                              "parent": "",
+                              "genericTypes": []
+                            },
+                            "typeAlias": {
+                              "value": "ObjectStore"
+                            }
+                          },
+                          "fields": []
                         },
                         "annotations": {
+                          "elementReference": {
+                            "elementReference": {
+                              "namespace": "os",
+                              "name": "object-store",
+                              "type": "OBJECT_STORE"
+                            }
+                          },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
                           }

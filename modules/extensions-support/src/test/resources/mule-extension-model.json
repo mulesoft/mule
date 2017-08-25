@@ -1691,7 +1691,7 @@
                   },
                   {
                     "key": {
-                      "name": "object-store-ref"
+                      "name": "objectStore"
                     },
                     "model": {
                       "type": "String",
