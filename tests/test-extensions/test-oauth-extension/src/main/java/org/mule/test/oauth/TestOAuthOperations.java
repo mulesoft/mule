@@ -8,6 +8,7 @@ package org.mule.test.oauth;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -18,7 +19,9 @@ public class TestOAuthOperations {
     return connection;
   }
 
-  public void captureCallbackPayloads(@Config TestOAuthExtension config, AuthCodeRequest request, AuthorizationCodeState state) {
+  public void captureCallbackPayloads(@Config TestOAuthExtension config,
+                                      @Optional AuthCodeRequest request,
+                                      @Optional AuthorizationCodeState state) {
     config.getCapturedAuthCodeRequests().add(request);
     config.getCapturedAuthCodeStates().add(state);
   }
