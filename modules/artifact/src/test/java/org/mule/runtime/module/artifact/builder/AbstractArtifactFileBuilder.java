@@ -204,10 +204,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     ZipResource result = null;
 
     if (!props.isEmpty()) {
-      // TODO(pablo.kraan): packager - check this
-      File classesFolder = new File(getTempFolder(), "classes");
-      classesFolder.mkdirs();
-      final File applicationPropertiesFile = new File(classesFolder, propertiesFileName);
+      final File applicationPropertiesFile = new File(getTempFolder(), propertiesFileName);
       applicationPropertiesFile.deleteOnExit();
       createPropertiesFile(applicationPropertiesFile, props);
 

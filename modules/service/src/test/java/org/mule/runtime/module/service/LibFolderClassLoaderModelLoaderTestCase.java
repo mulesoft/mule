@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.LibFolderClassLoaderModelLoader.CLASSES_FOLDER;
 import static org.mule.runtime.module.service.LibFolderClassLoaderModelLoader.LIB_FOLDER;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
@@ -53,12 +52,10 @@ public class LibFolderClassLoaderModelLoaderTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void addsClassesFolderToClassLoader() throws Exception {
-    File classesFolder = serviceFolder.newFolder(CLASSES_FOLDER);
-
+  public void addsArtifactFolderToClassLoader() throws Exception {
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(serviceFolder.getRoot(), emptyMap(), SERVICE);
 
-    assertThat(classLoaderModel.getUrls(), hasItemInArray(classesFolder.toURI().toURL()));
+    assertThat(classLoaderModel.getUrls(), hasItemInArray(serviceFolder.getRoot().toURI().toURL()));
   }
 
   @Test
