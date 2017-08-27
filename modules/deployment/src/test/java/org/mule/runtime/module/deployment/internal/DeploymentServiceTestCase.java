@@ -2011,25 +2011,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deploysLightApplicationWithPluginDependingOnPlugin() throws Exception {
-
-    ArtifactPluginFileBuilder dependantPlugin =
-        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(pluginEcho3TestClassFile, "org/foo/echo/Plugin3Echo.class")
-            .dependingOn(echoPlugin);
-
-    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
-        .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin).usingLightwayPackage();
-    addPackedAppFromBuilder(artifactFileBuilder);
-
-    startDeployment();
-
-    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
-
-    executeApplicationFlow("main");
-  }
-
-  @Test
   public void deploysApplicationWithPrivilegedPluginDependingOnPlugin() throws Exception {
     ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
         .configuredWith(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")

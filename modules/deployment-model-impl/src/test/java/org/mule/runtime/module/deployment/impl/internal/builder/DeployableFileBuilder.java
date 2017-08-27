@@ -77,34 +77,33 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   protected final List<ZipUtils.ZipResource> getCustomResources() {
     final List<ZipUtils.ZipResource> customResources = new LinkedList<>();
 
-
-    for (AbstractDependencyFileBuilder dependencyFileBuilder : getAllCompileDependencies()) {
-      customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactFile().getAbsolutePath(),
-                                                   Paths.get(REPOSITORY_FOLDER,
-                                                             dependencyFileBuilder.getArtifactFileRepositoryPath())
-                                                       .toString()));
-
-      if (useHeavyPackage && MULE_PLUGIN_CLASSIFIER.equals(dependencyFileBuilder.getClassifier())) {
-        File pluginClassLoaderModel = createClassLoaderModelJsonFile(dependencyFileBuilder);
-        customResources.add(new ZipUtils.ZipResource(pluginClassLoaderModel.getAbsolutePath(),
-                                                     Paths.get(REPOSITORY_FOLDER,
-                                                               dependencyFileBuilder.getArtifactFileRepositoryFolderPath(),
-                                                               CLASSLOADER_MODEL_JSON_DESCRIPTOR)
-                                                         .toString()));
-      } else {
-        customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactPomFile().getAbsolutePath(),
-                                                     Paths.get(REPOSITORY_FOLDER,
-                                                               dependencyFileBuilder.getArtifactFilePomRepositoryPath())
-                                                         .toString()));
-      }
-    }
-
-    customResources.addAll(doGetCustomResources());
-
     if (useHeavyPackage) {
+      for (AbstractDependencyFileBuilder dependencyFileBuilder : getAllCompileDependencies()) {
+        customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactFile().getAbsolutePath(),
+                                                     Paths.get(REPOSITORY_FOLDER,
+                                                               dependencyFileBuilder.getArtifactFileRepositoryPath())
+                                                         .toString()));
+
+        if (MULE_PLUGIN_CLASSIFIER.equals(dependencyFileBuilder.getClassifier())) {
+          File pluginClassLoaderModel = createClassLoaderModelJsonFile(dependencyFileBuilder);
+          customResources.add(new ZipUtils.ZipResource(pluginClassLoaderModel.getAbsolutePath(),
+                                                       Paths.get(REPOSITORY_FOLDER,
+                                                                 dependencyFileBuilder.getArtifactFileRepositoryFolderPath(),
+                                                                 CLASSLOADER_MODEL_JSON_DESCRIPTOR)
+                                                           .toString()));
+        } else {
+          customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactPomFile().getAbsolutePath(),
+                                                       Paths.get(REPOSITORY_FOLDER,
+                                                                 dependencyFileBuilder.getArtifactFilePomRepositoryPath())
+                                                           .toString()));
+        }
+      }
+
       customResources.add(new ZipUtils.ZipResource(getClassLoaderModelFile().getAbsolutePath(),
                                                    CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION));
     }
+
+    customResources.addAll(doGetCustomResources());
 
     return customResources;
   }
