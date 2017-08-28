@@ -244,8 +244,8 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="request"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="state"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="request"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="state"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
