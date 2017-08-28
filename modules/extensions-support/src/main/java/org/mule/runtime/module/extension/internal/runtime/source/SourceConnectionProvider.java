@@ -33,7 +33,7 @@ public class SourceConnectionProvider implements ConnectionProvider<Object> {
 
   @Override
   public void disconnect(Object connection) {
-    connectionManager.disconnect(connection);
+    connectionManager.release(connection);
   }
 
   @Override
