@@ -16,6 +16,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 
@@ -72,29 +73,27 @@ public class ServiceResourcesResolver {
                                            e);
       }
 
-      muleServiceModel.getClassLoaderModelLoaderDescriptor().ifPresent(
-                                                                       classLoaderModelDescriptor -> {
-                                                                         exportPackages
-                                                                             .addAll((List<String>) classLoaderModelDescriptor
-                                                                                 .getAttributes().getOrDefault(EXPORTED_PACKAGES,
-                                                                                                               new ArrayList<>()));
-                                                                         exportResources
-                                                                             .addAll((List<String>) classLoaderModelDescriptor
-                                                                                 .getAttributes().getOrDefault(EXPORTED_RESOURCES,
-                                                                                                               new ArrayList<>()));
+      MuleArtifactLoaderDescriptor classLoaderModelDescriptor = muleServiceModel.getClassLoaderModelLoaderDescriptor();
+      exportPackages
+          .addAll((List<String>) classLoaderModelDescriptor
+              .getAttributes().getOrDefault(EXPORTED_PACKAGES,
+                                            new ArrayList<>()));
+      exportResources
+          .addAll((List<String>) classLoaderModelDescriptor
+              .getAttributes().getOrDefault(EXPORTED_RESOURCES,
+                                            new ArrayList<>()));
 
-                                                                         privilegedExportedPackages
-                                                                             .addAll((List<String>) classLoaderModelDescriptor
-                                                                                 .getAttributes()
-                                                                                 .getOrDefault(PRIVILEGED_EXPORTED_PACKAGES,
-                                                                                               new ArrayList<>()));
+      privilegedExportedPackages
+          .addAll((List<String>) classLoaderModelDescriptor
+              .getAttributes()
+              .getOrDefault(PRIVILEGED_EXPORTED_PACKAGES,
+                            new ArrayList<>()));
 
-                                                                         privilegedArtifacts
-                                                                             .addAll((List<String>) classLoaderModelDescriptor
-                                                                                 .getAttributes()
-                                                                                 .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
-                                                                                               new ArrayList<>()));
-                                                                       });
+      privilegedArtifacts
+          .addAll((List<String>) classLoaderModelDescriptor
+              .getAttributes()
+              .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
+                            new ArrayList<>()));
 
       return new ArtifactUrlClassification(serviceUrlClassification.getName(), muleServiceModel.getServiceProviderClassName(),
                                            serviceUrlClassification.getUrls());

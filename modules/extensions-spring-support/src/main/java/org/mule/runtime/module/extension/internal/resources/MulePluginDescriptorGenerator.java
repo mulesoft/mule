@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExten
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoader.SOAP_LOADER_ID;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -54,12 +55,12 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
     final MulePluginModelBuilder builder = new MulePluginModelBuilder();
     builder.setName(extensionModel.getName())
         .setMinMuleVersion(extensionModel.getMinMuleVersion().toCompleteNumericVersion());
-    builder.withClassLoaderModelDescriber()
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())
         .addProperty(EXPORTED_RESOURCES, exportCollector.getExportedResources())
         .addProperty(PRIVILEGED_EXPORTED_PACKAGES, exportCollector.getPrivilegedExportedPackages())
-        .addProperty(PRIVILEGED_ARTIFACTS_IDS, exportCollector.getPrivilegedArtifacts());
+        .addProperty(PRIVILEGED_ARTIFACTS_IDS, exportCollector.getPrivilegedArtifacts()).build());
     builder.withExtensionModelDescriber()
         .setId(getLoaderId(extensionModel))
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())

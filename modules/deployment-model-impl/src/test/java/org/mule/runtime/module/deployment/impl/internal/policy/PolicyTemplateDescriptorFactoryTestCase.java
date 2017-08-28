@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -133,7 +134,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   public void readsRuntimeLibs() throws Exception {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_POLICY_MODEL_LOADER_ID);
+    mulePolicyModelBuilder
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
 
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
         .describedBy(mulePolicyModelBuilder.build());
@@ -153,7 +155,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void assignsBundleDescriptor() throws Exception {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
-        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
 
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).usingLibrary(echoTestJarFile.getAbsolutePath())
@@ -175,8 +178,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void readsPlugin() throws Exception {
     MulePolicyModelBuilder policyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
-        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    policyModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
     ArtifactPluginFileBuilder plugin1 = new ArtifactPluginFileBuilder("plugin1");
     ArtifactPluginFileBuilder plugin2 = new ArtifactPluginFileBuilder("plugin2");
@@ -214,8 +217,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void detectsInvalidClassLoaderModelLoaderId() throws Exception {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
-        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(INVALID_LOADER_ID);
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(INVALID_LOADER_ID, emptyMap()));
 
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(mulePolicyModelBuilder.build());
     File tempFolder = createTempFolder();
@@ -232,8 +235,8 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void detectsInvalidBundleDescriptorLoaderId() throws Exception {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
-        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(INVALID_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_POLICY_MODEL_LOADER_ID);
+        .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(INVALID_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
 
     PolicyFileBuilder policyFileBuilder = new PolicyFileBuilder(POLICY_NAME).describedBy(mulePolicyModelBuilder.build());
     File tempFolder = createTempFolder();

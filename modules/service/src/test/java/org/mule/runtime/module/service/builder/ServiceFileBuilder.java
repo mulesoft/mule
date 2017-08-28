@@ -99,7 +99,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     serviceDescriptor.deleteOnExit();
     MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
     serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
-    serviceModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    serviceModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);
     String serviceDescriptorContent = new MuleServiceModelJsonSerializer().serialize(serviceModelBuilder.build());

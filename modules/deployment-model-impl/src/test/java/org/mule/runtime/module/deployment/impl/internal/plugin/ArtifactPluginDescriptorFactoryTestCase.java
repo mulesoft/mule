@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -29,6 +30,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
@@ -101,9 +103,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     String pluginName = "samplePlugin";
 
     MulePluginModel.MulePluginModelBuilder builder = new MulePluginModel.MulePluginModelBuilder();
-    builder.withClassLoaderModelDescriber()
-        .setId("mule")
-        .build();
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId("mule").build());
     Map<String, Object> attributes = new HashMap<>();
     attributes.put(GROUP_ID, "org.mule.test");
     attributes.put(ARTIFACT_ID, pluginName);
@@ -112,6 +112,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     attributes.put(TYPE, "jar");
 
     builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, attributes));
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     MulePluginModel mulePluginModel = builder
         .setName(pluginName)
         .setMinMuleVersion("4.0.0")
@@ -143,7 +144,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
         .setMinMuleVersion(MIN_MULE_VERSION)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    pluginModelBuilder.withClassLoaderModelDescriber().setId(INVALID_LOADER_ID);
+    pluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(INVALID_LOADER_ID, emptyMap()));
 
     ArtifactPluginFileBuilder pluginFileBuilder =
         new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())
@@ -162,8 +163,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   @Test
   public void detectsInvalidBundleDescriptorModelLoaderId() throws Exception {
     MulePluginModel.MulePluginModelBuilder pluginModelBuilder = new MulePluginModel.MulePluginModelBuilder().setName(PLUGIN_NAME)
-        .setMinMuleVersion(MIN_MULE_VERSION).withBundleDescriptorLoader(createBundleDescriptorLoader(INVALID_LOADER_ID));
-    pluginModelBuilder.withClassLoaderModelDescriber().setId(FILE_SYSTEM_POLICY_MODEL_LOADER_ID);
+        .setMinMuleVersion(MIN_MULE_VERSION).withBundleDescriptorLoader(createBundleDescriptorLoader(INVALID_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
 
     ArtifactPluginFileBuilder pluginFileBuilder =
         new ArtifactPluginFileBuilder(PLUGIN_NAME).tempFolder(pluginsTempFolder.newFolder())

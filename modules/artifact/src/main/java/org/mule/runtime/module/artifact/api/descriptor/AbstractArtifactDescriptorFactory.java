@@ -80,11 +80,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     descriptor.setBundleDescriptor(getBundleDescriptor(artifactLocation, artifactModel));
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
 
-    artifactModel.getClassLoaderModelLoaderDescriptor().ifPresent(classLoaderModelLoaderDescriptor -> {
-      ClassLoaderModel classLoaderModel = getClassLoaderModel(artifactLocation, classLoaderModelLoaderDescriptor);
-      descriptor.setClassLoaderModel(classLoaderModel);
-
-    });
+    ClassLoaderModel classLoaderModel =
+        getClassLoaderModel(artifactLocation, artifactModel.getClassLoaderModelLoaderDescriptor());
+    descriptor.setClassLoaderModel(classLoaderModel);
 
     doDescriptorConfig(artifactModel, descriptor, artifactLocation);
 

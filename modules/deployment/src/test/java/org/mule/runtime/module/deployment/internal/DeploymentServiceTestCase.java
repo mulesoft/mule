@@ -92,6 +92,7 @@ import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.exception.MuleException;
@@ -186,9 +187,9 @@ import org.mockito.verification.VerificationMode;
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
-  protected static final int DEPLOYMENT_TIMEOUT = 10000;
+  private static final int DEPLOYMENT_TIMEOUT = 10000;
   protected static final String[] NONE = new String[0];
-  protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
+  private static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
   private static final String MULE_POLICY_CLASSIFIER = "mule-policy";
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-plugin";
 
@@ -421,6 +422,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
           .setMinMuleVersion(MIN_MULE_VERSION).setName(FOO_POLICY_NAME)
           .withBundleDescriptorLoader(createBundleDescriptorLoader(FOO_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
   private final PolicyFileBuilder barPolicyFileBuilder =
@@ -428,6 +430,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
           .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
           .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
   private final PolicyFileBuilder policyUsingAppPluginFileBuilder =
@@ -435,6 +438,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
           .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
           .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+          .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
   private final PolicyFileBuilder policyIncludingPluginFileBuilder =
@@ -1702,7 +1706,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder builder = new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
-    builder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
 
     return new ArtifactPluginFileBuilder(extensionName)
@@ -1724,7 +1728,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
-    builder.withClassLoaderModelDescriber().addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
 
     final ArtifactPluginFileBuilder usingByeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
@@ -1764,7 +1769,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
     builder.withExtensionModelDescriber().setId(XmlExtensionModelLoader.DESCRIBER_ID).addProperty(RESOURCE_XML,
                                                                                                   moduleDestination);
-    builder.withClassLoaderModelDescriber().addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID);
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .addProperty(EXPORTED_PACKAGES, asList("org.foo")).setId(MULE_LOADER_ID).build());
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER, MULE_LOADER_ID));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
@@ -1800,6 +1806,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     builder.withExtensionModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER,
                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
     final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder(extensionName)
         .describedBy(builder.build());
@@ -1819,7 +1826,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     MulePluginModelBuilder builder =
         new MulePluginModelBuilder().setName(extensionName).setMinMuleVersion(MIN_MULE_VERSION);
-    builder.withClassLoaderModelDescriber().setId("a-non-existing-ID-describer").addProperty("aProperty", "aValue");
+    builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId("a-non-existing-ID-describer")
+        .addProperty("aProperty", "aValue").build());
     builder.withBundleDescriptorLoader(createBundleDescriptorLoader(extensionName, MULE_EXTENSION_CLASSIFIER,
                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
 
@@ -3388,6 +3396,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
             .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
             .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                      PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+            .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
             .build());
 
     policyManager.registerPolicyTemplate(brokenPolicyFileBuilder.getArtifactFile());
@@ -4287,7 +4296,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    mulePolicyModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME)
         .describedBy(mulePolicyModelBuilder.build())
         .dependingOn(helloExtensionV2Plugin);
@@ -4298,10 +4307,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin")
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriber()
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .addProperty(EXPORTED_RESOURCES,
                      asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
-        .setId(MULE_LOADER_ID);
+        .setId(MULE_LOADER_ID).build());
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
         .describedBy((mulePluginModelBuilder.build()));
@@ -4312,9 +4321,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin")
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
-    mulePluginModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID)
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_RESOURCES,
-                     asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"));
+                     asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
+        .build());
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
@@ -4324,8 +4334,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(BAZ_POLICY_NAME)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(BAZ_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
-    mulePolicyModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     return new PolicyFileBuilder(BAZ_POLICY_NAME).describedBy(mulePolicyModelBuilder
         .build()).dependingOn(helloExtensionV1Plugin);
   }

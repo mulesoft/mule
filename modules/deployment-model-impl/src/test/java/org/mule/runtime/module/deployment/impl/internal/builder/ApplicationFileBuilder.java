@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -21,7 +20,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -169,11 +168,13 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
       String[] configFiles = configs.split(",");
       muleApplicationModelBuilder.setConfigs(asList(configFiles));
     });
-    muleApplicationModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    MuleArtifactLoaderDescriptorBuilder muleArtifactLoaderDescriptorBuilder =
+        new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
     exportedResources.ifPresent(resources -> {
-      muleApplicationModelBuilder.withClassLoaderModelDescriber().addProperty(EXPORTED_RESOURCES, resources.split(","));
+      muleArtifactLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(","));
     });
-    muleApplicationModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    muleApplicationModelBuilder.withClassLoaderModelDescriptorLoader(muleArtifactLoaderDescriptorBuilder.build());
+    muleApplicationModelBuilder.withBundleDescriptorLoader(muleArtifactLoaderDescriptorBuilder.build());
     String applicationDescriptorContent = new MuleApplicationModelJsonSerializer().serialize(muleApplicationModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(applicationDescriptor)) {
       fileWriter.write(applicationDescriptorContent);
