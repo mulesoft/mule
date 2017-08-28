@@ -494,7 +494,8 @@ public class MacroExpansionModuleModel {
    * @param moduleGlobalElementsNames names of the <module/>s global component that will be macro expanded in the Mule application
    * @param literalsParameters {@link Map} with all he <property>s and <parameter>s that were feed with a literal value in the
    *        Mule application's code.
-   * @param configurationModel TODO lautaro add comment here
+   * @param configurationModel element used to check whether or not the macro expanded element must have the same name as the one
+   *                           defined in the application by calling {@link #getTestConnectionGlobalElement(ConfigurationModel)}
    * @return a transformed {@link ComponentModel} from the {@code modelToCopy}, where the global element's attributes has been
    *         updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter
    *         can be optimized by replacing it for the literal's value, it will be done as well using the
