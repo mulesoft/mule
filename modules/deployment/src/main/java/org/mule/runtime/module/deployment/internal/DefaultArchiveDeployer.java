@@ -296,7 +296,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void addZombieApp(Artifact artifact) {
-    File resourceFile = artifact.getResourceFiles()[0];
+    File resourceFile = artifact.getResourceFiles()[0].getParentFile();
 
     if (resourceFile.exists()) {
       try {
