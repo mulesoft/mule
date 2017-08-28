@@ -134,5 +134,6 @@ final class ExtensionActivator implements Startable, Stoppable {
       stopIfNeeded(element);
     }
     lifecycleAwareElements.clear();
+    enumTypes.clear();
   }
 }
