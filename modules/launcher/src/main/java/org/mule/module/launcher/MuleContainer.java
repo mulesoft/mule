@@ -212,6 +212,8 @@ public class MuleContainer
 
         unregisterShutdownHook();
         doShutdown();
+
+        System.exit(1);
     }
 
     /**
@@ -228,8 +230,6 @@ public class MuleContainer
     protected void doShutdown() throws MuleException
     {
         stop();
-
-        System.exit(0);
     }
 
     public void stop() throws MuleException
