@@ -86,7 +86,7 @@
                     "fields": []
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -130,7 +130,7 @@
                     "fields": []
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
