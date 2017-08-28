@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
@@ -22,6 +24,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.Interceptable;
@@ -73,15 +76,27 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   private final ConnectionManagerAdapter connectionManager;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
+  private final List<ValueTransformer> valueTransformers;
 
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
-  public DefaultExecutionMediator(ExtensionModel extensionModel, OperationModel operationModel,
-                                  ConnectionManagerAdapter connectionManager, ErrorTypeRepository typeRepository) {
+
+  @FunctionalInterface
+  public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter<OperationModel>, Object, Object> {
+
+  }
+
+  public DefaultExecutionMediator(ExtensionModel extensionModel,
+                                  OperationModel operationModel,
+                                  ConnectionManagerAdapter connectionManager,
+                                  ErrorTypeRepository typeRepository,
+                                  ValueTransformer... valueTransformers) {
     this.connectionManager = connectionManager;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }
+
 
   /**
    * Executes the operation per the specification in this classes' javadoc
@@ -127,31 +142,44 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
       }
 
-      result.doOnSuccess(value -> {
-        onSuccess(context, value, interceptors);
-        stats.ifPresent(s -> s.discountInflightOperation());
-        sink.success(value);
-      })
-          .onErrorMap(e -> {
-            e = exceptionEnricherManager.process(e);
-            e = moduleExceptionHandler.processException(e);
-            e = onError(context, e, interceptors);
-
-            return e;
-          }).subscribe(value -> {
+      result
+          .map(value -> transform(context, value))
+          .doOnSuccess(value -> {
+            onSuccess(context, value, interceptors);
+            stats.ifPresent(s -> s.discountInflightOperation());
+            sink.success(value);
+          }).onErrorMap(t -> mapError(context, interceptors, t))
+          .subscribe(v -> {
           }, sink::error);
-    }).doOnTerminate((value, e) -> {
-      try {
-        after(context, value, executedInterceptors);
-      } finally {
-        executedInterceptors.clear();
-      }
-    });
+    })
+        .doOnTerminate((value, e) -> {
+          try {
+            after(context, value, executedInterceptors);
+          } finally {
+            executedInterceptors.clear();
+          }
+        });
 
     return from(getRetryPolicyTemplate(context).applyPolicy(publisher,
                                                             e -> extractConnectionException(e).isPresent(),
                                                             e -> stats.ifPresent(s -> s.discountInflightOperation()),
                                                             throwable -> throwable));
+  }
+
+  private Throwable mapError(ExecutionContextAdapter context, List<Interceptor> interceptors, Throwable e) {
+    e = exceptionEnricherManager.process(e);
+    e = moduleExceptionHandler.processException(e);
+    e = onError(context, e, interceptors);
+
+    return e;
+  }
+
+  private Object transform(ExecutionContextAdapter context, Object value) {
+    for (ValueTransformer transformer : valueTransformers) {
+      value = transformer.apply(context, value);
+    }
+
+    return value;
   }
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {

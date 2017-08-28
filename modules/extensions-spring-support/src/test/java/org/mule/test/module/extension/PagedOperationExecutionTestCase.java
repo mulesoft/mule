@@ -9,12 +9,15 @@ package org.mule.test.module.extension;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.util.Iterator;
@@ -57,7 +60,9 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
 
   @Test
   public void pagedOperationException() throws Exception {
-    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(is(instanceOf(ConnectionException.class)));
+
     getCursor("failingPagedOperation").next();
   }
 
