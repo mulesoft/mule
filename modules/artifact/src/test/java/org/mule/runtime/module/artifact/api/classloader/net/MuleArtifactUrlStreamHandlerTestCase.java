@@ -11,12 +11,10 @@ import static org.apache.commons.io.IOUtils.contentEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection.CLASSES_FOLDER;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlConnection.SEPARATOR;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler.register;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
-
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -95,18 +93,6 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testReadResourceUnderClasses() throws IOException {
-    String resourceUnderClasses = CLASSES_FOLDER + SEPARATOR + "org/foo/echo/aResource.txt";
-
-    URL url = getURL(resourceUnderClasses);
-    InputStream actualInputStream = url.openStream();
-    assertThat(actualInputStream, notNullValue());
-
-    String pluginPropertiesActual = IOUtils.toString(actualInputStream);
-    assertThat(pluginPropertiesActual, is("content of some resource"));
-  }
-
-  @Test
   public void testReadRootLibJarElement() throws IOException {
     String file = "lib/test-jar-with-resources.jar";
 
@@ -136,8 +122,6 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
   public void testHttpUnsupportedProtocol() throws IOException {
     String file = "http://some.domain.com/artifact.zip"
         + SEPARATOR
-        + "classes"
-        + SEPARATOR
         + "some-non-existing-path.txt";
 
     URL urlWithMuleArtifactProtocol = new URL(PROTOCOL, "", -1, file);
@@ -146,15 +130,9 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testClassloaderWithMulePluginUrls() throws IOException {
-    URL classesURL = getURL(CLASSES_FOLDER + SEPARATOR);
     URL jarURL = getURL("lib/test-jar-with-resources.jar" + SEPARATOR);
 
-    URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {classesURL, jarURL});
-
-    // looking for resource that's located in the classesURL
-    InputStream actualSomeClassInputStream = urlClassLoader.getResourceAsStream("org/foo/echo/aResource.txt");
-    assertThat(actualSomeClassInputStream, notNullValue());
-    assertThat(IOUtils.toString(actualSomeClassInputStream), is("content of some resource"));
+    URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {jarURL});
 
     // looking for resource that's located in the jarURL (zip within zip scenario)
     InputStream testResourceWithinZipInputStream = urlClassLoader.getResourceAsStream("test-resource-2.txt");

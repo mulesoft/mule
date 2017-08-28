@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.deployment.model.internal.domain;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainClassesFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -40,7 +40,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   public URL findResource(String name) {
     URL resource = super.findResource(name);
     if (resource == null) {
-      File file = new File(getDomainClassesFolder(getArtifactDescriptor().getName()) + File.separator + name);
+      File file = new File(getDomainFolder(getArtifactDescriptor().getName()) + File.separator + name);
       if (file.exists()) {
         try {
           resource = file.toURI().toURL();
@@ -54,7 +54,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
 
   @Override
   protected String[] getLocalResourceLocations() {
-    return new String[] {getDomainClassesFolder(getArtifactDescriptor().getName()).getAbsolutePath(),
+    return new String[] {getDomainFolder(getArtifactDescriptor().getName()).getAbsolutePath(),
         getMuleConfDir().getAbsolutePath()};
   }
 }

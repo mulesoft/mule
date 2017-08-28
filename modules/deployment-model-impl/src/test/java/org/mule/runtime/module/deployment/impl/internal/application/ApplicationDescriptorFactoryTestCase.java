@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -43,11 +42,6 @@ public class ApplicationDescriptorFactoryTestCase
   @Override
   protected String getArtifactRootFolder() {
     return "apps/";
-  }
-
-  @Override
-  protected File getArtifactClassesFolder() {
-    return getAppClassesFolder(ARTIFACT_NAME);
   }
 
   @Override

@@ -96,7 +96,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   public ApplicationFileBuilder definedBy(String configFile) {
     checkImmutable();
     checkArgument(!StringUtils.isEmpty(configFile), "Config file cannot be empty");
-    this.resources.add(new ZipResource(configFile, "classes" + File.separator + DEFAULT_CONFIGURATION_RESOURCE));
+    this.resources.add(new ZipResource(configFile, DEFAULT_CONFIGURATION_RESOURCE));
 
     return this;
   }
@@ -117,7 +117,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   }
 
   /**
-   * Adds a resource file to the artifact classes folder.
+   * Adds a resource file to the artifact folder.
    *
    * @param resourceFile class file from a external file or test resource. Non empty.
    * @param targetFile name to use on the added resource. Non empty.
@@ -126,7 +126,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   public ApplicationFileBuilder usingResource(String resourceFile, String targetFile) {
     checkImmutable();
     checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
-    resources.add(new ZipResource(resourceFile, "classes/" + targetFile));
+    resources.add(new ZipResource(resourceFile, targetFile));
 
     return getThis();
   }

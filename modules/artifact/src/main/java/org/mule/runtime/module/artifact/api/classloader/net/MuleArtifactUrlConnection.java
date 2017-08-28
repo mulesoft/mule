@@ -69,8 +69,7 @@ import sun.net.www.ParseUtil;
  */
 public class MuleArtifactUrlConnection extends URLConnection {
 
-  public static final String SEPARATOR = "!/";
-  public static final String CLASSES_FOLDER = "classes";
+  static final String SEPARATOR = "!/";
   private static final List<String> SUPPORTED_PROTOCOLS = asList("file");
   /**
    * initialized from the first element of the split URL, which must be a zip form of file

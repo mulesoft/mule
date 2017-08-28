@@ -77,7 +77,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   public void createsApplication() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
-    final File[] resourceFiles = new File[] {new File("classes", "mule-config.xml")};
+    final File[] resourceFiles = new File[] {new File("mule-config.xml")};
     when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = mock(ArtifactPluginDescriptor.class);

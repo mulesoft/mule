@@ -26,7 +26,6 @@ public class MuleFoldersUtil {
   public static final String SHARED_FOLDER = "shared";
   public static final String APPS_FOLDER = "apps";
   public static final String PLUGINS_FOLDER = "plugins";
-  public static final String CLASSES_FOLDER = "classes";
   public static final String DOMAINS_FOLDER = "domains";
   public static final String CONTAINER_APP_PLUGINS = "plugins";
   public static final String SERVER_PLUGINS = "server-plugins";
@@ -99,10 +98,6 @@ public class MuleFoldersUtil {
     return new File(getDomainsFolder(), domainName);
   }
 
-  public static File getDomainClassesFolder(String domainName) {
-    return new File(getDomainFolder(domainName), "classes");
-  }
-
   public static File getDomainLibFolder(String domainName) {
     return new File(getDomainFolder(domainName), LIB_FOLDER);
   }
@@ -117,10 +112,6 @@ public class MuleFoldersUtil {
 
   public static File getAppTempFolder(String appName) {
     return new File(new File(getExecutionFolder(), appName), "temp");
-  }
-
-  public static File getAppClassesFolder(String appName) {
-    return new File(getAppFolder(appName), CLASSES_FOLDER);
   }
 
   /**

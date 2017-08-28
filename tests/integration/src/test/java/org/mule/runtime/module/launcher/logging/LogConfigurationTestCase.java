@@ -98,7 +98,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
 
     File domainFile = new DomainFileBuilder(DOMAIN_NAME)
         .definedBy("log/empty-domain-with-log4j/empty-domain-config.xml")
-        .containingResource("log/empty-domain-with-log4j/log4j2-test.xml", "classes/log4j2-test.xml")
+        .containingResource("log/empty-domain-with-log4j/log4j2-test.xml", "log4j2-test.xml")
         .getArtifactFile();
     muleServer.deployDomainFile(domainFile);
 

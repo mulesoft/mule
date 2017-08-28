@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.CLASSES_DIR;
 import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderModelLoader.LIB_DIR;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,7 +36,6 @@ public class FileSystemPolicyClassLoaderModelLoaderTestCase extends AbstractMule
   @Test
   public void createsClassLoaderModelFromFolder() throws Exception {
     File policyFolder = temporaryFolder.newFolder();
-    File classesFolder = new File(policyFolder, CLASSES_DIR);
     File libFolder = new File(policyFolder, LIB_DIR);
     assertThat(libFolder.mkdir(), is(true));
 
@@ -49,7 +47,7 @@ public class FileSystemPolicyClassLoaderModelLoaderTestCase extends AbstractMule
     ClassLoaderModel classLoaderModel = classLoaderModelLoader.load(policyFolder, null, POLICY);
 
     assertThat(classLoaderModel.getUrls().length, equalTo(3));
-    assertThat(classLoaderModel.getUrls()[0], equalTo(classesFolder.toURI().toURL()));
+    assertThat(classLoaderModel.getUrls()[0], equalTo(policyFolder.toURI().toURL()));
     assertThat(asList(classLoaderModel.getUrls()), allOf(hasItem(file1.toURI().toURL()), hasItem(file2.toURI().toURL())));
     assertThat(classLoaderModel.getDependencies(), is(empty()));
     assertThat(classLoaderModel.getExportedPackages(), is(empty()));

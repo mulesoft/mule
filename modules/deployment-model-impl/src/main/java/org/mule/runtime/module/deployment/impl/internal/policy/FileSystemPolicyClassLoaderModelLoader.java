@@ -25,8 +25,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   public static final String FILE_SYSTEM_POLICY_MODEL_LOADER_ID = "FILE_SYSTEM_POLICY_MODEL_LOADER";
-  protected static final String LIB_DIR = "lib";
-  public static final String CLASSES_DIR = "classes";
+  static final String LIB_DIR = "lib";
   private static final String JAR_FILE = ".jar";
 
 
@@ -37,7 +36,7 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
 
   /**
    * Given a policy template's location it will build a {@link ClassLoaderModel} taking in account jars located inside the
-   * {@value LIB_DIR} folder and resources located inside the {@value CLASSES_DIR} folder.
+   * {@value LIB_DIR} folder and resources located inside the artifact folder.
    *
    * @param artifactFolder {@link File} where the current plugin to work with.
    * @param attributes collection of attributes describing the loader. Non null.
@@ -64,7 +63,7 @@ public class FileSystemPolicyClassLoaderModelLoader implements ClassLoaderModelL
   private void loadUrls(ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder, File artifactFolder)
       throws InvalidDescriptorLoaderException {
     try {
-      classLoaderModelBuilder.containing(new File(artifactFolder, CLASSES_DIR).toURI().toURL());
+      classLoaderModelBuilder.containing(artifactFolder.toURI().toURL());
       final File libDir = new File(artifactFolder, LIB_DIR);
       if (libDir.exists()) {
         final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(JAR_FILE));
