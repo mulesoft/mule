@@ -9,11 +9,12 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -24,8 +25,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -72,29 +73,12 @@ public class PluginResourcesResolver {
                                            e);
       }
 
-      mulePluginModel.getClassLoaderModelLoaderDescriptor().ifPresent(
-                                                                      classLoaderModelDescriptor -> {
-                                                                        exportPackages
-                                                                            .addAll((List<String>) classLoaderModelDescriptor
-                                                                                .getAttributes().getOrDefault(EXPORTED_PACKAGES,
-                                                                                                              new ArrayList<>()));
-                                                                        exportResources
-                                                                            .addAll((List<String>) classLoaderModelDescriptor
-                                                                                .getAttributes().getOrDefault(EXPORTED_RESOURCES,
-                                                                                                              new ArrayList<>()));
+      Map<String, Object> attributes = mulePluginModel.getClassLoaderModelLoaderDescriptor().getAttributes();
+      exportPackages.addAll((List<String>) attributes.getOrDefault(EXPORTED_PACKAGES, emptyList()));
+      exportResources.addAll((List<String>) attributes.getOrDefault(EXPORTED_RESOURCES, emptyList()));
 
-                                                                        privilegedExportedPackages
-                                                                            .addAll((List<String>) classLoaderModelDescriptor
-                                                                                .getAttributes()
-                                                                                .getOrDefault(PRIVILEGED_EXPORTED_PACKAGES,
-                                                                                              new ArrayList<>()));
-
-                                                                        privilegedArtifacts
-                                                                            .addAll((List<String>) classLoaderModelDescriptor
-                                                                                .getAttributes()
-                                                                                .getOrDefault(PRIVILEGED_ARTIFACTS_IDS,
-                                                                                              new ArrayList<>()));
-                                                                      });
+      privilegedExportedPackages.addAll((List<String>) attributes.getOrDefault(PRIVILEGED_EXPORTED_PACKAGES, emptyList()));
+      privilegedArtifacts.addAll((List<String>) attributes.getOrDefault(PRIVILEGED_ARTIFACTS_IDS, emptyList()));
 
       return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
                                          pluginUrlClassification.getExportClasses(),

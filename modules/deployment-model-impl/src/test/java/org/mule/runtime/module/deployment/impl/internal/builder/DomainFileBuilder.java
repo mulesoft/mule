@@ -20,6 +20,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -142,20 +143,22 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
                                               Optional<String> configResources, Optional<String> exportedResources) {
     File domainDescriptor = new File(getTempFolder(), getArtifactId() + "domain.json");
     domainDescriptor.deleteOnExit();
-    MuleDomainModel.MuleDomainModelBuilder MuleDomainModelBuilder =
+    MuleDomainModel.MuleDomainModelBuilder muleDomainModelBuilder =
         new MuleDomainModel.MuleDomainModelBuilder();
-    MuleDomainModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
-    redeploymentEnabled.ifPresent(MuleDomainModelBuilder::setRedeploymentEnabled);
+    muleDomainModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    redeploymentEnabled.ifPresent(muleDomainModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");
-      MuleDomainModelBuilder.setConfigs(asList(configFiles));
+      muleDomainModelBuilder.setConfigs(asList(configFiles));
     });
-    MuleDomainModelBuilder.withClassLoaderModelDescriber().setId(MULE_LOADER_ID);
+    MuleArtifactLoaderDescriptorBuilder muleArtifactClassLoaderDescriptorBuilder =
+        new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
     exportedResources.ifPresent(resources -> {
-      MuleDomainModelBuilder.withClassLoaderModelDescriber().addProperty(EXPORTED_RESOURCES, resources.split(","));
+      muleArtifactClassLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(","));
     });
-    MuleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
-    String applicationDescriptorContent = new MuleDomainModelJsonSerializer().serialize(MuleDomainModelBuilder.build());
+    muleDomainModelBuilder.withClassLoaderModelDescriptorLoader(muleArtifactClassLoaderDescriptorBuilder.build());
+    muleDomainModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+    String applicationDescriptorContent = new MuleDomainModelJsonSerializer().serialize(muleDomainModelBuilder.build());
     try (FileWriter fileWriter = new FileWriter(domainDescriptor)) {
       fileWriter.write(applicationDescriptorContent);
     } catch (IOException e) {

@@ -119,26 +119,28 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
       final MulePluginModel.MulePluginModelBuilder builder = new MulePluginModel.MulePluginModelBuilder();
       builder.setName(getArtifactId())
           .setMinMuleVersion("4.0.0");
-      MuleArtifactLoaderDescriptorBuilder classLoaderModelDescriber = builder.withClassLoaderModelDescriber()
-          .setId(MULE_LOADER_ID);
+      MuleArtifactLoaderDescriptorBuilder classLoaderModelDescriptorBuilder =
+          new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
       if (properties.containsKey(EXPORTED_CLASS_PACKAGES_PROPERTY)) {
-        classLoaderModelDescriber.addProperty(EXPORTED_PACKAGES,
-                                              ((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
+        classLoaderModelDescriptorBuilder.addProperty(EXPORTED_PACKAGES,
+                                                      ((String) properties.get(EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
       }
       if (properties.containsKey(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY)) {
-        classLoaderModelDescriber.addProperty(PRIVILEGED_EXPORTED_PACKAGES,
-                                              ((String) properties.get(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY)).split(","));
+        classLoaderModelDescriptorBuilder.addProperty(PRIVILEGED_EXPORTED_PACKAGES,
+                                                      ((String) properties.get(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY))
+                                                          .split(","));
       }
       if (properties.containsKey(PRIVILEGED_ARTIFACTS_PROPERTY)) {
-        classLoaderModelDescriber.addProperty(PRIVILEGED_ARTIFACTS_IDS,
-                                              ((String) properties.get(PRIVILEGED_ARTIFACTS_PROPERTY)).split(","));
+        classLoaderModelDescriptorBuilder.addProperty(PRIVILEGED_ARTIFACTS_IDS,
+                                                      ((String) properties.get(PRIVILEGED_ARTIFACTS_PROPERTY)).split(","));
       }
       if (properties.containsKey(EXPORTED_RESOURCE_PROPERTY)) {
-        classLoaderModelDescriber.addProperty(EXPORTED_RESOURCES,
-                                              ((String) properties.get(EXPORTED_RESOURCE_PROPERTY)).split(","));
+        classLoaderModelDescriptorBuilder.addProperty(EXPORTED_RESOURCES,
+                                                      ((String) properties.get(EXPORTED_RESOURCE_PROPERTY)).split(","));
       }
-
+      builder.withClassLoaderModelDescriptorLoader(classLoaderModelDescriptorBuilder.build());
       builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+
 
       mulePluginModel = builder.build();
     }
