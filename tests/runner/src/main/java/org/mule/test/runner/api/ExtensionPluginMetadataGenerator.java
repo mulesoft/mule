@@ -77,8 +77,6 @@ class ExtensionPluginMetadataGenerator {
     this.extensionModelLoaderFinder = loaderFinder;
   }
 
-
-
   private File getExtensionMulePluginJsonFile(File baseResourcesFolder) {
     return Paths.get(baseResourcesFolder.getPath(), "classes", META_INF_MULE_PLUGIN).toFile();
   }
@@ -203,6 +201,7 @@ class ExtensionPluginMetadataGenerator {
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
     extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);
+    extensionsInfrastructure.generateSchemaTestResource(extensionModel, generatedResourcesDirectory);
     extensionGeneratorEntries.add(new ExtensionGeneratorEntry(extensionModel, generatedResourcesDirectory));
     return generatedResourcesDirectory.getParentFile();
   }

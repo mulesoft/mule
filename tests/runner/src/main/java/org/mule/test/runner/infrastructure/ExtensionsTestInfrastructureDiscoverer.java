@@ -8,25 +8,30 @@
 package org.mule.test.runner.infrastructure;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -85,13 +90,24 @@ public class ExtensionsTestInfrastructureDiscoverer {
     createManifestFileIfNecessary(generatedResourcesDirectory);
     ExtensionsTestLoaderResourcesGenerator generator =
         new ExtensionsTestLoaderResourcesGenerator(getResourceFactories(), generatedResourcesDirectory);
-
     generator.generateFor(extensionModel);
     return generator.dumpAll();
   }
 
   public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory) {
     return generateDslResources(generatedResourcesDirectory, null);
+  }
+
+  public void generateSchemaTestResource(ExtensionModel model, File generatedResourcesDirectory) {
+    String xsdFileName = model.getXmlDslModel().getXsdFileName();
+    try {
+      ExtensionSchemaGenerator schemaGenerator = getSchemaGenerator();
+      String schema = schemaGenerator.generate(model, DslResolvingContext.getDefault(extensionManager.getExtensions()));
+      File xsd = FileUtils.newFile(generatedResourcesDirectory, xsdFileName);
+      FileUtils.copyStreamToFile(new ByteArrayInputStream(schema.getBytes()), xsd);
+    } catch (IOException e) {
+      throw new RuntimeException(format("Error generating test xsd resource [%s]: " + e.getMessage(), xsdFileName, e));
+    }
   }
 
   public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, ExtensionModel forExtensionModel) {
@@ -112,6 +128,12 @@ public class ExtensionsTestInfrastructureDiscoverer {
 
   private List<GeneratedResourceFactory> getResourceFactories() {
     return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, currentThread().getContextClassLoader()));
+  }
+
+  private ExtensionSchemaGenerator getSchemaGenerator() {
+    return serviceRegistry.lookupProviders(ExtensionSchemaGenerator.class,
+                                           currentThread().getContextClassLoader())
+        .iterator().next();
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
