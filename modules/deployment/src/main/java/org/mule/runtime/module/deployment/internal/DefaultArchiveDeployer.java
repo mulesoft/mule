@@ -87,6 +87,9 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
     if (!isUpdatedZombieArtifact(artifactDir)) {
+      if (!artifactDir.equals("default")) {
+        throw new DeploymentException(createStaticMessage("BAD!!!"));
+      }
       return null;
     }
 
@@ -296,7 +299,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void addZombieApp(Artifact artifact) {
-    File resourceFile = artifact.getResourceFiles()[0].getParentFile();
+    File resourceFile = artifact.getResourceFiles()[0];
 
     if (resourceFile.exists()) {
       try {
