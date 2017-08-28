@@ -13,7 +13,10 @@
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
 
-    <module-global-element-proxy:config name="another-proxy-config" someUserConfig="#[properties.someUserConfig]" somePassConfig="#[properties.somePassConfig]" port="#[properties.port]"/>
+    <!--<module-global-element-proxy:config name="another-proxy-config" someUserConfig="#[properties.someUserConfig]" somePassConfig="#[properties.somePassConfig]" port="#[properties.port]" xmlns:connection="true"/>-->
+    <module-global-element-proxy:config name="another-proxy-config" someUserConfig="#[properties.someUserConfig]" somePassConfig="#[properties.somePassConfig]" port="#[properties.port]" >
+        <module-global-element-proxy:connection />
+    </module-global-element-proxy:config>
 
     <operation name="do-login">
         <parameters>

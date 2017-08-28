@@ -60,7 +60,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
-    builders.add(0, new AbstractConfigurationBuilder() {
+    builders.add(new AbstractConfigurationBuilder() {
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
@@ -68,15 +68,15 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         if (muleContext.getExtensionManager() == null) {
           extensionManager = createDefaultExtensionManager();
           ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+          initialiseIfNeeded(extensionManager, muleContext);
         }
         extensionManager = muleContext.getExtensionManager();
-        initialiseIfNeeded(extensionManager, muleContext);
-
         registerXmlExtensions(extensionManager);
       }
 
       private void registerXmlExtensions(ExtensionManager extensionManager) {
-        final Set<ExtensionModel> extensions = new HashSet<>();
+        //take all the plugins loaded by org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder in the extension manager
+        final Set<ExtensionModel> extensions = new HashSet<>(extensionManager.getExtensions());
         for (String modulePath : getModulePaths()) {
           Map<String, Object> params = new HashMap<>();
           params.put(XmlExtensionModelLoader.RESOURCE_XML, modulePath);

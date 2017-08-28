@@ -6,18 +6,20 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd">
 
-    <module-global-element:config name="la-plata-config-using-literals" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}" protocolConfig="HTTP"/>
-    <module-global-element:config name="gonnet-config-using-expressions" someUserConfig="#['userGonnet']" somePassConfig="#['passGonnet']" port="#['${httpPort}']" protocolConfig="HTTP"/>
+    <!-- notice the config 'la-plata-config' uses literals in every attribute -->
+    <module-global-element:config name="la-plata-config" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}" protocolConfig="HTTP"/>
+    <!-- notice the config 'gonnet-config-using-expressions' uses epxressions and literals, resolving them accordingly -->
+    <module-global-element:config name="gonnet-config" someUserConfig="#['userGonnet']" somePassConfig="#['passGonnet']" port="#['${httpPort}']" protocolConfig="HTTP"/>
 
     <flow name="testHttpDoLogin">
-        <module-global-element:do-login config-ref="la-plata-config-using-literals" someUser="#['userLP']" somePass="#['passLP']" />
+        <module-global-element:do-login config-ref="la-plata-config" someUser="#['userLP']" somePass="#['passLP']" />
     </flow>
 
     <flow name="testHttpDontLogin">
-        <module-global-element:do-login config-ref="la-plata-config-using-literals" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
+        <module-global-element:do-login config-ref="la-plata-config" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
     </flow>
 
     <flow name="testHttpDoLoginGonnet">
-        <module-global-element:do-login config-ref="gonnet-config-using-expressions" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
+        <module-global-element:do-login config-ref="gonnet-config" someUser="#['userGonnet']" somePass="#['passGonnet']"/>
     </flow>
 </mule>

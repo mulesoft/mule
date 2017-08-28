@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-not-defined-test-connection"
+        minMuleVersion="4.0.0"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:file="http://www.mulesoft.org/schema/mule/file"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    <property name="port" type="string"/>
+
+
+    <http:request-config name="http-global-element" basePath="/basic-auth/">
+        <http:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+            <!-- ... -->
+        </http:request-connection>
+    </http:request-config>
+
+    <file:config name="file-global-element">
+        <file:connection workingDir="#[properties.workingDir]"/>
+    </file:config>
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+
+</module>

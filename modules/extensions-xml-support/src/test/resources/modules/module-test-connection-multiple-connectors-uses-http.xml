@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-test-connection"
+        minMuleVersion="4.0.0"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:file="http://www.mulesoft.org/schema/mule/file"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+
+    <!--Notice the following global element does have the xmlns:connection -->
+    <http:request-config name="http-config" basePath="/basic-auth/" xmlns:connection="true">
+        <http:request-connection host="localhost" protocol="HTTP" port="80">
+            <http:authentication>
+                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <!--Notice the following global element does not have the xmlns:connection -->
+    <file:config name="file-config">
+        <file:connection workingDir="#[properties.workingDir]"/>
+    </file:config>
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+
+</module>

@@ -17,7 +17,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.List;
@@ -55,6 +59,27 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
   @Override
   protected String getConfigFile() {
     return "flows/flows-using-module-multiple-global-elements.xml";
+  }
+
+  @Test
+  public void testConnectionconfigPatternA() throws Exception {
+    doTestConnection("configPatternA");
+  }
+
+  @Test
+  public void testConnectionconfigPatternB() throws Exception {
+    doTestConnection("configPatternB");
+  }
+
+  private void doTestConnection(String globalElement) throws MuleException {
+    ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration(globalElement, testEvent());
+    assertThat(config, is(notNullValue()));
+    assertThat(config.getConnectionProvider().isPresent(), is(true));
+    final ConnectionProvider connectionProvider = config.getConnectionProvider().get();
+    final Object connect = connectionProvider.connect();
+    final ConnectionValidationResult connectionValidationResult = connectionProvider.validate(connect);
+    assertThat(connectionValidationResult.isValid(), is(true));
+    connectionProvider.disconnect(connect);
   }
 
   @Test

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-not-defined-test-connection"
+        minMuleVersion="4.0.0"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    <property name="port" type="string"/>
+
+
+    <http:request-config name="first-config-not-defined-to-which-one-do-test-connection" basePath="/basic-auth/">
+        <http:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+            <!-- ... -->
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="second-config-not-defined-to-which-one-do-test-connection" basePath="/basic-auth/">
+        <http:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+            <!-- ... -->
+        </http:request-connection>
+    </http:request-config>
+
+</module>
