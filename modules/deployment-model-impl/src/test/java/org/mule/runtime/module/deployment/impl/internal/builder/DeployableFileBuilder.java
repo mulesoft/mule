@@ -13,8 +13,8 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationDescr
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.tools.api.packager.structure.PackagerFolders.META_INF;
-import static org.mule.tools.api.packager.structure.PackagerFolders.MULE_ARTIFACT;
+import static org.mule.tools.api.packager.structure.FolderNames.META_INF;
+import static org.mule.tools.api.packager.structure.FolderNames.MULE_ARTIFACT;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
@@ -147,7 +147,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
-    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
+    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF.value()).resolve(MULE_ARTIFACT.value()).toFile();
 
     if (!destinationFolder.exists()) {
       assertThat(destinationFolder.mkdirs(), is(true));
