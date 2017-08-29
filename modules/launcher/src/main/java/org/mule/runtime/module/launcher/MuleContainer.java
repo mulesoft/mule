@@ -7,9 +7,14 @@
 package org.mule.runtime.module.launcher;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
-import org.mule.runtime.api.exception.ExceptionHelper;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -17,7 +22,6 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -40,14 +44,14 @@ import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 
+import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MuleContainer {
 
@@ -237,23 +241,24 @@ public class MuleContainer {
    * @param e the exception that caused the shutdown
    */
   public void shutdown(Throwable e) throws MuleException {
-    I18nMessage msg = CoreMessages.fatalErrorWhileRunning();
-    MuleException muleException = ExceptionHelper.getRootMuleException(e);
+    I18nMessage msg = fatalErrorWhileRunning();
+    MuleException muleException = getRootMuleException(e);
     if (muleException != null) {
       logger.error(muleException.getDetailedMessage());
     } else {
       logger.error(msg.toString() + " " + e.getMessage(), e);
     }
-    List<String> msgs = new ArrayList<String>();
+    List<String> msgs = new ArrayList<>();
     msgs.add(msg.getMessage());
-    Throwable root = ExceptionHelper.getRootException(e);
+    Throwable root = getRootException(e);
     msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
     msgs.add(" ");
-    msgs.add(CoreMessages.fatalErrorInShutdown().getMessage());
-    String shutdownMessage = StringMessageUtils.getBoilerPlate(msgs, '*', 80);
+    msgs.add(fatalErrorInShutdown().getMessage());
+    String shutdownMessage = getBoilerPlate(msgs, '*', 80);
     logger.error(shutdownMessage);
 
     doShutdown();
+    System.exit(1);
   }
 
   /**
@@ -268,8 +273,6 @@ public class MuleContainer {
   protected void doShutdown() throws MuleException {
     unregisterShutdownHook();
     stop();
-
-    System.exit(0);
   }
 
   public void stop() throws MuleException {
