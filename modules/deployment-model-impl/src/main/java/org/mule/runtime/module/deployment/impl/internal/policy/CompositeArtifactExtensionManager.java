@@ -10,6 +10,13 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.InternalEvent;
@@ -21,11 +28,16 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Composes {@link ExtensionManager} from a child and a parent artifacts, so child artifact can access extensions provided by the
  * parent.
  */
-public class CompositeArtifactExtensionManager implements ExtensionManager {
+public class CompositeArtifactExtensionManager implements ExtensionManager, Lifecycle {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(CompositeArtifactExtensionManager.class);
 
   private final ExtensionManager parentExtensionManager;
   private final ExtensionManager childExtensionManager;
@@ -120,6 +132,26 @@ public class CompositeArtifactExtensionManager implements ExtensionManager {
   @Override
   public void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
     throw new UnsupportedOperationException("Composite extension manager cannot register extension providers");
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(childExtensionManager);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(childExtensionManager);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(childExtensionManager);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(childExtensionManager, LOGGER);
   }
 
   public ExtensionManager getParentExtensionManager() {

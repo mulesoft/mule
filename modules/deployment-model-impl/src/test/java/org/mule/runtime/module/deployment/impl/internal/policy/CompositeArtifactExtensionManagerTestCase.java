@@ -18,7 +18,15 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
@@ -34,15 +42,24 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
+@RunWith(MockitoJUnitRunner.class)
 public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestCase {
 
   public static final String PROVIDER_NAME = "providerName";
 
-  private final ExtensionManager parentExtensionManager = mock(ExtensionManager.class);
-  private final ExtensionManager childExtensionManager = mock(ExtensionManager.class);
-  private final OperationModel operationModel = mock(OperationModel.class);
+  @Mock
+  private ExtensionManager parentExtensionManager;
+
+  @Mock(extraInterfaces = Lifecycle.class)
+  private ExtensionManager childExtensionManager;
+
+  @Mock
+  private OperationModel operationModel;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -277,4 +294,42 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     expectedException.expect(UnsupportedOperationException.class);
     extensionManager.registerConfigurationProvider(mock(ConfigurationProvider.class));
   }
+
+  @Test
+  public void initialise() throws InitialisationException {
+    CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
+                                                                                               childExtensionManager);
+
+    extensionManager.initialise();
+    verify(((Initialisable) childExtensionManager)).initialise();
+  }
+
+  @Test
+  public void start() throws MuleException {
+    CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
+                                                                                               childExtensionManager);
+
+    extensionManager.start();
+    verify(((Startable) childExtensionManager)).start();
+  }
+
+  @Test
+  public void stop() throws MuleException {
+    CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
+                                                                                               childExtensionManager);
+
+    extensionManager.stop();
+    verify(((Stoppable) childExtensionManager)).stop();
+  }
+
+  @Test
+  public void dispose() throws MuleException {
+    CompositeArtifactExtensionManager extensionManager = new CompositeArtifactExtensionManager(parentExtensionManager,
+                                                                                               childExtensionManager);
+
+    extensionManager.dispose();
+    verify(((Disposable) childExtensionManager)).dispose();
+  }
+
+
 }

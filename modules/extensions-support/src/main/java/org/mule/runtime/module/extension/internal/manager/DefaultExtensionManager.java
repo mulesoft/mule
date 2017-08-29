@@ -277,4 +277,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
+
+  public ExtensionActivator getExtensionActivator() {
+    return extensionActivator;
+  }
 }
