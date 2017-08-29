@@ -216,7 +216,7 @@
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.0.0-rc.darkseid-SNAPSHOT</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.darkseid-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.0.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.0.0-rc.darkseid-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-SNAPSHOT</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.0.0-rc.darkseid-SNAPSHOT</muleMavenClientTest>
