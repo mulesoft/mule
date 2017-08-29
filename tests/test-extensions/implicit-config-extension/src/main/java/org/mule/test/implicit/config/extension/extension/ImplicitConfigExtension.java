@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 @Extension(name = "implicit")
 @Operations({ImplicitOperations.class})
@@ -37,6 +38,12 @@ public class ImplicitConfigExtension implements Initialisable, Startable, MuleCo
   @Parameter
   @Optional(defaultValue = "#[mel:flowVars['optionalWithDefault']]")
   private Integer optionalWithDefault;
+
+  @ParameterGroup(name = "nullSafeGroup")
+  private NullSafeParameterGroup nullSafeGroup;
+
+  @ParameterGroup(name = "nullSafeGroupShowInDsl", showInDsl = true)
+  private NullSafeParameterGroupShowInDsl nullSafeGroupShowInDsl;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -71,5 +78,21 @@ public class ImplicitConfigExtension implements Initialisable, Startable, MuleCo
 
   public Integer getOptionalWithDefault() {
     return optionalWithDefault;
+  }
+
+  public NullSafeParameterGroup getNullSafeGroup() {
+    return nullSafeGroup;
+  }
+
+  public void setNullSafeGroup(NullSafeParameterGroup nullSafeGroup) {
+    this.nullSafeGroup = nullSafeGroup;
+  }
+
+  public NullSafeParameterGroupShowInDsl getNullSafeGroupShowInDsl() {
+    return nullSafeGroupShowInDsl;
+  }
+
+  public void setNullSafeGroupShowInDsl(NullSafeParameterGroupShowInDsl nullSafeGroupShowInDsl) {
+    this.nullSafeGroupShowInDsl = nullSafeGroupShowInDsl;
   }
 }
