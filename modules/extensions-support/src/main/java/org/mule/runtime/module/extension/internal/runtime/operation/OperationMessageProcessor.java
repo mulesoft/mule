@@ -211,7 +211,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   private InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
-    return returnDelegate.asReturnValue(value, operationContext);
+    if (value instanceof InternalEvent) {
+      return (InternalEvent) value;
+    } else {
+      return returnDelegate.asReturnValue(value, operationContext);
+    }
   }
 
   private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) {
