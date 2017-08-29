@@ -164,6 +164,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     this.enableNotifications = enableNotifications;
   }
 
+  public void setLogException(String logException) {
+    this.logException = logException;
+  }
+
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return messageProcessors;
