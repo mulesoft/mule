@@ -87,9 +87,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
     if (!isUpdatedZombieArtifact(artifactDir)) {
-      if (!artifactDir.equals("default")) {
-        throw new DeploymentException(createStaticMessage("BAD!!!"));
-      }
       return null;
     }
 
