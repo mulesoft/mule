@@ -97,7 +97,7 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         NodeList nodeList ;
         if (index % 2 == 0)
         {
-            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/band/text()", evenNode, XPathReturnType.NODESET, evenEvent);
+            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/band/text()", evenNode.cloneNode(false), XPathReturnType.NODESET, evenEvent);
 
             for (int i = 0; i < nodeList.getLength(); i++)
             {
@@ -106,7 +106,7 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         }
         else
         {
-            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/band/text()", oddNode, XPathReturnType.NODESET, oddEvent);
+            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/band/text()", oddNode.cloneNode(false), XPathReturnType.NODESET, oddEvent);
 
             for (int i = 0; i < nodeList.getLength(); i++)
             {
@@ -120,7 +120,7 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         NodeList nodeList ;
         if (index % 2 == 0)
         {
-            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/name/text()", evenNode, XPathReturnType.NODESET, evenEvent);
+            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/name/text()", evenNode.cloneNode(false), XPathReturnType.NODESET, evenEvent);
 
             for (int i = 0; i < nodeList.getLength(); i++)
             {
@@ -129,7 +129,7 @@ public class JaxpXPathEvaluatorTestCase extends AbstractMuleContextTestCase
         }
         else
         {
-            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/name/text()", oddNode, XPathReturnType.NODESET, oddEvent);
+            nodeList = (NodeList) jaxpXPathEvaluator.evaluate("songs/song/name/text()", oddNode.cloneNode(false), XPathReturnType.NODESET, oddEvent);
 
             for (int i = 0; i < nodeList.getLength(); i++)
             {
