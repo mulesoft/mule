@@ -66,11 +66,11 @@ public class SourceConnectionManager {
   }
 
   /**
-   * Disconnects the given connection
+   * Invalidates the given connection
    *
-   * @param connection the connection to be released
+   * @param connection the connection to be invalidated
    */
-  void disconnect(Object connection) {
+  void invalidate(Object connection) {
     ConnectionHandler<Object> connectionHandler = connections.remove(new Reference<>(connection));
     if (connectionHandler != null) {
       connectionHandler.invalidate();

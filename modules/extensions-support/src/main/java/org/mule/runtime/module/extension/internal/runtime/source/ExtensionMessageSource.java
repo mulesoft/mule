@@ -202,7 +202,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .map(p -> from(retryPolicyTemplate.applyPolicy(p)))
         .orElseGet(() -> create(sink -> {
           try {
-            exception.getConnection().ifPresent(sourceConnectionManager::disconnect);
+            exception.getConnection().ifPresent(sourceConnectionManager::invalidate);
             restart();
             sink.success();
           } catch (Exception e) {
