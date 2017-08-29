@@ -46,7 +46,7 @@ import java.util.stream.Stream;
  *
  * @since 4.0
  */
-final class ExtensionActivator implements Startable, Stoppable {
+public final class ExtensionActivator implements Startable, Stoppable {
 
   private final ExtensionErrorsRegistrant extensionErrorsRegistrant;
   private final MuleRegistry registry;
@@ -135,5 +135,9 @@ final class ExtensionActivator implements Startable, Stoppable {
     }
     lifecycleAwareElements.clear();
     enumTypes.clear();
+  }
+
+  public Set<Class<? extends Enum>> getEnumTypes() {
+    return enumTypes;
   }
 }
