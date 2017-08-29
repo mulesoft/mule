@@ -247,6 +247,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TYPE = "type";
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
+  private static final String LOG_EXCEPTION = "logException";
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
@@ -277,6 +278,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
         .asPrototype().build());
     componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
@@ -284,6 +286,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
