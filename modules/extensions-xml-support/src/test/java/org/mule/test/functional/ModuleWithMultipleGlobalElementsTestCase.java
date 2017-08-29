@@ -62,12 +62,12 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
   }
 
   @Test
-  public void testConnectionconfigPatternA() throws Exception {
+  public void testConnectionConfigPatternA() throws Exception {
     doTestConnection("configPatternA");
   }
 
   @Test
-  public void testConnectionconfigPatternB() throws Exception {
+  public void testConnectionConfigPatternB() throws Exception {
     doTestConnection("configPatternB");
   }
 

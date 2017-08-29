@@ -21,7 +21,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Collection;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ModuleTestConnectionSuccessful extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleTestConnectionSuccessfulTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter
   public String path;

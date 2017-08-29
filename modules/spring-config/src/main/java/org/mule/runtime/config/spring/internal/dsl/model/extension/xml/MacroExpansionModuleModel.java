@@ -69,8 +69,8 @@ public class MacroExpansionModuleModel {
   public static final String TNS_PREFIX = "tns";
 
   /**
-   * literal that represents the name of the connection element for any given module. If the module's name is math, then the value of
-   * this field will name the global element as <github:connection ../>. As an example, think of the following snippet:
+   * literal that represents the name of the connection element for any given module. If the module's name is github, then the
+   * value of this field will name the global element as <github:connection ../>. As an example, think of the following snippet:
    *
    * <code>
    *    <github:config configParameter="someFood" ...>
