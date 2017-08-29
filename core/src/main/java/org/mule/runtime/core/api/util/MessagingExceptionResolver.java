@@ -87,14 +87,15 @@ public class MessagingExceptionResolver {
     Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(errorType).build();
     InternalEvent event = InternalEvent.builder(me.getEvent()).error(error).build();
 
+    MessagingException result;
     if (root instanceof MessagingException) {
       ((MessagingException) root).setProcessedEvent(event);
-      return ((MessagingException) root);
+      result = ((MessagingException) root);
     } else {
-      MessagingException result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
+      result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
           : new MessagingException(event, root, failingComponent);
-      return enrich(result, failingComponent, event, context);
     }
+    return enrich(result, failingComponent, event, context);
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(AnnotatedObject obj, MessagingException me, ErrorTypeLocator locator) {
