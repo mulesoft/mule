@@ -13,25 +13,30 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessin
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Function;
@@ -39,9 +44,6 @@ import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 /**
@@ -66,7 +68,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private Predicate<InternalEvent> shouldRetry;
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
-  private FlowConstruct flowConstruct;
+  private ProcessingStrategy processingStrategy;
   private List<Processor> processors;
 
   @Override
@@ -82,7 +84,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
     policyTemplate =
         new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries, timer);
     shouldRetry = event -> event.getError().isPresent();
-    flowConstruct = (FlowConstruct) componentLocator.find(Location.builder().globalName(getRootContainerName()).build()).get();
+    Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
+    if (rootContainer instanceof FlowConstruct) {
+      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+    } else {
+      processingStrategy = DIRECT_PROCESSING_STRATEGY_INSTANCE;
+    }
   }
 
   @Override
@@ -122,11 +129,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   }
 
   private ReactiveProcessor scheduleRoute(ReactiveProcessor route) {
-    if (flowConstruct instanceof Pipeline) {
-      return publisher -> from(publisher).transform(((Pipeline) flowConstruct).getProcessingStrategy().onPipeline(route));
-    } else {
-      return publisher -> publisher;
-    }
+    return publisher -> from(publisher).transform(processingStrategy.onPipeline(route));
   }
 
   /**
