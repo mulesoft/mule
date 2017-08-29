@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.muleumo.org" xmlns:tns="http://www.muleumo.org"
+                  xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:echo="http://www.echo.org"
+                  xmlns:log="http://www.log.org"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+        <xsd:schema>
+            <xsd:import namespace="http://www.echo.org" schemaLocation="echoSchema.xsd"/>
+            <xsd:import namespace="http://www.log.org" schemaLocation="logSchema.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="echoResponse">
+        <wsdl:part name="parameters" element="echo:echoResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="logRequest">
+        <wsdl:part name="parameters" element="log:log">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="logResponse">
+        <wsdl:part name="parameters" element="log:logResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="echoRequest">
+        <wsdl:part name="parameters" element="echo:echo">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="WebServicePortType">
+        <wsdl:operation name="log">
+            <wsdl:input name="logRequest" message="tns:logRequest">
+            </wsdl:input>
+            <wsdl:output name="logResponse" message="tns:logResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echo">
+            <wsdl:input name="echoRequest" message="tns:echoRequest">
+            </wsdl:input>
+            <wsdl:output name="echoResponse" message="tns:echoResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="log2">
+            <wsdl:input name="logRequest" message="tns:logRequest">
+            </wsdl:input>
+            <wsdl:output name="logResponse" message="tns:logResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echo2">
+            <wsdl:input name="echoRequest" message="tns:echoRequest">
+            </wsdl:input>
+            <wsdl:output name="echoResponse" message="tns:echoResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="WebServiceHttpBinding" type="tns:WebServicePortType">
+        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="log">
+            <wsdlsoap:operation soapAction=""/>
+            <wsdl:input name="logRequest">
+                <wsdlsoap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="logResponse">
+                <wsdlsoap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echo">
+            <wsdlsoap:operation soapAction=""/>
+            <wsdl:input name="echoRequest">
+                <wsdlsoap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoResponse">
+                <wsdlsoap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="WebService">
+        <wsdl:port name="WebServiceMulePort2" binding="tns:WebServiceHttpBinding">
+            <wsdlsoap:address location="http://localhost:6080/webServiceProxy"/>
+        </wsdl:port>
+        <wsdl:port name="WebServiceMulePort" binding="tns:WebServiceHttpBinding">
+            <wsdlsoap:address location="http://localhost:6070/webServiceProxy"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
