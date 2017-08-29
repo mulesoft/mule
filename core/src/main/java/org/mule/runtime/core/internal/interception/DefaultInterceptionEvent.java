@@ -20,6 +20,7 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.privileged.interception.InternalInterceptionEvent;
 
 import java.util.Map;
 import java.util.Optional;

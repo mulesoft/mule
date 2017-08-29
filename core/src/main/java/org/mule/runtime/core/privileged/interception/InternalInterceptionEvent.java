@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.interception;
+package org.mule.runtime.core.privileged.interception;
 
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.core.api.InternalEvent;
