@@ -41,10 +41,9 @@ import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import javax.xml.namespace.QName;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.namespace.QName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +52,7 @@ import org.junit.Test;
 public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_MESSAGE = "Messaging Error Message";
+  private static final String EXPECTED_MESSAGE = "THIS MESSAGE SHOULD BE THROWN";
 
   private AnnotatedObject processor = mock(AnnotatedObject.class);
   private InternalEvent event = mock(InternalEvent.class);
@@ -156,11 +156,23 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveTopExceptionWithSameError() {
     Optional<Error> surfaceError = mockError(TRANSFORMER, TRANSFORMER_EXCEPTION);
     when(event.getError()).thenReturn(surfaceError);
-    Exception cause = new MuleFatalException(createStaticMessage("THIS MESSAGE SHOULD BE THROWN"), new LinkageError("!"));
+    Exception cause = new MuleFatalException(createStaticMessage(EXPECTED_MESSAGE), new LinkageError("!"));
     MessagingException me = newMessagingException(cause, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, FATAL);
-    assertExceptionMessage(resolved.getMessage(), "THIS MESSAGE SHOULD BE THROWN", FATAL_EXCEPTION.getClass());
+    assertExceptionMessage(resolved.getMessage(), EXPECTED_MESSAGE, FATAL_EXCEPTION.getClass());
+  }
+
+  @Test
+  public void resolveWithParentInChain() {
+    ErrorType withParent = ErrorTypeBuilder.builder().parentErrorType(CONNECTION).identifier("CONNECT").namespace("TEST").build();
+    Optional<Error> surfaceError = mockError(withParent, new Exception());
+    when(event.getError()).thenReturn(surfaceError);
+    Exception cause = new ConnectionException("Some Connection Error", new Exception());
+    MessagingException me = newMessagingException(cause, event, processor);
+    MessagingException resolved = resolver.resolve(me, context);
+    assertExceptionErrorType(resolved, withParent);
+    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE, null);
   }
 
   @Test
