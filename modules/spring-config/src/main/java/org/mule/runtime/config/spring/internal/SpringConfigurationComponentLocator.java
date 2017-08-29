@@ -9,30 +9,30 @@ package org.mule.runtime.config.spring.internal;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.AnnotatedObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.collections.map.HashedMap;
-
 /**
  * Spring implementation of {@link ConfigurationComponentLocator}.
- * 
+ *
  * since 4.0
  */
 public class SpringConfigurationComponentLocator implements ConfigurationComponentLocator {
 
-  private Map<String, AnnotatedObject> componentsMap = new HashedMap();
+  private Map<String, AnnotatedObject> componentsMap = new HashMap<>();
 
   /**
    * Adds a new component to the locator.
-   * 
+   *
    * @param component the component to be added
    */
   public void addComponent(AnnotatedObject component) {

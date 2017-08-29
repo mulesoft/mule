@@ -11,10 +11,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
@@ -33,6 +33,7 @@ import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelH
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -42,12 +43,12 @@ import org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Visitor that setups the {@link DefaultComponentLocation} for all mule components in the artifact configuration.
@@ -98,9 +99,9 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
       } else if (isRootProcessorScope(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, parentComponentLocation, typedComponentIdentifier);
       } else if (isMunitFlowIdentifier(parentComponentModel)) {
-        componentLocation = parentComponentLocation
-            .appendRoutePart()
-            .appendLocationPart(findProcessorPath(componentModel), typedComponentIdentifier, componentModel.getConfigFileName(),
+        componentLocation = parentComponentLocation.appendRoutePart()
+            .appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
+                                componentModel.getConfigFileName(),
                                 componentModel.getLineNumber());
       } else if (isErrorHandler(componentModel)) {
         componentLocation = processErrorHandlerComponent(componentModel, parentComponentLocation, typedComponentIdentifier);
@@ -263,7 +264,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   /**
    * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the
    * returned {@link ComponentLocation} are mapped to the new operation rather the original flow.
-   * 
+   *
    * @param componentModel source to generate the new {@link ComponentLocation}, it also relies in its parent
    *        {@link ComponentModel#getParent()}
    * @param operationTypedIdentifier identifier of the current operation
