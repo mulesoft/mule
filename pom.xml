@@ -214,7 +214,7 @@
         <allureReportVersion>2.3.1</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.0.0-rc.darkseid-SNAPSHOT</muleDslApiVersion>
+        <muleDslApiVersion>1.0.0-rc.darkseid</muleDslApiVersion>
         <muleExtensionsApiVersion>1.0.0-rc.darkseid</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-rc.darkseid-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc.darkseid-SNAPSHOT</muleMavenClientApi>
