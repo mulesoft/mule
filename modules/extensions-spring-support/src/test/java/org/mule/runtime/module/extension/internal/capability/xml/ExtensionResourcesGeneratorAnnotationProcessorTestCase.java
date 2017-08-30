@@ -20,7 +20,15 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.StringReader;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteSource;
 import net.sf.saxon.xpath.XPathFactoryImpl;
@@ -29,14 +37,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.StringReader;
 
 @SmallTest
-public class ExtensionResourcesGeneratorAnnotationProcessorTestCase {
+public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String GROUP_PARAMETER_1 = "Group parameter 1";
   private static final String GROUP_PARAMETER_2 = "Group parameter 2";
