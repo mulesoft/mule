@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.extension.internal.loader;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -22,10 +24,16 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
+import org.mule.extension.http.internal.temporary.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -37,6 +45,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalEle
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -44,7 +53,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -430,6 +441,22 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     parameters.put(XmlExtensionModelLoader.VALIDATE_XML, validateXml);
-    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
+    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(),
+                                                            getDefault(getDependencyExtensions()),
+                                                            parameters);
+  }
+
+  private Set<ExtensionModel> getDependencyExtensions() {
+    ExtensionModel sockets = loadExtension(SocketsExtension.class, emptySet());
+    ExtensionModel http = loadExtension(HttpConnector.class, singleton(sockets));
+    return ImmutableSet.<ExtensionModel>builder().add(http).add(sockets).build();
+  }
+
+  private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
+    DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+    Map<String, Object> ctx = new HashMap<>();
+    ctx.put(TYPE_PROPERTY_NAME, extension.getName());
+    ctx.put(VERSION, "1.0.0-SNAPSHOT");
+    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 }

@@ -131,9 +131,8 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private ExtensionSchemaGenerator getSchemaGenerator() {
-    return serviceRegistry.lookupProviders(ExtensionSchemaGenerator.class,
-                                           currentThread().getContextClassLoader())
-        .iterator().next();
+    return copyOf(serviceRegistry.lookupProviders(ExtensionSchemaGenerator.class, currentThread().getContextClassLoader()))
+        .get(0);
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
