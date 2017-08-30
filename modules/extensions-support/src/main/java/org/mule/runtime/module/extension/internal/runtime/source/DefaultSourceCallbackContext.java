@@ -101,7 +101,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   @Override
   public void releaseConnection() {
     if (connection != null) {
-      sourceCallback.getSourceConnectionManager().disconnect(connection);
+      sourceCallback.getSourceConnectionManager().release(connection);
     }
   }
 

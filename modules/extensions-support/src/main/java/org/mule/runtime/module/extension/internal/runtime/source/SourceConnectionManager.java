@@ -58,10 +58,22 @@ public class SourceConnectionManager {
    *
    * @param connection the connection to be released
    */
-  void disconnect(Object connection) {
-    ConnectionHandler<Object> connectionHandler = connections.remove(connection);
+  void release(Object connection) {
+    ConnectionHandler<Object> connectionHandler = connections.remove(new Reference<>(connection));
     if (connectionHandler != null) {
       connectionHandler.release();
+    }
+  }
+
+  /**
+   * Invalidates the given connection
+   *
+   * @param connection the connection to be invalidated
+   */
+  void invalidate(Object connection) {
+    ConnectionHandler<Object> connectionHandler = connections.remove(new Reference<>(connection));
+    if (connectionHandler != null) {
+      connectionHandler.invalidate();
     }
   }
 
