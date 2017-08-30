@@ -47,6 +47,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -98,6 +99,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.To
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -106,9 +109,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 /**
  * Builder class to generate a XSD schema that describes a {@link ExtensionModel}
@@ -139,8 +139,7 @@ public final class SchemaBuilder {
   private ObjectTypeSchemaDelegate objectTypeDelegate;
   private MapSchemaDelegate mapDelegate;
 
-  public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
-                                        DslResolvingContext dslContext) {
+  public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel, DslResolvingContext dslContext) {
     SchemaBuilder builder = new SchemaBuilder();
     builder.extensionModel = extensionModel;
     builder.schema = new Schema();
