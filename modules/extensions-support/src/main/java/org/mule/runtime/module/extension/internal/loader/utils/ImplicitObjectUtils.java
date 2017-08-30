@@ -6,19 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.HashedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import java.util.Optional;
+
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 
 /**
  * Utilities for creating object with implicit values based on a {@link ParameterizedModel}
@@ -43,21 +49,33 @@ public final class ImplicitObjectUtils {
     ParametersResolver parametersResolver =
         ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
 
-    for (ParameterModel parameterModel : parameterizedModel.getAllParameterModels()) {
-      Object defaultValue = parameterModel.getDefaultValue();
-      ValueResolver resolver;
-      if (defaultValue instanceof String) {
-        resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), muleContext);
+    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+      Optional<ParameterGroupDescriptor> descriptor = parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class)
+          .map(ParameterGroupModelProperty::getDescriptor);
+
+      if (descriptor.isPresent()) {
+        String groupKey = getContainerName(descriptor.get().getContainer());
+        resolverSet.add(groupKey,
+                        NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
+                                                        muleContext, parametersResolver));
       } else {
-        resolver = new StaticValueResolver<>(null);
-      }
+        parameterGroupModel.getParameterModels().forEach(parameterModel -> {
+          Object defaultValue = parameterModel.getDefaultValue();
+          ValueResolver resolver;
+          if (defaultValue instanceof String) {
+            resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), muleContext);
+          } else {
+            resolver = new StaticValueResolver<>(null);
+          }
 
-      if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
-        MetadataType metadataType = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-        resolver = NullSafeValueResolverWrapper.of(resolver, metadataType, muleContext, parametersResolver);
-      }
+          if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
+            MetadataType metadataType = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
+            resolver = NullSafeValueResolverWrapper.of(resolver, metadataType, muleContext, parametersResolver);
+          }
 
-      resolverSet.add(parameterModel.getName(), resolver);
+          resolverSet.add(parameterModel.getName(), resolver);
+        });
+      }
     }
 
     return resolverSet;
