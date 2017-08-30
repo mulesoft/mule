@@ -234,25 +234,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -332,25 +321,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -3271,25 +3249,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -3369,25 +3336,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -3966,25 +3922,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -4064,25 +4009,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -4661,25 +4595,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -4759,25 +4682,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -5563,25 +5475,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -5661,25 +5562,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -6258,25 +6148,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -6356,25 +6235,14 @@
                                 "name": "type"
                               },
                               "model": {
-                                "type": "Union",
-                                "of": [
-                                  {
-                                    "type": "String",
-                                    "annotations": {
-                                      "enum": {
-                                        "type": "[Ljava.lang.String;",
-                                        "values": [
-                                          "jks",
-                                          "jceks",
-                                          "pkcs12"
-                                        ]
-                                      }
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
                                     }
-                                  },
-                                  {
-                                    "type": "String"
                                   }
-                                ]
+                                }
                               },
                               "annotations": {
                                 "description": {
@@ -9134,25 +9002,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -9232,25 +9089,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -9829,25 +9675,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -9927,25 +9762,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -10524,25 +10348,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -10622,25 +10435,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -11426,25 +11228,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -11524,25 +11315,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -12121,25 +11901,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -12219,25 +11988,14 @@
                             "name": "type"
                           },
                           "model": {
-                            "type": "Union",
-                            "of": [
-                              {
-                                "type": "String",
-                                "annotations": {
-                                  "enum": {
-                                    "type": "[Ljava.lang.String;",
-                                    "values": [
-                                      "jks",
-                                      "jceks",
-                                      "pkcs12"
-                                    ]
-                                  }
+                            "type": "String",
+                            "annotations": {
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "example": "jks, jceks, pkcs12 or other store type"
                                 }
-                              },
-                              {
-                                "type": "String"
                               }
-                            ]
+                            }
                           },
                           "annotations": {
                             "description": {
@@ -13748,25 +13506,14 @@
                         "name": "type"
                       },
                       "model": {
-                        "type": "Union",
-                        "of": [
-                          {
-                            "type": "String",
-                            "annotations": {
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "jks",
-                                  "jceks",
-                                  "pkcs12"
-                                ]
-                              }
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
                             }
-                          },
-                          {
-                            "type": "String"
                           }
-                        ]
+                        }
                       },
                       "annotations": {
                         "description": {
@@ -13846,25 +13593,14 @@
                         "name": "type"
                       },
                       "model": {
-                        "type": "Union",
-                        "of": [
-                          {
-                            "type": "String",
-                            "annotations": {
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "jks",
-                                  "jceks",
-                                  "pkcs12"
-                                ]
-                              }
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
                             }
-                          },
-                          {
-                            "type": "String"
                           }
-                        ]
+                        }
                       },
                       "annotations": {
                         "description": {
@@ -14215,25 +13951,14 @@
                         "name": "type"
                       },
                       "model": {
-                        "type": "Union",
-                        "of": [
-                          {
-                            "type": "String",
-                            "annotations": {
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "jks",
-                                  "jceks",
-                                  "pkcs12"
-                                ]
-                              }
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
                             }
-                          },
-                          {
-                            "type": "String"
                           }
-                        ]
+                        }
                       },
                       "annotations": {
                         "description": {
@@ -14313,25 +14038,14 @@
                         "name": "type"
                       },
                       "model": {
-                        "type": "Union",
-                        "of": [
-                          {
-                            "type": "String",
-                            "annotations": {
-                              "enum": {
-                                "type": "[Ljava.lang.String;",
-                                "values": [
-                                  "jks",
-                                  "jceks",
-                                  "pkcs12"
-                                ]
-                              }
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
                             }
-                          },
-                          {
-                            "type": "String"
                           }
-                        ]
+                        }
                       },
                       "annotations": {
                         "description": {
