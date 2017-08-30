@@ -13,6 +13,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -53,13 +54,17 @@ public class TransformerChain extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
     Message result = event.getMessage();
     Object temp = event.getMessage();
     Transformer lastTransformer = null;
     for (Object element : transformers) {
       lastTransformer = (Transformer) element;
-      temp = lastTransformer.transform(temp);
+      try {
+        temp = lastTransformer.transform(temp);
+      } catch (TransformerException e) {
+        throw new MessageTransformerException(lastTransformer, e, event.getMessage());
+      }
       if (temp instanceof Message) {
         result = (Message) temp;
       } else {

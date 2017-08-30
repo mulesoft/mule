@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -23,12 +25,15 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.runtime.core.internal.transformer.builder.MockTransformerBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.io.ByteArrayInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +84,26 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     } catch (IllegalArgumentException expected) {
     }
     verifyTransformerNotExecuted(converter1);
+  }
+
+  @Test
+  public void failsOnConverterWhenSourceAndReturnTypeDoesNotMatchAndThereIsNoImplicitConversion2() throws MuleException {
+    // Converter(B->C), payload A: FAIL
+    ByteArrayInputStream payload = new ByteArrayInputStream(TEST_PAYLOAD.getBytes());
+    DataType originalSourceType = DataType.fromType(payload.getClass());
+
+    Transformer converter1 = new MockConverterBuilder().from(originalSourceType).to(dataTypeC).build();
+    A transformedPayload = new A();
+    when(converter1.transform(any())).thenReturn(transformedPayload);
+
+    Message message = of(payload);
+
+    try {
+      transformationService.applyTransformers(message, null, converter1);
+      fail("Transformation is supposed to fail");
+    } catch (MessageTransformerException expected) {
+      assertThat(expected.getErrorMessage().getPayload().getValue(), is(transformedPayload));
+    }
   }
 
   @Test

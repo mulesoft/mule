@@ -134,8 +134,10 @@ public class CompositeConverter extends AbstractAnnotatedObject implements Conve
       try {
         event = InternalEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
+      } catch (MessageTransformerException e) {
+        throw e;
       } catch (Exception e) {
-        throw new MessageTransformerException(this, e);
+        throw new MessageTransformerException(this, e, event.getMessage());
       }
     }
 

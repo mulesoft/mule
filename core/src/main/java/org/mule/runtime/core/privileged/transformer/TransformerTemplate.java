@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.transformer;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
@@ -23,13 +24,15 @@ public class TransformerTemplate extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
     try {
       return callback.doTransform(event.getMessage());
+    } catch (MessageTransformerException e) {
+      throw e;
     } catch (TransformerException e) {
-      throw new TransformerException(e.getI18nMessage(), this, e);
+      throw new MessageTransformerException(e.getI18nMessage(), this, e, event.getMessage());
     } catch (Exception e) {
-      throw new TransformerException(this, e);
+      throw new MessageTransformerException(this, e, event.getMessage());
     }
   }
 
