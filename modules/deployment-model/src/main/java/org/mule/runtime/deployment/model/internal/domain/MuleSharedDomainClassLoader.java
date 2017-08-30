@@ -9,11 +9,15 @@ package org.mule.runtime.deployment.model.internal.domain;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -28,6 +32,8 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
   static {
     registerAsParallelCapable();
   }
+
+  private static final Logger LOGGER = getLogger(MuleSharedDomainClassLoader.class);
 
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
                                      ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
@@ -45,7 +51,7 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
         try {
           resource = file.toURI().toURL();
         } catch (MalformedURLException e) {
-          logger.debug("Failure looking for resource", e);
+          LOGGER.debug("Failure looking for resource", e);
         }
       }
     }

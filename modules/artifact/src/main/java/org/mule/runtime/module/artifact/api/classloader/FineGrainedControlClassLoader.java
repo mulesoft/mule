@@ -11,8 +11,12 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
+
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -25,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.misc.CompoundEnumeration;
 import sun.net.www.protocol.jar.Handler;
 
@@ -43,7 +45,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     registerAsParallelCapable();
   }
 
-  protected Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);
 
   private final ClassLoaderLookupPolicy lookupPolicy;
   private final boolean verboseLogging;
@@ -52,11 +54,11 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     super(urls, parent, new NonCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
-    verboseLogging = logger.isDebugEnabled() || isVerboseLoggingEnabled();
+    verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
   }
 
   private boolean isVerboseLoggingEnabled() {
-    return logger.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+    return LOGGER.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
   @Override
@@ -123,10 +125,10 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   }
 
   private void doVerboseLogging(String message) {
-    if (logger.isDebugEnabled()) {
-      logger.debug(message);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug(message);
     } else {
-      logger.info(message);
+      LOGGER.info(message);
     }
   }
 

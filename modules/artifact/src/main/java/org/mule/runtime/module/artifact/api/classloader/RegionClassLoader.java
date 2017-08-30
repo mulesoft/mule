@@ -14,9 +14,12 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -54,6 +57,8 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   static {
     registerAsParallelCapable();
   }
+
+  private static final Logger LOGGER = getLogger(RegionClassLoader.class);
 
   private final ReadWriteLock innerStateRWLock = new ReentrantReadWriteLock();
   private final Lock innerStateReadLock = innerStateRWLock.readLock();
@@ -111,7 +116,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
         if (!(packageLookupStrategy instanceof ChildFirstLookupStrategy)) {
           throw new IllegalStateException(illegalPackageMappingError(p, packageLookupStrategy));
         } else if (packageMapping.containsKey(p)) {
-          throw new IllegalStateException(duplicatePackageMappingError(p));
+          throw new IllegalStateException(duplicatePackageMappingError(p, packageMapping.get(p), artifactClassLoader));
         } else {
           packageMapping.put(p, artifactClassLoader);
         }
@@ -137,8 +142,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                   p, packageLookupStrategy.getClass().getName());
   }
 
-  static String duplicatePackageMappingError(String packageName) {
-    return "Attempt to redefine mapping for package: " + packageName;
+  static String duplicatePackageMappingError(String packageName, ArtifactClassLoader originalDefinitionClassLoader,
+                                             ArtifactClassLoader overridingDefinitionClassLoader) {
+    return format("Attempt to redefine mapping for package: '%s'. Original definition classloader is %s, Overriding definition classloader is %s",
+                  packageName, originalDefinitionClassLoader.toString(), overridingDefinitionClassLoader.toString());
   }
 
   private RegionMemberClassLoader findRegisteredClassLoader(ArtifactClassLoader artifactClassLoader) {
@@ -261,10 +268,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       classLoader.dispose();
     } catch (Exception e) {
       final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-      if (logger.isDebugEnabled()) {
-        logger.debug(message, classLoader.getArtifactId(), e);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(message, classLoader.getArtifactId(), e);
       } else {
-        logger.error(message, classLoader.getArtifactId());
+        LOGGER.error(message, classLoader.getArtifactId());
       }
     }
   }

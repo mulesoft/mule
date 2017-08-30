@@ -35,18 +35,18 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.EnumerationMatcher;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
@@ -259,7 +259,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(duplicatePackageMappingError(PACKAGE_NAME));
+    expectedException.expectMessage(duplicatePackageMappingError(PACKAGE_NAME, appClassLoader, pluginClassLoader));
     regionClassLoader.addClassLoader(pluginClassLoader,
                                      new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
   }
