@@ -12,7 +12,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 
 /**
- * Test implementation for generating DSL resources in order to test {@link ExtensionPluginMetadataGenerator}.
+ * {@link ExtensionSchemaGenerator} test implementation in order to test {@link ExtensionPluginMetadataGenerator}.
  */
 public class TestExtensionSchemaGenerator implements ExtensionSchemaGenerator {
 
