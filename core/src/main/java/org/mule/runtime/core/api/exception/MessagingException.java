@@ -283,12 +283,13 @@ public class MessagingException extends MuleException {
   }
 
   @Override
-  protected void appendSummaryMessage(StringBuilder builder) {
+  protected String getSummaryMessageAdditionalInfo() {
+    StringBuilder builder = new StringBuilder();
     builder.append("Error Type            : ")
         .append(getEvent().getError().map(e -> e.getErrorType().toString()).orElse("(None)"))
         .append(lineSeparator());
 
-    super.appendSummaryMessage(builder);
+    return builder.toString();
   }
 
   /**
