@@ -25,7 +25,7 @@ public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
 
   public ListConsumer(Producer<List<T>> producer) {
     super(producer);
-    this.reset();
+    reset();
   }
 
   /**
@@ -33,21 +33,21 @@ public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
    */
   @Override
   protected T doConsume() throws NoSuchElementException {
-    if (this.isConsumed()) {
+    if (isConsumed()) {
       throw new NoSuchElementException();
     }
 
-    T element = this.currentPage.get(this.index);
-    this.index++;
+    T element = currentPage.get(index);
+    index++;
 
     return element;
   }
 
   @Override
   protected boolean checkConsumed() {
-    if (this.index >= this.pageSize) {
-      this.loadNextPage(this.producer);
-      return this.pageSize == 0;
+    if (index >= pageSize) {
+      loadNextPage();
+      return pageSize == 0;
     }
     return false;
   }
@@ -57,7 +57,7 @@ public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
    */
   @Override
   public int getSize() {
-    return this.producer.getSize();
+    return producer.getSize();
   }
 
   /**
@@ -66,16 +66,16 @@ public class ListConsumer<T> extends AbstractConsumer<T, List<T>> {
   @Override
   public void close() throws IOException {
     super.close();
-    this.currentPage = null;
+    currentPage = null;
   }
 
   private void reset() {
-    this.index = 0;
-    this.pageSize = this.currentPage == null ? 0 : this.currentPage.size();
+    index = 0;
+    pageSize = currentPage == null ? 0 : currentPage.size();
   }
 
-  private void loadNextPage(Producer<List<T>> producer) {
-    this.currentPage = producer.produce();
-    this.reset();
+  public void loadNextPage() {
+    currentPage = producer.produce();
+    reset();
   }
 }

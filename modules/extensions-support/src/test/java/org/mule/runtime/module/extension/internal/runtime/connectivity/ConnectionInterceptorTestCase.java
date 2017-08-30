@@ -9,11 +9,14 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 import static java.util.Optional.empty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -44,6 +47,9 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
   private ExtensionConnectionSupplier connectionSupplier;
 
   @Mock
+  private OperationModel operationModel;
+
+  @Mock
   private ConnectionHandler connectionHandler;
 
   private ConnectionInterceptor interceptor;
@@ -51,6 +57,8 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
+    when(operationContext.getComponentModel()).thenReturn(operationModel);
+    when(operationModel.getModelProperty(PagedOperationModelProperty.class)).thenReturn(empty());
     when(configurationInstance.getValue()).thenReturn(config);
 
     Map<String, Object> contextVariables = new HashMap<>();
@@ -81,6 +89,15 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
     muleContext.getInjector().inject(interceptor);
 
     when(connectionSupplier.getConnection(operationContext)).thenReturn(connectionHandler);
+  }
+
+  @Test
+  public void pagedOperation() throws Exception {
+    when(operationModel.getModelProperty(PagedOperationModelProperty.class))
+        .thenReturn(Optional.of(new PagedOperationModelProperty()));
+
+    interceptor.before(operationContext);
+    verify(connectionSupplier, never()).getConnection(operationContext);
   }
 
   @Test

@@ -34,7 +34,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -76,14 +75,13 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -115,8 +113,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
-  private final ExtensionModel extensionModel;
-  private final OperationModel operationModel;
+  protected final ExtensionModel extensionModel;
+  protected final OperationModel operationModel;
   private final ResolverSet resolverSet;
   private final String target;
   private final String targetValue;
@@ -212,7 +210,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
         .onErrorMap(Exceptions::unwrap);
   }
 
-  protected InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
+  private InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
     return returnDelegate.asReturnValue(value, operationContext);
   }
 

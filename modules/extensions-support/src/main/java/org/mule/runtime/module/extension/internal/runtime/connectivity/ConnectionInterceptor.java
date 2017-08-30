@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
@@ -46,6 +47,10 @@ public final class ConnectionInterceptor implements Interceptor {
    */
   @Override
   public void before(ExecutionContext<OperationModel> executionContext) throws Exception {
+    if (executionContext.getComponentModel().getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+      return;
+    }
+
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
     checkArgument(context.getVariable(CONNECTION_PARAM) == null, "A connection was already set for this operation context");
     context.setVariable(CONNECTION_PARAM, getConnection(context));
@@ -73,7 +78,9 @@ public final class ConnectionInterceptor implements Interceptor {
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
 
     Runnable closeCommand = context.removeVariable(CLOSE_CONNECTION_COMMAND);
-    closeCommand.run();
+    if (closeCommand != null) {
+      closeCommand.run();
+    }
   }
 
   private void release(ExecutionContext<OperationModel> executionContext) {
