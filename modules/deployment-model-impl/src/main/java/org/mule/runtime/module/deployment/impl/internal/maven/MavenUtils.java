@@ -113,8 +113,8 @@ public class MavenUtils {
     final File mulePluginPom = lookupPomFromMavenLocation(artifactFolder);
     MavenXpp3Reader reader = new MavenXpp3Reader();
     Model model;
-    try {
-      model = reader.read(new FileReader(mulePluginPom));
+    try (FileReader mulePluginPomFileReader = new FileReader(mulePluginPom)) {
+      model = reader.read(mulePluginPomFileReader);
     } catch (IOException | XmlPullParserException e) {
       throw new ArtifactDescriptorCreateException(format("There was an issue reading '%s' for the plugin '%s'",
                                                          mulePluginPom.getName(), artifactFolder.getAbsolutePath()),
