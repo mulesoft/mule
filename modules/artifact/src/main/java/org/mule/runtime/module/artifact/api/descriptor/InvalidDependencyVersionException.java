@@ -15,7 +15,7 @@ public class InvalidDependencyVersionException extends RuntimeException {
   /**
    * {@inheritDoc}
    */
-  public InvalidDependencyVersionException(String message) {
-    super(message);
+  public InvalidDependencyVersionException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

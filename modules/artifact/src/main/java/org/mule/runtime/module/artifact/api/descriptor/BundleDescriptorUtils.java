@@ -7,12 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
+import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.SemverException;
 
 /**
  * Utilities to work with {@link BundleDescriptor}
@@ -36,33 +37,24 @@ public class BundleDescriptorUtils {
       return true;
     }
 
-    Version available = getBundleVersion(availableVersion);
-    Version expected = getBundleVersion(expectedVersion);
+    Semver available = getBundleVersion(availableVersion);
+    Semver expected = getBundleVersion(expectedVersion);
 
-    if (available.compareTo(expected) >= 0) {
-      String availableMajorVersion = getMajorVersion(availableVersion);
-      String expectedMajorVersion = getMajorVersion(expectedVersion);
-
-      return availableMajorVersion.equals(expectedMajorVersion);
+    if (available.isGreaterThan(expected)) {
+      return available.getMajor().equals(expected.getMajor());
     }
 
     return false;
   }
 
-  private static String getMajorVersion(String version) {
-    int index = version.indexOf(".");
-    if (index < 0) {
-      return version;
-    } else {
-      return version.substring(0, index);
-    }
-  }
-
-  private static Version getBundleVersion(String version) {
+  private static Semver getBundleVersion(String version) {
     try {
-      return new GenericVersionScheme().parseVersion(version);
-    } catch (InvalidVersionSpecificationException e) {
-      throw new InvalidDependencyVersionException("Unable to parse bundle version: " + version);
+      return new Semver(version, LOOSE);
+    } catch (SemverException e) {
+      throw new InvalidDependencyVersionException(
+                                                  format("Unable to parse bundle version: %s, version is not following semantic versioning",
+                                                         version),
+                                                  e);
     }
   }
 }

@@ -286,6 +286,7 @@
              https://bugs.eclipse.org/bugs/show_bug.cgi?id=501019 -->
         <aetherVersion>1.0.2.v20150114</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
+        <semver4jVersion>2.0.3</semver4jVersion>
         <powermockVersion>1.6.5</powermockVersion>
         <allure.maven.plugin.version>2.8</allure.maven.plugin.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
