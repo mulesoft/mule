@@ -107,9 +107,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       return false;
     }
 
+    //First get saved zombieFile
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
 
-    if ((zombieArtifact != null) && (!zombieArtifact.updatedZombieApp())) {
+    //Create a new artifact from the artifactFolder
+    Artifact artifact = null;
+    try {
+      artifact = createArtifact(new File(getMuleAppsDir(), artifactName));
+    } catch (IOException e) {
+      //If artifact could not be created, it should remain as a zombie
+      return false;
+    }
+    if ((zombieArtifact != null) && (!zombieArtifact.updatedZombieApp())
+        && Arrays.equals(zombieArtifact.resourceFiles, artifact.getResourceFiles())) {
       return false;
     }
     return true;
@@ -301,7 +311,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void addZombieApp(Artifact artifact) {
-    if (Arrays.stream(artifact.getResourceFiles()).map((f) -> f.exists()).reduce(true, (a,t) -> a && t)) {
+    if (allResourcesExist(artifact.getResourceFiles())) {
       try {
         artifactZombieMap.put(artifact.getArtifactName(), new ZombieArtifact(artifact.getResourceFiles()));
       } catch (Exception e) {
@@ -321,7 +331,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     try {
-      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[]{marker}));
+      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
     } catch (Exception e) {
       logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
@@ -424,6 +434,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     artifactZombieMap.remove(artifact.getArtifactName());
   }
 
+  private static boolean allResourcesExist(File[] resourceFiles) {
+    return Arrays.stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
+  }
+
   private static class ZombieArtifact {
 
     URI uri; //Refers to the URI of the artifact folder
@@ -437,7 +451,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     private ZombieArtifact(File[] resourceFiles) {
       //Is exploded artifact
       this.resourceFiles = resourceFiles;
-      uri = resourceFiles[0].toURI();
+      uri = resourceFiles[0].toURI(); //For when a marker is saved
       originalTimeStamp = computeMaxTimestamp();
     }
 
@@ -451,7 +465,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     //Returns true only if all the files exist
     public boolean exists() {
-      return Arrays.stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
+      return allResourcesExist(resourceFiles);
     }
 
   }
