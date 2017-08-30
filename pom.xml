@@ -218,7 +218,7 @@
         <muleExtensionsApiVersion>1.0.0-rc.darkseid</muleExtensionsApiVersion>
         <muleHttpPolicyApiVersion>1.0.0-rc.darkseid</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc.darkseid</muleMavenClientApi>
-        <muleMavenClientImpl>1.0.0-rc.darkseid-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientImpl>1.0.0-rc.darkseid</muleMavenClientImpl>
         <muleMavenClientTest>1.0.0-rc.darkseid-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.darkseid</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc.darkseid</muleApiVersion>
