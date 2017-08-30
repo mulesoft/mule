@@ -55,6 +55,10 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    */
   @Override
   public void release() {
+    if (connection == null) {
+      return;
+    }
+
     boolean returnAttempted = false;
     try {
       poolingListener.onReturn(connection);
