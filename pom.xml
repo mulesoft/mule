@@ -222,7 +222,7 @@
         <muleMavenClientTest>1.0.0-rc.darkseid-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc.darkseid-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc.darkseid</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-rc.darkseid-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.0.0-rc.darkseid</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleSpringModuleTestVersion>1.0.0-SNAPSHOT</muleSpringModuleTestVersion>
