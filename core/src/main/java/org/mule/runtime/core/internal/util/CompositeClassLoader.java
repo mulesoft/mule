@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +36,10 @@ public class CompositeClassLoader extends ClassLoader {
 
   public CompositeClassLoader(ClassLoader first, ClassLoader... others) {
     delegates = new ArrayList<>();
-    delegates.add(first);
-    delegates.addAll(asList(others));
+    if (first != null) {
+      delegates.add(first);
+    }
+    delegates.addAll(asList(others).stream().filter(o -> o != null).collect(toList()));
   }
 
   @Override

@@ -12,9 +12,12 @@ import static java.lang.System.identityHashCode;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -29,6 +32,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   static {
     registerAsParallelCapable();
   }
+
+  private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
@@ -89,7 +94,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     try {
       createResourceReleaserInstance().release();
     } catch (Exception e) {
-      logger.error("Cannot create resource releaser instance", e);
+      LOGGER.error("Cannot create resource releaser instance", e);
     }
     super.dispose();
     shutdownListeners();
@@ -100,7 +105,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       try {
         listener.execute();
       } catch (Exception e) {
-        logger.error("Error executing shutdown listener", e);
+        LOGGER.error("Error executing shutdown listener", e);
       }
     }
 
@@ -150,7 +155,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     try {
       createCustomInstance(getErrorHooksClassLocation());
     } catch (Exception e) {
-      logger.error("Cannot configure error hooks", e);
+      LOGGER.error("Cannot configure error hooks", e);
     }
   }
 

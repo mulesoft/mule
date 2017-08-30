@@ -7,11 +7,15 @@
 package org.mule.runtime.config.spring.internal.editors;
 
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
+
+import org.springframework.beans.PropertyEditorRegistrar;
+import org.springframework.beans.PropertyEditorRegistry;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;
@@ -22,9 +26,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
 
 /**
  * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
@@ -66,28 +67,30 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
   private void discoverCustomPropertyEditor() {
     customPropertyEditorsCache = new HashMap<>();
 
-    // Look for any editors needed by extensions
-    try {
-      Enumeration<URL> urls = ClassUtils.getResources(CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME, getClass());
-      while (urls.hasMoreElements()) {
-        URL url = urls.nextElement();
-        Properties props = new Properties();
-        InputStream stream = url.openStream();
-        try {
-          props.load(stream);
-          for (Map.Entry<Object, Object> entry : props.entrySet()) {
-            String target = (String) entry.getKey();
-            String editor = (String) entry.getValue();
-            Class<?> requiredType = ClassUtils.loadClass(target, getClass());
-            Class<PropertyEditor> propertyEditorClass = ClassUtils.loadClass(editor, getClass());
-            customPropertyEditorsCache.put(requiredType, propertyEditorClass);
+    for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
+      // Look for any editors needed by extensions
+      try {
+        Enumeration<URL> urls = classLoader.getResources(CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME);
+        while (urls.hasMoreElements()) {
+          URL url = urls.nextElement();
+          Properties props = new Properties();
+          InputStream stream = url.openStream();
+          try {
+            props.load(stream);
+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
+              String target = (String) entry.getKey();
+              String editor = (String) entry.getValue();
+              Class<?> requiredType = classLoader.loadClass(target);
+              Class<PropertyEditor> propertyEditorClass = (Class<PropertyEditor>) classLoader.loadClass(editor);
+              customPropertyEditorsCache.put(requiredType, propertyEditorClass);
+            }
+          } finally {
+            closeQuietly(stream);
           }
-        } finally {
-          closeQuietly(stream);
         }
+      } catch (Exception e) {
+        throw new IllegalStateException("Error loading custom property editors", e);
       }
-    } catch (Exception e) {
-      throw new IllegalStateException("Error loading custom property editors", e);
     }
   }
 }

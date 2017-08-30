@@ -29,10 +29,23 @@ import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -50,18 +63,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.Exclusion;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -421,7 +422,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     logger.debug("{} plugins defined to be classified", pluginsArtifacts.size());
 
     Predicate<Dependency> mulePluginDependencyFilter =
-        dependency -> dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER);
+        dependency -> dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER)
+            && dependency.getScope().equals(COMPILE);
     if (PLUGIN.equals(rootArtifactType)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
       buildPluginUrlClassification(rootArtifact, context, mulePluginDependencyFilter, pluginsClassified,
@@ -696,7 +698,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   /**
    * Discovers the {@link Dependency} from the list of directDependencies using the artifact coordiantes in format of:
-   * 
+   *
    * <pre>
    * groupId:artifactId
    * </pre>
@@ -751,7 +753,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * <p/>
    * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
    * include this its compiled classes classification.
-   * 
+   *
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
@@ -940,14 +942,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Creates a {@link Map} that has as key the folder that holds the artifact and value a {@link List} of {@link URL}s. For
    * instance, an artifact in class path that only has its jar packaged output:
-   * 
+   *
    * <pre>
    *   key=/Users/jdoe/.m2/repository/org/mule/extensions/mule-extensions-api-xml-dsl/1.0.0-SNAPSHOT/
    *   value=[file:/Users/jdoe/.m2/repository/org/mule/extensions/mule-extensions-api-xml-dsl/1.0.0-SNAPSHOT/mule-extensions-api-xml-dsl-1.0.0-20160823.170911-32.jar]
    * </pre>
    * <p/>
    * Another case is for those artifacts that have both packaged versions, the jar and the -tests.jar. For instance:
-   * 
+   *
    * <pre>
    *   key=/Users/jdoe/Development/mule/extensions/file/target
    *   value=[file:/Users/jdoe/.m2/repository/org/mule/modules/mule-module-file-extension-common/4.0-SNAPSHOT/mule-module-file-extension-common-4.0-SNAPSHOT.jar,
