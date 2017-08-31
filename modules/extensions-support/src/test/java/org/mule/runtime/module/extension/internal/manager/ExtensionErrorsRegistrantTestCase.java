@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
@@ -166,5 +168,19 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
     errorsRegistrant.registerErrors(extensionModel);
     verify(mockTypeLocator, times(0)).addComponentExceptionMapper(any(), any());
+  }
+
+  @Test
+  public void operationTriesToAddInternalErrorType() {
+    ErrorTypeRepository repository = mock(ErrorTypeRepository.class);
+    when(repository.getErrorType(any())).then((e) -> typeRepository.getErrorType(((ComponentIdentifier) e.getArguments()[0])));
+    ErrorModel internalRepeatedError = ErrorModelBuilder.newError(SOURCE_RESPONSE_GENERATE).build();
+    when(operationWithError.getErrorModels()).thenReturn(singleton(internalRepeatedError));
+    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationWithError));
+    when(extensionModel.getErrorModels()).thenReturn(singleton(internalRepeatedError));
+    ErrorTypeLocator mockTypeLocator = mock(ErrorTypeLocator.class);
+    errorsRegistrant = new ExtensionErrorsRegistrant(typeRepository, mockTypeLocator);
+    errorsRegistrant.registerErrors(extensionModel);
+    verify(repository, times(0)).addErrorType(any(), any());
   }
 }
