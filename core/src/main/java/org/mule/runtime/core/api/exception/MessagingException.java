@@ -17,6 +17,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.ErrorBuilder;
@@ -36,6 +37,7 @@ public class MessagingException extends MuleException {
 
   public static final String PAYLOAD_INFO_KEY = "Payload";
   public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
+  private static final String SUMMARY_KEY = MessagingException.class.getName();
 
   /**
    * Serial version
@@ -283,13 +285,13 @@ public class MessagingException extends MuleException {
   }
 
   @Override
-  protected String getSummaryMessageAdditionalInfo() {
+  protected Pair<String,String> getSummaryMessageAdditionalInfo() {
     StringBuilder builder = new StringBuilder();
     builder.append("Error Type            : ")
         .append(getEvent().getError().map(e -> e.getErrorType().toString()).orElse("(None)"))
         .append(lineSeparator());
 
-    return builder.toString();
+    return new Pair<>(SUMMARY_KEY, builder.toString());
   }
 
   /**
