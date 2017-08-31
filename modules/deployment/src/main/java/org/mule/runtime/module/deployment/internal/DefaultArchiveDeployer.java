@@ -7,10 +7,8 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.lang3.ArrayUtils.toArray;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
@@ -110,18 +108,10 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     //First get saved zombieFile
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
 
-    //Create a new artifact from the artifactFolder
-    Artifact artifact = null;
-    try {
-      artifact = createArtifact(new File(getMuleAppsDir(), artifactName));
-    } catch (IOException e) {
-      //If artifact could not be created, it should remain as a zombie
+    if ((zombieArtifact != null) && (!zombieArtifact.updatedZombieApp())) {
       return false;
     }
-    if ((zombieArtifact != null) && (!zombieArtifact.updatedZombieApp())
-        && Arrays.equals(zombieArtifact.resourceFiles, artifact.getResourceFiles())) {
-      return false;
-    }
+
     return true;
   }
 
