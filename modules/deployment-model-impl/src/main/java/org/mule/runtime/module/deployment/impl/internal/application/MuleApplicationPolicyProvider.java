@@ -81,8 +81,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       applicationPolicyInstance.initialise();
 
       registeredPolicyInstanceProviders
-          .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance,
-                                                    parametrization.getId()));
+          .add(new RegisteredPolicyInstanceProvider(applicationPolicyInstance, parametrization.getId()));
       registeredPolicyInstanceProviders.sort(null);
       registeredPolicyTemplate.get().count++;
     } catch (Exception e) {
@@ -100,7 +99,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
       registeredPolicyInstanceProviders.remove(provider);
 
       Optional<RegisteredPolicyTemplate> registeredPolicyTemplate = registeredPolicyTemplates.stream()
-          .filter(p -> p.policyTemplate.equals(p.policyTemplate))
+          .filter(p -> p.policyTemplate.equals(provider.getApplicationPolicyInstance().getPolicyTemplate()))
           .findFirst();
 
       if (!registeredPolicyTemplate.isPresent()) {

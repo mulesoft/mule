@@ -125,6 +125,11 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   @Override
+  public PolicyTemplate getPolicyTemplate() {
+    return template;
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     if (policyInstance == null) {
       synchronized (this) {
