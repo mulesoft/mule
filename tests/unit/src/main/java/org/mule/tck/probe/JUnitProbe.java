@@ -34,16 +34,23 @@ public abstract class JUnitProbe implements Probe {
     try {
       return test();
     } catch (AssertionError e) {
-      if (firstFailure == null) {
-        firstFailure = e;
-      }
-      this.lastFailure = e;
+      storeAssertionError(e);
       return false;
     } catch (Throwable e) {
       throwable = e;
+      if (throwable.getCause() instanceof AssertionError) {
+        storeAssertionError((AssertionError) throwable.getCause());
+      }
       logger.debug("Probing failed with exception", e);
       return false;
     }
+  }
+
+  private void storeAssertionError(AssertionError e) {
+    if (firstFailure == null) {
+      firstFailure = e;
+    }
+    this.lastFailure = e;
   }
 
   /**
