@@ -21,7 +21,8 @@ public abstract class JUnitProbe implements Probe {
 
   private static final Logger logger = LoggerFactory.getLogger(JUnitProbe.class);
 
-  private AssertionError lastFailure;
+  private AssertionError firstFailure;
+  protected AssertionError lastFailure;
   private Throwable throwable;
 
   /**
@@ -33,6 +34,9 @@ public abstract class JUnitProbe implements Probe {
     try {
       return test();
     } catch (AssertionError e) {
+      if (firstFailure == null) {
+        firstFailure = e;
+      }
       this.lastFailure = e;
       return false;
     } catch (Throwable e) {
