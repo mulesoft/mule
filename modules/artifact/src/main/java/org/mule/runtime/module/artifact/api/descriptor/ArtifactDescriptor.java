@@ -58,14 +58,6 @@ public class ArtifactDescriptor {
   }
 
   /**
-   * Returns a {@link File} representing the descriptor file
-   * @return the descriptor file
-   */
-  public File getDescriptorFile() {
-    return new File(rootFolder, MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
-  }
-
-  /**
    * @return the minimal mule version required to run this artifact
    */
   public MuleVersion getMinMuleVersion() {

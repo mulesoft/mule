@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -25,6 +26,7 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -119,7 +121,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public void undeployArtifact(String artifactId) {
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactId);
     if ((zombieArtifact != null)) {
-
       if (zombieArtifact.exists()) {
         return;
       } else {
@@ -179,12 +180,15 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public Map<URI, Long> getArtifactsZombieMap() {
-    Map<URI, Long> result = new HashMap<URI, Long>();
-
+  public Map<String, Map<URI, Long>> getArtifactsZombieMap() {
+    Map<String, Map<URI, Long>> result = new HashMap<>();
     for (String artifact : artifactZombieMap.keySet()) {
-      ZombieArtifact file = artifactZombieMap.get(artifact);
-      result.put(file.uri, file.initialResourceFiles.get(new File(file.uri)));
+      Map<URI, Long> tmpMap = new HashMap<>();
+      ZombieArtifact zombieArtifact = artifactZombieMap.get(artifact);
+      for (Map.Entry<File, Long> file : zombieArtifact.initialResourceFiles.entrySet()) {
+        tmpMap.put(file.getKey().toURI(), file.getValue());
+      }
+      result.put(artifact, tmpMap);
     }
     return result;
   }
@@ -303,8 +307,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private void addZombieApp(Artifact artifact) {
     if (allResourcesExist(artifact.getResourceFiles())) {
       try {
+        List<File> resourceFiles = new ArrayList<>();
+        resourceFiles.addAll(Arrays.asList(artifact.getResourceFiles()));
+        if ((((DeployableArtifactDescriptor) artifact.getDescriptor()).isRedeploymentEnabled())) {
+          resourceFiles.add(((DeployableArtifactDescriptor) artifact.getDescriptor()).getDescriptorFile());
+        }
         artifactZombieMap.put(artifact.getArtifactName(),
-                              new ZombieArtifact(artifact.getResourceFiles(), artifact.getDescriptor().getDescriptorFile()));
+                              new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
       } catch (Exception e) {
         // ignore resource
       }
@@ -322,7 +331,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     try {
-      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}, marker));
+      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
     } catch (Exception e) {
       logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
@@ -431,20 +440,18 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private static class ZombieArtifact {
 
-    URI uri;
     Map<File, Long> initialResourceFiles = new HashMap<>();
 
-    private ZombieArtifact(File[] resourceFiles, File descriptor) {
+    private ZombieArtifact(File[] resourceFiles) {
       //Is exploded artifact
       for (File resourceFile : resourceFiles) {
         initialResourceFiles.put(resourceFile, resourceFile.lastModified());
       }
-      initialResourceFiles.put(descriptor, descriptor.lastModified());
-      uri = resourceFiles[0].toURI(); //For when a marker is saved
     }
 
     public boolean isFor(URI uri) {
-      return this.uri.equals(uri);
+      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().toURI().equals(uri))
+          .collect(Collectors.toList()).isEmpty());
     }
 
     public boolean updatedZombieApp() {

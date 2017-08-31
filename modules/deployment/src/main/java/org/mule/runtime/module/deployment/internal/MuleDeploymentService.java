@@ -181,11 +181,11 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * @return URL/lastModified of apps which previously failed to deploy
    */
-  Map<URI, Long> getZombieApplications() {
+  Map<String, Map<URI, Long>> getZombieApplications() {
     return applicationDeployer.getArtifactsZombieMap();
   }
 
-  Map<URI, Long> getZombieDomains() {
+  Map<String, Map<URI, Long>> getZombieDomains() {
     return domainDeployer.getArtifactsZombieMap();
   }
 
