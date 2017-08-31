@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -104,6 +105,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
       return false;
     }
+
+    List<Artifact> artifactList = artifacts.stream().filter((a) -> a.getArtifactName().equals(artifactName)).collect(Collectors.toList());
 
     //First get saved zombieFile
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
@@ -433,6 +436,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     URI uri; //Refers to the URI of the artifact folder
     Long originalTimeStamp;
     File[] resourceFiles;
+    File descriptor;
 
     private long computeMaxTimestamp() {
       return Collections.max(Arrays.stream(resourceFiles).map((f) -> f.lastModified()).collect(Collectors.toList()));
