@@ -667,7 +667,7 @@ public class ApplicationModel {
   }
 
   private void validateNameHasValidCharacters() {
-    executeOnEveryMuleComponentTree(componentModel -> {
+    executeOnEveryRootElement(componentModel -> {
       String nameAttributeValue = componentModel.getNameAttribute();
       if (nameAttributeValue != null) {
         verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
