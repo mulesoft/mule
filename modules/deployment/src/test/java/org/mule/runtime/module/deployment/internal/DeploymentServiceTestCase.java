@@ -2018,6 +2018,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-13395: depending plugin is not found in maven repo when package is light")
   public void deploysLightApplicationWithPluginDependingOnPlugin() throws Exception {
 
     ArtifactPluginFileBuilder dependantPlugin =
