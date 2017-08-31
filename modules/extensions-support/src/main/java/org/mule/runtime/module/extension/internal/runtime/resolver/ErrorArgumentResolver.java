@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
  * {@link ArgumentResolver} which returns the {@link Error} in the {@link InternalEvent}

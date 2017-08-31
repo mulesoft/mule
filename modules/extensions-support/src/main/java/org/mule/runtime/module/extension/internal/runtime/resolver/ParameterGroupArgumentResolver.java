@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ParameterGroupObjectBuilder;
 
 public final class ParameterGroupArgumentResolver<T> implements ArgumentResolver<T> {

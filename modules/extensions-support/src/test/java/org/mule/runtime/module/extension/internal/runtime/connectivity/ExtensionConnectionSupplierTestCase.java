@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.xa.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

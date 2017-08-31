@@ -65,10 +65,10 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
@@ -211,7 +211,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   private InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
-    return returnDelegate.asReturnValue(value, operationContext);
+    if (value instanceof InternalEvent) {
+      return (InternalEvent) value;
+    } else {
+      return returnDelegate.asReturnValue(value, operationContext);
+    }
   }
 
   private Mono<Object> executeOperation(ExecutionContextAdapter operationContext) {

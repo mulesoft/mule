@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 

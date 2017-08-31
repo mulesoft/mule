@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import org.reactivestreams.Publisher;
 
