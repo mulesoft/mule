@@ -139,8 +139,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
         try {
           holder.getExpirable().expired();
         } catch (Exception e) {
-          // TODO MULE-863: What should we really do?
-          LOGGER.debug(e.getMessage());
+          LOGGER.warn(e.getMessage());
         }
       }
     }
