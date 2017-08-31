@@ -29,6 +29,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
+import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -607,6 +608,7 @@ public class ApplicationModel {
     // TODO MULE-9692 all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
     validateNameIsNotRepeated();
+    validateNameHasValidCharacters();
     validateErrorMappings();
     validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
@@ -660,6 +662,15 @@ public class ApplicationModel {
                                                              componentModel.getIdentifier()));
         }
         existingObjectsWithName.put(nameAttributeValue, componentModel);
+      }
+    });
+  }
+
+  private void validateNameHasValidCharacters() {
+    executeOnEveryMuleComponentTree(componentModel -> {
+      String nameAttributeValue = componentModel.getNameAttribute();
+      if (nameAttributeValue != null) {
+        verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
       }
     });
   }
