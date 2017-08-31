@@ -10,15 +10,14 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TYPE_SUFFIX;
-
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExtendingOperationModelProperty;
 
 import javax.xml.namespace.QName;
 
@@ -33,35 +32,36 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     super(builder);
   }
 
-  public void registerOperation(OperationModel operationModel, DslElementSyntax dslSyntax) {
-    String typeName = capitalize(operationModel.getName()) + TYPE_SUFFIX;
-    registerProcessorElement(operationModel, typeName, dslSyntax);
-    registerOperationType(typeName, operationModel, dslSyntax);
+  public void registerOperation(ComponentModel componentModel, DslElementSyntax dslSyntax) {
+    String typeName = capitalize(componentModel.getName()) + TYPE_SUFFIX;
+    registerProcessorElement(componentModel, typeName, dslSyntax);
+    ExtensionType extensionType = registerOperationType(typeName, componentModel, dslSyntax);
+    registerNestedComponents(extensionType, componentModel.getNestedComponents());
   }
 
-  private void registerProcessorElement(OperationModel operationModel, String typeName, DslElementSyntax dslSyntax) {
+
+  void registerProcessorElement(ComponentModel componentModel, String typeName, DslElementSyntax dslSyntax) {
     Element element = new TopLevelElement();
     element.setName(dslSyntax.getElementName());
     element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
-    element.setAnnotation(builder.createDocAnnotation(operationModel.getDescription()));
-    element.setSubstitutionGroup(getOperationSubstitutionGroup(operationModel));
+    element.setAnnotation(builder.createDocAnnotation(componentModel.getDescription()));
+    element.setSubstitutionGroup(getOperationSubstitutionGroup(componentModel));
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
   }
 
-  private void registerOperationType(String name, OperationModel operationModel, DslElementSyntax dslSyntax) {
-    ExtensionType operationType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
-    initialiseSequence(operationType);
-    ExplicitGroup sequence = operationType.getSequence();
-    builder.addInfrastructureParameters(operationType, operationModel, sequence);
+  ExtensionType registerOperationType(String name, ComponentModel operationModel, DslElementSyntax dslSyntax) {
+    ExtensionType componentType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
+    initialiseSequence(componentType);
+    ExplicitGroup sequence = componentType.getSequence();
+    builder.addInfrastructureParameters(componentType, operationModel, sequence);
     operationModel.getParameterGroupModels()
-        .forEach(group -> registerParameterGroup(operationType, group));
+        .forEach(group -> registerParameterGroup(componentType, group));
+    return componentType;
   }
 
-  private QName getOperationSubstitutionGroup(OperationModel operationModel) {
-    Reference<QName> substitutionGroup = new Reference<>(MULE_ABSTRACT_OPERATOR);
-    operationModel.getModelProperty(ExtendingOperationModelProperty.class)
-        .ifPresent(property -> substitutionGroup.set(getSubstitutionGroup(property.getType())));
-
-    return substitutionGroup.get();
+  private QName getOperationSubstitutionGroup(ComponentModel componentModel) {
+    return componentModel.getStereotype().equals(MuleStereotypeFactory.processor())
+        ? MULE_ABSTRACT_OPERATOR
+        : getSubstitutionGroup(componentModel.getStereotype());
   }
 }

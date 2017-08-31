@@ -21,7 +21,7 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
    * @param processors {@link Processor} instance(s) to be used in the construction of a {@link MessageProcessorChain}
    * @return the current {@link MessageProcessorBuilder} instance.
    */
-  MessageProcessorChainBuilder chain(Processor... processors);
+  public MessageProcessorChainBuilder chain(Processor... processors);
 
   /**
    * Chain a {@link MessageProcessorBuilder} by adding it the the list of processors builders that the builder implementation will

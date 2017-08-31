@@ -36,7 +36,7 @@ public class ModuleExceptionHandler {
   private final Set<ErrorModel> allowedErrorTypes;
   private final String extensionNamespace;
 
-  public ModuleExceptionHandler(ExecutableComponentModel componentModel, ExtensionModel extensionModel,
+  public ModuleExceptionHandler(ComponentModel componentModel, ExtensionModel extensionModel,
                                 ErrorTypeRepository typeRepository) {
 
     this.componentModel = componentModel;

@@ -12,12 +12,10 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENS
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
-import org.mule.runtime.extension.api.annotation.RestrictedTo;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
@@ -29,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -45,11 +44,11 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.RecursiveChainA;
 import org.mule.test.heisenberg.extension.model.RecursiveChainB;
 import org.mule.test.heisenberg.extension.model.RecursivePojo;
-import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
-import org.mule.test.heisenberg.extension.model.types.WeaponType;
+import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
+import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -57,11 +56,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 
+@Stereotype(EmpireStereotype.class)
 public class HeisenbergOperations implements Disposable {
 
   public static final String CURE_CANCER_MESSAGE = "Can't help you, you are going to die";
@@ -114,50 +113,14 @@ public class HeisenbergOperations implements Disposable {
     return enemies;
   }
 
+  @Stereotype(KillingStereotype.class)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
-    return killWithCustomMessage(new KillParameters(victim, goodbyeMessage));
-  }
-
-  public String killWithCustomMessage(@ParameterGroup(name = KILL_WITH_GROUP) KillParameters killParameters) {
+    KillParameters killParameters = new KillParameters(victim, goodbyeMessage);
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 
   public String knock(KnockeableDoor knockedDoor) {
     return knockedDoor.knock();
-  }
-
-  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricins) {
-    return ricins;
-  }
-
-  public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon) {
-    return format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
-  }
-
-  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = PAYLOAD) List<Weapon> weapons) {
-    return weapons.stream().map(Weapon::kill).collect(Collectors.toList());
-  }
-
-  public List<String> killWithMultipleWildCardWeapons(List<? extends Weapon> wildCardWeapons) {
-    return wildCardWeapons.stream().map(Weapon::kill).collect(Collectors.toList());
-  }
-
-  @Throws(HeisenbergErrorTyperProvider.class)
-  public String killMany(@RestrictedTo(HeisenbergExtension.class) List<NestedProcessor> killOperations, String reason)
-      throws Exception {
-    StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
-    for (NestedProcessor processor : killOperations) {
-      builder.append(processor.process()).append("\n");
-    }
-
-    return builder.toString();
-  }
-
-  public String killOne(@RestrictedTo(HeisenbergExtension.class) NestedProcessor killOperation, String reason) throws Exception {
-    StringBuilder builder = new StringBuilder("Killed the following because " + reason + ":\n");
-    builder.append(killOperation.process()).append("\n");
-
-    return builder.toString();
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)

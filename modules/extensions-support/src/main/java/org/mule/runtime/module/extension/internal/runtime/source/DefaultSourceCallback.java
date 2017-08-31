@@ -112,7 +112,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
       checkArgument(product.processContextSupplier, "processContextSupplier");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
-      checkArgument(product.sourceModel, "sourceModel");
+      checkArgument(product.sourceModel, "source");
       checkArgument(product.cursorProviderFactory, "cursorStreamProviderFactory");
       checkArgument(product.messageSource, "messageSource");
       checkArgument(product.muleContext, "muleContext");

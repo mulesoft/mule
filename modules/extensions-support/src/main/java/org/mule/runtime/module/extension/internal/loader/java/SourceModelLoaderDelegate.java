@@ -116,7 +116,6 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     declareSourceParameters(sourceType, source);
     declareSourceCallback(sourceType, source);
-
     sourceDeclarers.put(sourceType.getDeclaringClass(), source);
   }
 

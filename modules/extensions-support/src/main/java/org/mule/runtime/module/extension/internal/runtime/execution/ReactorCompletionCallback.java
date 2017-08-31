@@ -31,7 +31,7 @@ final class ReactorCompletionCallback implements CompletionCallback<Object, Obje
   }
 
   @Override
-  public void error(Exception e) {
+  public void error(Throwable e) {
     sink.error(e);
   }
 }

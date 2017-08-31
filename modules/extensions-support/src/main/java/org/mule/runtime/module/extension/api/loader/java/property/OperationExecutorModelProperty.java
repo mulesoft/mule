@@ -26,8 +26,7 @@ public final class OperationExecutorModelProperty implements ModelProperty {
    *
    * @param executorFactory a {@link OperationExecutorFactory}
    */
-  public OperationExecutorModelProperty(
-                                        OperationExecutorFactory executorFactory) {
+  public OperationExecutorModelProperty(OperationExecutorFactory executorFactory) {
     this.executorFactory = executorFactory;
   }
 

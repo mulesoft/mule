@@ -34,7 +34,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -74,17 +73,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [

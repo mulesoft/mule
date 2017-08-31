@@ -50,6 +50,7 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -87,16 +88,19 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void blockingExecutionTypes() {
-    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    final List<String> blockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper",
+                                                          "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier");
 
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);
     new IdempotentExtensionWalker() {
 
       @Override
       protected void onOperation(OperationModel operation) {
-        assertThat(operation.isBlocking(), is(true));
         String operationName = operation.getName();
+
+        assertThat(operation.isBlocking(), is(!blockingOperations.contains(operationName)));
 
         if (operationName.equals("approve")) {
           assertThat(operation.getExecutionType(), is(CPU_INTENSIVE));

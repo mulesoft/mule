@@ -26,7 +26,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -48,17 +47,12 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -172,6 +166,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.oauth.TestOAuthConnection"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
+          "nestedComponents": [],
           "errors": [
             {
               "type": "RETRY_EXHAUSTED",
@@ -198,38 +218,6 @@
               }
             }
           ],
-          "output": {
-            "type": {
-              "format": "java",
-              "type": "@ref:org.mule.test.oauth.TestOAuthConnection"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
-          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -452,6 +440,32 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
+          "nestedComponents": [],
           "errors": [
             {
               "type": "RETRY_EXHAUSTED",
@@ -478,38 +492,6 @@
               }
             }
           ],
-          "output": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
-          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -664,7 +646,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -686,17 +667,12 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [

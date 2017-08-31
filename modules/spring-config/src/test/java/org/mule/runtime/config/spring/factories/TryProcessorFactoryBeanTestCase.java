@@ -21,6 +21,7 @@ import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

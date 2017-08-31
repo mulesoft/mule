@@ -20,13 +20,13 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
+import org.mule.runtime.extension.api.runtime.process.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
-
 import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.AnnotatedElement;
@@ -50,6 +50,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(StreamingHelper.class)
       .add(SourceResult.class)
       .add(ComponentLocation.class)
+      .add(Chain.class)
       .build();
 
   /**

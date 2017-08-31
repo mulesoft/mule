@@ -265,7 +265,16 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-  
+
+    <!-- Message Validator -->
+    <xsd:element name="abstract-validator" abstract="true" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for validator message processor elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <!-- Message Processors -->
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>

@@ -126,6 +126,13 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     return value;
   }
 
+  public ResolverSet merge(ResolverSet resolverSet) {
+    ResolverSet newResolverSet = new ResolverSet(muleContext);
+    resolvers.forEach(newResolverSet::add);
+    resolverSet.getResolvers().forEach(newResolverSet::add);
+    return newResolverSet;
+  }
+
   public Map<String, ValueResolver<?>> getResolvers() {
     return ImmutableMap.copyOf(resolvers);
   }

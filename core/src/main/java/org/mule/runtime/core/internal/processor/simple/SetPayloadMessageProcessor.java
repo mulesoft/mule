@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.processor.simple;
 
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
  */
 public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
+  private static final TypedValue NULL_TYPED_VALUE = new TypedValue<>(null, OBJECT);
   private DataType dataType;
   private String value;
   private AttributeEvaluator valueEvaluator;
@@ -56,18 +58,18 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private TypedValue resolveTypedValue(InternalEvent event) {
     if (valueEvaluator.getRawValue() == null) {
-      return new TypedValue(null, DataType.OBJECT);
+      return NULL_TYPED_VALUE;
     } else {
       return valueEvaluator.resolveTypedValue(event);
     }
   }
 
   public void setMimeType(String mimeType) {
-    setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).mediaType(mimeType).build());
+    setDataType(DataType.builder(dataType == null ? OBJECT : dataType).mediaType(mimeType).build());
   }
 
   public void setEncoding(String encoding) {
-    setDataType(DataType.builder(dataType == null ? DataType.OBJECT : dataType).charset(encoding).build());
+    setDataType(DataType.builder(dataType == null ? OBJECT : dataType).charset(encoding).build());
   }
 
   public void setDataType(DataType dataType) {

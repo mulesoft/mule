@@ -26,6 +26,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -157,6 +158,11 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
           public void onConfiguration(ConfigurationModel model) {
             parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
                                                         parsingContext));
+          }
+
+          @Override
+          protected void onConstruct(ConstructModel model) {
+            //TODO
           }
 
           @Override

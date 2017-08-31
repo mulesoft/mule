@@ -55,6 +55,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -78,14 +79,13 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DslElementModelFactory} that creates a {@link DslElementModel} based on its {@link ElementDeclaration}
@@ -210,13 +210,15 @@ class DeclarationBasedElementModelFactory {
     componentDeclaration.getComponents().forEach(nestedComponentDeclaration -> {
 
       if (nestedComponentDeclaration instanceof RouteElementDeclaration) {
-        model.getNestedComponents().stream()
-            .filter(nestedModel -> nestedModel instanceof NestedRouteModel
-                && nestedModel.getName().equals(nestedComponentDeclaration.getName()))
-            .findFirst()
-            .ifPresent(nestedRouteModel -> componentElement.containing(
-                                                                       crateRouteElement((NestedRouteModel) nestedRouteModel,
-                                                                                         (RouteElementDeclaration) nestedComponentDeclaration)));
+        if (model instanceof ComposableModel) {
+          ((ComposableModel) model).getNestedComponents().stream()
+              .filter(nestedModel -> nestedModel instanceof NestedRouteModel
+                  && nestedModel.getName().equals(nestedComponentDeclaration.getName()))
+              .findFirst()
+              .ifPresent(nestedRouteModel -> componentElement.containing(
+                                                                         crateRouteElement((NestedRouteModel) nestedRouteModel,
+                                                                                           (RouteElementDeclaration) nestedComponentDeclaration)));
+        }
 
       } else {
         create(nestedComponentDeclaration)

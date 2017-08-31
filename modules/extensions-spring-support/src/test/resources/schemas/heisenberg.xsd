@@ -542,7 +542,8 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AsyncListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="async-listen-payments"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-message-source" abstract="true" name="async-source"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="AsyncListenPaymentsType" substitutionGroup="async-source" name="async-listen-payments"></xs:element>
   <xs:complexType name="AsyncListenPaymentsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -924,11 +925,6 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-operator" abstract="true" name="heisenberg-empire"></xs:element>
-  <xs:group name="heisenberg-empire-group">
-    <xs:choice>
-      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" ref="heisenberg-empire"></xs:element>
-    </xs:choice>
-  </xs:group>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="CallSaulType" substitutionGroup="heisenberg-empire" name="call-saul"></xs:element>
   <xs:complexType name="CallSaulType">
     <xs:complexContent>
@@ -1350,6 +1346,24 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AlwaysFailsWrapperType" substitutionGroup="mule:abstract-operator" name="always-fails-wrapper"></xs:element>
+  <xs:complexType name="AlwaysFailsWrapperType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="1" name="processors">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                </xs:choice>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ApproveType" substitutionGroup="heisenberg-empire" name="approve"></xs:element>
   <xs:complexType name="ApproveType">
     <xs:complexContent>
@@ -1445,6 +1459,42 @@
             <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ExceptionOnCallbacksType" substitutionGroup="mule:abstract-operator" name="exception-on-callbacks"></xs:element>
+  <xs:complexType name="ExceptionOnCallbacksType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="1" name="processors">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                </xs:choice>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ExecuteAnythingType" substitutionGroup="mule:abstract-operator" name="execute-anything"></xs:element>
+  <xs:complexType name="ExecuteAnythingType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="1" name="chain">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                </xs:choice>
+        </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1614,7 +1664,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillType" substitutionGroup="heisenberg-empire" name="kill"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg-empire" abstract="true" name="killing-operation"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillType" substitutionGroup="killing-operation" name="kill"></xs:element>
   <xs:complexType name="KillType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1639,14 +1690,19 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillManyType" substitutionGroup="heisenberg-empire" name="kill-many"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="KillManyType" substitutionGroup="mule:abstract-operator" name="kill-many"></xs:element>
   <xs:complexType name="KillManyType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
-          <xs:element minOccurs="1" maxOccurs="unbounded" name="kill-operations">
+          <xs:element minOccurs="1" name="kill-operations">
             <xs:complexType>
-              <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="unbounded" ref="heisenberg-empire-group"></xs:group>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug-killing"></xs:element>
+                  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
+                </xs:choice>
+              </xs:sequence>
             </xs:complexType>
           </xs:element>
         </xs:sequence>
@@ -1669,37 +1725,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillOneType" substitutionGroup="heisenberg-empire" name="kill-one"></xs:element>
-  <xs:complexType name="KillOneType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-          <xs:element minOccurs="1" maxOccurs="1" name="kill-operation">
-            <xs:complexType>
-              <xs:group xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg-empire-group"></xs:group>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="reason"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithCustomMessageType" substitutionGroup="heisenberg-empire" name="kill-with-custom-message"></xs:element>
+  <xs:element abstract="true" name="drug-killing"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithCustomMessageType" substitutionGroup="killing-operation" name="kill-with-custom-message"></xs:element>
   <xs:complexType name="KillWithCustomMessageType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1724,7 +1751,26 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithMultipleWildCardWeaponsType" substitutionGroup="heisenberg-empire" name="kill-with-multiple-wild-card-weapons"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithIdType" substitutionGroup="killing-operation" name="kill-with-id"></xs:element>
+  <xs:complexType name="KillWithIdType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="required" name="id"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithMultipleWildCardWeaponsType" substitutionGroup="killing-operation" name="kill-with-multiple-wild-card-weapons"></xs:element>
   <xs:complexType name="KillWithMultipleWildCardWeaponsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1754,7 +1800,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithMultiplesWeaponsType" substitutionGroup="heisenberg-empire" name="kill-with-multiples-weapons"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithMultiplesWeaponsType" substitutionGroup="killing-operation" name="kill-with-multiples-weapons"></xs:element>
   <xs:complexType name="KillWithMultiplesWeaponsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1784,7 +1830,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithRicinsType" substitutionGroup="heisenberg-empire" name="kill-with-ricins"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithRicinsType" substitutionGroup="drug-killing" name="kill-with-ricins"></xs:element>
   <xs:complexType name="KillWithRicinsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1811,7 +1857,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="heisenberg-empire" name="kill-with-weapon"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="killing-operation" name="kill-with-weapon"></xs:element>
   <xs:complexType name="KillWithWeaponType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
@@ -1943,6 +1989,39 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NeverFailsWrapperType" substitutionGroup="mule:abstract-operator" name="never-fails-wrapper"></xs:element>
+  <xs:complexType name="NeverFailsWrapperType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" name="optional-processors">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                </xs:choice>
+                  </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="OperationWithInputStreamContentParamType" substitutionGroup="heisenberg-empire" name="operation-with-input-stream-content-param"></xs:element>
   <xs:complexType name="OperationWithInputStreamContentParamType">
     <xs:complexContent>
@@ -1954,7 +2033,7 @@
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence>
                     <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="input-stream-content"></xs:element>
-                  </xs:sequence>
+        </xs:sequence>
                 </xs:extension>
               </xs:complexContent>
             </xs:complexType>
@@ -1975,6 +2054,38 @@
             <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
           </xs:annotation>
         </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PayloadModifierType" substitutionGroup="mule:abstract-operator" name="payload-modifier"></xs:element>
+  <xs:complexType name="PayloadModifierType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" name="attributes">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="attribute">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="1" name="chain">
+            <xs:complexType>
+              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:choice>
+                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                </xs:choice>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="payload"></xs:attribute>
+        <xs:attribute type="mule:expressionMap" use="optional" name="attributes"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

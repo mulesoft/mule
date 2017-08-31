@@ -131,7 +131,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
   private static final String GET_GRAMS_IN_STORAGE = "getGramsInStorage";
   private static final String EXTENDED_CONFIG_NAME = "extended-config";
-  private static final String EXTENDED_CONFIG_DESCRIPTION = "extendedDescription";
   private static final String SOURCE_NAME = "ListenPayments";
   private static final String ASYNC_SOURCE_NAME = "AsyncListenPayments";
   private static final String DEA_SOURCE_NAME = "dea-radio";
@@ -154,7 +153,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String CONNECTION_PAGED_OPERATION = "pagedOperationUsingConnection";
   private static final String DIE = "die";
   private static final String KILL_MANY = "killMany";
-  private static final String KILL_ONE = "killOne";
   private static final String LAUNDER_MONEY = "launder";
   private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
   private static final String ALIAS = "alias";
@@ -464,7 +462,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(30));
+    assertThat(extensionDeclaration.getOperations(), hasSize(35));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(14));
@@ -480,7 +478,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS, "");
     assertOperation(withOperationsDeclaration, DIE, "");
     assertOperation(extensionDeclaration, KILL_MANY, "");
-    assertOperation(extensionDeclaration, KILL_ONE, "");
     assertOperation(withOperationsDeclaration, LAUNDER_MONEY, "");
     assertOperation(extensionDeclaration, INJECTED_EXTENSION_MANAGER, "");
     assertOperation(extensionDeclaration, ALIAS, "");

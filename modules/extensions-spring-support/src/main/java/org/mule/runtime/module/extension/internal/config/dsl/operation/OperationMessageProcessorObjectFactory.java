@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -27,7 +28,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.OperationMes
 public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor> {
 
   private final ExtensionModel extensionModel;
-  private final OperationModel operationModel;
+  private final OperationModel componentModel;
   private final PolicyManager policyManager;
   private ConfigurationProvider configurationProvider;
   private String target = EMPTY;
@@ -36,18 +37,18 @@ public class OperationMessageProcessorObjectFactory extends AbstractExtensionObj
   private RetryPolicyTemplate retryPolicyTemplate;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
-                                                OperationModel operationModel,
+                                                OperationModel componentModel,
                                                 MuleContext muleContext,
                                                 PolicyManager policyManager) {
     super(muleContext);
     this.extensionModel = extensionModel;
-    this.operationModel = operationModel;
+    this.componentModel = componentModel;
     this.policyManager = policyManager;
   }
 
   @Override
   public OperationMessageProcessor doGetObject() throws Exception {
-    return new OperationMessageProcessorBuilder(extensionModel, operationModel, policyManager, muleContext)
+    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext)
         .setConfigurationProvider(configurationProvider)
         .setParameters(parameters)
         .setTarget(target)

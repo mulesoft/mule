@@ -6,7 +6,6 @@
  */
 package org.mule.test.module.extension.typed.value;
 
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.test.typed.value.extension.extension.TypedValueExtension;
 import org.mule.test.typed.value.extension.extension.TypedValueSource;
@@ -31,8 +30,8 @@ public class TypedValueParameterOnConfigTestCase extends AbstractTypedValueTestC
     TypedValueExtension extension =
         (TypedValueExtension) flowRunner("typedValueOnDynamicConfig").run().getMessage().getPayload().getValue();
 
-    assertTypedValue(extension.getStringTypedValue(), "string", APPLICATION_JSON, UTF8);
-    assertTypedValue(extension.getDifferedDoor().getAddress(), "address", MediaType.ANY, UTF8);
+    assertTypedValue(extension.getStringTypedValue(), "JsonStringElement", MediaType.ANY, null);
+    assertTypedValue(extension.getDifferedDoor().getAddress(), "address", MediaType.ANY, null);
   }
 
   @Test

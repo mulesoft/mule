@@ -8,14 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -40,7 +39,7 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
       if (config instanceof Interceptable) {
         return new ExecutionContextConfigurationDecorator(config,
                                                           ((Interceptable) config).getInterceptors().stream()
-                                                              .map(interceptor -> new InterceptorDecorator(interceptor))
+                                                              .map(InterceptorDecorator::new)
                                                               .collect(toList()));
       } else {
         return config;
@@ -69,7 +68,7 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
 
       if (decorated instanceof Interceptable) {
         this.operationExecutorInterceptors = ((Interceptable) decorated).getInterceptors().stream()
-            .map(interceptor -> new InterceptorDecorator(interceptor))
+            .map(InterceptorDecorator::new)
             .collect(toList());
       } else {
         this.operationExecutorInterceptors = emptyList();

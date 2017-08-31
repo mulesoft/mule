@@ -96,6 +96,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -106,8 +107,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.w3c.dom.Document;
 
 /**
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
@@ -400,7 +399,9 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
       }
 
       declareParameterizedComponent(model, elementDsl, declarer, line.getConfigAttributes(), line.getChildren());
-      declareComposableModel(model, elementDsl, dsl, line, declarer);
+      if (model instanceof ComposableModel) {
+        declareComposableModel((ComposableModel) model, elementDsl, dsl, line, declarer);
+      }
       return Optional.of(declarer);
     }
     return Optional.empty();

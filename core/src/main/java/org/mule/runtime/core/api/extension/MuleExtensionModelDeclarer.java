@@ -74,6 +74,7 @@ import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
 import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 
 import com.google.gson.reflect.TypeToken;
@@ -111,15 +112,15 @@ class MuleExtensionModelDeclarer {
 
     // constructs
     declareFlow(extensionDeclarer, typeLoader);
-    declareForEach(extensionDeclarer, typeLoader);
     declareChoice(extensionDeclarer, typeLoader);
     declareErrorHandler(extensionDeclarer, typeLoader);
     declareTry(extensionDeclarer, typeLoader);
-    declareAsync(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
     declareConfiguration(extensionDeclarer, typeLoader);
 
     // operations
+    declareAsync(extensionDeclarer, typeLoader);
+    declareForEach(extensionDeclarer, typeLoader);
     declareFlowRef(extensionDeclarer, typeLoader);
     declareIdempotentValidator(extensionDeclarer, typeLoader);
     declareLogger(extensionDeclarer, typeLoader);
@@ -206,7 +207,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    ConstructDeclarer async = extensionDeclarer.withConstruct("async")
+    OperationDeclarer async = extensionDeclarer.withOperation("async")
         .describedAs("Processes the nested list of message processors asynchronously using a thread pool");
 
     async.withChain();
@@ -215,6 +216,9 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .ofType(typeLoader.load(String.class))
         .describedAs("Name that will be used to name the async scheduler");
+
+    async.withOutput().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+    async.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -269,7 +273,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
 
-    ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
+    OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
         .describedAs(
                      "The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
                          + " generating a message for each element.");
@@ -304,6 +308,9 @@ class MuleExtensionModelDeclarer {
         .defaultingTo("counter")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Property name used to store the number of message being iterated.");
+
+    forEach.withOutput().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+    forEach.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -324,7 +331,7 @@ class MuleExtensionModelDeclarer {
   private void declareFlow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer flow = extensionDeclarer.withConstruct(FLOW_ELEMENT_IDENTIFIER)
         .allowingTopLevelDefinition()
-        .withStereotype(MuleExtensionModelProvider.FLOW_STEREOTYPE);
+        .withStereotype(MuleStereotypeFactory.flow());
 
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
@@ -332,10 +339,10 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(Integer.class));
 
     flow.withComponent("source")
-        .withAllowedStereotypes(MuleExtensionModelProvider.SOURCE_STEREOTYPE);
+        .withAllowedStereotypes(MuleStereotypeFactory.source());
     flow.withChain().setRequired(true);
     flow.withComponent("errorHandler")
-        .withAllowedStereotypes(MuleExtensionModelProvider.ERROR_HANDLER_STEREOTYPE);
+        .withAllowedStereotypes(MuleStereotypeFactory.errorHandler());
 
   }
 
@@ -401,12 +408,12 @@ class MuleExtensionModelDeclarer {
 
     tryScope.withChain();
     tryScope.withOptionalComponent("errorHandler")
-        .withAllowedStereotypes(MuleExtensionModelProvider.ERROR_HANDLER_STEREOTYPE);
+        .withAllowedStereotypes(MuleStereotypeFactory.errorHandler());
   }
 
   private void declareErrorHandler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer errorHandler = extensionDeclarer.withConstruct("errorHandler")
-        .withStereotype(MuleExtensionModelProvider.ERROR_HANDLER_STEREOTYPE)
+        .withStereotype(MuleStereotypeFactory.errorHandler())
         .allowingTopLevelDefinition()
         .describedAs(
                      "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
@@ -513,6 +520,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
+        .withStereotype(MuleStereotypeFactory.configuration())
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());

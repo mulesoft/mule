@@ -39,7 +39,7 @@ public class ImplicitConfigTestCase extends AbstractExtensionFunctionalTestCase 
     assertThat(config.getInitialise(), is(1));
     assertThat(config.getStart(), is(1));
     assertThat(config.getOptionalNoDefault(), is(nullValue()));
-    assertThat(config.getOptionalWithDefault(), is(DEFAULT_VALUE_FROM_EXPRESSION));
+    assertThat(config.getOptionalWithDefault(), is(PARAMETER_DEFAULT_VALUE));
   }
 
   @Test
