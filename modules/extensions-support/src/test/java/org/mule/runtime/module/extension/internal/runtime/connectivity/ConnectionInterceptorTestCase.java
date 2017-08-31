@@ -17,7 +17,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 

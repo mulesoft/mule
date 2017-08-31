@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.function.Consumer;
 

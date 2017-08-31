@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOU
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
  * An argument resolver that yields instances of {@Link SourceCompletionCallback}.

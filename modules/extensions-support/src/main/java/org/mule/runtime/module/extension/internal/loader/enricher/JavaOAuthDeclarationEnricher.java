@@ -41,7 +41,7 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.UnauthorizeOperationExecutor;
 

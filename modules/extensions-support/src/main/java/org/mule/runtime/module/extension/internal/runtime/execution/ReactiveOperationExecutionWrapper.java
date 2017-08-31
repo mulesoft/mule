@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.Map;
 import java.util.function.Function;

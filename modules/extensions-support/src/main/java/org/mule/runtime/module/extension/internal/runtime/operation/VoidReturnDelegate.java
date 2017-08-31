@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
  * An implementation of {@link ReturnDelegate} intended for operations which return {@link Void} and that were executed with a

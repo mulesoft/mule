@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.COM
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
-import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
  * {@link ArgumentResolver} which returns the {@link ExtensionProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}

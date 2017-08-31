@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
-import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultFlowListener;
 
 /**

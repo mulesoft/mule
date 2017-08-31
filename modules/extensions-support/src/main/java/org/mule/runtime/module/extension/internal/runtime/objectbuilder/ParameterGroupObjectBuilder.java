@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.runtime.EventedExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
