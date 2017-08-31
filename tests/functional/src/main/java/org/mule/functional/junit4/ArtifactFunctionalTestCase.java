@@ -243,7 +243,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
     public TestClassLoaderRepository() {
       registerClassLoader(Thread.currentThread().getContextClassLoader());
-      registerClassLoader(containerClassLoader);
       for (Object classLoader : serviceClassLoaders) {
         registerClassLoader(classLoader);
       }
