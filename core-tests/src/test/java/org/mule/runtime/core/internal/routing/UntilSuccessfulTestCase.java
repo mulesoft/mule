@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -27,15 +26,16 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
@@ -67,6 +67,11 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     public void setNumberOfFailuresToSimulate(int numberOfFailuresToSimulate) {
       this.numberOfFailuresToSimulate = numberOfFailuresToSimulate;
     }
+  }
+
+  @Parameters
+  public static Collection<Boolean> modeParameters() {
+    return asList(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
   }
 
   @Rule
@@ -148,7 +153,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     try {
       untilSuccessful.process(testEvent);
     } finally {
-      assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
+      assertEquals(1 + untilSuccessful.getMaxRetries(), targetMessageProcessor.getEventCount());
     }
   }
 
@@ -185,9 +190,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertEquals(testEvent.getMessage(), eventReceived.getMessage());
   }
 
-  @Parameterized.Parameters
-  public static Collection<Boolean> modeParameters() {
-    return asList(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
-  }
+
 
 }

@@ -17,10 +17,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
@@ -38,7 +37,6 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
   private final ExtensionModel extensionModel;
   private final MuleContext muleContext;
   private Provider<ResolverSet> resolverSetProvider;
-  private ConnectionManagerAdapter connectionManagerAdapter = null;
   private ConnectionProviderModel connectionProviderModel = null;
   private ResolverSet resolverSet = null;
 
