@@ -98,9 +98,6 @@
                 <set-payload value="Expected."/>
                 <test:queue name="out"/>
             </on-error-propagate>
-            <on-error-propagate type="SOURCE, SOURCE_RESPONSE">
-                <test:queue name="out"/>
-            </on-error-propagate>
         </error-handler>
     </flow>
 
