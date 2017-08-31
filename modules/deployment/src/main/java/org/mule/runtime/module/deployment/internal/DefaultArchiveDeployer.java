@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,8 +104,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     if (deployedAppNames.contains(artifactName) && (!artifactZombieMap.containsKey(artifactName))) {
       return false;
     }
-
-    List<Artifact> artifactList = artifacts.stream().filter((a) -> a.getArtifactName().equals(artifactName)).collect(Collectors.toList());
 
     //First get saved zombieFile
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
@@ -187,7 +184,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     for (String artifact : artifactZombieMap.keySet()) {
       ZombieArtifact file = artifactZombieMap.get(artifact);
-      result.put(file.uri, file.originalTimeStamp);
+      result.put(file.uri, file.initialResourceFiles.get(new File(file.uri)));
     }
     return result;
   }
@@ -306,7 +303,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private void addZombieApp(Artifact artifact) {
     if (allResourcesExist(artifact.getResourceFiles())) {
       try {
-        artifactZombieMap.put(artifact.getArtifactName(), new ZombieArtifact(artifact.getResourceFiles()));
+        artifactZombieMap.put(artifact.getArtifactName(),
+                              new ZombieArtifact(artifact.getResourceFiles(), artifact.getDescriptor().getDescriptorFile()));
       } catch (Exception e) {
         // ignore resource
       }
@@ -324,7 +322,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     try {
-      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
+      artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}, marker));
     } catch (Exception e) {
       logger.debug(format("Failed to mark an exploded artifact [%s] as a zombie", marker.getName()), e);
     }
@@ -433,20 +431,16 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private static class ZombieArtifact {
 
-    URI uri; //Refers to the URI of the artifact folder
-    Long originalTimeStamp;
-    File[] resourceFiles;
-    File descriptor;
+    URI uri;
+    Map<File, Long> initialResourceFiles = new HashMap<>();
 
-    private long computeMaxTimestamp() {
-      return Collections.max(Arrays.stream(resourceFiles).map((f) -> f.lastModified()).collect(Collectors.toList()));
-    }
-
-    private ZombieArtifact(File[] resourceFiles) {
+    private ZombieArtifact(File[] resourceFiles, File descriptor) {
       //Is exploded artifact
-      this.resourceFiles = resourceFiles;
+      for (File resourceFile : resourceFiles) {
+        initialResourceFiles.put(resourceFile, resourceFile.lastModified());
+      }
+      initialResourceFiles.put(descriptor, descriptor.lastModified());
       uri = resourceFiles[0].toURI(); //For when a marker is saved
-      originalTimeStamp = computeMaxTimestamp();
     }
 
     public boolean isFor(URI uri) {
@@ -454,12 +448,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     public boolean updatedZombieApp() {
-      return this.originalTimeStamp != computeMaxTimestamp();
+      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().lastModified() != entry.getValue())
+          .collect(Collectors.toList()).isEmpty());
     }
 
     //Returns true only if all the files exist
     public boolean exists() {
-      return allResourcesExist(resourceFiles);
+      return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
     }
 
   }

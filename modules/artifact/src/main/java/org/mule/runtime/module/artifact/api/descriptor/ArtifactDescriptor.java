@@ -62,7 +62,7 @@ public class ArtifactDescriptor {
    * @return the descriptor file
    */
   public File getDescriptorFile() {
-    return new File(MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+    return new File(rootFolder, MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
   }
 
   /**
