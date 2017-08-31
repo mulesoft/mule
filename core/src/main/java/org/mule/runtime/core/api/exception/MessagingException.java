@@ -286,7 +286,7 @@ public class MessagingException extends MuleException {
   }
 
   @Override
-  protected void appendSummaryMessage(Map<String,String> summary) {
+  protected void appendSummaryMessage(Map<String, String> summary) {
     super.appendSummaryMessage(summary);
     StringBuilder builder = new StringBuilder();
     builder.append("Error Type            : ")
