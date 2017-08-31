@@ -210,8 +210,8 @@
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xstreamVersion>1.4.9</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
-        <allureJunitVersion>2.0-BETA16</allureJunitVersion>
-        <allureReportVersion>2.3.1</allureReportVersion>
+        <allureJunitVersion>2.0-BETA17</allureJunitVersion>
+        <allureReportVersion>2.3.4</allureReportVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.0.0-SNAPSHOT</muleDslApiVersion>
