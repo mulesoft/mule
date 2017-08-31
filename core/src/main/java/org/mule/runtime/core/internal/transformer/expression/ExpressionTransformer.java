@@ -7,10 +7,9 @@
 package org.mule.runtime.core.internal.transformer.expression;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionReturnedNull;
-
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 
 import java.nio.charset.Charset;
 import java.util.Iterator;
@@ -38,7 +37,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer {
   private boolean returnSourceIfNull = false;
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
     Object results[] = new Object[arguments.size()];
     int i = 0;
     for (Iterator<ExpressionArgument> iterator = arguments.iterator(); iterator.hasNext(); i++) {
@@ -46,11 +45,12 @@ public class ExpressionTransformer extends AbstractExpressionTransformer {
       try {
         results[i] = argument.evaluate(event);
       } catch (ExpressionRuntimeException e) {
-        throw new TransformerException(this, e);
+        throw new MessageTransformerException(this, e, event.getMessage());
       }
 
       if (!argument.isOptional() && results[i] == null) {
-        throw new TransformerException(expressionReturnedNull(argument.getExpressionConfig().getExpression()), this);
+        throw new MessageTransformerException(expressionReturnedNull(argument.getExpressionConfig().getExpression()), this,
+                                              event.getMessage());
       }
 
     }

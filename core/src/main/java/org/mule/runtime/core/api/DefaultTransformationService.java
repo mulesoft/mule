@@ -10,12 +10,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -143,10 +145,10 @@ public class DefaultTransformationService implements TransformationService {
    * @param outputDataType the desired return type
    * @return The converted payload of this message. Note that this method will not alter the payload of this message *unless* the
    *         payload is an InputStream in which case the stream will be read and the payload will become the fully read stream.
-   * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload
    */
   @Deprecated
-  public Message internalTransform(Message message, DataType outputDataType) throws TransformerException {
+  public Message internalTransform(Message message, DataType outputDataType) throws MessageTransformerException {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
@@ -184,7 +186,7 @@ public class DefaultTransformationService implements TransformationService {
     if (!dataType.isStreamType()) {
       try {
         return getPayload(message, DataType.STRING, encoding);
-      } catch (TransformerException e) {
+      } catch (MessageTransformerException e) {
         return "Payload could not be converted to a String. Payload type is " + dataType.getType();
       }
     }
@@ -231,6 +233,10 @@ public class DefaultTransformationService implements TransformationService {
           }
         }
       }
+
+      Transformer lastTransformer = transformers.get(transformers.size() - 1);
+      DataType returnDataType = lastTransformer.getReturnDataType();
+      checkResultDataType(message, returnDataType, result.getPayload().getValue());
     }
     return result;
   }
@@ -301,10 +307,10 @@ public class DefaultTransformationService implements TransformationService {
    * @return The converted payload of this message. Note that this method will not alter the payload of this message <b>unless</b>
    *         the payload is an {@link InputStream} in which case the stream will be read and the payload will become the fully
    *         read stream.
-   * @throws TransformerException if a transformer cannot be found or there is an error during transformation of the payload.
+   * @throws MessageTransformerException if a transformer cannot be found or there is an error during transformation of the payload.
    */
   @SuppressWarnings("unchecked")
-  private <T> T getPayload(Message message, DataType resultType, Charset encoding) throws TransformerException {
+  private <T> T getPayload(Message message, DataType resultType, Charset encoding) throws MessageTransformerException {
     // Handle null by ignoring the request
     if (resultType == null) {
       throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
@@ -318,20 +324,33 @@ public class DefaultTransformationService implements TransformationService {
     }
 
     // The transformer to execute on this message
-    Transformer transformer = muleContext.getRegistry().lookupTransformer(dataType, resultType);
-    if (transformer == null) {
-      throw new TransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType));
+    Transformer transformer = null;
+    try {
+      transformer = muleContext.getRegistry().lookupTransformer(dataType, resultType);
+      if (transformer == null) {
+        throw new MessageTransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType), null, message);
+      }
+
+      // Pass in the message itself
+      Object result = transformer.transform(message, encoding);
+      // Unless we disallow Object.class as a valid return type we need to do this extra check
+      checkResultDataType(message, resultType, result);
+
+      return (T) result;
+    } catch (MessageTransformerException e) {
+      throw e;
+    } catch (TransformerException e) {
+      throw new MessageTransformerException(transformer, e, message);
     }
+  }
 
-    // Pass in the message itself
-    Object result = transformer.transform(message, encoding);
-
-    // Unless we disallow Object.class as a valid return type we need to do this extra check
-    if (!resultType.getType().isAssignableFrom(result.getClass())) {
-      throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
+  private void checkResultDataType(Message message, DataType resultType, Object value) throws MessageTransformerException {
+    if (value != null && !resultType.getType().isAssignableFrom(value.getClass())) {
+      TypedValue<Object> actualType = TypedValue.of(value);
+      Message transformedMessage = Message.builder(message).payload(actualType).build();
+      throw new MessageTransformerException(transformOnObjectNotOfSpecifiedType(resultType, actualType), null,
+                                            transformedMessage);
     }
-
-    return (T) result;
   }
 
   @Override

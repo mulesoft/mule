@@ -21,7 +21,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -53,11 +53,11 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     when(mockExpressionManager.parse(anyString(), any(InternalEvent.class), any(ComponentLocation.class)))
-        .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void testSetPayloadTransformerNulValue() throws InitialisationException, TransformerException {
+  public void testSetPayloadTransformerNulValue() throws InitialisationException, MessageTransformerException {
     setPayloadTransformer.setValue(null);
     setPayloadTransformer.initialise();
 
@@ -66,7 +66,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testSetPayloadTransformerPlainText() throws InitialisationException, TransformerException {
+  public void testSetPayloadTransformerPlainText() throws InitialisationException, MessageTransformerException {
     setPayloadTransformer.setValue(PLAIN_TEXT);
     setPayloadTransformer.initialise();
 
@@ -77,7 +77,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testSetPayloadTransformerExpression() throws InitialisationException, TransformerException {
+  public void testSetPayloadTransformerExpression() throws InitialisationException, MessageTransformerException {
     setPayloadTransformer.setValue(EXPRESSION);
     when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();

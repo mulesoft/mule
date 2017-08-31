@@ -10,15 +10,15 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 
 import java.nio.charset.Charset;
 
 /**
  * A transformer that uses the transform discovery mechanism to convert the message payload. This transformer works much better
  * when transforming custom object types rather that java types since there is less chance for ambiguity. If an exact match cannot
- * be made an execption will be thrown.
+ * be made an exception will be thrown.
  */
 public class AutoTransformer extends AbstractMessageTransformer {
 
@@ -37,7 +37,7 @@ public class AutoTransformer extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
     return muleContext.getTransformationService()
         .internalTransform(event.getMessage(), DataType.fromType(getReturnDataType().getType()))
         .getPayload().getValue();

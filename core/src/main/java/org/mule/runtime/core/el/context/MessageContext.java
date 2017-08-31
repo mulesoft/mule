@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.Serializable;
@@ -82,9 +83,9 @@ public class MessageContext {
    *
    * @param dataType the DatType to transform the current message payload to
    * @return the transformed payload
-   * @throws TransformerException if there is an error during transformation
+   * @throws MessageTransformerException if there is an error during transformation
    */
-  public Object payloadAs(DataType dataType) throws TransformerException {
+  public Object payloadAs(DataType dataType) throws MessageTransformerException {
     eventBuilder.message(muleContext.getTransformationService().internalTransform(event.getMessage(), dataType));
     event = eventBuilder.build();
     return event.getMessage().getPayload().getValue();

@@ -14,8 +14,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -39,12 +39,9 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -53,6 +50,9 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
@@ -379,14 +379,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public <T> T transformMessage(Class<T> outputType, MuleContext muleContext) throws TransformerException {
-      return (T) transformMessage(DataType.fromType(outputType), muleContext);
-    }
-
-    @Override
-    public Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException {
+    public Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException {
       if (outputType == null) {
-        throw new TransformerException(CoreMessages.objectIsNull("outputType"));
+        throw new MessageTransformerException(objectIsNull("outputType"), null, message);
       }
 
       Message transformedMessage = muleContext.getTransformationService().internalTransform(message, outputType);
@@ -405,7 +400,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
      * @see org.mule.runtime.core.api.transformer.Transformer
      */
     @Override
-    public String transformMessageToString(MuleContext muleContext) throws TransformerException {
+    public String transformMessageToString(MuleContext muleContext) throws MessageTransformerException {
       final DataType dataType = DataType.builder(getMessage().getPayload().getDataType()).type(String.class).build();
       return (String) transformMessage(dataType, muleContext);
     }

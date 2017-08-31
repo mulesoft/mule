@@ -90,8 +90,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         return src;
       } else {
         I18nMessage msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
-        /// FIXME
-        throw new MessageTransformerException(msg, this);
+        throw new MessageTransformerException(msg, this, event.getMessage());
       }
     }
     if (logger.isDebugEnabled()) {
@@ -111,7 +110,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = of(src);
     } else {
       if (event == null) {
-        throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this);
+        throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this, null);
       }
       message = event.getMessage();
     }
@@ -124,11 +123,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
       event = InternalEvent.builder(create(flowConstruct, location)).message(message).flow(flowConstruct).build();
     }
-    try {
-      result = transformMessage(event, enc);
-    } catch (TransformerException e) {
-      throw new MessageTransformerException(e.getI18nMessage(), this, e);
-    }
+
+    result = transformMessage(event, enc);
 
     if (logger.isDebugEnabled()) {
       logger.debug(String.format("Object after transform: %s", StringMessageUtils.toString(result)));
@@ -151,7 +147,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (getReturnDataType() != null) {
       DataType dt = DataType.fromObject(object);
       if (!getReturnDataType().isCompatibleWith(dt)) {
-        throw new MessageTransformerException(CoreMessages.transformUnexpectedType(dt, getReturnDataType()), this);
+        throw new MessageTransformerException(CoreMessages.transformUnexpectedType(dt, getReturnDataType()), this,
+                                              event.getMessage());
       }
     }
 
@@ -165,5 +162,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Transform the message
    */
-  public abstract Object transformMessage(InternalEvent event, Charset outputEncoding) throws TransformerException;
+  public abstract Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException;
 }

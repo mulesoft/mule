@@ -11,14 +11,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.DefaultEventBuilder;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
@@ -97,26 +97,12 @@ public interface InternalEvent extends Serializable, Event {
    * @param outputType The requested output type.
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format.
-   * @throws TransformerException if a failure occurs in the transformer
+   * @throws MessageTransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
    * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
   @Deprecated
-  <T> T transformMessage(Class<T> outputType, MuleContext muleContext) throws TransformerException;
-
-  /**
-   * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
-   * this event was received.
-   * 
-   * @param outputType The requested output type.
-   * @param muleContext the Mule node.
-   * @return the message transformed into it's recognized or expected format.
-   * @throws TransformerException if a failure occurs in the transformer
-   * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException;
+  Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException;
 
   /**
    * Returns the message transformed into it's recognized or expected format and then into a String. The transformer used is the
@@ -125,12 +111,12 @@ public interface InternalEvent extends Serializable, Event {
    * 
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format as a Strings.
-   * @throws TransformerException if a failure occurs in the transformer
+   * @throws MessageTransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
   @Deprecated
-  String transformMessageToString(MuleContext muleContext) throws TransformerException;
+  String transformMessageToString(MuleContext muleContext) throws MessageTransformerException;
 
   /**
    * Returns the message contents as a string If necessary this will use the encoding set on the event
