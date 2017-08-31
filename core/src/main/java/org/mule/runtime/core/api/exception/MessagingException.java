@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -285,13 +286,14 @@ public class MessagingException extends MuleException {
   }
 
   @Override
-  protected Pair<String,String> getSummaryMessageAdditionalInfo() {
+  protected void appendSummaryMessage(Map<String,String> summary) {
+    super.appendSummaryMessage(summary);
     StringBuilder builder = new StringBuilder();
     builder.append("Error Type            : ")
         .append(getEvent().getError().map(e -> e.getErrorType().toString()).orElse("(None)"))
         .append(lineSeparator());
 
-    return new Pair<>(SUMMARY_KEY, builder.toString());
+    summary.put(SUMMARY_KEY, builder.toString());
   }
 
   /**
