@@ -6,6 +6,7 @@
  */
 package org.mule.tck.probe;
 
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 /**
@@ -14,25 +15,31 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 public class JUnitLambdaProbe extends JUnitProbe {
 
   private final CheckedSupplier<Boolean> probable;
-  private final CheckedSupplier<String> failureDescription;
+  private final CheckedFunction<AssertionError, String> failureDescription;
 
   public JUnitLambdaProbe(CheckedSupplier<Boolean> probable, String failureDescription) {
     this.probable = probable;
-    this.failureDescription = () -> failureDescription;
+    this.failureDescription = ae -> failureDescription;
   }
 
-  public JUnitLambdaProbe(CheckedSupplier<Boolean> probable, CheckedSupplier<String> failureDescription) {
+  public JUnitLambdaProbe(CheckedSupplier<Boolean> probable, CheckedFunction<AssertionError, String> failureDescription) {
     this.probable = probable;
     this.failureDescription = failureDescription;
   }
 
+  public JUnitLambdaProbe(CheckedSupplier<Boolean> probable, CheckedSupplier<String> failureDescription) {
+    this.probable = probable;
+    this.failureDescription = ae -> failureDescription.get();
+  }
+
   public JUnitLambdaProbe(CheckedSupplier<Boolean> probable) {
-    this(probable, () -> null);
+    this(probable, ae -> null);
   }
 
   @Override
   public String describeFailure() {
-    return failureDescription.get() == null ? super.describeFailure() : failureDescription.get();
+    String description = failureDescription.apply(lastFailure);
+    return description == null ? super.describeFailure() : description;
   }
 
   @Override

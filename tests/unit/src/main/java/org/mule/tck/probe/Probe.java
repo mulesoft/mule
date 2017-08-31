@@ -12,7 +12,7 @@ package org.mule.tck.probe;
 public interface Probe {
 
   /**
-   * Indicates wheter or not the specified criteria was met or not.
+   * Indicates whether or not the specified criteria was met or not.
    *
    * @return true if the criteria is satisfied.
    */

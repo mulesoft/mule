@@ -6,6 +6,7 @@
  */
 package org.mule.tck.probe;
 
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 public class PollingProber implements Prober {
@@ -37,12 +38,21 @@ public class PollingProber implements Prober {
     new PollingProber().check(new JUnitLambdaProbe(probable, failureDescription));
   }
 
+  public static void probe(CheckedSupplier<Boolean> probable, CheckedFunction<AssertionError, String> failureDescription) {
+    new PollingProber().check(new JUnitLambdaProbe(probable, failureDescription));
+  }
+
   public static void probe(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probable) {
     probe(timeoutMillis, pollDelayMillis, probable, () -> null);
   }
 
   public static void probe(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probable,
                            CheckedSupplier<String> failureDescription) {
+    new PollingProber(timeoutMillis, pollDelayMillis).check(new JUnitLambdaProbe(probable, failureDescription));
+  }
+
+  public static void probe(long timeoutMillis, long pollDelayMillis, CheckedSupplier<Boolean> probable,
+                           CheckedFunction<AssertionError, String> failureDescription) {
     new PollingProber(timeoutMillis, pollDelayMillis).check(new JUnitLambdaProbe(probable, failureDescription));
   }
 

@@ -6,8 +6,10 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.System.lineSeparator;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
@@ -27,11 +29,11 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.reactivestreams.Publisher;
 
 import com.eaio.uuid.UUID;
+
+import java.util.concurrent.CountDownLatch;
 
 import reactor.core.publisher.Flux;
 
@@ -47,6 +49,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   private Processor next;
   private String requestTaskToken;
   private String responseTaskToken;
+  private String responseStackTrace;
   private CountDownLatch responseLatch;
   private int responseInvocationCount = 0;
   private boolean responseResult = true;
@@ -109,6 +112,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     } else {
       responseTaskToken = generateTaskToken();
     }
+    responseStackTrace = getStackTrace(new Exception());
 
     responseResult = responseResult && expressionManager.evaluateBoolean(responseExpression, event, getLocation(), false, true);
     increaseResponseCount();
@@ -137,11 +141,11 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     } else if (responseExpressionFailed()) {
       fail(failureMessagePrefix() + "Response expression " + expression + " evaluated false.");
     } else if (responseCount > 0 && responseSameTask) {
-      assertThat(failureMessagePrefix() + "Response thread was not same as request thread", responseTaskToken,
+      assertThat(failureMessagePrefix() + "Response task was not same as request task", responseTaskToken,
                  is(requestTaskToken));
     } else if (responseCount > 0 && !responseSameTask) {
-      assertThat(failureMessagePrefix() + "Response thread was same as request thread", responseTaskToken,
-                 not(is(requestTaskToken)));
+      assertThat(failureMessagePrefix() + "Response task was same as request task. Response stack trace is " + lineSeparator()
+          + responseStackTrace, responseTaskToken, not(is(requestTaskToken)));
     }
   }
 

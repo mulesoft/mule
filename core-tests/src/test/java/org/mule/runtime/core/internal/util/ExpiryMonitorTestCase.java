@@ -53,10 +53,13 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
     monitor.addExpirable(EXPIRE_TIME, MILLISECONDS, e);
 
     new PollingProber(EXPIRE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
-      assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
+      assertThat(expired, is(true));
       return true;
-    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
+    }, ae -> {
+      ae.printStackTrace();
+      return "" + currentTimeMillis() + " - " + monitor.toString();
+    }));
   }
 
   @Test
@@ -68,10 +71,13 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
     assertThat(expired, is(false));
 
     new PollingProber(EXPIRE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
-      assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
+      assertThat(expired, is(true));
       return true;
-    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
+    }, ae -> {
+      ae.printStackTrace();
+      return "" + currentTimeMillis() + " - " + monitor.toString();
+    }));
     assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
   }
 
@@ -87,10 +93,13 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
     assertTrue(!expired);
 
     new PollingProber(EXPIRE_TIMEOUT, 50).check(new JUnitLambdaProbe(() -> {
-      assertThat(expired, is(true));
       assertThat(monitor.isRegistered(e), is(false));
+      assertThat(expired, is(true));
       return true;
-    }, () -> "" + currentTimeMillis() + " - " + monitor.toString()));
+    }, ae -> {
+      ae.printStackTrace();
+      return "" + currentTimeMillis() + " - " + monitor.toString();
+    }));
     assertThat(expiredTime - startTime, greaterThanOrEqualTo(EXPIRE_TIME - DELTA_TIME));
   }
 
@@ -103,8 +112,8 @@ public class ExpiryMonitorTestCase extends AbstractMuleContextTestCase {
     monitor.removeExpirable(e);
 
     Thread.sleep(EXPIRE_TIMEOUT);
-    assertThat(expired, is(false));
     assertThat(monitor.isRegistered(e), is(false));
+    assertThat(expired, is(false));
   }
 
   private void expire() {

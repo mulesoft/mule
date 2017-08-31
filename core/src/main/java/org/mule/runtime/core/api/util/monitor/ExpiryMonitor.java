@@ -10,17 +10,17 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 
+import org.slf4j.Logger;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and can invoke a callback method once the object time
@@ -31,7 +31,7 @@ public class ExpiryMonitor implements Runnable, Disposable {
   /**
    * logger used by this class
    */
-  private static final Logger logger = LoggerFactory.getLogger(ExpiryMonitor.class);
+  private static final Logger LOGGER = getLogger(ExpiryMonitor.class);
 
   private Scheduler scheduler;
 
@@ -76,26 +76,26 @@ public class ExpiryMonitor implements Runnable, Disposable {
    *
    * @param value the expiry value
    * @param timeUnit The time unit of the Expiry value
-   * @param expirable the objec that will expire
+   * @param expirable the object that will expire
    */
   public void addExpirable(long value, TimeUnit timeUnit, Expirable expirable) {
     if (isRegistered(expirable)) {
       resetExpirable(expirable);
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Adding new expirable: " + expirable);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Adding new expirable: " + expirable);
       }
       monitors.put(expirable, new ExpirableHolder(timeUnit.toMillis(value), expirable));
     }
   }
 
   public boolean isRegistered(Expirable expirable) {
-    return (monitors.get(expirable) != null);
+    return monitors.containsKey(expirable);
   }
 
   public void removeExpirable(Expirable expirable) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Removing expirable: " + expirable);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Removing expirable: " + expirable);
     }
     monitors.remove(expirable);
   }
@@ -104,8 +104,8 @@ public class ExpiryMonitor implements Runnable, Disposable {
     ExpirableHolder eh = monitors.get(expirable);
     if (eh != null) {
       eh.reset();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Reset expirable: " + expirable);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Reset expirable: " + expirable);
       }
     }
   }
@@ -116,10 +116,12 @@ public class ExpiryMonitor implements Runnable, Disposable {
   @Override
   public void run() {
     if (!onPollingNodeOnly || muleContext == null || muleContext.isPrimaryPollingInstance()) {
-      for (ExpirableHolder holder : monitors.values()) {
-        if (holder.isExpired()) {
-          removeExpirable(holder.getExpirable());
-          holder.getExpirable().expired();
+      synchronized (monitors) {
+        for (ExpirableHolder holder : monitors.values()) {
+          if (holder.isExpired()) {
+            removeExpirable(holder.getExpirable());
+            holder.getExpirable().expired();
+          }
         }
       }
     }
@@ -127,17 +129,19 @@ public class ExpiryMonitor implements Runnable, Disposable {
 
   @Override
   public void dispose() {
-    logger.info("disposing monitor");
+    LOGGER.info("disposing monitor");
     scheduler.stop();
     ExpirableHolder holder;
-    for (Object element : monitors.values()) {
-      holder = (ExpirableHolder) element;
-      removeExpirable(holder.getExpirable());
-      try {
-        holder.getExpirable().expired();
-      } catch (Exception e) {
-        // TODO MULE-863: What should we really do?
-        logger.debug(e.getMessage());
+    synchronized (monitors) {
+      for (Object element : monitors.values()) {
+        holder = (ExpirableHolder) element;
+        removeExpirable(holder.getExpirable());
+        try {
+          holder.getExpirable().expired();
+        } catch (Exception e) {
+          // TODO MULE-863: What should we really do?
+          LOGGER.debug(e.getMessage());
+        }
       }
     }
   }
