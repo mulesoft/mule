@@ -172,7 +172,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -637,7 +636,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
     assertZombieApplication(brokenAppFileBuilder.getDeployedPath(), 1, false);
-
   }
 
   /**
@@ -2316,7 +2314,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    assertZombieDomain(brokenDomainFileBuilder.getDeployedPath(), 1, false, true);
+    assertZombieDomain(brokenDomainFileBuilder.getDeployedPath(), 1, false);
   }
 
   @Test
@@ -2331,7 +2329,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    assertZombieDomain(brokenDomainFileBuilder.getDeployedPath(), 1, false, true);
+    assertZombieDomain(brokenDomainFileBuilder.getDeployedPath(), 1, false);
   }
 
   @Test
@@ -2649,7 +2647,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    assertZombieDomain("domain with spaces", 1, false, true);
+    assertZombieDomain("domain with spaces", 1, false);
   }
 
   @Test
@@ -2662,7 +2660,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    assertZombieDomain("domain with spaces", 1, false, true);
+    assertZombieDomain("domain with spaces", 1, false);
   }
 
   @Test
@@ -2692,7 +2690,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2705,7 +2703,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2841,7 +2839,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2859,7 +2857,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2877,7 +2875,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2986,7 +2984,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    assertZombieDomain(emptyDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(emptyDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -2999,7 +2997,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder, emptyDomainFileBuilder.getZipPath());
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    assertZombieDomain(emptyDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(emptyDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -3016,7 +3014,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -3031,7 +3029,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true, true);
+    assertZombieDomain(incompleteDomainFileBuilder.getId(), 1, true);
   }
 
   @Test
@@ -4123,20 +4121,21 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .build());
   }
 
-  private void assertZombieApplication(String appId, int expectedZombieCount, boolean parent) {
+  private void assertZombieApplication(String appId, int expectedZombieCount, boolean compareAgainstParentFileName) {
     final Map<String, Map<URI, Long>> zombieMap = deploymentService.getZombieApplications();
-    assertZombie(zombieMap, appId, expectedZombieCount, parent);
+    assertZombie(zombieMap, appId, expectedZombieCount, compareAgainstParentFileName);
   }
 
-  private void assertZombieDomain(String domainId, int expectedZombieCount, boolean parent, boolean expectName) {
+  private void assertZombieDomain(String domainId, int expectedZombieCount, boolean compareAgainstParentFileName) {
     final Map<String, Map<URI, Long>> zombieMap = deploymentService.getZombieDomains();
-    assertZombie(zombieMap, domainId, expectedZombieCount, parent);
+    assertZombie(zombieMap, domainId, expectedZombieCount, compareAgainstParentFileName);
   }
 
-  private void assertZombie(Map<String, Map<URI, Long>> zombieMap, String appId, int expectedZombieCount, boolean parent) {
+  private void assertZombie(Map<String, Map<URI, Long>> zombieMap, String appId, int expectedZombieCount,
+                            boolean compareAgainstParentFileName) {
     assertEquals("Wrong number of zombie apps registered.", expectedZombieCount, zombieMap.size());
     if (expectedZombieCount > 0) {
-      if (parent) {
+      if (compareAgainstParentFileName) {
         assertThat("Wrong URL tagged as zombie.",
                    getZombieFromMap((entry) -> new File((URI) entry.getKey()).getParentFile().getName().equals(appId), zombieMap),
                    is(notNullValue()));
@@ -4153,11 +4152,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     Map.Entry<URI, Long> zombieEntry = null;
     //For every app in zombieMap
     for (Map<URI, Long> zombieResource : zombieMap.values()) {
-      try {
-        zombieEntry = zombieResource.entrySet().stream().filter(filter).collect(Collectors.toList()).get(0);
-      } catch (Exception e) {
-        //If exception raised, should be because name was not found in zombieMap. Continue searching
-      }
+      zombieEntry = zombieResource.entrySet().stream().filter(filter).findFirst().orElse(null);
     }
     return zombieEntry;
   }

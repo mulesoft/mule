@@ -51,6 +51,12 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   void stop();
 
   /**
+   * @return the artifact descriptor
+   */
+  @Override
+  D getDescriptor();
+
+  /**
    * Dispose the artifact. Most commonly this includes the release of the resources held by the artifact
    */
   void dispose();

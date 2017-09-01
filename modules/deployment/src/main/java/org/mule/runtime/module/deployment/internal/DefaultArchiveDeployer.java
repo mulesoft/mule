@@ -15,9 +15,7 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
@@ -304,13 +302,13 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  private void addZombieApp(Artifact artifact) {
+  private void addZombieApp(DeployableArtifact artifact) {
     if (allResourcesExist(artifact.getResourceFiles())) {
       try {
         List<File> resourceFiles = new ArrayList<>();
         resourceFiles.addAll(Arrays.asList(artifact.getResourceFiles()));
-        if ((((DeployableArtifactDescriptor) artifact.getDescriptor()).isRedeploymentEnabled())) {
-          resourceFiles.add(((DeployableArtifactDescriptor) artifact.getDescriptor()).getDescriptorFile());
+        if (artifact.getDescriptor().isRedeploymentEnabled()) {
+          resourceFiles.add(artifact.getDescriptor().getDescriptorFile());
         }
         artifactZombieMap.put(artifact.getArtifactName(),
                               new ZombieArtifact(resourceFiles.toArray(new File[resourceFiles.size()])));
@@ -329,7 +327,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     if (!marker.exists()) {
       return;
     }
-
     try {
       artifactZombieMap.put(artifactName, new ZombieArtifact(new File[] {marker}));
     } catch (Exception e) {
