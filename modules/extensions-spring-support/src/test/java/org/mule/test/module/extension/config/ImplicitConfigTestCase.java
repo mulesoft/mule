@@ -6,17 +6,17 @@
  */
 package org.mule.test.module.extension.config;
 
-import org.junit.Test;
-import org.mule.test.implicit.config.extension.extension.Counter;
-import org.mule.test.implicit.config.extension.extension.ImplicitConfigExtension;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import org.mule.test.implicit.config.extension.extension.Counter;
+import org.mule.test.implicit.config.extension.extension.ImplicitConfigExtension;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+
+import org.junit.Test;
 
 public class ImplicitConfigTestCase extends AbstractExtensionFunctionalTestCase {
 

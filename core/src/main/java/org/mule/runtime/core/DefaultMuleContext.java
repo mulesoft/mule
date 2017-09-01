@@ -44,11 +44,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMessageAwareExceptionCause;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -125,8 +123,6 @@ import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
-import org.slf4j.Logger;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -139,6 +135,7 @@ import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContext {
@@ -265,7 +262,7 @@ public class DefaultMuleContext implements MuleContext {
       // Only apply hook for Event signals.
       if (signal instanceof InternalEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((InternalEvent) signal, getErrorMessageAwareExceptionCause(throwable));
+            : new MessagingException((InternalEvent) signal, throwable);
       } else {
         return throwable;
       }

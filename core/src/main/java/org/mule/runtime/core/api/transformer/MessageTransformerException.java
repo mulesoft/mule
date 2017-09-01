@@ -50,8 +50,4 @@ public class MessageTransformerException extends MuleException implements ErrorM
     return message;
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
 }

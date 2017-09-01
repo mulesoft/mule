@@ -41,8 +41,4 @@ public class UnsupportedAuthenticationSchemeException extends ServerSecurityExce
     return errorMessage;
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
 }

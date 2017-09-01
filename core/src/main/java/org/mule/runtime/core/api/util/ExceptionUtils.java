@@ -15,17 +15,14 @@ import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 
@@ -167,9 +164,8 @@ public class ExceptionUtils {
     ErrorType foundErrorType = locator.lookupErrorType(cause);
     ErrorType resultError = isUnknownMuleError(foundErrorType) ? currentError : foundErrorType;
 
-    Throwable unwrappedCause = getWrapperErrorCause(cause);
     ErrorType errorType = getComponentIdentifier(processor)
-        .map(ci -> locator.lookupComponentErrorType(ci, unwrappedCause))
+        .map(ci -> locator.lookupComponentErrorType(ci, cause))
         .orElse(locator.lookupErrorType(cause));
 
     return ErrorBuilder.builder(cause)
@@ -213,17 +209,6 @@ public class ExceptionUtils {
   }
 
   /**
-   * Resolve the root cause of an exception. If the exception is an instance of {@link ErrorMessageAwareException} then it's root
-   * cause is used, else the candidate exception instance if returned.
-   *
-   * @param exception candidate exception.
-   * @return root cause exception.
-   */
-  public static Throwable getErrorMessageAwareExceptionCause(Throwable exception) {
-    return exception instanceof ErrorMessageAwareException ? ((ErrorMessageAwareException) exception).getRootCause() : exception;
-  }
-
-  /**
    * Given a {@link MessagingException} return the first cause that isn't a messaging exception. If the candidate exception is not
    * a {@link MessagingException} then it is returned as is.
    *
@@ -238,24 +223,8 @@ public class ExceptionUtils {
     return cause != null ? cause : exception;
   }
 
-  /**
-   * Resolve the root cause of an exception. If the exception is an instance of {@link ErrorMessageAwareException} then it's root
-   * cause is used, else the candidate exception instance if returned.
-   *
-   * @param exception candidate exception.
-   * @return root cause exception.
-   */
-  public static Throwable getRootCauseException(Throwable exception) {
-    return exception instanceof ErrorMessageAwareException ? ((ErrorMessageAwareException) exception).getRootCause() : exception;
-  }
-
   public static Optional<ComponentIdentifier> getComponentIdentifier(AnnotatedObject obj) {
     return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
-  }
-
-  private static Throwable getWrapperErrorCause(Throwable exception) {
-    return exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
-        : exception;
   }
 
   private static boolean isMessagingExceptionCause(MessagingException me, Throwable cause) {
