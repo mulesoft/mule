@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
@@ -47,6 +48,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
@@ -61,6 +63,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -124,7 +127,7 @@ public class ModuleFlowProcessingPhase
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
       final InternalEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
 
-      FlowProcessor flowExecutionProcessor = new FlowProcessor(template, templateEvent);
+      FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct.getExceptionListener(), templateEvent);
       flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
       final SourcePolicy policy =
           policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
@@ -258,7 +261,8 @@ public class ModuleFlowProcessingPhase
       throws MuleException {
     Message message = template.getMessage();
     InternalEvent templateEvent =
-        builder(create(flowConstruct, sourceLocation, null, responseCompletion)).message(message)
+        builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion))
+            .message(message)
             .flow(flowConstruct)
             .build();
 
@@ -320,10 +324,13 @@ public class ModuleFlowProcessingPhase
 
     private final ModuleFlowProcessingPhaseTemplate template;
     private final InternalEvent templateEvent;
+    private final MessagingExceptionHandler messagingExceptionHandler;
 
-    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, InternalEvent templateEvent) {
+    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, MessagingExceptionHandler messagingExceptionHandler,
+                         InternalEvent templateEvent) {
       this.template = template;
       this.templateEvent = templateEvent;
+      this.messagingExceptionHandler = messagingExceptionHandler;
     }
 
     @Override
@@ -333,8 +340,11 @@ public class ModuleFlowProcessingPhase
 
     @Override
     public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
-      return from(publisher).then(request -> from(template.routeEventAsync(request))
-          .switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))));
+      return from(publisher)
+          .flatMapMany(event -> processWithChildContext(event,
+                                                        p -> from(p).flatMapMany(e -> template.routeEventAsync(e))
+                                                            .switchIfEmpty(fromCallable(() -> emptyEvent(templateEvent))),
+                                                        Optional.empty(), messagingExceptionHandler));
     }
   }
 

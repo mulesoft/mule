@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.api.processor.MessageProcessors.process;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
@@ -21,6 +19,7 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,9 +65,8 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * in the chain until the finally policy it's executed in which case then next operation of it, it will be the operation
    * execution.
    */
-  public final Publisher<InternalEvent> processPolicies(InternalEvent operationEvent) {
-    return just(operationEvent)
-        .flatMapMany(event -> processWithChildContext(event, new AbstractCompositePolicy.NextOperationCall(), empty()));
+  public final ReactiveProcessor getPolicyProcessor() {
+    return new AbstractCompositePolicy.NextOperationCall();
   }
 
   /**

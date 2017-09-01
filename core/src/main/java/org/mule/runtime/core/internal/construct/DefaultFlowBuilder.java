@@ -24,11 +24,14 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -245,18 +248,6 @@ public class DefaultFlowBuilder implements Builder {
           });
     }
 
-    @Override
-    protected CompletableFuture<Event> executeEvent(InternalEvent event) {
-      return Mono.just(event).transform(this).onErrorResume(throwable -> {
-        MessagingException messagingException = (MessagingException) throwable;
-        return Mono.from(getExceptionListener().apply(messagingException));
-      }).onErrorMap(throwable -> {
-        MessagingException messagingException = (MessagingException) throwable;
-        InternalEvent resultEvent = messagingException.getEvent();
-        return new ComponentExecutionException(resultEvent.getError().get().getCause(), resultEvent);
-      }).map(resultEvent -> (Event) resultEvent).toFuture();
-    }
-
     private InternalEvent createMuleEventForCurrentFlow(InternalEvent event, Object replyToDestination,
                                                         ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
@@ -322,5 +313,9 @@ public class DefaultFlowBuilder implements Builder {
       return getProcessingStrategy() != null ? getProcessingStrategy().isSynchronous() : true;
     }
 
+    @Override
+    protected InternalEventContext createEventContext() {
+      return DefaultEventContext.create(this, getLocation());
+    }
   }
 }
