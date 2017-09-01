@@ -8,13 +8,15 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactExtensionManagerConfigurationBuilder.META_INF_FOLDER;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -26,8 +28,8 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.persistence.manifest.ExtensionManifestXmlSerializer;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,54 +56,55 @@ public class ExtensionModelDiscoverer {
   /**
    * For each artifactPlugin discovers the {@link ExtensionModel}.
    *
-   * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
-   * @param artifactPlugins {@lin Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins deployed inside the artifact. Non null.
-   * @return {@link Set} of {@link ExtensionModel} discovered from the {@link List} of artifactPlugins.
+   * @param loaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders.
+   * @param artifactPlugins {@link Pair} of {@link ArtifactPluginDescriptor} and {@link ArtifactClassLoader} for artifact plugins deployed inside the artifact. Non null.
+   * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding {@link ExtensionModel}.
    */
-  public Set<ExtensionModel> discoverExtensionModels(ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                                     List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
-    final Set<ExtensionModel> extensions = new HashSet<>();
+  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverExtensionModels(ExtensionModelLoaderRepository loaderRepository,
+                                                                                     List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
+    final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
     artifactPlugins.forEach(artifactPlugin -> {
+      Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
       final ArtifactPluginDescriptor artifactPluginDescriptor = artifactPlugin.getFirst();
       Optional<LoaderDescriber> loaderDescriber = artifactPluginDescriptor.getExtensionModelDescriptorProperty();
       ClassLoader artifactClassloader = artifactPlugin.getSecond().getClassLoader();
       String artifactName = artifactPluginDescriptor.getName();
-      if (loaderDescriber.isPresent()) {
-        discoverExtensionThroughJsonDescriber(extensionModelLoaderRepository, loaderDescriber.get(), extensions,
-                                              artifactClassloader, artifactName);
-      } else {
-        URL manifest = artifactPlugin.getSecond().findResource(META_INF_FOLDER + "/" + EXTENSION_MANIFEST_FILE_NAME);
-        if (manifest != null) {
-          //TODO: Remove when MULE-11136
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Discovered extension " + artifactName);
-          }
-          discoverExtensionThroughManifest(extensions, artifactClassloader, manifest);
-        } else {
-          LOGGER.warn("Extension [" + artifactName + "] could not be discovered");
-        }
+      ExtensionModel extension = loaderDescriber
+          .map(describer -> discoverExtensionThroughJsonDescriber(loaderRepository, describer,
+                                                                  extensions, artifactClassloader,
+                                                                  artifactName))
+          .orElseGet(() -> discoverExtensionThroughManifest(artifactPlugin, extensions,
+                                                            artifactClassloader, artifactName));
+      if (extension != null) {
+        descriptorsWithExtensions.add(new Pair<>(artifactPluginDescriptor, extension));
       }
     });
-    return extensions;
+    return descriptorsWithExtensions;
   }
 
   /**
    * Parses the extension-manifest.xml file, and gets the extension type and version to use the
    * {@link DefaultJavaExtensionModelLoader} to load the extension.
-   *
-   * @param extensions with the previously generated {@link ExtensionModel}s that will be used to generate the current {@link ExtensionModel}
-   *                   and store it in {@code extensions} once generated.
-   * @param artifactClassloader the loaded artifact {@link ClassLoader} to find the required resources.
-   * @param manifestUrl the location of the extension-manifest.xml file.
    */
   //TODO: Remove when MULE-11136
-  private void discoverExtensionThroughManifest(Set<ExtensionModel> extensions,
-                                                ClassLoader artifactClassloader, URL manifestUrl) {
-    ExtensionManifest extensionManifest = parseExtensionManifestXml(manifestUrl);
-    Map<String, Object> params = new HashMap<>();
-    params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
-    params.put(VERSION, extensionManifest.getVersion());
-    extensions.add(new DefaultJavaExtensionModelLoader().loadExtensionModel(artifactClassloader, getDefault(extensions), params));
+  private ExtensionModel discoverExtensionThroughManifest(Pair<ArtifactPluginDescriptor, ArtifactClassLoader> artifactPlugin,
+                                                          Set<ExtensionModel> extensions, ClassLoader artifactClassloader,
+                                                          String artifactName) {
+    URL manifest = artifactPlugin.getSecond().findResource(META_INF_FOLDER + "/" + EXTENSION_MANIFEST_FILE_NAME);
+    if (manifest != null) {
+      //TODO: Remove when MULE-11136
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Discovered extension " + artifactName);
+      }
+      ExtensionManifest extensionManifest = parseExtensionManifestXml(manifest);
+      Map<String, Object> params = new HashMap<>();
+      params.put(TYPE_PROPERTY_NAME, extensionManifest.getDescriberManifest().getProperties().get("type"));
+      params.put(VERSION, extensionManifest.getVersion());
+      return new DefaultJavaExtensionModelLoader().loadExtensionModel(artifactClassloader, getDefault(extensions), params);
+    } else {
+      LOGGER.warn("Extension [" + artifactName + "] could not be discovered");
+      return null;
+    }
   }
 
   //TODO: Remove when MULE-11136
@@ -127,15 +130,12 @@ public class ExtensionModelDiscoverer {
    * @param artifactName the name of the artifact being loaded.
    * @throws IllegalArgumentException there is no {@link ExtensionModelLoader} for the ID in the {@link MulePluginModel}.
    */
-  private void discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                                     LoaderDescriber loaderDescriber, Set<ExtensionModel> extensions,
-                                                     ClassLoader artifactClassloader, String artifactName) {
+  private ExtensionModel discoverExtensionThroughJsonDescriber(ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                                               LoaderDescriber loaderDescriber, Set<ExtensionModel> extensions,
+                                                               ClassLoader artifactClassloader, String artifactName) {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
-            + "to generate an ExtensionModel (working with the plugin '%s')",
-                                                               loaderDescriber.getId(), artifactName)));
-    extensions.add(loader.loadExtensionModel(artifactClassloader, getDefault(extensions), loaderDescriber.getAttributes()));
+            + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
+    return loader.loadExtensionModel(artifactClassloader, getDefault(extensions), loaderDescriber.getAttributes());
   }
-
-
 }
