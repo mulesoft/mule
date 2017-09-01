@@ -28,8 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableMap;
-
 /**
  * Repository for the different {@link ErrorType Error Types} in a mule artifact.
  *
@@ -90,10 +88,6 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
    */
   @Override
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    checkIfErrorIsAlreadyRegistered(errorTypeIdentifier, ImmutableMap.<ComponentIdentifier, ErrorType>builder()
-        .putAll(errorTypes)
-        .putAll(internalErrorTypes)
-        .build());
     ErrorType errorType = buildErrorType(errorTypeIdentifier, parentErrorType);
     errorTypes.put(errorTypeIdentifier, errorType);
     return errorType;
@@ -104,19 +98,15 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
    */
   @Override
   public ErrorType addInternalErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    checkIfErrorIsAlreadyRegistered(errorTypeIdentifier, internalErrorTypes);
     ErrorType errorType = buildErrorType(errorTypeIdentifier, parentErrorType);
     internalErrorTypes.put(errorTypeIdentifier, errorType);
     return errorType;
   }
 
-  private void checkIfErrorIsAlreadyRegistered(ComponentIdentifier errorTypeIdentifier, Map<ComponentIdentifier, ?> map) {
-    if (map.containsKey(errorTypeIdentifier)) {
-      throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));
-    }
-  }
-
   private ErrorType buildErrorType(ComponentIdentifier identifier, ErrorType parent) {
+    if (errorTypes.containsKey(identifier) || internalErrorTypes.containsKey(identifier)) {
+      throw new IllegalStateException(format("An error type with identifier %s already exists", identifier));
+    }
     return ErrorTypeBuilder.builder()
         .namespace(identifier.getNamespace())
         .identifier(identifier.getName())
