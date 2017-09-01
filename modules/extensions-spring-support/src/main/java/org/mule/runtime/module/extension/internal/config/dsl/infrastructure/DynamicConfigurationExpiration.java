@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.time.Time;
 
 /**
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.time.Time;
  *
  * @since 4.0
  */
-public class DynamicConfigurationExpiration extends AbstractAnnotatedObject {
+public class DynamicConfigurationExpiration extends AbstractComponent {
 
   private final Time frequency;
 

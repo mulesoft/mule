@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.retry;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -15,16 +15,16 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 /**
  * Configures the default reconnection behaviour for a connected component.
  *
- * Whenever a connected {@link Processor} or {@link Source} doesn't specify a specific reconnection strategy,
- * an instance of this class should be used as a fallback.
+ * Whenever a connected {@link Processor} or {@link Source} doesn't specify a specific reconnection strategy, an instance of this
+ * class should be used as a fallback.
  *
  * @since 4.0
  */
-public class ReconnectionConfig extends AbstractAnnotatedObject {
+public class ReconnectionConfig extends AbstractComponent {
 
   /**
-   * When the application is deployed, a connectivity test is performed on all connectors. If set to {@code true},
-   * deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy
+   * When the application is deployed, a connectivity test is performed on all connectors. If set to {@code true}, deployment will
+   * fail if the test doesn't pass after exhausting the associated reconnection strategy
    */
   private final boolean failsDeployment;
 

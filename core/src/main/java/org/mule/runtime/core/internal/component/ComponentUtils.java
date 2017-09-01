@@ -13,7 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.util.Optional;
@@ -29,13 +29,13 @@ public interface ComponentUtils {
    * Returns the {@link FlowConstruct} of the root container element if there is one. Otherwise return {@link Optional#empty()}
    * 
    * @param componentLocator the locator for the {@link FlowConstruct}
-   * @param annotatedObject the component that may be configured within a {@link FlowConstruct}
+   * @param component the component that may be configured within a {@link FlowConstruct}
    * @return the {@link FlowConstruct} of the root container element if there is one. Otherwise return {@link Optional#empty()}
    */
   static Optional<FlowConstruct> getFromAnnotatedObject(ConfigurationComponentLocator componentLocator,
-                                                        AnnotatedObject annotatedObject) {
-    Optional<AnnotatedObject> objectFoundOptional =
-        componentLocator.find(Location.builder().globalName(annotatedObject.getRootContainerName()).build());
+                                                        Component component) {
+    Optional<Component> objectFoundOptional =
+        componentLocator.find(Location.builder().globalName(component.getRootContainerName()).build());
     Optional<FlowConstruct> flowConstruct = objectFoundOptional.flatMap(objectFound -> objectFound instanceof FlowConstruct
         ? of((FlowConstruct) objectFound) : empty()).filter(object -> object != null);
 
@@ -47,16 +47,16 @@ public interface ComponentUtils {
    * fails.
    * 
    * @param componentLocator the locator for the {@link FlowConstruct}
-   * @param annotatedObject the component that may be configured within a {@link FlowConstruct}
+   * @param component the component that may be configured within a {@link FlowConstruct}
    * @return the {@link FlowConstruct} of the root container element. If the root container is not a {@link FlowConstruct} then it
    *         fails.
    */
   static FlowConstruct getFromAnnotatedObjectOrFail(ConfigurationComponentLocator componentLocator,
-                                                    AnnotatedObject annotatedObject) {
-    return getFromAnnotatedObject(componentLocator, annotatedObject)
+                                                    Component component) {
+    return getFromAnnotatedObject(componentLocator, component)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
                                                                                "Couldn't find FlowConstruct with global name %s or it was not an instance of FlowConstruct",
-                                                                               annotatedObject.getRootContainerName()))));
+                                                                               component.getRootContainerName()))));
   }
 
 }

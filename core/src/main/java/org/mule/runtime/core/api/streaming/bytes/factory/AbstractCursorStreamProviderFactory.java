@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.InternalEvent;
@@ -18,15 +18,14 @@ import org.mule.runtime.core.internal.streaming.CursorManager;
 import java.io.InputStream;
 
 /**
- * Base implementation of {@link CursorStreamProviderFactory} which contains all the base behaviour and template
- * methods.
+ * Base implementation of {@link CursorStreamProviderFactory} which contains all the base behaviour and template methods.
  * <p>
- * It interacts with the {@link CursorManager} in order to track all allocated resources and make
- * sure they're properly disposed of once they're no longer necessary.
+ * It interacts with the {@link CursorManager} in order to track all allocated resources and make sure they're properly disposed
+ * of once they're no longer necessary.
  *
  * @since 4.0
  */
-public abstract class AbstractCursorStreamProviderFactory extends AbstractAnnotatedObject implements CursorStreamProviderFactory {
+public abstract class AbstractCursorStreamProviderFactory extends AbstractComponent implements CursorStreamProviderFactory {
 
   private final ByteBufferManager bufferManager;
   private final StreamingManager streamingManager;

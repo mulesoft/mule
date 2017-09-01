@@ -20,7 +20,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -253,7 +253,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doStart();
     startIfStartable(processingStrategy);
     sink = processingStrategy.createSink(this, processFlowFunction());
-    //TODO MULE-13360: PhaseErrorLifecycleInterceptor is not being applied when AbstractPipeline doStart fails
+    // TODO MULE-13360: PhaseErrorLifecycleInterceptor is not being applied when AbstractPipeline doStart fails
     try {
       startIfStartable(pipeline);
     } catch (MuleException e) {
@@ -322,7 +322,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return maxConcurrency;
   }
 
-  private class ProcessEndProcessor extends AbstractAnnotatedObject implements Processor, InternalProcessor {
+  private class ProcessEndProcessor extends AbstractComponent implements Processor, InternalProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

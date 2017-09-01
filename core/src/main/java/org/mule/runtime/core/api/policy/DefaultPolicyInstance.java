@@ -16,7 +16,7 @@ import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 
 
 //TODO MULE-10963 - Remove FlowConstruct implementation once MPs don't depend on FlowConstructAware anymore.
-public class DefaultPolicyInstance extends AbstractAnnotatedObject
+public class DefaultPolicyInstance extends AbstractComponent
     implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
 
   private final static Logger logger = getLogger(DefaultPolicyInstance.class);

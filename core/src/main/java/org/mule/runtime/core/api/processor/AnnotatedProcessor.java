@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.api.component.Component;
 
 /**
  * A {@link Processor} that supports annotations.
  * 
  * @since 4.0
  */
-public interface AnnotatedProcessor extends AnnotatedObject, Processor {
+public interface AnnotatedProcessor extends Component, Processor {
 
 }

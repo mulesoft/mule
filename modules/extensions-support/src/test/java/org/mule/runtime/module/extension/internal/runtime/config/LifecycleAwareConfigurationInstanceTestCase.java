@@ -39,7 +39,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
@@ -98,7 +98,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Mock
   private ConfigurationState configurationState;
 
-  protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(AnnotatedObject.class));
+  protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
 
   @Mock
   protected ConnectionManagerAdapter connectionManager;

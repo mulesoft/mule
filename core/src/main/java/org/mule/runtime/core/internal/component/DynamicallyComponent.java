@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.component;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler;
 
 /**
@@ -14,6 +14,6 @@ import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandl
  *
  * @since 1.0
  */
-public interface DynamicallyAnnotatedObject extends AnnotatedObject {
+public interface DynamicallyComponent extends Component {
 
 }

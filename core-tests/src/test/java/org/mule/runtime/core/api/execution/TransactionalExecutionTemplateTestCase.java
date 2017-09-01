@@ -16,7 +16,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -53,7 +53,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   protected MuleContext mockMuleContext = mockContextWithServices();
 
   protected FlowConstruct mockFlow =
-      mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class).defaultAnswer(RETURNS_DEEP_STUBS));
+      mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class).defaultAnswer(RETURNS_DEEP_STUBS));
   @Mock
   protected InternalEvent RETURN_VALUE;
   @Spy

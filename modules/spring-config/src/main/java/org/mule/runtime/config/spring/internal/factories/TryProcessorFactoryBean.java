@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.internal.factories;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -29,7 +29,7 @@ import java.util.List;
  *
  *        TODO MULE-12726 Remove TryProcessorFactoryBean
  */
-public class TryProcessorFactoryBean extends AbstractAnnotatedObject implements FactoryBean {
+public class TryProcessorFactoryBean extends AbstractComponent implements FactoryBean {
 
   protected List messageProcessors;
   protected MessagingExceptionHandler exceptionListener;

@@ -33,7 +33,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -621,7 +621,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     };
   }
 
-  class AnnotatedAsyncProcessor extends AbstractAnnotatedObject implements AnnotatedProcessor {
+  class AnnotatedAsyncProcessor extends AbstractComponent implements AnnotatedProcessor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

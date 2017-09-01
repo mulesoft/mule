@@ -22,7 +22,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
@@ -54,7 +54,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private static final String ERROR_MESSAGE = "Messaging Error Message";
   private static final String EXPECTED_MESSAGE = "THIS MESSAGE SHOULD BE THROWN";
 
-  private AnnotatedObject processor = mock(AnnotatedObject.class);
+  private Component processor = mock(Component.class);
   private InternalEvent event = mock(InternalEvent.class);
   private MuleContext context = mock(MuleContext.class);
   private FlowCallStack flowCallStack = mock(FlowCallStack.class);
@@ -204,7 +204,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     assertThat(error.get().getErrorType(), is(expected));
   }
 
-  private MessagingException newMessagingException(Throwable e, InternalEvent event, AnnotatedObject processor) {
+  private MessagingException newMessagingException(Throwable e, InternalEvent event, Component processor) {
     return new MessagingException(createStaticMessage(ERROR_MESSAGE), event, e, processor);
   }
 

@@ -8,7 +8,7 @@ package org.mule.runtime.core.privileged.object;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Creates object instances based on the class and sets any properties. This factory is also responsible for applying any object
  * processors on the object before the lifecycle callbacks are called.
  */
-public abstract class AbstractObjectFactory extends AbstractAnnotatedObject implements ObjectFactory {
+public abstract class AbstractObjectFactory extends AbstractComponent implements ObjectFactory {
 
   public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
   public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";

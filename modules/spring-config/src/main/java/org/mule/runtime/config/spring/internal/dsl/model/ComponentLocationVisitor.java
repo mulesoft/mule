@@ -37,6 +37,7 @@ import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelH
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper;
@@ -65,7 +66,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
-   * annotation under the key {@link org.mule.runtime.api.meta.AbstractAnnotatedObject#LOCATION_KEY}.
+   * annotation under the key {@link AbstractComponent#LOCATION_KEY}.
    *
    * @param componentModel the component model that will be assign it's {@link DefaultComponentLocation}.
    */

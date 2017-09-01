@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMuleObjectOwner<T> extends AbstractAnnotatedObject
+public abstract class AbstractMuleObjectOwner<T> extends AbstractComponent
     implements Lifecycle, MuleContextAware {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());

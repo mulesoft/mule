@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 
 /**
  * Abstract class for {@link Processor}s that must also be annotated object.
  *
  * This is usually the case of processors created from the configuration elements.
  */
-public abstract class AbstractProcessor extends AbstractAnnotatedObject implements Processor {
+public abstract class AbstractProcessor extends AbstractComponent implements Processor {
 
 }

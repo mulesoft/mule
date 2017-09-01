@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor.simple;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.processor.Processor;
  *
  * @since 4.0
  */
-public abstract class SimpleMessageProcessor extends AbstractAnnotatedObject
+public abstract class SimpleMessageProcessor extends AbstractComponent
     implements Processor, MuleContextAware, Initialisable {
 
   protected MuleContext muleContext;

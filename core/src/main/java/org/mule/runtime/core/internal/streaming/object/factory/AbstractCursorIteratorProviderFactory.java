@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.InternalEvent;
@@ -18,15 +18,14 @@ import org.mule.runtime.core.internal.streaming.CursorManager;
 import java.util.Iterator;
 
 /**
- * Base implementation of {@link CursorIteratorProviderFactory} which contains all the base behaviour and template
- * methods.
+ * Base implementation of {@link CursorIteratorProviderFactory} which contains all the base behaviour and template methods.
  * <p>
- * It interacts with the {@link CursorManager} in order to track all allocated resources and make
- * sure they're properly disposed of once they're no longer necessary.
+ * It interacts with the {@link CursorManager} in order to track all allocated resources and make sure they're properly disposed
+ * of once they're no longer necessary.
  *
  * @since 4.0
  */
-public abstract class AbstractCursorIteratorProviderFactory extends AbstractAnnotatedObject
+public abstract class AbstractCursorIteratorProviderFactory extends AbstractComponent
     implements CursorIteratorProviderFactory {
 
   private final StreamingManager streamingManager;
@@ -56,7 +55,7 @@ public abstract class AbstractCursorIteratorProviderFactory extends AbstractAnno
    * Implementations should use this method to actually create the output value
    *
    * @param iterator the streaming iterator
-   * @param event    the event on which streaming is happening
+   * @param event the event on which streaming is happening
    */
   protected abstract Object resolve(Iterator iterator, InternalEvent event);
 

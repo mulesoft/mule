@@ -10,7 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.io.IOException;
  *
  * @since 4.0
  */
-public class ReturnDataObjectFactory extends AbstractAnnotatedObjectFactory<String> {
+public class ReturnDataObjectFactory extends AbstractComponentFactory<String> {
 
   private String file;
   private String content;

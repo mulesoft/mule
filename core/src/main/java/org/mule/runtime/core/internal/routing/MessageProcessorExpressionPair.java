@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A holder for a pair of MessageProcessor and an expression.
  */
-public class MessageProcessorExpressionPair extends AbstractAnnotatedObject
+public class MessageProcessorExpressionPair extends AbstractComponent
     implements MuleContextAware, Lifecycle {
 
   private final static Logger LOGGER = LoggerFactory.getLogger(MessageProcessorExpressionPair.class);

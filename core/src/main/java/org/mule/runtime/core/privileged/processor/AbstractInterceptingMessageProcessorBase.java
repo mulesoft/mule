@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.processToApp
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * InterceptingMessageProcessor itself, to let individual subclasses make that decision \. This simply provides an implementation
  * of setNext and holds the next message processor as an attribute.
  */
-public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
+public abstract class AbstractInterceptingMessageProcessorBase extends AbstractComponent
     implements Processor, MuleContextAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());

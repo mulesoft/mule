@@ -15,7 +15,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter;
 import org.mule.runtime.core.privileged.processor.ProcessorChainRouter;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
@@ -196,7 +196,7 @@ public class TestParsersComponentBuildingDefinitionProvider implements Component
         .build());
 
     definitions.add(baseBuilder.withIdentifier("chain")
-        .withTypeDefinition(fromType(AnnotatedObject.class))
+        .withTypeDefinition(fromType(Component.class))
         .withObjectFactoryType(MessageProcessorChainObjectFactory.class)
         .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(Object.class).build())
         .build());

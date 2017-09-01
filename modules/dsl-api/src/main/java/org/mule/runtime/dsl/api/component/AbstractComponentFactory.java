@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.dsl.api.component;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 
 /**
- * Basic implementation of {@link AnnotatedObjectFactory} that handles all annotation related behavior including
+ * Basic implementation of {@link ComponentFactory} that handles all annotation related behavior including
  * {@link ObjectFactory#getObject()}.
  *
- * @param <T> the type of the object to be created, which should be an {@link AnnotatedObject}.
+ * @param <T> the type of the object to be created, which should be an {@link Component}.
  */
-public abstract class AbstractAnnotatedObjectFactory<T> extends AbstractAnnotatedObject implements AnnotatedObjectFactory<T> {
+public abstract class AbstractComponentFactory<T> extends AbstractComponent implements ComponentFactory<T> {
 
   /**
    * Method to be implemented instead of {@link ObjectFactory#getObject()}.
@@ -28,7 +28,7 @@ public abstract class AbstractAnnotatedObjectFactory<T> extends AbstractAnnotate
   @Override
   public T getObject() throws Exception {
     T annotatedInstance = doGetObject();
-    ((AnnotatedObject) annotatedInstance).setAnnotations(getAnnotations());
+    ((Component) annotatedInstance).setAnnotations(getAnnotations());
     return annotatedInstance;
   }
 }

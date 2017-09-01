@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.core.api.execution.LocationExecutionContextProvider.getSourceXML;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,31 +25,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private AnnotatedObject annotatedObject;
+  private Component component;
 
   @Test
   public void sanitizedUrl() {
-    withXmlElement(annotatedObject, "<sftp:outbound-endpoint url=\"sftp://muletest:muletest@localhost:22198/~/testdir");
-    String sanitized = getSourceXML(annotatedObject);
+    withXmlElement(component, "<sftp:outbound-endpoint url=\"sftp://muletest:muletest@localhost:22198/~/testdir");
+    String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
   }
 
   @Test
   public void sanitizedAddress() {
-    withXmlElement(annotatedObject, "<sftp:outbound-endpoint address=\"sftp://muletest:muletest@localhost:22198/~/testdir");
-    String sanitized = getSourceXML(annotatedObject);
+    withXmlElement(component, "<sftp:outbound-endpoint address=\"sftp://muletest:muletest@localhost:22198/~/testdir");
+    String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:outbound-endpoint address=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
   }
 
   @Test
   public void sanitizedPasswordAttribute() {
-    withXmlElement(annotatedObject, "<sftp:config username=\"user\" password=\"pass\" />");
-    String sanitized = getSourceXML(annotatedObject);
+    withXmlElement(component, "<sftp:config username=\"user\" password=\"pass\" />");
+    String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
 
   }
 
-  private void withXmlElement(AnnotatedObject annotatedObject, String value) {
-    when(annotatedObject.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY)).thenReturn(value);
+  private void withXmlElement(Component component, String value) {
+    when(component.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY)).thenReturn(value);
   }
 }

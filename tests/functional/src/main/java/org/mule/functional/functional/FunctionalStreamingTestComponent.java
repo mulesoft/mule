@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see EventCallback
  */
-public abstract class FunctionalStreamingTestComponent extends AbstractAnnotatedObject implements Processor, MuleContextAware {
+public abstract class FunctionalStreamingTestComponent extends AbstractComponent implements Processor, MuleContextAware {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 

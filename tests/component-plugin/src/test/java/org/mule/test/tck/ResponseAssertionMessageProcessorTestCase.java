@@ -10,7 +10,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;

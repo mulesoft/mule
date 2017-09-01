@@ -10,7 +10,7 @@ import static com.google.common.cache.CacheBuilder.newBuilder;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,10 +25,11 @@ import com.google.common.cache.LoadingCache;
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
  *
- * When the notification is to be sent on the context of the processing of a {@link InternalEvent} (meaning, the method used to fire the
- * notification takes a {@link InternalEvent} argument), then this instance will delegate into a {@link ServerNotificationHandler} that
- * corresponds to the {@link MuleContext} of that event. When the notification does not relate to a particular {@link InternalEvent} (for
- * example, connection/reconnection/disconnection events), then a {@link #defaultNotificationHandler} will be used
+ * When the notification is to be sent on the context of the processing of a {@link InternalEvent} (meaning, the method used to
+ * fire the notification takes a {@link InternalEvent} argument), then this instance will delegate into a
+ * {@link ServerNotificationHandler} that corresponds to the {@link MuleContext} of that event. When the notification does not
+ * relate to a particular {@link InternalEvent} (for example, connection/reconnection/disconnection events), then a
+ * {@link #defaultNotificationHandler} will be used
  */
 public class NotificationHelper {
 
@@ -95,8 +96,8 @@ public class NotificationHelper {
    * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
    * @param action the action code for the notification
    */
-  public void fireNotification(AnnotatedObject source, InternalEvent event, FlowConstruct flowConstruct, int action) {
-    fireNotification(source, event, ((AnnotatedObject) flowConstruct).getLocation(), flowConstruct.getMuleContext(), action);
+  public void fireNotification(Component source, InternalEvent event, FlowConstruct flowConstruct, int action) {
+    fireNotification(source, event, ((Component) flowConstruct).getLocation(), flowConstruct.getMuleContext(), action);
   }
 
   /**
@@ -109,7 +110,7 @@ public class NotificationHelper {
    * @param context the mule context
    * @param action the action code for the notification
    */
-  public void fireNotification(AnnotatedObject source, InternalEvent event, ComponentLocation location, MuleContext context,
+  public void fireNotification(Component source, InternalEvent event, ComponentLocation location, MuleContext context,
                                int action) {
     ServerNotificationHandler serverNotificationHandler = getNotificationHandler(context);
     try {

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http.policy.api;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 /**
@@ -26,7 +26,7 @@ public abstract class HttpPolicyPointcutParameters extends PolicyPointcutParamet
    * @param path the target path of the message
    * @param method the HTTP method of the message
    */
-  public HttpPolicyPointcutParameters(AnnotatedObject component, String path, String method) {
+  public HttpPolicyPointcutParameters(Component component, String path, String method) {
     super(component);
     this.path = path;
     this.method = method;

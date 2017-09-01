@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import javax.inject.Inject;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class RetryPolicyTemplateObjectFactory extends AbstractAnnotatedObjectFactory<RetryPolicyTemplate> {
+public class RetryPolicyTemplateObjectFactory extends AbstractComponentFactory<RetryPolicyTemplate> {
 
   private boolean blocking;
   private Integer count = DEFAULT_RETRY_COUNT;

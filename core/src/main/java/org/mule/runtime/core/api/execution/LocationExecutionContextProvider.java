@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.execution;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.ComponentLocationProvider;
 
 import java.util.Map;
@@ -37,13 +37,13 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * Populates the passed beanAnnotations with the other passed parameters.
    *
    * @param beanAnnotations the map with annotations to populate
-   * @param xmlContent      the xml representation of the element definition.
+   * @param xmlContent the xml representation of the element definition.
    */
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String xmlContent) {
     beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, xmlContent);
   }
 
-  protected static String getSourceXML(AnnotatedObject element) {
+  protected static String getSourceXML(Component element) {
     Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
     return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
   }

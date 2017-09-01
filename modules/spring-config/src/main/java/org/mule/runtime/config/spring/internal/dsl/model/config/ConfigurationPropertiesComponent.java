@@ -14,7 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.config.spring.api.dsl.model.ResourceProvider;
 
 import java.io.InputStream;
@@ -31,7 +31,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @since 4.0
  */
-public class ConfigurationPropertiesComponent extends AbstractAnnotatedObject
+public class ConfigurationPropertiesComponent extends AbstractComponent
     implements ConfigurationPropertiesProvider, Initialisable {
 
   private static final String PROPERTIES_EXTENSION = ".properties";

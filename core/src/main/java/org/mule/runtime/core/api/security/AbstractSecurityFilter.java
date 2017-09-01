@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.StringUtils.splitAndTrim;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
@@ -29,7 +29,7 @@ import javax.inject.Inject;
  * <code>AbstractSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the
  * SecurityManager for this instance
  */
-public abstract class AbstractSecurityFilter extends AbstractAnnotatedObject implements SecurityFilter {
+public abstract class AbstractSecurityFilter extends AbstractComponent implements SecurityFilter {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 

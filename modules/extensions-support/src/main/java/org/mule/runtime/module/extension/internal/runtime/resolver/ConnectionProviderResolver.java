@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
@@ -27,7 +27,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConnectionProviderResolver<C> extends AbstractAnnotatedObject
+public class ConnectionProviderResolver<C> extends AbstractComponent
     implements ConnectionProviderValueResolver<C>, Initialisable, Startable {
 
   private final ConnectionProviderObjectBuilder<C> objectBuilder;

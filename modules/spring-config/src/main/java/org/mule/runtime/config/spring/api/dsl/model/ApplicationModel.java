@@ -39,7 +39,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.api.dsl.processor.ConfigFile;
@@ -420,7 +420,7 @@ public class ApplicationModel {
                                                                        of(configFile.getFilename()),
                                                                        of(configLine.getLineNumber()));
                   propertiesComponent.setAnnotations(ImmutableMap
-                      .<QName, Object>builder().put(AbstractAnnotatedObject.LOCATION_KEY,
+                      .<QName, Object>builder().put(AbstractComponent.LOCATION_KEY,
                                                     new DefaultComponentLocation(of(CONFIGURATION_PROPERTIES_ELEMENT),
                                                                                  singletonList(locationPart)))
                       .build());

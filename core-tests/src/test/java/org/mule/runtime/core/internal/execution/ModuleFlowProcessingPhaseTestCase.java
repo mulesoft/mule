@@ -17,7 +17,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -39,7 +38,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -128,7 +127,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     moduleFlowProcessingPhase = new ModuleFlowProcessingPhase(policyManager);
     initialiseIfNeeded(moduleFlowProcessingPhase, muleContext);
 
-    flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     final MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))

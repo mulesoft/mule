@@ -11,7 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -19,12 +19,10 @@ import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 
-import java.util.Optional;
-
 /**
  * Placeholder class which makes the default exception handler available.
  */
-public class MuleClientFlowConstruct extends AbstractAnnotatedObject implements FlowConstruct {
+public class MuleClientFlowConstruct extends AbstractComponent implements FlowConstruct {
 
   MuleContext muleContext;
 

@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.security.tls;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.lifecycle.CreateException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.TlsDirectKeyStore;
 import org.mule.runtime.core.api.security.TlsDirectTrustStore;
@@ -104,7 +104,7 @@ import javax.net.ssl.TrustManagerFactory;
  * works.
  * </p>
  */
-public final class TlsConfiguration extends AbstractAnnotatedObject
+public final class TlsConfiguration extends AbstractComponent
     implements TlsDirectTrustStore, TlsDirectKeyStore, TlsIndirectKeyStore {
 
   public static final String DEFAULT_KEYSTORE = ".keystore";

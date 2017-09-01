@@ -30,7 +30,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -60,7 +60,7 @@ import org.slf4j.Logger;
  * @see FunctionalTestNotification
  * @see FunctionalTestNotificationListener
  */
-public class FunctionalTestProcessor extends AbstractAnnotatedObject implements Processor, Lifecycle {
+public class FunctionalTestProcessor extends AbstractComponent implements Processor, Lifecycle {
 
   private static final Logger LOGGER = getLogger(FunctionalTestProcessor.class);
 

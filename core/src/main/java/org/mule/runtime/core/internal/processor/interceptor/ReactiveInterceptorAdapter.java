@@ -25,7 +25,7 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,13 +82,13 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       return next;
     }
 
-    final ComponentLocation componentLocation = ((AnnotatedObject) component).getLocation();
+    final ComponentLocation componentLocation = ((Component) component).getLocation();
     if (!interceptorFactory.intercept(componentLocation)) {
       return next;
     }
 
     final ProcessorInterceptor interceptor = interceptorFactory.get();
-    Map<String, String> dslParameters = (Map<String, String>) ((AnnotatedObject) component).getAnnotation(ANNOTATION_PARAMETERS);
+    Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
     ReactiveProcessor interceptedProcessor;
     if (implementsAround(interceptor)) {
@@ -99,7 +99,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
               .onErrorMap(CompletionException.class, completionException -> completionException.getCause()))
           .onErrorMap(MessagingException.class, error -> {
             return createMessagingException(doAfter(interceptor, component, of(error.getCause())).apply(error.getEvent()),
-                                            error.getCause(), (AnnotatedObject) component);
+                                            error.getCause(), (Component) component);
           })
           .map(doAfter(interceptor, component, empty()));
     } else {
@@ -110,7 +110,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
           .transform(next)
           .onErrorMap(MessagingException.class, error -> {
             return createMessagingException(doAfter(interceptor, component, of(error.getCause())).apply(error.getEvent()),
-                                            error.getCause(), (AnnotatedObject) component);
+                                            error.getCause(), (Component) component);
           })
           .map(doAfter(interceptor, component, empty()));
     }
@@ -137,15 +137,15 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     ((AnnotatedObject) component).getLocation().getLocation());
+                     ((Component) component).getLocation().getLocation());
       }
 
       try {
-        interceptor.before(((AnnotatedObject) component).getLocation(), getResolvedParams(eventWithResolvedParams),
+        interceptor.before(((Component) component).getLocation(), getResolvedParams(eventWithResolvedParams),
                            interceptionEvent);
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e, (AnnotatedObject) component));
+        throw propagate(new MessagingException(interceptionEvent.resolve(), e, (Component) component));
       }
     };
   }
@@ -161,12 +161,12 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,
-                   ((AnnotatedObject) component).getLocation().getLocation());
+                   ((Component) component).getLocation().getLocation());
     }
 
     try {
       return interceptor
-          .around(((AnnotatedObject) component).getLocation(), getResolvedParams(eventWithResolvedParams), interceptionEvent,
+          .around(((Component) component).getLocation(), getResolvedParams(eventWithResolvedParams), interceptionEvent,
                   reactiveInterceptionAction)
           .exceptionally(t -> {
             if (t instanceof MessagingException) {
@@ -174,12 +174,12 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
             } else {
               throw new CompletionException(createMessagingException(eventWithResolvedParams,
                                                                      t instanceof CompletionException ? t.getCause() : t,
-                                                                     ((AnnotatedObject) component)));
+                                                                     ((Component) component)));
             }
           })
           .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
     } catch (Exception e) {
-      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (AnnotatedObject) component));
+      throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
     }
   }
 
@@ -196,20 +196,20 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     ((AnnotatedObject) component).getLocation().getLocation());
+                     ((Component) component).getLocation().getLocation());
       }
 
       try {
-        interceptor.after(((AnnotatedObject) component).getLocation(), interceptionEvent, thrown);
+        interceptor.after(((Component) component).getLocation(), interceptionEvent, thrown);
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e, (AnnotatedObject) component));
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
       }
     };
   }
 
   private boolean isInterceptable(Processor component) {
-    return ((AnnotatedObject) component).getLocation() != null;
+    return ((Component) component).getLocation() != null;
   }
 
   private InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
@@ -231,7 +231,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       if (processor instanceof ParametersResolverProcessor) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Disposing resolved parameters for processor {}...",
-                       ((AnnotatedObject) processor).getLocation().getLocation());
+                       ((Component) processor).getLocation().getLocation());
         }
 
         ((ParametersResolverProcessor) processor)
@@ -257,7 +257,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         // handling exceptions here in the interceptor adapter code. Any exception is to be handling by the interceptor
         // implementation
         if (expressionManager.isExpression(providedValue)) {
-          return expressionManager.evaluate(providedValue, event, ((AnnotatedObject) processor).getLocation()).getValue();
+          return expressionManager.evaluate(providedValue, event, ((Component) processor).getLocation()).getValue();
         } else {
           return valueOf(providedValue);
         }
@@ -291,7 +291,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return builder.build();
   }
 
-  private MessagingException createMessagingException(InternalEvent event, Throwable cause, AnnotatedObject processor) {
+  private MessagingException createMessagingException(InternalEvent event, Throwable cause, Component processor) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
 

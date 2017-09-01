@@ -9,7 +9,7 @@ package org.mule.functional.api.component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class LifecycleObject extends AbstractAnnotatedObject implements Lifecycle {
+public class LifecycleObject extends AbstractComponent implements Lifecycle {
 
   @Inject
   private MuleContext muleContext;

@@ -16,11 +16,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -97,7 +97,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.log(muleEvent);
     verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent,
-                                                                                    ((AnnotatedObject) flow).getLocation());
+                                                                                    ((Component) flow).getLocation());
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -178,7 +178,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExtendedExpressionManager buildExpressionManager() {
     ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
-    when(expressionLanguage.parse(anyString(), any(InternalEvent.class), eq(((AnnotatedObject) flow).getLocation())))
+    when(expressionLanguage.parse(anyString(), any(InternalEvent.class), eq(((Component) flow).getLocation())))
         .thenReturn("text to log");
     return expressionLanguage;
   }

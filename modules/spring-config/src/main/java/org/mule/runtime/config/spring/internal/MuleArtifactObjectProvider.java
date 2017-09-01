@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.ioc.ObjectProvider;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  * 
  * @since 4.0
  */
-class MuleArtifactObjectProvider extends AbstractAnnotatedObject implements ObjectProvider {
+class MuleArtifactObjectProvider extends AbstractComponent implements ObjectProvider {
 
   private final MuleArtifactContext muleArtifactContext;
 

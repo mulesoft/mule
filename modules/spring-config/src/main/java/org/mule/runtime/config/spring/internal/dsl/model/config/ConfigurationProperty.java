@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import org.mule.runtime.api.component.Component;
 
 /**
  * Represents a configuration attribute.
@@ -22,9 +23,8 @@ public class ConfigurationProperty {
   /**
    * Creates a new configuration value
    *
-   * @param source the source of this configuration attribute. For instance, it may be an
-   *        {@link org.mule.runtime.api.meta.AnnotatedObject} if it's source was defined in the artifact configuration or it may
-   *        be the deployment properties configured at deployment time.
+   * @param source the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was
+   *        defined in the artifact configuration or it may be the deployment properties configured at deployment time.
    * @param key the key of the configuration attribute to reference it.
    * @param rawValue the plain configuration value without resolution. A configuration value may contain reference to other
    *        configuration attributes.
@@ -40,9 +40,8 @@ public class ConfigurationProperty {
 
 
   /**
-   * @return the source of this configuration attribute. For instance, it may be an
-   *         {@link org.mule.runtime.api.meta.AnnotatedObject} if it's source was defined in the artifact configuration or it may
-   *         be the deployment properties configured at deployment time.
+   * @return the source of this configuration attribute. For instance, it may be an {@link Component} if it's source was defined
+   *         in the artifact configuration or it may be the deployment properties configured at deployment time.
    */
   public Object getSource() {
     return source;

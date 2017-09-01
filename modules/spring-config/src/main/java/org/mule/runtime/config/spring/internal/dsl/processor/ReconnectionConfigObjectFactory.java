@@ -10,14 +10,14 @@ import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 /**
  * {@link ObjectFactory} which yields instances of {@link ReconnectionConfig}
  *
  * @since 4.0
  */
-public class ReconnectionConfigObjectFactory extends AbstractAnnotatedObjectFactory<ReconnectionConfig> {
+public class ReconnectionConfigObjectFactory extends AbstractComponentFactory<ReconnectionConfig> {
 
   private boolean failsDeployment = false;
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();

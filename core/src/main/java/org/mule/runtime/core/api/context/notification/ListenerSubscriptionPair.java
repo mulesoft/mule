@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 /**
  * A simple tuple that stores a listener with an optional subscription (used to match a resource ID).
  */
-public class ListenerSubscriptionPair<N extends Notification> extends AbstractAnnotatedObject {
+public class ListenerSubscriptionPair<N extends Notification> extends AbstractComponent {
 
   public final static String ANY_SELECTOR_STRING = "*";
 

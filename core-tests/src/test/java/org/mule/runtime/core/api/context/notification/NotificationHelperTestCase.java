@@ -19,7 +19,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
@@ -94,7 +94,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   @Test
   public void fireNotificationForEvent() {
     when(messageSource.getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
-    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
@@ -127,7 +127,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
         .identifier(buildFromStringRepresentation("http:listener"))
         .build());
     when(messageSource.getLocation()).thenReturn(location);
-    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    final FlowConstruct flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 

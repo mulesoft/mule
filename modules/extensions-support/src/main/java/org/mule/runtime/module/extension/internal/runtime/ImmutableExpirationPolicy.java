@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.core.api.time.TimeSupplier;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0
  */
-public final class ImmutableExpirationPolicy extends AbstractAnnotatedObject implements ExpirationPolicy {
+public final class ImmutableExpirationPolicy extends AbstractComponent implements ExpirationPolicy {
 
   /**
    * Returns an instance with the default settings

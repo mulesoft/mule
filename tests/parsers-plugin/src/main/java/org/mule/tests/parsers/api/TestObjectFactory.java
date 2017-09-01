@@ -10,13 +10,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.LinkedList;
 
 import javax.inject.Inject;
 
-public class TestObjectFactory extends AbstractAnnotatedObjectFactory<TestObject> implements Lifecycle {
+public class TestObjectFactory extends AbstractComponentFactory<TestObject> implements Lifecycle {
 
   private LinkedList<String> lifecycleActions = new LinkedList<>();
   private LinkedList<String> createdObjectLifecycleActions = new LinkedList<>();

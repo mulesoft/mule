@@ -15,7 +15,7 @@ import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCaus
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -57,7 +57,7 @@ public class MessagingException extends MuleException {
   private boolean causeRollback;
   private boolean handled;
   private boolean inErrorHandler;
-  private transient AnnotatedObject failingComponent;
+  private transient Component failingComponent;
 
   /**
    * @deprecated use MessagingException(Message, MuleEvent)
@@ -77,7 +77,7 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(message, null));
   }
 
-  public MessagingException(I18nMessage message, InternalEvent event, AnnotatedObject failingComponent) {
+  public MessagingException(I18nMessage message, InternalEvent event, Component failingComponent) {
     super(message);
     this.event = event;
     extractMuleMessage(event);
@@ -103,7 +103,7 @@ public class MessagingException extends MuleException {
     setMessage(generateMessage(message, null));
   }
 
-  public MessagingException(I18nMessage message, InternalEvent event, Throwable cause, AnnotatedObject failingComponent) {
+  public MessagingException(I18nMessage message, InternalEvent event, Throwable cause, Component failingComponent) {
     super(message, getCause(cause));
     this.event = getEvent(event, cause);
     extractMuleMessage(event);
@@ -129,7 +129,7 @@ public class MessagingException extends MuleException {
     setMessage(original.getMessage());
   }
 
-  public MessagingException(InternalEvent event, Throwable cause, AnnotatedObject failingComponent) {
+  public MessagingException(InternalEvent event, Throwable cause, Component failingComponent) {
     super(getCause(cause));
     this.event = getEvent(event, cause);
     extractMuleMessage(event);
@@ -349,7 +349,7 @@ public class MessagingException extends MuleException {
   /**
    * @return the Mule component that causes the failure
    */
-  public AnnotatedObject getFailingComponent() {
+  public Component getFailingComponent() {
     return failingComponent;
   }
 
@@ -376,7 +376,7 @@ public class MessagingException extends MuleException {
 
     boolean failingComponentWasSerialized = in.readBoolean();
     if (failingComponentWasSerialized) {
-      this.failingComponent = (AnnotatedObject) in.readObject();
+      this.failingComponent = (Component) in.readObject();
     }
   }
 

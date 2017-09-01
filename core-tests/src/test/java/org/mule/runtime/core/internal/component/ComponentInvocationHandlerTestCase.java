@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.component;
 
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 
@@ -23,8 +23,8 @@ import static org.hamcrest.Matchers.nullValue;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -37,11 +37,11 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 @SmallTest
-public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCase {
+public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void notAnnotated() throws Exception {
-    AnnotatedObject annotated = addAnnotationsToClass(NotAnnotated.class).newInstance();
+    Component annotated = addAnnotationsToClass(NotAnnotated.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
     annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
@@ -49,12 +49,12 @@ public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCa
     assertThat(annotated.getClass().getMethod("setSomething", Object.class).isAnnotationPresent(Inject.class), is(true));
 
     assertThat(removeDynamicAnnotations(annotated), instanceOf(NotAnnotated.class));
-    assertThat(removeDynamicAnnotations(annotated), not(instanceOf(AnnotatedObject.class)));
+    assertThat(removeDynamicAnnotations(annotated), not(instanceOf(Component.class)));
   }
 
   @Test
   public void extendsAbstractAnnotated() throws Exception {
-    AnnotatedObject annotated = addAnnotationsToClass(ExtendsAnnotated.class).newInstance();
+    Component annotated = addAnnotationsToClass(ExtendsAnnotated.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
     annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
@@ -64,7 +64,7 @@ public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCa
 
   @Test
   public void overridesAbstractAnnotated() throws Exception {
-    Class<AnnotatedObject> clazz = addAnnotationsToClass(ExtendsAnnotated.class);
+    Class<Component> clazz = addAnnotationsToClass(ExtendsAnnotated.class);
 
     Method method = clazz.getMethod("setSomething", Object.class);
 
@@ -73,13 +73,13 @@ public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCa
 
   @Test
   public void implementsAnnotated() throws Exception {
-    AnnotatedObject annotated = addAnnotationsToClass(ImplementsAnnotated.class).newInstance();
+    Component annotated = addAnnotationsToClass(ImplementsAnnotated.class).newInstance();
     assertThat(annotated.getAnnotations(), is(nullValue()));
   }
 
   @Test
   public void implementsInitialisable() throws Exception {
-    AnnotatedObject annotated = addAnnotationsToClass(ImplementsInitialisable.class).newInstance();
+    Component annotated = addAnnotationsToClass(ImplementsInitialisable.class).newInstance();
     assertThat(annotated.getAnnotations().keySet(), empty());
     annotated.setAnnotations(singletonMap(LOCATION_KEY, "value"));
     assertThat(annotated.getAnnotations().keySet(), contains(LOCATION_KEY));
@@ -100,7 +100,7 @@ public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCa
 
   }
 
-  public static class ExtendsAnnotated extends AbstractAnnotatedObject {
+  public static class ExtendsAnnotated extends AbstractComponent {
 
     @Inject
     public void setSomething(Object something) {
@@ -109,7 +109,7 @@ public class AnnotatedObjectInvocationHandlerTestCase extends AbstractMuleTestCa
 
   }
 
-  public static class ImplementsAnnotated implements AnnotatedObject {
+  public static class ImplementsAnnotated implements Component {
 
     @Override
     public Object getAnnotation(QName name) {

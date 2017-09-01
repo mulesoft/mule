@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
 
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.extension.internal.config.DefaultExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
@@ -16,7 +16,7 @@ import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
  *
  * @since 4.0
  */
-public class ExtensionConfigObjectFactory extends AbstractAnnotatedObjectFactory<ExtensionConfig> {
+public class ExtensionConfigObjectFactory extends AbstractComponentFactory<ExtensionConfig> {
 
   private DynamicConfigurationExpiration dynamicConfigurationExpiration;
 

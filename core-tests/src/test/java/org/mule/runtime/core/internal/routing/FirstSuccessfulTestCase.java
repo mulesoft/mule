@@ -20,7 +20,7 @@ import static org.mule.tck.MuleTestUtils.createErrorMock;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
@@ -87,9 +87,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
     FirstSuccessful fs = new FirstSuccessful();
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
-    when(((AnnotatedObject) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
+    when(((Component) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     fs.setMuleContext(muleContext);
 
     fs.setRoutes(asList(processors));

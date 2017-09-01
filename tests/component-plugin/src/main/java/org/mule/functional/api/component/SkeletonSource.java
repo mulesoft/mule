@@ -8,7 +8,7 @@ package org.mule.functional.api.component;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.meta.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.source.MessageSource;
  *
  * @since 4.0
  */
-public class SkeletonSource extends AbstractAnnotatedObject implements MessageSource, Startable {
+public class SkeletonSource extends AbstractComponent implements MessageSource, Startable {
 
   private Processor listener;
   private volatile boolean started = false;

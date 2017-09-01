@@ -15,7 +15,7 @@ import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -25,7 +25,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
@@ -346,13 +346,13 @@ public abstract class AbstractMuleTestCase {
   /**
    * Utility method to add a mock component location.
    * 
-   * @param annotatedObject object to add the location.
+   * @param component object to add the location.
    */
-  protected void addMockComponentLocation(AnnotatedObject annotatedObject) {
+  protected void addMockComponentLocation(Component component) {
     ComponentLocation componentLocation = mock(ComponentLocation.class, RETURNS_DEEP_STUBS);
     Mockito.when(componentLocation.getLineInFile()).thenReturn(empty());
     Mockito.when(componentLocation.getFileName()).thenReturn(empty());
-    annotatedObject.setAnnotations(Collections.singletonMap(LOCATION_KEY, componentLocation));
+    component.setAnnotations(Collections.singletonMap(LOCATION_KEY, componentLocation));
   }
 
   private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);

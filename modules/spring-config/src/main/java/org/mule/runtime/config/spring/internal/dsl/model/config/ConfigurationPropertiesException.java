@@ -9,27 +9,27 @@ package org.mule.runtime.config.spring.internal.dsl.model.config;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.location.ComponentProvider;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
 
 public class ConfigurationPropertiesException extends RuntimeConfigurationException implements ComponentProvider {
 
-  private AnnotatedObject component;
+  private Component component;
 
-  public ConfigurationPropertiesException(I18nMessage message, AnnotatedObject component) {
+  public ConfigurationPropertiesException(I18nMessage message, Component component) {
     super(message);
     checkNotNull(component, "component cannot be null");
     this.component = component;
   }
 
-  public ConfigurationPropertiesException(I18nMessage message, AnnotatedObject component, Exception e) {
+  public ConfigurationPropertiesException(I18nMessage message, Component component, Exception e) {
     super(message, e);
     checkNotNull(component, "component cannot be null");
     this.component = component;
   }
 
   @Override
-  public AnnotatedObject getComponent() {
+  public Component getComponent() {
     return component;
   }
 }

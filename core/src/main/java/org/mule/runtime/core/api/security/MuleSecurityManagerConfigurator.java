@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MA
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class MuleSecurityManagerConfigurator extends AbstractAnnotatedObjectFactory<SecurityManager> {
+public class MuleSecurityManagerConfigurator extends AbstractComponentFactory<SecurityManager> {
 
   private List<SecurityProvider> providers = new ArrayList<>();
   private List<EncryptionStrategy> encryptionStrategies = new ArrayList<>();

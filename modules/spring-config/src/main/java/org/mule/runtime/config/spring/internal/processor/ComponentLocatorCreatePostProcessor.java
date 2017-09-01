@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.processor;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.internal.SpringConfigurationComponentLocator;
 
 import org.springframework.beans.BeansException;
@@ -42,8 +42,8 @@ public class ComponentLocatorCreatePostProcessor implements BeanPostProcessor {
   @Override
   public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
     // We check for instanceof AnnotatedObject because this method may be called for spring objects
-    if (!(o instanceof FactoryBean) && o instanceof AnnotatedObject && ((AnnotatedObject) o).getLocation() != null) {
-      componentLocator.addComponent((AnnotatedObject) o);
+    if (!(o instanceof FactoryBean) && o instanceof Component && ((Component) o).getLocation() != null) {
+      componentLocator.addComponent((Component) o);
     }
     return o;
   }
