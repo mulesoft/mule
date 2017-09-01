@@ -45,7 +45,8 @@ public class FileJarExplorer implements JarExplorer {
           final String relativePath = classFile.getAbsolutePath().substring(libraryFile.getAbsolutePath().length() + 1);
           if (relativePath.endsWith(CLASS_EXTENSION)) {
             final String packageName =
-                getPackageName(relativePath.substring(0, relativePath.length() - CLASS_EXTENSION.length()).replace(File.separator, "."));
+                getPackageName(relativePath.substring(0, relativePath.length() - CLASS_EXTENSION.length()).replace(File.separator,
+                                                                                                                   "."));
             packages.add(packageName);
           } else {
             resources.add(relativePath);
