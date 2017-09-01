@@ -44,7 +44,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
   protected RetryCounter retryCounter;
 
   private volatile int count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
-  private volatile Duration frequency = Duration.ofMillis(SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY);
+  private volatile Duration frequency = ofMillis(SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY);
 
   public SimpleRetryPolicy(long frequency, int retryCount) {
     this.frequency = ofMillis(frequency);
