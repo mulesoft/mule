@@ -7,16 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -37,11 +35,10 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
+import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -88,12 +85,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
 
   private void assertParameterOrder(ParameterizedModel parameterizedModel, String parameterName, int expectedOrder) {
     ParameterModel paramOne = getNamedObject(parameterizedModel.getAllParameterModels(), parameterName);
-    Optional<LayoutModel> layoutModel = paramOne.getLayoutModel();
-    assertThat(layoutModel.isPresent(), is(true));
-    LayoutModel layoutModel1 = layoutModel.get();
-    Integer order = layoutModel1.getOrder().orElse(null);
-    assertThat("expecting parameter [" + parameterName + "] at position [" + expectedOrder + "] but was at [" + order + "]",
-               order, is(expectedOrder));
+    assertLayoutModel(parameterName, expectedOrder, paramOne.getLayoutModel());
   }
 
   @Operations(OrderedOperations.class)

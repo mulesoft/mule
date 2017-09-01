@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
 
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 class EnricherTestUtils {
 
@@ -26,13 +27,22 @@ class EnricherTestUtils {
     return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
   }
 
-  public static <T extends NamedObject> T getNamedObject(List<T> operationList, String name) {
+  static <T extends NamedObject> T getNamedObject(List<T> operationList, String name) {
     return operationList.stream().filter(operation -> operation.getName().equals(name)).collect(toList()).get(0);
   }
 
-  public static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty) {
+  static <T extends ModelProperty> T checkIsPresent(BaseDeclaration declaration, Class<T> modelProperty) {
     final Optional<T> property = declaration.getModelProperty(modelProperty);
     assertThat(property.isPresent(), is(true));
     return property.get();
   }
+
+  static void assertLayoutModel(String parameterName, int expectedOrder, Optional<LayoutModel> layoutModel) {
+    assertThat(layoutModel.isPresent(), is(true));
+    LayoutModel layoutModel1 = layoutModel.get();
+    Integer order = layoutModel1.getOrder().orElse(null);
+    assertThat("expecting parameter [" + parameterName + "] at position [" + expectedOrder + "] but was at [" + order + "]",
+               order, is(expectedOrder));
+  }
+
 }

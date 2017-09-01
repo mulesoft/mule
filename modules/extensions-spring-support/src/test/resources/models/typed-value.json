@@ -77,6 +77,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -291,6 +297,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -688,6 +700,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 0
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -752,7 +770,8 @@
           "layoutModel": {
             "password": false,
             "text": false,
-            "query": false
+            "query": false,
+            "order": 1
           },
           "showInDsl": true,
           "name": "SimplePojo",
@@ -1171,6 +1190,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -1354,6 +1379,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -1500,6 +1531,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -1682,6 +1719,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -1868,6 +1911,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2014,6 +2063,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2231,7 +2286,8 @@
           "layoutModel": {
             "password": false,
             "text": false,
-            "query": false
+            "query": false,
+            "order": 1
           },
           "showInDsl": true,
           "name": "param",
@@ -2415,6 +2471,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2637,6 +2699,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2823,6 +2891,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2997,6 +3071,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -3387,6 +3467,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
