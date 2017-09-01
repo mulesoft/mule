@@ -23,6 +23,7 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.CONN
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -33,6 +34,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -75,6 +77,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -428,5 +431,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   public ExtensionModel getExtensionModel() {
     return extensionModel;
+  }
+
+  @Override
+  public List<ValueProviderModel> getModels(String providerName) {
+    return getValueProviderModels(componentModel.getAllParameterModels());
   }
 }

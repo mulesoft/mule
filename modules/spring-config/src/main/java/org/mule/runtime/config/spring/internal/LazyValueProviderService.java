@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.internal;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
@@ -16,18 +17,23 @@ import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtili
 import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
-
-import java.util.Optional;
-import java.util.function.Supplier;
+import org.mule.runtime.extension.api.values.ComponentValueProvider;
+import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -43,6 +49,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
+  private Supplier<ConfigurationComponentLocator> componentLocatorSupplier;
 
   private LazyMuleArtifactContext lazyMuleArtifactContext;
 
@@ -50,9 +57,13 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext, Supplier<ValueProviderService> valueProviderServiceSupplier) {
+  private ConfigurationComponentLocator componentLocator;
+
+  LazyValueProviderService(LazyMuleArtifactContext artifactContext, Supplier<ValueProviderService> valueProviderServiceSupplier,
+                           Supplier<ConfigurationComponentLocator> componentLocatorSupplier) {
     this.lazyMuleArtifactContext = artifactContext;
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
+    this.componentLocatorSupplier = componentLocatorSupplier;
   }
 
   /**
@@ -60,13 +71,31 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return initializeComponent(locationWithOutConnection(location))
+    return initializeComponent(location, providerName)
         .orElseGet(() -> providerService.getValues(location, providerName));
   }
 
-  private Optional<ValueResult> initializeComponent(Location location) {
+  private Optional<ValueResult> initializeComponent(Location location, String providerName) {
+    Location locationWithOutConnection = locationWithOutConnection(location);
+
     try {
-      lazyMuleArtifactContext.initializeComponent(location);
+      lazyMuleArtifactContext.createComponent(locationWithOutConnection);
+
+      ValueProviderModel valueProviderModel = getModel(location, providerName)
+          .orElseThrow(() -> new ValueResolvingException(format("Unable to retrieve the model for the provider: [%s] in the location: [%s]",
+                                                                providerName, location),
+                                                         INVALID_LOCATION));
+
+      if (valueProviderModel.requiresConnection() || valueProviderModel.requiresConfiguration()) {
+        // All components are initialized to be able to retrieve the configuration or connection
+        lazyMuleArtifactContext.initializeComponent(location);
+      }
+
+    } catch (ValueResolvingException e) {
+      return of(resultFrom(newFailure(e)
+          .withFailureCode(e.getFailureCode())
+          .build()));
+
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {
@@ -81,6 +110,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
           .withFailureCode(UNKNOWN)
           .build()));
     }
+
     return empty();
   }
 
@@ -91,5 +121,37 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   @Override
   public void initialise() throws InitialisationException {
     this.providerService = valueProviderServiceSupplier.get();
+    this.componentLocator = componentLocatorSupplier.get();
+  }
+
+  public Optional<ValueProviderModel> getModel(Location location, String providerName) {
+    boolean isConnection = isConnection(location);
+
+    if (isConnection) {
+      location = deleteLastPartFromLocation(location);
+    }
+
+    return getModel(location, isConnection, providerName);
+  }
+
+  private Optional<ValueProviderModel> getModel(Location location, boolean isConnection, String providerName) {
+    Reference<ValueProviderModel> model = new Reference<>();
+
+    componentLocator.find(location).ifPresent(provider -> {
+      try {
+        if (provider instanceof ComponentValueProvider) {
+          model.set(((ComponentValueProvider) provider).getModels(providerName).get(0));
+        } else if (provider instanceof ConfigurationParameterValueProvider) {
+          if (isConnection) {
+            model.set(((ConfigurationParameterValueProvider) provider).getConnectionModels(providerName).get(0));
+          } else {
+            model.set(((ConfigurationParameterValueProvider) provider).getConfigModels(providerName).get(0));
+          }
+        }
+      } catch (Exception ignored) {
+      }
+    });
+
+    return ofNullable(model.get());
   }
 }

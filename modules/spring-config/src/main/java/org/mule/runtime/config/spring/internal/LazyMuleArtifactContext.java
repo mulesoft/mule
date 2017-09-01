@@ -17,12 +17,12 @@ import static org.mule.runtime.config.spring.internal.LazyValueProviderService.N
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
@@ -88,7 +87,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
                                                                      new LazyValueProviderService(this,
                                                                                                   () -> muleContext
                                                                                                       .getRegistry()
-                                                                                                      .get(NON_LAZY_VALUE_PROVIDER_SERVICE)));
+                                                                                                      .get(NON_LAZY_VALUE_PROVIDER_SERVICE),
+                                                                                                  muleContext::getConfigurationComponentLocator));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
   }
@@ -127,8 +127,24 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     });
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void initializeComponent(Location location) {
+    applyLifecycle(createComponents(location));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void createComponent(Location location) {
+    createComponents(location);
+  }
+
+  private List<String> createComponents(Location location) {
+    Reference<List<String>> createdComponents = new Reference<>();
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                                componentBuildingDefinitionRegistry);
@@ -139,13 +155,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       unregisterComponents(dependencyResolver.resolveComponentModelDependencies());
 
       ApplicationModel minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModel(location);
-      createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+      List<String> applicationComponents =
+          super.createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+      createdComponents.set(applicationComponents);
+      // This is required to force the execution of postProcessAfterInitialization() for each created component
+      applicationComponents.forEach(component -> muleContext.getRegistry().get(component));
     });
+    return createdComponents.get();
   }
 
   private void unregisterComponents(List<ComponentModel> componentModels) {
     if (muleContext.isStarted()) {
-      componentModels.stream().forEach(componentModel -> {
+      componentModels.forEach(componentModel -> {
         final String nameAttribute = componentModel.getNameAttribute();
         if (nameAttribute != null) {
           try {
