@@ -11,17 +11,19 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -48,13 +50,14 @@ import org.slf4j.Logger;
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
 public class IdempotentMessageValidator extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, Initialisable, Disposable {
+    implements Processor, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
 
   protected MuleContext muleContext;
 
   protected volatile ObjectStore<String> store;
+  protected ObjectStore<String> privateStore;
   protected String storePrefix;
 
   protected String idExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
@@ -72,11 +75,33 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
           format("%s.%s.%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(),
                  this.getClass().getName());
     }
-    if (store == null) {
-      this.store = createMessageIdStore();
-    }
+    setupObjectStore();
+  }
 
-    initialiseIfNeeded(store);
+  private void setupObjectStore() throws InitialisationException {
+    //Check if  OS was properly configured
+    if (store != null && privateStore != null) {
+      throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+                                        this);
+    }
+    if (store == null) {
+      if (privateStore == null) { //If no object store was defined, create one
+        this.store = createMessageIdStore();
+      } else { //If object store was defined privately
+        this.store = privateStore;
+      }
+    }
+    initialiseIfNeeded(store, true, muleContext);
+  }
+
+  @Override
+  public void start() throws MuleException {
+    startIfNeeded(store);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(store);
   }
 
   @Override
@@ -179,5 +204,9 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
 
   public void setStorePrefix(String storePrefix) {
     this.storePrefix = storePrefix;
+  }
+
+  public void setPrivateObjectStore(ObjectStore<String> privateStore) {
+    this.privateStore = privateStore;
   }
 }

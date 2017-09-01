@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.message.Message.of;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
@@ -195,4 +199,20 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
   }
+
+  @Test
+  public void multipleObjectStoreConfigurationShouldRaiseException() throws Exception {
+    idempotent.setPrivateObjectStore(new InMemoryObjectStore<>());
+    expected.expect(InitialisationException.class);
+    idempotent.initialise();
+  }
+
+  @Test
+  public void implicitObjectStoreIsCreatedWhenNonDefined() throws Exception {
+    idempotent.setObjectStore(null);
+    idempotent.initialise();
+    assertThat(idempotent.getObjectStore(), is(notNullValue()));
+  }
+
+
 }

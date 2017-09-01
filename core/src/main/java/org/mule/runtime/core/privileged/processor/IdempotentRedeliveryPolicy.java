@@ -8,9 +8,12 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -27,7 +30,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
-import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private String messageDigestAlgorithm;
   private String idExpression;
   private ObjectStore<AtomicInteger> store;
+  private ObjectStore<AtomicInteger> privateStore;
   private LockFactory lockFactory;
   private String idrId;
 
@@ -91,9 +94,19 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
     lockFactory = muleContext.getLockFactory();
-    if (store == null) {
-      store = new ProvidedObjectStoreWrapper<>(null, internalObjectStoreSupplier());
+    if (store != null && privateStore != null) {
+      throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+                                        this);
     }
+    if (store == null) {
+      if (privateStore == null) //If no object store was defined, create one
+      {
+        this.store = internalObjectStoreSupplier().get();
+      } else { //If object store was defined privately
+        this.store = privateStore;
+      }
+    }
+    initialiseIfNeeded(store, true, muleContext);
     initialiseIfNeeded(objectToByteArray, muleContext);
     initialiseIfNeeded(byteArrayToHexString, muleContext);
   }
@@ -112,21 +125,30 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void dispose() {
     super.dispose();
-
-    if (store != null) {
-      if (store instanceof ObjectStorePartition) {
-        try {
-          ((ObjectStorePartition) store).close();
-        } catch (ObjectStoreException e) {
-          logger.warn("error closing object store: " + e.getMessage(), e);
-        }
+    if (store instanceof ObjectStorePartition) {
+      try {
+        ((ObjectStorePartition) store).close();
+      } catch (ObjectStoreException e) {
+        logger.warn("error closing object store: " + e.getMessage(), e);
       }
+    }
+    if (store != null) {
+      disposeIfNeeded(store, logger);
       store = null;
     }
   }
 
   @Override
-  public void start() throws MuleException {}
+  public void start() throws MuleException {
+    super.start();
+    startIfNeeded(store);
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    super.stop();
+    stopIfNeeded(store);
+  }
 
 
   @Override
@@ -246,7 +268,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   public void setObjectStore(ObjectStore<AtomicInteger> store) {
-    this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreSupplier());
+    this.store = store;
   }
+
+  public void setPrivateObjectStore(ObjectStore<AtomicInteger> store) {
+    this.privateStore = store;
+  }
+
+
 }
 

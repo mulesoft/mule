@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static java.util.Arrays.asList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
@@ -38,6 +40,8 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.extension.api.ExtensionConstants.OBJECT_STORE_ELEMENT_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.OBJECT_STORE_ELEMENT_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
@@ -64,6 +68,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.parameter.ElementReference;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
@@ -180,16 +186,21 @@ class MuleExtensionModelDeclarer {
         .describedAs("Defines one or more expressions to use when extracting the value from the message.");
 
     validator.onDefaultParameterGroup()
-        .withOptionalParameter("objectStore")
-        .ofType(typeLoader.load(String.class))
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The object store where the IDs of the processed events are going to be stored.");
-
-    validator.onDefaultParameterGroup()
         .withOptionalParameter("storePrefix")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Defines the prefix of the object store names. This will only be used for the internally built object store.");
+
+    validator.onDefaultParameterGroup().withOptionalParameter("objectStore").withDsl(
+                                                                                     ParameterDslConfiguration.builder()
+                                                                                         .allowsInlineDefinition(true)
+                                                                                         .allowsReferences(true).build())
+        .ofType(typeLoader.load(ObjectStore.class)).withExpressionSupport(NOT_SUPPORTED)
+        .withElementReferences(asList(new ElementReference(OBJECT_STORE_ELEMENT_NAMESPACE, OBJECT_STORE_ELEMENT_NAME,
+                                                           OBJECT_STORE)))
+        .describedAs("The object store where the IDs of the processed events are going to be stored. " +
+            "If defined as argument it should reference a globally created object store. Otherwise, " +
+            "it can be defined inline or not at all. In the last case, a default object store will be provided.");
 
     validator.withErrorModel(duplicateMessageError);
   }

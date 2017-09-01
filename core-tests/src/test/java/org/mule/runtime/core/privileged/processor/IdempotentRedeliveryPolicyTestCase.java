@@ -10,6 +10,8 @@ import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
@@ -25,6 +27,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
@@ -51,7 +54,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -72,6 +77,10 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
   private AtomicInteger count = new AtomicInteger();
+  private ObjectStore mockObjectStore = mock(ObjectStore.class);
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   @SuppressWarnings("rawtypes")
@@ -149,6 +158,14 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     firstIrpExecutionThread.join();
     threadCausingRedeliveryException.join();
     assertThat(count.get(), equalTo(2));
+  }
+
+  @Test
+  public void multipleObjectStoreConfigurationShouldRaiseException() throws Exception {
+    irp.setObjectStore(mockObjectStore);
+    irp.setPrivateObjectStore(mockObjectStore);
+    expectedException.expect(InitialisationException.class);
+    irp.initialise();
   }
 
   private void processUntilFailure() {

@@ -92,6 +92,7 @@
             <xsd:element ref="sub-flow" />
             <xsd:element ref="top-level-processor"/>
             <xsd:element ref="abstract-global-intercepting-message-processor"/>
+            <xsd:element ref="abstract-object-store"/>
         </xsd:choice>
     </xsd:group>
 
@@ -2718,6 +2719,15 @@
     <xsd:complexType name="idempotentMessageValidatorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element ref="abstract-private-object-store">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Object store defined privately for message validation
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="idExpression" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2732,7 +2742,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="objectStore" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2797,6 +2806,15 @@
     <xsd:complexType name="idempotentRedeliveryPolicyType">
         <xsd:complexContent>
             <xsd:extension base="abstractRedeliveryPolicyType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element ref="abstract-private-object-store">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Object store defined privately for message validation
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="useSecureHash" type="xsd:boolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2819,8 +2837,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
-                <xsd:attribute name="object-store-ref" type="xsd:string" use="optional">
+                <xsd:attribute name="objectStore" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The object store where the redelivery counter for each message is going to be stored.
@@ -2848,8 +2865,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                
-                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="processed-groups-object-store" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2857,7 +2872,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- TODO MULE-12379 Allow inline definition of object stores in elements -->
                 <xsd:attribute name="event-groups-object-store" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3993,6 +4007,31 @@
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- Object Store -->
+    <xsd:element name="abstract-object-store" abstract="true" type="abstractObjectStoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for global object store elements.Global means that any element can access it.
+                Used for elements that reference an object-store but the implementation is in the connector
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="abstract-private-object-store" abstract="true" type="abstractObjectStoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for private object store elements.Private means that only the component that defines it will be able to access it.
+                Used for elements that reference an object-store but the implementation is in the connector
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractObjectStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
 

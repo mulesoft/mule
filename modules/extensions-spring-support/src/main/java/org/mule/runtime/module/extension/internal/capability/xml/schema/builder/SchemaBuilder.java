@@ -36,6 +36,7 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_RE
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -193,7 +194,8 @@ public final class SchemaBuilder {
   private SchemaBuilder withTypes(Collection<ObjectType> types) {
     types.stream().filter(t -> {
       Optional<DslElementSyntax> typeDsl = dslResolver.resolve(t);
-      return typeDsl.isPresent() && typeDsl.get().supportsTopLevelDeclaration();
+      return (typeDsl.isPresent() && typeDsl.get().supportsTopLevelDeclaration())
+          || getSubstitutionGroup(t).isPresent();
     }).forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
 
     return this;
