@@ -388,4 +388,20 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="on-error-assert" type="onErrorAssertType"
+                 substitutionGroup="mule:abstract-on-error">
+        <xsd:annotation>
+            <xsd:documentation>
+                Error handler used to assert exceptions. It will check the exception and validate it and it's fields to an expected one.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="onErrorAssertType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractOnErrorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

@@ -21,6 +21,7 @@ import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
+import org.mule.functional.api.component.OnErrorAssertHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
@@ -173,6 +174,10 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("failurePhase", fromSimpleParameter("failurePhase").build())
         .build());
 
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
+                                             .withTypeDefinition(fromType(OnErrorAssertHandler.class))
+                                             .withSetterParameterDefinition("logException", fromSimpleParameter("logException").withDefaultValue("true").build())
+                                             .asPrototype().build());
     return componentBuildingDefinitions;
   }
 }
