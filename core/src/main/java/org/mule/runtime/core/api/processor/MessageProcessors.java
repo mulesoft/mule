@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
@@ -26,11 +27,11 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
-
-import reactor.core.publisher.Mono;
+import java.util.function.Consumer;
 
 /**
  * Some convenience methods for message processors.
@@ -72,45 +73,67 @@ public class MessageProcessors {
   }
 
   /**
-   * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
-   * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
-   * <p/>
-   * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not
-   * complete the {@link InternalEventContext} will cause this method to never return.
+   * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
+   * a {@link InternalEvent} result is available or throws an exception in the case of an error. This is currently used widely to
+   * continue to support the blocking {@link Processor#process(InternalEvent)} API when the implementation of a {@link Processor}
+   * is implemented via {@link ReactiveProcessor#apply(Object)}.
+   * <p>
+   * The {@link InternalEvent} returned by this method will <b>not</b> be completed with a {@link InternalEvent} or
+   * {@link Throwable} unless the delegate {@link Processor} does this.
    *
    * TODO MULE-13054 Remove blocking processor API
    *
-   * @param event event to process.
-   * @param processor processor to adapt.
+   * @param event event to process
+   * @param processor processor to adapt
    * @return result event
-   * @throws MuleException
+   * @throws MuleException if an error occurs
    */
   public static InternalEvent processToApply(InternalEvent event, ReactiveProcessor processor) throws MuleException {
+    return processToApply(event, processor, false);
+  }
+
+  /**
+   * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
+   * a {@link InternalEvent} result is available or throws an exception in the case of an error. This is currently used widely to
+   * continue to support the blocking {@link Processor#process(InternalEvent)} API when the implementation of a {@link Processor}
+   * is implemented via {@link ReactiveProcessor#apply(Object)}.
+   * <p>
+   * The {@link InternalEvent} returned by this method will be completed with a {@link InternalEvent} or {@link Throwable} if
+   * {@code completeContext} is {@code true}.
+   *
+   * TODO MULE-13054 Remove blocking processor API
+   *
+   * @param event event to process
+   * @param processor processor to adapt
+   * @return result event
+   * @throws MuleException if an error occurs
+   */
+  public static InternalEvent processToApply(InternalEvent event, ReactiveProcessor processor, boolean completeContext)
+      throws MuleException {
     try {
-      return just(event).transform(processor).switchIfEmpty(from(event.getContext().getResponsePublisher())).block();
+      return just(event)
+          .transform(processor)
+          // Ensure errors handled by MessageProcessorChains are returned
+          .switchIfEmpty(from(event.getContext().getResponsePublisher()))
+          .doOnSuccess(completeSuccessIfNeeded(event.getContext(), completeContext))
+          .doOnError(completeErrorIfNeeded(event.getContext(), completeContext))
+          .block();
     } catch (Throwable e) {
       throw rxExceptionToMuleException(e);
     }
   }
 
   /**
-   * Adapt a {@link ReactiveProcessor} used via non-blocking API {@link ReactiveProcessor#apply(Object)} by blocking and waiting
-   * for response {@link InternalEvent} or throwing an {@link MuleException} in the case of an error.
-   * <p/>
-   * If the {@link ReactiveProcessor} drops the event due to an error or stop action, then the result of returned will be that of
-   * the {@link InternalEventContext} completion. Attempting to adapt a processor implementation that filters events and does not
-   * complete the {@link InternalEventContext} will cause this method to never return.
-   * 
-   * This method uses a child context so that if processing occurs using non-blocking further down the chain this will not
-   * interfere with current context.
+   * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
+   * a {@link InternalEvent} result is available or throws an exception in the case of an error. This method differs from
+   * {@link #processToApply(InternalEvent, ReactiveProcessor)} in that processing will be scoped using a child
+   * {@link InternalEventContext} such that completion of the {@link InternalEventContext} in the delegate {@link Processor} does
+   * not complete the original {@link InternalEventContext}.
    *
-   * TODO MULE-13054 Remove blocking processor API
-   *
-   * @param event event to process.
-   * @param processor processor to adapt.
+   * @param event event to process
+   * @param processor processor to adapt
    * @return result event
-   * @throws MuleException
+   * @throws MuleException if an error occurs
    */
   public static InternalEvent processToApplyWithChildContext(InternalEvent event, ReactiveProcessor processor)
       throws MuleException {
@@ -125,10 +148,26 @@ public class MessageProcessors {
   }
 
   /**
+   * Process an {@link InternalEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<InternalEvent>} via
+   * which the future {@link InternalEvent} or {@link Throwable} will be published.
+   * <p/>
+   * The {@link InternalEvent} returned by this method <b>will</b> be completed with the same {@link InternalEvent} instance and
+   * if an error occurs during processing the {@link InternalEventContext} will be completed with the error.
+   * 
+   * @param event event to process
+   * @param processor processor to use
+   * @return future result
+   */
+  public static Publisher<InternalEvent> process(InternalEvent event, ReactiveProcessor processor) {
+    return just(event).transform(processor)
+        .switchIfEmpty(from(event.getContext().getResponsePublisher()))
+        .doOnSuccess(completeSuccessIfNeeded(event.getContext(), true))
+        .doOnError(completeErrorIfNeeded(event.getContext(), true));
+  }
+
+  /**
    * Process a {@link ReactiveProcessor} using a child {@link InternalEventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
-   * <p>
-   * No error-handling will be performed when errors occur.
    *
    * @param event the event to process.
    * @param processor the processor to process.
@@ -166,11 +205,7 @@ public class MessageProcessors {
                                                                           boolean completeParentOnEmpty) {
     return just(builder(child, event).build())
         .transform(processor)
-        .doOnNext(result -> {
-          if (!(from(child.getResponsePublisher()).toFuture().isDone())) {
-            child.success(result);
-          }
-        })
+        .doOnNext(completeSuccessIfNeeded(child, true))
         .switchIfEmpty(from(child.getResponsePublisher()))
         .map(result -> builder(event.getContext(), result).build())
         .doOnError(MessagingException.class,
@@ -180,6 +215,22 @@ public class MessageProcessors {
             event.getContext().success();
           }
         });
+  }
+
+  private static Consumer<InternalEvent> completeSuccessIfNeeded(InternalEventContext child, boolean complete) {
+    return result -> {
+      if (!(from(child.getResponsePublisher()).toFuture().isDone()) && complete) {
+        child.success(result);
+      }
+    };
+  }
+
+  private static Consumer<Throwable> completeErrorIfNeeded(InternalEventContext child, boolean complete) {
+    return throwable -> {
+      if (!(from(child.getResponsePublisher()).toFuture().isDone()) && complete) {
+        child.error(throwable);
+      }
+    };
   }
 
   /**

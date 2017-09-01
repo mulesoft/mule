@@ -10,6 +10,8 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.processor.MessageProcessors.process;
+import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -70,7 +72,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(source, sourceEvent);
     List<Policy> parameterizedPolicies = policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters);
     if (parameterizedPolicies.isEmpty()) {
-      return event -> just(sourceEvent).transform(flowExecutionProcessor)
+      return event -> from(process(event, flowExecutionProcessor))
           .defaultIfEmpty(InternalEvent.builder(sourceEvent).message(of(null)).build())
           .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(flowExecutionResult -> right(new SourcePolicySuccessResult(flowExecutionResult,
                                                                                                                                         () -> messageSourceResponseParametersProcessor

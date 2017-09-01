@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
-import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -31,7 +30,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -326,9 +324,4 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
   }
 
-  @Override
-  protected Optional<FlowConstruct> getFlowConstruct() {
-    Object object = muleContext.getRegistry().get(getRootContainerName());
-    return object instanceof FlowConstruct ? of((FlowConstruct) object) : Optional.empty();
-  }
 }

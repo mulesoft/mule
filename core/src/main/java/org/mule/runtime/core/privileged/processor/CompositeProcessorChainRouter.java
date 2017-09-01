@@ -18,6 +18,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -53,7 +54,7 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
   }
 
   @Override
-  protected Function<Publisher<InternalEvent>, Publisher<InternalEvent>> getExecutableFunction() {
+  protected ReactiveProcessor getExecutableFunction() {
     return publisher -> from(publisher).transform(messageProcessorChain);
   }
 

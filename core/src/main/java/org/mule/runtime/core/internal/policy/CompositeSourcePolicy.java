@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
@@ -131,7 +132,7 @@ public class CompositeSourcePolicy extends
    */
   @Override
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(InternalEvent sourceEvent) {
-    return from(processPolicies(sourceEvent))
+    return from(MessageProcessors.process(sourceEvent, getPolicyProcessor()))
         .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(policiesResultEvent -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()
               .map(parametersTransformer -> concatMaps(originalResponseParameters, parametersTransformer

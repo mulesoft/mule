@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -121,7 +123,8 @@ public class CompositeOperationPolicy extends
       Message message = getParametersTransformer().isPresent()
           ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
           : operationEvent.getMessage();
-      return processPolicies(InternalEvent.builder(operationEvent).message(message).build());
+      return processWithChildContext(InternalEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
+                                     empty());
     } catch (Exception e) {
       return error(e);
     }
