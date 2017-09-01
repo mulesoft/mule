@@ -15,11 +15,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,6 +29,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.slf4j.Logger;
 import sun.misc.CompoundEnumeration;
 
 /**
@@ -224,7 +222,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(name);
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
-        resource = artifactClassLoader.getClassLoader().getResource(name);
+        resource = artifactClassLoader.findResource(name);
         if (resource != null) {
           break;
         }

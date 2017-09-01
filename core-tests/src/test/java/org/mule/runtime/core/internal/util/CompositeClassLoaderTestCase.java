@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.util;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -28,25 +26,20 @@ import org.junit.Test;
 @SmallTest
 public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
 
-  public static final String CLASS_NAME = "java.lang.Object";
-  public static final Class APP_LOADED_CLASS = Object.class;
-  public static final Class PLUGIN_LOADED_CLASS = String.class;
+  private static final String CLASS_NAME = "java.lang.Object";
+  private static final Class APP_LOADED_CLASS = Object.class;
+  private static final Class PLUGIN_LOADED_CLASS = String.class;
 
-  public static final String RESOURCE_NAME = "dummy.txt";
-  public static final String PLUGIN_RESOURCE_NAME = "plugin.txt";
+  private static final String RESOURCE_NAME = "dummy.txt";
+  private static final String PLUGIN_RESOURCE_NAME = "plugin.txt";
 
-  public static final String LIBRARY_NAME = "dummy.so";
-  public static final String APP_LOADED_LIBRARY = "app.dummy.so";
-  public static final String PLUGIN_LOADED_LIBRARY = "plugin.dummy.so";
-  public static final String APP_NAME = "testApp";
+  private final URL APP_LOADED_RESOURCE;
+  private final URL PLUGIN_LOADED_RESOURCE;
 
-  public final URL APP_LOADED_RESOURCE;
-  public final URL PLUGIN_LOADED_RESOURCE;
-
-  public final InputStream APP_LOADED_STREAM_RESOURCE = mock(InputStream.class);
-  public final InputStream PLUGIN_LOADED_STREAM_RESOURCE = mock(InputStream.class);
-  private final TestClassLoader appClassLoader = new TestClassLoader();
-  private final TestClassLoader pluginClassLoader = new TestClassLoader();
+  private final InputStream APP_LOADED_STREAM_RESOURCE = mock(InputStream.class);
+  private final InputStream PLUGIN_LOADED_STREAM_RESOURCE = mock(InputStream.class);
+  private final TestClassLoader appClassLoader = new TestClassLoader(null);
+  private final TestClassLoader pluginClassLoader = new TestClassLoader(null);
 
 
   public CompositeClassLoaderTestCase() throws MalformedURLException {

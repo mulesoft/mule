@@ -16,6 +16,10 @@ import java.util.Enumeration;
 
 public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {
 
+  public TestArtifactClassLoader(ClassLoader parent) {
+    super(parent);
+  }
+
   @Override
   public String getArtifactId() {
     return null;

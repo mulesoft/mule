@@ -12,11 +12,8 @@ import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
-
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.slf4j.Logger;
 import sun.misc.CompoundEnumeration;
 import sun.net.www.protocol.jar.Handler;
 
@@ -144,7 +142,6 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   public URL getResource(String name) {
     URL url = findResource(name);
     if (url == null && getParent() != null) {
-
       url = getParent().getResource(name);
     }
     return url;
