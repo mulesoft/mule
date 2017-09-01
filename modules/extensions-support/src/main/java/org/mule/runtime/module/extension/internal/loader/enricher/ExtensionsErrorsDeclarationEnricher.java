@@ -8,18 +8,13 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_GENERATE;
-import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_ERROR_RESPONSE_SEND;
-import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_GENERATE;
-import static org.mule.runtime.extension.api.error.MuleErrors.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.loader.enricher.ModuleErrors.RETRY_EXHAUSTED;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
@@ -40,7 +35,7 @@ import java.util.Set;
  */
 public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher {
 
-  private static final String MULE = CORE_NAMESPACE_NAME;
+  private static String ERROR_MASK = "Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it";
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -49,12 +44,9 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
 
   private class EnricherDelegate implements DeclarationEnricher {
 
-    private ErrorsModelFactory muleErrorsModelFactory;
-
     @Override
     public void enrich(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      muleErrorsModelFactory = new ErrorsModelFactory(MuleErrors.class.getEnumConstants(), MULE);
       Set<ErrorModel> errorModels = extensionDeclaration.getErrorModels();
       new IdempotentDeclarationWalker() {
 
@@ -65,37 +57,15 @@ public class ExtensionsErrorsDeclarationEnricher implements DeclarationEnricher 
             operationDeclaration.addErrorModel(getErrorModel(RETRY_EXHAUSTED, errorModels, operationDeclaration));
           }
         }
-
-        @Override
-        protected void onSource(WithSourcesDeclaration owner, SourceDeclaration sourceDeclaration) {
-          sourceDeclaration.getSuccessCallback().ifPresent(callback -> {
-            registerError(SOURCE_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-            registerError(SOURCE_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-          });
-
-          sourceDeclaration.getErrorCallback().ifPresent(callback -> {
-            registerError(SOURCE_ERROR_RESPONSE_SEND, sourceDeclaration, extensionDeclaration);
-            registerError(SOURCE_ERROR_RESPONSE_GENERATE, sourceDeclaration, extensionDeclaration);
-          });
-        }
       }.walk(extensionDeclaration);
     }
+  }
 
-    private void registerError(MuleErrors error, SourceDeclaration sourceDeclaration, ExtensionDeclaration extensionDeclaration) {
-      ErrorModel errorModel = muleErrorsModelFactory.getErrorModel(error);
-      extensionDeclaration.addErrorModel(errorModel);
-      sourceDeclaration.addErrorModel(errorModel);
-    }
-
-    private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDefinition, Set<ErrorModel> errorModels,
-                                     ComponentDeclaration component) {
-      return errorModels
-          .stream()
-          .filter(error -> !error.getNamespace().equals(MULE) && error.getType().equals(errorTypeDefinition.getType()))
-          .findFirst()
-          .orElseThrow(() -> new IllegalModelDefinitionException(
-                                                                 format("Trying to add the '%s' Error to the Component '%s' but the Extension doesn't declare it",
-                                                                        errorTypeDefinition, component.getName())));
-    }
+  private ErrorModel getErrorModel(ErrorTypeDefinition<?> errorTypeDef, Set<ErrorModel> errors, ComponentDeclaration component) {
+    return errors
+        .stream()
+        .filter(e -> !e.getNamespace().equals(CORE_NAMESPACE_NAME) && e.getType().equals(errorTypeDef.getType()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalModelDefinitionException(format(ERROR_MASK, errorTypeDef, component.getName())));
   }
 }

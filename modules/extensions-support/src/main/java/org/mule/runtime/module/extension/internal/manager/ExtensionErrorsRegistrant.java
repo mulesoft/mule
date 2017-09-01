@@ -93,7 +93,7 @@ class ExtensionErrorsRegistrant {
 
   private ErrorType getErrorType(ErrorModel errorModel) {
     ComponentIdentifier identifier = createIdentifier(errorModel.getType(), errorModel.getNamespace());
-    Optional<ErrorType> optionalError = errorTypeRepository.lookupErrorType(identifier);
+    Optional<ErrorType> optionalError = errorTypeRepository.getErrorType(identifier);
     return optionalError.orElseGet(() -> createErrorType(errorModel, identifier));
   }
 
