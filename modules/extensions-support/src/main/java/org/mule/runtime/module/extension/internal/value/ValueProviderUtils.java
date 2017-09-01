@@ -6,21 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
+import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
- * Utility class for {@link ValueProviderMediator}
+ * Utility class for {@link ValueProvider} related objects
  *
  * @since 4.0
  */
-class ValueProviderMediatorUtils {
+public class ValueProviderUtils {
 
   /**
    * Given a {@link Value}, this is navigated recursively cloning each {@link Value} of the tree structure creating a
@@ -59,4 +63,17 @@ class ValueProviderMediatorUtils {
         .collect(toMap(param -> param.getValueProviderModel().get().getPartOrder(), NamedObject::getName));
   }
 
+  /**
+   * Given a list of {@link ParameterModel} retrieves all the parameters that have an associated {@link ValueProviderModel}
+   *
+   * @param parameterModels Parameters to introspect
+   * @return The {@link List} of {@link ParameterModel} that have an associated {@link ValueProviderModel}
+   */
+  public static List<ValueProviderModel> getValueProviderModels(List<ParameterModel> parameterModels) {
+    return parameterModels.stream()
+        .map(ParameterModel::getValueProviderModel)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
+  }
 }

@@ -19,15 +19,16 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
-
-import java.util.Optional;
-import java.util.function.Supplier;
+import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -60,13 +61,36 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return initializeComponent(locationWithOutConnection(location))
+    return initializeComponent(location, providerName)
         .orElseGet(() -> providerService.getValues(location, providerName));
   }
 
-  private Optional<ValueResult> initializeComponent(Location location) {
+  @Override
+  public Optional<ValueProviderModel> getModel(Location location, String providerName) {
+    return providerService.getModel(location, providerName);
+  }
+
+  private Optional<ValueResult> initializeComponent(Location location, String providerName) {
+    Location locationWithOutConnection = locationWithOutConnection(location);
+
     try {
-      lazyMuleArtifactContext.initializeComponent(location);
+      lazyMuleArtifactContext.createComponent(locationWithOutConnection);
+
+      ValueProviderModel valueProviderModel = providerService.getModel(location, providerName)
+          .orElseThrow(() -> new ValueResolvingException(format("Unable to retrieve the model for the provider: [%s] in the location: [%s]",
+                                                                providerName, location),
+                                                         INVALID_LOCATION));
+
+      if (valueProviderModel.requiresConnection() || valueProviderModel.requiresConfiguration()) {
+        // All components are initialized to be able to retrieve the configuration or connection
+        lazyMuleArtifactContext.initializeComponent(location);
+      }
+
+    } catch (ValueResolvingException e) {
+      return of(resultFrom(newFailure(e)
+          .withFailureCode(e.getFailureCode())
+          .build()));
+
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {
@@ -81,6 +105,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
           .withFailureCode(UNKNOWN)
           .build()));
     }
+
     return empty();
   }
 

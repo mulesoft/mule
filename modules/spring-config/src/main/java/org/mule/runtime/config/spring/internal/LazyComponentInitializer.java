@@ -9,6 +9,8 @@ package org.mule.runtime.config.spring.internal;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
+import java.util.List;
+
 /**
  * Initializer for the creation of lazy resources.
  *
@@ -17,7 +19,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 public interface LazyComponentInitializer {
 
   /**
-   * Calling this method guarantees that the requested component from the configuration will be created.
+   * Calling this method guarantees that the requested component from the configuration will be created and
+   * initialized.
    * <p/>
    * The requested component must exists in the configuration.
    *
@@ -25,5 +28,16 @@ public interface LazyComponentInitializer {
    * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponent(Location location);
+
+  /**
+   * Calling this method guarantees that the requested component from the configuration will be created.
+   * <p/>
+   * The requested component must exists in the configuration.
+   *
+   * @param location the location of the configuration component.
+   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
+   * @return The {@link List} of created component's names
+   */
+  List<String> createComponent(Location location);
 
 }
