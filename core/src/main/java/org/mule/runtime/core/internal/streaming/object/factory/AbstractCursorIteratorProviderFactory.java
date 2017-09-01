@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object.factory;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.InternalEvent;

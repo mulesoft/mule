@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategy;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.dsl.api.component;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 
 /**

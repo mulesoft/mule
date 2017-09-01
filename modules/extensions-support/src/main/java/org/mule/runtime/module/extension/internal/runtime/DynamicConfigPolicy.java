@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 

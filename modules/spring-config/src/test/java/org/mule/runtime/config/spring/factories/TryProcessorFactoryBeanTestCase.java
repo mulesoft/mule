@@ -10,7 +10,7 @@ import static java.util.Collections.singletonMap;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import org.mule.runtime.config.spring.internal.factories.TryProcessorFactoryBean;

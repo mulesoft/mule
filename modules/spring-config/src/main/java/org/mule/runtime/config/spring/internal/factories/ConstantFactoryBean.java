@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.internal.factories;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.time.Time;
 
 import java.util.Optional;

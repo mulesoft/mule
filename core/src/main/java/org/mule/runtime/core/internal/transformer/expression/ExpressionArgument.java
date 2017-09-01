@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transformer.expression;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;

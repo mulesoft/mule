@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.streaming.bytes;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 

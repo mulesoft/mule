@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.retry.policy;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;

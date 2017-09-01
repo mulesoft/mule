@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.object;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;

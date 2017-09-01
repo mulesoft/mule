@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.api.meta.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.TYPE_ERROR;
 import static org.mule.runtime.core.api.context.notification.ExceptionNotification.EXCEPTION_ACTION;
 

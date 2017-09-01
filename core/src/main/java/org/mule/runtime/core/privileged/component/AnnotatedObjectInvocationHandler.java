@@ -15,7 +15,7 @@ import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 
 import java.util.Objects;
 import java.util.function.Predicate;

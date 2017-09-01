@@ -6,7 +6,7 @@
  */
 package org.mule.test.subtypes.extension;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 
 public final class FinalPojo extends AbstractComponent {
 

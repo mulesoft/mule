@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.core.api.time.TimeSupplier;
 

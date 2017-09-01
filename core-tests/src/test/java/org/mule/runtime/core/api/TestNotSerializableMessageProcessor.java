@@ -8,7 +8,7 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AbstractComponent;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
 
 public class TestNotSerializableMessageProcessor extends AbstractComponent implements Processor {

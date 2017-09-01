@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.component;
 
-import static org.mule.runtime.api.meta.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import org.mule.runtime.api.component.Component;
 
 import java.util.HashMap;
