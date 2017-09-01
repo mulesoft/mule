@@ -91,9 +91,9 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
   @Override
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
     checkIfErrorIsAlreadyRegistered(errorTypeIdentifier, ImmutableMap.<ComponentIdentifier, ErrorType>builder()
-                                                           .putAll(errorTypes)
-                                                           .putAll(internalErrorTypes)
-                                                           .build());
+        .putAll(errorTypes)
+        .putAll(internalErrorTypes)
+        .build());
     ErrorType errorType = buildErrorType(errorTypeIdentifier, parentErrorType);
     errorTypes.put(errorTypeIdentifier, errorType);
     return errorType;
@@ -118,10 +118,10 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
 
   private ErrorType buildErrorType(ComponentIdentifier identifier, ErrorType parent) {
     return ErrorTypeBuilder.builder()
-             .namespace(identifier.getNamespace())
-             .identifier(identifier.getName())
-             .parentErrorType(parent)
-             .build();
+        .namespace(identifier.getNamespace())
+        .identifier(identifier.getName())
+        .parentErrorType(parent)
+        .build();
   }
 
   /**
