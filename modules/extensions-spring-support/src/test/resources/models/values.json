@@ -37,7 +37,10 @@
                   "required2"
                 ],
                 "partOrder": 1,
-                "providerName": "channel"
+                "providerName": "channel",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -365,7 +368,10 @@
                   "anyParameter"
                 ],
                 "partOrder": 1,
-                "providerName": "valueParam"
+                "providerName": "valueParam",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -405,7 +411,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -712,7 +721,10 @@
                   "anyParameter"
                 ],
                 "partOrder": 1,
-                "providerName": "valueParam"
+                "providerName": "valueParam",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -752,7 +764,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -1202,7 +1217,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channels"
+                    "providerName": "channels",
+                    "requiresConfiguration": true,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1454,7 +1472,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channels"
+                    "providerName": "channels",
+                    "requiresConfiguration": false,
+                    "requiresConnection": true,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1653,7 +1674,10 @@
                       "required2"
                     ],
                     "partOrder": 1,
-                    "providerName": "channel"
+                    "providerName": "channel",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1934,7 +1958,10 @@
                       "anyParameter"
                     ],
                     "partOrder": 1,
-                    "providerName": "valueParam"
+                    "providerName": "valueParam",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -1974,7 +2001,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channels"
+                    "providerName": "channels",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2234,7 +2264,10 @@
                       "anyParameter"
                     ],
                     "partOrder": 1,
-                    "providerName": "valueParam"
+                    "providerName": "valueParam",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2274,7 +2307,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channels"
+                    "providerName": "channels",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -2754,7 +2790,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channel"
+                    "providerName": "channel",
+                    "requiresConfiguration": false,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -3015,7 +3054,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channel"
+                    "providerName": "channel",
+                    "requiresConfiguration": true,
+                    "requiresConnection": false,
+                    "isOpen": true
                   },
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -3408,7 +3450,10 @@
                   "valueProviderModel": {
                     "actingParameters": [],
                     "partOrder": 1,
-                    "providerName": "channel"
+                    "providerName": "channel",
+                    "requiresConfiguration": false,
+                    "requiresConnection": true,
+                    "isOpen": true
                   },
                   "expressionSupport": "NOT_SUPPORTED",
                   "role": "BEHAVIOUR",
@@ -3772,7 +3817,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channel"
+                "providerName": "channel",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4110,7 +4158,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "AMERICA",
@@ -4142,7 +4193,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 2,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "USA",
@@ -4174,7 +4228,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 3,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "SFO",
@@ -4266,7 +4323,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channel"
+                "providerName": "channel",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4349,7 +4409,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4432,7 +4495,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4548,7 +4614,10 @@
                   "anyParameter"
                 ],
                 "partOrder": 1,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4588,7 +4657,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4707,7 +4779,10 @@
                   "strings"
                 ],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -4958,7 +5033,10 @@
                   "superString"
                 ],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -5048,7 +5126,10 @@
                   "anyParameter"
                 ],
                 "partOrder": 1,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -5088,7 +5169,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -5206,7 +5290,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channel"
+                "providerName": "channel",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -5802,7 +5889,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "AMERICA",
@@ -5834,7 +5924,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 2,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "USA",
@@ -5866,7 +5959,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 3,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "defaultValue": "SFO",
@@ -6103,7 +6199,10 @@
                   "anyParameter"
                 ],
                 "partOrder": 1,
-                "providerName": "values"
+                "providerName": "values",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
@@ -6310,7 +6409,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -6771,7 +6873,10 @@
                   "superString"
                 ],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -7178,7 +7283,10 @@
               "valueProviderModel": {
                 "actingParameters": [],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "SUPPORTED",
               "role": "BEHAVIOUR",
@@ -7440,7 +7548,10 @@
                   "strings"
                 ],
                 "partOrder": 1,
-                "providerName": "channels"
+                "providerName": "channels",
+                "requiresConfiguration": false,
+                "requiresConnection": false,
+                "isOpen": true
               },
               "expressionSupport": "NOT_SUPPORTED",
               "role": "BEHAVIOUR",
