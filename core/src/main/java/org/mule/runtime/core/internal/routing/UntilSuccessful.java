@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrat
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,16 +33,13 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,8 +47,6 @@ import reactor.core.publisher.Mono;
  * exception has been raised and, optionally, if the response matches an expression.
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(UntilSuccessful.class);
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
@@ -82,7 +76,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
     super.initialise();
     timer = muleContext.getSchedulerService().cpuLightScheduler();
     policyTemplate =
-        new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries, timer);
+        new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
     shouldRetry = event -> event.getError().isPresent();
     Object rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
     if (rootContainer instanceof FlowConstruct) {

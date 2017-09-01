@@ -6,20 +6,25 @@
  */
 package org.mule.runtime.core.internal.retry.policies;
 
+import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMillis;
+import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
-import static reactor.core.publisher.Flux.range;
+import static org.mule.runtime.core.internal.retry.reactor.Retry.onlyIf;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.reactor.BackoffDelay;
+import org.mule.runtime.core.internal.retry.reactor.Retry;
+import org.mule.runtime.core.internal.retry.reactor.RetryExhaustedException;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -27,29 +32,24 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.util.function.Tuples;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
  */
 public class SimpleRetryPolicy implements RetryPolicy {
 
-  protected static final Logger logger = LoggerFactory.getLogger(SimpleRetryPolicy.class);
+  protected static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
 
   protected RetryCounter retryCounter;
 
   private volatile int count = SimpleRetryPolicyTemplate.DEFAULT_RETRY_COUNT;
-  private volatile long frequency = SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY;
-  private Scheduler timer;
+  private volatile Duration frequency = ofMillis(SimpleRetryPolicyTemplate.DEFAULT_FREQUENCY);
 
-  public SimpleRetryPolicy(long frequency, int retryCount, ScheduledExecutorService timer) {
-    this.frequency = frequency;
+  public SimpleRetryPolicy(long frequency, int retryCount) {
+    this.frequency = ofMillis(frequency);
     this.count = retryCount;
     this.retryCounter = new RetryCounter();
-    this.timer = fromExecutorService(timer);
   }
 
   @Override
@@ -57,36 +57,49 @@ public class SimpleRetryPolicy implements RetryPolicy {
                                       Predicate<Throwable> shouldRetry,
                                       Consumer<Throwable> onExhausted,
                                       Function<Throwable, Throwable> errorFunction) {
-    final int actualCount = count + 1;
-    return from(publisher).retryWhen(errors -> errors.zipWith(range(1, actualCount), Tuples::of)
-        .flatMap(tuple -> {
-          final Throwable exception = tuple.getT1();
-          if (tuple.getT2() == actualCount || !shouldRetry.test(exception)) {
-            onExhausted.accept(exception);
-            return (Mono<T>) error(errorFunction.apply(exception));
-          } else {
-            if (isTransactionActive()) {
-              return just(delay(ofMillis(frequency), timer).block());
-            } else {
-              return delay(ofMillis(frequency), timer);
+    return from(publisher)
+        .onErrorResume(e -> {
+          if (shouldRetry.test(e)) {
+            Retry<T> retry = (Retry<T>) onlyIf(ctx -> shouldRetry.test(unwrap(ctx.exception())))
+                .backoff(ctx -> new BackoffDelay(frequency, ZERO, ZERO));
+
+            if (count != RETRY_COUNT_FOREVER) {
+              retry = retry.retryMax(count - 1);
             }
+
+            Mono<T> retryMono = from(publisher)
+                .retryWhen(retry)
+                .doOnError(e2 -> onExhausted.accept(unwrap(e2)))
+                .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
+
+            if (isTransactionActive()) {
+              retryMono = just(retryMono.block());
+            }
+
+            return delay(frequency).then(retryMono);
+
+          } else {
+            e = unwrap(e);
+            onExhausted.accept(e);
+            return error(errorFunction.apply(e));
           }
-        }));
+        });
   }
 
   public PolicyStatus applyPolicy(Throwable cause) {
-
     if (isExhausted() || !isApplicableTo(cause)) {
       return PolicyStatus.policyExhausted(cause);
     } else {
-      if (logger.isInfoEnabled()) {
-        logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt " + (retryCounter.current().get() + 1)
-            + " of " + (count != SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited"));
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info(
+                    "Waiting for " + frequency.toMillis() + "ms before reconnecting. Failed attempt "
+                        + (retryCounter.current().get() + 1)
+                        + " of " + (count != RETRY_COUNT_FOREVER ? String.valueOf(count) : "unlimited"));
       }
 
       try {
         retryCounter.current().getAndIncrement();
-        Thread.sleep(frequency);
+        Thread.sleep(frequency.toMillis());
         return PolicyStatus.policyOk();
       } catch (InterruptedException e) {
         // If we get an interrupt exception, some one is telling us to stop
@@ -109,14 +122,10 @@ public class SimpleRetryPolicy implements RetryPolicy {
    * Determines if the policy is exhausted or not comparing the original configuration against the current state.
    */
   protected boolean isExhausted() {
-    return count != SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER && retryCounter.current().get() >= count;
+    return count != RETRY_COUNT_FOREVER && retryCounter.current().get() >= count;
   }
 
   protected static class RetryCounter extends ThreadLocal<AtomicInteger> {
-
-    public int countRetry() {
-      return get().incrementAndGet();
-    }
 
     public void reset() {
       get().set(0);
