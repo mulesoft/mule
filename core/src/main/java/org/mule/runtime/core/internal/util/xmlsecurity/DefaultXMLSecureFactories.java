@@ -149,7 +149,7 @@ public class DefaultXMLSecureFactories {
   }
 
   public TransformerFactory createSaxonTransformerFactory() {
-    TransformerFactory factory = new SaxonTransformerFactory();
+    TransformerFactory factory = SaxonTransformerFactory.newInstance();
 
     configureTransformerFactory(factory);
 
