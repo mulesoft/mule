@@ -190,7 +190,8 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     return values;
   }
 
-  private <T> T withConnectionProviderInfo(WithConnectionProviderInfo<T> info) throws ValueResolvingException {
+  private <T> T withConnectionProviderInfo(WithConnectionProviderInfo<T> withConnectionProviderInfoCallable)
+      throws ValueResolvingException {
     ConnectionProvider<?> connectionProvider = configuration.getConnectionProvider()
         .orElseThrow(() -> new ValueResolvingException("Unable to obtain the Connection Provider Instance", UNKNOWN));
 
@@ -200,7 +201,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
             .orElseThrow(() -> new ValueResolvingException("Internal error. Unable to obtain the Connection Provider Model",
                                                            UNKNOWN));
 
-    return info.execute(unwrap, connectionProviderModel);
+    return withConnectionProviderInfoCallable.execute(unwrap, connectionProviderModel);
   }
 
   @FunctionalInterface

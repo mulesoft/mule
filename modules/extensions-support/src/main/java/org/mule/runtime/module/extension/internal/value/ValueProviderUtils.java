@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.values.ValueProvider;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Utility class for {@link ValueProvider} related objects
@@ -71,9 +71,8 @@ public class ValueProviderUtils {
    */
   public static List<ValueProviderModel> getValueProviderModels(List<ParameterModel> parameterModels) {
     return parameterModels.stream()
-        .map(ParameterModel::getValueProviderModel)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .map(parameterModel -> parameterModel.getValueProviderModel().orElse(null))
+        .filter(Objects::nonNull)
         .collect(toList());
   }
 }

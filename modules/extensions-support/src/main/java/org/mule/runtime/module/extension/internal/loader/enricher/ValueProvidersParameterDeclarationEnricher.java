@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarat
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -49,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -148,8 +148,8 @@ public class ValueProvidersParameterDeclarationEnricher extends AbstractAnnotate
     resolverParameters.forEach(param -> propertyBuilder
         .withInjectableParameter(param.getName(), param.getMetadataType(typeLoader), param.isRequired()));
 
-    AtomicBoolean requiresConfiguration = new AtomicBoolean(false);
-    AtomicBoolean requiresConnection = new AtomicBoolean(false);
+    Reference<Boolean> requiresConfiguration = new Reference<>(false);
+    Reference<Boolean> requiresConnection = new Reference<>(false);
 
     enrichWithConnection(propertyBuilder, resolverClassWrapper)
         .ifPresent(field -> requiresConnection.set(true));

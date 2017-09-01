@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.value;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.deleteLastPartFromLocation;
@@ -16,8 +15,6 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.INVA
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -29,7 +26,6 @@ import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import javax.inject.Inject;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -52,20 +48,6 @@ public class MuleValueProviderService implements ValueProviderService {
   @Override
   public ValueResult getValues(Location location, String providerName) {
     return getValueResult(() -> this.findValueProvider(location, providerName).resolve());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Optional<ValueProviderModel> getModel(Location location, String providerName) {
-    boolean isConnection = isConnection(location);
-
-    if (isConnection) {
-      location = deleteLastPartFromLocation(location);
-    }
-
-    return getModel(location, isConnection, providerName);
   }
 
   /**
@@ -127,26 +109,5 @@ public class MuleValueProviderService implements ValueProviderService {
         .orElseThrow(() -> new ValueResolvingException(format("Invalid location [%s]. No element found in the given location.",
                                                               location),
                                                        INVALID_LOCATION));
-  }
-
-  private Optional<ValueProviderModel> getModel(Location location, boolean isConnection, String providerName) {
-    Reference<ValueProviderModel> model = new Reference<>();
-
-    componentLocator.find(location).ifPresent(provider -> {
-      try {
-        if (provider instanceof ComponentValueProvider) {
-          model.set(((ComponentValueProvider) provider).getModels(providerName).get(0));
-        } else if (provider instanceof ConfigurationParameterValueProvider) {
-          if (isConnection) {
-            model.set(((ConfigurationParameterValueProvider) provider).getConnectionModels(providerName).get(0));
-          } else {
-            model.set(((ConfigurationParameterValueProvider) provider).getConfigModels(providerName).get(0));
-          }
-        }
-      } catch (Exception ignored) {
-      }
-    });
-
-    return ofNullable(model.get());
   }
 }

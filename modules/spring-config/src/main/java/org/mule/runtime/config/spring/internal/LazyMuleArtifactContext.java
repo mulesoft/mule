@@ -87,7 +87,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
                                                                      new LazyValueProviderService(this,
                                                                                                   () -> muleContext
                                                                                                       .getRegistry()
-                                                                                                      .get(NON_LAZY_VALUE_PROVIDER_SERVICE)));
+                                                                                                      .get(NON_LAZY_VALUE_PROVIDER_SERVICE),
+                                                                                                  muleContext::getConfigurationComponentLocator));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
   }
@@ -131,14 +132,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    */
   @Override
   public void initializeComponent(Location location) {
-    applyLifecycle(createComponent(location));
+    applyLifecycle(createComponents(location));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public List<String> createComponent(Location location) {
+  public void createComponent(Location location) {
+    createComponents(location);
+  }
+
+  private List<String> createComponents(Location location) {
     Reference<List<String>> createdComponents = new Reference<>();
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
