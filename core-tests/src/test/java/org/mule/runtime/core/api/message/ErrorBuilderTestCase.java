@@ -118,11 +118,6 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
       return Message.of(TEST_PAYLOAD);
     }
 
-    @Override
-    public Throwable getRootCause() {
-      return this;
-    }
-
   }
 
 }

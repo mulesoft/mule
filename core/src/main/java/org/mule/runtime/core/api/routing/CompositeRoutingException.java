@@ -91,8 +91,4 @@ public class CompositeRoutingException extends MuleException implements Composed
     return of(routingResult);
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
 }

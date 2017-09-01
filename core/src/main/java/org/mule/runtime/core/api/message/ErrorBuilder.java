@@ -53,16 +53,14 @@ public final class ErrorBuilder {
    * @param e the exception to use from which the error will be created.
    */
   private ErrorBuilder(Throwable e) {
-    Throwable exception = e;
     if (e instanceof ErrorMessageAwareException) {
-      exception = ((ErrorMessageAwareException) e).getRootCause();
       this.errorMessage = ((ErrorMessageAwareException) e).getErrorMessage();
     }
     if (e instanceof ComposedErrorException) {
       this.errors = ((ComposedErrorException) e).getErrors();
     }
-    this.exception = exception;
-    String exceptionDescription = exception.getMessage() != null ? exception.getMessage() : "unknown description";
+    this.exception = e;
+    String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
     MuleException muleRoot = getRootMuleException(this.exception);
