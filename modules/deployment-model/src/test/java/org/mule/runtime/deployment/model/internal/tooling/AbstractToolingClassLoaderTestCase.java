@@ -59,6 +59,7 @@ public abstract class AbstractToolingClassLoaderTestCase extends AbstractMuleTes
     protected boolean disposed = false;
 
     public TestToolingPluginClassLoader(ArtifactPluginDescriptor artifactPluginDescriptor) {
+      super(null);
       this.artifactPluginDescriptor = artifactPluginDescriptor;
     }
 

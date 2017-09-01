@@ -25,6 +25,10 @@ public class TestClassLoader extends ClassLoader {
   private Map<String, InputStream> streamResources = new HashMap<>();
   private Map<String, String> libraries = new HashMap<>();
 
+  public TestClassLoader(ClassLoader parent) {
+    super(parent);
+  }
+
   @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {
     return findClass(name);
@@ -41,7 +45,11 @@ public class TestClassLoader extends ClassLoader {
 
   @Override
   public URL getResource(String s) {
-    return resources.get(s);
+    URL url = resources.get(s);
+    if (url == null && getParent() != null) {
+      url = getParent().getResource(s);
+    }
+    return url;
   }
 
   @Override

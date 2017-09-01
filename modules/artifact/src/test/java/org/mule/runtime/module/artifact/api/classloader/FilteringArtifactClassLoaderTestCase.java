@@ -20,12 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.tck.util.EnumerationMatcher.equalTo;
-
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
-import org.mule.runtime.module.artifact.api.classloader.ExportedService;
-import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,10 +45,10 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
-  public static final String CLASS_NAME = "java.lang.Object";
+  private static final String CLASS_NAME = "java.lang.Object";
   public static final String RESOURCE_NAME = "dummy.txt";
   private static final String SERVICE_INTERFACE_NAME = "org.foo.Service";
-  public static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
+  private static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
 
 
   @Rule
@@ -104,7 +99,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void loadsExportedClass() throws ClassNotFoundException {
-    TestClassLoader classLoader = new TestClassLoader();
+    TestClassLoader classLoader = new TestClassLoader(null);
     Class expectedClass = this.getClass();
     classLoader.addClass(CLASS_NAME, expectedClass);
 
@@ -154,7 +149,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void filtersResources() throws Exception {
-    TestClassLoader classLoader = new TestClassLoader();
+    TestClassLoader classLoader = new TestClassLoader(null);
     URL blockedResource = new URL("file:///app.txt");
     classLoader.addResource(RESOURCE_NAME, blockedResource);
 

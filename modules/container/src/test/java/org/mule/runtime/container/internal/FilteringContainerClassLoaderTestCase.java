@@ -40,7 +40,7 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
   @Test
   @Override
   public void loadsExportedResource() throws ClassNotFoundException, MalformedURLException {
-    TestClassLoader classLoader = new TestClassLoader();
+    TestClassLoader classLoader = new TestClassLoader(null);
     URL expectedResource = new URL("file:///app.txt");
     classLoader.addResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME, expectedResource);
 
@@ -56,7 +56,7 @@ public class FilteringContainerClassLoaderTestCase extends FilteringArtifactClas
   @Test
   @Override
   public void getsExportedResources() throws Exception {
-    TestClassLoader classLoader = new TestClassLoader();
+    TestClassLoader classLoader = new TestClassLoader(null);
     URL resource = new URL("file:/app.txt");
     classLoader.addResource(FilteringArtifactClassLoaderTestCase.RESOURCE_NAME, resource);
 
