@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
@@ -27,6 +27,8 @@ import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Repository for the different {@link ErrorType Error Types} in a mule artifact.
@@ -88,7 +90,13 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
    */
   @Override
   public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    return addErrorTypeTo(errorTypeIdentifier, parentErrorType, this.errorTypes);
+    checkIfErrorIsAlreadyRegistered(errorTypeIdentifier, ImmutableMap.<ComponentIdentifier, ErrorType>builder()
+                                                           .putAll(errorTypes)
+                                                           .putAll(internalErrorTypes)
+                                                           .build());
+    ErrorType errorType = buildErrorType(errorTypeIdentifier, parentErrorType);
+    errorTypes.put(errorTypeIdentifier, errorType);
+    return errorType;
   }
 
   /**
@@ -96,19 +104,24 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
    */
   @Override
   public ErrorType addInternalErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
-    return addErrorTypeTo(errorTypeIdentifier, parentErrorType, this.internalErrorTypes);
+    checkIfErrorIsAlreadyRegistered(errorTypeIdentifier, internalErrorTypes);
+    ErrorType errorType = buildErrorType(errorTypeIdentifier, parentErrorType);
+    internalErrorTypes.put(errorTypeIdentifier, errorType);
+    return errorType;
   }
 
-  private ErrorType addErrorTypeTo(ComponentIdentifier identifier, ErrorType parent, Map<ComponentIdentifier, ErrorType> map) {
-    ErrorTypeBuilder errorTypeBuilder =
-        ErrorTypeBuilder.builder().namespace(identifier.getNamespace())
-            .identifier(identifier.getName())
-            .parentErrorType(parent);
-    ErrorType errorType = errorTypeBuilder.build();
-    if (map.put(identifier, errorType) != null) {
-      throw new IllegalStateException(format("An error type with identifier %s already exists", identifier));
+  private void checkIfErrorIsAlreadyRegistered(ComponentIdentifier errorTypeIdentifier, Map<ComponentIdentifier, ?> map) {
+    if (map.containsKey(errorTypeIdentifier)) {
+      throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));
     }
-    return errorType;
+  }
+
+  private ErrorType buildErrorType(ComponentIdentifier identifier, ErrorType parent) {
+    return ErrorTypeBuilder.builder()
+             .namespace(identifier.getNamespace())
+             .identifier(identifier.getName())
+             .parentErrorType(parent)
+             .build();
   }
 
   /**
