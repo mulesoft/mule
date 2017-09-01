@@ -152,6 +152,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -722,6 +728,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -871,6 +883,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -1510,6 +1528,12 @@
                 }
               ],
               "exclusiveParametersModels": [],
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
               "showInDsl": false,
               "name": "General",
               "description": "",
@@ -2158,6 +2182,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
@@ -2797,6 +2827,12 @@
             }
           ],
           "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
           "showInDsl": false,
           "name": "General",
           "description": "",
