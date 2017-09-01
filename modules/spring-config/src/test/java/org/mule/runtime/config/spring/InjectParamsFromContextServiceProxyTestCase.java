@@ -18,7 +18,7 @@ import static org.mule.runtime.config.spring.internal.InjectParamsFromContextSer
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.container.api.MuleInvocationHandler;
+import org.mule.runtime.container.api.ReflectiveInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.Preferred;
@@ -187,7 +187,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void throughProxyAugmentedInvocation() throws Exception {
     BaseService service = new AugmentedMethodService();
 
-    final MuleInvocationHandler noOpHandler = new MuleInvocationHandler(service) {
+    final ReflectiveInvocationHandler noOpHandler = new ReflectiveInvocationHandler(service) {
 
       @Override
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

@@ -15,11 +15,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class LifecycleFilterProxyTestCase {
+public class LifecycleFilterProxyTestCase extends AbstractMuleTestCase {
 
   private ProxiedObjectImplementation innerObject;
   private ProxiedObject proxiedObject;

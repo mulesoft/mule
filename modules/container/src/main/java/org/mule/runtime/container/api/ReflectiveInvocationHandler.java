@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * @since 4.0
  */
-public abstract class MuleInvocationHandler<T> implements InvocationHandler {
+public abstract class ReflectiveInvocationHandler<T> implements InvocationHandler {
 
   private final T innerObject;
 
@@ -36,7 +36,7 @@ public abstract class MuleInvocationHandler<T> implements InvocationHandler {
    *
    * @param innerObject object instance to wrap. Non null.
    */
-  protected MuleInvocationHandler(T innerObject) {
+  protected ReflectiveInvocationHandler(T innerObject) {
     checkArgument(innerObject != null, "service cannot be null");
     this.innerObject = innerObject;
   }
@@ -45,9 +45,8 @@ public abstract class MuleInvocationHandler<T> implements InvocationHandler {
    * @return the methods declared in the implementation of the proxied service.
    */
   protected Method[] getImplementationDeclaredMethods() {
-    if (isProxyClass(getProxiedObject().getClass())
-        && getInvocationHandler(getProxiedObject()) instanceof MuleInvocationHandler) {
-      return ((MuleInvocationHandler) getInvocationHandler(getProxiedObject())).getImplementationDeclaredMethods();
+    if (isNestedProxy()) {
+      return ((ReflectiveInvocationHandler) getInvocationHandler(getProxiedObject())).getImplementationDeclaredMethods();
     } else {
       List<Method> methods = new LinkedList<>();
       Class<?> clazz = getProxiedObject().getClass();
@@ -66,8 +65,7 @@ public abstract class MuleInvocationHandler<T> implements InvocationHandler {
    * See {@link InvocationHandler#invoke(Object, Method, Object[])}
    */
   protected Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {
-    if (isProxyClass(getProxiedObject().getClass())
-        && getInvocationHandler(getProxiedObject()) instanceof MuleInvocationHandler) {
+    if (isNestedProxy()) {
       return getInvocationHandler(getProxiedObject()).invoke(getProxiedObject(), method, args);
     } else {
       try {
@@ -85,5 +83,10 @@ public abstract class MuleInvocationHandler<T> implements InvocationHandler {
    */
   protected T getProxiedObject() {
     return innerObject;
+  }
+
+  private boolean isNestedProxy() {
+    return isProxyClass(getProxiedObject().getClass())
+        && getInvocationHandler(getProxiedObject()) instanceof ReflectiveInvocationHandler;
   }
 }

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterface
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.container.api.MuleInvocationHandler;
+import org.mule.runtime.container.api.ReflectiveInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,8 +21,10 @@ import java.lang.reflect.Method;
 /**
  * Proxies an object instance to filter invocations (without raising an exception) of lifecycle methods from {@link Startable},
  * {@link Stoppable} and {@link Disposable} interfaces.
+ *
+ * @since 4.0
  */
-public class LifecycleFilterProxy<T> extends MuleInvocationHandler<T> {
+public class LifecycleFilterProxy<T> extends ReflectiveInvocationHandler<T> {
 
   /**
    * Creates a new proxy for the provided object instance.
