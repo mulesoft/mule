@@ -9,9 +9,6 @@ package org.mule.runtime.core.internal.config.preferred;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.mule.runtime.core.internal.config.preferred.Preferred;
-import org.mule.runtime.core.internal.config.preferred.PreferredComparator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
