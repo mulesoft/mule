@@ -38,9 +38,6 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +47,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -76,6 +76,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     this.interceptorFactory = interceptorFactory;
   }
 
+  // TODO MULE-13449 Loggers in this method must be INFO
   @Override
   public ReactiveProcessor apply(Processor component, ReactiveProcessor next) {
     if (!isInterceptable(component)) {
@@ -92,7 +93,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
     ReactiveProcessor interceptedProcessor;
     if (implementsAround(interceptor)) {
-      LOGGER.info("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
+      LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
       interceptedProcessor = publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
           .flatMapMany(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
@@ -103,8 +104,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
           })
           .map(doAfter(interceptor, component, empty()));
     } else {
-      LOGGER.info("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
-                  componentLocation.getLocation());
+      LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
+                   componentLocation.getLocation());
       interceptedProcessor = publisher -> from(publisher)
           .map(doBefore(interceptor, component, dslParameters))
           .transform(next)
@@ -115,7 +116,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
           .map(doAfter(interceptor, component, empty()));
     }
 
-    LOGGER.info("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
+    LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;
   }
 

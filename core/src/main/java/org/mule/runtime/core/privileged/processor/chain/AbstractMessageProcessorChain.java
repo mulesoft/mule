@@ -45,6 +45,7 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
@@ -54,6 +55,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,6 +70,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final String name;
   private final List<Processor> processors;
   private ProcessingStrategy processingStrategy;
+  private List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
   private StreamingManager streamingManager;
 
   AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
@@ -156,16 +159,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .map(updateEventForStreaming(streamingManager)));
 
     // #7 Apply processor interceptors.
-    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream()
-        .forEach(interceptorFactory -> {
-          ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-          try {
-            muleContext.getInjector().inject(reactiveInterceptorAdapter);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-          interceptors.add(0, reactiveInterceptorAdapter);
-        });
+    interceptors.addAll(0, additionalInterceptors);
 
 
     // #8 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
@@ -290,6 +284,16 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void initialise() throws InitialisationException {
+    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream().forEach(interceptorFactory -> {
+      ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
+      try {
+        muleContext.getInjector().inject(reactiveInterceptorAdapter);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+      additionalInterceptors.add(0, reactiveInterceptorAdapter);
+    });
+
     try {
       streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
     } catch (RegistrationException e) {
