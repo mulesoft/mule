@@ -161,11 +161,6 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
           }
 
           @Override
-          protected void onConstruct(ConstructModel model) {
-            //TODO
-          }
-
-          @Override
           public void onOperation(OperationModel model) {
             parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
                                                     model, dslSyntaxResolver, parsingContext));

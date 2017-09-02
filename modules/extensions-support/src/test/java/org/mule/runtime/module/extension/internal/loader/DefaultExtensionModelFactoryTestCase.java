@@ -88,8 +88,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void blockingExecutionTypes() {
-    final List<String> blockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper",
-                                                          "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier");
+    final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
+                                                             "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier");
 
     ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
     Reference<Boolean> cpuIntensive = new Reference<>(false);
@@ -100,7 +100,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
       protected void onOperation(OperationModel operation) {
         String operationName = operation.getName();
 
-        assertThat(operation.isBlocking(), is(!blockingOperations.contains(operationName)));
+        assertThat(operation.isBlocking(), is(!nonBlockingOperations.contains(operationName)));
 
         if (operationName.equals("approve")) {
           assertThat(operation.getExecutionType(), is(CPU_INTENSIVE));

@@ -36,23 +36,24 @@
         <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE"/>
     </heisenberg:config>
 
-    <flow name="killMany">
-        <heisenberg:kill-many reason="${killingReason}">
-            <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>
-            </heisenberg:kill-operations>
-        </heisenberg:kill-many>
-    </flow>
+    <!--TODO MULE-13440-->
+    <!--<flow name="killMany">-->
+        <!--<heisenberg:kill-many reason="${killingReason}">-->
+            <!--<heisenberg:kill-operations>-->
+                <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
+                <!--<heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>-->
+                <!--<heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>-->
+            <!--</heisenberg:kill-operations>-->
+        <!--</heisenberg:kill-many>-->
+    <!--</flow>-->
 
-    <flow name="killManyButOnlyOneProvided">
-        <heisenberg:kill-many reason="${killingReason}">
-            <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
-            </heisenberg:kill-operations>
-        </heisenberg:kill-many>
-    </flow>
+    <!--<flow name="killManyButOnlyOneProvided">-->
+        <!--<heisenberg:kill-many reason="${killingReason}">-->
+            <!--<heisenberg:kill-operations>-->
+                <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
+            <!--</heisenberg:kill-operations>-->
+        <!--</heisenberg:kill-many>-->
+    <!--</flow>-->
 
     <flow name="executeAnything">
         <heisenberg:execute-anything>
@@ -125,5 +126,18 @@
                 <set-variable variableName="newAttributes" value="#[attributes]"/>
             </heisenberg:chain>
         </heisenberg:payload-modifier>
+    </flow>
+
+    <flow name="getChain">
+        <heisenberg:get-chain>
+            <heisenberg:chain>
+                <set-variable variableName="newPayload" value="#[payload]"/>
+                <set-variable variableName="newAttributes" value="#[attributes]"/>
+            </heisenberg:chain>
+        </heisenberg:get-chain>
+    </flow>
+
+    <flow name="getCounter">
+        <heisenberg:get-counter/>
     </flow>
 </mule>

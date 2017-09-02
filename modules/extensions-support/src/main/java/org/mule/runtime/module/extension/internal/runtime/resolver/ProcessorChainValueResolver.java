@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ObjectNameHelper;
-import org.mule.runtime.core.internal.processor.chain.ImmutableProcessorChainExecutor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 import org.mule.runtime.extension.api.runtime.process.Chain;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -34,6 +35,8 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
 
   private final MessageProcessorChain chain;
 
+  private AtomicBoolean initialised = new AtomicBoolean(false);
+
   @Inject
   private MuleContext muleContext;
 
@@ -41,8 +44,8 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
     this.chain = chain;
   }
 
-  public ProcessorChainValueResolver(List<Processor> algo) {
-    chain = new DefaultMessageProcessorChainBuilder().chain(algo).build();
+  public ProcessorChainValueResolver(List<Processor> processors) {
+    chain = newChain(empty(), processors);
   }
 
   /**
@@ -54,12 +57,7 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
    */
   @Override
   public Chain resolve(ValueResolvingContext context) throws MuleException {
-    try {
-      muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), chain);
-      initialiseIfNeeded(chain, muleContext);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
-    }
+    initialiseIfNeeded();
     return new ImmutableProcessorChainExecutor(context.getEvent(), chain);
   }
 
@@ -69,6 +67,18 @@ public final class ProcessorChainValueResolver implements ValueResolver<Chain> {
   @Override
   public boolean isDynamic() {
     return false;
+  }
+
+  private void initialiseIfNeeded() {
+    if (!initialised.get()) {
+      try {
+        muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), chain);
+        LifecycleUtils.initialiseIfNeeded(chain, muleContext);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
+      }
+      initialised.set(true);
+    }
   }
 
 }

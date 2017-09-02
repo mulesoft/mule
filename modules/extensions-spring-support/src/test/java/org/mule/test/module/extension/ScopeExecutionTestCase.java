@@ -8,10 +8,13 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
@@ -20,12 +23,7 @@ import org.junit.rules.ExpectedException;
 
 public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
-  public static final String HEISENBERG = "heisenberg";
   private static final String KILL_REASON = "I'm the one who knocks";
-  private static final String GUSTAVO_FRING = "Gustavo Fring";
-  private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
-  private static final String VICTIM = "Skyler";
-  private static final String EMPTY_STRING = "";
 
   @Rule
   public SystemProperty maxRedelivery = new SystemProperty("killingReason", KILL_REASON);
@@ -41,6 +39,26 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   @Override
   protected boolean isDisposeContextPerClass() {
     return true;
+  }
+
+  @Test
+  public void verifyProcessorInitialise() throws Exception {
+    runFlow("getChain").getMessage().getPayload().getValue();
+    runFlow("getChain").getMessage().getPayload().getValue();
+    runFlow("getChain").getMessage().getPayload().getValue();
+    int value = (int) runFlow("getCounter").getMessage().getPayload().getValue();
+    assertThat(value, is(1));
+  }
+
+  @Test
+  public void verifySameProcessorInstance() throws Exception {
+    Object getChainFirst = runFlow("getChain").getMessage().getPayload().getValue();
+    Object getChainSecond = runFlow("getChain").getMessage().getPayload().getValue();
+    assertThat(getChainFirst, is(not(sameInstance(getChainSecond))));
+
+    Object firstChain = ClassUtils.getFieldValue(getChainFirst, "chain", false);
+    Object secondChain = ClassUtils.getFieldValue(getChainSecond, "chain", false);
+    assertThat(firstChain, is(sameInstance(secondChain)));
   }
 
   @Test
@@ -64,7 +82,8 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   public void exceptionOnCallbacksSuccess() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("ON_SUCCESS_EXCEPTION");
+    // When an exception occurs in the "onSuccess", we then invoke the onError
+    expectedException.expectMessage("ON_ERROR_EXCEPTION");
     runFlow("exceptionOnCallbacksSuccess");
   }
 
@@ -76,7 +95,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   }
 
   @Test
-  @org.junit.Ignore("TODO FOREACH")
+  @org.junit.Ignore("MULE-13440")
   public void manyNestedOperations() throws Exception {
     InternalEvent event = runFlow("killMany");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
@@ -86,7 +105,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   }
 
   @Test
-  @org.junit.Ignore("TODO FOREACH")
+  @org.junit.Ignore("MULE-13440")
   public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception {
     InternalEvent event = runFlow("killManyButOnlyOneProvided");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";

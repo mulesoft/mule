@@ -144,11 +144,15 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
         .collect(toList());
   }
 
+  /**
+   * Utility to batch fix input files when severe model changes are introduced.
+   * Use carefully, not a mechanism to get away with anything.
+   * First check why the generated json is different and make sure you're not introducing any bugs.
+   * This should NEVER be committed as true
+   *
+   * @return whether or not the "expected" test files should be updated when comparison fails
+   */
   private boolean shouldUpdateExpectedFilesOnError() {
-    // Utility to batch fix input files when severe model changes are introduced.
-    // Use carefully, not a mechanism to get away with anything.
-    // First check why the generated json is different and make sure you're not introducing any bugs.
-    // This should NEVER be committed as true
     return false;
   }
 

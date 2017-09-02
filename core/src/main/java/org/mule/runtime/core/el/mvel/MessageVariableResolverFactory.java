@@ -30,7 +30,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String PAYLOAD = "payload";
   public static final String ATTRIBUTES = "attributes";
   public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
-  public static final String FLOW_VARS = "vars";
+  public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
   protected InternalEvent event;

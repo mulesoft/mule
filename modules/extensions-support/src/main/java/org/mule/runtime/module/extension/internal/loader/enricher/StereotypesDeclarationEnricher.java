@@ -7,6 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
@@ -31,7 +34,6 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.process.Chain;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -52,7 +54,8 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    new EnricherDelegate().apply(extensionLoadingContext);
+    withContextClassLoader(extensionLoadingContext.getExtensionClassLoader(),
+                           () -> new EnricherDelegate().apply(extensionLoadingContext));
   }
 
   private static class EnricherDelegate {
@@ -76,7 +79,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                 .ifPresent(methodElement -> addStereotypes(extensionDeclarer,
                                                            methodElement,
                                                            declaration,
-                                                           MuleStereotypeFactory.processor()));
+                                                           PROCESSOR));
           }
 
           @Override
@@ -86,7 +89,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                 .ifPresent(declaringType -> addStereotypes(extensionDeclarer,
                                                            declaringType,
                                                            declaration,
-                                                           MuleStereotypeFactory.source()));
+                                                           SOURCE));
 
           }
         }.walk(declaration);
@@ -160,7 +163,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           }
         }
       } else {
-        declaration.addAllowedStereotype(MuleStereotypeFactory.processor());
+        declaration.addAllowedStereotype(PROCESSOR);
       }
     }
 

@@ -7,7 +7,7 @@
 package org.mule.test.heisenberg.extension.stereotypes;
 
 
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR_DEFINITION;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 
 import java.util.Optional;
@@ -21,6 +21,6 @@ public class EmpireStereotype implements StereotypeDefinition {
 
   @Override
   public Optional<StereotypeDefinition> getParent() {
-    return Optional.of(MuleStereotypeFactory.processorDefinition());
+    return Optional.of(PROCESSOR_DEFINITION);
   }
 }

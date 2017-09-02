@@ -49,6 +49,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIGURATION;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -74,7 +77,7 @@ import org.mule.runtime.core.api.source.SchedulingStrategy;
 import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 
 import com.google.gson.reflect.TypeToken;
@@ -331,7 +334,7 @@ class MuleExtensionModelDeclarer {
   private void declareFlow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer flow = extensionDeclarer.withConstruct(FLOW_ELEMENT_IDENTIFIER)
         .allowingTopLevelDefinition()
-        .withStereotype(MuleStereotypeFactory.flow());
+        .withStereotype(FLOW);
 
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
@@ -339,10 +342,10 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(Integer.class));
 
     flow.withComponent("source")
-        .withAllowedStereotypes(MuleStereotypeFactory.source());
+        .withAllowedStereotypes(MuleStereotypes.SOURCE);
     flow.withChain().setRequired(true);
     flow.withComponent("errorHandler")
-        .withAllowedStereotypes(MuleStereotypeFactory.errorHandler());
+        .withAllowedStereotypes(ERROR_HANDLER);
 
   }
 
@@ -408,12 +411,12 @@ class MuleExtensionModelDeclarer {
 
     tryScope.withChain();
     tryScope.withOptionalComponent("errorHandler")
-        .withAllowedStereotypes(MuleStereotypeFactory.errorHandler());
+        .withAllowedStereotypes(ERROR_HANDLER);
   }
 
   private void declareErrorHandler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer errorHandler = extensionDeclarer.withConstruct("errorHandler")
-        .withStereotype(MuleStereotypeFactory.errorHandler())
+        .withStereotype(ERROR_HANDLER)
         .allowingTopLevelDefinition()
         .describedAs(
                      "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
@@ -520,7 +523,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
-        .withStereotype(MuleStereotypeFactory.configuration())
+        .withStereotype(CONFIGURATION)
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());

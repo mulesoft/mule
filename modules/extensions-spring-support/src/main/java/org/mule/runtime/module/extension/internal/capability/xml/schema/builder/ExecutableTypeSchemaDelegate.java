@@ -17,6 +17,9 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_A
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import org.mule.metadata.api.model.MetadataType;
@@ -31,7 +34,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
@@ -164,7 +166,7 @@ abstract class ExecutableTypeSchemaDelegate {
     final ExplicitGroup choice = new ExplicitGroup();
     chainModel.getAllowedStereotypes().forEach(stereotype -> {
       // We need this to support both message-processor and mixed-content-message-processor
-      if (stereotype.equals(MuleStereotypeFactory.processor())) {
+      if (stereotype.equals(PROCESSOR)) {
         NamedGroup group = builder.createGroup(MULE_MESSAGE_PROCESSOR_TYPE, true);
         choice.getParticle().add(objectFactory.createGroup(group));
       } else {
@@ -183,15 +185,15 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   protected QName getSubstitutionGroup(StereotypeModel stereotypeDefinition) {
-    if (stereotypeDefinition.equals(MuleStereotypeFactory.processor())) {
+    if (stereotypeDefinition.equals(PROCESSOR)) {
       return MULE_ABSTRACT_OPERATOR;
     }
 
-    if (stereotypeDefinition.equals(MuleStereotypeFactory.source())) {
+    if (stereotypeDefinition.equals(SOURCE)) {
       return MULE_ABSTRACT_MESSAGE_SOURCE;
     }
 
-    if (stereotypeDefinition.equals(MuleStereotypeFactory.validator())) {
+    if (stereotypeDefinition.equals(VALIDATOR)) {
       return MULE_ABSTRACT_VALIDATOR;
     }
 

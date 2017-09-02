@@ -11,7 +11,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.processor.EventBasedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
@@ -46,8 +45,8 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
    */
   @Override
   public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return value instanceof EventBasedResult
-        ? ((EventBasedResult) value).getEvent()
+    return value instanceof EventedResult
+        ? ((EventedResult) value).getEvent()
         : InternalEvent.builder(operationContext.getEvent()).message(toMessage(value, operationContext)).build();
   }
 }

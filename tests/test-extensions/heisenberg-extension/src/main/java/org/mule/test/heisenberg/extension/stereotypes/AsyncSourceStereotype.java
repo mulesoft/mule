@@ -7,7 +7,7 @@
 package org.mule.test.heisenberg.extension.stereotypes;
 
 
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeFactory;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE_DEFINITION;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 
 import java.util.Optional;
@@ -21,6 +21,6 @@ public class AsyncSourceStereotype implements StereotypeDefinition {
 
   @Override
   public Optional<StereotypeDefinition> getParent() {
-    return Optional.of(MuleStereotypeFactory.sourceDefinition());
+    return Optional.of(SOURCE_DEFINITION);
   }
 }

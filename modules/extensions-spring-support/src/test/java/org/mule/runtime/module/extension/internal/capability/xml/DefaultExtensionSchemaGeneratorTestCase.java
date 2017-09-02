@@ -171,11 +171,15 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
         .collect(toList());
   }
 
+  /**
+   * Utility to batch fix input files when severe model changes are introduced.
+   * Use carefully, not a mechanism to get away with anything.
+   * First check why the generated json is different and make sure you're not introducing any bugs.
+   * This should NEVER be committed as true
+   *
+   * @return whether or not the "expected" test files should be updated when comparison fails
+   */
   private boolean shouldUpdateExpectedFilesOnError() {
-    // Utility to batch fix input files when severe model changes are introduced.
-    // Use carefully, not a mechanism to get away with anything.
-    // First check why the generated json is different and make sure you're not introducing any bugs.
-    // This should NEVER be committed as true
     return false;
   }
 
@@ -190,7 +194,6 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     try {
       compareXML(expectedSchema, schema);
     } catch (Throwable t) {
-      stringToFile(extensionUnderTest.getName() + "_result.xsd", schema);
       if (shouldUpdateExpectedFilesOnError()) {
         File root = new File(getResourceAsUrl("schemas/" + expectedXSD, getClass()).toURI()).getParentFile()
             .getParentFile().getParentFile().getParentFile();

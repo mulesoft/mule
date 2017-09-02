@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,23 +49,19 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     final InternalEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.from(event));
-    nestedProcessor
-        .onSuccess(result -> {
-          assertThat(result.getOutput(), is(TEST_PAYLOAD));
+    nestedProcessor.process(result -> {
+      assertThat(result.getOutput(), is(TEST_PAYLOAD));
 
-          ArgumentCaptor<InternalEvent> captor = ArgumentCaptor.forClass(InternalEvent.class);
-          try {
-            verify(messageProcessor).process(captor.capture());
-          } catch (MuleException e) {
-            throw new RuntimeException(e);
-          }
+      ArgumentCaptor<InternalEvent> captor = ArgumentCaptor.forClass(InternalEvent.class);
+      try {
+        verify(messageProcessor).process(captor.capture());
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
 
-          InternalEvent capturedEvent = captor.getValue();
-          assertThat(capturedEvent, is(event));
-        })
-        .onError((e, r) -> {
-          throw new RuntimeException(e);
-        });
+      InternalEvent capturedEvent = captor.getValue();
+      assertThat(capturedEvent, is(event));
+    }, (e, r) -> fail(e.getMessage()));
   }
 
   @Test

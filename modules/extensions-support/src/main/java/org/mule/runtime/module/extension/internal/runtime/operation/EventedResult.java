@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.processor;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -14,16 +15,26 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;
 
-public class EventBasedResult<T, A> extends Result<T, A> {
+/**
+ * An operation execution {@link Result} that is created based on the resulting {@link InternalEvent}
+ * of that execution.
+ * This allows for executions to be concatenated by the plugin's developer without losing
+ * information of the event propagated through the flow.
+ *
+ * @param <T> the generic type of the output value
+ * @param <A> the generic type of the message attributes
+ * @since 1.0
+ */
+public final class EventedResult<T, A> extends Result<T, A> {
 
   private final InternalEvent event;
 
-  private EventBasedResult(InternalEvent event) {
+  private EventedResult(InternalEvent event) {
     this.event = event;
   }
 
-  public static <T, A> EventBasedResult<T, A> from(InternalEvent event) {
-    return new EventBasedResult<>(event);
+  public static <T, A> EventedResult<T, A> from(InternalEvent event) {
+    return new EventedResult<>(event);
   }
 
   public InternalEvent getEvent() {
@@ -63,7 +74,7 @@ public class EventBasedResult<T, A> extends Result<T, A> {
 
       @Override
       public Result<T, A> build() {
-        return EventBasedResult.from(product.message(message.build()).build());
+        return EventedResult.from(product.message(message.build()).build());
       }
     };
   }
@@ -75,17 +86,17 @@ public class EventBasedResult<T, A> extends Result<T, A> {
 
   @Override
   public Optional<A> getAttributes() {
-    return Optional.ofNullable((A) event.getMessage().getAttributes().getValue());
+    return ofNullable((A) event.getMessage().getAttributes().getValue());
   }
 
   @Override
   public Optional<MediaType> getMediaType() {
-    return Optional.ofNullable(event.getMessage().getPayload().getDataType().getMediaType());
+    return ofNullable(event.getMessage().getPayload().getDataType().getMediaType());
   }
 
   @Override
   public Optional<MediaType> getAttributesMediaType() {
-    return Optional.ofNullable(event.getMessage().getAttributes().getDataType().getMediaType());
+    return ofNullable(event.getMessage().getAttributes().getDataType().getMediaType());
   }
 
   @Override

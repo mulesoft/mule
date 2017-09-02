@@ -214,27 +214,29 @@ public abstract class ExtensionDefinitionParser {
    */
   protected abstract Builder doParse(Builder definitionBuilder) throws ConfigurationException;
 
+  /**
+   * Parses the given {@code nestedComponents} and generates matching definitions  
+   *
+   * @param nestedComponents a list of {@link NestableElementModel}
+   */
   protected void parseNestedComponents(List<? extends NestableElementModel> nestedComponents) {
-    nestedComponents.forEach(component -> {
-      final DslElementSyntax paramDsl = dslResolver.resolve(component);
-      component.accept(new NestableElementModelVisitor() {
+    nestedComponents.forEach(component -> component.accept(new NestableElementModelVisitor() {
 
-        @Override
-        public void visit(NestedComponentModel component) {
-          // not yet implemented
-        }
+      @Override
+      public void visit(NestedChainModel component) {
+        parseProcessorChain(component);
+      }
 
-        @Override
-        public void visit(NestedChainModel component) {
-          parseProcessorChain(component);
-        }
+      @Override
+      public void visit(NestedComponentModel component) {
+        // not yet implemented, support this when SDK the user to receive a single component
+      }
 
-        @Override
-        public void visit(NestedRouteModel component) {
-          // not yet implemented
-        }
-      });
-    });
+      @Override
+      public void visit(NestedRouteModel component) {
+        // not yet implemented, support this when SDK the user to receive routes
+      }
+    }));
   }
 
   /**

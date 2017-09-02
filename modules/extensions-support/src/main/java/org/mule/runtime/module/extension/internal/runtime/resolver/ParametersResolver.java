@@ -56,10 +56,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEn
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+
 import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -106,19 +106,9 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
-    List<ParameterModel> nestedParameter = new ArrayList<>();
-    //    if(model instanceof ConstructModel){
-    //      List<? extends NestableElementModel> nestedComponents = ((ConstructModel) model).getNestedComponents();
-    //      nestedParameter = nestedComponents.stream().map(nc -> new ImmutableParameterModel(nc.getName(), nc.getDescription(), BaseTypeBuilder.create(JAVA).anyType().build(), false, true, false, ExpressionSupport.NOT_SUPPORTED, "", ParameterRole.BEHAVIOUR, ParameterDslConfiguration.builder().build(), DisplayModel.builder().build(), LayoutModel.builder().build(), null, emptyList(), emptySet())).collect(Collectors.toList());
-    //    }
     List<ParameterModel> flatParameters = getFlatParameters(inlineGroups, model.getAllParameterModels());
-    ArrayList<ParameterModel> parameterModels = new ArrayList<>();
-    parameterModels.addAll(flatParameters);
-    parameterModels.addAll(nestedParameter);
-    ResolverSet resolverSet =
-        getParametersAsResolverSet(model, parameterModels, muleContext);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
     for (ParameterGroupModel group : inlineGroups) {
-
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
     return resolverSet;
