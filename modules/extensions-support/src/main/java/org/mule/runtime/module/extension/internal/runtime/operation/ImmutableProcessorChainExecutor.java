@@ -109,14 +109,14 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
     try {
       successHandler.accept(result);
     } catch (Throwable error) {
-      errorHandler.accept(error, result); 
+      errorHandler.accept(error, result);
     }
   }
 
   private InternalEvent handleError(Throwable error, InternalEvent childEvent) {
     try {
       errorHandler.accept(error, EventedResult.from(childEvent));
-    } catch (Throwable e){
+    } catch (Throwable e) {
       originalEvent.getContext().error(e);
     }
     return null;
