@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-using-raise-error="http://www.mulesoft.org/schema/mule/module-using-raise-error"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/module-using-raise-error http://www.mulesoft.org/schema/mule/module-using-raise-error/current/mule-module-using-raise-error.xsd">
+
+    <flow name="simple">
+        <module-using-raise-error:fail-raise-error/>
+        <error-handler>
+            <on-error-continue type="CONNECTIVITY">
+                <set-payload value="#['Could not connect: ' ++ error.description]"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="complex">
+        <module-using-raise-error:fail-raise-error custom="true"/>
+        <error-handler>
+            <on-error-continue type="SC:SMART_CONNECTOR_CUSTOM">
+                <set-payload value="#['Custom error: ' ++ error.description]"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="simpleProxy">
+        <module-using-raise-error:fail-proxy/>
+        <error-handler>
+            <on-error-continue type="ROUTING">
+                <set-payload value="#['Could not route: ' ++ error.description]"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="complexProxy">
+        <module-using-raise-error:fail-proxy errorToRaise="SC:CUSTOM" description="#['Something went wrong.']"/>
+        <error-handler>
+            <on-error-continue type="SC:CUSTOM">
+                <set-payload value="#['Custom error: ' ++ error.description]"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="simpleMapping">
+        <module-using-raise-error:fail-proxy>
+            <error-mapping sourceType="ROUTING" targetType="APP:CUSTOM"/>
+        </module-using-raise-error:fail-proxy>
+        <error-handler>
+            <on-error-continue type="APP:CUSTOM">
+                <set-payload value="Handled"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="complexMapping">
+        <module-using-raise-error:fail-raise-error>
+            <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM" targetType="APP:CUSTOM"/>
+        </module-using-raise-error:fail-raise-error>
+        <error-handler>
+            <on-error-continue type="APP:CUSTOM">
+                <set-payload value="Handled"/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+</mule>

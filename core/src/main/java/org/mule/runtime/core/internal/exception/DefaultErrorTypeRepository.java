@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE;
@@ -19,12 +21,12 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_ID
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -106,7 +108,7 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
 
   private ErrorType buildErrorType(ComponentIdentifier identifier, ErrorType parent) {
     if (errorTypes.containsKey(identifier) || internalErrorTypes.containsKey(identifier)) {
-      throw new IllegalStateException(format("An error type with identifier %s already exists", identifier));
+      throw new IllegalStateException(format("An error type with identifier '%s' already exists", identifier));
     }
     return ErrorTypeBuilder.builder()
         .namespace(identifier.getNamespace())
@@ -133,6 +135,13 @@ public class DefaultErrorTypeRepository implements ErrorTypeRepository {
       errorType = ofNullable(this.internalErrorTypes.get(errorTypeIdentifier));
     }
     return errorType;
+  }
+
+  @Override
+  public Collection<String> getErrorNamespaces() {
+    return concat(this.errorTypes.keySet().stream(), this.internalErrorTypes.keySet().stream())
+        .map(id -> id.getNamespace().toUpperCase())
+        .collect(toSet());
   }
 
   /**

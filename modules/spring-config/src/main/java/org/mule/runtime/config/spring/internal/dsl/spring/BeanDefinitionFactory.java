@@ -27,6 +27,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.OBJECT_IDENTIFIER;
+import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper.addAnnotation;
@@ -35,9 +36,10 @@ import static org.mule.runtime.config.spring.internal.dsl.spring.WrapperElementT
 import static org.mule.runtime.config.spring.internal.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import static org.mule.runtime.core.api.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,13 +49,13 @@ import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.spring.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.core.api.exception.ErrorMapping;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.api.exception.ErrorMapping;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
@@ -61,9 +63,11 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -90,6 +94,7 @@ public class BeanDefinitionFactory {
   public static final String SPRING_SINGLETON_OBJECT = "singleton";
   public static final String SOURCE_TYPE = "sourceType";
   public static final String TARGET_TYPE = "targetType";
+  private static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -120,6 +125,7 @@ public class BeanDefinitionFactory {
   private BeanDefinitionCreator componentModelProcessor;
   private ErrorTypeRepository errorTypeRepository;
   private ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  private Set<String> syntheticErrorNamespaces = new HashSet<>();
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
@@ -182,6 +188,7 @@ public class BeanDefinitionFactory {
     // how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
     processMuleSecurityManager(componentModel, registry);
+    processRaiseError(componentModel);
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
@@ -197,15 +204,13 @@ public class BeanDefinitionFactory {
               addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
                 Map<String, String> parameters = innerComponent.getParameters();
                 ComponentIdentifier source = buildFromStringRepresentation(parameters.get(SOURCE_TYPE));
-                ComponentIdentifier target = buildFromStringRepresentation(parameters.get(TARGET_TYPE));
 
                 ErrorType errorType = errorTypeRepository
                     .lookupErrorType(source)
-                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Unable to find error '%s' from Error Type Repository",
-                                                                                    source)));
+                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
                 ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-                ErrorType targetValue = resolveErrorType(target);
+                ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
                 return new ErrorMapping(errorTypeMatcher, targetValue);
               }).collect(toList()), componentModel);
             }
@@ -219,11 +224,41 @@ public class BeanDefinitionFactory {
     return beanDefinition;
   }
 
-  private ErrorType resolveErrorType(ComponentIdentifier errorIdentifier) {
-    Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
-    return optionalErrorType.isPresent()
-        ? optionalErrorType.get()
-        : errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
+  private void processRaiseError(ComponentModel componentModel) {
+    if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
+      resolveErrorType(componentModel.getParameters().get("type"));
+    }
+  }
+
+  private ErrorType resolveErrorType(String representation) {
+    int separator = representation.indexOf(":");
+    String namespace;
+    String identifier;
+    if (separator > 0) {
+      namespace = representation.substring(0, separator).toUpperCase();
+      identifier = representation.substring(separator + 1).toUpperCase();
+    } else {
+      namespace = CORE_ERROR_NS;
+      identifier = representation.toUpperCase();
+    }
+
+    ComponentIdentifier errorIdentifier = ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
+    if (CORE_ERROR_NS.equals(namespace)) {
+      return errorTypeRepository.lookupErrorType(errorIdentifier)
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                 identifier))));
+    } else if (errorTypeRepository.getErrorNamespaces().contains(namespace) && !syntheticErrorNamespaces.contains(namespace)) {
+      throw new MuleRuntimeException(createStaticMessage(format("Cannot use error type '%s:%s': namespace already exists.",
+                                                                namespace, identifier)));
+    } else if (syntheticErrorNamespaces.contains(namespace)) {
+      Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
+      if (optionalErrorType.isPresent()) {
+        return optionalErrorType.get();
+      }
+    } else {
+      syntheticErrorNamespaces.add(namespace);
+    }
+    return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
   }
 
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {

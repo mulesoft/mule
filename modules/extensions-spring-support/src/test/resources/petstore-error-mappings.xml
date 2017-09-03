@@ -23,10 +23,10 @@
 
     <flow name="simpleMapping">
         <petstore:fail petNames="#[vars.names]">
-            <error-mapping targetType="MY_REQUESTER"/>
+            <error-mapping targetType="APP:MY_REQUESTER"/>
         </petstore:fail>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -37,10 +37,10 @@
 
     <flow name="complexMapping">
         <petstore:fail petNames="#[vars.names]">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
         </petstore:fail>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -51,14 +51,14 @@
 
     <flow name="multipleMappings">
         <petstore:fail petNames="#[vars.names]">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
+            <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
+            <error-mapping sourceType="EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
         </petstore:fail>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
-            <on-error-continue type="MY_OTHER_ERROR">
+            <on-error-continue type="APP:MY_OTHER_ERROR">
                 <set-payload value="Bad expression."/>
             </on-error-continue>
             <on-error-continue>

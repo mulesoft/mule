@@ -105,6 +105,7 @@ public class ApplicationModel {
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ERROR_HANDLER = "error-handler";
   public static final String ERROR_MAPPING = "error-mapping";
+  public static final String RAISE_ERROR = "raise-error";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
@@ -151,6 +152,8 @@ public class ApplicationModel {
           .build();
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
+  public static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
   public static final ComponentIdentifier MULE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(MULE_ROOT_ELEMENT).build();
   public static final ComponentIdentifier MULE_DOMAIN_IDENTIFIER =

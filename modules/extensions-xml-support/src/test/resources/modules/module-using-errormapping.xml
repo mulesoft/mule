@@ -19,9 +19,9 @@
     <operation name="fail-proxy">
         <parameters>
             <parameter name="petNames" type="string"/>
-            <parameter name="errorMappingTargetType" type="string" defaultValue="A_DEFAULT_TARGET"/>
+            <parameter name="errorMappingTargetType" type="string" defaultValue="APP:A_DEFAULT_TARGET"/>
             <parameter name="errorMappingSourceType" type="string" defaultValue="ANY"/>
-            <parameter name="secondErrorMappingTargetType" type="string" defaultValue="ANOTHER_DEFAULT_TARGET"/>
+            <parameter name="secondErrorMappingTargetType" type="string" defaultValue="APP:ANOTHER_DEFAULT_TARGET"/>
             <parameter name="secondErrorMappingSourceType" type="string" defaultValue="ANY"/>
         </parameters>
         <body>
@@ -38,10 +38,9 @@
             <parameter name="petNames" type="string"/>
         </parameters>
         <body>
-            <!-- TODO until MULE-13291 is done (Implement "<raise-error>"), the only way to raise a custom error is by remapping it -->
             <petstore:fail petNames="#[parameters.petNames]">
-                <mule:error-mapping targetType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
-                <mule:error-mapping targetType="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
+                <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
+                <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
             </petstore:fail>
         </body>
         <output type="string"/>

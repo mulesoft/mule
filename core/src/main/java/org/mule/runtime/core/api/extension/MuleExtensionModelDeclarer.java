@@ -127,6 +127,7 @@ class MuleExtensionModelDeclarer {
     declareFlowRef(extensionDeclarer, typeLoader);
     declareIdempotentValidator(extensionDeclarer, typeLoader);
     declareLogger(extensionDeclarer, typeLoader);
+    declareRaiseError(extensionDeclarer, typeLoader);
 
     // sources
     declareScheduler(extensionDeclarer, typeLoader);
@@ -271,6 +272,28 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The log category to be used");
 
+  }
+
+  private void declareRaiseError(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
+        .describedAs("Throws an error with the specified type and description.");
+
+    raiseError.withOutput().ofType(typeLoader.load(void.class));
+    raiseError.withOutputAttributes().ofType(typeLoader.load(void.class));
+
+    raiseError.onDefaultParameterGroup()
+        .withRequiredParameter("type")
+        .ofType(BaseTypeBuilder.create(JAVA).stringType()
+            .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
+                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
+            .build())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The error type to raise.");
+
+    raiseError.onDefaultParameterGroup()
+        .withOptionalParameter("description")
+        .ofType(typeLoader.load(String.class))
+        .describedAs("The description of this error.");
   }
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

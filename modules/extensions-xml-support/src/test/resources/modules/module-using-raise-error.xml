@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-using-raise-error"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <operation name="fail-proxy">
+        <parameters>
+            <parameter name="errorToRaise" type="string" defaultValue="ROUTING"/>
+            <parameter name="description" type="string" defaultValue="A bad error occurred."/>
+        </parameters>
+        <body>
+            <mule:raise-error type="#[parameters.errorToRaise]" description="#[parameters.description]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="fail-raise-error">
+        <parameters>
+            <parameter name="custom" type="boolean" defaultValue="false"/>
+        </parameters>
+        <body>
+            <mule:choice>
+                <mule:when expression="#[parameters.custom]">
+                    <mule:raise-error type="SC:SMART_CONNECTOR_CUSTOM" description="A custom error occurred."/>
+                </mule:when>
+                <mule:otherwise>
+                    <mule:raise-error type="CONNECTIVITY" description="#['A module error ' ++ 'occurred.']"/>
+                </mule:otherwise>
+            </mule:choice>
+        </body>
+        <output type="string"/>
+        <errors>
+            <error type="SMART_CONNECTOR_CUSTOM"/>
+        </errors>
+    </operation>
+
+</module>
