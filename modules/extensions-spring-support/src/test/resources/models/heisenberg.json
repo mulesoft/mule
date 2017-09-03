@@ -7189,64 +7189,7 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [
-            {
-              "type": "SOURCE_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            }
-          ],
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -8893,64 +8836,7 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [
-            {
-              "type": "SOURCE_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            }
-          ],
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -10597,64 +10483,7 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [
-            {
-              "type": "SOURCE_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_SEND",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "SOURCE_RESPONSE_GENERATE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "SOURCE_RESPONSE",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "SOURCE",
-                  "namespace": "MULE",
-                  "parent": {
-                    "type": "ANY",
-                    "namespace": "MULE"
-                  }
-                }
-              }
-            }
-          ],
+          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -18380,62 +18209,6 @@
             "type": "ANY",
             "namespace": "MULE"
           }
-        }
-      }
-    },
-    {
-      "type": "SOURCE_RESPONSE_SEND",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE_RESPONSE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "SOURCE",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      }
-    },
-    {
-      "type": "SOURCE_RESPONSE_GENERATE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE_RESPONSE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "SOURCE",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      }
-    },
-    {
-      "type": "SOURCE_ERROR_RESPONSE_SEND",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "SOURCE_ERROR_RESPONSE_GENERATE",
-      "namespace": "MULE",
-      "parent": {
-        "type": "SOURCE",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
         }
       }
     }
