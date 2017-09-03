@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.metadata;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -37,8 +36,7 @@ public class DefaultMetadataContext extends DefaultExtensionResolvingContext imp
    */
   public DefaultMetadataContext(Optional<ConfigurationInstance> configInstance,
                                 ConnectionManager connectionManager,
-                                MetadataCache cache, ClassTypeLoader typeLoader)
-      throws ConnectionException {
+                                MetadataCache cache, ClassTypeLoader typeLoader) {
     super(configInstance, connectionManager, typeLoader);
     this.cache = cache;
   }
