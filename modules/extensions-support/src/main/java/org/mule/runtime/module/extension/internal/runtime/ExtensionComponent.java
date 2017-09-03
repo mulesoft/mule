@@ -139,7 +139,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
-    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, muleContext);
+    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -151,7 +151,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
-    valueProviderMediator.setMuleContext(muleContext);
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())

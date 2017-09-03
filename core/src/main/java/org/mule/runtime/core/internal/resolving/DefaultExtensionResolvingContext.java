@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.resolving;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -29,7 +30,7 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
 
   private final Optional<ConfigurationInstance> configInstance;
   private final ClassTypeLoader typeLoader;
-  private final ConnectionHandler connectionHandler;
+  private ConnectionHandleSupplier connectionHandler;
 
   /**
    * Retrieves the configuration for the related component
@@ -46,9 +47,13 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
     this.typeLoader = typeLoader;
 
     if (configInstance.isPresent() && configInstance.get().getConnectionProvider().isPresent()) {
-      this.connectionHandler = connectionManager.getConnection(configInstance.get().getValue());
+      connectionHandler = () -> {
+        Optional<ConnectionHandler> connection = ofNullable(connectionManager.getConnection(configInstance.get().getValue()));
+        connectionHandler = () -> connection;
+        return connection;
+      };
     } else {
-      this.connectionHandler = null;
+      connectionHandler = Optional::empty;
     }
   }
 
@@ -71,7 +76,8 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
    */
   @Override
   public <C> Optional<C> getConnection() throws ConnectionException {
-    return connectionHandler != null ? of((C) connectionHandler.getConnection()) : empty();
+    Optional<ConnectionHandler> optionalHandler = connectionHandler.get();
+    return optionalHandler.isPresent() ? of((C) optionalHandler.get().getConnection()) : empty();
   }
 
   /**
@@ -95,8 +101,16 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
    */
   @Override
   public void dispose() {
-    if (connectionHandler != null) {
-      connectionHandler.release();
+    try {
+      connectionHandler.get().ifPresent(ConnectionHandler::release);
+    } catch (ConnectionException ignore) {
+      //If it fails at this moment the connection was never used
     }
+  }
+
+  @FunctionalInterface
+  private interface ConnectionHandleSupplier {
+
+    Optional<ConnectionHandler> get() throws ConnectionException;
   }
 }
