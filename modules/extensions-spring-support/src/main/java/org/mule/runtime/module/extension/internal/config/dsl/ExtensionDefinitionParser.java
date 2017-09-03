@@ -50,12 +50,16 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -89,9 +93,8 @@ import org.mule.runtime.module.extension.internal.loader.java.property.QueryPara
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverValueResolverWrapper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParameterValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
@@ -212,6 +215,31 @@ public abstract class ExtensionDefinitionParser {
   protected abstract Builder doParse(Builder definitionBuilder) throws ConfigurationException;
 
   /**
+   * Parses the given {@code nestedComponents} and generates matching definitions  
+   *
+   * @param nestedComponents a list of {@link NestableElementModel}
+   */
+  protected void parseNestedComponents(List<? extends NestableElementModel> nestedComponents) {
+    nestedComponents.forEach(component -> component.accept(new NestableElementModelVisitor() {
+
+      @Override
+      public void visit(NestedChainModel component) {
+        parseProcessorChain(component);
+      }
+
+      @Override
+      public void visit(NestedComponentModel component) {
+        // not yet implemented, support this when SDK the user to receive a single component
+      }
+
+      @Override
+      public void visit(NestedRouteModel component) {
+        // not yet implemented, support this when SDK the user to receive routes
+      }
+    }));
+  }
+
+  /**
    * Parsers the given {@code parameters} and generates matching definitions
    *
    * @param parameters a list of {@link ParameterModel}
@@ -259,26 +287,21 @@ public abstract class ExtensionDefinitionParser {
             parseMapParameters(parameter, objectType, paramDsl);
             return;
           }
-          if (isNestedProcessor(objectType)) {
-            parseNestedProcessor(parameter);
-          } else {
 
-            if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
-              parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
-              parseObjectParameter(parameter, paramDsl);
-            } else {
-              parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
-                          parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
-                          paramDsl, parameter.getModelProperties());
-            }
+          if (!parsingContext.isRegistered(paramDsl.getElementName(), paramDsl.getPrefix())) {
+            parsingContext.registerObjectType(paramDsl.getElementName(), paramDsl.getPrefix(), objectType);
+            parseObjectParameter(parameter, paramDsl);
+          } else {
+            parseObject(getKey(parameter), parameter.getName(), objectType, parameter.getDefaultValue(),
+                        parameter.getExpressionSupport(), parameter.isRequired(), acceptsReferences(parameter),
+                        paramDsl, parameter.getModelProperties());
           }
+
         }
 
         @Override
         public void visitArrayType(ArrayType arrayType) {
-          if (isNestedProcessor(arrayType.getType())) {
-            parseNestedProcessorList(parameter);
-          } else if (!parseAsContent(arrayType)) {
+          if (!parseAsContent(arrayType)) {
             parseCollectionParameter(parameter, arrayType, paramDsl);
           }
         }
@@ -296,9 +319,6 @@ public abstract class ExtensionDefinitionParser {
           return false;
         }
 
-        private boolean isNestedProcessor(MetadataType type) {
-          return ExtensionMetadataTypeUtils.getType(type).map(NestedProcessor.class::isAssignableFrom).orElse(false);
-        }
       });
     });
   }
@@ -306,7 +326,7 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an open {@link ObjectType}
    *
-   * @param parameter a {@link ParameterModel}
+   * @param parameter  a {@link ParameterModel}
    * @param objectType a {@link ObjectType}
    */
   protected void parseMapParameters(ParameterModel parameter, ObjectType objectType, DslElementSyntax paramDsl) {
@@ -317,12 +337,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an open {@link ObjectType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param dictionaryType the parameter's open {@link ObjectType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param dictionaryType    the parameter's open {@link ObjectType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
   protected void parseMapParameters(String key, String name, ObjectType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
@@ -870,13 +890,13 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ObjectType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param type an {@link ObjectType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param type              an {@link ObjectType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required or not
-   * @param modelProperties parameter's {@link ModelProperty}s
+   * @param required          whether the parameter is required or not
+   * @param modelProperties   parameter's {@link ModelProperty}s
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required,
@@ -940,23 +960,13 @@ public abstract class ExtensionDefinitionParser {
         .collect(toList());
   }
 
-  private void parseNestedProcessor(ParameterModel parameterModel) {
-    final String processorElementName = hyphenize(parameterModel.getName());
-    addParameter(getChildKey(parameterModel.getName()),
-                 fromChildConfiguration(NestedProcessorValueResolver.class).withWrapperIdentifier(processorElementName));
+  private void parseProcessorChain(NestedChainModel chainModel) {
+    final String processorElementName = hyphenize(chainModel.getName());
+    addParameter(getChildKey(chainModel.getName()),
+                 fromChildConfiguration(ProcessorChainValueResolver.class).withWrapperIdentifier(processorElementName));
 
     addDefinition(baseDefinitionBuilder.withIdentifier(processorElementName)
-        .withTypeDefinition(fromType(NestedProcessorValueResolver.class))
-        .withConstructorParameterDefinition(fromChildConfiguration(Processor.class).build()).build());
-  }
-
-  private void parseNestedProcessorList(ParameterModel parameterModel) {
-    final String processorElementName = hyphenize(parameterModel.getName());
-    addParameter(getChildKey(parameterModel.getName()), fromChildCollectionConfiguration(NestedProcessorListValueResolver.class)
-        .withWrapperIdentifier(processorElementName));
-
-    addDefinition(baseDefinitionBuilder.withIdentifier(processorElementName)
-        .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
+        .withTypeDefinition(fromType(ProcessorChainValueResolver.class))
         .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
         .build());
   }

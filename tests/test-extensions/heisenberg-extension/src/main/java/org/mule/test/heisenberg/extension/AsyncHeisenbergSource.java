@@ -15,14 +15,17 @@ import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 
 @Alias("AsyncListenPayments")
 @EmitsResponse
 @Streaming
+@Stereotype(AsyncSourceStereotype.class)
 public class AsyncHeisenbergSource extends HeisenbergSource {
 
   public static SourceCompletionCallback completionCallback;

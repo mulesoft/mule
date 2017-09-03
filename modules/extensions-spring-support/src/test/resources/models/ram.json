@@ -105,108 +105,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [
-            {
-              "type": "SOAP_FAULT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "ENCODING",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "INVALID_WSDL",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "ANY",
-              "namespace": "MULE"
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "RAM",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "BAD_RESPONSE",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "BAD_REQUEST",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CANNOT_DISPATCH",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "RAM",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "TIMEOUT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
           "output": {
             "type": {
               "format": "java",
@@ -402,17 +300,113 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotypes": [
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
+          "nestedComponents": [],
+          "errors": [
             {
-              "type": "PROCESSOR",
+              "type": "SOAP_FAULT",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "ENCODING",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "CONNECTIVITY",
               "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "INVALID_WSDL",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "ANY",
+              "namespace": "MULE"
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "RAM",
+              "parent": {
+                "type": "RETRY_EXHAUSTED",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "BAD_RESPONSE",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "RETRY_EXHAUSTED",
+              "namespace": "MULE",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "BAD_REQUEST",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "CANNOT_DISPATCH",
+              "namespace": "RAM",
+              "parent": {
+                "type": "ANY",
+                "namespace": "MULE"
+              }
+            },
+            {
+              "type": "CONNECTIVITY",
+              "namespace": "RAM",
+              "parent": {
+                "type": "CONNECTIVITY",
+                "namespace": "MULE",
+                "parent": {
+                  "type": "ANY",
+                  "namespace": "MULE"
+                }
+              }
+            },
+            {
+              "type": "TIMEOUT",
+              "namespace": "RAM",
               "parent": {
                 "type": "ANY",
                 "namespace": "MULE"
               }
             }
           ],
-          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [

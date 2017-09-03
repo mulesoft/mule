@@ -1389,6 +1389,36 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "String"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
+          "nestedComponents": [],
           "errors": [
             {
               "type": "RETRY_EXHAUSTED",
@@ -1415,38 +1445,6 @@
               }
             }
           ],
-          "output": {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
-          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1711,7 +1709,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -1733,17 +1730,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [],
           "name": "die",
           "description": "",
@@ -1753,7 +1749,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -1791,17 +1786,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2194,7 +2188,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -2232,17 +2225,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2635,7 +2627,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -2698,17 +2689,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2787,7 +2777,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -2809,17 +2798,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2898,7 +2886,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -2920,17 +2907,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3092,7 +3078,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -3130,17 +3115,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3533,6 +3517,36 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "String"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": true,
+          "supportsStreaming": false,
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
+          "nestedComponents": [],
           "errors": [
             {
               "type": "RETRY_EXHAUSTED",
@@ -3559,38 +3573,6 @@
               }
             }
           ],
-          "output": {
-            "type": {
-              "format": "java",
-              "type": "String"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "outputAttributes": {
-            "type": {
-              "format": "java",
-              "type": "Void"
-            },
-            "hasDynamicType": false,
-            "description": "",
-            "modelProperties": {}
-          },
-          "transactional": false,
-          "requiresConnection": true,
-          "supportsStreaming": false,
-          "stereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
-          "nestedComponents": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3855,7 +3837,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -3892,17 +3873,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4036,7 +4016,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -4073,17 +4052,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4417,7 +4395,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -4455,17 +4432,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4858,7 +4834,6 @@
         {
           "blocking": true,
           "executionType": "CPU_LITE",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -4880,17 +4855,16 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5197,7 +5171,6 @@
         {
           "blocking": true,
           "executionType": "BLOCKING",
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -5250,17 +5223,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "PROCESSOR",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7189,7 +7161,6 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -7229,17 +7200,16 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
+          "stereotype": {
+            "type": "AsyncSource",
+            "namespace": "HEISENBERG",
+            "parent": {
               "type": "SOURCE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
+              "namespace": "MULE"
             }
-          ],
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8836,7 +8806,6 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -8876,17 +8845,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
-              "type": "SOURCE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
+          "stereotype": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10483,7 +10447,6 @@
             "description": "",
             "modelProperties": {}
           },
-          "errors": [],
           "output": {
             "type": {
               "format": "java",
@@ -10523,17 +10486,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
-          "stereotypes": [
-            {
-              "type": "SOURCE",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          ],
+          "stereotype": {
+            "type": "SOURCE",
+            "namespace": "MULE"
+          },
           "nestedComponents": [],
+          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -11174,7 +11132,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -11196,17 +11153,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11608,9 +11564,58 @@
       "kind": "operation"
     },
     {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "parameterGroupModels": [],
+      "name": "alwaysFailsWrapper",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
       "blocking": true,
       "executionType": "CPU_INTENSIVE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -11632,17 +11637,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11840,7 +11844,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -11862,17 +11865,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11993,6 +11995,36 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
+      "nestedComponents": [],
       "errors": [
         {
           "type": "OAUTH2",
@@ -12027,38 +12059,6 @@
           }
         }
       ],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12177,9 +12177,8 @@
       "kind": "operation"
     },
     {
-      "blocking": true,
+      "blocking": false,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -12201,19 +12200,78 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
         {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
         }
       ],
-      "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [],
-      "name": "failToExecute",
+      "name": "exceptionOnCallbacks",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "chain",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "parameterGroupModels": [],
+      "name": "executeAnything",
       "description": "",
       "modelProperties": {},
       "kind": "operation"
@@ -12221,7 +12279,302 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
+      "nestedComponents": [],
       "errors": [],
+      "parameterGroupModels": [],
+      "name": "failToExecute",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Object",
+          "annotations": {
+            "typeId": "org.mule.runtime.extension.api.runtime.process.Chain",
+            "classInformation": {
+              "classname": "org.mule.runtime.extension.api.runtime.process.Chain",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": []
+            },
+            "typeAlias": {
+              "value": "Chain"
+            }
+          },
+          "fields": []
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "chain",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "getChain",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Number",
+          "annotations": {
+            "classInformation": {
+              "classname": "int",
+              "hasDefaultConstructor": false,
+              "isInterface": false,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": true,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": []
+            },
+            "int": {}
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [],
+      "errors": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "getCounter",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
       "output": {
         "type": {
           "format": "java",
@@ -12295,17 +12648,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12478,7 +12830,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -12518,17 +12869,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12607,7 +12957,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -12629,17 +12978,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12800,7 +13148,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -12822,17 +13169,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13165,7 +13511,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -13218,17 +13563,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13379,7 +13723,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -13401,17 +13744,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13583,8 +13925,56 @@
       "kind": "operation"
     },
     {
-      "blocking": true,
+      "blocking": false,
       "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "drugKilling",
+              "namespace": "HEISENBERG"
+            },
+            {
+              "type": "killingOperation",
+              "namespace": "HEISENBERG",
+              "parent": {
+                "type": "heisenberg-empire",
+                "namespace": "HEISENBERG"
+              }
+            }
+          ],
+          "name": "killOperations",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
       "errors": [
         {
           "type": "OAUTH2",
@@ -13619,103 +14009,9 @@
           }
         }
       ],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Array",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.util.List",
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [
-                      "java.util.Collection"
-                    ],
-                    "parent": "",
-                    "genericTypes": []
-                  }
-                },
-                "item": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "org.mule.runtime.core.api.NestedProcessor",
-                    "classInformation": {
-                      "classname": "org.mule.runtime.core.api.NestedProcessor",
-                      "hasDefaultConstructor": false,
-                      "isInterface": true,
-                      "isInstantiable": false,
-                      "isAbstract": true,
-                      "isFinal": false,
-                      "implementedInterfaces": [],
-                      "parent": "",
-                      "genericTypes": []
-                    },
-                    "typeAlias": {
-                      "value": "NestedProcessor"
-                    }
-                  },
-                  "fields": []
-                }
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "elementReferences": [],
-              "name": "killOperations",
-              "description": "",
-              "modelProperties": {}
-            },
             {
               "type": {
                 "format": "java",
@@ -13735,7 +14031,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 1
               },
               "elementReferences": [],
               "name": "reason",
@@ -13761,7 +14057,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Advanced"
               },
               "elementReferences": [],
@@ -13859,7 +14155,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -13881,240 +14176,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
         }
-      ],
+      },
       "nestedComponents": [],
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Object",
-                "annotations": {
-                  "typeId": "org.mule.runtime.core.api.NestedProcessor",
-                  "classInformation": {
-                    "classname": "org.mule.runtime.core.api.NestedProcessor",
-                    "hasDefaultConstructor": false,
-                    "isInterface": true,
-                    "isInstantiable": false,
-                    "isAbstract": true,
-                    "isFinal": false,
-                    "implementedInterfaces": [],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "typeAlias": {
-                    "value": "NestedProcessor"
-                  }
-                },
-                "fields": []
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 1
-              },
-              "elementReferences": [],
-              "name": "killOperation",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": true,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2
-              },
-              "elementReferences": [],
-              "name": "reason",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "layoutModel": {
-            "password": false,
-            "text": false,
-            "query": false,
-            "order": 1
-          },
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        },
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "target",
-              "displayModel": {
-                "displayName": "Target Variable"
-              },
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "targetValue",
-              "displayModel": {
-                "displayName": "Target Value"
-              },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "Output",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "killOne",
-      "description": "",
-      "modelProperties": {},
-      "kind": "operation"
-    },
-    {
-      "blocking": true,
-      "executionType": "CPU_LITE",
       "errors": [],
-      "output": {
-        "type": {
-          "format": "java",
-          "type": "String"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "outputAttributes": {
-        "type": {
-          "format": "java",
-          "type": "Void"
-        },
-        "hasDynamicType": false,
-        "description": "",
-        "modelProperties": {}
-      },
-      "transactional": false,
-      "requiresConnection": false,
-      "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
-      "nestedComponents": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14305,7 +14376,184 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Number",
+          "annotations": {
+            "classInformation": {
+              "classname": "int",
+              "hasDefaultConstructor": false,
+              "isInterface": false,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": true,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": []
+            },
+            "int": {}
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
+        }
+      },
+      "nestedComponents": [],
       "errors": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "int",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "int": {}
+                }
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "elementReferences": [],
+              "name": "id",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "killWithId",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
       "output": {
         "type": {
           "format": "java",
@@ -14345,17 +14593,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14493,7 +14740,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -14533,17 +14779,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14682,7 +14927,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -14722,17 +14966,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
+      "stereotype": {
+        "type": "drugKilling",
+        "namespace": "HEISENBERG"
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14871,7 +15110,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -14893,17 +15131,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+      "stereotype": {
+        "type": "killingOperation",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "heisenberg-empire",
+          "namespace": "HEISENBERG"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15112,7 +15349,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -15134,17 +15370,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15291,7 +15526,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -15331,17 +15565,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15482,7 +15715,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -15504,17 +15736,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15659,9 +15890,187 @@
       "kind": "operation"
     },
     {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Object",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": []
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          },
+          "fields": []
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": false,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "optionalProcessors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "elementReferences": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "neverFailsWrapper",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -15683,17 +16092,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15869,9 +16277,164 @@
       "kind": "operation"
     },
     {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "chain",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "typeId": "java.lang.Object",
+                  "classInformation": {
+                    "classname": "java.lang.Object",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "typeAlias": {
+                    "value": "Object"
+                  }
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "elementReferences": [],
+              "name": "payload",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Object",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.util.Map",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [
+                      "java.lang.String",
+                      "java.lang.String"
+                    ]
+                  }
+                },
+                "open": {
+                  "type": "String"
+                },
+                "fields": []
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "elementReferences": [],
+              "name": "attributes",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "payloadModifier",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -15911,17 +16474,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16059,7 +16621,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16101,17 +16662,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16251,7 +16811,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16273,17 +16832,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16403,7 +16961,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16443,17 +17000,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16591,7 +17147,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16631,17 +17186,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16780,7 +17334,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16802,17 +17355,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16933,7 +17485,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -16955,17 +17506,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17115,7 +17665,6 @@
     {
       "blocking": true,
       "executionType": "CPU_LITE",
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -17137,17 +17686,16 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
           "type": "PROCESSOR",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
+          "namespace": "MULE"
         }
-      ],
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [],
       "name": "throwError",
       "description": "",
@@ -17701,7 +18249,6 @@
   "messageSources": [
     {
       "hasResponse": false,
-      "errors": [],
       "output": {
         "type": {
           "format": "java",
@@ -17817,17 +18364,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotypes": [
-        {
-          "type": "SOURCE",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      ],
+      "stereotype": {
+        "type": "SOURCE",
+        "namespace": "MULE"
+      },
       "nestedComponents": [],
+      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -18233,7 +18775,6 @@
           "parent": "",
           "genericTypes": []
         },
-        "extensibleType": {},
         "typeAlias": {
           "value": "HeisenbergExtension"
         }

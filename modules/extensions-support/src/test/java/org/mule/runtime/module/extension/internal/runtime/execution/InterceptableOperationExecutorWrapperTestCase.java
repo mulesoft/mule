@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;

@@ -6,33 +6,32 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.GROUP_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_VALIDATOR;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.extension.api.annotation.Extensible;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.property.QNameModelProperty;
@@ -40,13 +39,11 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.At
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.GroupRef;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamedGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.loader.java.property.TypeRestrictionModelProperty;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -64,7 +61,7 @@ abstract class ExecutableTypeSchemaDelegate {
 
   protected final SchemaBuilder builder;
   protected final ObjectFactory objectFactory = new ObjectFactory();
-  private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
+  private final Map<String, TopLevelElement> substitutionGroups = new LinkedHashMap<>();
   private final DslSyntaxResolver dsl;
 
   ExecutableTypeSchemaDelegate(SchemaBuilder builder) {
@@ -106,141 +103,120 @@ abstract class ExecutableTypeSchemaDelegate {
       DslElementSyntax paramDsl = dsl.resolve(parameter);
       MetadataType parameterType = parameter.getType();
 
-      if (isOperation(parameterType)) {
-        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : MAX_ONE;
-        childElements.add(generateNestedProcessorElement(paramDsl, parameter, maxOccurs));
-      } else {
-        boolean shouldDeclare = true;
-        if (parameter.getModelProperty(QNameModelProperty.class).isPresent()
-            && !parameter.getDslConfiguration().allowsReferences()) {
-          shouldDeclare = false;
-        }
+      boolean shouldDeclare = true;
+      if (parameter.getModelProperty(QNameModelProperty.class).isPresent()
+          && !parameter.getDslConfiguration().allowsReferences()) {
+        shouldDeclare = false;
+      }
 
-        if (shouldDeclare) {
-          this.builder.declareAsParameter(parameterType, type, parameter, paramDsl, childElements);
-        }
+      if (shouldDeclare) {
+        this.builder.declareAsParameter(parameterType, type, parameter, paramDsl, childElements);
       }
     });
 
-    if (!childElements.isEmpty()) {
-      if (type.getSequence() == null) {
-        final ExplicitGroup all = new ExplicitGroup();
-        all.setMinOccurs(ZERO);
-        all.setMaxOccurs(MAX_ONE);
-        builder.addParameterToSequence(childElements, all);
-        type.setSequence(all);
-
-      } else {
-        builder.addParameterToSequence(childElements, type.getSequence());
-      }
-    }
+    appendToSequence(type, childElements);
 
     return type;
   }
 
-  protected void initialiseSequence(ExtensionType operationType) {
-    if (operationType.getSequence() == null) {
+  protected ExtensionType registerNestedComponents(ExtensionType type, List<? extends NestableElementModel> nestedComponents) {
+    List<TopLevelElement> childElements = new LinkedList<>();
+    nestedComponents.forEach(component -> component.accept(new NestableElementModelVisitor() {
+
+      @Override
+      public void visit(NestedComponentModel component) {}
+
+      @Override
+      public void visit(NestedChainModel component) {
+        childElements.add(generateNestedProcessorElement(dsl.resolve(component), component));
+      }
+
+      @Override
+      public void visit(NestedRouteModel component) {}
+    }));
+
+    appendToSequence(type, childElements);
+    return type;
+  }
+
+  private void appendToSequence(ExtensionType type, List<TopLevelElement> childElements) {
+    if (!childElements.isEmpty()) {
+      initialiseSequence(type);
+      builder.addParameterToSequence(childElements, type.getSequence());
+    }
+  }
+
+
+  protected void initialiseSequence(ExtensionType type) {
+    if (type.getSequence() == null) {
       ExplicitGroup sequence = new ExplicitGroup();
       sequence.setMinOccurs(ZERO);
       sequence.setMaxOccurs(MAX_ONE);
-      operationType.setSequence(sequence);
+      type.setSequence(sequence);
     }
   }
 
-  private TopLevelElement generateNestedProcessorElement(DslElementSyntax paramDsl, ParameterModel parameterModel,
-                                                         String maxOccurs) {
-    LocalComplexType collectionComplexType = new LocalComplexType();
-    GroupRef group = generateNestedProcessorGroup(parameterModel, maxOccurs);
-    collectionComplexType.setGroup(group);
-    collectionComplexType.setAnnotation(builder.createDocAnnotation(parameterModel.getDescription()));
-
+  private TopLevelElement generateNestedProcessorElement(DslElementSyntax paramDsl, NestedChainModel chainModel) {
     TopLevelElement collectionElement = new TopLevelElement();
     collectionElement.setName(paramDsl.getElementName());
-    collectionElement.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
-    collectionElement.setMaxOccurs(maxOccurs);
-    collectionElement.setComplexType(collectionComplexType);
+    collectionElement.setMinOccurs(chainModel.isRequired() ? ONE : ZERO);
     collectionElement.setAnnotation(builder.createDocAnnotation(EMPTY));
 
-    return collectionElement;
-  }
-
-  private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs) {
-    QName ref = MULE_MESSAGE_PROCESSOR_TYPE;
-    TypeRestrictionModelProperty restrictionCapability =
-        parameterModel.getModelProperty(TypeRestrictionModelProperty.class).orElse(null);
-    if (restrictionCapability != null) {
-      ref = getSubstitutionGroup(restrictionCapability.getType());
-      ref = new QName(ref.getNamespaceURI(), getGroupName(ref.getLocalPart()), ref.getPrefix());
-    }
-
-    GroupRef group = new GroupRef();
-    group.setRef(ref);
-    group.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
-    group.setMaxOccurs(maxOccurs);
-
-    return group;
-  }
-
-  private boolean isOperation(MetadataType type) {
-    if (!type.getMetadataFormat().equals(JAVA)) {
-      return false;
-    }
-    Reference<Boolean> isOperation = new Reference<>(false);
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        getType(objectType)
-            .filter(NestedProcessor.class::isAssignableFrom)
-            .ifPresent(clazz -> isOperation.set(true));
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
+    LocalComplexType complexType = new LocalComplexType();
+    final ExplicitGroup choice = new ExplicitGroup();
+    chainModel.getAllowedStereotypes().forEach(stereotype -> {
+      // We need this to support both message-processor and mixed-content-message-processor
+      if (stereotype.equals(PROCESSOR)) {
+        NamedGroup group = builder.createGroup(MULE_MESSAGE_PROCESSOR_TYPE, true);
+        choice.getParticle().add(objectFactory.createGroup(group));
+      } else {
+        TopLevelElement localAbstractElementRef = builder.createRefElement(getSubstitutionGroup(stereotype), true);
+        choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
       }
     });
 
-    return isOperation.get();
+    ExplicitGroup sequence = new ExplicitGroup();
+    sequence.setMinOccurs(ONE);
+    sequence.setMaxOccurs(UNBOUNDED);
+    sequence.getParticle().add(objectFactory.createChoice(choice));
+    complexType.setSequence(sequence);
+    collectionElement.setComplexType(complexType);
+    return collectionElement;
   }
 
-  protected QName getSubstitutionGroup(Class<?> type) {
-    return new QName(builder.getSchema().getTargetNamespace(), registerExtensibleElement(type));
-  }
-
-  private String registerExtensibleElement(Class<?> type) {
-    Extensible extensible = type.getAnnotation(Extensible.class);
-    checkArgument(extensible != null, format("Type %s is not extensible", type.getName()));
-
-    String name = extensible.alias();
-    if (StringUtils.isBlank(name)) {
-      name = type.getName() + OPERATION_SUBSTITUTION_GROUP_SUFFIX;
+  protected QName getSubstitutionGroup(StereotypeModel stereotypeDefinition) {
+    if (stereotypeDefinition.equals(PROCESSOR)) {
+      return MULE_ABSTRACT_OPERATOR;
     }
 
-    NamedGroup group = substitutionGroups.get(name);
+    if (stereotypeDefinition.equals(SOURCE)) {
+      return MULE_ABSTRACT_MESSAGE_SOURCE;
+    }
+
+    if (stereotypeDefinition.equals(VALIDATOR)) {
+      return MULE_ABSTRACT_VALIDATOR;
+    }
+
+    return new QName(builder.getSchema().getTargetNamespace(), registerExtensibleElement(stereotypeDefinition));
+  }
+
+  private String registerExtensibleElement(StereotypeModel stereotypeModel) {
+    final String name = hyphenize(stereotypeModel.getName()).toLowerCase();
+
+    TopLevelElement group = substitutionGroups.get(name);
     if (group == null) {
       // register abstract element to serve as substitution
-      TopLevelElement element = new TopLevelElement();
+      final TopLevelElement element = new TopLevelElement();
       element.setName(name);
       element.setAbstract(true);
-      element.setSubstitutionGroup(MULE_ABSTRACT_OPERATOR);
+
+      stereotypeModel.getParent()
+          .ifPresent(parent -> element.setSubstitutionGroup(getSubstitutionGroup(parent)));
+
       builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
-
-      group = new NamedGroup();
-      group.setName(getGroupName(name));
-      builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(group);
-
-      substitutionGroups.put(name, group);
-
-      element = new TopLevelElement();
-      element.setRef(new QName(builder.getSchema().getTargetNamespace(), name));
-      group.getChoice().getParticle().add(objectFactory.createElement(element));
+      substitutionGroups.put(name, element);
     }
 
     return name;
-  }
-
-  private String getGroupName(String name) {
-    return name + GROUP_SUFFIX;
   }
 }

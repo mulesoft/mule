@@ -35,6 +35,6 @@
     </flow>
 
     <flow name="overridedArgumentEncoding">
-        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[mel:flowVars.customEncoding]"/>
+        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[vars.customEncoding]"/>
     </flow>
 </mule>

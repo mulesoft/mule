@@ -22,6 +22,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
@@ -346,7 +347,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), emptyList(), null, null,
                                                        of(sourceCallbackModel), empty(), empty(), false, false, false,
-                                                       null, emptySet(), emptySet(), emptySet());
+                                                       null, SOURCE, emptySet(), emptySet());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     validate();
   }

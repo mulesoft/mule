@@ -87,7 +87,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
-                                  OperationModel operationModel,
+                                  ComponentModel operationModel,
                                   ConnectionManagerAdapter connectionManager,
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {

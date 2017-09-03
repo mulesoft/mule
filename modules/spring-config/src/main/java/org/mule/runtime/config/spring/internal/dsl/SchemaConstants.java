@@ -62,6 +62,8 @@ public final class SchemaConstants {
       new QName(CORE_NAMESPACE, "abstractOperatorType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_MESSAGE_SOURCE =
       new QName(CORE_NAMESPACE, "abstract-message-source", CORE_PREFIX);
+  public static final QName MULE_ABSTRACT_VALIDATOR =
+      new QName(CORE_NAMESPACE, "abstract-validator", CORE_PREFIX);
   public static final QName MULE_MESSAGE_PROCESSOR_TYPE =
       new QName(CORE_NAMESPACE, "messageProcessorOrMixedContentMessageProcessor", CORE_PREFIX);
   public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, TLS_CONTEXT_ELEMENT_IDENTIFIER, "tls");

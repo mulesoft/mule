@@ -7,26 +7,22 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of keys -&gt; {@link ValueResolver} pairs. The result of evaluating
@@ -46,32 +42,47 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   private Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
   private final MuleContext muleContext;
-  private Function<InternalEvent, Optional<ConfigurationInstance>> configProvider;
 
   public ResolverSet(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
   /**
-   * Links the given {@link ValueResolver} to the given {@link ParameterModel}. If such {@code parameter} was already added, then
-   * the associated {@code resolver} is replaced.
+   * Links the given {@link ValueResolver} to the given identifying {@code key}.
    *
-   * @param key      a not {@code null} {@link ParameterModel}
+   * @param key      a non-blank {@code key}
    * @param resolver a not {@code null} {@link ValueResolver}
    * @return this resolver set to allow chaining
-   * @throws IllegalArgumentException is either {@code parameter} or {@code resolver} are {@code null}
+   * @throws IllegalStateException if the {@code key} was already associated to a {@code resolver}
+   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null}
    */
   public ResolverSet add(String key, ValueResolver resolver) {
-    checkArgument(key != null, "key cannot be null");
-    checkArgument(resolver != null, "resolver cannot be null");
+    checkArgument(!isBlank(key), "A key for a ValueResolver cannot be blank");
+    checkArgument(resolver != null, "Resolver cannot be null");
 
     if (resolvers.put(key, resolver) != null) {
       throw new IllegalStateException("A value was already given for key " + key);
     }
 
-    if (resolver.isDynamic()) {
+    if (!dynamic && resolver.isDynamic()) {
       dynamic = true;
     }
+    return this;
+  }
+
+  /**
+   * Links all the given {@link ValueResolver}s to the given identifying {@code key}.
+   *
+   * @param resolvers a not {@code null} {@link Map} of {@code key}-{@link ValueResolver}
+   * @return this resolver set to allow chaining
+   * @throws IllegalStateException if any of the {@code key}s were already associated to a {@code resolver}
+   * @throws IllegalArgumentException if either {@code key} is empty or {@code resolver} is {@code null},
+   * on any of the entries.
+   * @see ResolverSet#add(String, ValueResolver)
+   */
+  public ResolverSet addAll(Map<String, ValueResolver<?>> resolvers) {
+    checkArgument(resolvers != null, "Resolvers to be added cannot be null");
+    resolvers.forEach(this::add);
     return this;
   }
 
@@ -124,6 +135,22 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     }
 
     return value;
+  }
+
+  /**
+   * Creates a new instance of {@link ResolverSet} containing all the resolvers
+   * of both {@code this} {@link ResolverSet} and the given {@code resolverSet}
+   *
+   * @param resolverSet a {@link ResolverSet} to merge with {@code this} {@link ResolverSet}
+   * @return a new instance of {@link ResolverSet} containing all the resolvers.
+   * @throws IllegalStateException if a duplicated {@code key} is found during the merge
+   * @throws IllegalArgumentException if the given {@code resolverSet} is {@code null}
+   */
+  public ResolverSet merge(ResolverSet resolverSet) {
+    ResolverSet newResolverSet = new ResolverSet(muleContext);
+    newResolverSet.addAll(resolvers);
+    newResolverSet.addAll(resolverSet.getResolvers());
+    return newResolverSet;
   }
 
   public Map<String, ValueResolver<?>> getResolvers() {

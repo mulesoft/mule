@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
@@ -172,6 +171,18 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
         .collect(toList());
   }
 
+  /**
+   * Utility to batch fix input files when severe model changes are introduced.
+   * Use carefully, not a mechanism to get away with anything.
+   * First check why the generated json is different and make sure you're not introducing any bugs.
+   * This should NEVER be committed as true
+   *
+   * @return whether or not the "expected" test files should be updated when comparison fails
+   */
+  private boolean shouldUpdateExpectedFilesOnError() {
+    return false;
+  }
+
   @Before
   public void setup() throws IOException {
     expectedSchema = getResourceAsString("schemas/" + expectedXSD, getClass());
@@ -183,12 +194,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     try {
       compareXML(expectedSchema, schema);
     } catch (Throwable t) {
-      // utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away
-      // with anything. First check why the generated json is different and make sure you're not introducing any bugs.
-      // This should never be commited as true
-      boolean fixInputFiles = false;
-
-      if (fixInputFiles) {
+      if (shouldUpdateExpectedFilesOnError()) {
         File root = new File(getResourceAsUrl("schemas/" + expectedXSD, getClass()).toURI()).getParentFile()
             .getParentFile().getParentFile().getParentFile();
         File testDir = new File(root, "src/test/resources/schemas");

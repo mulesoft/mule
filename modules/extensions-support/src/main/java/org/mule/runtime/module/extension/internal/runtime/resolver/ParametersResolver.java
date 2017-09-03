@@ -34,7 +34,9 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -104,12 +106,18 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
-    ResolverSet resolverSet =
-        getParametersAsResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
+    List<ParameterModel> flatParameters = getFlatParameters(inlineGroups, model.getAllParameterModels());
+    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
     for (ParameterGroupModel group : inlineGroups) {
-
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
+    return resolverSet;
+  }
+
+  public ResolverSet getNestedComponentsAsResolverSet(ComponentModel model) {
+    List<? extends NestableElementModel> nestedComponents = model.getNestedComponents();
+    ResolverSet resolverSet = new ResolverSet(muleContext);
+    nestedComponents.forEach(nc -> resolverSet.add(nc.getName(), toValueResolver(parameters.get(nc.getName()))));
     return resolverSet;
   }
 

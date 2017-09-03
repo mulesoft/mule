@@ -16,7 +16,6 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.COM
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -61,13 +60,12 @@ public final class ReflectiveMethodOperationExecutor
    */
   @Override
   public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
-    ExecutionContextAdapter<OperationModel> contextAdapter = (ExecutionContextAdapter<OperationModel>) executionContext;
     try {
       return justOrEmpty(executor.execute(executionContext));
     } catch (Exception e) {
-      return handleError(e, contextAdapter);
+      return handleError(e, (ExecutionContextAdapter<OperationModel>) executionContext);
     } catch (Throwable t) {
-      return handleError(wrapFatal(t), contextAdapter);
+      return handleError(wrapFatal(t), (ExecutionContextAdapter<OperationModel>) executionContext);
     }
   }
 
@@ -75,7 +73,7 @@ public final class ReflectiveMethodOperationExecutor
     CompletionCallback completionCallback = executionContext.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
     if (completionCallback != null) {
       if (t instanceof Exception) {
-        completionCallback.error((Exception) t);
+        completionCallback.error(t);
       } else {
         completionCallback.error(new MuleRuntimeException(t));
       }
@@ -113,7 +111,7 @@ public final class ReflectiveMethodOperationExecutor
   @Override
   public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
     return executor instanceof OperationArgumentResolverFactory
-        ? ((OperationArgumentResolverFactory) executor).createArgumentResolver(operationModel)
+        ? executor.createArgumentResolver(operationModel)
         : ec -> emptyMap();
   }
 }

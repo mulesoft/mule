@@ -47,6 +47,7 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -143,6 +144,18 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
         .collect(toList());
   }
 
+  /**
+   * Utility to batch fix input files when severe model changes are introduced.
+   * Use carefully, not a mechanism to get away with anything.
+   * First check why the generated json is different and make sure you're not introducing any bugs.
+   * This should NEVER be committed as true
+   *
+   * @return whether or not the "expected" test files should be updated when comparison fails
+   */
+  private boolean shouldUpdateExpectedFilesOnError() {
+    return false;
+  }
+
   @Before
   public void setup() throws IOException {
     generator = new ExtensionModelJsonSerializer(true);
@@ -155,25 +168,15 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     try {
       JSONAssert.assertEquals(expectedJson, json, true);
     } catch (AssertionError e) {
-      // utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away
-      // with anything. First check why the generated json is different and make sure you're not introducing any bugs.
-      // This should never be commited as true
-      boolean fixInputFiles = false;
 
-      if (fixInputFiles) {
-        File root = new File(getResourceAsUrl("models/" + expectedSource, getClass()).toURI()).getParentFile()
-            .getParentFile().getParentFile().getParentFile();
-        File testDir = new File(root, "src/test/resources/models");
-        File target = new File(testDir, expectedSource);
-        stringToFile(target.getAbsolutePath(), json);
-
-        System.out.println(expectedSource + " fixed");
+      if (shouldUpdateExpectedFilesOnError()) {
+        updateExpectedJson(json);
       } else {
         System.out.println("Expected: \n " + expectedJson);
         System.out.println("\n\nBut Got: \n " + json);
-      }
 
-      throw e;
+        throw e;
+      }
     }
   }
 
@@ -181,6 +184,16 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
   public void load() throws Exception {
     ExtensionModel result = generator.deserialize(expectedJson);
     assertThat(result, is(extensionUnderTest));
+  }
+
+  private void updateExpectedJson(String json) throws URISyntaxException, IOException {
+    File root = new File(getResourceAsUrl("models/" + expectedSource, getClass()).toURI()).getParentFile()
+        .getParentFile().getParentFile().getParentFile();
+    File testDir = new File(root, "src/test/resources/models");
+    File target = new File(testDir, expectedSource);
+    stringToFile(target.getAbsolutePath(), json);
+
+    System.out.println(expectedSource + " fixed");
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {

@@ -102,35 +102,6 @@
                                              victim="#[vars.victim]"/>
     </flow>
 
-    <flow name="killMany">
-        <heisenberg:kill-many reason="I'm the one who knocks">
-            <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
-                                                     goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
-                <heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>
-            </heisenberg:kill-operations>
-        </heisenberg:kill-many>
-    </flow>
-
-    <flow name="killManyButOnlyOneProvided">
-        <heisenberg:kill-many reason="I'm the one who knocks">
-            <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
-                                                     goodbyeMessage="bye bye"/>
-            </heisenberg:kill-operations>
-        </heisenberg:kill-many>
-    </flow>
-
-    <flow name="killOne">
-        <heisenberg:kill-one reason="I'm the one who knocks">
-            <heisenberg:kill-operation>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
-                                                     goodbyeMessage="bye bye"/>
-            </heisenberg:kill-operation>
-        </heisenberg:kill-one>
-    </flow>
-
     <flow name="injectedExtensionManager">
         <heisenberg:get-injected-extension-manager/>
     </flow>

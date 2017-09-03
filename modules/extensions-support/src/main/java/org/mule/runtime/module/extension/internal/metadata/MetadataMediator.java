@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.metadata.MetadataAttributes;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -51,7 +51,6 @@ import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-
 import com.google.common.collect.ImmutableList;
 
 import java.util.LinkedList;
@@ -214,7 +213,8 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        constructModel.getNestedComponents(),
                                                        constructModel.allowsTopLevelDeclaration(),
                                                        constructModel.getDisplayModel().orElse(null),
-                                                       constructModel.getStereotypes(),
+                                                       constructModel.getErrorModels(),
+                                                       constructModel.getStereotype(),
                                                        constructModel.getModelProperties()));
       }
 
@@ -228,6 +228,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.getDescription(),
                                                        resolveParameterGroupModelType(
                                                                                       operationModel.getParameterGroupModels(),
+
                                                                                       inputMetadataDescriptor.getAllParameters()),
                                                        operationModel.getNestedComponents(),
                                                        typedOutputModel, typedAttributesModel, operationModel.isBlocking(),
@@ -236,7 +237,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                        operationModel.supportsStreaming(),
                                                        operationModel.getDisplayModel().orElse(null),
                                                        operationModel.getErrorModels(),
-                                                       operationModel.getStereotypes(),
+                                                       operationModel.getStereotype(),
                                                        operationModel.getModelProperties()));
       }
 
@@ -263,7 +264,7 @@ public final class MetadataMediator<T extends ComponentModel> {
                                                     sourceModel.isTransactional(),
                                                     sourceModel.supportsStreaming(),
                                                     sourceModel.getDisplayModel().orElse(null),
-                                                    sourceModel.getStereotypes(),
+                                                    sourceModel.getStereotype(),
                                                     sourceModel.getErrorModels(), sourceModel.getModelProperties()));
       }
     });

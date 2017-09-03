@@ -224,31 +224,6 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   @Test
-  public void oneNestedOperation() throws Exception {
-    InternalEvent event = runFlow("killOne");
-    String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
-
-    assertThat(expected, is(event.getMessageAsString(muleContext)));
-  }
-
-  @Test
-  public void manyNestedOperations() throws Exception {
-    InternalEvent event = runFlow("killMany");
-    String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
-        + "bye bye, Nazi dudes\n";
-
-    assertThat(event.getMessageAsString(muleContext), is(expected));
-  }
-
-  @Test
-  public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception {
-    InternalEvent event = runFlow("killManyButOnlyOneProvided");
-    String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
-
-    assertThat(expected, is(event.getMessageAsString(muleContext)));
-  }
-
-  @Test
   public void getInjectedDependency() throws Exception {
     ExtensionManager extensionManager =
         (ExtensionManager) runFlow("injectedExtensionManager").getMessage().getPayload().getValue();

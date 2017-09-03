@@ -36,7 +36,7 @@ public class ImplicitConfigExtension implements Initialisable, Startable, MuleCo
   private String optionalNoDefault;
 
   @Parameter
-  @Optional(defaultValue = "#[mel:flowVars['optionalWithDefault']]")
+  @Optional(defaultValue = "#[vars.number]")
   private Integer optionalWithDefault;
 
   @ParameterGroup(name = "nullSafeGroup")

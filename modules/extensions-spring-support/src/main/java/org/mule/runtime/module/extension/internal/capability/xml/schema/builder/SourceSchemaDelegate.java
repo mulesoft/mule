@@ -11,7 +11,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TYPE_SUFFIX;
-
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -49,8 +49,14 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     element.setName(dslSyntax.getElementName());
     element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
     element.setAnnotation(builder.createDocAnnotation(sourceModel.getDescription()));
-    element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
+    element.setSubstitutionGroup(getSourceSubstitutionGroup(sourceModel));
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
+  }
+
+  private QName getSourceSubstitutionGroup(SourceModel sourceModel) {
+    return sourceModel.getStereotype().equals(SOURCE)
+        ? MULE_ABSTRACT_MESSAGE_SOURCE
+        : getSubstitutionGroup(sourceModel.getStereotype());
   }
 
   private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {

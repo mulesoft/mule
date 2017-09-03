@@ -11,14 +11,17 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Stereotype(EmpireStereotype.class)
 public class MoneyLaunderingOperation {
 
   public static final List<PersonalInfo> INVOLVED_PEOPLE = asList(

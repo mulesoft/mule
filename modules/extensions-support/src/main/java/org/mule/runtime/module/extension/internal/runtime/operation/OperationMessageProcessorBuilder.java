@@ -15,11 +15,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -107,25 +108,26 @@ public final class OperationMessageProcessorBuilder {
       try {
 
         final ExtensionManager extensionManager = muleContext.getExtensionManager();
-        final ResolverSet resolverSet =
-            ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
+        final ResolverSet operationArguments = getArgumentsResolverSet();
 
         OperationMessageProcessor processor;
+
         if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
           processor =
               new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                 resolverSet,
+                                                 operationArguments,
                                                  cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  extensionConnectionSupplier);
         } else if (supportsOAuth(extensionModel)) {
           processor =
               new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                 resolverSet,
+                                                 operationArguments,
                                                  cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
                                                  oauthManager);
         } else {
-          processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                    resolverSet,
+          processor = new OperationMessageProcessor(extensionModel, operationModel,
+                                                    configurationProvider, target, targetValue,
+                                                    operationArguments,
                                                     cursorProviderFactory, retryPolicyTemplate, extensionManager,
                                                     policyManager);
         }
@@ -136,5 +138,15 @@ public final class OperationMessageProcessorBuilder {
         throw new MuleRuntimeException(e);
       }
     });
+  }
+
+  private ResolverSet getArgumentsResolverSet() throws ConfigurationException {
+    final ResolverSet parametersResolverSet =
+        ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
+
+    final ResolverSet childsResolverSet =
+        ParametersResolver.fromValues(parameters, muleContext).getNestedComponentsAsResolverSet(operationModel);
+
+    return parametersResolverSet.merge(childsResolverSet);
   }
 }

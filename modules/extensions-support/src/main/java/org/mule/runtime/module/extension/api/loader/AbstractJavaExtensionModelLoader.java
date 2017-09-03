@@ -39,6 +39,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.MimeTypeParame
 import org.mule.runtime.module.extension.internal.loader.enricher.ParameterLayoutOrderDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RedeliveryPolicyDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.RefNameDeclarationEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.StereotypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.SubTypesDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.enricher.ValueProvidersParameterDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
@@ -90,6 +91,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                                new RefNameDeclarationEnricher(),
                                                                                                new ConnectionDeclarationEnricher(),
                                                                                                new ErrorsDeclarationEnricher(),
+                                                                                               new StereotypesDeclarationEnricher(),
                                                                                                new ExtensionsErrorsDeclarationEnricher(),
                                                                                                //TODO: MOVE TO EXT_API when https://www.mulesoft.org/jira/browse/MULE-13070
                                                                                                new MimeTypeParametersDeclarationEnricher(),
