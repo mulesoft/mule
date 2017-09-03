@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.internal.resolving;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.resolving.ExtensionResolvingContext;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.Optional;
@@ -29,7 +31,8 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
 
   private final Optional<ConfigurationInstance> configInstance;
   private final ClassTypeLoader typeLoader;
-  private final ConnectionHandler connectionHandler;
+  private LazyValue<ConnectionHandler> connectionHandler;
+
 
   /**
    * Retrieves the configuration for the related component
@@ -40,15 +43,15 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
    * @param typeLoader        instance of a {@link ClassTypeLoader} in the context of this extension
    */
   public DefaultExtensionResolvingContext(Optional<ConfigurationInstance> configInstance,
-                                          ConnectionManager connectionManager, ClassTypeLoader typeLoader)
-      throws ConnectionException {
+                                          ConnectionManager connectionManager, ClassTypeLoader typeLoader) {
     this.configInstance = configInstance;
     this.typeLoader = typeLoader;
 
     if (configInstance.isPresent() && configInstance.get().getConnectionProvider().isPresent()) {
-      this.connectionHandler = connectionManager.getConnection(configInstance.get().getValue());
+      connectionHandler = new LazyValue<>((CheckedSupplier<ConnectionHandler>) () -> connectionManager
+          .getConnection(configInstance.get().getValue()));
     } else {
-      this.connectionHandler = null;
+      connectionHandler = new LazyValue<>((ConnectionHandler) null);
     }
   }
 
@@ -71,7 +74,12 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
    */
   @Override
   public <C> Optional<C> getConnection() throws ConnectionException {
-    return connectionHandler != null ? of((C) connectionHandler.getConnection()) : empty();
+    try {
+      return ofNullable((C) connectionHandler.get().getConnection());
+    } catch (Exception e) {
+      Optional<ConnectionException> connectionException = extractConnectionException(e);
+      throw connectionException.orElse(new ConnectionException(e));
+    }
   }
 
   /**
@@ -95,8 +103,6 @@ public class DefaultExtensionResolvingContext implements ExtensionResolvingConte
    */
   @Override
   public void dispose() {
-    if (connectionHandler != null) {
-      connectionHandler.release();
-    }
+    connectionHandler.ifComputed(ConnectionHandler::release);
   }
 }

@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.api.values.ValueResolvingException.CONNECTION_FAILURE;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -142,7 +141,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
     this.metadataMediator = new MetadataMediator<>(componentModel);
-    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, muleContext);
+    this.valueProviderMediator = new ValueProviderMediator<>(componentModel, () -> muleContext);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -154,7 +153,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
-    valueProviderMediator.setMuleContext(muleContext);
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
@@ -309,9 +307,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                                                .getConnection().orElse(null),
                                                                                            (CheckedSupplier<Object>) () -> context
                                                                                                .getConfig().orElse(null))));
-    } catch (ConnectionException e) {
-      throw new ValueResolvingException("An error occurred obtaining the connection for the ValueProvider", CONNECTION_FAILURE,
-                                        e);
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof ValueResolvingException) {
@@ -334,15 +329,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
-  private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> metadataContextFunction)
-      throws ValueResolvingException, ConnectionException {
+  private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> metadataContextFunction) {
     ExtensionResolvingContext context = getResolvingContext();
     R result = metadataContextFunction.apply(context);
     context.dispose();
     return result;
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException, ConnectionException {
+  private MetadataContext getMetadataContext() throws MetadataResolvingException {
     InternalEvent fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
@@ -363,7 +357,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return new DefaultMetadataContext(configuration, connectionManager, metadataService.getMetadataCache(cacheId), typeLoader);
   }
 
-  private ExtensionResolvingContext getResolvingContext() throws ValueResolvingException, ConnectionException {
+  private ExtensionResolvingContext getResolvingContext() {
     InternalEvent fakeEvent = getInitialiserEvent(muleContext);
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
     return new DefaultExtensionResolvingContext(configuration, connectionManager, typeLoader);
