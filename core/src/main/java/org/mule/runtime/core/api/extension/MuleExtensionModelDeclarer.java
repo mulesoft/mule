@@ -49,7 +49,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIGURATION;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
@@ -523,7 +523,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
-        .withStereotype(APP_CONFIGURATION)
+        .withStereotype(CONFIG)
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());

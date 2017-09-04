@@ -24,7 +24,7 @@
         "type": "CONFIG",
         "namespace": "FN",
         "parent": {
-          "type": "CONFIG",
+          "type": "MODULE_CONFIG",
           "namespace": "MULE"
         }
       },
@@ -81,12 +81,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [

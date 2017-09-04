@@ -61,7 +61,7 @@
         "type": "CONFIG",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "CONFIG",
+          "type": "MODULE_CONFIG",
           "namespace": "MULE"
         }
       },
@@ -1418,14 +1418,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "heisenberg-empire",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1453,6 +1445,14 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1738,6 +1738,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -1746,8 +1748,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [],
           "name": "die",
           "description": "",
@@ -1794,6 +1794,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -1802,8 +1804,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2233,6 +2233,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2241,8 +2243,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2697,6 +2697,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2705,8 +2707,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2806,6 +2806,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2814,8 +2816,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2915,6 +2915,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2923,8 +2925,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3123,6 +3123,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -3131,8 +3133,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3546,14 +3546,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "heisenberg-empire",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -3581,6 +3573,14 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3881,6 +3881,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -3889,8 +3891,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4060,6 +4060,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4068,8 +4070,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4440,6 +4440,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4448,8 +4450,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4863,6 +4863,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4871,8 +4873,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5231,6 +5231,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -5239,8 +5241,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5633,14 +5633,6 @@
       ],
       "connectionProviders": [
         {
-          "stereotype": {
-            "type": "CONNECTION",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "CONNECTION",
-              "namespace": "MULE"
-            }
-          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [
             {
@@ -5651,6 +5643,14 @@
               "type": "NATIVE"
             }
           ],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7216,6 +7216,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "AsyncSource",
             "namespace": "HEISENBERG",
@@ -7224,8 +7226,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8861,12 +8861,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10502,12 +10502,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -11169,6 +11169,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11177,8 +11179,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11603,10 +11603,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -11623,6 +11619,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "alwaysFailsWrapper",
       "description": "",
@@ -11653,6 +11653,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11661,8 +11663,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11881,6 +11881,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11889,8 +11891,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12032,14 +12032,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "heisenberg-empire",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "PROCESSOR",
-          "namespace": "MULE"
-        }
-      },
       "nestedComponents": [],
       "errors": [
         {
@@ -12075,6 +12067,14 @@
           }
         }
       ],
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12216,10 +12216,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12236,6 +12232,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "exceptionOnCallbacks",
       "description": "",
@@ -12266,10 +12266,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12286,6 +12282,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "executeAnything",
       "description": "",
@@ -12316,6 +12316,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12324,8 +12326,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "failToExecute",
       "description": "",
@@ -12374,10 +12374,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12394,6 +12390,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12507,12 +12507,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12664,6 +12664,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12672,8 +12674,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12885,6 +12885,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12893,8 +12895,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12994,6 +12994,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -13002,8 +13004,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13185,6 +13185,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -13193,8 +13195,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13579,6 +13579,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -13587,8 +13589,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13760,6 +13760,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -13768,8 +13770,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13964,10 +13964,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -14025,6 +14021,10 @@
           }
         }
       ],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14192,6 +14192,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14200,8 +14202,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14427,6 +14427,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14435,8 +14437,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14609,6 +14609,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14617,8 +14619,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14795,6 +14795,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14803,8 +14805,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14982,12 +14982,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "drugKilling",
         "namespace": "HEISENBERG"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15147,6 +15147,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -15155,8 +15157,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15386,6 +15386,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15394,8 +15396,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15581,6 +15581,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15589,8 +15591,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15752,6 +15752,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15760,8 +15762,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15947,10 +15947,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": false,
@@ -15967,6 +15963,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16108,6 +16108,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16116,8 +16118,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16316,10 +16316,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -16336,6 +16332,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16490,6 +16490,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16498,8 +16500,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16678,6 +16678,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16686,8 +16688,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16848,6 +16848,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16856,8 +16858,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17016,6 +17016,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17024,8 +17026,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17202,6 +17202,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17210,8 +17212,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17371,6 +17371,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17379,8 +17381,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17522,6 +17522,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17530,8 +17532,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17702,6 +17702,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17710,8 +17712,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "throwError",
       "description": "",
@@ -17723,14 +17723,6 @@
   "constructs": [],
   "connectionProviders": [
     {
-      "stereotype": {
-        "type": "CONNECTION",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "CONNECTION",
-          "namespace": "MULE"
-        }
-      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [
         {
@@ -17741,6 +17733,14 @@
           "type": "NATIVE"
         }
       ],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -18388,12 +18388,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "SOURCE",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [

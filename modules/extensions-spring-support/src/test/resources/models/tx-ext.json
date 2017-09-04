@@ -24,7 +24,7 @@
         "type": "CONFIG",
         "namespace": "TX",
         "parent": {
-          "type": "CONFIG",
+          "type": "MODULE_CONFIG",
           "namespace": "MULE"
         }
       },
@@ -55,10 +55,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -86,6 +82,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -387,10 +387,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -418,6 +414,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -745,12 +745,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "PROCESSOR",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1202,10 +1202,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1233,6 +1229,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1455,10 +1455,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1486,6 +1482,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1741,10 +1741,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1772,6 +1768,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1994,10 +1994,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -2025,6 +2021,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2247,10 +2247,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -2278,6 +2274,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2479,6 +2479,8 @@
       ],
       "connectionProviders": [
         {
+          "connectionManagementType": "POOLING",
+          "externalLibraryModels": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TX",
@@ -2487,8 +2489,6 @@
               "namespace": "MULE"
             }
           },
-          "connectionManagementType": "POOLING",
-          "externalLibraryModels": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2926,6 +2926,8 @@
           "modelProperties": {}
         },
         {
+          "connectionManagementType": "NONE",
+          "externalLibraryModels": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "TX",
@@ -2934,8 +2936,6 @@
               "namespace": "MULE"
             }
           },
-          "connectionManagementType": "NONE",
-          "externalLibraryModels": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3226,12 +3226,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3667,12 +3667,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4088,12 +4088,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "fail",
       "description": "",
@@ -4105,6 +4105,8 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "connectionManagementType": "POOLING",
+      "externalLibraryModels": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "TX",
@@ -4113,8 +4115,6 @@
           "namespace": "MULE"
         }
       },
-      "connectionManagementType": "POOLING",
-      "externalLibraryModels": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4552,6 +4552,8 @@
       "modelProperties": {}
     },
     {
+      "connectionManagementType": "NONE",
+      "externalLibraryModels": [],
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "TX",
@@ -4560,8 +4562,6 @@
           "namespace": "MULE"
         }
       },
-      "connectionManagementType": "NONE",
-      "externalLibraryModels": [],
       "parameterGroupModels": [
         {
           "parameters": [

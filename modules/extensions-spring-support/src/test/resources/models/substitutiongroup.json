@@ -24,7 +24,7 @@
         "type": "CONFIG",
         "namespace": "SG",
         "parent": {
-          "type": "CONFIG",
+          "type": "MODULE_CONFIG",
           "namespace": "MULE"
         }
       },

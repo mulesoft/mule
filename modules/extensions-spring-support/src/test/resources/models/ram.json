@@ -103,7 +103,7 @@
         "type": "CONFIG",
         "namespace": "RAM",
         "parent": {
-          "type": "CONFIG",
+          "type": "MODULE_CONFIG",
           "namespace": "MULE"
         }
       },
@@ -308,10 +308,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -415,6 +411,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -958,6 +958,8 @@
       ],
       "connectionProviders": [
         {
+          "connectionManagementType": "POOLING",
+          "externalLibraryModels": [],
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "RAM",
@@ -966,8 +968,6 @@
               "namespace": "MULE"
             }
           },
-          "connectionManagementType": "POOLING",
-          "externalLibraryModels": [],
           "parameterGroupModels": [
             {
               "parameters": [

@@ -12,9 +12,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class CoreExtensionModelSerializationTestCase {
