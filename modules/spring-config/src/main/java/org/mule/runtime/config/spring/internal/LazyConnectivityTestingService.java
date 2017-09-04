@@ -59,7 +59,7 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
           .findFirst()
           .orElse(unknownFailureResponse(lastMessage(causalChain), e));
     } catch (Exception e) {
-      return unknownFailureResponse(e.getMessage(), e);
+      return unknownFailureResponse(e.getCause().getMessage(), e);
     }
     return connectivityTestingService.testConnection(location);
   }
