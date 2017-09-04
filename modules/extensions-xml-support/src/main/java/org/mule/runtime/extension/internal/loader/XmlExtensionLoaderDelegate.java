@@ -277,7 +277,7 @@ public final class XmlExtensionLoaderDelegate {
         validateXml ? schemaValidatingDocumentLoader() : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
     try {
       final Set<ExtensionModel> extensions = new HashSet<>(context.getDslResolvingContext().getExtensions());
-      extensions.add(createTnsExtensionModel(resource, extensions));
+      createTnsExtensionModel(resource, extensions).ifPresent(extensions::add);
       return xmlConfigurationDocumentLoader.loadDocument(extensions, resource.getFile(), resource.openStream());
     } catch (IOException e) {
       throw new MuleRuntimeException(
@@ -286,14 +286,17 @@ public final class XmlExtensionLoaderDelegate {
     }
   }
 
-  private ExtensionModel createTnsExtensionModel(URL resource, Set<ExtensionModel> extensions) throws IOException {
-    return new ExtensionModelFactory().create(
-                                              new DefaultExtensionLoadingContext(declareTns(resource, extensions),
-                                                                                 currentThread().getContextClassLoader(),
-                                                                                 new NullDslResolvingContext()));
-  }
-
-  private ExtensionDeclarer declareTns(URL resource, Set<ExtensionModel> extensions) throws IOException {
+  /**
+   * Transforms the current <module/> by stripping out the <body/>'s content, so that there are not parsing errors, to generate
+   * a simpler {@link ExtensionModel} if there are references to the TNS prefix defined by the {@link #XMLNS_TNS}.
+   *
+   * @param resource <module/>'s resource
+   * @param extensions complete list of extensions the current module depends on
+   * @return an {@link ExtensionModel} if there's a {@link #XMLNS_TNS} defined, {@link Optional#empty()} otherwise
+   * @throws IOException if it fails reading the resource
+   */
+  private Optional<ExtensionModel> createTnsExtensionModel(URL resource, Set<ExtensionModel> extensions) throws IOException {
+    ExtensionModel result = null;
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     try {
       final Source xslt = new StreamSource(getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_BODY_REMOVAL));
@@ -307,12 +310,16 @@ public final class XmlExtensionLoaderDelegate {
                                                                 resource.getFile())),
                                      e);
     }
-
     final Document transformedModuleDocument = schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new)
         .loadDocument(extensions, resource.getFile(), new ByteArrayInputStream(resultStream.toByteArray()));
-    final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
-    loadModuleExtension(extensionDeclarer, resource, transformedModuleDocument, extensions);
-    return extensionDeclarer;
+    if (StringUtils.isNotBlank(transformedModuleDocument.getDocumentElement().getAttribute(XMLNS_TNS))) {
+      final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
+      loadModuleExtension(extensionDeclarer, resource, transformedModuleDocument, extensions);
+      result = new ExtensionModelFactory()
+          .create(new DefaultExtensionLoadingContext(extensionDeclarer, currentThread().getContextClassLoader(),
+                                                     new NullDslResolvingContext()));
+    }
+    return Optional.ofNullable(result);
   }
 
   private ComponentModel getModuleComponentModel(URL resource, Document moduleDocument) {

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-calling-operations-within-module-with-global-elements"
+        minMuleVersion="4.1.0"
+
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-calling-operations-within-module-with-global-elements"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:file="http://www.mulesoft.org/schema/mule/file"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+           http://www.mulesoft.org/schema/mule/module-calling-operations-within-module-with-global-elements http://www.mulesoft.org/schema/mule/module-calling-operations-within-module-with-global-elements/current/mule-module-calling-operations-within-module-with-global-elements.xsd">
+
+    <property name="workingDir" type="string"/>
+    <property name="filenamePattern" type="string"/>
+
+    <file:config name="file">
+        <file:connection workingDir="#[properties.workingDir]"/>
+    </file:config>
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+
+    <operation name="list">
+        <parameters>
+            <parameter name="path" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:internal-list myPath="#[parameters.path]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <!--
+    INTERNAL OPERATIONS BELOW.
+    Despite being seen from the outside of this <module> boundary (smart connector' <operation>s don't have "private" visibility),
+    they are all meant to be used through a proxy method for testing purposes, and that's why all of them start with the
+    "internal-" prefix.
+    -->
+    <operation name="internal-list">
+        <parameters>
+            <parameter name="myPath" type="string"/>
+        </parameters>
+        <body>
+            <file:list directoryPath="#[parameters.myPath]" config-ref="file" matcher="globalMatcher"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+</module>
