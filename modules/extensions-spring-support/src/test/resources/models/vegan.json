@@ -37,6 +37,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [],
@@ -47,6 +55,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "APPLE_CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1410,6 +1426,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -2603,6 +2627,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4269,6 +4301,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -4858,6 +4898,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [
@@ -5138,6 +5186,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -5372,6 +5428,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [
@@ -5652,6 +5716,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -5845,11 +5917,27 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "VEGAN",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "VEGAN",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [

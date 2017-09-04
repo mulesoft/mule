@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1581,6 +1589,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -2524,6 +2540,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "MARVEL",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2957,6 +2981,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -3192,6 +3224,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "MARVEL",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [

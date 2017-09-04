@@ -8,11 +8,16 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclaration;
@@ -20,6 +25,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithStereotypesDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
@@ -68,8 +74,34 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       Optional<ImplementingTypeModelProperty> implementingType =
           declaration.getModelProperty(ImplementingTypeModelProperty.class);
 
+      final String stereotypePrefix = getStereotypePrefix(extensionDeclarer);
+      final StereotypeModel defaultConfigStereotype = newStereotype("CONFIG", stereotypePrefix)
+          .withParent(CONFIG).build();
+      final StereotypeModel defaultConnectionStereotype = newStereotype("CONNECTION", stereotypePrefix)
+          .withParent(CONNECTION).build();
+
       if (implementingType.isPresent()) {
         new IdempotentDeclarationWalker() {
+
+          @Override
+          protected void onConfiguration(ConfigurationDeclaration declaration) {
+            declaration.getModelProperty(ImplementingTypeModelProperty.class)
+                .map(ImplementingTypeModelProperty::getType)
+                .ifPresent(declaringType -> addStereotypes(extensionDeclarer,
+                                                           declaringType,
+                                                           declaration,
+                                                           defaultConfigStereotype));
+          }
+
+          @Override
+          protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
+            declaration.getModelProperty(ImplementingTypeModelProperty.class)
+                .map(ImplementingTypeModelProperty::getType)
+                .ifPresent(declaringType -> addStereotypes(extensionDeclarer,
+                                                           declaringType,
+                                                           declaration,
+                                                           defaultConnectionStereotype));
+          }
 
           @Override
           public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
@@ -116,16 +148,16 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
     }
 
     void addStereotypes(ExtensionDeclarer extensionDeclarer, Class<?> annotatedClass,
-                        ComponentDeclaration declaration, StereotypeModel defaultStereotype) {
+                        WithStereotypesDeclaration declaration, StereotypeModel defaultStereotype) {
       addStereotypes(extensionDeclarer, declaration, getAnnotation(annotatedClass, Stereotype.class),
                      defaultStereotype);
     }
 
-    private void addStereotypes(ExtensionDeclarer extensionDeclarer, ComponentDeclaration declaration,
+    private void addStereotypes(ExtensionDeclarer extensionDeclarer, WithStereotypesDeclaration declaration,
                                 Stereotype customStereotype, StereotypeModel defaultStereotype) {
 
       if (customStereotype != null) {
-        final String extensionPrefix = extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
+        final String extensionPrefix = getStereotypePrefix(extensionDeclarer);
         try {
           declaration.withStereotype(getStereotype(ClassUtils.instantiateClass(customStereotype.value()), extensionPrefix));
         } catch (Exception e) {
@@ -135,6 +167,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       } else {
         declaration.withStereotype(defaultStereotype);
       }
+    }
+
+    private String getStereotypePrefix(ExtensionDeclarer extensionDeclarer) {
+      return extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
     }
 
     StereotypeModel getStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
@@ -154,7 +190,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       Optional<AllowedStereotypes> stereotypes = parameter.getAnnotation(AllowedStereotypes.class);
 
       if (stereotypes.isPresent()) {
-        final String extensionPrefix = extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
+        final String extensionPrefix = getStereotypePrefix(extensionDeclarer);
         for (Class<? extends StereotypeDefinition> definition : stereotypes.get().value()) {
           try {
             declaration.addAllowedStereotype(getStereotype(ClassUtils.instantiateClass(definition), extensionPrefix));

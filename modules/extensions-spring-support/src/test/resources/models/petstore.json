@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2949,6 +2957,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "SIMPLE_CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "CUSTOM_CONNECTION",
+              "namespace": "PETSTORE"
+            }
+          },
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -3628,6 +3644,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -4307,6 +4331,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CUSTOM_CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -5193,6 +5225,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -5872,6 +5912,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "PETSTORE",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -8747,6 +8795,14 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "stereotype": {
+        "type": "SIMPLE_CONNECTION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CUSTOM_CONNECTION",
+          "namespace": "PETSTORE"
+        }
+      },
       "connectionManagementType": "CACHED",
       "externalLibraryModels": [],
       "parameterGroupModels": [
@@ -9426,6 +9482,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [
@@ -10105,6 +10169,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CUSTOM_CONNECTION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
       "parameterGroupModels": [
@@ -10991,6 +11063,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [
@@ -11670,6 +11750,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "PETSTORE",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [

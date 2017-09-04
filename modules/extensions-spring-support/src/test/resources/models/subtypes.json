@@ -344,6 +344,14 @@
   ],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1131,6 +1139,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "SUBTYPES",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -2449,6 +2465,14 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "SUBTYPES",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [

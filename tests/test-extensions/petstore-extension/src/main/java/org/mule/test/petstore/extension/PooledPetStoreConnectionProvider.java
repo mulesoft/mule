@@ -8,8 +8,11 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.test.petstore.extension.stereotype.CustomPetstoreConnectionStereotype;
 
 @Alias("pooled")
+@Stereotype(CustomPetstoreConnectionStereotype.class)
 public class PooledPetStoreConnectionProvider extends PetStoreConnectionProvider<PetStoreClient>
     implements PoolingConnectionProvider<PetStoreClient> {
 

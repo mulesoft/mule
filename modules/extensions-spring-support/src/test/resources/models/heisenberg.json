@@ -57,6 +57,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -5625,6 +5633,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [
             {
@@ -17707,6 +17723,14 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [
         {

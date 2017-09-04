@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "TX",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [
@@ -2471,6 +2479,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -2910,6 +2926,14 @@
           "modelProperties": {}
         },
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -4081,6 +4105,14 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TX",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
       "parameterGroupModels": [
@@ -4520,6 +4552,14 @@
       "modelProperties": {}
     },
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TX",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [

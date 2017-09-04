@@ -77,6 +77,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -10409,6 +10417,14 @@
       ],
       "connectionProviders": [
         {
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "METADATA",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "parameterGroupModels": [
@@ -13302,6 +13318,14 @@
   "constructs": [],
   "connectionProviders": [
     {
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "parameterGroupModels": [
