@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
@@ -23,7 +23,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
@@ -72,7 +71,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
 
   private List<Processor> messageProcessors;
-  private String expression = DEFAULT_SPIT_EXPRESSION;
+  private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
   private SplittingStrategy<InternalEvent, Iterator<TypedValue<?>>> splittingStrategy;
   private String rootMessageVariableName = DEFAULT_ROOT_MESSAGE_PROPERTY;
@@ -88,7 +87,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher)
         .doOnNext(event -> {
-          if (expression.equals(DEFAULT_SPIT_EXPRESSION)
+          if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
               && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
             throw new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE);
           }
@@ -172,11 +171,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   private Iterator<TypedValue<?>> splitRequest(InternalEvent request) {
     Object payloadValue = request.getMessage().getPayload().getValue();
-    if (DEFAULT_SPIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
+    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
       // Support EventBuilderConfigurerList currently used by Batch Module
       return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
                                  input -> TypedValue.of(input));
-    } else if (DEFAULT_SPIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
+    } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
       // Support EventBuilderConfigurerIterator currently used by Batch Module
       return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
     } else {

@@ -443,14 +443,14 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void entrySetFunction() throws Exception {
-    final String key="foo";
-    final String value="bar";
+    final String key = "foo";
+    final String value = "bar";
     InternalEvent event = eventBuilder().message(Message.builder().value(singletonMap(key, value)).build()).build();
     TypedValue result =
         expressionLanguage.evaluate("dw::core::Objects::entrySet(payload)", event, BindingContext.builder().build());
     assertThat(result.getValue(), instanceOf(List.class));
-    assertThat(((List)result.getValue()).get(0), instanceOf(Map.class));
-    Map entry = (Map) ((List)result.getValue()).get(0);
+    assertThat(((List) result.getValue()).get(0), instanceOf(Map.class));
+    Map entry = (Map) ((List) result.getValue()).get(0);
     assertThat(entry.get("key"), instanceOf(QualifiedName.class));
     assertThat(((QualifiedName) entry.get("key")).name(), equalTo(key));
     assertThat(entry.get("value"), equalTo(value));
