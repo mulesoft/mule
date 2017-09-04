@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -52,9 +51,7 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
 
     assertThat(osParam.getAllowedStereotypes(), hasSize(1));
     StereotypeModel stereotypeModel = osParam.getAllowedStereotypes().get(0);
-    assertThat(stereotypeModel.getNamespace(), equalTo("os"));
-    assertThat(stereotypeModel.getName(), equalTo("objectStore"));
-    assertThat(stereotypeModel.getParent().get(), is(OBJECT_STORE));
+    assertThat(stereotypeModel, is(OBJECT_STORE));
   }
 
   @Test
@@ -64,7 +61,7 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
     ParameterModel param = operation.getAllParameterModels().get(0);
     List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
     assertThat(stereotypes, hasSize(1));
-    assertStereotype(stereotypes.get(0), "mule", "flow", FLOW);
+    assertThat(stereotypes.get(0), is(FLOW));
   }
 
   @Test
@@ -81,7 +78,8 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
     assertThat(stereotypeModel.getNamespace(), is(ns));
     assertThat(stereotypeModel.getName(), is(name));
     if (stereotypeModel.getParent().isPresent()) {
-      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getName(), parent.getParent().orElse(null));
+      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getName(),
+                       parent.getParent().orElse(null));
     } else {
       assertThat(stereotypeModel.getParent().isPresent(), is(false));
     }

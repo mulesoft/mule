@@ -208,7 +208,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
         return getStereotype(instantiateClass(definitionClass), namespace);
       } catch (Exception e) {
         throw new IllegalModelDefinitionException("Invalid StereotypeDefinition found with name: "
-                                                      + definitionClass.getName(), e);
+            + definitionClass.getName(), e);
       }
     }
 

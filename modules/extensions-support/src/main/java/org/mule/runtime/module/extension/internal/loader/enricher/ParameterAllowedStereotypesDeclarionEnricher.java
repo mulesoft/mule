@@ -60,7 +60,7 @@ public final class ParameterAllowedStereotypesDeclarionEnricher extends Abstract
   private List<StereotypeModel> getStereotypes(AnnotatedElement element) {
     ConfigReferences references = element.getAnnotation(ConfigReferences.class);
     if (references != null) {
-      return stream(references.value()).map(ref -> newStereotype(ref.namespace(), ref.name())
+      return stream(references.value()).map(ref -> newStereotype(ref.name(), ref.namespace())
           .withParent(CONFIG)
           .build())
           .collect(toList());
@@ -68,7 +68,7 @@ public final class ParameterAllowedStereotypesDeclarionEnricher extends Abstract
 
     ConfigReference ref = element.getAnnotation(ConfigReference.class);
     if (ref != null) {
-      return singletonList(newStereotype(ref.namespace(), ref.name()).withParent(CONFIG).build());
+      return singletonList(newStereotype(ref.name(), ref.namespace()).withParent(CONFIG).build());
     }
 
     if (element.getAnnotation(FlowReference.class) != null) {
