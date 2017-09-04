@@ -213,7 +213,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
         : expression;
 
-    if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)) {
+    if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)
+        && !sanitizedExpression.substring(3, 4).equals(PREFIX_EXPR_SEPARATOR)) {
       sanitizedExpression = sanitizedExpression.substring((DW_PREFIX + PREFIX_EXPR_SEPARATOR).length());
     }
     return sanitizedExpression;

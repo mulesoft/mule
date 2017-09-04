@@ -153,7 +153,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void mapEntrySetExpression() throws Exception {
-    simpleForeach.setCollectionExpression("#[dw:dw::core::Objects::entrySet(payload)]");
+    simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
     simpleForeach.initialise();
     process(simpleForeach, eventBuilder().message(of(singletonMap("foo", "bar"))).build());
   }
