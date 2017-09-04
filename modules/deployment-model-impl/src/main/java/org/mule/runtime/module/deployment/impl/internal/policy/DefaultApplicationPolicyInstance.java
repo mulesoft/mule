@@ -100,7 +100,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     artifactBuilder.withServiceConfigurator(customizationService -> {
       MuleRegistry applicationRegistry = application.getMuleContext().getRegistry();
       customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
-                                                      applicationRegistry.lookupObject(OBJECT_LOCK_PROVIDER));
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(OBJECT_LOCK_PROVIDER)));
       customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
                                                       createLifecycleFilterProxy(applicationRegistry
                                                           .lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY)));
@@ -110,7 +111,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
                                                       applicationRegistry.lookupObject(OBJECT_POLICY_MANAGER_STATE_HANDLER));
       customizationService.overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
-                                                      applicationRegistry.lookupObject(OBJECT_TIME_SUPPLIER));
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(OBJECT_TIME_SUPPLIER)));
       Object muleClusterManager = applicationRegistry.lookupObject(CLUSTER_MANAGER_ID);
       if (muleClusterManager != null) {
         customizationService.registerCustomServiceImpl(CLUSTER_MANAGER_ID,

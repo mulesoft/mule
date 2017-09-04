@@ -16,7 +16,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.container.api.ReflectiveInvocationHandler;
+import org.mule.runtime.container.api.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -37,7 +37,7 @@ import javax.inject.Named;
  * 
  * @since 4.0
  */
-public class InjectParamsFromContextServiceProxy extends ReflectiveInvocationHandler<Service> {
+public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandler<Service> {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
       "More than one invocation candidate for for method '%s' in service '%s'";

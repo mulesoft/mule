@@ -11,8 +11,6 @@ import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.service.Service;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,26 +25,26 @@ import java.util.List;
  * 
  * @since 4.0
  */
-public abstract class ReflectiveInvocationHandler<T> implements InvocationHandler {
+public abstract class MetadataInvocationHandler<T> implements InvocationHandler {
 
   private final T innerObject;
 
   /**
-   * Creates a new proxy for the provided service instance.
+   * Creates a new proxy for the provided instance of type T.
    *
    * @param innerObject object instance to wrap. Non null.
    */
-  protected ReflectiveInvocationHandler(T innerObject) {
-    checkArgument(innerObject != null, "service cannot be null");
+  protected MetadataInvocationHandler(T innerObject) {
+    checkArgument(innerObject != null, "object cannot be null");
     this.innerObject = innerObject;
   }
 
   /**
-   * @return the methods declared in the implementation of the proxied service.
+   * @return the methods declared in the implementation of the proxied object.
    */
   protected Method[] getImplementationDeclaredMethods() {
     if (isNestedProxy()) {
-      return ((ReflectiveInvocationHandler) getInvocationHandler(getProxiedObject())).getImplementationDeclaredMethods();
+      return ((MetadataInvocationHandler) getInvocationHandler(getProxiedObject())).getImplementationDeclaredMethods();
     } else {
       List<Method> methods = new LinkedList<>();
       Class<?> clazz = getProxiedObject().getClass();
@@ -60,7 +58,7 @@ public abstract class ReflectiveInvocationHandler<T> implements InvocationHandle
   }
 
   /**
-   * Performs the actual invocation on the proxied {@link Service}, or delegates the call to an inner proxy.
+   * Performs the actual invocation on the proxied {@link Object}, or delegates the call to an inner proxy.
    * 
    * See {@link InvocationHandler#invoke(Object, Method, Object[])}
    */
@@ -72,7 +70,7 @@ public abstract class ReflectiveInvocationHandler<T> implements InvocationHandle
         return method.invoke(getProxiedObject(), args);
       } catch (InvocationTargetException ite) {
         // Unwrap target exception to ensure InvocationTargetException (in case of unchecked exceptions) or
-        // UndeclaredThrowableException (in case of checked exceptions) is not thrown by Service instead of target exception.
+        // UndeclaredThrowableException (in case of checked exceptions) is not thrown by inner object instead of target exception.
         throw ite.getTargetException();
       }
     }
@@ -87,6 +85,6 @@ public abstract class ReflectiveInvocationHandler<T> implements InvocationHandle
 
   private boolean isNestedProxy() {
     return isProxyClass(getProxiedObject().getClass())
-        && getInvocationHandler(getProxiedObject()) instanceof ReflectiveInvocationHandler;
+        && getInvocationHandler(getProxiedObject()) instanceof MetadataInvocationHandler;
   }
 }

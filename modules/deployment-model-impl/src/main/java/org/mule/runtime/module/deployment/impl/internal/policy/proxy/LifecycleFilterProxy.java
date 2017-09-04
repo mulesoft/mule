@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterface
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.container.api.ReflectiveInvocationHandler;
+import org.mule.runtime.container.api.MetadataInvocationHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public class LifecycleFilterProxy<T> extends ReflectiveInvocationHandler<T> {
+public class LifecycleFilterProxy<T> extends MetadataInvocationHandler<T> {
 
   /**
    * Creates a new proxy for the provided object instance.

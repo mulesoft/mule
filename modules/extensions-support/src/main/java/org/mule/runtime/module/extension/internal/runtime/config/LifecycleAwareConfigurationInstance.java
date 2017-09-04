@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -347,7 +348,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
   private void initStats() {
     if (timeSupplier == null) {
-      timeSupplier = new TimeSupplier();
+      timeSupplier = new LocalTimeSupplier();
     }
 
     configurationStats = new DefaultMutableConfigurationStats(timeSupplier);

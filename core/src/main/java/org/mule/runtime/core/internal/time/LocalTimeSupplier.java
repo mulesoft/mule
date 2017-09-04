@@ -4,16 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.time;
+package org.mule.runtime.core.internal.time;
+
+import org.mule.runtime.core.api.time.TimeSupplier;
 
 import java.util.function.Supplier;
 
 /**
- * A {@link Supplier} which provides a unified time in milliseconds.
+ * A {@link Supplier} which provides the current system time in milliseconds.
  *
  * @since 4.0
  */
-public interface TimeSupplier extends Supplier<Long> {
+public class LocalTimeSupplier implements TimeSupplier {
 
   /**
    * Returns {@link System#currentTimeMillis()}
@@ -21,5 +23,7 @@ public interface TimeSupplier extends Supplier<Long> {
    * @return the current time in milliseconds
    */
   @Override
-  Long get();
+  public Long get() {
+    return System.currentTimeMillis();
+  }
 }
