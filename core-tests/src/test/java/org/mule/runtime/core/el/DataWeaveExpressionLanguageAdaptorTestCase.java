@@ -7,6 +7,7 @@
 package org.mule.runtime.core.el;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
@@ -78,7 +79,9 @@ import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.weave.v2.model.structure.QualifiedName;
 
+import org.apache.commons.cli.Option;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -88,9 +91,12 @@ import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
@@ -433,6 +439,21 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     InternalEvent event = testEvent();
     new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
     verify(expressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
+  }
+
+  @Test
+  public void entrySetFunction() throws Exception {
+    final String key = "foo";
+    final String value = "bar";
+    InternalEvent event = eventBuilder().message(Message.builder().value(singletonMap(key, value)).build()).build();
+    TypedValue result =
+        expressionLanguage.evaluate("dw::core::Objects::entrySet(payload)", event, BindingContext.builder().build());
+    assertThat(result.getValue(), instanceOf(List.class));
+    assertThat(((List) result.getValue()).get(0), instanceOf(Map.class));
+    Map entry = (Map) ((List) result.getValue()).get(0);
+    assertThat(entry.get("key"), instanceOf(QualifiedName.class));
+    assertThat(((QualifiedName) entry.get("key")).name(), equalTo(key));
+    assertThat(entry.get("value"), equalTo(value));
   }
 
   private InternalEvent getEventWithError(Optional<Error> error) {

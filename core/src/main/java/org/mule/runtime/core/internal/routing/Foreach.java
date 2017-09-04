@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPIT_EXPRESSION;
+import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
@@ -40,6 +40,7 @@ import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerLis
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,9 +67,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   private static final String DEFAULT_ROOT_MESSAGE_PROPERTY = "rootMessage";
   private static final Logger LOGGER = getLogger(Foreach.class);
+  static final String MAP_NOT_SUPPORTED_MESSAGE =
+      "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
 
   private List<Processor> messageProcessors;
-  private String expression = DEFAULT_SPIT_EXPRESSION;
+  private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
   private SplittingStrategy<InternalEvent, Iterator<TypedValue<?>>> splittingStrategy;
   private String rootMessageVariableName = DEFAULT_ROOT_MESSAGE_PROPERTY;
@@ -82,38 +85,45 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
-    return from(publisher).flatMap(originalEvent -> {
+    return from(publisher)
+        .doOnNext(event -> {
+          if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
+              && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
+            throw new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE);
+          }
+        })
+        .flatMap(originalEvent -> {
 
-      // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
-      final Object previousCounterVar = originalEvent.getVariables().containsKey(counterVariableName)
-          ? originalEvent.getVariables().get(counterVariableName).getValue()
-          : null;
-      final Object previousRootMessageVar =
-          originalEvent.getVariables().containsKey(rootMessageVariableName)
-              ? originalEvent.getVariables().get(rootMessageVariableName).getValue()
+          // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
+          final Object previousCounterVar = originalEvent.getVariables().containsKey(counterVariableName)
+              ? originalEvent.getVariables().get(counterVariableName).getValue()
               : null;
+          final Object previousRootMessageVar =
+              originalEvent.getVariables().containsKey(rootMessageVariableName)
+                  ? originalEvent.getVariables().get(rootMessageVariableName).getValue()
+                  : null;
 
-      final InternalEvent requestEvent =
-          builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
+          final InternalEvent requestEvent =
+              builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
 
-      return splitAndProcess(requestEvent)
-          .map(result -> {
-            final Builder responseBuilder = builder(result).message(originalEvent.getMessage());
-            restoreVariables(previousCounterVar, previousRootMessageVar, responseBuilder);
-            return responseBuilder.build();
-          })
-          .onErrorMap(MessagingException.class, me -> {
-            // Restore variables in case of error also
-            InternalEvent.Builder exceptionEventBuilder = builder(me.getEvent());
-            restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
-            me.setProcessedEvent(exceptionEventBuilder.build());
-            return me;
-          })
-          // Required due to lack of decent support for error-handling in reactor. See
-          // https://github.com/reactor/reactor-core/issues/629.
-          .onErrorMap(throwable -> !(throwable instanceof MessagingException),
-                      throwable -> new MessagingException(originalEvent, throwable, this));
-    });
+          return splitAndProcess(requestEvent)
+              .map(result -> {
+                final Builder responseBuilder = builder(result).message(originalEvent.getMessage());
+                restoreVariables(previousCounterVar, previousRootMessageVar, responseBuilder);
+                return responseBuilder.build();
+              })
+              .onErrorMap(MessagingException.class, me -> {
+                // Restore variables in case of error also
+                InternalEvent.Builder exceptionEventBuilder = builder(me.getEvent());
+                restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
+                me.setProcessedEvent(exceptionEventBuilder.build());
+                return me;
+              })
+              // Required due to lack of decent support for error-handling in reactor. See
+              // https://github.com/reactor/reactor-core/issues/629.
+              .onErrorMap(throwable -> !(throwable instanceof MessagingException),
+                          throwable -> new MessagingException(originalEvent, throwable, this));
+        });
   }
 
   private void restoreVariables(Object previousCounterVar, Object previousRootMessageVar, Builder responseBuilder) {
@@ -161,11 +171,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   private Iterator<TypedValue<?>> splitRequest(InternalEvent request) {
     Object payloadValue = request.getMessage().getPayload().getValue();
-    if (DEFAULT_SPIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
+    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
       // Support EventBuilderConfigurerList currently used by Batch Module
       return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
                                  input -> TypedValue.of(input));
-    } else if (DEFAULT_SPIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
+    } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
       // Support EventBuilderConfigurerIterator currently used by Batch Module
       return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
     } else {

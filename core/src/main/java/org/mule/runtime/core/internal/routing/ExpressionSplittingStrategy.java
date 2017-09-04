@@ -23,7 +23,7 @@ import java.util.Iterator;
  */
 public class ExpressionSplittingStrategy implements SplittingStrategy<InternalEvent, Iterator<TypedValue<?>>> {
 
-  public static final String DEFAULT_SPIT_EXPRESSION = "#[payload]";
+  public static final String DEFAULT_SPLIT_EXPRESSION = "#[payload]";
   private final String expression;
   private final ExpressionManager expressionManager;
 
@@ -44,7 +44,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<InternalEv
    * @param expressionManager expression manager to use to evaluate the expression
    */
   public ExpressionSplittingStrategy(ExpressionManager expressionManager) {
-    this(expressionManager, DEFAULT_SPIT_EXPRESSION);
+    this(expressionManager, DEFAULT_SPLIT_EXPRESSION);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<InternalEv
    * @return true if the expression was not configured or the configured one is the default one.
    */
   public boolean hasDefaultExpression() {
-    return DEFAULT_SPIT_EXPRESSION.equals(expression);
+    return DEFAULT_SPLIT_EXPRESSION.equals(expression);
   }
 
   /**

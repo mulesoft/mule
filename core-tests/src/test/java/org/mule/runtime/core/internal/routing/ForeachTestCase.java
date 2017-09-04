@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,6 +36,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -140,6 +142,20 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     process(simpleForeach, eventBuilder().message(of(iterable.iterator())).build());
 
     assertSimpleProcessedMessages();
+  }
+
+  @Test
+  public void mapPayload() throws Exception {
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(Foreach.MAP_NOT_SUPPORTED_MESSAGE);
+    process(simpleForeach, eventBuilder().message(of(singletonMap("foo", "bar"))).build());
+  }
+
+  @Test
+  public void mapEntrySetExpression() throws Exception {
+    simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
+    simpleForeach.initialise();
+    process(simpleForeach, eventBuilder().message(of(singletonMap("foo", "bar"))).build());
   }
 
   @Test

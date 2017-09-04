@@ -52,6 +52,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final String DW_PREFIX = "dw";
   public static final String MEL_PREFIX = "mel";
   public static final String PREFIX_EXPR_SEPARATOR = ":";
+  static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
