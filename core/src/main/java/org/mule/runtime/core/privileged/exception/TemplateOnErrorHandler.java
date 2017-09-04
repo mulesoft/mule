@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.exception;
+package org.mule.runtime.core.privileged.exception;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;
@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;

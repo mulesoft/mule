@@ -3,7 +3,7 @@ package org.mule.functional.api.component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 public class OnErrorAssertHandler extends TemplateOnErrorHandler{
 
@@ -31,5 +31,4 @@ public class OnErrorAssertHandler extends TemplateOnErrorHandler{
   protected void doLogException(Throwable t) {
     logger.error("\n\nTHIS IS AN ERROR\n\n");
   }
-
 }
