@@ -16,8 +16,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
-
 /**
  * Avoid configuring factories each time they are used. Since we started using setFeature to avoid security issues,
  * getting a new XML factory object is very expensive.
@@ -93,18 +91,6 @@ public class XMLSecureFactoriesCache {
       @Override
       public Object createFactory() {
         return secureFactories.createTransformerFactory();
-      }
-    };
-
-    return (TransformerFactory) cache.getUnchecked(config);
-  }
-
-  public TransformerFactory getSaxonTransformerFactory(final DefaultXMLSecureFactories secureFactories) {
-    XMLFactoryConfig config = new XMLFactoryConfig(secureFactories, null, SaxonTransformerFactory.class.toString()) {
-
-      @Override
-      public Object createFactory() {
-        return secureFactories.createSaxonTransformerFactory();
       }
     };
 

@@ -11,10 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -35,6 +32,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 /**
  * Tests if the current module contains global elements poorly defined in which the current smart connector cannot determine to
  * which one should delegate the test connection feature.
@@ -54,7 +56,7 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
 
   @Test
   public void multipleGlobalElementsWithXmlnsConnectionAttribute() {
-    setExpectedMessage("first-config", "second-config");
+    setExpectedMessage("Can't resolve  http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd");
     getExtensionModelFrom("validation/testconnection/module-multiple-global-element-xmlns-connection-true.xml");
   }
 

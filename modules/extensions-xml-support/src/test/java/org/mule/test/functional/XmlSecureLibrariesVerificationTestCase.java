@@ -4,13 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.util.xmlsecurity;
+package org.mule.test.functional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories.createDefault;
-
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
@@ -23,7 +21,17 @@ import org.junit.Test;
 /**
  * Check that secure factories use Java defaults, which are more updated and support the latest security features.
  */
-public class XmlSecureLibrariesVerificationTestCase extends AbstractMuleTestCase {
+public class XmlSecureLibrariesVerificationTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+
+  @Override
+  protected String getModulePath() {
+    return "modules/module-simple.xml";
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "flows/flows-using-module-simple.xml";
+  }
 
   @Test
   public void documentBuilder() {
@@ -53,11 +61,5 @@ public class XmlSecureLibrariesVerificationTestCase extends AbstractMuleTestCase
   public void schema() {
     SchemaFactory factory = createDefault().getSchemaFactory("http://www.w3.org/2001/XMLSchema");
     assertThat(factory.getClass().getName(), equalTo("com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory"));
-  }
-
-  @Test
-  public void saxonTransformer() {
-    TransformerFactory factory = createDefault().getSaxonTransformerFactory();
-    assertThat(factory.getClass().getName(), equalTo("net.sf.saxon.TransformerFactoryImpl"));
   }
 }

@@ -73,10 +73,6 @@ public class XMLSecureFactories {
     return XMLSecureFactoriesCache.getInstance().getTransformerFactory(secureFactories);
   }
 
-  public TransformerFactory getSaxonTransformerFactory() {
-    return XMLSecureFactoriesCache.getInstance().getSaxonTransformerFactory(secureFactories);
-  }
-
   public SchemaFactory getSchemaFactory(String schemaLocation) {
     return XMLSecureFactoriesCache.getInstance().getSchemaFactory(secureFactories, schemaLocation);
   }

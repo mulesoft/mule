@@ -20,7 +20,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -142,14 +141,6 @@ public class DefaultXMLSecureFactories {
     } else {
       factory = TransformerFactory.newInstance();
     }
-
-    configureTransformerFactory(factory);
-
-    return factory;
-  }
-
-  public TransformerFactory createSaxonTransformerFactory() {
-    TransformerFactory factory = SaxonTransformerFactory.newInstance();
 
     configureTransformerFactory(factory);
 
