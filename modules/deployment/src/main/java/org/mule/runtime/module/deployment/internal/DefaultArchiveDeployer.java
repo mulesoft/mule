@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -25,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -306,7 +307,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     if (allResourcesExist(artifact.getResourceFiles())) {
       try {
         List<File> resourceFiles = new ArrayList<>();
-        resourceFiles.addAll(Arrays.asList(artifact.getResourceFiles()));
+        resourceFiles.addAll(asList(artifact.getResourceFiles()));
         if (artifact.getDescriptor().isRedeploymentEnabled()) {
           resourceFiles.add(artifact.getDescriptor().getDescriptorFile());
         }
@@ -432,7 +433,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private static boolean allResourcesExist(File[] resourceFiles) {
-    return Arrays.stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
+    return stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
   }
 
   private static class ZombieArtifact {
