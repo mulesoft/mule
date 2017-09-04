@@ -6,23 +6,18 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
-
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,23 +51,17 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public Domain deployPackagedArtifact(String zip) throws DeploymentException {
-    Domain domain = domainDeployer.deployPackagedArtifact(zip);
-    deployBundledAppsIfDomainWasCreated(domain);
-    return domain;
+    return domainDeployer.deployPackagedArtifact(zip);
   }
 
   @Override
   public Domain deployExplodedArtifact(String artifactDir) throws DeploymentException {
-    Domain domain = domainDeployer.deployExplodedArtifact(artifactDir);
-    deployBundledAppsIfDomainWasCreated(domain);
-    return domain;
+    return domainDeployer.deployExplodedArtifact(artifactDir);
   }
 
   @Override
   public Domain deployPackagedArtifact(URI artifactAchivedUrl) {
-    Domain domain = domainDeployer.deployPackagedArtifact(artifactAchivedUrl);
-    deployBundledAppsIfDomainWasCreated(domain);
-    return domain;
+    return domainDeployer.deployPackagedArtifact(artifactAchivedUrl);
   }
 
   /**
@@ -153,29 +142,5 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   @Override
   public void deployArtifact(Domain artifact) {
     domainDeployer.deployArtifact(artifact);
-  }
-
-  private void deployBundledAppsIfDomainWasCreated(Domain domain) {
-    if (domain != null) {
-      deployBundleApps(domain);
-    }
-  }
-
-  private void deployBundleApps(Domain domain) {
-    File domainFolder = new File(domainDeployer.getDeploymentDirectory(), domain.getArtifactName());
-    File appsFolder = new File(domainFolder, DOMAIN_BUNDLE_APPS_FOLDER);
-    if (appsFolder.exists()) {
-      File[] files = appsFolder.listFiles((dir, name) -> name.endsWith(JAR_FILE_SUFFIX));
-      for (File file : files) {
-        try {
-          FileUtils.moveFile(file, new File(MuleContainerBootstrapUtils.getMuleAppsDir(), file.getName()));
-        } catch (IOException e) {
-          logger.warn(e.getMessage());
-          if (logger.isDebugEnabled()) {
-            logger.debug("Cannot move file {} to apps folder", file, e);
-          }
-        }
-      }
-    }
   }
 }

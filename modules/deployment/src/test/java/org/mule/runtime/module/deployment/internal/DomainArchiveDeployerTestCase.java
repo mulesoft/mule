@@ -100,20 +100,6 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void deployAllAppsInsideDomainAppsFolder() throws Exception {
-    String testAppName = "test-app";
-    String testApp2Name = "test-app2";
-    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
-    putApplicationInTestDomainAppsFolder(testAppName);
-    putApplicationInTestDomainAppsFolder(testApp2Name);
-    DomainArchiveDeployer domainArchiveDeployer =
-        new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
-    domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH);
-    verifyApplicationCopyToAppsFolder(testAppName);
-    verifyApplicationCopyToAppsFolder(testApp2Name);
-  }
-
-  @Test
   public void undeployDomainWithNoApps() throws Exception {
     when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
     when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
