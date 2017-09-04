@@ -39,8 +39,6 @@ import java.util.Optional;
  */
 public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> {
 
-  private List<ApplicationFileBuilder> applications = new LinkedList<>();
-
   /**
    * Creates a new builder
    *
@@ -68,7 +66,6 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
    */
   public DomainFileBuilder(String id, DomainFileBuilder source) {
     super(id, source);
-    this.applications.addAll(source.applications);
   }
 
   @Override
@@ -90,28 +87,9 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
     return this;
   }
 
-  /**
-   * Adds an application to the domain.
-   *
-   * @param appFileBuilder builder defining the application. Non null.
-   * @return the same builder instance
-   */
-  public DomainFileBuilder containing(ApplicationFileBuilder appFileBuilder) {
-    checkImmutable();
-    checkArgument(appFileBuilder != null, "Application builder cannot be null");
-    this.applications.add(appFileBuilder);
-
-    return this;
-  }
-
   @Override
   protected List<ZipResource> doGetCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
-
-    for (ApplicationFileBuilder application : applications) {
-      final File applicationFile = application.getArtifactFile();
-      customResources.add(new ZipResource(applicationFile.getAbsolutePath(), "apps/" + applicationFile.getName()));
-    }
 
     final ZipResource domainProperties =
         createPropertiesFile(this.deployProperties, DEFAULT_DEPLOY_PROPERTIES_RESOURCE, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);
