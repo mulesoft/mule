@@ -10,6 +10,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.scheduler.SchedulerConfig;
 import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -81,7 +82,7 @@ public class MockSchedulerService implements SchedulerService {
   }
 
   @Override
-  public List<Scheduler> getSchedulers() {
-    return singletonList(new MockScheduler());
+  public List<SchedulerView> getSchedulers() {
+    return singletonList(new MockSchedulerView());
   }
 }
