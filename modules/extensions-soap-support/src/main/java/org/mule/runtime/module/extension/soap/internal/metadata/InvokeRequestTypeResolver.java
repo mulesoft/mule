@@ -11,6 +11,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.soap.api.client.SoapClient;
 import org.mule.runtime.soap.api.client.metadata.SoapOperationMetadata;
 
