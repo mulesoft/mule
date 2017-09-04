@@ -25,6 +25,7 @@ import org.mule.runtime.core.internal.retry.reactor.Retry;
 import org.mule.runtime.core.internal.retry.reactor.RetryExhaustedException;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -32,14 +33,18 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+import reactor.core.Cancellation;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
  */
 public class SimpleRetryPolicy implements RetryPolicy {
 
-  protected static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
+  private static final Logger LOGGER = getLogger(SimpleRetryPolicy.class);
+  private static final Scheduler TRANSACTIONAL_RETRY_SCHEDULER = new TransactionalRetryScheduler();
 
   protected RetryCounter retryCounter;
 
@@ -73,10 +78,13 @@ public class SimpleRetryPolicy implements RetryPolicy {
                 .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
 
             if (isTransactionActive()) {
-              retryMono = just(retryMono.block());
+              retry.withBackoffScheduler(TRANSACTIONAL_RETRY_SCHEDULER);
+              retryMono = delay(frequency, TRANSACTIONAL_RETRY_SCHEDULER).then(just(retryMono.block()));
+            } else {
+              retryMono = delay(frequency).then(retryMono);
             }
 
-            return delay(frequency).then(retryMono);
+            return retryMono;
 
           } else {
             e = unwrap(e);
@@ -138,6 +146,62 @@ public class SimpleRetryPolicy implements RetryPolicy {
     @Override
     protected AtomicInteger initialValue() {
       return new AtomicInteger(0);
+    }
+  }
+
+  private static class TransactionalRetryScheduler implements Scheduler {
+
+    private final Scheduler delegate = Schedulers.immediate();
+
+    @Override
+    public Cancellation schedule(Runnable task) {
+      return delegate.schedule(task);
+    }
+
+    @Override
+    public Cancellation schedule(Runnable task, long delay, TimeUnit unit) {
+      try {
+        Thread.sleep(unit.toMillis(delay));
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return schedule(task);
+    }
+
+    @Override
+    public Cancellation schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
+      return delegate.schedulePeriodically(task, initialDelay, period, unit);
+    }
+
+    @Override
+    public long now(TimeUnit unit) {
+      return delegate.now(unit);
+    }
+
+    @Override
+    public Worker createWorker() {
+      return delegate.createWorker();
+    }
+
+    @Override
+    public void dispose() {
+      delegate.dispose();
+    }
+
+    @Override
+    public void start() {
+      delegate.start();
+    }
+
+    @Override
+    @Deprecated
+    public void shutdown() {
+      delegate.shutdown();
+    }
+
+    @Override
+    public boolean isDisposed() {
+      return delegate.isDisposed();
     }
   }
 }
