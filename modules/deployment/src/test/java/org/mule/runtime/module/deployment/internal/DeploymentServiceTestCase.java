@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -39,7 +40,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
@@ -170,6 +170,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 
 import org.junit.After;
 import org.junit.Before;
@@ -633,12 +634,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", brokenAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(brokenAppFileBuilder.getDeployedPath(), deploymentService.getZombieApplications());
   }
 
   /**
@@ -655,12 +651,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertAppsDir(new String[] {brokenAppWithFunkyNameAppFileBuilder.getDeployedPath()}, NONE, true);
     assertApplicationAnchorFileDoesNotExists(brokenAppWithFunkyNameAppFileBuilder.getId());
 
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", brokenAppWithFunkyNameAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(brokenAppWithFunkyNameAppFileBuilder.getDeployedPath(),
+                                       deploymentService.getZombieApplications());
 
     reset(applicationDeploymentListener);
 
@@ -686,11 +678,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", "broken-app.jar", new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("broken-app.jar", deploymentService.getZombieApplications());
   }
 
   @Test
@@ -784,12 +772,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    String appName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces", appName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("app with spaces", deploymentService.getZombieApplications());
   }
 
   @Test
@@ -802,12 +785,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {"app with spaces"}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    String appName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces", appName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("app with spaces", deploymentService.getZombieApplications());
   }
 
   @Test
@@ -840,7 +818,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
-    assertZombieApplication(appId);
+    assertArtifactIsRegisteredAsZombie(appId, deploymentService.getZombieApplications());
     assertThat(deploymentService.findApplication(appId).getMuleContext(), nullValue());
   }
 
@@ -856,7 +834,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
     assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getMuleContext(), nullValue());
   }
 
@@ -908,7 +886,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
 
     reset(applicationDeploymentListener);
 
@@ -936,7 +914,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
 
     reset(applicationDeploymentListener);
 
@@ -1111,8 +1089,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(applicationDeploymentListener, appName);
     assertAppsDir(new String[] {}, new String[] {appName}, true);
 
-    final Map<URI, Long> startZombieMap = deploymentService.getZombieApplications();
-    assertEquals("Should be a zombie file for the app's broken XML config", 1, startZombieMap.size());
+    assertArtifactIsRegisteredAsZombie(appName, deploymentService.getZombieApplications());
 
     final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
     assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
@@ -1122,9 +1099,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     deleteDirectory(new File(appsDir, app.getArtifactName()));
     assertAppFolderIsDeleted(appName);
     assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
+    assertNoZombiePresent(deploymentService.getZombieApplications());
 
-    final Map<URI, Long> endZombieMap = deploymentService.getZombieApplications();
-    assertEquals("Should not be any more zombie files present", 0, endZombieMap.size());
   }
 
   @Test
@@ -1150,12 +1126,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // zip stays intact, no app dir created
     assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    String appName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("app with spaces.jar", deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1168,12 +1139,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // zip stays intact, no app dir created
     assertAppsDir(new String[] {"app with spaces.jar"}, NONE, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    String appName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "app with spaces.jar", appName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("app with spaces.jar", deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1412,7 +1378,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1430,7 +1396,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1448,7 +1414,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertAppFolderIsMaintained(incompleteAppFileBuilder.getId());
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1468,8 +1434,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
-    assertEquals("Failed app still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieApplications().size());
+    assertNoZombiePresent(deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1488,8 +1453,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
 
-    assertEquals("Failed app still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieApplications().size());
+    assertNoZombiePresent(deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1503,7 +1467,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
 
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertZombieApplication(emptyAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(emptyAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1515,7 +1479,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertZombieApplication(emptyAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(emptyAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1531,7 +1495,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1545,7 +1509,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
     assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
-    assertZombieApplication(incompleteAppFileBuilder.getId());
+    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -1565,8 +1529,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addExplodedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getId());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
-    assertEquals("Failed app still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieApplications().size());
+    assertNoZombiePresent(deploymentService.getZombieApplications());
   }
 
   @Test
@@ -2348,12 +2311,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as domain", brokenDomainFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(brokenDomainFileBuilder.getDeployedPath(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2368,12 +2326,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDomainAnchorFileDoesNotExists(brokenDomainFileBuilder.getId());
 
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as domain.", brokenDomainFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(brokenDomainFileBuilder.getDeployedPath(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2691,12 +2644,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    String domainName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "domain with spaces", domainName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("domain with spaces", deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2709,13 +2657,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, "domain with spaces"}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    // Spaces are converted to %20 is returned by java file api :/
-    String appName = new File(zombie.getKey()).getName();
-    assertEquals("Wrong URL tagged as zombie.", "domain with spaces", appName);
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie("domain with spaces", deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2745,12 +2687,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie domains registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2763,12 +2700,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Maintains app dir created
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, incompleteDomainFileBuilder.getId()}, true);
-    final Map<URI, Long> zombieMap = deploymentService.getZombieDomains();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2904,9 +2836,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2924,9 +2854,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2944,9 +2872,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Check that the failed application folder is still there
     assertDomainFolderIsMaintained(incompleteDomainFileBuilder.getId());
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2966,8 +2892,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertEquals("Failed domain still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieDomains().size());
+    assertNoZombiePresent(deploymentService.getZombieDomains());
   }
 
   @Test
@@ -2987,8 +2912,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertEquals("Failed domain still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieDomains().size());
+    assertNoZombiePresent(deploymentService.getZombieDomains());
   }
 
   @Ignore("MULE-6926: flaky test")
@@ -3055,9 +2979,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", emptyDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(emptyDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -3070,9 +2992,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder, emptyDomainFileBuilder.getZipPath());
     assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", emptyDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(emptyDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -3089,9 +3009,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -3106,9 +3024,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
     assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    final Map.Entry<URI, Long> zombie = deploymentService.getZombieDomains().entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", incompleteDomainFileBuilder.getId(),
-                 new File(zombie.getKey()).getParentFile().getName());
+    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
   }
 
   @Test
@@ -3128,8 +3044,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     addExplodedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getId());
 
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
-    assertEquals("Failed domain still appears as zombie after a successful redeploy", 0,
-                 deploymentService.getZombieDomains().size());
+    assertNoZombiePresent(deploymentService.getZombieDomains());
   }
 
   private Action createUndeployDummyDomainAction() {
@@ -3701,12 +3616,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     // don't assert dir contents, we want to check internal deployer state next
     assertAppsDir(NONE, new String[] {brokenAppFileBuilder.getId()}, false);
     assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", brokenAppFileBuilder.getDeployedPath(),
-                 new File(zombie.getKey()).getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    assertArtifactIsRegisteredAsZombie(brokenAppFileBuilder.getDeployedPath(), deploymentService.getZombieApplications());
 
     // Checks that the invalid zip was not deployed again
     try {
@@ -4205,12 +4115,28 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         .build());
   }
 
-  private void assertZombieApplication(String appId) {
-    final Map<URI, Long> zombieMap = deploymentService.getZombieApplications();
-    assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
-    final Map.Entry<URI, Long> zombie = zombieMap.entrySet().iterator().next();
-    assertEquals("Wrong URL tagged as zombie.", appId, new File(zombie.getKey()).getParentFile().getName());
-    assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+  private void assertNoZombiePresent(Map<String, Map<URI, Long>> zombieMap) {
+    assertEquals("Wrong number of zombie artifacts registered.", 0, zombieMap.size());
+  }
+
+  private void assertArtifactIsRegisteredAsZombie(String artifactName, Map<String, Map<URI, Long>> zombieMap) {
+    assertEquals("Wrong number of zombie artifacts registered.", 1, zombieMap.size());
+    if (!zombieMap.containsKey(artifactName)) {
+      Map.Entry<URI, Long> zombieEntry =
+          getZombieFromMap((entry) -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
+      assertThat("Wrong URL tagged as zombie.", zombieEntry, is(notNullValue()));
+    }
+  }
+
+  private Map.Entry<URI, Long> getZombieFromMap(Predicate<Map.Entry> filter, Map<String, Map<URI, Long>> zombieMap) {
+    Map.Entry<URI, Long> zombieEntry = null;
+    for (Map<URI, Long> zombieResource : zombieMap.values()) {
+      zombieEntry = zombieResource.entrySet().stream().filter(filter).findFirst().orElse(null);
+      if (zombieEntry != null) {
+        break;
+      }
+    }
+    return zombieEntry;
   }
 
   /**

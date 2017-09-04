@@ -43,7 +43,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void redeploy(T artifact) throws DeploymentException;
 
-  Map<URI, Long> getArtifactsZombieMap();
+  Map<String, Map<URI, Long>> getArtifactsZombieMap();
 
   void setArtifactFactory(ArtifactFactory<T> artifactFactory);
 

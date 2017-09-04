@@ -83,6 +83,15 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
     this.plugins = plugins;
   }
 
+  /**
+   * Returns a {@link File} representing the descriptor file
+   *
+   * @return the descriptor file
+   */
+  public File getDescriptorFile() {
+    return new File(getRootFolder(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+  }
+
   protected List<String> getDefaultConfigResources() {
     return emptyList();
   }

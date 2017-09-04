@@ -136,7 +136,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public Map<URI, Long> getArtifactsZombieMap() {
+  public Map<String, Map<URI, Long>> getArtifactsZombieMap() {
     return domainDeployer.getArtifactsZombieMap();
   }
 
