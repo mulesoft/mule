@@ -135,7 +135,7 @@ public class MacroExpansionModuleModel {
           if (operationModel.isPresent()) {
             ComponentModel replacementModel =
                 createModuleOperationChain(operationRefModel, extensionModel, operationModel.get(), moduleGlobalElementsNames,
-                                           testConnectionGlobalElementName);
+                                           testConnectionGlobalElementName, Optional.empty());
             componentModelsToReplaceByIndex.put(i, replacementModel);
           }
         }
@@ -211,7 +211,8 @@ public class MacroExpansionModuleModel {
 
     List<ComponentModel> globalElementsModel = new ArrayList<>();
     globalElementsModel.addAll(moduleGlobalElements.stream()
-        .map(globalElementModel -> copyGlobalElementComponentModel(globalElementModel, configRefModel.getNameAttribute(),
+        .map(globalElementModel -> copyGlobalElementComponentModel(globalElementModel,
+                                                                   Optional.of(configRefModel.getNameAttribute()),
                                                                    moduleGlobalElementsNames, literalsParameters,
                                                                    configurationModel))
         .collect(Collectors.toList()));
@@ -246,20 +247,22 @@ public class MacroExpansionModuleModel {
    * @param moduleGlobalElementsNames collection with the global components names (such as <http:config name="a"../>, <file:config
    *        name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/> that will be macro
    *        expanded
-  
+   * @param configRefParentTnsName parent reference to the global element if exists (it might not be global elements in the
+   *                               current module)
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
   private ComponentModel createModuleOperationChain(ComponentModel operationRefModel, ExtensionModel extensionModel,
                                                     OperationModel operationModel, Set<String> moduleGlobalElementsNames,
-                                                    Optional<String> testConnectionGlobalElementName) {
+                                                    Optional<String> testConnectionGlobalElementName,
+                                                    Optional<String> configRefParentTnsName) {
     final OperationComponentModelModelProperty operationComponentModelModelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class).get();
     final ComponentModel operationModuleComponentModel = operationComponentModelModelProperty
         .getBodyComponentModel();
     List<ComponentModel> bodyProcessors = operationModuleComponentModel.getInnerComponents();
-
-    String configRefName = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
-
+    Optional<String> configRefName =
+        referencesOperationsWithinModule(operationRefModel) ? configRefParentTnsName
+            : Optional.ofNullable(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF));
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder
         .setIdentifier(builder().namespace(CORE_PREFIX).name("module-operation-chain").build());
@@ -284,7 +287,8 @@ public class MacroExpansionModuleModel {
                                                                                                                                extensionModel,
                                                                                                                                tnsOperation,
                                                                                                                                moduleGlobalElementsNames,
-                                                                                                                               testConnectionGlobalElementName)));
+                                                                                                                               testConnectionGlobalElementName,
+                                                                                                                               configRefName)));
       } else {
         ComponentModel childMPcomponentModel =
             copyOperationComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames, literalsParameters,
@@ -363,7 +367,7 @@ public class MacroExpansionModuleModel {
    * @param propertiesMap <property>s that are feed in the current usage of the <module/>
    * @param parametersMap <param>s that are feed in the current usage of the <module/>
    * @return a {@link Map} of <property>s and <parameter>s that could be replaced by their literal values, see
-   *         {@link #copyGlobalElementComponentModel(ComponentModel, String, Set, Map)}
+   *         {@link #copyGlobalElementComponentModel(ComponentModel, Optional, Set, Map, ConfigurationModel)}
    */
   private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
     final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
@@ -501,7 +505,7 @@ public class MacroExpansionModuleModel {
    *         can be optimized by replacing it for the literal's value, it will be done as well using the
    *         {@code literalsParameters}
    */
-  private ComponentModel copyGlobalElementComponentModel(ComponentModel modelToCopy, String configRefName,
+  private ComponentModel copyGlobalElementComponentModel(ComponentModel modelToCopy, Optional<String> configRefName,
                                                          Set<String> moduleGlobalElementsNames,
                                                          Map<String, String> literalsParameters,
                                                          ConfigurationModel configurationModel) {
@@ -561,7 +565,7 @@ public class MacroExpansionModuleModel {
    *         can be optimized by replacing it for the literal's value, it will be done as well using the
    *         {@code literalsParameters}
    */
-  private ComponentModel copyOperationComponentModel(ComponentModel modelToCopy, String configRefName,
+  private ComponentModel copyOperationComponentModel(ComponentModel modelToCopy, Optional<String> configRefName,
                                                      Set<String> moduleGlobalElementsNames,
                                                      Map<String, String> literalsParameters,
                                                      ExtensionModel extensionModel,
@@ -589,7 +593,8 @@ public class MacroExpansionModuleModel {
                                                                                  extensionModel,
                                                                                  tnsOperation,
                                                                                  moduleGlobalElementsNames,
-                                                                                 testConnectionGlobalElementName);
+                                                                                 testConnectionGlobalElementName,
+                                                                                 configRefName);
           operationReplacementModel.addChildComponentModel(moduleOperationChain);
         });
       } else {
@@ -662,8 +667,8 @@ public class MacroExpansionModuleModel {
 
   // TODO MULE-12526: once implemented, remove this validation as it will be done through XSD (config-ref must be mandatory in
   // each operation for Smart Connectors)
-  private void validateConfigRefAttribute(ComponentModel modelToCopy, String configRefName, String originalValue) {
-    if (MODULE_OPERATION_CONFIG_REF.equals(configRefName) && StringUtils.isBlank(originalValue)) {
+  private void validateConfigRefAttribute(ComponentModel modelToCopy, Optional<String> configRefName, String originalValue) {
+    if (configRefName.isPresent() && MODULE_OPERATION_CONFIG_REF.equals(configRefName) && StringUtils.isBlank(originalValue)) {
       throw new IllegalArgumentException(format("The operation '%s' is missing the '%s' attribute",
                                                 modelToCopy.getIdentifier().getName(), MODULE_OPERATION_CONFIG_REF));
     }
@@ -672,7 +677,7 @@ public class MacroExpansionModuleModel {
   // TODO MULE-9849: until there's no clear way to check against the ComponentModel using the
   // org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor.onReferenceSimpleParameter(), we workaround
   // the issue by checking every <module/>'s global element's name.
-  private String calculateAttributeValue(String configRefNameToAppend, Set<String> moduleGlobalElementsNames,
+  private String calculateAttributeValue(Optional<String> configRefNameToAppend, Set<String> moduleGlobalElementsNames,
                                          String originalValue,
                                          Optional<String> testConnectionGlobalElementName) {
     String result;
@@ -680,9 +685,9 @@ public class MacroExpansionModuleModel {
       // current value is a global element reference
       if (testConnectionGlobalElementName.isPresent() && testConnectionGlobalElementName.get().equals(originalValue)) {
         //and it's also a reference to a bean that will be doing test connection, which implies no renaming must be done when macro expanding.
-        result = configRefNameToAppend;
+        result = configRefNameToAppend.get();
       } else {
-        result = originalValue.concat("-").concat(configRefNameToAppend);
+        result = originalValue.concat("-").concat(configRefNameToAppend.get());
       }
     } else {
       result = originalValue;
