@@ -44,7 +44,7 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputHeade
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeKeysResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeOutputTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTypeResolver;
-import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
+import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
