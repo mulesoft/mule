@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvalu
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX;
+import static org.mule.runtime.core.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -214,8 +215,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         : expression;
 
     if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)
-        && !sanitizedExpression.substring(3, 4).equals(PREFIX_EXPR_SEPARATOR)) {
-      sanitizedExpression = sanitizedExpression.substring((DW_PREFIX + PREFIX_EXPR_SEPARATOR).length());
+        // Handle DW functions that start with dw:: without removing dw:
+        && !sanitizedExpression.substring(DW_PREFIX_LENGTH - 1, DW_PREFIX_LENGTH).equals(PREFIX_EXPR_SEPARATOR)) {
+      sanitizedExpression = sanitizedExpression.substring(DW_PREFIX_LENGTH);
     }
     return sanitizedExpression;
   }
