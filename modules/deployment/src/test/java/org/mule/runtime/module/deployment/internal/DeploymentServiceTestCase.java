@@ -402,7 +402,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final DomainFileBuilder incompleteDomainFileBuilder =
       new DomainFileBuilder("incompleteDomain").definedBy("incomplete-domain-config.xml");
   private final DomainFileBuilder invalidDomainBundleFileBuilder =
-      new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml");//.containing(emptyAppFileBuilder);
+      new DomainFileBuilder("invalid-domain-bundle").definedBy("incomplete-domain-config.xml");
   private final DomainFileBuilder dummyDomainBundleFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
       .definedBy("empty-domain-config.xml");
   private final DomainFileBuilder dummyDomainFileBuilder =
