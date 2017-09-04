@@ -85,6 +85,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   /**
    * Returns a {@link File} representing the descriptor file
+   *
    * @return the descriptor file
    */
   public File getDescriptorFile() {

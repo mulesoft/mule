@@ -4130,9 +4130,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private Map.Entry<URI, Long> getZombieFromMap(Predicate<Map.Entry> filter, Map<String, Map<URI, Long>> zombieMap) {
     Map.Entry<URI, Long> zombieEntry = null;
-    //For every artifact in zombieMap
     for (Map<URI, Long> zombieResource : zombieMap.values()) {
       zombieEntry = zombieResource.entrySet().stream().filter(filter).findFirst().orElse(null);
+      if (zombieEntry != null) {
+        break;
+      }
     }
     return zombieEntry;
   }
