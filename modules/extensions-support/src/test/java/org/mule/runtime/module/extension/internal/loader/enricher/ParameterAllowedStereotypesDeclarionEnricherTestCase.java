@@ -10,17 +10,17 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.CONFIG;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.FLOW;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ElementReference;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
@@ -38,10 +38,10 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
   @Test
   public void connectionProviderWithMultipleConfigReferenceParameter() {
     ParameterModel paramWithReferences = configuration.getConnectionProviders().get(0).getAllParameterModels().get(0);
-    List<ElementReference> references = paramWithReferences.getAllowedStereotypes();
-    assertThat(references, hasSize(2));
-    assertReference(references.get(0), HeisenbergExtension.HEISENBERG, "config", CONFIG);
-    assertReference(references.get(1), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
+    List<StereotypeModel> allowedStereotypes = paramWithReferences.getAllowedStereotypes();
+    assertThat(allowedStereotypes, hasSize(2));
+    assertStereotype(allowedStereotypes.get(0), HeisenbergExtension.HEISENBERG, "config", CONFIG);
+    assertStereotype(allowedStereotypes.get(1), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
   }
 
   @Test
@@ -51,10 +51,10 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
         .findFirst().get();
 
     assertThat(osParam.getAllowedStereotypes(), hasSize(1));
-    ElementReference reference = osParam.getAllowedStereotypes().get(0);
-    assertThat(reference.getNamespace(), equalTo("os"));
-    assertThat(reference.getElementName(), equalTo("objectStore"));
-    assertThat(reference.getType(), is(OBJECT_STORE));
+    StereotypeModel stereotypeModel = osParam.getAllowedStereotypes().get(0);
+    assertThat(stereotypeModel.getNamespace(), equalTo("os"));
+    assertThat(stereotypeModel.getName(), equalTo("objectStore"));
+    assertThat(stereotypeModel.getParent().get(), is(OBJECT_STORE));
   }
 
   @Test
@@ -62,9 +62,9 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
     assertThat(operation.getAllParameterModels(), hasSize(1));
     ParameterModel param = operation.getAllParameterModels().get(0);
-    List<ElementReference> references = param.getAllowedStereotypes();
-    assertThat(references, hasSize(1));
-    assertReference(references.get(0), "mule", "flow", FLOW);
+    List<StereotypeModel> stereotypes = param.getAllowedStereotypes();
+    assertThat(stereotypes, hasSize(1));
+    assertStereotype(stereotypes.get(0), "mule", "flow", FLOW);
   }
 
   @Test
@@ -72,14 +72,18 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(2));
     ParameterModel param = params.get(0);
-    List<ElementReference> references = param.getAllowedStereotypes();
-    assertThat(references, hasSize(1));
-    assertReference(references.get(0), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
+    List<StereotypeModel> allowedStereotypes = param.getAllowedStereotypes();
+    assertThat(allowedStereotypes, hasSize(1));
+    assertStereotype(allowedStereotypes.get(0), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
   }
 
-  private void assertReference(ElementReference reference, String ns, String name, ElementReference.ElementType type) {
-    assertThat(reference.getNamespace(), is(ns));
-    assertThat(reference.getElementName(), is(name));
-    assertThat(reference.getType(), is(type));
+  private void assertStereotype(StereotypeModel stereotypeModel, String ns, String name, StereotypeModel parent) {
+    assertThat(stereotypeModel.getNamespace(), is(ns));
+    assertThat(stereotypeModel.getName(), is(name));
+    if (stereotypeModel.getParent().isPresent()) {
+      assertStereotype(stereotypeModel.getParent().get(), parent.getNamespace(), parent.getName(), parent.getParent().orElse(null));
+    } else {
+      assertThat(stereotypeModel.getParent().isPresent(), is(false));
+    }
   }
 }
