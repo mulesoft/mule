@@ -9,16 +9,16 @@ package org.mule.runtime.module.extension.internal.runtime.security;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.CredentialsBuilder;
-import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
+import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.util.List;
 
@@ -47,6 +47,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
     Authentication authResult = manager.authenticate(authentication);
 
     SecurityContext context = manager.createSecurityContext(authResult);
+    context.setAuthentication(authResult);
     session.setSecurityContext(context);
   }
 
