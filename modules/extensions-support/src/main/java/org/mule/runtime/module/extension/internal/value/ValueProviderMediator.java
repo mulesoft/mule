@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 public final class ValueProviderMediator<T extends ParameterizedModel & EnrichableModel> {
 
   private T containerModel;
-  private MuleContext muleContext;
+  private Supplier<MuleContext> muleContext;
   private Supplier<Object> NULL_SUPPLIER = () -> null;
 
   /**
@@ -47,7 +47,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
    * @param containerModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
    * @param muleContext context to be able to initialize {@link ValueProvider} if necessary
    */
-  public ValueProviderMediator(T containerModel, MuleContext muleContext) {
+  public ValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext) {
     this.containerModel = containerModel;
     this.muleContext = muleContext;
   }
@@ -117,7 +117,7 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
       ValueResolvingException {
 
     ValueProvider valueProvider =
-        factoryModelProperty.createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, muleContext)
+        factoryModelProperty.createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, muleContext.get())
             .createValueProvider();
 
     Set<Value> valueSet = valueProvider.resolve();
@@ -144,10 +144,4 @@ public final class ValueProviderMediator<T extends ParameterizedModel & Enrichab
         .collect(toList());
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
 }
