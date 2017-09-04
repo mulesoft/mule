@@ -187,7 +187,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     List<SchedulerView> schedulers = new ArrayList<>();
 
     for (Scheduler scheduler : decorators) {
-      schedulers.add(new DefaultSchedulerView(scheduler));
+      schedulers.add(new TestSchedulerView(scheduler));
     }
 
     return unmodifiableList(schedulers);
@@ -205,7 +205,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
     return scheduler.getScheduledTasks();
   }
 
-  private class DefaultSchedulerView implements SchedulerView {
+  private class TestSchedulerView implements SchedulerView {
 
     private Scheduler scheduler;
 
@@ -214,7 +214,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
      *
      * @param scheduler the scheduler to provide a view for.
      */
-    public DefaultSchedulerView(Scheduler scheduler) {
+    public TestSchedulerView(Scheduler scheduler) {
       this.scheduler = scheduler;
     }
 
@@ -230,7 +230,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
     @Override
     public boolean isTerminated() {
-      return scheduler.isShutdown();
+      return scheduler.isTerminated();
     }
 
     @Override
