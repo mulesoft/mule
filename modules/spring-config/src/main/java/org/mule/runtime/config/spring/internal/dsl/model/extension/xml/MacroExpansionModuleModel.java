@@ -247,7 +247,8 @@ public class MacroExpansionModuleModel {
    * @param moduleGlobalElementsNames collection with the global components names (such as <http:config name="a"../>, <file:config
    *        name="b"../>, <file:matcher name="c"../> and so on) that are contained within the <module/> that will be macro
    *        expanded
-   * @param configRefParentTnsName todo Lautaro add javadoc
+   * @param configRefParentTnsName parent reference to the global element if exists (it might not be global elements in the
+   *                               current module)
    * @return a new component model that represents the old placeholder but expanded with the content of the <body/>
    */
   private ComponentModel createModuleOperationChain(ComponentModel operationRefModel, ExtensionModel extensionModel,
