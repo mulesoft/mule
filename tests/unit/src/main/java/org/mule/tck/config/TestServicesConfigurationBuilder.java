@@ -14,9 +14,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.scheduler.SchedulerConfig.config;
+
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -24,11 +25,11 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import java.util.List;
-
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import java.util.List;
 
 /**
  * Registers services instances into the {@link MuleRegistry} of a {@link MuleContext}.
@@ -76,7 +77,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   }
 
   public void stopServices() throws MuleException {
-    final List<Scheduler> schedulers = schedulerService.getSchedulers();
+    final List<SchedulerView> schedulers = schedulerService.getSchedulers();
     try {
       assertThat(schedulers, empty());
     } finally {

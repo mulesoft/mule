@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.scheduler;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.service.Service;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public interface SchedulerService extends Service {
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
    * must act only as a delegate of {@link #cpuLightScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
-   * 
+   *
    * @return a scheduler that runs {@code cpu-light} tasks.
    */
   Scheduler cpuLightScheduler();
@@ -50,7 +51,7 @@ public interface SchedulerService extends Service {
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
    * must act only as a delegate of {@link #ioScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
-   * 
+   *
    * @return a scheduler that runs {@code blocking I/O} tasks.
    */
   Scheduler ioScheduler();
@@ -65,7 +66,7 @@ public interface SchedulerService extends Service {
    * <p>
    * Implementations must get the appropriate config from the runtime context to build the target {@link Scheduler}. This method
    * must act only as a delegate of {@link #cpuIntensiveScheduler(SchedulerConfig, SchedulerPoolsConfigFactory)}.
-   * 
+   *
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
   Scheduler cpuIntensiveScheduler();
@@ -78,9 +79,9 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
-   * 
+   *
    * @return a scheduler that runs {@code cpu-light} tasks.
    */
   Scheduler cpuLightScheduler(SchedulerConfig config);
@@ -93,9 +94,9 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
-   * 
+   *
    * @return a scheduler that runs {@code blocking I/O} tasks.
    */
   Scheduler ioScheduler(SchedulerConfig config);
@@ -109,9 +110,9 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
-   * 
+   *
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
   Scheduler cpuIntensiveScheduler(SchedulerConfig config);
@@ -124,10 +125,10 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
    * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
-   * 
+   *
    * @return a scheduler that runs {@code cpu-light} tasks.
    */
   Scheduler cpuLightScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
@@ -140,10 +141,10 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
    * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
-   * 
+   *
    * @return a scheduler that runs {@code blocking I/O} tasks.
    */
   Scheduler ioScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
@@ -157,10 +158,10 @@ public interface SchedulerService extends Service {
    * <p>
    * If the provided {@code config} has {@code maxConcurrentTasks} set, exceeding tasks will block the caller, until a running
    * task is finished.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
    * @param poolsConfigFactory the configuration to use for the thread pools that the schedulers use.
-   * 
+   *
    * @return a scheduler that runs {@code CPU intensive} tasks.
    */
   Scheduler cpuIntensiveScheduler(SchedulerConfig config, SchedulerPoolsConfigFactory poolsConfigFactory);
@@ -169,7 +170,7 @@ public interface SchedulerService extends Service {
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
    * {@link SynchronousQueue}.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
@@ -179,7 +180,7 @@ public interface SchedulerService extends Service {
    * Builds a fresh {@link Scheduler} for custom tasks. The returned {@link Scheduler} is backed by an
    * {@link java.util.concurrent.ExecutorService} built with the given {@code corePoolSize} threads and a
    * {@link LinkedBlockingQueue} with the given {@code queueSize}.
-   * 
+   *
    * @param config allows customization of the returned scheduler.
    * @return a scheduler whose threads manage {@code custom} tasks.
    */
@@ -187,9 +188,9 @@ public interface SchedulerService extends Service {
 
   /**
    * Provides a read-only view of all currently active {@link Scheduler}s created through this service.
-   * 
-   * @return all currently active {@link Scheduler}s.
+   *
+   * @return a {@link List} of {@link SchedulerView}s for all currently active {@link Scheduler}s.
    */
-  List<Scheduler> getSchedulers();
+  List<SchedulerView> getSchedulers();
 
 }

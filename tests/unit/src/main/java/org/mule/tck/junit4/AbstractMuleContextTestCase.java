@@ -10,6 +10,8 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -27,12 +29,13 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultTransformationService;
@@ -68,6 +71,12 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
@@ -76,16 +85,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -397,7 +401,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private static List<Scheduler> schedulersOnInit;
+  private static List<SchedulerView> schedulersOnInit;
 
   protected static void recordSchedulersOnInit(MuleContext context) {
     if (context != null) {
@@ -410,14 +414,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   protected static void verifyAndStopSchedulers() throws MuleException {
     final SchedulerService serviceImpl = muleContext.getSchedulerService();
-    final List<Scheduler> schedulers = new ArrayList<>(serviceImpl.getSchedulers());
-    schedulers.removeAll(schedulersOnInit);
 
+    Set<String> schedulersOnInitNames = schedulersOnInit.stream().map(s -> s.getName()).collect(toSet());
     try {
-      assertThat(schedulers, empty());
+      assertThat(muleContext.getSchedulerService().getSchedulers().stream()
+          .filter(s -> !schedulersOnInitNames.contains(s.getName())).collect(toList()), empty());
     } finally {
-      schedulers.forEach(sched -> sched.shutdownNow());
-
       if (serviceImpl instanceof SimpleUnitTestSupportSchedulerService) {
         stopIfNeeded(serviceImpl);
       }
@@ -446,7 +448,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   /**
    * Creates a basic event builder with its context already set.
-   * 
+   *
    * @return a basic event builder with its context already set.
    */
   protected static Builder eventBuilder() throws MuleException {

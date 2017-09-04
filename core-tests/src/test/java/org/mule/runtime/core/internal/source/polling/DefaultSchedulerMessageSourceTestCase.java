@@ -9,26 +9,29 @@ package org.mule.runtime.core.internal.source.polling;
 import static java.util.Collections.singletonMap;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
+import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
@@ -60,21 +63,28 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
   @Test
   public void disposeScheduler() throws Exception {
-    reset(muleContext.getSchedulerService());
-    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SchedulerService schedulerService = muleContext.getSchedulerService();
+    reset(schedulerService);
 
-    verify(muleContext.getSchedulerService()).cpuLightScheduler();
-    List<Scheduler> createdSchedulers = muleContext.getSchedulerService().getSchedulers();
+    AtomicReference<Scheduler> pollScheduler = new AtomicReference<>();
+
+    doAnswer(invocation -> {
+      Scheduler scheduler = (Scheduler) invocation.callRealMethod();
+      pollScheduler.set(scheduler);
+      return scheduler;
+    }).when(schedulerService).cpuLightScheduler();
+
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    verify(schedulerService).cpuLightScheduler();
+
     schedulerMessageSource.start();
 
-    Scheduler pollScheduler = createdSchedulers.get(createdSchedulers.size() - 1);
-
-    verify(pollScheduler).scheduleAtFixedRate(any(), anyLong(), anyLong(), any());
+    verify(pollScheduler.get()).scheduleAtFixedRate(any(), anyLong(), anyLong(), any());
 
     schedulerMessageSource.stop();
     schedulerMessageSource.dispose();
 
-    verify(pollScheduler).stop();
+    verify(pollScheduler.get()).stop();
   }
 
   private DefaultSchedulerMessageSource schedulerMessageSource;
