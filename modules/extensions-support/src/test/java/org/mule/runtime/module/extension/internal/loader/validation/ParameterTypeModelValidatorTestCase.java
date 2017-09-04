@@ -108,7 +108,7 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
     expectedException
         .expectMessage("Parameter 'parameter' that a contains reference to a [CONFIG] should be of type String but is of type java.lang.Object");
     when(parameter.getType()).thenReturn(TYPE_LOADER.load(Object.class));
-    when(parameter.getElementReferences()).thenReturn(singletonList(new ElementReference("test", "config", CONFIG)));
+    when(parameter.getAllowedStereotypes()).thenReturn(singletonList(new ElementReference("test", "config", CONFIG)));
     validate(extensionModel, validator);
   }
 }

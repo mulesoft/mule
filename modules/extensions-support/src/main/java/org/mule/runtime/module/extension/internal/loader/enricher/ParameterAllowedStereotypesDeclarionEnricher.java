@@ -10,36 +10,37 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.CONFIG;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.FLOW;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
-
+import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
-import org.mule.runtime.api.meta.model.parameter.ElementReference;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
-import org.mule.runtime.extension.api.annotation.ElementReferences;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreReference;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
+
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 
 /**
- * Enriches the {@link ParameterDeclaration}s of an extension model with a {@link List} of {@link ElementReferences} if they
+ * Enriches the {@link ParameterDeclaration}s of an extension model with a {@link List} of {@link StereotypeModel} if they
  * are marked as a reference to at least some element.
  *
  * @since 4.0
  */
-public final class ElementReferenceDeclarionEnricher extends AbstractAnnotatedDeclarationEnricher {
+public final class ParameterAllowedStereotypesDeclarionEnricher extends AbstractAnnotatedDeclarationEnricher {
 
   /**
    * {@inheritDoc}
    * <p>
-   * Checks all the declared parameters if someone is annotated with {@link ElementReferences} to create the references and set
+   * Checks all the declared parameters if someone is annotated with {@link ConfigReferences} to create the references and set
    * them up.
    */
   @Override
@@ -49,30 +50,33 @@ public final class ElementReferenceDeclarionEnricher extends AbstractAnnotatedDe
       @Override
       protected void onParameter(ParameterGroupDeclaration parameterGroup, ParameterDeclaration declaration) {
         declaration.getModelProperty(ImplementingParameterModelProperty.class)
-            .ifPresent(param -> declaration.setElementReferences(getReferences(param.getParameter())));
+            .ifPresent(param -> declaration.setAllowedStereotypeModels(getStereotypes(param.getParameter())));
         declaration.getModelProperty(DeclaringMemberModelProperty.class)
-            .ifPresent(field -> declaration.setElementReferences(getReferences(field.getDeclaringField())));
+            .ifPresent(field -> declaration.setAllowedStereotypeModels(getStereotypes(field.getDeclaringField())));
       }
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private List<ElementReference> getReferences(AnnotatedElement element) {
-    ElementReferences references = element.getAnnotation(ElementReferences.class);
+  private List<StereotypeModel> getStereotypes(AnnotatedElement element) {
+    ConfigReferences references = element.getAnnotation(ConfigReferences.class);
     if (references != null) {
-      return stream(references.value()).map(ref -> new ElementReference(ref.namespace(), ref.name(), CONFIG)).collect(toList());
+      return stream(references.value()).map(ref -> newStereotype(ref.namespace(), ref.name())
+          .withParent(CONFIG)
+          .build())
+          .collect(toList());
     }
 
     ConfigReference ref = element.getAnnotation(ConfigReference.class);
     if (ref != null) {
-      return singletonList(new ElementReference(ref.namespace(), ref.name(), CONFIG));
+      return singletonList(newStereotype(ref.namespace(), ref.name()).withParent(CONFIG).build());
     }
 
     if (element.getAnnotation(FlowReference.class) != null) {
-      return singletonList(new ElementReference("mule", "flow", FLOW));
+      return singletonList(FLOW);
     }
 
     if (element.getAnnotation(ObjectStoreReference.class) != null) {
-      return singletonList(new ElementReference("os", "objectStore", OBJECT_STORE));
+      return singletonList(OBJECT_STORE);
     }
 
     return emptyList();

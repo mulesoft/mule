@@ -299,10 +299,10 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(filterModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(filterModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultObjectType.class));
     assertThat(filterModel.getAllParameterModels().get(3).isRequired(), is(false));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().size(), is(1));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getElementName(), is("object-store"));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getNamespace(), is("os"));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getType(),
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().size(), is(1));
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0).getElementName(), is("object-store"));
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0).getNamespace(), is("os"));
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0).getType(),
                is(OBJECT_STORE));
 
 

@@ -200,8 +200,8 @@ class MuleExtensionModelDeclarer {
                                                                                          .allowsInlineDefinition(true)
                                                                                          .allowsReferences(true).build())
         .ofType(typeLoader.load(ObjectStore.class)).withExpressionSupport(NOT_SUPPORTED)
-        .withElementReferences(asList(new ElementReference(OBJECT_STORE_ELEMENT_NAMESPACE, OBJECT_STORE_ELEMENT_NAME,
-                                                           OBJECT_STORE)))
+        .withAllowedStereotypes(asList(new ElementReference(OBJECT_STORE_ELEMENT_NAMESPACE, OBJECT_STORE_ELEMENT_NAME,
+                                                            OBJECT_STORE)))
         .describedAs("The object store where the IDs of the processed events are going to be stored. " +
             "If defined as argument it should reference a globally created object store. Otherwise, " +
             "it can be defined inline or not at all. In the last case, a default object store will be provided.");

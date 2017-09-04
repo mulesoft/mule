@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ElementReferenceEnricherTestCase extends AbstractMuleTestCase {
+public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends AbstractMuleTestCase {
 
   private final ExtensionModel extension = loadExtension(MarvelExtension.class);
   private final ConfigurationModel configuration = extension.getConfigurationModel(DrStrange.CONFIG_NAME).get();
@@ -38,7 +38,7 @@ public class ElementReferenceEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void connectionProviderWithMultipleConfigReferenceParameter() {
     ParameterModel paramWithReferences = configuration.getConnectionProviders().get(0).getAllParameterModels().get(0);
-    List<ElementReference> references = paramWithReferences.getElementReferences();
+    List<ElementReference> references = paramWithReferences.getAllowedStereotypes();
     assertThat(references, hasSize(2));
     assertReference(references.get(0), HeisenbergExtension.HEISENBERG, "config", CONFIG);
     assertReference(references.get(1), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
@@ -50,8 +50,8 @@ public class ElementReferenceEnricherTestCase extends AbstractMuleTestCase {
         .filter(p -> p.getName().equals("spellStore"))
         .findFirst().get();
 
-    assertThat(osParam.getElementReferences(), hasSize(1));
-    ElementReference reference = osParam.getElementReferences().get(0);
+    assertThat(osParam.getAllowedStereotypes(), hasSize(1));
+    ElementReference reference = osParam.getAllowedStereotypes().get(0);
     assertThat(reference.getNamespace(), equalTo("os"));
     assertThat(reference.getElementName(), equalTo("objectStore"));
     assertThat(reference.getType(), is(OBJECT_STORE));
@@ -62,7 +62,7 @@ public class ElementReferenceEnricherTestCase extends AbstractMuleTestCase {
     OperationModel operation = configuration.getOperationModel("withFlowReference").get();
     assertThat(operation.getAllParameterModels(), hasSize(1));
     ParameterModel param = operation.getAllParameterModels().get(0);
-    List<ElementReference> references = param.getElementReferences();
+    List<ElementReference> references = param.getAllowedStereotypes();
     assertThat(references, hasSize(1));
     assertReference(references.get(0), "mule", "flow", FLOW);
   }
@@ -72,7 +72,7 @@ public class ElementReferenceEnricherTestCase extends AbstractMuleTestCase {
     List<ParameterModel> params = configuration.getAllParameterModels();
     assertThat(params, hasSize(2));
     ParameterModel param = params.get(0);
-    List<ElementReference> references = param.getElementReferences();
+    List<ElementReference> references = param.getAllowedStereotypes();
     assertThat(references, hasSize(1));
     assertReference(references.get(0), MARVEL_EXTENSION, CONFIG_NAME, CONFIG);
   }

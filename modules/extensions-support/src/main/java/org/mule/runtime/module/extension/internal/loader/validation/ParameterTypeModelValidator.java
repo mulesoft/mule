@@ -47,11 +47,11 @@ public final class ParameterTypeModelValidator implements ExtensionModelValidato
   }
 
   private void validateParameterWithReferencesType(ParameterModel parameter, ProblemsReporter problemsReporter) {
-    if (!parameter.getElementReferences().isEmpty() && !(parameter.getType() instanceof StringType)) {
+    if (!parameter.getAllowedStereotypes().isEmpty() && !(parameter.getType() instanceof StringType)) {
       problemsReporter.addError(new Problem(parameter, format(
                                                               "Parameter '%s' that a contains reference to a [%s] should be of type String but is of type %s",
                                                               parameter.getName(),
-                                                              parameter.getElementReferences().get(0).getType(),
+                                                              parameter.getAllowedStereotypes().get(0).getType(),
                                                               parameter.getType())));
     }
   }
