@@ -1,0 +1,6 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://consumer.ws.module.mule.org/"
+	attributeFormDefault="unqualified" elementFormDefault="unqualified"
+	targetNamespace="http://consumer.ws.module.mule.org/">
+    <xs:element name="echoResponse" type="tns:echoResponse"/>
+</xs:schema>

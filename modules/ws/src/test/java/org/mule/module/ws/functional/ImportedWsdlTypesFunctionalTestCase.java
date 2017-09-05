@@ -9,7 +9,7 @@ package org.mule.module.ws.functional;
 
 import org.junit.Test;
 
-public class ImportedWsdlTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
+public abstract class ImportedWsdlTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
 
     @Override

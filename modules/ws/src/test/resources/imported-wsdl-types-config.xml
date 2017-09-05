@@ -16,7 +16,7 @@
         <http:config useTransportForUris="${useTransportForUris}"/>
     </configuration>
 
-    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="TestImportedTypes.wsdl"
+    <ws:consumer-config serviceAddress="http://localhost:${port}/services/Test" wsdlLocation="${wsdlLocation}"
                         service="TestService" port="TestPort" name="globalConfig"/>
 
     <flow name="client">
