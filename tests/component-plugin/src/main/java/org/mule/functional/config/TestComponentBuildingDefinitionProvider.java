@@ -7,6 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
@@ -16,11 +17,13 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
+import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.DependencyInjectionObject;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
+import org.mule.functional.api.component.LogChecker;
 import org.mule.functional.api.component.OnErrorAssertHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
@@ -175,9 +178,13 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
-                                             .withTypeDefinition(fromType(OnErrorAssertHandler.class))
-                                             .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
-                                             .build());
+                                             .withTypeDefinition(fromType(OnErrorAssertHandler.class)).withSetterParameterDefinition("checkers",fromChildCollectionConfiguration(LogChecker.class).build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class)).withSetterParameterDefinition("expectedLogMessage", fromChildConfiguration(String.class).withIdentifier("expected-log-message").build())
+            .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("expected-log-message").withTypeDefinition(fromType(String.class)).build());
+
     return componentBuildingDefinitions;
   }
 }

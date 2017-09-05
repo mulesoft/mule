@@ -401,8 +401,34 @@
     <xsd:complexType name="onErrorAssertType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractOnErrorType">
+                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xsd:element ref="abstract-log-checker"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-log-checker" type="abstractLogCheckerType" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for log checker
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractLogCheckerType" abstract="true">
+        <xsd:complexContent>
+                <xsd:extension base="mule:annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="check-equals" substitutionGroup="abstract-log-checker" type="checkEqualsType"/>
+
+    <xsd:complexType name="checkEqualsType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractLogCheckerType">
                 <xsd:sequence minOccurs="0" maxOccurs="1">
-                    <xsd:element name="logToCheck" type="xsd:string">
+                    <xsd:element name="expected-log-message" type="xsd:string">
                         <xsd:annotation>
                             <xsd:documentation>
                                 The log message to compare to
@@ -410,8 +436,11 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
+                <xsd:attribute type="xsd:boolean" name="filterLog" default="true"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+
 
 </xsd:schema>

@@ -7,9 +7,12 @@ import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 
+import java.util.List;
+
 public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor{
 
-  private String expectedLogMessage;
+
+  private List<LogChecker> checkers;
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
@@ -19,6 +22,9 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
   @Override
   public InternalEvent handleException(MessagingException exception, InternalEvent event) {
     String messageToLog = createMessageToLog(exception);
+    for( LogChecker checker : this.checkers) {
+      checker.check(messageToLog);
+    }
     exception.setHandled(true);
     return null;
   }
@@ -33,12 +39,12 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
     return true;
   }
 
-  public void setExpectedLogMessage(String expectedLogMessage) {
-    this.expectedLogMessage = expectedLogMessage;
+  public void setCheckers(List<LogChecker> logCheckers) {
+    this.checkers = logCheckers;
   }
 
-  public String getExpectedLogMessage() {
-    return this.expectedLogMessage;
+  public List<LogChecker> getCheckers() {
+    return this.checkers;
   }
 
 }
