@@ -176,8 +176,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
                                              .withTypeDefinition(fromType(OnErrorAssertHandler.class))
-                                             .withSetterParameterDefinition("logException", fromSimpleParameter("logException").withDefaultValue("true").build())
-                                             .asPrototype().build());
+                                             .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+                                             .build());
     return componentBuildingDefinitions;
   }
 }

@@ -9,6 +9,8 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 
 public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor{
 
+  private String expectedLogMessage;
+
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
@@ -16,8 +18,9 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
 
   @Override
   public InternalEvent handleException(MessagingException exception, InternalEvent event) {
-    doLogException(exception);
-    return event;
+    String messageToLog = createMessageToLog(exception);
+    exception.setHandled(true);
+    return null;
   }
 
   @Override
@@ -30,8 +33,12 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
     return true;
   }
 
-  @Override
-  protected void doLogException(Throwable t) {
-    logger.error("\n\nTHIS IS AN ERROR\n\n");
+  public void setExpectedLogMessage(String expectedLogMessage) {
+    this.expectedLogMessage = expectedLogMessage;
   }
+
+  public String getExpectedLogMessage() {
+    return this.expectedLogMessage;
+  }
+
 }

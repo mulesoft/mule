@@ -400,7 +400,17 @@
 
     <xsd:complexType name="onErrorAssertType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractOnErrorType"/>
+            <xsd:extension base="mule:abstractOnErrorType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element name="logToCheck" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The log message to compare to
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
