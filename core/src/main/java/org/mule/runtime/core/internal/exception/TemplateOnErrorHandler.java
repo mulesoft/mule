@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.exception;
+package org.mule.runtime.core.internal.exception;
 
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.stream;

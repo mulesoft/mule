@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
