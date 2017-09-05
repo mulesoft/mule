@@ -6833,7 +6833,7 @@
                           "stereotype": {
                             "stereotypeModel": {
                               "type": "OBJECT_STORE",
-                              "namespace": "os"
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -12583,7 +12583,7 @@
                       "stereotype": {
                         "stereotypeModel": {
                           "type": "OBJECT_STORE",
-                          "namespace": "os"
+                          "namespace": "OS"
                         }
                       },
                       "description": {
@@ -12962,7 +12962,7 @@
                       "stereotype": {
                         "stereotypeModel": {
                           "type": "OBJECT_STORE",
-                          "namespace": "os"
+                          "namespace": "OS"
                         }
                       },
                       "description": {

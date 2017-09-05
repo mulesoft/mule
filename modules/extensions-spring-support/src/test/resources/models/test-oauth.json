@@ -1354,7 +1354,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "os"
+                      "namespace": "OS"
                     }
                   ],
                   "name": "objectStore",
@@ -2008,7 +2008,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "os"
+                      "namespace": "OS"
                     }
                   ],
                   "name": "objectStore",
@@ -2673,7 +2673,7 @@
               "allowedStereotypeModels": [
                 {
                   "type": "OBJECT_STORE",
-                  "namespace": "os"
+                  "namespace": "OS"
                 }
               ],
               "name": "objectStore",
@@ -3327,7 +3327,7 @@
               "allowedStereotypeModels": [
                 {
                   "type": "OBJECT_STORE",
-                  "namespace": "os"
+                  "namespace": "OS"
                 }
               ],
               "name": "objectStore",

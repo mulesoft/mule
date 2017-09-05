@@ -90,7 +90,7 @@
               "allowedStereotypeModels": [
                 {
                   "type": "OBJECT_STORE",
-                  "namespace": "os"
+                  "namespace": "OS"
                 }
               ],
               "name": "spellStore",
@@ -2148,7 +2148,7 @@
                           "stereotype": {
                             "stereotypeModel": {
                               "type": "OBJECT_STORE",
-                              "namespace": "os"
+                              "namespace": "OS"
                             }
                           },
                           "description": {
