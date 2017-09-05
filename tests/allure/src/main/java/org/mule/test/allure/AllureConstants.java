@@ -304,6 +304,12 @@ public interface AllureConstants {
 
   }
 
+  interface SchedulerFeature {
+
+    String SCHEDULER = "Scheduler";
+
+  }
+
   interface StreamingFeature {
 
     String STREAMING = "Streaming";

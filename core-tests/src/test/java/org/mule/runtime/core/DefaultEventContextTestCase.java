@@ -31,6 +31,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
@@ -86,17 +87,20 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         },
         {
             (CheckedSupplier<InternalEventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
-                                                                 TEST_CONNECTOR_LOCATION),
+                                                                 TEST_CONNECTOR_LOCATION, NullExceptionHandler.getInstance()),
             (CheckedFunction<MonoProcessor<Void>, InternalEventContext>) externalCompletion -> create("id",
                                                                                                       DefaultEventContextTestCase.class
                                                                                                           .getName(),
                                                                                                       TEST_CONNECTOR_LOCATION,
                                                                                                       null,
-                                                                                                      externalCompletion),
+                                                                                                      externalCompletion,
+                                                                                                      NullExceptionHandler
+                                                                                                          .getInstance()),
             (CheckedFunction<ComponentLocation, InternalEventContext>) location -> create("id",
                                                                                           DefaultEventContextTestCase.class
                                                                                               .getName(),
-                                                                                          location)
+                                                                                          location,
+                                                                                          NullExceptionHandler.getInstance())
         }
     });
   }

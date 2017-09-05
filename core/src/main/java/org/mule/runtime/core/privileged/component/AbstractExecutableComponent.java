@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
@@ -88,7 +89,8 @@ public abstract class AbstractExecutableComponent extends AbstractAnnotatedObjec
   }
 
   protected InternalEventContext createEventContext() {
-    return DefaultEventContext.create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation());
+    return DefaultEventContext.create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(),
+                                      NullExceptionHandler.getInstance());
   }
 
   /**
