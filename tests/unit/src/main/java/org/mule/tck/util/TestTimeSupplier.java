@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 4.0
  */
-public class TestTimeSupplier extends TimeSupplier {
+public class TestTimeSupplier implements TimeSupplier {
 
   private long timeInMillis;
 

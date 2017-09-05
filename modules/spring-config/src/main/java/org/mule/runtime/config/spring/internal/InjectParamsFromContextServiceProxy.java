@@ -16,7 +16,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.container.api.ServiceInvocationHandler;
+import org.mule.runtime.container.api.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -37,7 +37,7 @@ import javax.inject.Named;
  * 
  * @since 4.0
  */
-public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandler {
+public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandler<Service> {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
       "More than one invocation candidate for for method '%s' in service '%s'";
@@ -79,7 +79,7 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
         if (arg == null) {
           throw new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
                                                                parameter.getName(), injectable.getName(),
-                                                               getService().getName()));
+                                                               getProxiedObject().getName()));
         }
         augmentedArgs.add(arg);
       }
@@ -91,7 +91,7 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
   private Method resolveInjectableMethod(Method method) throws RegistrationException {
     Method candidate = null;
 
-    for (Method serviceImplMethod : getServiceImplementationDeclaredMethods()) {
+    for (Method serviceImplMethod : getImplementationDeclaredMethods()) {
       if (isPublic(serviceImplMethod.getModifiers())
           && serviceImplMethod.getName().equals(method.getName())
           && serviceImplMethod.getAnnotationsByType(Inject.class).length > 0
@@ -100,7 +100,7 @@ public class InjectParamsFromContextServiceProxy extends ServiceInvocationHandle
             && !(candidate.getName().equals(serviceImplMethod.getName())
                 && deepEquals(candidate.getParameterTypes(), serviceImplMethod.getParameterTypes()))) {
           throw new IllegalDependencyInjectionException(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(),
-                                                               getService().getName()));
+                                                               getProxiedObject().getName()));
         }
         candidate = serviceImplMethod;
       }

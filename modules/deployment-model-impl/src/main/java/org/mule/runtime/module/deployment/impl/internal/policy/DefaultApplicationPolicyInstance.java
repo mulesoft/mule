@@ -10,17 +10,23 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -42,6 +48,7 @@ import java.util.Optional;
  */
 public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
+  public static final String CLUSTER_MANAGER_ID = "_muleClusterManager";
   private final Application application;
   private final PolicyTemplate template;
   private final PolicyParametrization parametrization;
@@ -90,11 +97,32 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
                                                                                      artifactPlugins,
                                                                                      new DefaultExtensionManagerFactory()));
 
-    artifactBuilder.withServiceConfigurator(customizationService -> customizationService
-        .overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER,
-                                    application.getMuleContext().getRegistry()
-                                        .lookupObject(MuleProperties.OBJECT_POLICY_MANAGER_STATE_HANDLER)));
-
+    artifactBuilder.withServiceConfigurator(customizationService -> {
+      MuleRegistry applicationRegistry = application.getMuleContext().getRegistry();
+      /*
+       * OBJECT_POLICY_MANAGER_STATE_HANDLER is not proxied as it doesn't implement any lifecycle interfaces (Startable, Stoppable
+       * or Disposable)
+       */
+      customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
+                                                      applicationRegistry.lookupObject(OBJECT_POLICY_MANAGER_STATE_HANDLER));
+      customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(OBJECT_LOCK_PROVIDER)));
+      customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY)));
+      customizationService.overrideDefaultServiceImpl(BASE_IN_MEMORY_OBJECT_STORE_KEY,
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY)));
+      customizationService.overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
+                                                      createLifecycleFilterProxy(applicationRegistry
+                                                          .lookupObject(OBJECT_TIME_SUPPLIER)));
+      Object muleClusterManager = applicationRegistry.lookupObject(CLUSTER_MANAGER_ID);
+      if (muleClusterManager != null) {
+        customizationService.registerCustomServiceImpl(CLUSTER_MANAGER_ID,
+                                                       createLifecycleFilterProxy(muleClusterManager));
+      }
+    });
     try {
       policyContext = artifactBuilder.build();
       policyContext.getMuleContext().start();

@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -78,7 +79,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
         return new DynamicConfigurationProvider(providerName, extensionModel, implicitConfigurationModel,
                                                 resolverSet,
                                                 implicitConnectionProviderValueResolver,
-                                                ImmutableExpirationPolicy.getDefault(new TimeSupplier()), muleContext);
+                                                ImmutableExpirationPolicy.getDefault(new LocalTimeSupplier()), muleContext);
       }
 
       return new ConfigurationProviderToolingAdapter(providerName, extensionModel,
