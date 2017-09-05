@@ -14,11 +14,8 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
+public abstract class IncludedXsdTypesFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
 {
-    @Rule
-    public SystemProperty wsdlLocation = new SystemProperty("wsdlLocation", "TestIncludedTypes.wsdl");
-
     @Override
     protected String getConfigFile()
     {

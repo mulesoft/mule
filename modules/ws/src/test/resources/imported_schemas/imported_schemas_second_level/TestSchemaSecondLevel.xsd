@@ -1,0 +1,9 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns2="http://consumer.imported.ws.module.mule.org/"
+	attributeFormDefault="unqualified" elementFormDefault="unqualified"
+	targetNamespace="http://consumer.imported.ws.module.mule.org/">
+	 <xs:import
+		namespace="http://consumer.imported.imported.ws.module.mule.org/"
+		schemaLocation="imported_schemas_third_level/TestSchemaThirdLevel.xsd" />
+	    <xs:element name="echo" type="tns:echo"/>
+</xs:schema>
