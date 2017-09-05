@@ -59,9 +59,9 @@ public class SecurityFilterMessageProcessor extends AbstractAnnotatedObject
 
   @Override
   public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
-    return from(publisher).doOnNext(event -> {
+    return from(publisher).map(event -> {
       try {
-        filter.doFilter(event);
+        return filter.doFilter(event);
       } catch (Exception e) {
         throw propagate(e);
       }

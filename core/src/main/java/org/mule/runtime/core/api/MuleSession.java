@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.security.SecurityContext;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -24,22 +23,6 @@ import java.util.Set;
  */
 @Deprecated
 public interface MuleSession extends Serializable {
-
-  /**
-   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context
-   * 
-   * @param context the context for this session or null if the request is not secure.
-   */
-  void setSecurityContext(SecurityContext context);
-
-  /**
-   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context
-   * 
-   * @return the context for this session or null if the request is not secure.
-   */
-  SecurityContext getSecurityContext();
 
   /**
    * Will set a session scope property.

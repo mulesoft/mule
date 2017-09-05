@@ -62,9 +62,8 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
 
     SecurityContext context = getSecurityManager().createSecurityContext(authResult);
     context.setAuthentication(authResult);
-    event.getSession().setSecurityContext(context);
 
-    return event;
+    return InternalEvent.builder(event).securityContext(context).build();
   }
 
   protected Authentication getAuthenticationToken(InternalEvent event) throws UnauthorisedException {

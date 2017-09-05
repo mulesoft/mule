@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.core.api.session;
 
+import static java.util.Collections.synchronizedMap;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyNotSerializableWasDropped;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionPropertyNotSerializableWarning;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,9 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>DefaultMuleSession</code> manages the interaction and distribution of events for Mule Services.
@@ -52,13 +55,11 @@ public final class DefaultMuleSession implements MuleSession {
   private Map<String, TypedValue> properties;
 
   public DefaultMuleSession() {
-    properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
+    properties = synchronizedMap(new CaseInsensitiveHashMap());
   }
 
   public DefaultMuleSession(MuleSession session) {
-    this.securityContext = session.getSecurityContext();
-
-    this.properties = Collections.synchronizedMap(new CaseInsensitiveHashMap());
+    this.properties = synchronizedMap(new CaseInsensitiveHashMap());
     for (String key : session.getPropertyNamesAsSet()) {
       this.properties.put(key, createTypedValue(session, key));
     }
@@ -66,28 +67,6 @@ public final class DefaultMuleSession implements MuleSession {
 
   private TypedValue createTypedValue(MuleSession session, String key) {
     return new TypedValue(session.getProperty(key), session.getPropertyDataType(key));
-  }
-
-  /**
-   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context
-   *
-   * @param context the context for this session or null if the request is not secure.
-   */
-  @Override
-  public void setSecurityContext(SecurityContext context) {
-    securityContext = context;
-  }
-
-  /**
-   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context
-   *
-   * @return the context for this session or null if the request is not secure.
-   */
-  @Override
-  public SecurityContext getSecurityContext() {
-    return securityContext;
   }
 
   /**
@@ -100,7 +79,7 @@ public final class DefaultMuleSession implements MuleSession {
   @Override
   public void setProperty(String key, Object value) {
     if (!(value instanceof Serializable)) {
-      logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
+      logger.warn(sessionPropertyNotSerializableWarning(key).toString());
     }
 
     properties.put(key, new TypedValue(value, DataType.fromObject(value)));
@@ -109,7 +88,7 @@ public final class DefaultMuleSession implements MuleSession {
   @Override
   public void setProperty(String key, Object value, DataType dataType) {
     if (!(value instanceof Serializable)) {
-      logger.warn(CoreMessages.sessionPropertyNotSerializableWarning(key).toString());
+      logger.warn(sessionPropertyNotSerializableWarning(key).toString());
     }
     properties.put(key, new TypedValue(value, dataType));
   }
@@ -155,7 +134,7 @@ public final class DefaultMuleSession implements MuleSession {
     while (propertyIterator.hasNext()) {
       final Entry<String, TypedValue> entry = propertyIterator.next();
       if (!(entry.getValue().getValue() instanceof Serializable)) {
-        logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()).toString());
+        logger.warn(propertyNotSerializableWasDropped(entry.getKey()).toString());
         propertyIterator.remove();
       }
     }

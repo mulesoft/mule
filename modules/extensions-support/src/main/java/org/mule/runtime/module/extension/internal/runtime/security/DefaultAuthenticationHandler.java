@@ -12,7 +12,6 @@ import org.mule.runtime.api.security.CredentialsBuilder;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -21,6 +20,7 @@ import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Default implementation of a {@link AuthenticationHandler}
@@ -29,12 +29,13 @@ import java.util.List;
  */
 public class DefaultAuthenticationHandler implements AuthenticationHandler {
 
-  private final MuleSession session;
+  private SecurityContext securityContext;
   private SecurityManager manager;
+  private final Consumer<SecurityContext> securityContextUpdater;
 
-  public DefaultAuthenticationHandler(SecurityManager manager, MuleSession session) {
-    this.session = session;
+  public DefaultAuthenticationHandler(SecurityManager manager, Consumer<SecurityContext> securityContextUpdater) {
     this.manager = manager;
+    this.securityContextUpdater = securityContextUpdater;
   }
 
   /**
@@ -48,7 +49,8 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
 
     SecurityContext context = manager.createSecurityContext(authResult);
     context.setAuthentication(authResult);
-    session.setSecurityContext(context);
+    this.securityContext = context;
+    this.securityContextUpdater.accept(context);
   }
 
   /**
@@ -80,7 +82,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
    */
   @Override
   public Authentication getAuthentication() {
-    return session.getSecurityContext().getAuthentication();
+    return securityContext.getAuthentication();
   }
 
   /**

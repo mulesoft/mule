@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -50,7 +51,9 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
     TypedValue result =
         operationContext.getMuleContext().getExpressionManager()
             .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
-    return InternalEvent.builder(operationContext.getEvent()).addVariable(this.target, result.getValue(), result.getDataType())
+    return InternalEvent.builder(operationContext.getEvent())
+        .securityContext(operationContext.getSecurityContext())
+        .addVariable(this.target, result.getValue(), result.getDataType())
         .build();
   }
 }

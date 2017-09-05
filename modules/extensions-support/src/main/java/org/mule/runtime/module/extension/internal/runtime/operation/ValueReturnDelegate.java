@@ -47,6 +47,8 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
   public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     return value instanceof EventedResult
         ? ((EventedResult) value).getEvent()
-        : InternalEvent.builder(operationContext.getEvent()).message(toMessage(value, operationContext)).build();
+        : InternalEvent.builder(operationContext.getEvent())
+            .securityContext(operationContext.getSecurityContext())
+            .message(toMessage(value, operationContext)).build();
   }
 }

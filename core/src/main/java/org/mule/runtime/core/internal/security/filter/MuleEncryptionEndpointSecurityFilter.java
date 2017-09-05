@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.security.filter;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.encryptionStrategyNotSet;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.Authentication;
@@ -15,7 +16,6 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CredentialsNotSetException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -45,7 +45,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
       CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) credentialsAccessor.getCredentials(event);
     if (userHeader == null) {
-      throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(), this);
+      throw new CredentialsNotSetException(event, event.getSecurityContext(), this);
     }
 
     Credentials user = new DefaultMuleCredentials(userHeader, getSecurityManager());
@@ -68,14 +68,13 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
 
     SecurityContext context = getSecurityManager().createSecurityContext(authentication);
     context.setAuthentication(authentication);
-    event.getSession().setSecurityContext(context);
-    return event;
+    return InternalEvent.builder(event).securityContext(context).build();
   }
 
   @Override
   protected void doInitialise() throws InitialisationException {
     if (strategy == null) {
-      throw new InitialisationException(CoreMessages.encryptionStrategyNotSet(), this);
+      throw new InitialisationException(encryptionStrategyNotSet(), this);
     }
   }
 

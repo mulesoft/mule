@@ -7,40 +7,50 @@
 package org.mule.runtime.core.api.event;
 
 import static java.time.Duration.ofMillis;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static reactor.core.publisher.Mono.from;
+
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.core.api.security.DefaultMuleCredentials;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
@@ -51,9 +61,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Test
-  public void testEventSerialization() throws Exception {
-    setCurrentEvent(testEvent());
-
+  public void serialization() throws Exception {
     Transformer transformer = createSerializableToByteArrayTransformer();
     transformer.setMuleContext(muleContext);
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(testEvent());
@@ -235,6 +243,44 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertThat(((Pipeline) before.getFlowConstruct()).getSerializationEventContextCache().get(before.getContext().getId()),
                is(nullValue()));
 
+  }
+
+  @Test
+  public void securityContextCopy() throws Exception {
+    SecurityContext securityContext = mock(SecurityContext.class);
+    InternalEvent event = InternalEvent.builder(testEvent()).securityContext(securityContext).build();
+
+    InternalEvent eventCopy = InternalEvent.builder(event).message(Message.of("copy")).build();
+
+    assertThat(securityContext, sameInstance(eventCopy.getSecurityContext()));
+  }
+
+  @Test
+  public void securityContextSerialization() throws Exception {
+    Transformer transformer = createSerializableToByteArrayTransformer();
+    transformer.setMuleContext(muleContext);
+
+    InternalEvent event = InternalEvent.builder(testEvent()).securityContext(createTestAuthentication()).build();
+
+    Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
+    assertNotNull(serialized);
+    ByteArrayToObject trans = new ByteArrayToObject();
+    trans.setMuleContext(muleContext);
+    InternalEvent deserialized = (InternalEvent) trans.transform(serialized);
+
+    assertThat(deserialized.getSecurityContext().getAuthentication().getPrincipal(),
+               is(event.getSecurityContext().getAuthentication().getPrincipal()));
+    assertThat(deserialized.getSecurityContext().getAuthentication().getProperties().get("key1"),
+               is(event.getSecurityContext().getAuthentication().getProperties().get("key1")));
+    assertThat(deserialized.getSecurityContext().getAuthentication().getCredentials(),
+               is(event.getSecurityContext().getAuthentication().getCredentials()));
+  }
+
+  private SecurityContext createTestAuthentication() {
+    Authentication auth = new DefaultMuleAuthentication(new DefaultMuleCredentials("dan", new char[] {'d', 'f'}));
+    SecurityContext securityContext =
+        new DefaultSecurityContextFactory().create(auth.setProperties(singletonMap("key1", "value1")));
+    return securityContext;
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

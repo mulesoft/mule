@@ -16,6 +16,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -43,6 +44,9 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -50,9 +54,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
@@ -72,6 +73,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private ReplyToHandler replyToHandler;
   private Object replyToDestination;
   private MuleSession session = new DefaultMuleSession();
+  private SecurityContext securityContext;
   private InternalEvent originalEvent;
   private boolean modified;
   private boolean notificationsEnabled = true;
@@ -90,6 +92,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.flowCallStack = event.getFlowCallStack().clone();
     this.replyToHandler = event.getReplyToHandler();
     this.replyToDestination = event.getReplyToDestination();
+    this.securityContext = event.getSecurityContext();
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
@@ -245,6 +248,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
+  public InternalEvent.Builder securityContext(SecurityContext securityContext) {
+    SecurityContext originalValue = this.securityContext;
+    this.securityContext = securityContext;
+    this.modified = originalValue != securityContext;
+    return this;
+  }
+
+  @Override
   public Builder disableNotifications() {
     this.notificationsEnabled = false;
     this.modified = true;
@@ -259,9 +270,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       requireNonNull(message);
 
       return new InternalEventImplementation(context, message, flowVariables, moduleProperties, moduleParameters,
-                                             internalParameters,
-                                             flow, session, replyToDestination, replyToHandler,
-                                             flowCallStack, groupCorrelation, error, legacyCorrelationId, notificationsEnabled);
+                                             internalParameters, flow, session, securityContext, replyToDestination,
+                                             replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
+                                             notificationsEnabled);
     }
   }
 
@@ -290,6 +301,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     // TODO MULE-10013 make this final
     private Message message;
     private final MuleSession session;
+    private SecurityContext securityContext;
     // TODO MULE-10013 make this final
     private transient FlowConstruct flowConstruct;
 
@@ -316,7 +328,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private InternalEventImplementation(InternalEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, TypedValue<?>> properties, Map<String, TypedValue<?>> parameters,
                                         Map<String, ?> internalParameters, FlowConstruct flowConstruct, MuleSession session,
-                                        Object replyToDestination, ReplyToHandler replyToHandler,
+                                        SecurityContext securityContext, Object replyToDestination, ReplyToHandler replyToHandler,
                                         FlowCallStack flowCallStack, Optional<GroupCorrelation> groupCorrelation, Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
@@ -325,6 +337,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         this.flowName = flowConstruct.getName();
       }
       this.session = session;
+      this.securityContext = securityContext;
       this.message = message;
       variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
       this.properties = properties;
@@ -355,7 +368,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Optional<Authentication> getAuthentication() {
-      SecurityContext securityContext = session.getSecurityContext();
       if (securityContext == null) {
         return empty();
       }
@@ -558,7 +570,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public SecurityContext getSecurityContext() {
-      return session.getSecurityContext();
+      return securityContext;
     }
 
     private GroupCorrelation groupCorrelation;
