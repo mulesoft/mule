@@ -1801,9 +1801,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     startDeployment();
 
-    // TODO(fernandezlautaro): MULE-11089 the following line is expecting to see one deploy, for some reason tries to redeploy two
-    // times so I added until this bug gets fixed
-    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId(), times(2));
+    assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId(), times(1));
   }
 
   @Test

@@ -139,21 +139,21 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployPackagedArtifact(URI artifactAchivedUri) throws DeploymentException {
-    T artifact;
 
     try {
-      try {
+      File artifactLocation = installArtifact(artifactAchivedUri);
 
-        artifact = installFrom(artifactAchivedUri);
+      T artifact;
+      try {
+        artifact = createArtifact(artifactLocation);
         trackArtifact(artifact);
       } catch (Throwable t) {
-        File artifactArchive = new File(artifactAchivedUri);
-        String artifactName = removeEndIgnoreCase(artifactArchive.getName(), JAR_FILE_SUFFIX);
+        String artifactName = artifactLocation.getName();
 
         // error text has been created by the deployer already
         logDeploymentFailure(t, artifactName);
 
-        addZombieFile(artifactName, artifactArchive);
+        addZombieFile(artifactName, artifactLocation);
 
         deploymentListener.onDeploymentFailure(artifactName, t);
 
@@ -171,6 +171,26 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       final String msg = "Failed to deploy from URI: " + artifactAchivedUri;
       throw new DeploymentException(createStaticMessage(msg), t);
     }
+  }
+
+  private File installArtifact(URI artifactAchivedUri) throws IOException {
+    File artifactLocation;
+    try {
+      artifactLocation = installFrom(artifactAchivedUri);
+    } catch (Throwable t) {
+      File artifactArchive = new File(artifactAchivedUri);
+      String artifactName = removeEndIgnoreCase(artifactArchive.getName(), JAR_FILE_SUFFIX);
+
+      // error text has been created by the deployer already
+      logDeploymentFailure(t, artifactName);
+
+      addZombieFile(artifactName, artifactArchive);
+
+      deploymentListener.onDeploymentFailure(artifactName, t);
+
+      throw t;
+    }
+    return artifactLocation;
   }
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
@@ -380,10 +400,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
   }
 
-  private T installFrom(URI uri) throws IOException {
-    File artifactLocation = artifactArchiveInstaller.installArtifact(uri);
-    T artifact = createArtifact(artifactLocation);
-    return artifact;
+  private File installFrom(URI uri) throws IOException {
+    return artifactArchiveInstaller.installArtifact(uri);
   }
 
   private T createArtifact(File artifactLocation) throws IOException {
