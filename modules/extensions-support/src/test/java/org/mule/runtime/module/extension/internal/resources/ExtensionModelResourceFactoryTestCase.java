@@ -31,7 +31,6 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
     extensionModel = loadExtension(HeisenbergExtension.class);
   }
 
-
   @Override
   protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
     return new Class[] {ExtensionModelResourceFactory.class};

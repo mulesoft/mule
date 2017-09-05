@@ -20,7 +20,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
-import static org.mule.runtime.api.meta.model.parameter.ElementReference.ElementType.OBJECT_STORE;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleManifest.getVendorName;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
@@ -31,6 +30,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -299,14 +299,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(filterModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(filterModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultObjectType.class));
     assertThat(filterModel.getAllParameterModels().get(3).isRequired(), is(false));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().size(), is(1));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getElementName(), is("object-store"));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getNamespace(), is("os"));
-    assertThat(filterModel.getAllParameterModels().get(3).getElementReferences().get(0).getType(),
-               is(OBJECT_STORE));
-
-
-
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().size(), is(1));
+    assertThat(filterModel.getAllParameterModels().get(3).getAllowedStereotypes().get(0), is(OBJECT_STORE));
   }
 
   @Test

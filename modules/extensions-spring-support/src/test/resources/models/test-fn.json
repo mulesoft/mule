@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "FN",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [],
@@ -73,12 +81,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -122,7 +130,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -163,7 +171,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -193,7 +201,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -249,7 +257,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "echo",
               "description": "",
               "modelProperties": {}
@@ -303,7 +311,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "bool",
               "description": "",
               "modelProperties": {}
@@ -342,7 +350,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "number",
               "description": "",
               "modelProperties": {}
@@ -380,7 +388,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doubles",
               "description": "",
               "modelProperties": {}
@@ -418,7 +426,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "floats",
               "description": "",
               "modelProperties": {}
@@ -457,7 +465,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "longs",
               "description": "",
               "modelProperties": {}
@@ -495,7 +503,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "shorts",
               "description": "",
               "modelProperties": {}
@@ -583,7 +591,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -609,7 +617,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "prefix",
               "description": "",
               "modelProperties": {}
@@ -732,7 +740,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pojo",
               "description": "",
               "modelProperties": {}
@@ -801,7 +809,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "expression",
               "description": "",
               "modelProperties": {}
@@ -842,7 +850,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "item",
               "description": "",
               "modelProperties": {}
@@ -867,7 +875,7 @@
                 "text": false,
                 "query": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "returnType",
               "description": "",
               "modelProperties": {}

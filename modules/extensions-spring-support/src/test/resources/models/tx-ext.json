@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "TX",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [
@@ -47,10 +55,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -78,6 +82,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -114,7 +122,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -149,7 +157,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -179,7 +187,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -315,7 +323,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -379,10 +387,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -410,6 +414,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -446,7 +454,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "action",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -487,7 +495,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -517,7 +525,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -653,7 +661,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -737,12 +745,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "PROCESSOR",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -779,7 +787,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -929,7 +937,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -975,7 +983,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1005,7 +1013,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1141,7 +1149,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1194,10 +1202,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1225,6 +1229,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1261,7 +1269,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -1394,7 +1402,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1447,10 +1455,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1478,6 +1482,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1503,7 +1511,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalConnection",
                   "description": "",
                   "modelProperties": {}
@@ -1541,7 +1549,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -1680,7 +1688,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1733,10 +1741,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1764,6 +1768,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1800,7 +1808,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -1933,7 +1941,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1986,10 +1994,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -2017,6 +2021,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2053,7 +2061,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -2186,7 +2194,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2239,10 +2247,6 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -2270,6 +2274,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2306,7 +2314,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of joining action that operations can take regarding transactions.",
                   "modelProperties": {}
@@ -2439,7 +2447,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2473,6 +2481,14 @@
         {
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2501,7 +2517,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -2674,7 +2690,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2881,7 +2897,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -2912,6 +2928,14 @@
         {
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TX",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2940,7 +2964,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "useXa",
                   "description": "",
                   "modelProperties": {}
@@ -3113,7 +3137,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3202,12 +3226,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3243,7 +3267,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {}
@@ -3280,7 +3304,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionType",
                   "description": "The type of transaction to create. Availability will depend on the runtime version.",
                   "modelProperties": {
@@ -3382,11 +3406,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -3413,7 +3436,7 @@
                     "order": 2,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3563,7 +3586,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3643,12 +3666,12 @@
           "transactional": true,
           "requiresConnection": true,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3684,7 +3707,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionType",
                   "description": "The type of transaction to create. Availability will depend on the runtime version.",
                   "modelProperties": {}
@@ -3721,7 +3744,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transactionalAction",
                   "description": "The type of beginning action that sources can take regarding transactions.",
                   "modelProperties": {
@@ -3823,11 +3846,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -3854,7 +3876,7 @@
                     "order": 2,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -4004,7 +4026,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4064,12 +4086,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "fail",
       "description": "",
@@ -4083,6 +4105,14 @@
     {
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TX",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4111,7 +4141,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -4284,7 +4314,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -4491,7 +4521,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -4522,6 +4552,14 @@
     {
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TX",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4550,7 +4588,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "useXa",
               "description": "",
               "modelProperties": {}
@@ -4723,7 +4761,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {

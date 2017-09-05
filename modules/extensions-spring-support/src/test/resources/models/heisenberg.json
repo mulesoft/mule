@@ -57,6 +57,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -99,7 +107,7 @@
                 "query": false,
                 "order": 8
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "familyInformations",
               "description": "",
               "modelProperties": {}
@@ -143,7 +151,7 @@
                 "query": false,
                 "order": 9
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "enemies",
               "description": "",
               "modelProperties": {}
@@ -202,7 +210,7 @@
                 "query": false,
                 "order": 10
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "monthlyIncomes",
               "description": "",
               "modelProperties": {}
@@ -232,7 +240,7 @@
                 "query": false,
                 "order": 11
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cancer",
               "description": "",
               "modelProperties": {}
@@ -293,7 +301,7 @@
                 "query": false,
                 "order": 12
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "recipe",
               "description": "",
               "modelProperties": {}
@@ -357,7 +365,7 @@
                 "query": false,
                 "order": 13
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "deathsBySeasons",
               "description": "",
               "modelProperties": {}
@@ -398,7 +406,7 @@
                 "query": false,
                 "order": 14
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "money",
               "description": "",
               "modelProperties": {}
@@ -424,7 +432,7 @@
                 "query": false,
                 "order": 15
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -468,7 +476,7 @@
                 "query": false,
                 "order": 16
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "wildCardWeapons",
               "description": "",
               "modelProperties": {}
@@ -530,7 +538,7 @@
                 "query": false,
                 "order": 17
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "wildCards",
               "description": "",
               "modelProperties": {}
@@ -576,7 +584,7 @@
                 "query": false,
                 "order": 18
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weaponValueMap",
               "displayModel": {
                 "displayName": "Parameter Custom Display Name"
@@ -625,7 +633,7 @@
                 "query": false,
                 "order": 19
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "candidateDoors",
               "description": "",
               "modelProperties": {}
@@ -663,7 +671,7 @@
                 "query": false,
                 "order": 20
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "initialHealth",
               "description": "",
               "modelProperties": {}
@@ -700,7 +708,7 @@
                 "query": false,
                 "order": 21
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "finalHealth",
               "description": "",
               "modelProperties": {}
@@ -726,7 +734,7 @@
                 "query": false,
                 "order": 22
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "labAddress",
               "displayModel": {
                 "example": "308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104"
@@ -755,7 +763,7 @@
                 "query": false,
                 "order": 23
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "firstEndevour",
               "description": "",
               "modelProperties": {}
@@ -810,7 +818,7 @@
                 "query": false,
                 "order": 24
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "healthProgressions",
               "description": "",
               "modelProperties": {}
@@ -872,7 +880,7 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "labeledRicin",
               "description": "",
               "modelProperties": {}
@@ -898,7 +906,7 @@
                 "query": false,
                 "order": 25
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "nextDoor",
               "description": "",
               "modelProperties": {}
@@ -943,7 +951,7 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "ricinPacks",
               "displayModel": {
                 "summary": "A set of ricin packs"
@@ -989,7 +997,7 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -1032,7 +1040,7 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -1062,7 +1070,7 @@
                 "order": 3,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -1092,7 +1100,7 @@
                 "order": 4,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -1122,7 +1130,7 @@
                 "order": 5,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -1155,7 +1163,7 @@
                 "order": 6,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -1200,7 +1208,7 @@
                 "order": 7,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -1245,7 +1253,7 @@
                 "query": false,
                 "order": 26
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -1282,7 +1290,7 @@
                 "query": false,
                 "order": 27
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "beardTrimming",
               "description": "",
               "modelProperties": {}
@@ -1327,7 +1335,7 @@
                 "query": false,
                 "order": 28
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "worksAtDEA",
               "description": "",
               "modelProperties": {}
@@ -1357,7 +1365,7 @@
                 "query": false,
                 "order": 29
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "lovesMinerals",
               "description": "",
               "modelProperties": {}
@@ -1410,14 +1418,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "heisenberg-empire",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -1445,6 +1445,14 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1470,7 +1478,7 @@
                     "order": 1,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1511,7 +1519,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1541,7 +1549,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1677,7 +1685,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1730,6 +1738,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -1738,8 +1748,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [],
           "name": "die",
           "description": "",
@@ -1786,6 +1794,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -1794,8 +1804,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1944,7 +1952,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1990,7 +1998,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2020,7 +2028,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2156,7 +2164,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2225,6 +2233,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2233,8 +2243,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2383,7 +2391,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -2429,7 +2437,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2459,7 +2467,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2595,7 +2603,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2689,6 +2697,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2697,8 +2707,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2723,7 +2731,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2753,7 +2761,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2798,6 +2806,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2806,8 +2816,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2832,7 +2840,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2862,7 +2870,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2907,6 +2915,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -2915,8 +2925,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2956,7 +2964,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "index",
                   "description": "",
                   "modelProperties": {}
@@ -2983,7 +2991,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -3024,7 +3032,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3054,7 +3062,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3115,6 +3123,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -3123,8 +3133,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3273,7 +3281,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -3319,7 +3327,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3349,7 +3357,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3485,7 +3493,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3538,14 +3546,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "heisenberg-empire",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -3573,6 +3573,14 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "heisenberg-empire",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3598,7 +3606,7 @@
                     "order": 1,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -3639,7 +3647,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3669,7 +3677,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3805,7 +3813,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3873,6 +3881,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -3881,8 +3891,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3921,7 +3929,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "amount",
                   "description": "",
                   "modelProperties": {}
@@ -3962,7 +3970,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3992,7 +4000,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4052,6 +4060,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4060,8 +4070,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4087,7 +4095,7 @@
                     "order": 1,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -4114,7 +4122,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -4289,7 +4297,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -4341,7 +4349,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4371,7 +4379,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4432,6 +4440,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4440,8 +4450,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4590,7 +4598,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -4636,7 +4644,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4666,7 +4674,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4802,7 +4810,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4855,6 +4863,8 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -4863,8 +4873,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4890,7 +4898,7 @@
                     "order": 1,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -5065,7 +5073,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -5117,7 +5125,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5147,7 +5155,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5223,6 +5231,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "heisenberg-empire",
             "namespace": "HEISENBERG",
@@ -5231,8 +5241,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5381,7 +5389,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -5427,7 +5435,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5457,7 +5465,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5593,7 +5601,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5635,6 +5643,14 @@
               "type": "NATIVE"
             }
           ],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "HEISENBERG",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5660,7 +5676,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "saulPhoneNumber",
                   "description": "",
                   "modelProperties": {}
@@ -5951,7 +5967,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -6135,7 +6151,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -6208,7 +6224,7 @@
                       "query": false,
                       "order": 12
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "payment",
                     "description": "",
                     "modelProperties": {}
@@ -6234,7 +6250,7 @@
                       "query": false,
                       "order": 13
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -6264,7 +6280,7 @@
                       "query": false,
                       "order": 14
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "fail",
                     "description": "",
                     "modelProperties": {}
@@ -6320,7 +6336,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -6346,7 +6362,7 @@
                       "query": false,
                       "order": 15
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -6391,7 +6407,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -6436,7 +6452,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -6479,7 +6495,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -6509,7 +6525,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -6539,7 +6555,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -6569,7 +6585,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -6602,7 +6618,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -6647,7 +6663,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -6694,7 +6710,7 @@
                       "query": false,
                       "order": 16
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -6720,7 +6736,7 @@
                       "query": false,
                       "order": 17
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
@@ -6750,7 +6766,7 @@
                       "query": false,
                       "order": 18
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
@@ -6806,7 +6822,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -6832,7 +6848,7 @@
                       "query": false,
                       "order": 19
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -6877,7 +6893,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -6922,7 +6938,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -6965,7 +6981,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -6995,7 +7011,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -7025,7 +7041,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -7055,7 +7071,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -7088,7 +7104,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -7133,7 +7149,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -7200,6 +7216,8 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "AsyncSource",
             "namespace": "HEISENBERG",
@@ -7208,8 +7226,6 @@
               "namespace": "MULE"
             }
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7248,7 +7264,7 @@
                     "query": false,
                     "order": 8
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "initialBatchNumber",
                   "description": "",
                   "modelProperties": {}
@@ -7289,7 +7305,7 @@
                     "query": false,
                     "order": 9
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "corePoolSize",
                   "description": "",
                   "modelProperties": {}
@@ -7316,7 +7332,7 @@
                     "order": 10,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -7414,11 +7430,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -7445,7 +7460,7 @@
                     "order": 11,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -7631,7 +7646,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -7781,7 +7796,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7853,7 +7868,7 @@
                       "query": false,
                       "order": 12
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "payment",
                     "description": "",
                     "modelProperties": {}
@@ -7879,7 +7894,7 @@
                       "query": false,
                       "order": 13
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -7909,7 +7924,7 @@
                       "query": false,
                       "order": 14
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "fail",
                     "description": "",
                     "modelProperties": {}
@@ -7965,7 +7980,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -7991,7 +8006,7 @@
                       "query": false,
                       "order": 15
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -8036,7 +8051,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -8081,7 +8096,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -8124,7 +8139,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -8154,7 +8169,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -8184,7 +8199,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -8214,7 +8229,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -8247,7 +8262,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -8292,7 +8307,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -8339,7 +8354,7 @@
                       "query": false,
                       "order": 16
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -8365,7 +8380,7 @@
                       "query": false,
                       "order": 17
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
@@ -8395,7 +8410,7 @@
                       "query": false,
                       "order": 18
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
@@ -8451,7 +8466,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -8477,7 +8492,7 @@
                       "query": false,
                       "order": 19
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -8522,7 +8537,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -8567,7 +8582,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -8610,7 +8625,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -8640,7 +8655,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -8670,7 +8685,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -8700,7 +8715,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -8733,7 +8748,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -8778,7 +8793,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -8845,12 +8860,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8889,7 +8904,7 @@
                     "query": false,
                     "order": 8
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "initialBatchNumber",
                   "description": "",
                   "modelProperties": {}
@@ -8930,7 +8945,7 @@
                     "query": false,
                     "order": 9
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "corePoolSize",
                   "description": "",
                   "modelProperties": {}
@@ -8957,7 +8972,7 @@
                     "order": 10,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -9055,11 +9070,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -9086,7 +9100,7 @@
                     "order": 11,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -9272,7 +9286,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -9422,7 +9436,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -9494,7 +9508,7 @@
                       "query": false,
                       "order": 13
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "payment",
                     "description": "",
                     "modelProperties": {}
@@ -9520,7 +9534,7 @@
                       "query": false,
                       "order": 14
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -9550,7 +9564,7 @@
                       "query": false,
                       "order": 15
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "fail",
                     "description": "",
                     "modelProperties": {}
@@ -9606,7 +9620,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -9632,7 +9646,7 @@
                       "query": false,
                       "order": 16
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -9677,7 +9691,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -9722,7 +9736,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -9765,7 +9779,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -9795,7 +9809,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -9825,7 +9839,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -9855,7 +9869,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -9888,7 +9902,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -9933,7 +9947,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -9980,7 +9994,7 @@
                       "query": false,
                       "order": 17
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "sameNameParameter",
                     "description": "",
                     "modelProperties": {}
@@ -10006,7 +10020,7 @@
                       "query": false,
                       "order": 18
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "methylamine",
                     "description": "",
                     "modelProperties": {}
@@ -10036,7 +10050,7 @@
                       "query": false,
                       "order": 19
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "propagateError",
                     "description": "",
                     "modelProperties": {}
@@ -10092,7 +10106,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "labeledRicin",
                     "description": "",
                     "modelProperties": {}
@@ -10118,7 +10132,7 @@
                       "query": false,
                       "order": 20
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "nextDoor",
                     "description": "",
                     "modelProperties": {}
@@ -10163,7 +10177,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "ricinPacks",
                     "displayModel": {
                       "summary": "A set of ricin packs"
@@ -10208,7 +10222,7 @@
                       "order": 1,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "myName",
                     "description": "",
                     "modelProperties": {}
@@ -10251,7 +10265,7 @@
                       "order": 2,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "age",
                     "description": "",
                     "modelProperties": {}
@@ -10281,7 +10295,7 @@
                       "order": 3,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfConception",
                     "description": "",
                     "modelProperties": {}
@@ -10311,7 +10325,7 @@
                       "order": 4,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfBirth",
                     "description": "",
                     "modelProperties": {}
@@ -10341,7 +10355,7 @@
                       "order": 5,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfDeath",
                     "displayModel": {
                       "displayName": "Date of decease"
@@ -10374,7 +10388,7 @@
                       "order": 6,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "dateOfGraduation",
                     "description": "",
                     "modelProperties": {}
@@ -10419,7 +10433,7 @@
                       "order": 7,
                       "tabName": "General"
                     },
-                    "elementReferences": [],
+                    "allowedStereotypeModels": [],
                     "name": "knownAddresses",
                     "description": "",
                     "modelProperties": {}
@@ -10486,12 +10500,12 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": true,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "SOURCE",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10530,7 +10544,7 @@
                     "query": false,
                     "order": 8
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "initialBatchNumber",
                   "description": "",
                   "modelProperties": {}
@@ -10571,7 +10585,7 @@
                     "query": false,
                     "order": 9
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "corePoolSize",
                   "description": "",
                   "modelProperties": {}
@@ -10601,7 +10615,7 @@
                     "query": false,
                     "order": 10
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectable",
                   "description": "",
                   "modelProperties": {}
@@ -10628,7 +10642,7 @@
                     "order": 11,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -10726,11 +10740,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "OS"
                             }
                           },
                           "description": {
@@ -10757,7 +10770,7 @@
                     "order": 12,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -10943,7 +10956,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -11093,7 +11106,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -11153,6 +11166,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11161,8 +11176,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11187,7 +11200,7 @@
                 "query": false,
                 "order": 8
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "greeting",
               "displayModel": {
                 "example": "Hello my friend!"
@@ -11217,7 +11230,7 @@
                 "order": 9,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -11260,7 +11273,7 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -11303,7 +11316,7 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -11333,7 +11346,7 @@
                 "order": 3,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -11363,7 +11376,7 @@
                 "order": 4,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -11393,7 +11406,7 @@
                 "order": 5,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -11426,7 +11439,7 @@
                 "order": 6,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -11471,7 +11484,7 @@
                 "order": 7,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -11512,7 +11525,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11542,7 +11555,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11587,10 +11600,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -11607,6 +11616,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "alwaysFailsWrapper",
       "description": "",
@@ -11637,6 +11650,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11645,8 +11660,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11671,7 +11684,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "investment",
               "description": "",
               "modelProperties": {}
@@ -11697,7 +11710,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "recursivePojo",
               "description": "",
               "modelProperties": {}
@@ -11723,7 +11736,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "recursiveChainB",
               "description": "",
               "modelProperties": {}
@@ -11749,7 +11762,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "recursiveChainA",
               "description": "",
               "modelProperties": {}
@@ -11790,7 +11803,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11820,7 +11833,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11865,6 +11878,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -11873,8 +11888,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -11900,7 +11913,7 @@
                 "order": 1,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -11941,7 +11954,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11971,7 +11984,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12016,14 +12029,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "heisenberg-empire",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "PROCESSOR",
-          "namespace": "MULE"
-        }
-      },
       "nestedComponents": [],
       "errors": [
         {
@@ -12059,6 +12064,14 @@
           }
         }
       ],
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12084,7 +12097,7 @@
                 "order": 1,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -12125,7 +12138,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12155,7 +12168,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12200,10 +12213,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12220,6 +12229,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "exceptionOnCallbacks",
       "description": "",
@@ -12250,10 +12263,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12270,6 +12279,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [],
       "name": "executeAnything",
       "description": "",
@@ -12300,6 +12313,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12308,8 +12323,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "failToExecute",
       "description": "",
@@ -12358,10 +12371,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -12378,6 +12387,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12402,7 +12415,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12432,7 +12445,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12491,12 +12504,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "PROCESSOR",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12521,7 +12534,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12551,7 +12564,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12648,6 +12661,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12656,8 +12671,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12735,7 +12748,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "grams",
               "description": "",
               "modelProperties": {}
@@ -12776,7 +12789,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12806,7 +12819,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12869,6 +12882,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12877,8 +12892,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -12903,7 +12916,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12933,7 +12946,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12978,6 +12991,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -12986,8 +13001,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13016,7 +13029,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "fullyBald",
               "description": "",
               "modelProperties": {}
@@ -13053,7 +13066,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "beardTrimming",
               "description": "",
               "modelProperties": {}
@@ -13094,7 +13107,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13124,7 +13137,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13169,6 +13182,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -13177,8 +13192,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13205,7 +13218,7 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "myName",
               "description": "",
               "modelProperties": {}
@@ -13248,7 +13261,7 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "age",
               "description": "",
               "modelProperties": {}
@@ -13278,7 +13291,7 @@
                 "order": 3,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfConception",
               "description": "",
               "modelProperties": {}
@@ -13308,7 +13321,7 @@
                 "order": 4,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfBirth",
               "description": "",
               "modelProperties": {}
@@ -13338,7 +13351,7 @@
                 "order": 5,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfDeath",
               "displayModel": {
                 "displayName": "Date of decease"
@@ -13371,7 +13384,7 @@
                 "order": 6,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dateOfGraduation",
               "description": "",
               "modelProperties": {}
@@ -13416,7 +13429,7 @@
                 "order": 7,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "knownAddresses",
               "description": "",
               "modelProperties": {}
@@ -13457,7 +13470,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13487,7 +13500,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13563,6 +13576,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -13571,8 +13586,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13628,7 +13641,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "healthByYear",
               "description": "",
               "modelProperties": {}
@@ -13669,7 +13682,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13699,7 +13712,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13744,6 +13757,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -13752,8 +13767,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -13779,7 +13792,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "victim",
               "description": "",
               "modelProperties": {}
@@ -13805,7 +13818,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "goodbyeMessage",
               "description": "",
               "modelProperties": {}
@@ -13832,7 +13845,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -13873,7 +13886,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13903,7 +13916,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13948,10 +13961,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -14009,6 +14018,10 @@
           }
         }
       ],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14033,7 +14046,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reason",
               "description": "",
               "modelProperties": {}
@@ -14060,7 +14073,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -14101,7 +14114,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -14131,7 +14144,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -14176,6 +14189,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14184,8 +14199,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14211,7 +14224,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -14254,7 +14267,7 @@
                 "order": 1,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "victim",
               "description": "",
               "modelProperties": {}
@@ -14281,7 +14294,7 @@
                 "order": 2,
                 "tabName": "General"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "goodbyeMessage",
               "description": "",
               "modelProperties": {}
@@ -14322,7 +14335,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -14352,7 +14365,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -14411,6 +14424,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14419,8 +14434,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14459,7 +14472,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "id",
               "description": "",
               "modelProperties": {}
@@ -14500,7 +14513,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -14530,7 +14543,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -14593,6 +14606,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14601,8 +14616,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14645,7 +14658,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "wildCardWeapons",
               "description": "",
               "modelProperties": {}
@@ -14686,7 +14699,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -14716,7 +14729,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -14779,6 +14792,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -14787,8 +14802,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -14832,7 +14845,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -14873,7 +14886,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -14903,7 +14916,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -14966,12 +14979,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "drugKilling",
         "namespace": "HEISENBERG"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15015,7 +15028,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "ricins",
               "description": "",
               "modelProperties": {}
@@ -15056,7 +15069,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15086,7 +15099,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15131,6 +15144,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "killingOperation",
         "namespace": "HEISENBERG",
@@ -15139,8 +15154,6 @@
           "namespace": "HEISENBERG"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15165,7 +15178,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -15201,7 +15214,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {}
@@ -15227,7 +15240,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "attributesOfWeapon",
               "description": "",
               "modelProperties": {}
@@ -15254,7 +15267,7 @@
                 "order": 4,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -15295,7 +15308,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15325,7 +15338,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15370,6 +15383,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15378,8 +15393,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15404,7 +15417,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "knockedDoor",
               "description": "",
               "modelProperties": {}
@@ -15431,7 +15444,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -15472,7 +15485,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15502,7 +15515,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15565,6 +15578,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15573,8 +15588,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15617,7 +15630,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doors",
               "displayModel": {
                 "summary": "List of Knockeable Doors"
@@ -15661,7 +15674,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15691,7 +15704,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15736,6 +15749,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -15744,8 +15759,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15770,7 +15783,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "literalExpression",
               "description": "",
               "modelProperties": {}
@@ -15797,7 +15810,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -15838,7 +15851,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -15868,7 +15881,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -15931,10 +15944,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": false,
@@ -15951,6 +15960,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -15976,7 +15989,7 @@
                 "order": 1,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -16017,7 +16030,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16047,7 +16060,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16092,6 +16105,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16100,8 +16115,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16127,7 +16140,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -16184,7 +16197,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "inputStreamContent",
               "description": "",
               "modelProperties": {}
@@ -16225,7 +16238,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16255,7 +16268,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16300,10 +16313,6 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
       "nestedComponents": [
         {
           "isRequired": true,
@@ -16320,6 +16329,10 @@
         }
       ],
       "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16362,7 +16375,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "payload",
               "description": "",
               "modelProperties": {}
@@ -16408,7 +16421,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "attributes",
               "description": "",
               "modelProperties": {}
@@ -16474,6 +16487,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16482,8 +16497,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16526,7 +16539,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "phoneNumbers",
               "description": "",
               "modelProperties": {}
@@ -16567,7 +16580,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16597,7 +16610,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16662,6 +16675,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16670,8 +16685,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16716,7 +16729,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "sales",
               "description": "",
               "modelProperties": {}
@@ -16757,7 +16770,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16787,7 +16800,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -16832,6 +16845,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -16840,8 +16855,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -16866,7 +16879,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -16907,7 +16920,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -16937,7 +16950,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17000,6 +17013,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17008,8 +17023,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17052,7 +17065,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -17093,7 +17106,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17123,7 +17136,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17186,6 +17199,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17194,8 +17209,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17239,7 +17252,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapons",
               "description": "",
               "modelProperties": {}
@@ -17280,7 +17293,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17310,7 +17323,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17355,6 +17368,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17363,8 +17378,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17390,7 +17403,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weapon",
               "description": "",
               "modelProperties": {}
@@ -17431,7 +17444,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17461,7 +17474,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17506,6 +17519,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17514,8 +17529,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17540,7 +17553,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "literalExpression",
               "displayModel": {
                 "displayName": "Custom overrided display name"
@@ -17570,7 +17583,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -17611,7 +17624,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -17641,7 +17654,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -17686,6 +17699,8 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "heisenberg-empire",
         "namespace": "HEISENBERG",
@@ -17694,8 +17709,6 @@
           "namespace": "MULE"
         }
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [],
       "name": "throwError",
       "description": "",
@@ -17717,6 +17730,14 @@
           "type": "NATIVE"
         }
       ],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -17742,7 +17763,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "saulPhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -18033,7 +18054,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -18217,7 +18238,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -18364,12 +18385,12 @@
       "transactional": false,
       "requiresConnection": false,
       "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
       "stereotype": {
         "type": "SOURCE",
         "namespace": "MULE"
       },
-      "nestedComponents": [],
-      "errors": [],
       "parameterGroupModels": [
         {
           "parameters": [
@@ -18466,11 +18487,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "OS"
                         }
                       },
                       "description": {
@@ -18497,7 +18517,7 @@
                 "order": 1,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -18647,7 +18667,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

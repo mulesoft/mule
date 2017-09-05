@@ -20,6 +20,14 @@
   "importedTypes": [],
   "configurations": [
     {
+      "stereotype": {
+        "type": "CONFIG",
+        "namespace": "TEST-OAUTH",
+        "parent": {
+          "type": "MODULE_CONFIG",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [],
       "externalLibraryModels": [],
       "operations": [
@@ -47,12 +55,12 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "PROCESSOR",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -95,7 +103,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "request",
                   "description": "",
                   "modelProperties": {}
@@ -139,7 +147,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "state",
                   "description": "",
                   "modelProperties": {}
@@ -187,10 +195,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -218,6 +222,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -242,7 +250,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -272,7 +280,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -408,7 +416,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -461,10 +469,6 @@
           "transactional": false,
           "requiresConnection": true,
           "supportsStreaming": false,
-          "stereotype": {
-            "type": "PROCESSOR",
-            "namespace": "MULE"
-          },
           "nestedComponents": [],
           "errors": [
             {
@@ -492,6 +496,10 @@
               }
             }
           ],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -614,7 +622,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -667,12 +675,12 @@
           "transactional": false,
           "requiresConnection": false,
           "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
           "stereotype": {
             "type": "PROCESSOR",
             "namespace": "MULE"
           },
-          "nestedComponents": [],
-          "errors": [],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -697,7 +705,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
                   "description": "The id of the resource owner which access should be invalidated",
                   "modelProperties": {}
@@ -726,6 +734,14 @@
         {
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -766,7 +782,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -792,7 +808,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -822,7 +838,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -852,7 +868,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -1025,7 +1041,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1065,7 +1081,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -1085,7 +1101,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -1106,7 +1122,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -1127,7 +1143,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -1148,7 +1164,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -1168,7 +1184,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -1188,7 +1204,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -1208,7 +1224,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -1237,11 +1253,14 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
+                      "type": "listener-config",
                       "namespace": "http",
-                      "name": "listener-config",
-                      "type": "CONFIG"
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
                     }
                   ],
                   "name": "listenerConfig",
@@ -1263,7 +1282,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -1283,7 +1302,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -1303,7 +1322,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -1332,11 +1351,10 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
-                      "namespace": "os",
-                      "name": "objectStore",
-                      "type": "OBJECT_STORE"
+                      "type": "OBJECT_STORE",
+                      "namespace": "OS"
                     }
                   ],
                   "name": "objectStore",
@@ -1371,6 +1389,14 @@
         {
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
+          "stereotype": {
+            "type": "CONNECTION",
+            "namespace": "TEST-OAUTH",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          },
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1411,7 +1437,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "apiVersion",
                   "description": "",
                   "modelProperties": {}
@@ -1437,7 +1463,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "display",
                   "description": "",
                   "modelProperties": {}
@@ -1467,7 +1493,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "immediate",
                   "description": "",
                   "modelProperties": {}
@@ -1497,7 +1523,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "prompt",
                   "description": "",
                   "modelProperties": {}
@@ -1670,7 +1696,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1710,7 +1736,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "consumerKey",
                   "description": "The OAuth consumerKey as registered with the service provider",
                   "modelProperties": {}
@@ -1730,7 +1756,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "consumerSecret",
                   "description": "The OAuth consumerSecret as registered with the service provider",
                   "modelProperties": {}
@@ -1751,7 +1777,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "authorizationUrl",
                   "description": "The service provider\u0027s authorization endpoint URL",
                   "modelProperties": {}
@@ -1772,7 +1798,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "accessTokenUrl",
                   "description": "The service provider\u0027s accessToken endpoint URL",
                   "modelProperties": {}
@@ -1792,7 +1818,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "scopes",
                   "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
                   "modelProperties": {}
@@ -1812,7 +1838,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "resourceOwnerId",
                   "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
                   "modelProperties": {}
@@ -1832,7 +1858,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "before",
                   "description": "The name of a flow to be executed right before starting the OAuth dance",
                   "modelProperties": {}
@@ -1852,7 +1878,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "after",
                   "description": "The name of a flow to be executed right after an accessToken has been received",
                   "modelProperties": {}
@@ -1881,11 +1907,14 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
+                      "type": "listener-config",
                       "namespace": "http",
-                      "name": "listener-config",
-                      "type": "CONFIG"
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
                     }
                   ],
                   "name": "listenerConfig",
@@ -1907,7 +1936,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "callbackPath",
                   "description": "The path of the access token callback endpoint",
                   "modelProperties": {}
@@ -1927,7 +1956,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "authorizePath",
                   "description": "The path of the local http endpoint which triggers the OAuth dance",
                   "modelProperties": {}
@@ -1947,7 +1976,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "externalCallbackUrl",
                   "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
                   "modelProperties": {}
@@ -1976,11 +2005,10 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
-                      "namespace": "os",
-                      "name": "objectStore",
-                      "type": "OBJECT_STORE"
+                      "type": "OBJECT_STORE",
+                      "namespace": "OS"
                     }
                   ],
                   "name": "objectStore",
@@ -2025,6 +2053,14 @@
     {
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TEST-OAUTH",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2065,7 +2101,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "apiVersion",
               "description": "",
               "modelProperties": {}
@@ -2091,7 +2127,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "display",
               "description": "",
               "modelProperties": {}
@@ -2121,7 +2157,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "immediate",
               "description": "",
               "modelProperties": {}
@@ -2151,7 +2187,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "prompt",
               "description": "",
               "modelProperties": {}
@@ -2324,7 +2360,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -2364,7 +2400,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
               "modelProperties": {}
@@ -2384,7 +2420,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "consumerSecret",
               "description": "The OAuth consumerSecret as registered with the service provider",
               "modelProperties": {}
@@ -2405,7 +2441,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
               "modelProperties": {}
@@ -2426,7 +2462,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "accessTokenUrl",
               "description": "The service provider\u0027s accessToken endpoint URL",
               "modelProperties": {}
@@ -2447,7 +2483,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "scopes",
               "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
               "modelProperties": {}
@@ -2467,7 +2503,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "resourceOwnerId",
               "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
               "modelProperties": {}
@@ -2487,7 +2523,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "before",
               "description": "The name of a flow to be executed right before starting the OAuth dance",
               "modelProperties": {}
@@ -2507,7 +2543,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
               "modelProperties": {}
@@ -2536,11 +2572,14 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
+                  "type": "listener-config",
                   "namespace": "http",
-                  "name": "listener-config",
-                  "type": "CONFIG"
+                  "parent": {
+                    "type": "MODULE_CONFIG",
+                    "namespace": "MULE"
+                  }
                 }
               ],
               "name": "listenerConfig",
@@ -2562,7 +2601,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
               "modelProperties": {}
@@ -2582,7 +2621,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
               "modelProperties": {}
@@ -2602,7 +2641,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
@@ -2631,11 +2670,10 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
-                  "namespace": "os",
-                  "name": "objectStore",
-                  "type": "OBJECT_STORE"
+                  "type": "OBJECT_STORE",
+                  "namespace": "OS"
                 }
               ],
               "name": "objectStore",
@@ -2670,6 +2708,14 @@
     {
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
+      "stereotype": {
+        "type": "CONNECTION",
+        "namespace": "TEST-OAUTH",
+        "parent": {
+          "type": "CONNECTION",
+          "namespace": "MULE"
+        }
+      },
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2710,7 +2756,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "apiVersion",
               "description": "",
               "modelProperties": {}
@@ -2736,7 +2782,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "display",
               "description": "",
               "modelProperties": {}
@@ -2766,7 +2812,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "immediate",
               "description": "",
               "modelProperties": {}
@@ -2796,7 +2842,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "prompt",
               "description": "",
               "modelProperties": {}
@@ -2969,7 +3015,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -3009,7 +3055,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "consumerKey",
               "description": "The OAuth consumerKey as registered with the service provider",
               "modelProperties": {}
@@ -3029,7 +3075,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "consumerSecret",
               "description": "The OAuth consumerSecret as registered with the service provider",
               "modelProperties": {}
@@ -3050,7 +3096,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "authorizationUrl",
               "description": "The service provider\u0027s authorization endpoint URL",
               "modelProperties": {}
@@ -3071,7 +3117,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "accessTokenUrl",
               "description": "The service provider\u0027s accessToken endpoint URL",
               "modelProperties": {}
@@ -3091,7 +3137,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "scopes",
               "description": "The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation",
               "modelProperties": {}
@@ -3111,7 +3157,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "resourceOwnerId",
               "description": "The resourceOwnerId which each component should use if it doesn\u0027t reference otherwise.",
               "modelProperties": {}
@@ -3131,7 +3177,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "before",
               "description": "The name of a flow to be executed right before starting the OAuth dance",
               "modelProperties": {}
@@ -3151,7 +3197,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "after",
               "description": "The name of a flow to be executed right after an accessToken has been received",
               "modelProperties": {}
@@ -3180,11 +3226,14 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
+                  "type": "listener-config",
                   "namespace": "http",
-                  "name": "listener-config",
-                  "type": "CONFIG"
+                  "parent": {
+                    "type": "MODULE_CONFIG",
+                    "namespace": "MULE"
+                  }
                 }
               ],
               "name": "listenerConfig",
@@ -3206,7 +3255,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "callbackPath",
               "description": "The path of the access token callback endpoint",
               "modelProperties": {}
@@ -3226,7 +3275,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "authorizePath",
               "description": "The path of the local http endpoint which triggers the OAuth dance",
               "modelProperties": {}
@@ -3246,7 +3295,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "externalCallbackUrl",
               "description": "If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback",
               "modelProperties": {}
@@ -3275,11 +3324,10 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
-                  "namespace": "os",
-                  "name": "objectStore",
-                  "type": "OBJECT_STORE"
+                  "type": "OBJECT_STORE",
+                  "namespace": "OS"
                 }
               ],
               "name": "objectStore",
