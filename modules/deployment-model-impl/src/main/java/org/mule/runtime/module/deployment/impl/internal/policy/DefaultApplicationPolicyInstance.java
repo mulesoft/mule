@@ -99,6 +99,12 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
       MuleRegistry applicationRegistry = application.getMuleContext().getRegistry();
+      /*
+       * OBJECT_POLICY_MANAGER_STATE_HANDLER is not proxied as it doesn't implement any lifecycle interfaces (Startable, Stoppable
+       * or Disposable)
+       */
+      customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
+                                                      applicationRegistry.lookupObject(OBJECT_POLICY_MANAGER_STATE_HANDLER));
       customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
                                                       createLifecycleFilterProxy(applicationRegistry
                                                           .lookupObject(OBJECT_LOCK_PROVIDER)));
@@ -108,8 +114,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
       customizationService.overrideDefaultServiceImpl(BASE_IN_MEMORY_OBJECT_STORE_KEY,
                                                       createLifecycleFilterProxy(applicationRegistry
                                                           .lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY)));
-      customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
-                                                      applicationRegistry.lookupObject(OBJECT_POLICY_MANAGER_STATE_HANDLER));
       customizationService.overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
                                                       createLifecycleFilterProxy(applicationRegistry
                                                           .lookupObject(OBJECT_TIME_SUPPLIER)));

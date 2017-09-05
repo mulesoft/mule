@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.time;
 
+import static java.lang.System.currentTimeMillis;
+
 import org.mule.runtime.core.api.time.TimeSupplier;
 
 import java.util.function.Supplier;
@@ -24,6 +26,6 @@ public class LocalTimeSupplier implements TimeSupplier {
    */
   @Override
   public Long get() {
-    return System.currentTimeMillis();
+    return currentTimeMillis();
   }
 }
