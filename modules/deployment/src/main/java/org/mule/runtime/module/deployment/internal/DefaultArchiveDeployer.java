@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.StrictMath.abs;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -433,11 +434,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private static boolean allResourcesExist(File[] resourceFiles) {
-    return stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
+    return stream(resourceFiles).allMatch(File::exists);
   }
 
   private static class ZombieArtifact {
 
+    private static final int MIN_TIME_DIFFERENCE = 1000;
     Map<File, Long> initialResourceFiles = new HashMap<>();
 
     private ZombieArtifact(File[] resourceFiles) {
@@ -448,13 +450,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     public boolean isFor(URI uri) {
-      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().toURI().equals(uri))
-          .collect(Collectors.toList()).isEmpty());
+      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
     }
 
     public boolean updatedZombieApp() {
-      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().lastModified() != entry.getValue())
-          .collect(Collectors.toList()).isEmpty());
+      return initialResourceFiles.entrySet().stream()
+          .anyMatch((entry) -> abs(entry.getKey().lastModified() - entry.getValue()) > MIN_TIME_DIFFERENCE);
     }
 
     //Returns true only if all the files exist
