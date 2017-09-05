@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.routing.ValidationException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.el.DataWeaveExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

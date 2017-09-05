@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 
 import java.util.Random;
 
