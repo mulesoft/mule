@@ -14,12 +14,12 @@
     </tx:config>
 
     <flow name="alwaysBeginTxAction" initialState="stopped">
-        <tx:transactional-source-with-t-x-parameters config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <tx:transactional-source-with-tx-parameters config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
         <logger />
     </flow>
 
     <flow name="defaultTxAction" initialState="stopped">
-        <tx:transactional-source-with-t-x-parameters config-ref="localTx1"/>
+        <tx:transactional-source-with-tx-parameters config-ref="localTx1"/>
         <logger />
     </flow>
 
