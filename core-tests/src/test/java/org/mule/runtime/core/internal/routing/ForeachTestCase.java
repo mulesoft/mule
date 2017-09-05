@@ -11,15 +11,22 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
+import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
+import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -36,15 +43,16 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
   protected ArrayList<InternalEvent> processedEvents;
+  protected Map<String, TypedValue<?>> variables;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
@@ -74,6 +82,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     });
     lmp.add(innerProcessor);
     lmp.add(event -> {
+      variables = event.getVariables();
       processedEvents.add(event);
       return event;
     });
@@ -300,6 +309,25 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(processedEvents, hasSize(2));
     assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
     assertThat(processedEvents.get(1).getMessageAsString(muleContext), is("[3]:foo:zas"));
+  }
+
+  @Test
+  public void variables() throws Exception {
+    List<String> arrayList = new ArrayList<>();
+    arrayList.add("bar");
+    arrayList.add("zip");
+    InternalEvent in = eventBuilder().message(of(arrayList)).build();
+    process(simpleForeach, in);
+
+    assertSimpleProcessedMessages();
+    assertThat(variables.keySet(), hasSize(2));
+    assertThat(variables.keySet(), hasItems(DEFAULT_ROOT_MESSAGE_VARIABLE, DEFAULT_COUNTER_VARIABLE));
+
+    assertThat(MULE_MESSAGE.isCompatibleWith(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getDataType()), is(true));
+    assertThat(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getValue(), equalTo(in.getMessage()));
+
+    assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(), equalTo(DataType.builder().type(Integer.class).build()));
+    assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
   }
 
   private void assertSimpleProcessedMessages() {
