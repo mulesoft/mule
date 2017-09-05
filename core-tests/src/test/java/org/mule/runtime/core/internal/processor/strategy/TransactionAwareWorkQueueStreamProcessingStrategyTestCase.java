@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,13 +15,13 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
-import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
 import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory.TransactionAwareProactorStreamProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory.TransactionAwareWorkQueueStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import io.qameta.allure.Description;
@@ -30,23 +29,21 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(PROCESSING_STRATEGIES)
-@Story(DEFAULT)
-public class TransactionAwareProactorStreamProcessingStrategyTestCase extends ProactorStreamProcessingStrategyTestCase {
+@Story(WORK_QUEUE)
+public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
+  public TransactionAwareWorkQueueStreamProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareProactorStreamProcessingStrategy(() -> blocking,
-                                                                XS_BUFFER_SIZE,
-                                                                DEFAULT_SUBSCRIBER_COUNT,
-                                                                DEFAULT_WAIT_STRATEGY,
-                                                                () -> cpuLight,
-                                                                () -> blocking,
-                                                                () -> cpuIntensive,
-                                                                MAX_VALUE);
+    return new TransactionAwareWorkQueueStreamProcessingStrategy(() -> blocking,
+                                                                 XS_BUFFER_SIZE,
+                                                                 DEFAULT_SUBSCRIBER_COUNT,
+                                                                 DEFAULT_WAIT_STRATEGY,
+                                                                 () -> blocking,
+                                                                 4);
   }
 
   @Override

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.source;
 
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -17,7 +19,39 @@ import org.mule.runtime.core.api.processor.Processor;
 public interface MessageSource extends Component {
 
   /**
-   * Set the MessageProcessor listener on a message source which will be invoked when a message is received or generated.
+   * Set the {@link Processor} listener on a message source which will be invoked when a message is received or generated.
    */
   void setListener(Processor listener);
+
+  /**
+   * The {@link BackPressureStrategy} that {@link org.mule.runtime.core.api.construct.FlowConstruct} implementations that support
+   * the concept of back-pressure should use.
+   *
+   * @return the {@link BackPressureStrategy} to use.
+   */
+  default BackPressureStrategy getBackPressureStrategy() {
+    return WAIT;
+  }
+
+  enum BackPressureStrategy {
+
+    /**
+     * On back-pressure fail by returning an {@code OVERLOAD} {@link org.mule.runtime.api.message.Error} to the
+     * {@link MessageSource}.
+     */
+    FAIL,
+
+    /**
+     * On back-pressure block the current thread and wait until the {@link org.mule.runtime.core.api.InternalEvent} can be
+     * accepted.
+     */
+    WAIT,
+
+    /**
+     * On back-pressure drop the {@link org.mule.runtime.core.api.InternalEvent} by immediately completing
+     * {@link org.mule.runtime.core.api.InternalEventContext} with no result without performing any processing.
+     */
+    DROP
+  }
+
 }

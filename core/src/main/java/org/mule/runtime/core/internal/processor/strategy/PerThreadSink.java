@@ -48,6 +48,15 @@ class PerThreadSink implements Sink, Disposable {
   }
 
   @Override
+  public boolean emit(InternalEvent event) {
+    try {
+      return sinkCache.get(currentThread(), () -> sinkSupplier.get()).emit(event);
+    } catch (ExecutionException e) {
+      throw new IllegalStateException("Unable to create Sink for Thread " + currentThread(), e.getCause());
+    }
+  }
+
+  @Override
   public void dispose() {
     disposeIfNeeded(sinkCache.asMap().entrySet(), NOP_LOGGER);
     sinkCache.invalidateAll();

@@ -6,6 +6,8 @@
  */
 package org.mule.tck;
 
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -13,12 +15,20 @@ import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
+import org.mule.runtime.core.internal.util.rx.Operators;
 
 import org.reactivestreams.Publisher;
 
 public class TriggerableMessageSource extends AbstractComponent implements MessageSource {
 
   protected Processor listener;
+  private BackPressureStrategy backPressureStrategy = WAIT;
+
+  public TriggerableMessageSource() {}
+
+  public TriggerableMessageSource(BackPressureStrategy backPressureStrategy) {
+    this.backPressureStrategy = backPressureStrategy;
+  }
 
   public InternalEvent trigger(InternalEvent event) throws MuleException {
     return listener.process(event);
@@ -42,4 +52,8 @@ public class TriggerableMessageSource extends AbstractComponent implements Messa
     return ObjectUtils.toString(this);
   }
 
+  @Override
+  public BackPressureStrategy getBackPressureStrategy() {
+    return backPressureStrategy;
+  }
 }

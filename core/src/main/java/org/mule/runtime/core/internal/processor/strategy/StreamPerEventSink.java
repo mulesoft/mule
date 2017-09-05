@@ -46,4 +46,10 @@ public class StreamPerEventSink implements Sink {
         .transform(processor)
         .subscribe(requestUnbounded());
   }
+
+  @Override
+  public boolean emit(InternalEvent event) {
+    accept(event);
+    return true;
+  }
 }

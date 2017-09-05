@@ -15,25 +15,28 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.REACTOR;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(REACTOR)
@@ -72,7 +75,8 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("If CPU LIGHT pool has maximum size of 1 only 1 thread is used and further requests block.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new ReactorProcessingStrategy(() -> new TestScheduler(1, CPU_LIGHT))),
+        .processingStrategyFactory((context,
+                                    prefix) -> new ReactorProcessingStrategy(() -> new TestScheduler(1, CPU_LIGHT, true))),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(1l));
@@ -213,4 +217,32 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     assertThat(beforeThread.get().getName(), startsWith(CPU_LIGHT));
     assertThat(afterThread.get().getName(), startsWith(CPU_LIGHT));
   }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureWait() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(WAIT, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
+                       total -> total == STREAM_ITERATIONS);
+    }
+  }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureFail() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(FAIL, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
+                       total -> total == STREAM_ITERATIONS);
+    }
+  }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureDrop() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(DROP, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
+                       total -> total == STREAM_ITERATIONS);
+    }
+  }
+
 }

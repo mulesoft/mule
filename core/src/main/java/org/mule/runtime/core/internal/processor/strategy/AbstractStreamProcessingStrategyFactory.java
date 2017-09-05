@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.getInteger;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -51,7 +52,8 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   private static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
 
   public static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
-  public static final int DEFAULT_SUBSCRIBER_COUNT = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", 1);
+  public static final int DEFAULT_SUBSCRIBER_COUNT =
+      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", getRuntime().availableProcessors() / 12 + 1);
   public static final String DEFAULT_WAIT_STRATEGY =
       getProperty(SYSTEM_PROPERTY_PREFIX + "DEFAULT_WAIT_STRATEGY", LITE_BLOCKING.name());
   protected static String RING_BUFFER_SCHEDULER_NAME_SUFFIX = ".ring-buffer";

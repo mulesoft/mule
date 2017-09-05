@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.synchronizedSet;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -22,14 +23,20 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -50,11 +57,16 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
-import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +83,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.hamcrest.Matcher;
@@ -80,21 +93,30 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
 
-public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiveProcessorTestCase {
+@RunWith(Parameterized.class)
+public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleContextTestCase {
 
+  private static final Logger LOGGER = getLogger(AbstractProcessingStrategyTestCase.class);
+  private static final int CONCURRENT_TEST_CONCURRENCY = 8;
+
+  protected Mode mode;
   protected static final String CPU_LIGHT = "cpuLight";
   protected static final String IO = "I/O";
   protected static final String CPU_INTENSIVE = "cpuIntensive";
   protected static final String CUSTOM = "custom";
   protected static final String RING_BUFFER = "ringBuffer";
-  private static final int STREAM_ITERATIONS = 2000;
-  private static final int CONCURRENT_TEST_CONCURRENCY = 8;
+  protected static final int STREAM_ITERATIONS = 2000;
 
   protected Supplier<Builder> flowBuilder;
   protected Flow flow;
   protected Set<String> threads = synchronizedSet(new HashSet<>());
+  private TriggerableMessageSource triggerableMessageSource = getTriggerableMessageSource();
   protected Processor cpuLightProcessor = new ThreadTrackingProcessor() {
 
     @Override
@@ -147,28 +169,35 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     }
   };
 
-
   protected Scheduler cpuLight;
   protected Scheduler blocking;
   protected Scheduler cpuIntensive;
   protected Scheduler custom;
   protected Scheduler ringBuffer;
   protected Scheduler asyncExecutor;
+  protected ExecutorService cachedThreadPool = newFixedThreadPool(4);
+
+
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   public AbstractProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+    this.mode = mode;
+  }
+
+  @Parameterized.Parameters
+  public static Collection<Mode> modeParameters() {
+    return asList(new Mode[] {Mode.FLOW, SOURCE});
   }
 
   @Before
   public void before() throws RegistrationException {
-    cpuLight = new TestScheduler(2, CPU_LIGHT);
-    blocking = new TestScheduler(4, IO);
-    cpuIntensive = new TestScheduler(2, CPU_INTENSIVE);
-    custom = new TestScheduler(1, CUSTOM);
-    ringBuffer = new TestScheduler(1, RING_BUFFER);
+    cpuLight = new TestScheduler(2, CPU_LIGHT, false);
+    blocking = new TestScheduler(4, IO, true);
+    cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);
+    custom = new TestScheduler(1, CUSTOM, true);
+    ringBuffer = new TestScheduler(1, RING_BUFFER, true);
     asyncExecutor = muleContext.getRegistry().lookupObject(SchedulerService.class).ioScheduler();
 
     flowBuilder = () -> builder("test", muleContext)
@@ -188,17 +217,20 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @After
   public void after() {
-    flow.dispose();
+    if (flow != null) {
+      flow.dispose();
+    }
     cpuLight.stop();
     blocking.stop();
     cpuIntensive.stop();
     custom.stop();
     asyncExecutor.stop();
+    cachedThreadPool.shutdownNow();
   }
 
   @Test
   public void singleCpuLight() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
 
     flow.initialise();
     flow.start();
@@ -222,7 +254,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
     processors.add(latchedProcessor);
-    flow = flowBuilder.processors(processors).build();
+    flow = flowBuilder.source(triggerableMessageSource).processors(processors).build();
     flow.initialise();
     flow.start();
 
@@ -251,7 +283,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void multipleCpuLight() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -260,7 +293,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleBlocking() throws Exception {
-    flow = flowBuilder.get().processors(blockingProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -269,7 +302,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void multipleBlocking() throws Exception {
-    flow = flowBuilder.get().processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource)
+        .processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -278,7 +312,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void singleCpuIntensive() throws Exception {
-    flow = flowBuilder.get().processors(cpuIntensiveProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -288,7 +322,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
   @Test
   public void multipleCpuIntensive() throws Exception {
     flow =
-        flowBuilder.get().processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
+        flowBuilder.get().source(triggerableMessageSource)
+            .processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -297,7 +332,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void mix() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -306,8 +342,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void mix2() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
-                                        cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
+    flow = flowBuilder.get().source(triggerableMessageSource)
+        .processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
+                    cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
         .build();
     flow.initialise();
     flow.start();
@@ -317,7 +354,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void asyncCpuLight() throws Exception {
-    flow = flowBuilder.get().processors(asyncProcessor, cpuLightProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(asyncProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -331,20 +368,20 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void stream() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
       switch (mode) {
-        case BLOCKING:
+        case FLOW:
           flow.process(newEvent());
           latch.countDown();
           break;
-        case NON_BLOCKING:
-          processNonBlocking(flow, newEvent(), t -> latch.countDown(),
-                             response -> bubble(new AssertionError("Unexpected error")));
+        case SOURCE:
+          processSourceNonBlocking(flow, newEvent(), t -> latch.countDown(),
+                                   response -> bubble(new AssertionError("Unexpected error")));
       }
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
@@ -352,7 +389,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void concurrentStream() throws Exception {
-    flow = flowBuilder.get().processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -362,13 +399,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
         for (int j = 0; j < STREAM_ITERATIONS / CONCURRENT_TEST_CONCURRENCY; j++) {
           try {
             switch (mode) {
-              case BLOCKING:
+              case FLOW:
                 flow.process(newEvent());
                 latch.countDown();
                 break;
-              case NON_BLOCKING:
-                processNonBlocking(flow, newEvent(), t -> latch.countDown(),
-                                   response -> bubble(new AssertionError("Unexpected error")));
+              case SOURCE:
+                processSourceNonBlocking(flow, newEvent(), t -> latch.countDown(),
+                                         response -> bubble(new AssertionError("Unexpected error")));
             }
           } catch (MuleException e) {
             throw new RuntimeException(e);
@@ -381,14 +418,14 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void errorsStream() throws Exception {
-    flow = flowBuilder.get().processors(failingProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(failingProcessor).build();
     flow.initialise();
     flow.start();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
       switch (mode) {
-        case BLOCKING:
+        case FLOW:
           try {
             flow.process(newEvent());
             fail("Unexpected success");
@@ -396,9 +433,9 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
             latch.countDown();
           }
           break;
-        case NON_BLOCKING:
-          processNonBlocking(flow, newEvent(), response -> bubble(new AssertionError("Unexpected success")),
-                             t -> latch.countDown());
+        case SOURCE:
+          processSourceNonBlocking(flow, newEvent(), response -> bubble(new AssertionError("Unexpected success")),
+                                   t -> latch.countDown());
       }
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
@@ -406,7 +443,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
   @Test
   public void errorSuccessStream() throws Exception {
-    flow = flowBuilder.get().processors(errorSuccessProcessor).build();
+    flow = flowBuilder.get().source(triggerableMessageSource).processors(errorSuccessProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -414,7 +451,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     CountDownLatch errorLatch = new CountDownLatch(STREAM_ITERATIONS / 2);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
       switch (mode) {
-        case BLOCKING:
+        case FLOW:
           try {
             flow.process(newEvent());
             sucessLatch.countDown();
@@ -422,22 +459,34 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
             errorLatch.countDown();
           }
           break;
-        case NON_BLOCKING:
-          processNonBlocking(flow, newEvent(), response -> sucessLatch.countDown(), t -> errorLatch.countDown());
+        case SOURCE:
+          processSourceNonBlocking(flow, newEvent(), response -> sucessLatch.countDown(), t -> errorLatch.countDown());
       }
     }
     assertThat(sucessLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     assertThat(errorLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
-  protected void processNonBlocking(Flow flow, InternalEvent event, Consumer<InternalEvent> onResponse,
-                                    Consumer<Throwable> onError) {
-    just(event).transform(flow).subscribe(requestUnbounded());
+  protected void processSourceNonBlocking(Flow flow, InternalEvent event, Consumer<InternalEvent> onResponse,
+                                          Consumer<Throwable> onError) {
+    just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
     from(event.getContext().getResponsePublisher()).subscribe(onResponse, onError);
   }
 
   @Test
   public abstract void tx() throws Exception;
+
+  protected InternalEvent process(Processor processor, InternalEvent event, boolean unwrapMessagingException) throws Exception {
+    setMuleContextIfNeeded(processor, muleContext);
+    switch (mode) {
+      case FLOW:
+        return processor.process(event);
+      case SOURCE:
+        return triggerableMessageSource.trigger(event);
+      default:
+        return null;
+    }
+  }
 
   protected void testAsyncCpuLightNotificationThreads(AtomicReference<Thread> beforeThread, AtomicReference<Thread> afterThread)
       throws Exception {
@@ -454,6 +503,51 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     flow.initialise();
     flow.start();
     process(flow, testEvent());
+  }
+
+  protected void testBackPressure(BackPressureStrategy backPressureStrategy, Predicate<Integer> processedAssertion,
+                                  Predicate<Integer> rejectedAssertion, Predicate<Integer> totalAssertion)
+      throws MuleException {
+    if (mode.equals(SOURCE)) {
+
+      TriggerableMessageSource triggerableMessageSource = new TriggerableMessageSource(backPressureStrategy);
+      flow =
+          flowBuilder.get().source(triggerableMessageSource).processors(asList(cpuLightProcessor, new ThreadTrackingProcessor() {
+
+            @Override
+            public InternalEvent process(InternalEvent event) throws MuleException {
+              try {
+                Thread.sleep(3);
+              } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+              }
+              return super.process(event);
+            }
+
+            @Override
+            public ProcessingType getProcessingType() {
+              return BLOCKING;
+            }
+          })).maxConcurrency(2).build();
+      flow.initialise();
+      flow.start();
+
+      AtomicInteger rejected = new AtomicInteger();
+      AtomicInteger processed = new AtomicInteger();
+
+      for (int i = 0; i < STREAM_ITERATIONS; i++) {
+        cachedThreadPool.submit(() -> Flux.just(newEvent()).transform(triggerableMessageSource.getListener())
+            .doOnNext(event -> processed.getAndIncrement())
+            .doOnError(e -> rejected.getAndIncrement()).subscribe());
+      }
+
+      new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
+          .check(new JUnitLambdaProbe(() -> {
+            LOGGER.info("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
+            return totalAssertion.test(rejected.get() + processed.get())
+                && processedAssertion.test(processed.get()) && rejectedAssertion.test(rejected.get());
+          }));
+    }
   }
 
   class MultipleInvocationLatchedProcessor implements Processor {
@@ -510,9 +604,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
 
     private ExecutorService executor;
 
-    public TestScheduler(int threads, String threadNamePrefix) {
+    public TestScheduler(int threads, String threadNamePrefix, boolean reject) {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
-      executor = new ThreadPoolExecutor(threads, threads, 0l, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+      executor = new ThreadPoolExecutor(threads, threads, 0l, TimeUnit.MILLISECONDS,
+                                        new LinkedBlockingQueue(reject ? threads : Integer.MAX_VALUE),
                                         new NamedThreadFactory(threadNamePrefix));
     }
 
@@ -556,7 +651,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     private Scheduler delegate;
 
     public RejectingScheduler(Scheduler delegate) {
-      super(1, "prefix");
+      super(1, "prefix", true);
       this.delegate = delegate;
     }
 
@@ -643,6 +738,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractReactiv
     public ProcessingType getProcessingType() {
       return asyncProcessor.getProcessingType();
     }
+  }
+
+  public enum Mode {
+    /**
+     * Test using {@link Flow#process(InternalEvent)}.
+     */
+    FLOW,
+    /**
+     * Test using {@link org.mule.runtime.core.api.source.MessageSource}
+     */
+    SOURCE,
   }
 
 }

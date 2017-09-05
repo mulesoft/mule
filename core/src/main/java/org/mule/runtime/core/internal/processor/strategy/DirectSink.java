@@ -50,6 +50,11 @@ class DirectSink implements Sink, Disposable {
   }
 
   @Override
+  public boolean emit(InternalEvent event) {
+    return reactorSink.emit(event);
+  }
+
+  @Override
   public void dispose() {
     reactorSink.dispose();
   }

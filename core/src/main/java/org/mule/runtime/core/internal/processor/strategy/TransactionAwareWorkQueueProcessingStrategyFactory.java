@@ -96,6 +96,15 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
       }
 
       @Override
+      public boolean emit(InternalEvent event) {
+        if (isTransactionActive()) {
+          return syncSink.emit(event);
+        } else {
+          return workQueueSink.emit(event);
+        }
+      }
+
+      @Override
       public void dispose() {
         disposeIfNeeded(syncSink, NOP_LOGGER);
         disposeIfNeeded(workQueueSink, NOP_LOGGER);
