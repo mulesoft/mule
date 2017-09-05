@@ -52,7 +52,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "stringTypedValue",
               "description": "",
               "modelProperties": {}
@@ -78,7 +78,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -153,7 +153,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -183,7 +183,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -259,7 +259,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "stringValue",
                   "description": "",
                   "modelProperties": {}
@@ -286,7 +286,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -327,7 +327,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -357,7 +357,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -477,7 +477,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "stringNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -503,7 +503,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "wrappedString",
               "description": "",
               "modelProperties": {}
@@ -529,7 +529,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "complexTypedValue",
               "description": "",
               "modelProperties": {}
@@ -555,7 +555,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "complexNotWrapped",
               "description": "",
               "modelProperties": {}
@@ -619,7 +619,7 @@
                 "query": false,
                 "order": 7
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "mapOfComplexValues",
               "description": "",
               "modelProperties": {}
@@ -683,7 +683,7 @@
                 "query": false,
                 "order": 8
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "mapOfComplexTypedValues",
               "description": "",
               "modelProperties": {}
@@ -724,7 +724,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -750,7 +750,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -791,7 +791,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -821,7 +821,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -927,7 +927,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "inputStream",
               "description": "",
               "modelProperties": {}
@@ -954,7 +954,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -981,7 +981,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputEncoding",
               "description": "The encoding of the payload that this operation outputs.",
               "modelProperties": {}
@@ -1156,7 +1156,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
@@ -1208,7 +1208,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1238,7 +1238,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1350,7 +1350,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "objectTypedValue",
               "description": "",
               "modelProperties": {}
@@ -1391,7 +1391,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1421,7 +1421,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1496,7 +1496,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "differedDoor",
               "description": "",
               "modelProperties": {}
@@ -1537,7 +1537,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1567,7 +1567,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1678,7 +1678,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doorValues",
               "description": "",
               "modelProperties": {}
@@ -1719,7 +1719,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1749,7 +1749,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -1864,7 +1864,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doorMapValues",
               "description": "",
               "modelProperties": {}
@@ -1905,7 +1905,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -1935,7 +1935,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2010,7 +2010,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doorValue",
               "description": "",
               "modelProperties": {}
@@ -2051,7 +2051,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2081,7 +2081,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2157,7 +2157,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "description",
               "description": "",
               "modelProperties": {}
@@ -2183,7 +2183,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "brandName",
               "description": "",
               "modelProperties": {}
@@ -2224,7 +2224,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "weight",
               "description": "",
               "modelProperties": {}
@@ -2265,7 +2265,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2295,7 +2295,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2406,7 +2406,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "stringValues",
               "description": "",
               "modelProperties": {}
@@ -2447,7 +2447,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2477,7 +2477,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2628,7 +2628,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "doorMapListValues",
               "description": "",
               "modelProperties": {}
@@ -2669,7 +2669,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2699,7 +2699,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2814,7 +2814,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "stringMapValues",
               "description": "",
               "modelProperties": {}
@@ -2855,7 +2855,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -2885,7 +2885,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -2961,7 +2961,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "stringDescription",
               "description": "",
               "modelProperties": {}
@@ -2988,7 +2988,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -3029,7 +3029,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3059,7 +3059,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3112,7 +3112,7 @@
                   "query": false,
                   "order": 3
                 },
-                "elementReferences": [],
+                "allowedStereotypeModels": [],
                 "name": "stringValue",
                 "description": "",
                 "modelProperties": {}
@@ -3205,7 +3205,7 @@
                 "order": 1,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -3303,11 +3303,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -3334,7 +3333,7 @@
                 "order": 2,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -3484,7 +3483,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

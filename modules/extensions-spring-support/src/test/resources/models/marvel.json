@@ -52,11 +52,14 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
+                  "type": "ironMan",
                   "namespace": "Marvel",
-                  "name": "ironMan",
-                  "type": "CONFIG"
+                  "parent": {
+                    "type": "MODULE_CONFIG",
+                    "namespace": "MULE"
+                  }
                 }
               ],
               "name": "ironManConfig",
@@ -84,11 +87,10 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
-                  "namespace": "os",
-                  "name": "objectStore",
-                  "type": "OBJECT_STORE"
+                  "type": "OBJECT_STORE",
+                  "namespace": "os"
                 }
               ],
               "name": "spellStore",
@@ -226,7 +228,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -253,7 +255,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -294,7 +296,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -324,7 +326,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -434,7 +436,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "values",
                   "description": "",
                   "modelProperties": {}
@@ -474,7 +476,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "fetchSize",
                   "description": "",
                   "modelProperties": {}
@@ -624,7 +626,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -676,7 +678,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -706,7 +708,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -842,7 +844,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -941,7 +943,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "stream",
                   "description": "",
                   "modelProperties": {}
@@ -981,7 +983,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "position",
                   "description": "",
                   "modelProperties": {}
@@ -1008,7 +1010,7 @@
                     "order": 3,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1049,7 +1051,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1079,7 +1081,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1170,7 +1172,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "data",
                   "description": "",
                   "modelProperties": {}
@@ -1197,7 +1199,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1224,7 +1226,7 @@
                     "order": 3,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1399,7 +1401,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -1451,7 +1453,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1481,7 +1483,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1556,11 +1558,10 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
-                      "namespace": "mule",
-                      "name": "flow",
-                      "type": "FLOW"
+                      "type": "FLOW",
+                      "namespace": "MULE"
                     }
                   ],
                   "name": "flowRef",
@@ -1623,16 +1624,22 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [
+                  "allowedStereotypeModels": [
                     {
+                      "type": "config",
                       "namespace": "Heisenberg",
-                      "name": "config",
-                      "type": "CONFIG"
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
                     },
                     {
+                      "type": "ironMan",
                       "namespace": "Marvel",
-                      "name": "ironMan",
-                      "type": "CONFIG"
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
                     }
                   ],
                   "name": "multipleConfig",
@@ -1807,7 +1814,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1919,7 +1926,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "castFrequencyInMillis",
                   "description": "",
                   "modelProperties": {}
@@ -1945,7 +1952,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "spell",
                   "description": "",
                   "modelProperties": {}
@@ -1986,7 +1993,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "spellSize",
                   "description": "",
                   "modelProperties": {}
@@ -2013,7 +2020,7 @@
                     "order": 4,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -2040,7 +2047,7 @@
                     "order": 5,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputEncoding",
                   "description": "The encoding of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -2138,11 +2145,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "os"
                             }
                           },
                           "description": {
@@ -2169,7 +2175,7 @@
                     "order": 6,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -2355,7 +2361,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -2505,7 +2511,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2572,7 +2578,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "ironManConfigFile",
               "displayModel": {
                 "pathModel": {
@@ -2715,7 +2721,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "at",
                   "description": "",
                   "modelProperties": {}
@@ -2742,7 +2748,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -2783,7 +2789,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2813,7 +2819,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2949,7 +2955,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3015,7 +3021,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -3195,7 +3201,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3258,7 +3264,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "missileConfigurationDirectory",
                   "displayModel": {
                     "pathModel": {
@@ -3438,7 +3444,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3528,7 +3534,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "instructionsFile",
               "displayModel": {
                 "pathModel": {
@@ -3564,7 +3570,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -3605,7 +3611,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3635,7 +3641,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -3745,7 +3751,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "iteratorValues",
               "description": "",
               "modelProperties": {}
@@ -3786,7 +3792,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -3816,7 +3822,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"

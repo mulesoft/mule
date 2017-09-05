@@ -70,7 +70,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pets",
               "description": "",
               "modelProperties": {}
@@ -96,7 +96,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cage",
               "description": "",
               "modelProperties": {}
@@ -140,7 +140,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cages",
               "description": "",
               "modelProperties": {}
@@ -431,7 +431,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -483,7 +483,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -509,7 +509,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -535,7 +535,7 @@
                 "query": false,
                 "order": 7
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -576,7 +576,7 @@
                 "query": false,
                 "order": 8
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -617,7 +617,7 @@
                 "query": false,
                 "order": 9
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -742,7 +742,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -772,7 +772,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -908,7 +908,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1031,7 +1031,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1061,7 +1061,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1197,7 +1197,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1320,7 +1320,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1350,7 +1350,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1486,7 +1486,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1602,7 +1602,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1629,7 +1629,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -1670,7 +1670,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1700,7 +1700,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1836,7 +1836,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1919,7 +1919,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1949,7 +1949,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2049,7 +2049,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2079,7 +2079,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2215,7 +2215,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2341,7 +2341,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "countDownLatch",
                   "description": "",
                   "modelProperties": {}
@@ -2385,7 +2385,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "latch",
                   "description": "",
                   "modelProperties": {}
@@ -2426,7 +2426,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2456,7 +2456,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2592,7 +2592,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2718,7 +2718,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "ownerName",
                   "description": "",
                   "modelProperties": {}
@@ -2759,7 +2759,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2789,7 +2789,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2925,7 +2925,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2991,7 +2991,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -3017,7 +3017,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -3046,7 +3046,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -3093,7 +3093,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -3140,7 +3140,7 @@
                     "query": false,
                     "order": 6
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -3431,7 +3431,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -3615,7 +3615,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3678,7 +3678,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -3704,7 +3704,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -3733,7 +3733,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -3780,7 +3780,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -3827,7 +3827,7 @@
                     "query": false,
                     "order": 6
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -4118,7 +4118,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -4302,7 +4302,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4365,7 +4365,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -4391,7 +4391,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -4420,7 +4420,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -4467,7 +4467,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -4514,7 +4514,7 @@
                     "query": false,
                     "order": 6
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -4805,7 +4805,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -4989,7 +4989,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -5196,7 +5196,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
@@ -5259,7 +5259,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -5285,7 +5285,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -5314,7 +5314,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -5361,7 +5361,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -5408,7 +5408,7 @@
                     "query": false,
                     "order": 6
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -5699,7 +5699,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -5883,7 +5883,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -5946,7 +5946,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "username",
                   "description": "",
                   "modelProperties": {}
@@ -5972,7 +5972,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "password",
                   "description": "",
                   "modelProperties": {}
@@ -6001,7 +6001,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "openingDate",
                   "description": "",
                   "modelProperties": {}
@@ -6048,7 +6048,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "closedForHolidays",
                   "description": "",
                   "modelProperties": {}
@@ -6095,7 +6095,7 @@
                     "query": false,
                     "order": 6
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "discountDates",
                   "description": "",
                   "modelProperties": {}
@@ -6386,7 +6386,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
@@ -6570,7 +6570,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -6675,7 +6675,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "failOnStart",
                   "description": "",
                   "modelProperties": {}
@@ -6705,7 +6705,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "failOnException",
                   "description": "",
                   "modelProperties": {}
@@ -6732,7 +6732,7 @@
                     "order": 3,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -6830,11 +6830,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "os"
                             }
                           },
                           "description": {
@@ -6861,7 +6860,7 @@
                     "order": 4,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -7011,7 +7010,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7119,7 +7118,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -7146,7 +7145,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -7187,7 +7186,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7217,7 +7216,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7312,7 +7311,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "petNames",
               "description": "",
               "modelProperties": {}
@@ -7339,7 +7338,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -7380,7 +7379,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7410,7 +7409,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7485,7 +7484,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -7511,7 +7510,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -7560,7 +7559,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7590,7 +7589,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7665,7 +7664,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cashierName",
               "description": "",
               "modelProperties": {}
@@ -7691,7 +7690,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "rothIRA",
               "description": "",
               "modelProperties": {}
@@ -7717,7 +7716,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pensionPlan",
               "description": "",
               "modelProperties": {}
@@ -7758,7 +7757,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "cash",
               "description": "",
               "modelProperties": {}
@@ -7799,7 +7798,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "debt",
               "description": "",
               "modelProperties": {}
@@ -7850,7 +7849,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -7880,7 +7879,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -7959,7 +7958,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "usePhoneNumber",
               "description": "",
               "modelProperties": {}
@@ -7985,7 +7984,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -8011,7 +8010,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "encoding",
               "description": "",
               "modelProperties": {}
@@ -8038,7 +8037,7 @@
                 "order": 4,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -8079,7 +8078,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8109,7 +8108,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -8200,7 +8199,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "river",
               "description": "",
               "modelProperties": {}
@@ -8241,7 +8240,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pollutedStream",
               "description": "",
               "modelProperties": {}
@@ -8268,7 +8267,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -8309,7 +8308,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8339,7 +8338,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -8472,7 +8471,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "forbiddenPets",
               "description": "",
               "modelProperties": {}
@@ -8513,7 +8512,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -8543,7 +8542,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -8618,7 +8617,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "phoneNumber",
               "description": "",
               "modelProperties": {}
@@ -8714,7 +8713,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "providers",
               "description": "",
               "modelProperties": {}
@@ -8740,7 +8739,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "user",
               "description": "",
               "modelProperties": {}
@@ -8766,7 +8765,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "pass",
               "description": "",
               "modelProperties": {}
@@ -8829,7 +8828,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -8855,7 +8854,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -8884,7 +8883,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -8931,7 +8930,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -8978,7 +8977,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -9269,7 +9268,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -9453,7 +9452,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -9516,7 +9515,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -9542,7 +9541,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -9571,7 +9570,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -9618,7 +9617,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -9665,7 +9664,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -9956,7 +9955,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -10140,7 +10139,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -10203,7 +10202,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -10229,7 +10228,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -10258,7 +10257,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -10305,7 +10304,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -10352,7 +10351,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -10643,7 +10642,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -10827,7 +10826,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -11034,7 +11033,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
@@ -11097,7 +11096,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -11123,7 +11122,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -11152,7 +11151,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -11199,7 +11198,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -11246,7 +11245,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -11537,7 +11536,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -11721,7 +11720,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -11784,7 +11783,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "username",
               "description": "",
               "modelProperties": {}
@@ -11810,7 +11809,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "password",
               "description": "",
               "modelProperties": {}
@@ -11839,7 +11838,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "openingDate",
               "description": "",
               "modelProperties": {}
@@ -11886,7 +11885,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "closedForHolidays",
               "description": "",
               "modelProperties": {}
@@ -11933,7 +11932,7 @@
                 "query": false,
                 "order": 6
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "discountDates",
               "description": "",
               "modelProperties": {}
@@ -12224,7 +12223,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
@@ -12408,7 +12407,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -12581,11 +12580,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -12612,7 +12610,7 @@
                 "order": 1,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -12762,7 +12760,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -12863,7 +12861,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -12961,11 +12959,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -12992,7 +12989,7 @@
                 "order": 4,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13044,7 +13041,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "mammals",
               "description": "",
               "modelProperties": {}
@@ -13070,7 +13067,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "birds",
               "description": "",
               "modelProperties": {}
@@ -13217,7 +13214,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

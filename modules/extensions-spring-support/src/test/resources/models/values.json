@@ -63,7 +63,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -89,7 +89,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "required1",
               "description": "",
               "modelProperties": {}
@@ -115,7 +115,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "required2",
               "description": "",
               "modelProperties": {}
@@ -172,7 +172,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -345,7 +345,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -422,7 +422,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -471,7 +471,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -497,7 +497,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -554,7 +554,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -727,7 +727,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -804,7 +804,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "valueParam",
               "description": "",
               "modelProperties": {}
@@ -853,7 +853,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -879,7 +879,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -936,7 +936,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -1109,7 +1109,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1177,7 +1177,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "data",
               "description": "",
               "modelProperties": {}
@@ -1221,7 +1221,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "configValues",
               "description": "",
               "modelProperties": {}
@@ -1329,7 +1329,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1468,7 +1468,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1584,7 +1584,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -1723,7 +1723,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1800,7 +1800,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -1826,7 +1826,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "required1",
                   "description": "",
                   "modelProperties": {}
@@ -1852,7 +1852,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "required2",
                   "description": "",
                   "modelProperties": {}
@@ -2025,7 +2025,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2098,7 +2098,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -2147,7 +2147,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -2173,7 +2173,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2346,7 +2346,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2419,7 +2419,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "valueParam",
                   "description": "",
                   "modelProperties": {}
@@ -2468,7 +2468,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channels",
                   "description": "",
                   "modelProperties": {}
@@ -2494,7 +2494,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "anyParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2667,7 +2667,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2730,7 +2730,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -2903,7 +2903,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -2974,7 +2974,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -3147,7 +3147,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -3238,7 +3238,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -3265,7 +3265,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -3363,11 +3363,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "os"
                             }
                           },
                           "description": {
@@ -3394,7 +3393,7 @@
                     "order": 3,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3544,7 +3543,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3634,7 +3633,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
                   "modelProperties": {}
@@ -3661,7 +3660,7 @@
                     "order": 2,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "outputMimeType",
                   "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
@@ -3759,11 +3758,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "os"
                             }
                           },
                           "description": {
@@ -3790,7 +3788,7 @@
                     "order": 3,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -3940,7 +3938,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4015,7 +4013,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -4072,7 +4070,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "someParameter",
                   "description": "",
                   "modelProperties": {}
@@ -4245,7 +4243,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -4336,7 +4334,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -4371,7 +4369,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -4406,7 +4404,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -4441,7 +4439,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -4530,7 +4528,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -4616,7 +4614,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4702,7 +4700,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4728,7 +4726,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -4816,7 +4814,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -4865,7 +4863,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -4891,7 +4889,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -4982,7 +4980,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -5008,7 +5006,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -5038,7 +5036,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -5078,7 +5076,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -5122,7 +5120,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -5200,7 +5198,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -5236,7 +5234,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -5324,7 +5322,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -5373,7 +5371,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -5399,7 +5397,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -5489,7 +5487,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channel",
               "description": "",
               "modelProperties": {}
@@ -5516,7 +5514,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -5614,11 +5612,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -5645,7 +5642,7 @@
                 "order": 3,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -5795,7 +5792,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -5878,7 +5875,7 @@
                 "order": 5,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -5976,11 +5973,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -6007,7 +6003,7 @@
                 "order": 6,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -6060,7 +6056,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "required",
               "description": "",
               "modelProperties": {}
@@ -6095,7 +6091,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "continent",
               "description": "",
               "modelProperties": {}
@@ -6130,7 +6126,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "country",
               "description": "",
               "modelProperties": {}
@@ -6165,7 +6161,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -6307,7 +6303,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -6399,7 +6395,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "values",
               "description": "",
               "modelProperties": {}
@@ -6426,7 +6422,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -6524,11 +6520,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -6555,7 +6550,7 @@
                 "order": 3,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -6615,7 +6610,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -6641,7 +6636,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -6780,7 +6775,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -6863,7 +6858,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -6961,11 +6956,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -6992,7 +6986,7 @@
                 "order": 4,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -7044,7 +7038,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "superString",
               "description": "",
               "modelProperties": {}
@@ -7080,7 +7074,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7219,7 +7213,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -7302,7 +7296,7 @@
                 "order": 3,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -7400,11 +7394,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -7431,7 +7424,7 @@
                 "order": 4,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -7491,7 +7484,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7517,7 +7510,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "anyParameter",
               "description": "",
               "modelProperties": {}
@@ -7656,7 +7649,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -7751,7 +7744,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "channels",
               "description": "",
               "modelProperties": {}
@@ -7777,7 +7770,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredString",
               "description": "",
               "modelProperties": {}
@@ -7807,7 +7800,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredBoolean",
               "description": "",
               "modelProperties": {}
@@ -7847,7 +7840,7 @@
                 "query": false,
                 "order": 4
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "requiredInteger",
               "description": "",
               "modelProperties": {}
@@ -7891,7 +7884,7 @@
                 "query": false,
                 "order": 5
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "strings",
               "description": "",
               "modelProperties": {}
@@ -7918,7 +7911,7 @@
                 "order": 6,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -8016,11 +8009,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -8047,7 +8039,7 @@
                 "order": 7,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -8197,7 +8189,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

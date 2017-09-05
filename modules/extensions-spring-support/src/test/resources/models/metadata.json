@@ -110,7 +110,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "data",
               "description": "",
               "modelProperties": {}
@@ -137,7 +137,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "dataWithDefault",
               "description": "",
               "modelProperties": {}
@@ -244,7 +244,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -292,7 +292,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -333,7 +333,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -363,7 +363,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -499,7 +499,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -636,7 +636,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -684,7 +684,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -725,7 +725,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -755,7 +755,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -891,7 +891,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1025,7 +1025,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1073,7 +1073,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1114,7 +1114,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1144,7 +1144,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1280,7 +1280,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1432,7 +1432,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1473,7 +1473,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1503,7 +1503,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -1639,7 +1639,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -1765,7 +1765,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -1813,7 +1813,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -1854,7 +1854,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -1884,7 +1884,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2020,7 +2020,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2172,7 +2172,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2213,7 +2213,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2243,7 +2243,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -2379,7 +2379,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2487,7 +2487,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2535,7 +2535,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2674,7 +2674,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -2808,7 +2808,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -2856,7 +2856,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -2897,7 +2897,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -2927,7 +2927,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3063,7 +3063,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3179,7 +3179,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3227,7 +3227,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3366,7 +3366,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3504,7 +3504,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3552,7 +3552,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3593,7 +3593,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -3623,7 +3623,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -3759,7 +3759,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -3904,7 +3904,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -3952,7 +3952,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -3993,7 +3993,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4023,7 +4023,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4159,7 +4159,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4293,7 +4293,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4341,7 +4341,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -4382,7 +4382,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -4412,7 +4412,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -4548,7 +4548,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4664,7 +4664,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4807,7 +4807,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -4942,7 +4942,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -4990,7 +4990,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -5031,7 +5031,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5061,7 +5061,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5197,7 +5197,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5331,7 +5331,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -5376,7 +5376,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5406,7 +5406,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5542,7 +5542,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -5676,7 +5676,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -5724,7 +5724,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "firstPerson",
                   "description": "",
                   "modelProperties": {}
@@ -5768,7 +5768,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "otherPerson",
                   "description": "",
                   "modelProperties": {}
@@ -5809,7 +5809,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -5839,7 +5839,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -5975,7 +5975,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6109,7 +6109,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -6157,7 +6157,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -6198,7 +6198,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6228,7 +6228,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -6364,7 +6364,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6516,7 +6516,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -6557,7 +6557,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6587,7 +6587,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -6723,7 +6723,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -6849,7 +6849,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -6894,7 +6894,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -6924,7 +6924,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7060,7 +7060,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7194,7 +7194,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -7239,7 +7239,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -7269,7 +7269,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7405,7 +7405,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -7512,7 +7512,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "animal",
                   "description": "",
                   "modelProperties": {}
@@ -7662,7 +7662,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -7714,7 +7714,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -7744,7 +7744,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -7880,7 +7880,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8020,7 +8020,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -8174,7 +8174,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -8226,7 +8226,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -8256,7 +8256,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -8392,7 +8392,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -8558,7 +8558,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -8712,7 +8712,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
@@ -8764,7 +8764,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -8794,7 +8794,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -8930,7 +8930,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -9046,7 +9046,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -9094,7 +9094,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -9233,7 +9233,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -9349,7 +9349,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -9397,7 +9397,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -9536,7 +9536,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -9670,7 +9670,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -9718,7 +9718,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -9759,7 +9759,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -9789,7 +9789,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -9925,7 +9925,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -10059,7 +10059,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
                   "modelProperties": {}
@@ -10101,7 +10101,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "continent",
                   "description": "",
                   "modelProperties": {
@@ -10132,7 +10132,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "country",
                   "description": "",
                   "modelProperties": {
@@ -10163,7 +10163,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "city",
                   "displayModel": {
                     "displayName": "State | City"
@@ -10211,7 +10211,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -10241,7 +10241,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -10377,7 +10377,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -10583,7 +10583,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -10704,7 +10704,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "type",
                   "description": "",
                   "modelProperties": {
@@ -10806,11 +10806,10 @@
                           "fields": []
                         },
                         "annotations": {
-                          "elementReference": {
-                            "elementReference": {
-                              "namespace": "os",
-                              "name": "object-store",
-                              "type": "OBJECT_STORE"
+                          "stereotype": {
+                            "stereotypeModel": {
+                              "type": "OBJECT_STORE",
+                              "namespace": "os"
                             }
                           },
                           "description": {
@@ -10837,7 +10836,7 @@
                     "order": 2,
                     "tabName": "Redelivery"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
@@ -10987,7 +10986,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -11103,7 +11102,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "contents",
               "description": "",
               "modelProperties": {}
@@ -11220,7 +11219,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "mapContent",
               "description": "",
               "modelProperties": {}
@@ -11298,7 +11297,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "animalContent",
               "description": "",
               "modelProperties": {}
@@ -11412,7 +11411,7 @@
                 "query": true,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "query",
               "description": "",
               "modelProperties": {
@@ -11457,7 +11456,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11487,7 +11486,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11611,7 +11610,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -11656,7 +11655,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11686,7 +11685,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -11805,7 +11804,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -11850,7 +11849,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -11880,7 +11879,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12004,7 +12003,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12034,7 +12033,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12127,7 +12126,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -12172,7 +12171,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12202,7 +12201,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12285,7 +12284,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12315,7 +12314,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12390,7 +12389,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12420,7 +12419,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12513,7 +12512,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -12558,7 +12557,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12588,7 +12587,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12689,7 +12688,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "content",
               "description": "",
               "modelProperties": {}
@@ -12715,7 +12714,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -12823,7 +12822,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "type",
               "description": "",
               "modelProperties": {
@@ -12868,7 +12867,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -12898,7 +12897,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -12981,7 +12980,7 @@
                 "query": true,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "query",
               "description": "",
               "modelProperties": {
@@ -13012,7 +13011,7 @@
                 "order": 2,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "outputMimeType",
               "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
@@ -13053,7 +13052,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13083,7 +13082,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13169,7 +13168,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "plainShape",
               "description": "",
               "modelProperties": {}
@@ -13195,7 +13194,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "rectangleSubtype",
               "description": "",
               "modelProperties": {}
@@ -13221,7 +13220,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "animal",
               "description": "",
               "modelProperties": {}
@@ -13262,7 +13261,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -13292,7 +13291,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -13484,7 +13483,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
@@ -13677,11 +13676,10 @@
                       "fields": []
                     },
                     "annotations": {
-                      "elementReference": {
-                        "elementReference": {
-                          "namespace": "os",
-                          "name": "object-store",
-                          "type": "OBJECT_STORE"
+                      "stereotype": {
+                        "stereotypeModel": {
+                          "type": "OBJECT_STORE",
+                          "namespace": "os"
                         }
                       },
                       "description": {
@@ -13708,7 +13706,7 @@
                 "order": 4,
                 "tabName": "Redelivery"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
@@ -13761,7 +13759,7 @@
                 "query": false,
                 "order": 1
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "continent",
               "description": "",
               "modelProperties": {
@@ -13792,7 +13790,7 @@
                 "query": false,
                 "order": 2
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "country",
               "description": "",
               "modelProperties": {
@@ -13823,7 +13821,7 @@
                 "query": false,
                 "order": 3
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "city",
               "displayModel": {
                 "displayName": "State | City"
@@ -13969,7 +13967,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {

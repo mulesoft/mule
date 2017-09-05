@@ -439,7 +439,7 @@
                     "query": false,
                     "order": 1
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {
@@ -469,7 +469,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
@@ -530,7 +530,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "body",
                   "displayModel": {
                     "summary": "The XML body to include in the SOAP message, with all the required parameters."
@@ -574,7 +574,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "headers",
                   "displayModel": {
                     "displayName": "Headers",
@@ -614,7 +614,7 @@
                     "query": false,
                     "order": 5
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "attachments",
                   "displayModel": {
                     "summary": "The attachments to include in the SOAP request."
@@ -666,7 +666,7 @@
                     "order": 2,
                     "tabName": "Transport"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transportHeaders",
                   "displayModel": {
                     "displayName": "Headers",
@@ -711,7 +711,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "target",
                   "displayModel": {
                     "displayName": "Target Variable"
@@ -741,7 +741,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "targetValue",
                   "displayModel": {
                     "displayName": "Target Value"
@@ -877,7 +877,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
@@ -992,7 +992,7 @@
                     "query": false,
                     "order": 2
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "wsdlUrl",
                   "description": "",
                   "modelProperties": {}
@@ -1018,7 +1018,7 @@
                     "query": false,
                     "order": 3
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "service",
                   "description": "",
                   "modelProperties": {}
@@ -1044,7 +1044,7 @@
                     "query": false,
                     "order": 4
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "port",
                   "description": "",
                   "modelProperties": {}
@@ -1106,7 +1106,7 @@
                     "order": 1,
                     "tabName": "Transport"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "transport",
                   "displayModel": {
                     "displayName": "Transport Configuration"
@@ -1282,7 +1282,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
@@ -1489,7 +1489,7 @@
                     "query": false,
                     "tabName": "Advanced"
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
