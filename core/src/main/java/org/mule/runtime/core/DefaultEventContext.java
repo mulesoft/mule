@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
@@ -20,15 +19,17 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
+
 import java.io.Serializable;
 import java.time.OffsetTime;
 import java.util.Optional;
+
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Default immutable implementation of {@link InternalEventContext}.
@@ -62,25 +63,27 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   /**
    * Builds a new execution context with the given parameters.
-   *
-   * @param id the unique id for this event context.
+   *  @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
+   * @param exceptionHandler the exception handler that will deal with an error context
    */
-  public static InternalEventContext create(String id, String serverId, ComponentLocation location) {
-    return create(id, serverId, location, null);
+  public static InternalEventContext create(String id, String serverId, ComponentLocation location,
+                                            MessagingExceptionHandler exceptionHandler) {
+    return create(id, serverId, location, null, exceptionHandler);
   }
 
   /**
    * Builds a new execution context with the given parameters and an empty publisher.
-   *
-   * @param id the unique id for this event context.
+   *  @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
+   * @param exceptionHandler the exception handler that will deal with an error context
    */
-  public static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId) {
-    return create(id, serverId, location, correlationId, Mono.empty());
+  public static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
+                                            MessagingExceptionHandler exceptionHandler) {
+    return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
   }
 
   /**
@@ -99,16 +102,17 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   /**
    * Builds a new execution context with the given parameters.
-   *
-   * @param id the unique id for this event context.
+   *  @param id the unique id for this event context.
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link InternalEventContext} to depend on completion of source.
+  *        {@link InternalEventContext} to depend on completion of source.
+   * @param exceptionHandler the exception handler that will deal with an error context
    */
   public static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                                            Publisher<Void> externalCompletionPublisher) {
-    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher);
+                                            Publisher<Void> externalCompletionPublisher,
+                                            MessagingExceptionHandler exceptionHandler) {
+    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
   }
 
   /**
@@ -219,18 +223,18 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   /**
    * Builds a new execution context with the given parameters.
-   *
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link InternalEvent} of this
-   *        context, if available.
+  *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link InternalEventContext} to depend on completion of source.
+  *        {@link InternalEventContext} to depend on completion of source.
+   * @param exceptionHandler the exception handler that will deal with an error context
    */
   private DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
-                              Publisher<Void> externalCompletionPublisher) {
-    super(NullExceptionHandler.getInstance(), externalCompletionPublisher);
+                              Publisher<Void> externalCompletionPublisher, MessagingExceptionHandler exceptionHandler) {
+    super(exceptionHandler, externalCompletionPublisher);
     this.id = id;
     this.serverId = serverId;
     this.location = location;

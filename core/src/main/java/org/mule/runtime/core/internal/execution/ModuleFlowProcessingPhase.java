@@ -49,6 +49,7 @@ import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
@@ -261,10 +262,11 @@ public class ModuleFlowProcessingPhase
       throws MuleException {
     Message message = template.getMessage();
     InternalEvent templateEvent =
-        builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion))
-            .message(message)
-            .flow(flowConstruct)
-            .build();
+        builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
+                       NullExceptionHandler.getInstance()))
+                           .message(message)
+                           .flow(flowConstruct)
+                           .build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {
       SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();

@@ -134,9 +134,7 @@ public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> builder(create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation())).message(request)
-              .flow(flowConstruct)
-              .build())
+          .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))
           .transform(listener)
