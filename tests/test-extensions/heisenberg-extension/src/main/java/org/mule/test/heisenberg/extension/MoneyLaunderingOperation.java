@@ -10,9 +10,12 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Validator;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.test.heisenberg.extension.exception.ValidationErrorTypeProvider;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 
@@ -160,5 +163,11 @@ public class MoneyLaunderingOperation {
         return true;
       }
     };
+  }
+
+  @Validator
+  @Throws(ValidationErrorTypeProvider.class)
+  public void validateMoney() {
+
   }
 }

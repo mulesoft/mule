@@ -15,7 +15,8 @@ import java.util.Optional;
 
 public enum HeisenbergErrors implements ErrorTypeDefinition<HeisenbergErrors> {
 
-  CONNECTIVITY(MuleErrors.CONNECTIVITY), OAUTH2(HeisenbergErrors.CONNECTIVITY), HEALTH(HeisenbergErrors.CONNECTIVITY);
+  CONNECTIVITY(MuleErrors.CONNECTIVITY), OAUTH2(HeisenbergErrors.CONNECTIVITY), HEALTH(HeisenbergErrors.CONNECTIVITY), VALIDATION(
+      MuleErrors.VALIDATION);
 
   private ErrorTypeDefinition<?> parentErrortype;
 
