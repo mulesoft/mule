@@ -222,26 +222,40 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     initialiseIfInitialisable(pipeline);
   }
 
+  /*
+   * Processor that dispatches incoming source Events to the internal pipeline the Sink. The way in which the Event is dispatched
+   * and how overload is handled depends on the Source back-pressure strategy.
+   */
   private ReactiveProcessor dispatchToFlow(Sink sink) {
     if (source.getBackPressureStrategy() == WAIT) {
-      return publisher -> from(publisher).doOnNext(event -> sink.accept(event))
+      // If back-pressure strategy is WAIT then using blocking `accept(Event event)` to dispatch Event
+      return publisher -> from(publisher)
+          .doOnNext(event -> {
+            try {
+              sink.accept(event);
+            } catch (RejectedExecutionException ree) {
+              MessagingException me = new MessagingException(event, ree, this);
+              event.getContext().error(exceptionResolver.resolve(me, getMuleContext()));
+            }
+          })
           .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
     } else {
+      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
       return publisher -> from(publisher).flatMap(event -> {
         if (sink.emit(event)) {
           return event.getContext().getResponsePublisher();
         } else {
           if (source.getBackPressureStrategy() == DROP) {
+            // If Event is not accepted and the back-pressure strategy is DROP then drop Event.
             return empty();
           } else {
-            RejectedExecutionException rejectedExecutionException = new RejectedExecutionException(format(OVERLOAD_ERROR_MESSAGE,
-                                                                                                          AbstractPipeline.this
-                                                                                                              .getName()));
+            // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
+            RejectedExecutionException rejectedExecutionException =
+                new RejectedExecutionException(format(OVERLOAD_ERROR_MESSAGE, getName()));
             return error(exceptionResolver.resolve(new MessagingException(builder(event)
                 .error(ErrorBuilder.builder().errorType(overloadErrorType)
                     .description(format("Flow '%s' Busy.", getName()))
-                    .detailedDescription(format("Flow '%s' buffer is full and new message cannot be accepted at this time.",
-                                                getName()))
+                    .detailedDescription(format(OVERLOAD_ERROR_MESSAGE, getName()))
                     .exception(rejectedExecutionException)
                     .build())
                 .build(), rejectedExecutionException, this), muleContext));

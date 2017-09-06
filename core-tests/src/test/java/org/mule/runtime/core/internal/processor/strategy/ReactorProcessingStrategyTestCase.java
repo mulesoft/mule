@@ -161,7 +161,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Override
@@ -205,7 +205,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
     flow.initialise();
     flow.start();
     expectRejected();
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
@@ -222,8 +222,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureWait() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -231,8 +230,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureFail() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(FAIL, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -240,8 +238,7 @@ public class ReactorProcessingStrategyTestCase extends AbstractProcessingStrateg
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureDrop() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 

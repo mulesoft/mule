@@ -9,7 +9,9 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -94,8 +96,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -103,8 +104,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, success -> success < STREAM_ITERATIONS, failures -> failures > 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -112,8 +112,7 @@ public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessi
   @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
   public void sourceBackPressureDrop() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, success -> success < STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total < STREAM_ITERATIONS);
+      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
     }
   }
 

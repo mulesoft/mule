@@ -121,7 +121,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
 
     TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
 
-    process(flow, testEvent());
+    processFlow(testEvent());
 
     assertSynchronous(1);
   }

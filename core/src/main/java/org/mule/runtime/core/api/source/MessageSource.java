@@ -24,8 +24,8 @@ public interface MessageSource extends Component {
   void setListener(Processor listener);
 
   /**
-   * The {@link BackPressureStrategy} that {@link org.mule.runtime.core.api.construct.FlowConstruct} implementations that support
-   * the concept of back-pressure should use.
+   * The {@link BackPressureStrategy} to be used by {@link org.mule.runtime.core.api.construct.Pipeline} implements to handle
+   * overload.
    *
    * @return the {@link BackPressureStrategy} to use.
    */
@@ -33,6 +33,11 @@ public interface MessageSource extends Component {
     return WAIT;
   }
 
+  /**
+   * Strategy used by a {@link org.mule.runtime.core.api.construct.Pipeline} to respond to and overload situation where the
+   * {@link org.mule.runtime.core.api.construct.Pipeline} is unable to process a new {@link org.mule.runtime.api.event.Event} due
+   * to, for example, all available threads being busy.
+   */
   enum BackPressureStrategy {
 
     /**

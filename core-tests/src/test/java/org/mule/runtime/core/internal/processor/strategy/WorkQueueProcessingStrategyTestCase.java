@@ -55,7 +55,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Before
   public void before() throws RegistrationException {
     super.before();
-    // This processing strategy depends on blocking scheduler not rejecting work from callee thread in order to apply
+    // This processing strategy depends on blocking scheduler not rejecting work from caller thread in order to apply
     // back-pressure.
     blocking = new TestScheduler(4, IO, false);
   }
@@ -154,7 +154,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Override
@@ -206,7 +206,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     flow.initialise();
     flow.start();
     expectRejected();
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
@@ -251,8 +251,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureWait() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -260,8 +259,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureFail() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(FAIL, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -269,8 +267,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
   public void sourceBackPressureDrop() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 

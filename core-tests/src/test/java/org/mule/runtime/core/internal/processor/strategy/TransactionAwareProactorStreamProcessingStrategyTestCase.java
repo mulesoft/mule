@@ -59,7 +59,7 @@ public class TransactionAwareProactorStreamProcessingStrategyTestCase extends Pr
 
     TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
 
-    process(flow, testEvent());
+    processFlow(testEvent());
 
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

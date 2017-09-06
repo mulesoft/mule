@@ -21,12 +21,11 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
@@ -53,7 +52,7 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
 
     TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
 
-    process(flow, testEvent());
+    processFlow(testEvent());
 
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

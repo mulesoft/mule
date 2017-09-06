@@ -17,7 +17,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -27,6 +26,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
@@ -83,7 +83,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.hamcrest.Matcher;
@@ -98,6 +97,7 @@ import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleContextTestCase {
@@ -177,8 +177,6 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Scheduler asyncExecutor;
   protected ExecutorService cachedThreadPool = newFixedThreadPool(4);
 
-
-
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
@@ -202,6 +200,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     flowBuilder = () -> builder("test", muleContext)
         .processingStrategyFactory((muleContext, prefix) -> createProcessingStrategy(muleContext, prefix))
+        .source(triggerableMessageSource)
         // Avoid logging of errors by using a null exception handler.
         .messagingExceptionHandler((exception, event) -> event);
   }
@@ -230,11 +229,11 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void singleCpuLight() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
 
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
@@ -254,17 +253,17 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     List<Processor> processors = new ArrayList<>(asList(processorsBeforeLatch));
     processors.add(latchedProcessor);
-    flow = flowBuilder.source(triggerableMessageSource).processors(processors).build();
+    flow = flowBuilder.processors(processors).build();
     flow.initialise();
     flow.start();
 
     for (int i = 0; i < invocations; i++) {
-      asyncExecutor.submit(() -> process(flow, newEvent()));
+      asyncExecutor.submit(() -> processFlow(newEvent()));
     }
 
     latchedProcessor.getAllLatchedLatch().await();
 
-    asyncExecutor.submit(() -> process(flow, newEvent()));
+    asyncExecutor.submit(() -> processFlow(newEvent()));
 
     assertThat(latchedProcessor.getUnlatchedInvocationLatch().await(BLOCK_TIMEOUT, MILLISECONDS), is(!blocks));
 
@@ -283,82 +282,77 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void multipleCpuLight() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void singleBlocking() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(blockingProcessor).build();
+    flow = flowBuilder.get().processors(blockingProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void multipleBlocking() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource)
-        .processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
+    flow = flowBuilder.get().processors(blockingProcessor, blockingProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void singleCpuIntensive() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuIntensiveProcessor).build();
+    flow = flowBuilder.get().processors(cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void multipleCpuIntensive() throws Exception {
     flow =
-        flowBuilder.get().source(triggerableMessageSource)
-            .processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
+        flowBuilder.get().processors(cpuIntensiveProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void mix() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void mix2() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource)
-        .processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
-                    cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuLightProcessor, blockingProcessor, blockingProcessor,
+                                        cpuLightProcessor, cpuIntensiveProcessor, cpuIntensiveProcessor, cpuLightProcessor)
         .build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   public void asyncCpuLight() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(asyncProcessor, cpuLightProcessor).build();
+    flow = flowBuilder.get().processors(asyncProcessor, cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
@@ -368,28 +362,20 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void stream() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
-      switch (mode) {
-        case FLOW:
-          flow.process(newEvent());
-          latch.countDown();
-          break;
-        case SOURCE:
-          processSourceNonBlocking(flow, newEvent(), t -> latch.countDown(),
-                                   response -> bubble(new AssertionError("Unexpected error")));
-      }
+      dispatchFlow(newEvent(), t -> latch.countDown(), response -> bubble(new AssertionError("Unexpected error")));
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test
   public void concurrentStream() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(cpuLightProcessor).build();
+    flow = flowBuilder.get().processors(cpuLightProcessor).build();
     flow.initialise();
     flow.start();
 
@@ -398,15 +384,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       asyncExecutor.submit(() -> {
         for (int j = 0; j < STREAM_ITERATIONS / CONCURRENT_TEST_CONCURRENCY; j++) {
           try {
-            switch (mode) {
-              case FLOW:
-                flow.process(newEvent());
-                latch.countDown();
-                break;
-              case SOURCE:
-                processSourceNonBlocking(flow, newEvent(), t -> latch.countDown(),
-                                         response -> bubble(new AssertionError("Unexpected error")));
-            }
+            dispatchFlow(newEvent(), t -> latch.countDown(), response -> bubble(new AssertionError("Unexpected error")));
           } catch (MuleException e) {
             throw new RuntimeException(e);
           }
@@ -418,73 +396,62 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void errorsStream() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(failingProcessor).build();
+    flow = flowBuilder.get().processors(failingProcessor).build();
     flow.initialise();
     flow.start();
 
     CountDownLatch latch = new CountDownLatch(STREAM_ITERATIONS);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
-      switch (mode) {
-        case FLOW:
-          try {
-            flow.process(newEvent());
-            fail("Unexpected success");
-          } catch (Throwable t) {
-            latch.countDown();
-          }
-          break;
-        case SOURCE:
-          processSourceNonBlocking(flow, newEvent(), response -> bubble(new AssertionError("Unexpected success")),
-                                   t -> latch.countDown());
-      }
+      dispatchFlow(newEvent(), response -> bubble(new AssertionError("Unexpected success")), t -> latch.countDown());
     }
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test
   public void errorSuccessStream() throws Exception {
-    flow = flowBuilder.get().source(triggerableMessageSource).processors(errorSuccessProcessor).build();
+    flow = flowBuilder.get().processors(errorSuccessProcessor).build();
     flow.initialise();
     flow.start();
 
     CountDownLatch sucessLatch = new CountDownLatch(STREAM_ITERATIONS / 2);
     CountDownLatch errorLatch = new CountDownLatch(STREAM_ITERATIONS / 2);
     for (int i = 0; i < STREAM_ITERATIONS; i++) {
-      switch (mode) {
-        case FLOW:
-          try {
-            flow.process(newEvent());
-            sucessLatch.countDown();
-          } catch (Throwable t) {
-            errorLatch.countDown();
-          }
-          break;
-        case SOURCE:
-          processSourceNonBlocking(flow, newEvent(), response -> sucessLatch.countDown(), t -> errorLatch.countDown());
-      }
+      dispatchFlow(newEvent(), response -> sucessLatch.countDown(), t -> errorLatch.countDown());
     }
     assertThat(sucessLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     assertThat(errorLatch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
-  protected void processSourceNonBlocking(Flow flow, InternalEvent event, Consumer<InternalEvent> onResponse,
-                                          Consumer<Throwable> onError) {
-    just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
-    from(event.getContext().getResponsePublisher()).subscribe(onResponse, onError);
-  }
-
   @Test
   public abstract void tx() throws Exception;
 
-  protected InternalEvent process(Processor processor, InternalEvent event, boolean unwrapMessagingException) throws Exception {
-    setMuleContextIfNeeded(processor, muleContext);
+  protected InternalEvent processFlow(InternalEvent event) throws Exception {
+    setMuleContextIfNeeded(flow, muleContext);
     switch (mode) {
       case FLOW:
-        return processor.process(event);
+        return flow.process(event);
       case SOURCE:
-        return triggerableMessageSource.trigger(event);
+        just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
+        try {
+          return Mono.from(event.getContext().getResponsePublisher()).block();
+        } catch (Throwable throwable) {
+          throw rxExceptionToMuleException(throwable);
+        }
       default:
         return null;
+    }
+  }
+
+  protected void dispatchFlow(InternalEvent event, Consumer<InternalEvent> onSuccess,
+                              Consumer<Throwable> onError) {
+    setMuleContextIfNeeded(flow, muleContext);
+    switch (mode) {
+      case FLOW:
+        just(event).transform(flow).subscribe(requestUnbounded());
+        Mono.from(event.getContext().getResponsePublisher()).doOnNext(onSuccess).doOnError(onError).subscribe();
+      case SOURCE:
+        just(event).transform(triggerableMessageSource.getListener()).subscribe(requestUnbounded());
+        Mono.from(event.getContext().getResponsePublisher()).doOnNext(onSuccess).doOnError(onError).subscribe();
     }
   }
 
@@ -502,33 +469,37 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow = flowBuilder.get().processors(annotatedAsyncProcessor).build();
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
-  protected void testBackPressure(BackPressureStrategy backPressureStrategy, Predicate<Integer> processedAssertion,
-                                  Predicate<Integer> rejectedAssertion, Predicate<Integer> totalAssertion)
+  protected void testBackPressure(BackPressureStrategy backPressureStrategy, Matcher<Integer> processedAssertion,
+                                  Matcher<Integer> rejectedAssertion, Matcher<Integer> totalAssertion)
       throws MuleException {
     if (mode.equals(SOURCE)) {
 
-      TriggerableMessageSource triggerableMessageSource = new TriggerableMessageSource(backPressureStrategy);
+      triggerableMessageSource = new TriggerableMessageSource(backPressureStrategy);
       flow =
-          flowBuilder.get().source(triggerableMessageSource).processors(asList(cpuLightProcessor, new ThreadTrackingProcessor() {
+          flowBuilder.get()
+              .source(triggerableMessageSource)
+              .processors(asList(cpuLightProcessor, new ThreadTrackingProcessor() {
 
-            @Override
-            public InternalEvent process(InternalEvent event) throws MuleException {
-              try {
-                Thread.sleep(3);
-              } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-              }
-              return super.process(event);
-            }
+                @Override
+                public InternalEvent process(InternalEvent event) throws MuleException {
+                  try {
+                    Thread.sleep(3);
+                  } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                  }
+                  return super.process(event);
+                }
 
-            @Override
-            public ProcessingType getProcessingType() {
-              return BLOCKING;
-            }
-          })).maxConcurrency(2).build();
+                @Override
+                public ProcessingType getProcessingType() {
+                  return BLOCKING;
+                }
+              }))
+              .maxConcurrency(2)
+              .build();
       flow.initialise();
       flow.start();
 
@@ -544,8 +515,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
           .check(new JUnitLambdaProbe(() -> {
             LOGGER.info("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
-            return totalAssertion.test(rejected.get() + processed.get())
-                && processedAssertion.test(processed.get()) && rejectedAssertion.test(rejected.get());
+            return totalAssertion.matches(rejected.get() + processed.get())
+                && processedAssertion.matches(processed.get()) && rejectedAssertion.matches(rejected.get());
           }));
     }
   }

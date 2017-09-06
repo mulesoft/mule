@@ -10,7 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
@@ -186,7 +188,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Override
@@ -226,7 +228,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         .build();
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
     verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
     verify(blockingSchedulerSpy, times(1)).submit(any(Runnable.class));
     assertThat(threads, hasSize(1));
@@ -254,7 +256,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         .build();
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
     verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
     verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Runnable.class));
     assertThat(threads, hasSize(1));
@@ -342,8 +344,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
   public void sourceBackPressureWait() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(WAIT, success -> success == STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -351,8 +352,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
   public void sourceBackPressureFail() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(FAIL, success -> success < STREAM_ITERATIONS, failures -> failures > 0,
-                       total -> total == STREAM_ITERATIONS);
+      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
     }
   }
 
@@ -360,8 +360,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
   public void sourceBackPressureDrop() throws Exception {
     if (mode.equals(SOURCE)) {
-      testBackPressure(DROP, success -> success < STREAM_ITERATIONS, failures -> failures == 0,
-                       total -> total < STREAM_ITERATIONS);
+      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
     }
   }
 
