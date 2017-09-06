@@ -9,8 +9,10 @@ package org.mule.functional.api.component;
 
 import static java.lang.System.lineSeparator;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,14 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class StacktraceLogChecker extends AbstractLogChecker{
 
-  private static final Pattern PARSING_REGEX_PATTERN = Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
-
-  private List<MethodCall> expectedCalls;
+  private List<MethodCall> expectedCalls = new ArrayList<>();
 
   @Override
   public void check(String logMessage) {
     StringBuilder errors = new StringBuilder();
-    String[] stackTraceLines = splitLines(extractStacktraceFromLog(logMessage));
+    List<String> stackTraceLines = getStacktraceLinesFromLogLines(splitLines(logMessage));
     Set<MethodCall> actualStackCalls = new HashSet<>();
     for(String line : stackTraceLines) {
       actualStackCalls.add(createMethodCallFromLine(line));
@@ -46,6 +46,7 @@ public class StacktraceLogChecker extends AbstractLogChecker{
       fail(errors.toString());
     }
   }
+
 
   private MethodCall createMethodCallFromLine(String line) {
     Matcher matcher = PARSING_REGEX_PATTERN.matcher(line);

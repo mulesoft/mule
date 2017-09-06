@@ -10,8 +10,8 @@ import static java.lang.System.lineSeparator;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
 
-import java.util.Arrays;
-import java.util.function.Predicate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,8 +24,8 @@ public class EqualsLogChecker extends AbstractLogChecker {
   @Override
   public void check(String logMessage) {
     StringBuilder errors = new StringBuilder();
-    String[] expectedLines = splitLines(extractMessageFromLog(expectedLogMessage));
-    String[] actualLines = splitLines(extractMessageFromLog(logMessage));
+    List<String> expectedLines = getMessageLinesFromLogLines(splitLines(expectedLogMessage));
+    List<String> actualLines = getMessageLinesFromLogLines(splitLines(logMessage));
 
     checkLineCount(expectedLines, actualLines, errors);
 
@@ -38,46 +38,47 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
   }
 
-  private void checkLineCount(String[] expectedLog, String[] actualLog, StringBuilder errorCatcher) {
-    if(expectedLog.length != actualLog.length) {
+  private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {
+    if(expectedLog.size() != actualLog.size()) {
       errorCatcher.append(lineSeparator());
-      errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",actualLog.length,expectedLog.length));
+      errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",actualLog.size(),expectedLog.size()));
       errorCatcher.append(lineSeparator());
     }
   }
 
-  private void compareLines(String[] expectedLogLines, String[] actualLogLines, StringBuilder errorCatcher) {
+  private void compareLines(List<String> expectedLogLines, List<String> actualLogLines, StringBuilder errorCatcher) {
     int i;
-    for(i = 0; i < expectedLogLines.length ; i++) {
-      if(i >= actualLogLines.length) {
-        errorCatcher.append(String.format("Missing expected line[%d]: %s\n",i,expectedLogLines[i]));
+    for(i = 0; i < expectedLogLines.size() ; i++) {
+      if(i >= actualLogLines.size()) {
+        errorCatcher.append(String.format("Missing expected line[%d]: %s\n",i,expectedLogLines.get(i)));
       }else {
-        if(!(expectedLogLines[i].trim().equals(actualLogLines[i].trim()))) {
-          errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n",i,expectedLogLines[i].trim(), actualLogLines[i].trim()));
+        if(!(expectedLogLines.get(i).trim().equals(actualLogLines.get(i).trim()))) {
+          errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n",i,expectedLogLines.get(i).trim(), actualLogLines.get(i).trim()));
           errorCatcher.append(lineSeparator());
         }
       }
     }
-    if(actualLogLines.length > expectedLogLines.length) {
+    if(actualLogLines.size() > expectedLogLines.size()) {
       errorCatcher.append("Actual log has extra lines:\n");
-      for(int j = i;j < actualLogLines.length; j++) {
-        errorCatcher.append(actualLogLines[j]);
+      for(int j = i;j < actualLogLines.size(); j++) {
+        errorCatcher.append(actualLogLines.get(j));
         errorCatcher.append(lineSeparator());
       }
       errorCatcher.append(lineSeparator());
     }
   }
 
+
   @Override
-  protected String[] splitLines(String wholeMessage) {
+  protected List<String> splitLines(String wholeMessage) {
     if(shouldFilterLogMessage){
       return filterLines(super.splitLines(wholeMessage));
     }
     return super.splitLines(wholeMessage);
   }
 
-  private String[] filterLines(String[] splittedLog) {
-    return Arrays.stream(splittedLog).filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim())).toArray(String[]::new);
+  private List<String> filterLines(List<String> splittedLog) {
+    return splittedLog.stream().filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim())).collect(Collectors.toList());
   }
 
   public void setExpectedLogMessage(String expectedLogMessage) {
