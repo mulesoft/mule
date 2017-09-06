@@ -12,6 +12,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -41,6 +42,16 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   @Override
   public void changeEvent(InternalEvent updated) {
     decorated.changeEvent(updated);
+  }
+
+  @Override
+  public SecurityContext getSecurityContext() {
+    return decorated.getSecurityContext();
+  }
+
+  @Override
+  public void setSecurityContext(SecurityContext securityContext) {
+    decorated.setSecurityContext(securityContext);
   }
 
   @Override

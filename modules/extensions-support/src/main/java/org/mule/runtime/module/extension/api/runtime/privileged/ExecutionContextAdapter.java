@@ -10,6 +10,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -88,4 +89,20 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return The reconnection strategy to use in case of connectivity problems
    */
   Optional<RetryPolicyTemplate> getRetryPolicyTemplate();
+
+  /**
+   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
+   * this context
+   *
+   * @param securityContext the context for this session or null if the request is not secure.
+   */
+  void setSecurityContext(SecurityContext securityContext);
+
+  /**
+   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
+   * this context
+   *
+   * @return the context for this session or null if the request is not secure.
+   */
+  SecurityContext getSecurityContext();
 }

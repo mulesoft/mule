@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -22,8 +24,8 @@ import org.junit.Test;
 public class VoidReturnDelegateTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void returnsMuleEvent() {
-    InternalEvent event = mock(InternalEvent.class);
+  public void returnsMuleEvent() throws MuleException {
+    InternalEvent event = newEvent();
     ExecutionContextAdapter operationContext = mock(ExecutionContextAdapter.class);
     when(operationContext.getEvent()).thenReturn(event);
 

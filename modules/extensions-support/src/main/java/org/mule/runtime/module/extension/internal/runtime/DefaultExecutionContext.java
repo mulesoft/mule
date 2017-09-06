@@ -23,6 +23,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -55,6 +56,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final M componentModel;
   private final MuleContext muleContext;
   private InternalEvent event;
+  private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final LazyValue<Optional<TransactionConfig>> transactionConfig;
@@ -88,6 +90,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.extensionModel = extensionModel;
     this.configuration = configuration;
     this.event = event;
+    this.securityContext = event.getSecurityContext();
     this.componentModel = componentModel;
     this.parameters = parameters;
     this.cursorProviderFactory = cursorProviderFactory;
@@ -168,6 +171,18 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   public void changeEvent(InternalEvent updated) {
     requireNonNull(event);
     event = updated;
+    securityContext = event.getSecurityContext();
+  }
+
+  @Override
+  public void setSecurityContext(SecurityContext securityContext) {
+    requireNonNull(securityContext);
+    this.securityContext = securityContext;
+  }
+
+  @Override
+  public SecurityContext getSecurityContext() {
+    return securityContext;
   }
 
   /**

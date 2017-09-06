@@ -60,7 +60,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Internal parameters used by the runtime to pass information around.
-   * 
+   *
    */
   Map<String, ?> getInternalParameters();
 
@@ -81,7 +81,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Returns the contents of the message as a byte array.
-   * 
+   *
    * @param muleContext the Mule node.
    * @return the contents of the message as a byte array
    * @throws MuleException if the message cannot be converted into an array of bytes
@@ -93,7 +93,7 @@ public interface InternalEvent extends Serializable, Event {
   /**
    * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
    * this event was received.
-   * 
+   *
    * @param outputType The requested output type.
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format.
@@ -108,7 +108,7 @@ public interface InternalEvent extends Serializable, Event {
    * Returns the message transformed into it's recognized or expected format and then into a String. The transformer used is the
    * one configured on the endpoint through which this event was received. If necessary this will use the encoding set on the
    * event.
-   * 
+   *
    * @param muleContext the Mule node.
    * @return the message transformed into it's recognized or expected format as a Strings.
    * @throws MessageTransformerException if a failure occurs in the transformer
@@ -120,7 +120,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Returns the message contents as a string If necessary this will use the encoding set on the event
-   * 
+   *
    * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
@@ -131,7 +131,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Returns the message contents as a string
-   * 
+   *
    * @param encoding the encoding to use when converting the message to string
    * @param muleContext the Mule node.
    * @return the message contents as a string
@@ -143,7 +143,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Retrieves the service session for the current event
-   * 
+   *
    * @return the service session for the event
    * @deprecated Transport infrastructure is deprecated.
    */
@@ -161,7 +161,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Returns the muleContext for the Mule node that this event was received in
-   * 
+   *
    * @return the muleContext for the Mule node that this event was received in
    * @deprecated TODO MULE-10013 remove this
    */
@@ -170,7 +170,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Return the replyToHandler (if any) that will be used to perform async reply
-   * 
+   *
    * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
    */
   @Deprecated
@@ -178,7 +178,7 @@ public interface InternalEvent extends Serializable, Event {
 
   /**
    * Return the destination (if any) that will be passed to the reply-to handler.
-   * 
+   *
    * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
    */
   @Deprecated
@@ -197,9 +197,9 @@ public interface InternalEvent extends Serializable, Event {
    * <p>
    * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
    * always be empty.
-   * 
+   *
    * @return the flow stack associated to this event.
-   * 
+   *
    * @since 3.8.0
    */
   FlowCallStack getFlowCallStack();
@@ -340,7 +340,7 @@ public interface InternalEvent extends Serializable, Event {
     /**
      * Remove a parameter.
      * <p>
-     * 
+     *
      * @see #parameters(Map)
      *
      * @param key the parameter key.
@@ -402,7 +402,7 @@ public interface InternalEvent extends Serializable, Event {
     Builder error(Error error);
 
     /**
-     * 
+     *
      * @param replyToHandler
      * @return the builder instance
      * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
@@ -411,7 +411,7 @@ public interface InternalEvent extends Serializable, Event {
     Builder replyToHandler(ReplyToHandler replyToHandler);
 
     /**
-     * 
+     *
      * @param replyToDestination
      * @return the builder instance
      * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
@@ -430,11 +430,19 @@ public interface InternalEvent extends Serializable, Event {
 
     /**
      * Disables the firing of notifications when processing the produced event.
-     * 
+     *
      * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder disableNotifications();
+
+    /**
+     * The security context for this event. If not null outbound, inbound and/or method invocations will be authenticated using
+     * this context.
+     *
+     * @param securityContext the context for this session or null if the request is not secure.
+     */
+    Builder securityContext(SecurityContext securityContext);
 
     /**
      * @param session
@@ -456,7 +464,7 @@ public interface InternalEvent extends Serializable, Event {
   /**
    * Helper method to get the value of a given variable in a null-safe manner such that {@code null} is returned for non-existent
    * variables rather than a {@link NoSuchElementException} exception being thrown.
-   * 
+   *
    * @param key the key of the variable to retrieve.
    * @param event the event from which to retrieve a variable with the given key.
    * @param <T> the variable type

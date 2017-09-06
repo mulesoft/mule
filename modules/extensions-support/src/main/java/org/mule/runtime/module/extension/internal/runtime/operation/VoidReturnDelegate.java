@@ -29,11 +29,11 @@ final class VoidReturnDelegate implements ReturnDelegate {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @return {@link ExecutionContextAdapter#getEvent()}
    */
   @Override
   public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return operationContext.getEvent();
+    return InternalEvent.builder(operationContext.getEvent()).securityContext(operationContext.getSecurityContext()).build();
   }
 }
