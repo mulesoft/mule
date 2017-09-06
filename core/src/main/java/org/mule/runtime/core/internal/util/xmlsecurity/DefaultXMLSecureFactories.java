@@ -14,6 +14,7 @@ import static javax.xml.stream.XMLInputFactory.SUPPORT_DTD;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
@@ -31,6 +32,18 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultXMLSecureFactories {
 
+  public static final String DOCUMENT_BUILDER_FACTORY = "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl";
+  public static final String SAX_PARSER_FACTORY = "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl";
+  public static final String XML_INPUT_FACTORY = "com.sun.xml.internal.stream.XMLInputFactoryImpl";
+  public static final String TRANSFORMER_FACTORY = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
+  public static final String SCHEMA_FACTORY = "com.sun.org.apache.xerces.internal.jaxp.validation.XMLSchemaFactory";
+
+  public static final String DOCUMENT_BUILDER_PROPERTY = "javax.xml.parsers.DocumentBuilderFactory";
+  public static final String SAX_PARSER_PROPERTY = "javax.xml.parsers.SAXParserFactory";
+  public static final String XML_INPUT_PROPERTY = "javax.xml.stream.XMLInputFactory";
+  public static final String TRANSFORMER_PROPERTY = "javax.xml.transform.TransformerFactory";
+  public static final String SCHEMA_PROPERTY = "javax.xml.validation.SchemaFactory";
+
   private Boolean externalEntities;
   private Boolean expandEntities;
 
@@ -42,7 +55,18 @@ public class DefaultXMLSecureFactories {
   }
 
   public DocumentBuilderFactory createDocumentBuilderFactory() {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory factory;
+
+    if (System.getProperty(DOCUMENT_BUILDER_PROPERTY) == null) {
+      try {
+        factory = DocumentBuilderFactory.newInstance(DOCUMENT_BUILDER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (FactoryConfigurationError e) {
+        logCreationWarning("DocumentBuilderFactory", DOCUMENT_BUILDER_FACTORY, e);
+        factory = DocumentBuilderFactory.newInstance();
+      }
+    } else {
+      factory = DocumentBuilderFactory.newInstance();
+    }
 
     try {
       factory.setFeature("http://xml.org/sax/features/external-general-entities", externalEntities);
@@ -57,7 +81,18 @@ public class DefaultXMLSecureFactories {
   }
 
   public SAXParserFactory createSaxParserFactory() {
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory;
+
+    if (System.getProperty(SAX_PARSER_PROPERTY) == null) {
+      try {
+        factory = SAXParserFactory.newInstance(SAX_PARSER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (FactoryConfigurationError e) {
+        logCreationWarning("SAXParserFactory", SAX_PARSER_FACTORY, e);
+        factory = SAXParserFactory.newInstance();
+      }
+    } else {
+      factory = SAXParserFactory.newInstance();
+    }
 
     try {
       factory.setFeature("http://xml.org/sax/features/external-general-entities", externalEntities);
@@ -71,7 +106,22 @@ public class DefaultXMLSecureFactories {
   }
 
   public XMLInputFactory createXMLInputFactory() {
-    XMLInputFactory factory = XMLInputFactory.newInstance();
+    XMLInputFactory factory;
+
+    if (System.getProperty(XML_INPUT_PROPERTY) == null) {
+      try {
+        // There is no way to pass the class without an intermediate system property
+        final String propertyName = "_mule.XMLInputFactory";
+
+        System.setProperty(propertyName, XML_INPUT_FACTORY);
+        factory = XMLInputFactory.newFactory(propertyName, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (FactoryConfigurationError e) {
+        logCreationWarning("XMLInputFactory", XML_INPUT_FACTORY, e);
+        factory = XMLInputFactory.newInstance();
+      }
+    } else {
+      factory = XMLInputFactory.newInstance();
+    }
 
     configureXMLInputFactory(factory);
 
@@ -79,7 +129,18 @@ public class DefaultXMLSecureFactories {
   }
 
   public TransformerFactory createTransformerFactory() {
-    TransformerFactory factory = TransformerFactory.newInstance();
+    TransformerFactory factory;
+
+    if (System.getProperty(TRANSFORMER_PROPERTY) == null) {
+      try {
+        factory = TransformerFactory.newInstance(TRANSFORMER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (FactoryConfigurationError e) {
+        logCreationWarning("TransformerFactory", TRANSFORMER_FACTORY, e);
+        factory = TransformerFactory.newInstance();
+      }
+    } else {
+      factory = TransformerFactory.newInstance();
+    }
 
     configureTransformerFactory(factory);
 
@@ -87,7 +148,19 @@ public class DefaultXMLSecureFactories {
   }
 
   public SchemaFactory createSchemaFactory(String schemaLanguage) {
-    SchemaFactory factory = SchemaFactory.newInstance(schemaLanguage);
+    String schemaProperty = SCHEMA_PROPERTY + ":" + schemaLanguage;
+    SchemaFactory factory;
+
+    if (System.getProperty(schemaProperty) == null) {
+      try {
+        factory = SchemaFactory.newInstance(schemaLanguage, SCHEMA_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
+      } catch (IllegalArgumentException e) {
+        logCreationWarning("SchemaFactory", SCHEMA_FACTORY, e);
+        factory = SchemaFactory.newInstance(schemaLanguage);
+      }
+    } else {
+      factory = SchemaFactory.newInstance(schemaLanguage);
+    }
 
     configureSchemaFactory(factory);
 
@@ -135,6 +208,11 @@ public class DefaultXMLSecureFactories {
   protected static void logConfigurationWarning(String interfaceName, String implementationName, Throwable e) {
     logger.warn(format("Can't configure XML entity expansion for %s (%s), this could introduce XXE and BL vulnerabilities",
                        interfaceName, implementationName));
+    logger.warn(e);
+  }
+
+  protected static void logCreationWarning(String interfaceName, String desiredImplementation, Throwable e) {
+    logger.warn(format("Can't create %s (%s), falling back to default implementation", interfaceName, desiredImplementation));
     logger.warn(e);
   }
 
