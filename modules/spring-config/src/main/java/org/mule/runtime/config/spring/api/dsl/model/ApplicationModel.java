@@ -30,6 +30,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.ClassUtils;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.app.declaration.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -57,7 +60,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.config.GlobalPropertyCo
 import org.mule.runtime.config.spring.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.spring.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
@@ -65,10 +68,9 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.w3c.dom.Node;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,11 +81,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import javax.xml.namespace.QName;
-
-import org.apache.commons.lang3.ClassUtils;
-import org.w3c.dom.Node;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -901,7 +898,7 @@ public class ApplicationModel {
   }
 
   /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModuleModel} as
+   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
    * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
    * message processors
    *
@@ -909,7 +906,7 @@ public class ApplicationModel {
    *        expanded.
    */
   private void expandModules(Set<ExtensionModel> extensionModels) {
-    new MacroExpansionModuleModel(this, extensionModels).expand();
+    new MacroExpansionModulesModel(this, extensionModels).expand();
   }
 
   /**

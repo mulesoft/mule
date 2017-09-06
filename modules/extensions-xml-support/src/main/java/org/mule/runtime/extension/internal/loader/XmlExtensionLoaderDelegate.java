@@ -69,11 +69,11 @@ import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser
 import org.mule.runtime.config.spring.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.OperationComponentModelModelProperty;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.XmlExtensionModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
