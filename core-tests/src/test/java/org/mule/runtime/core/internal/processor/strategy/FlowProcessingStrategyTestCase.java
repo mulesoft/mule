@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -19,13 +18,11 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -52,9 +49,6 @@ public class FlowProcessingStrategyTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws RegistrationException {
     when(muleContext.getConfiguration()).thenReturn(configuration);
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
-    when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
-    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(empty());
     createFlow(null);
   }
 

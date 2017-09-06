@@ -7,6 +7,7 @@
 package org.mule.tck.util;
 
 import static java.util.Optional.empty;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.DefaultEventContext;
@@ -24,6 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -68,6 +71,9 @@ public class MuleContextUtils {
   public static MuleContext mockContextWithServices() {
     final MuleContext muleContext = mockMuleContext();
     when(muleContext.getSchedulerService()).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
+    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
+    when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
+    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(empty());
     mockNotificationsHandling(muleContext.getRegistry());
     return muleContext;
   }

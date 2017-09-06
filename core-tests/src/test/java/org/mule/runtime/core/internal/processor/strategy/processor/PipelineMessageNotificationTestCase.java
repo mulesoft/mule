@@ -42,7 +42,6 @@ import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.InternalProcessor;
@@ -97,10 +96,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     mockErrorTypeLocator();
     when(muleContext.getErrorTypeRepository().getErrorType(UNKNOWN)).thenReturn(Optional.of(mock(ErrorType.class)));
     when(muleContext.getTransformationService()).thenReturn(new DefaultTransformationService(muleContext));
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
-    when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
-    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(Optional.empty());
-
   }
 
   private void mockErrorTypeLocator() {
