@@ -9,7 +9,6 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
-    <jms:jms-producer-config name="templateProducerConfig"/>
     <jms:config name="jmsConfig" producerConfig="templateProducerConfig">
         <jms:active-mq-connection/>
     </jms:config>
