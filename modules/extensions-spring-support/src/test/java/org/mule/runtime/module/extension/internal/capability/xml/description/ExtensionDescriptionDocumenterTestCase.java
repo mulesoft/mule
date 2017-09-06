@@ -24,6 +24,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.c
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -34,7 +35,7 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.module.extension.internal.AbstractAnnotationProcessorTestCase;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
+import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.single.config.TestExtensionWithDocumentationAndSingleConfig;
 import org.mule.runtime.module.extension.internal.loader.enricher.ExtensionDescriptionsEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
@@ -73,12 +74,12 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
         {MULTIPLE_CONFIGS,
-            TestExtensionWithDocumentation.class,
-            "/META-INF/documentation-extension-descriptions.xml",
-            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension"},
+            TestExtensionWithDocumentationAndMultipleConfig.class,
+            "/META-INF/multiple-extension-descriptions.xml",
+            "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension/multiple/config"},
         {SINGLE_CONFIG,
             TestExtensionWithDocumentationAndSingleConfig.class,
-            "/META-INF/documentationwithsingleconfig-extension-descriptions.xml",
+            "/META-INF/single-extension-descriptions.xml",
             "src/test/java/org/mule/runtime/module/extension/internal/capability/xml/extension/single/config"},
     });
   }
@@ -88,10 +89,9 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   private final String expectedProductPath;
   private final String sourcePath;
 
-  public ExtensionDescriptionDocumenterTestCase(String name, Class<?> extensionClass, String expectedProductPath,
-                                                String sourcePath) {
+  public ExtensionDescriptionDocumenterTestCase(String name, Class<?> extension, String expectedProductPath, String sourcePath) {
     this.name = name;
-    this.extensionClass = extensionClass;
+    this.extensionClass = extension;
     this.expectedProductPath = expectedProductPath;
     this.sourcePath = sourcePath;
   }
@@ -111,34 +111,34 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
 
   @Test
   public void loadDocumentationFromFile() throws Exception {
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(currentThread().getContextClassLoader(),
-                                                                     getDefault(emptySet()));
+    ClassLoader cl = currentThread().getContextClassLoader();
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(cl, getDefault(emptySet()));
     DefaultJavaModelLoaderDelegate loader = new DefaultJavaModelLoaderDelegate(extensionClass, "1.0.0-dev");
     loader.declare(ctx);
     ExtensionDescriptionsEnricher enricher = new ExtensionDescriptionsEnricher();
     enricher.enrich(ctx);
     ExtensionModelFactory factory = new ExtensionModelFactory();
     ExtensionModel extensionModel = factory.create(ctx);
-    assertDescriptions(extensionModel);
+    assertDescribedExtensionModel(extensionModel);
   }
 
   @Test
   public void describeDescriptions() throws Exception {
     TestProcessor processor = new TestProcessor(extensionClass);
     doCompile(processor);
-    assertDescriptions(processor.getExtensionModel());
+    assertDescribedExtensionModel(processor.getExtensionModel());
   }
 
-  private void assertDescriptions(ExtensionModel declaration) {
-    List<ConfigurationModel> configurations = declaration.getConfigurationModels();
-
+  private void assertDescribedExtensionModel(ExtensionModel extensionModel) {
     if (isSingleConfigTest()) {
-      assertDescription(declaration, "Test Extension Description with single config");
-      assertThat(configurations, hasSize(1));
-      assertThat(configurations.get(0).getDescription(), is(DEFAULT_CONFIG_DESCRIPTION));
-      return;
+      assertDescriptionsSingleConfig(extensionModel);
+    } else {
+      assertDescriptionsMultipleConfigs(extensionModel);
     }
+  }
 
+  private void assertDescriptionsMultipleConfigs(ExtensionModel declaration) {
+    List<ConfigurationModel> configurations = declaration.getConfigurationModels();
     assertDescription(declaration, "Test Extension Description");
     assertThat(configurations, hasSize(2));
     ConfigurationModel first = configurations.get(1);
@@ -174,6 +174,34 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     OperationModel connectedOpe = connectedOperations.get(0);
     assertDescription(connectedOpe, "Test Operation with blank parameter description");
     assertDescription(connectedOpe.getAllParameterModels().get(0), "");
+  }
+
+  private void assertDescriptionsSingleConfig(ExtensionModel extensionModel) {
+    assertThat(extensionModel.getConfigurationModels(), hasSize(1));
+
+    assertThat(extensionModel.getOperationModels(), hasSize(1));
+    OperationModel withParameterGroup = extensionModel.getOperationModels().get(0);
+    assertDescription(withParameterGroup, "Operation with parameter group");
+    List<ParameterModel> operationParams = withParameterGroup.getAllParameterModels();
+    assertDescription(operationParams.get(0), "value param description");
+    assertDescription(operationParams.get(1), "First Description");
+    assertDescription(operationParams.get(2), "Second Description");
+
+    ConfigurationModel config = extensionModel.getConfigurationModels().get(0);
+    assertDescription(extensionModel, "Test Extension Description with single config");
+
+    assertDescription(config, DEFAULT_CONFIG_DESCRIPTION);
+    assertDescription(config.getAllParameterModels().get(0), "Config parameter");
+    assertDescription(config.getAllParameterModels().get(1), "Config Parameter with an Optional value");
+
+    assertThat(config.getOperationModels(), hasSize(1));
+    assertDescription(config.getOperationModels().get(0), "Operation with description");
+
+    ConnectionProviderModel provider = config.getConnectionProviders().get(0);
+    assertDescription(provider, "Provider description");
+    assertDescription(provider.getAllParameterModels().get(0), "Connection Param Description");
+    assertDescription(provider.getAllParameterModels().get(1), "First Description");
+    assertDescription(provider.getAllParameterModels().get(2), "Second Description");
   }
 
   private void doCompile(TestProcessor processor) throws Exception {

@@ -12,18 +12,13 @@ import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProvider
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestAnotherDocumentedProvider;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestDocumentedExtensionOperations;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestDocumentedParameterGroup;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestDocumentedProvider;
 
 /**
  * Test Extension Description with single config
  */
-@Extension(name = "documentationWithSingleConfig")
-@Operations({TestDocumentedExtensionOperations.class})
-@ConnectionProviders({TestDocumentedProvider.class, TestAnotherDocumentedProvider.class})
+@Extension(name = "single")
+@Operations({TestSingleConfigExtensionOperations.class})
+@ConnectionProviders({TestSingleConfigExtensionProvider.class})
 @Xml(namespace = "namespaceLocation", prefix = "documentation")
 public class TestExtensionWithDocumentationAndSingleConfig {
 
@@ -39,8 +34,5 @@ public class TestExtensionWithDocumentationAndSingleConfig {
   @Parameter
   @Optional
   private String configParameterWithComplexJavadoc;
-
-  @ParameterGroup(name = "group")
-  private TestDocumentedParameterGroup group;
 }
 
