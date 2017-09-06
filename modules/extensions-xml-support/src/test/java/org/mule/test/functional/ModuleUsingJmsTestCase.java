@@ -9,15 +9,9 @@ package org.mule.test.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-
-import io.qameta.allure.Issue;
+import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-@Ignore("MULE-12547: Flaky")
-@Issue("MULE-12547")
 public class ModuleUsingJmsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
