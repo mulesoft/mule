@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="config">
+            <description><![CDATA[Default configuration]]></description>
+            <parameters>
+                <parameter name="configParameter">
+                    <description><![CDATA[Config parameter]]></description>
+                </parameter>
+                <parameter name="configParameterWithComplexJavadoc">
+                    <description><![CDATA[Config Parameter with an Optional value]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="connection">
+            <description><![CDATA[Provider description]]></description>
+            <parameters>
+                <parameter name="connectionParam1">
+                    <description><![CDATA[Connection Param Description]]></description>
+                </parameter>
+                <parameter name="first">
+                    <description><![CDATA[First Description]]></description>
+                </parameter>
+                <parameter name="second">
+                    <description><![CDATA[Second Description]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="connection">
+            <description><![CDATA[Provider description]]></description>
+            <parameters>
+                <parameter name="connectionParam1">
+                    <description><![CDATA[Connection Param Description]]></description>
+                </parameter>
+                <parameter name="first">
+                    <description><![CDATA[First Description]]></description>
+                </parameter>
+                <parameter name="second">
+                    <description><![CDATA[Second Description]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="single">
+        <description><![CDATA[Test Extension Description with single config]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="operation">
+            <description><![CDATA[Operation with description]]></description>
+            <parameters>
+                <parameter name="otherFriend">
+                    <description><![CDATA[Some other friend]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="operationWithParameterGroup">
+            <description><![CDATA[Operation with parameter group]]></description>
+            <parameters>
+                <parameter name="value">
+                    <description><![CDATA[value param description]]></description>
+                </parameter>
+                <parameter name="first">
+                    <description><![CDATA[First Description]]></description>
+                </parameter>
+                <parameter name="second">
+                    <description><![CDATA[Second Description]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+</extension-documentation>

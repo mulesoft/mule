@@ -53,7 +53,7 @@
             </parameters>
         </connection>
     </connections>
-    <extension name="documentation">
+    <extension name="multiple">
         <description><![CDATA[Test Extension Description]]></description>
         <parameters/>
     </extension>

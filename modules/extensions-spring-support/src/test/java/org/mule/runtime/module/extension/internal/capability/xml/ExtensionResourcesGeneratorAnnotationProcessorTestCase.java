@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.capability.xml.extension.TestExtensionWithDocumentation;
+import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -63,10 +63,11 @@ public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends Abst
     when(byteSource.contentEquals(byteSourceCaptor.capture())).thenReturn(true);
 
     DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
-    ExtensionModel model = loader.loadExtensionModel(TestExtensionWithDocumentation.class.getClassLoader(),
+    ExtensionModel model = loader.loadExtensionModel(TestExtensionWithDocumentationAndMultipleConfig.class.getClassLoader(),
                                                      DslResolvingContext.getDefault(emptySet()),
                                                      ImmutableMap.<String, Object>builder()
-                                                         .put(TYPE_PROPERTY_NAME, TestExtensionWithDocumentation.class.getName())
+                                                         .put(TYPE_PROPERTY_NAME,
+                                                              TestExtensionWithDocumentationAndMultipleConfig.class.getName())
                                                          .put(VERSION, "4.0.0")
                                                          .build());
     String generatedSchema = new DefaultExtensionSchemaGenerator().generate(model, DslResolvingContext.getDefault(emptySet()));

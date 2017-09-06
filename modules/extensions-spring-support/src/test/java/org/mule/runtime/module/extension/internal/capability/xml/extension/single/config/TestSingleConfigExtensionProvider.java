@@ -4,21 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.capability.xml.extension;
+package org.mule.runtime.module.extension.internal.capability.xml.extension.single.config;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 /**
- * Provider Documentation
+ * Provider description
  */
-public class TestDocumentedProvider implements ConnectionProvider<String> {
+public class TestSingleConfigExtensionProvider implements ConnectionProvider<String> {
+
+  /**
+   * Connection Param Description
+   */
+  @Parameter
+  private String connectionParam1;
+
+  @ParameterGroup(name = "Connection Group")
+  private SingleConfigParameterGroup group;
 
   @Override
   public String connect() throws ConnectionException {
-    return "Magic Connection";
+    return "";
   }
 
   @Override
@@ -28,6 +38,6 @@ public class TestDocumentedProvider implements ConnectionProvider<String> {
 
   @Override
   public ConnectionValidationResult validate(String connection) {
-    return success();
+    return null;
   }
 }
