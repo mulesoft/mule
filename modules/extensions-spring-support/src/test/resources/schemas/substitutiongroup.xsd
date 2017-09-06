@@ -13,8 +13,8 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-mule-s-g-pojo"></xs:element>
-    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" substitutionGroup="sg:abstract-mule-s-g-pojo" name="mule-s-g-pojo">
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:sg="http://www.mulesoft.org/schema/mule/sg" type="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-mule-sg-pojo"></xs:element>
+    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" substitutionGroup="sg:abstract-mule-sg-pojo" name="mule-sg-pojo">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="sg:org.mule.test.substitutiongroup.extension.MuleSGPojo"></xs:extension>
@@ -69,10 +69,10 @@
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="mule-s-g-pojo">
+                        <xs:element minOccurs="0" maxOccurs="1" name="mule-sg-pojo">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" minOccurs="0" maxOccurs="1" ref="sg:abstract-mule-s-g-pojo"></xs:element>
+                                    <xs:element xmlns:sg="http://www.mulesoft.org/schema/mule/sg" minOccurs="0" maxOccurs="1" ref="sg:abstract-mule-sg-pojo"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
