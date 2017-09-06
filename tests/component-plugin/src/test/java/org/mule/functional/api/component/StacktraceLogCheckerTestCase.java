@@ -30,6 +30,14 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void stacktraceShouldBeEvalatedEvenWithNoSectionDelimiter() throws Exception {
+    String log = "this could be\nthe message part and\tshould not be evaluated\nat package.Class.method(whatever:0)";
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package","Class","method", 0);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check(log);
+  }
+
+  @Test
   public void callNotFoundShouldRaiseError() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package","Class","method", 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
@@ -46,9 +54,21 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
 
   @Test
-  public void linesWithoutExpectedFormatAreIgnored() throws Exception {
-
+  public void noLineNumberSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package","Class","method");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
+
+  @Test
+  public void differentLineNumbersRepresentDifferentExpectedMethodCalls() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package","Class","method",0);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    expectedException.expect(AssertionError.class);
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+
 
 
 }

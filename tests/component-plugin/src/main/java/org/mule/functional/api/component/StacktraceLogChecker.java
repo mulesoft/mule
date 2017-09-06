@@ -131,11 +131,7 @@ public class StacktraceLogChecker extends AbstractLogChecker{
 
     @Override
     public int hashCode() {
-      int lineNumberHash = 7;
-      if(lineNumber != null) {
-        lineNumberHash = lineNumber.hashCode();
-      }
-      return this.packageName.hashCode() + this.clazz.hashCode() + this.method.hashCode() + lineNumberHash;
+      return this.packageName.hashCode() + this.clazz.hashCode() + this.method.hashCode();
     }
 
     @Override
