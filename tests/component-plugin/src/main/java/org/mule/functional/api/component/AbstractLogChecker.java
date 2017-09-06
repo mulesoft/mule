@@ -1,19 +1,17 @@
 package org.mule.functional.api.component;
 
 
-public class AbstractLogChecker implements LogChecker {
+public abstract class AbstractLogChecker implements LogChecker {
 
   @Override
-  public void check(String logMessage) {
-    //Do nothing
-  }
+  public abstract void check(String logMessage);
 
   /**
    * Extracts the message part of the log. Separating it from the stack trace.
    *
    * @return a string with the log message
    */
-  protected String getLogMessage() {
+  protected String getLogMessage(String initialLog) {
     return null;
   }
 
@@ -22,7 +20,7 @@ public class AbstractLogChecker implements LogChecker {
    *
    * @return a string with the log stack trace.
    */
-  protected String getStackTrace() {
+  protected String getStackTrace(String initialLog) {
     return null;
   }
 

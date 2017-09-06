@@ -180,10 +180,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
                                              .withTypeDefinition(fromType(OnErrorAssertHandler.class)).withSetterParameterDefinition("checkers",fromChildCollectionConfiguration(LogChecker.class).build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class)).withSetterParameterDefinition("expectedLogMessage", fromChildConfiguration(String.class).withIdentifier("expected-log-message").build())
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class)).withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("expected-log-message").withTypeDefinition(fromType(String.class)).build());
 
     return componentBuildingDefinitions;
   }
