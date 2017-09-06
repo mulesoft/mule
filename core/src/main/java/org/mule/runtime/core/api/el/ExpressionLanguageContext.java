@@ -27,6 +27,14 @@ public interface ExpressionLanguageContext {
 
   void addAlias(String alias, String expression);
 
+  /**
+   * Adds an alias that requires access to internal Mule API
+   *
+   * @param alias name to be aliased
+   * @param expression expression to replace the alias.
+   */
+  void addInternalAlias(String alias, String expression);
+
   void declareFunction(String name, ExpressionLanguageFunction function);
 
   <T> T getVariable(String name);

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.el.DefaultExpressionManager.hasMelExpression;
+import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
