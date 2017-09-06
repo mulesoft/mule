@@ -9,19 +9,19 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link AbstractDescriptionDocumenter} implementation that picks a {@link ExtensionDeclaration} on which a {@link ExtensionModel}
@@ -65,6 +65,7 @@ final class ExtensionDescriptionDocumenter extends AbstractDescriptionDocumenter
           .forEach(config -> findMatchingConfiguration(declaration, config)
               .ifPresent(configDeclaration -> configDocumenter.document(configDeclaration, config)));
     } else {
+      configDocumenter.document(declaration.getConfigurations().get(0), extensionElement);
       declaration.getConfigurations().get(0).setDescription(DEFAULT_CONFIG_DESCRIPTION);
     }
   }
