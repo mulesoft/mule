@@ -206,13 +206,13 @@ public class DefaultXMLSecureFactories {
   }
 
   protected static void logConfigurationWarning(String interfaceName, String implementationName, Throwable e) {
-    logger.warn(format("Can't configure XML entity expansion for %s (%s), this could introduce XXE and BL vulnerabilities\n%s",
-                       interfaceName, implementationName, e));
+    logger.warn(format("Can't configure XML entity expansion for %s (%s), this could introduce XXE and BL vulnerabilities",
+                       interfaceName, implementationName),
+                e);
   }
 
   protected static void logCreationWarning(String interfaceName, String desiredImplementation, Throwable e) {
-    logger.warn(format("Can't create %s (%s), falling back to default implementation\n%s", interfaceName, desiredImplementation,
-                       e));
+    logger.warn(format("Can't create %s (%s), falling back to default implementation", interfaceName, desiredImplementation), e);
   }
 
   public Boolean getExternalEntities() {
