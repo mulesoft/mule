@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionProperty
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import org.slf4j.Logger;
@@ -45,12 +44,6 @@ public final class DefaultMuleSession implements MuleSession {
    * logger used by this class
    */
   private static Logger logger = LoggerFactory.getLogger(DefaultMuleSession.class);
-
-  /**
-   * The security context associated with the session. Note that this context will only be serialized if the SecurityContext
-   * object is Serializable.
-   */
-  private SecurityContext securityContext;
 
   private Map<String, TypedValue> properties;
 
