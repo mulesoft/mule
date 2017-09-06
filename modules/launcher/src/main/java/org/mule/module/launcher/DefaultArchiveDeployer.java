@@ -149,18 +149,36 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     public T deployPackagedArtifact(URL artifactAchivedUrl, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         T artifact;
-
+        String artifactName;
         try
         {
             try
             {
-                artifact = installFrom(artifactAchivedUrl, deploymentProperties);
+                artifactName = artifactArchiveInstaller.installArtifact(artifactAchivedUrl);
+            }
+            catch (Throwable t)
+            {
+                File artifactArchive = new File(artifactAchivedUrl.toURI());
+                artifactName = removeEndIgnoreCase(artifactArchive.getName(), ".zip");
+
+                // error text has been created by the deployer already
+                logDeploymentFailure(t, artifactName);
+
+                addZombieFile(artifactName, artifactArchive);
+
+                deploymentListener.onDeploymentFailure(artifactName, t);
+
+                throw t;
+            }
+
+            try
+            {
+                artifact = artifactFactory.createArtifact(artifactName, deploymentProperties);
                 trackArtifact(artifact);
             }
             catch (Throwable t)
             {
                 File artifactArchive = new File(artifactAchivedUrl.toURI());
-                String artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
 
                 // error text has been created by the deployer already
                 logDeploymentFailure(t, artifactName);
@@ -410,12 +428,6 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
         {
             logger.info(miniSplash(String.format("Undeployed artifact '%s'", artifact.getArtifactName())));
         }
-    }
-
-    private T installFrom(URL url, Optional<Properties> deploymentProperties) throws IOException
-    {
-        String artifactName = artifactArchiveInstaller.installArtifact(url);
-        return artifactFactory.createArtifact(artifactName, deploymentProperties);
     }
 
     @Override
