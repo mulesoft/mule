@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -177,7 +177,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     manager.onPipelineNotificationStart(pipelineNotification);
     assertThat(getContextInfo(event, rootFlowConstruct), is("at " + rootFlowConstruct.getName()));
 
-    AnnotatedObject annotatedMessageProcessor = (AnnotatedObject) createMockProcessor("/comp", true);
+    Component annotatedMessageProcessor = (Component) createMockProcessor("/comp", true);
 
     when(annotatedMessageProcessor.getAnnotation(docNameAttrName)).thenReturn("annotatedName");
     manager
@@ -286,9 +286,9 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     when(componentLocation.getFileName()).thenReturn(useLocationSettings ? of(CONFIG_FILE_NAME) : empty());
     when(componentLocation.getLineInFile()).thenReturn(useLocationSettings ? of(LINE_NUMBER) : empty());
 
-    AnnotatedObject annotatedMessageProcessor =
-        (AnnotatedObject) mock(Processor.class,
-                               withSettings().extraInterfaces(AnnotatedObject.class).defaultAnswer(RETURNS_DEEP_STUBS));
+    Component annotatedMessageProcessor =
+        (Component) mock(Processor.class,
+                         withSettings().extraInterfaces(Component.class).defaultAnswer(RETURNS_DEEP_STUBS));
 
     when(annotatedMessageProcessor.getAnnotation(any())).thenReturn(null);
     when(annotatedMessageProcessor.getLocation()).thenReturn(componentLocation);
@@ -370,11 +370,11 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   }
 
   protected MessageProcessorNotification buildProcessorNotification(InternalEvent event, Processor processor) {
-    return MessageProcessorNotification.createFrom(event, null, (AnnotatedObject) processor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
+    return MessageProcessorNotification.createFrom(event, null, (Component) processor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
   }
 
   protected PipelineMessageNotification buildPipelineNotification(InternalEvent event, String name) {
-    Pipeline flowConstruct = mock(Pipeline.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    Pipeline flowConstruct = mock(Pipeline.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getName()).thenReturn(name);
 
     return new PipelineMessageNotification(createInfo(event, null, null), flowConstruct, PROCESS_START);

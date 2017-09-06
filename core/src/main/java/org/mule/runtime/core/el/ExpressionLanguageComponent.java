@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-public class ExpressionLanguageComponent extends AbstractAnnotatedObject implements Processor, Initialisable {
+public class ExpressionLanguageComponent extends AbstractComponent implements Processor, Initialisable {
 
   @Inject
   private ExtendedExpressionManager expressionMgr;

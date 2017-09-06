@@ -31,7 +31,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -61,7 +61,7 @@ import javax.inject.Inject;
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
-public class MVELExpressionLanguage extends AbstractAnnotatedObject implements ExtendedExpressionLanguageAdaptor, Initialisable {
+public class MVELExpressionLanguage extends AbstractComponent implements ExtendedExpressionLanguageAdaptor, Initialisable {
 
   public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
 

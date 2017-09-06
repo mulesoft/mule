@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.object;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @since 4.0
  */
-public abstract class AbstractCursorIteratorProvider extends AbstractAnnotatedObject implements CursorIteratorProvider {
+public abstract class AbstractCursorIteratorProvider extends AbstractComponent implements CursorIteratorProvider {
 
   protected final StreamingIterator stream;
   private final AtomicBoolean closed = new AtomicBoolean(false);

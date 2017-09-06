@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.FactoryBean;
  * 
  * @since 4.0
  */
-public class DefaultFlowFactoryBean extends AbstractAnnotatedObject
+public class DefaultFlowFactoryBean extends AbstractComponent
     implements FactoryBean<Flow>, MuleContextAware {
 
   private String name;

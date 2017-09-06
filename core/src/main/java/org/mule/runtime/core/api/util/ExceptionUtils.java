@@ -19,7 +19,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -40,7 +40,7 @@ public class ExceptionUtils {
    * exception chain. Subclasses of the specified class do match.
    *
    * @param throwable the throwable to inspect, may be null
-   * @param type      the type to search for, subclasses match, null returns false
+   * @param type the type to search for, subclasses match, null returns false
    * @return the index into the throwable chain, false if no match or null input
    */
   public static boolean containsType(Throwable throwable, Class<?> type) {
@@ -80,7 +80,7 @@ public class ExceptionUtils {
    * Introspects the {@link Throwable} parameter to obtain the first {@link Throwable} of type {@code throwableType} in the
    * exception chain and return the cause of it.
    *
-   * @param throwable     the last throwable on the exception chain.
+   * @param throwable the last throwable on the exception chain.
    * @param throwableType the type of the throwable that the cause is wanted.
    * @return the cause of the first {@link Throwable} of type {@code throwableType}.
    */
@@ -96,7 +96,7 @@ public class ExceptionUtils {
    * {@link ConnectionException} the same value will be returned. If the throwable parameter has a cause of itself, then an empty
    * value will be returned.
    *
-   * @param throwable     the last throwable on the exception chain.
+   * @param throwable the last throwable on the exception chain.
    * @param throwableType the type of the throwable is wanted to find.
    * @return the cause of the first {@link Throwable} of type {@code throwableType}.
    */
@@ -123,10 +123,10 @@ public class ExceptionUtils {
    * turn also throw an exception or handle it returning a value.
    *
    * @param expectedExceptionType the type of exception which is expected to be thrown
-   * @param callable              the delegate to be executed
-   * @param exceptionHandler      a {@link ExceptionHandler} in case an unexpected exception is found instead
-   * @param <T>                   the generic type of the return value
-   * @param <E>                   the generic type of the expected exception
+   * @param callable the delegate to be executed
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
    */
@@ -153,11 +153,11 @@ public class ExceptionUtils {
    *
    * @param processor the component that threw the exception (processor or source).
    * @param cause the exception thrown.
-   * @param locator   the {@link ErrorTypeLocator}.
+   * @param locator the {@link ErrorTypeLocator}.
    * @return the resolved {@link ErrorType}
    */
   public static Error getErrorFromFailingProcessor(InternalEvent currentEvent,
-                                                   AnnotatedObject processor,
+                                                   Component processor,
                                                    Throwable cause,
                                                    ErrorTypeLocator locator) {
     ErrorType currentError = currentEvent != null ? currentEvent.getError().map(Error::getErrorType).orElse(null) : null;
@@ -189,12 +189,12 @@ public class ExceptionUtils {
    * Create new {@link InternalEvent} with {@link org.mule.runtime.api.message.Error} instance set.
    *
    * @param currentEvent event when error occured.
-   * @param obj    message processor/source.
-   * @param me           messaging exception.
-   * @param locator      the mule context.
+   * @param obj message processor/source.
+   * @param me messaging exception.
+   * @param locator the mule context.
    * @return new {@link InternalEvent} with relevant {@link org.mule.runtime.api.message.Error} set.
    */
-  public static InternalEvent createErrorEvent(InternalEvent currentEvent, AnnotatedObject obj,
+  public static InternalEvent createErrorEvent(InternalEvent currentEvent, Component obj,
                                                MessagingException me, ErrorTypeLocator locator) {
     Throwable cause = me.getCause() != null ? me.getCause() : me;
     List<ErrorMapping> errorMappings = getErrorMappings(obj);
@@ -223,7 +223,7 @@ public class ExceptionUtils {
     return cause != null ? cause : exception;
   }
 
-  public static Optional<ComponentIdentifier> getComponentIdentifier(AnnotatedObject obj) {
+  public static Optional<ComponentIdentifier> getComponentIdentifier(Component obj) {
     return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
   }
 
@@ -235,7 +235,7 @@ public class ExceptionUtils {
   }
 
 
-  static List<ErrorMapping> getErrorMappings(AnnotatedObject object) {
+  static List<ErrorMapping> getErrorMappings(Component object) {
     List<ErrorMapping> list = (List<ErrorMapping>) object.getAnnotation(ANNOTATION_ERROR_MAPPINGS);
     return list != null ? list : emptyList();
   }

@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationAt
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @since 4.0
  */
-public class DefaultMuleSecurityManager extends AbstractAnnotatedObject implements SecurityManager {
+public class DefaultMuleSecurityManager extends AbstractComponent implements SecurityManager {
 
   /**
    * logger used by this class

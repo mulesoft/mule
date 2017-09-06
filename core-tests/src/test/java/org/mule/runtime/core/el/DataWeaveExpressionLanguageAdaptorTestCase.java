@@ -25,8 +25,8 @@ import static org.mule.runtime.api.el.BindingContextUtils.PARAMETERS;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -65,7 +65,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
@@ -488,7 +488,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     }
   }
 
-  private static class MyAnnotatedBean extends MyBean implements AnnotatedObject {
+  private static class MyAnnotatedBean extends MyBean implements Component {
 
     public MyAnnotatedBean(String name) {
       super(name);

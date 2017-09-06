@@ -8,14 +8,14 @@ package org.mule.runtime.config.spring.internal.dsl.processor;
 
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 /**
  * Object factory for custom {@link SecurityFilter}.
  *
  * @since 4.0
  */
-public class CustomSecurityFilterObjectFactory extends AbstractAnnotatedObjectFactory<SecurityFilterMessageProcessor> {
+public class CustomSecurityFilterObjectFactory extends AbstractComponentFactory<SecurityFilterMessageProcessor> {
 
   private final SecurityFilter filter;
 

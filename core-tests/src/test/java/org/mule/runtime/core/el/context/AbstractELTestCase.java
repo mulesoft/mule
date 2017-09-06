@@ -18,7 +18,7 @@ import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
@@ -77,7 +77,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder) {
-    return expressionLanguage.evaluate(expression, event, eventBuilder, ((AnnotatedObject) flowConstruct).getLocation(),
+    return expressionLanguage.evaluate(expression, event, eventBuilder, ((Component) flowConstruct).getLocation(),
                                        BindingContext.builder().build())
         .getValue();
   }

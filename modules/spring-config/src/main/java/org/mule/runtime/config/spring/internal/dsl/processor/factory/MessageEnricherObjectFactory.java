@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.enricher.MessageEnricher;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * {@link ObjectFactory} to create a {@link org.mule.runtime.core.internal.enricher.MessageEnricher}.
  */
-public class MessageEnricherObjectFactory extends AbstractAnnotatedObjectFactory<MessageEnricher>
+public class MessageEnricherObjectFactory extends AbstractComponentFactory<MessageEnricher>
     implements MuleContextAware {
 
   private Processor messageProcessor;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.component;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ import javax.xml.namespace.QName;
 /**
  * Marker interface that tells that an object is created internally and not from an xml configuration.
  */
-public interface InternalComponent extends AnnotatedObject {
+public interface InternalComponent extends Component {
 
   @Override
   default Object getAnnotation(QName name) {

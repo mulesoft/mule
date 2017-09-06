@@ -13,13 +13,13 @@ import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class MessageProcessorFilterPairFactoryBean extends AbstractAnnotatedObjectFactory<MessageProcessorExpressionPair> {
+public class MessageProcessorFilterPairFactoryBean extends AbstractComponentFactory<MessageProcessorExpressionPair> {
 
   @Inject
   private MuleContext muleContext;

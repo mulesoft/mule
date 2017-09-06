@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
+public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
     implements FactoryBean<Processor>, MuleContextAware, NameableObject {
 
   protected MuleContext muleContext;

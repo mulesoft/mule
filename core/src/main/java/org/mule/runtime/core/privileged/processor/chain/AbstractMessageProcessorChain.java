@@ -26,7 +26,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
@@ -167,7 +167,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(event.getContext()
-                           .error(resolveException((AnnotatedObject) processor, event, throwable)))
+                           .error(resolveException((Component) processor, event, throwable)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
@@ -178,14 +178,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return interceptors;
   }
 
-  private MessagingException resolveException(AnnotatedObject processor, InternalEvent event, Throwable throwable) {
+  private MessagingException resolveException(Component processor, InternalEvent event, Throwable throwable) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
-    if (processor instanceof AnnotatedObject) {
-      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((AnnotatedObject) processor);
+    if (processor instanceof Component) {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
       return exception -> exceptionResolver.resolve(exception, muleContext);
     } else {
       return exception -> exception;
@@ -225,9 +225,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
 
-      if (((AnnotatedObject) processor).getLocation() != null) {
+      if (((Component) processor).getLocation() != null) {
         serverNotificationManager
-            .fireNotification(createFrom(event, ((AnnotatedObject) processor).getLocation(), (AnnotatedObject) processor,
+            .fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
                                          exceptionThrown, action));
       }
     }

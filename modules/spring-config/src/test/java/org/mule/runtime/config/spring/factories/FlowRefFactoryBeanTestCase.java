@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -43,7 +43,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -69,7 +69,7 @@ import reactor.core.publisher.Mono;
 public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
-      withSettings().extraInterfaces(AnnotatedObject.class, Processor.class, Initialisable.class, Disposable.class,
+      withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
                                      Startable.class, Stoppable.class);
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -41,7 +41,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void namedComponent() {
-    NamedObject named = mock(NamedObject.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    NamedObject named = mock(NamedObject.class, withSettings().extraInterfaces(Component.class));
     when(named.getName()).thenReturn("mockComponent");
     LocatedMuleException lme = new LocatedMuleException(named);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("/mockComponent @ app:internal:-1"));
@@ -49,7 +49,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void annotatedComponent() {
-    AnnotatedObject annotated = mock(AnnotatedObject.class);
+    Component annotated = mock(Component.class);
     when(annotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
     when(annotated.toString()).thenReturn("Mock@1");
     configureProcessorLocation(annotated);
@@ -61,7 +61,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void namedAnnotatedComponent() {
-    AnnotatedObject namedAnnotated = mock(AnnotatedObject.class, withSettings().extraInterfaces(NamedObject.class));
+    Component namedAnnotated = mock(Component.class, withSettings().extraInterfaces(NamedObject.class));
     when(((NamedObject) namedAnnotated).getName()).thenReturn("mockComponent");
     when(namedAnnotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
     when(namedAnnotated.toString()).thenReturn("Mock@1");
@@ -74,15 +74,15 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void rawComponent() {
-    Object raw = mock(Object.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    Object raw = mock(Object.class, withSettings().extraInterfaces(Component.class));
     when(raw.toString()).thenReturn("Mock@1");
 
     LocatedMuleException lme = new LocatedMuleException(raw);
     assertThat(lme.getInfo().get(INFO_LOCATION_KEY).toString(), is("Mock@1 @ app:internal:-1"));
   }
 
-  private void configureProcessorLocation(AnnotatedObject annotatedObject) {
-    when(annotatedObject.getLocation()).thenReturn(mockComponentLocation);
+  private void configureProcessorLocation(Component component) {
+    when(component.getLocation()).thenReturn(mockComponentLocation);
     when(mockComponentLocation.getFileName()).thenReturn(Optional.of("muleApp.xml"));
     when(mockComponentLocation.getLineInFile()).thenReturn(Optional.of(10));
     when(mockComponentLocation.getLocation()).thenReturn("Mock@1");

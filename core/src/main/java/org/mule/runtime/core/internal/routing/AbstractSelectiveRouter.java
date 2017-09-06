@@ -26,7 +26,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject implements SelectiveRouter,
+public abstract class AbstractSelectiveRouter extends AbstractComponent implements SelectiveRouter,
     RouterStatisticsRecorder, Lifecycle, MuleContextAware {
 
   private final List<MessageProcessorExpressionPair> conditionalMessageProcessors = new ArrayList<>();

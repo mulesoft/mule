@@ -40,7 +40,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
@@ -322,7 +322,7 @@ public class ModuleFlowProcessingPhase
     return 0;
   }
 
-  private class FlowProcessor extends AbstractAnnotatedObject implements Processor {
+  private class FlowProcessor extends AbstractComponent implements Processor {
 
     private final ModuleFlowProcessingPhaseTemplate template;
     private final InternalEvent templateEvent;

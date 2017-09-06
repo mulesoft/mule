@@ -16,7 +16,7 @@ import static org.mule.test.heisenberg.extension.DEARadioSource.MESSAGES_PER_POL
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.concurrent.Latch;
@@ -58,7 +58,7 @@ public class ListOfMessagesSourceTestCase extends AbstractExtensionFunctionalTes
     }
   }
 
-  public static class ListProcessor extends AbstractAnnotatedObject implements Processor {
+  public static class ListProcessor extends AbstractComponent implements Processor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

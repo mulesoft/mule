@@ -14,20 +14,20 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
 /**
- * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(ValueResolvingContext)} on each
- * {@link #resolve(ValueResolvingContext)}.
+ * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(ValueResolvingContext)} on
+ * each {@link #resolve(ValueResolvingContext)}.
  * <p/>
  * It implements {@link Lifecycle} and propagates all lifecycle events to the underlying {@code builder}
  *
  * @param <T> the generic type for the instances built.
  * @since 3.7.0
  */
-public class ObjectBuilderValueResolver<T> extends AbstractAnnotatedObject implements ValueResolver<T>, Initialisable {
+public class ObjectBuilderValueResolver<T> extends AbstractComponent implements ValueResolver<T>, Initialisable {
 
   private final ObjectBuilder<T> builder;
   private final MuleContext muleContext;

@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.process;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.policy.Policy;
@@ -107,7 +107,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
   /**
    * Inner class that implements the actually chaining of policies.
    */
-  public class NextOperationCall extends AbstractAnnotatedObject implements Processor {
+  public class NextOperationCall extends AbstractComponent implements Processor {
 
     private int index = 0;
 

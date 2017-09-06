@@ -10,8 +10,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.ANNOTATIONS_PROPERTY_NAME;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -71,7 +72,7 @@ public class ComponentModelHelper {
   }
 
   public static boolean isAnnotatedObject(ComponentModel componentModel) {
-    return isOfType(componentModel, AnnotatedObject.class);
+    return isOfType(componentModel, Component.class);
   }
 
   private static boolean isScopeProcessor(ComponentModel componentModel) {
@@ -129,11 +130,11 @@ public class ComponentModelHelper {
 
   public static void updateAnnotationValue(QName annotationKey, Object annotationValue, BeanDefinition beanDefinition) {
     PropertyValue propertyValue =
-        beanDefinition.getPropertyValues().getPropertyValue(AnnotatedObject.PROPERTY_NAME);
+        beanDefinition.getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       annotations = new HashMap<>();
-      propertyValue = new PropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
+      propertyValue = new PropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
     } else {
       annotations = (Map<QName, Object>) propertyValue.getValue();
@@ -146,7 +147,7 @@ public class ComponentModelHelper {
       return empty();
     }
     PropertyValue propertyValue =
-        componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(AnnotatedObject.PROPERTY_NAME);
+        componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       return empty();

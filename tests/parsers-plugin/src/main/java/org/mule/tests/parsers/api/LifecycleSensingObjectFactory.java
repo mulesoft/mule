@@ -16,12 +16,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingObjectFactory extends AbstractAnnotatedObjectFactory<Processor> implements Lifecycle {
+public class LifecycleSensingObjectFactory extends AbstractComponentFactory<Processor> implements Lifecycle {
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
 

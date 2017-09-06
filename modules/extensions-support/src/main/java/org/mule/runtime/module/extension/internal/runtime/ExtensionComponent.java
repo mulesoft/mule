@@ -30,7 +30,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
@@ -89,7 +89,7 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractAnnotatedObject
+public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     Lifecycle {
 

@@ -10,7 +10,7 @@ import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
@@ -152,7 +152,8 @@ public final class MuleTestUtils {
   /**
    * Returns the exception listener configured on a messaging exception handler
    * <p/>
-   * Invokes {@code getExceptionListeners} method on the provided exception handler to avoid exposing that method on the public API.
+   * Invokes {@code getExceptionListeners} method on the provided exception handler to avoid exposing that method on the public
+   * API.
    *
    * @param exceptionHandler exception handler to inspect
    * @return the list of configured exception listeners

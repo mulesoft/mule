@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.processor;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ import javax.xml.namespace.QName;
 /**
  * Marker interface that tells that a {@link Processor} is for internal use only.
  */
-public interface InternalProcessor extends AnnotatedObject {
+public interface InternalProcessor extends Component {
 
   @Override
   default Object getAnnotation(QName name) {

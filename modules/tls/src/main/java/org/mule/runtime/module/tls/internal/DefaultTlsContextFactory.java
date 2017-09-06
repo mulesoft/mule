@@ -13,7 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
  * Default implementation of the {@code TlsContextFactory} interface, which delegates all its operations to a
  * {@code TlsConfiguration} object. Only enabled cipher suites and protocols will not delegate to it if configured.
  */
-public class DefaultTlsContextFactory extends AbstractAnnotatedObject implements TlsContextFactory, Initialisable {
+public class DefaultTlsContextFactory extends AbstractComponent implements TlsContextFactory, Initialisable {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultTlsContextFactory.class);
   private static final String DEFAULT = "default";

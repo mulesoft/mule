@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.internal.dsl.model.config;
 import static org.mule.runtime.api.source.SchedulerMessageSource.SCHEDULER_MESSAGE_SOURCE_IDENTIFIER;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 import javax.inject.Inject;
 
@@ -22,7 +22,7 @@ public class DefaultComponentInitialStateManager implements ComponentInitialStat
   private ConfigurationProperties configurationProperties;
 
   @Override
-  public boolean mustStartMessageSource(AnnotatedObject component) {
+  public boolean mustStartMessageSource(Component component) {
     if (configurationProperties.resolveProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY).isPresent()) {
       if (component.getLocation().getComponentIdentifier().getIdentifier().equals(SCHEDULER_MESSAGE_SOURCE_IDENTIFIER)) {
         return !configurationProperties.resolveBooleanProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY).orElse(false);

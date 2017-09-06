@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -26,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is used as wrapper for {@link Processor}s referenced using the <processor> element so it can hold the metadata added
- * through the {@link org.mule.runtime.api.meta.AnnotatedObject} interface since the referenced object may be a singleton an the
- * metadata is related to the <processor> element it self and not to the referenced object.
+ * through the {@link Component} interface since the referenced object may be a singleton an the metadata is related to the
+ * <processor> element it self and not to the referenced object.
  */
 public class ReferenceProcessor extends AbstractProcessor
     implements InterceptingMessageProcessor, MuleContextAware, Lifecycle {

@@ -21,7 +21,7 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.success
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
@@ -46,7 +46,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   private ConnectivityTestingStrategy mockConnectivityTestingStrategy =
       mock(ConnectivityTestingStrategy.class, RETURNS_DEEP_STUBS);
   private DefaultConnectivityTestingService connectivityTestingService;
-  private AnnotatedObject fakeConnectivityTestingObject = mock(AnnotatedObject.class);
+  private Component fakeConnectivityTestingObject = mock(Component.class);
 
   @Before
   public void createConnectivityService() throws InitialisationException {

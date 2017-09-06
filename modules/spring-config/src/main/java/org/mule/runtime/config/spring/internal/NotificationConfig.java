@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
@@ -54,7 +54,7 @@ import java.util.Map;
  * @since 4.0
  */
 public abstract class NotificationConfig<N extends Notification, L extends NotificationListener<N>>
-    extends AbstractAnnotatedObject {
+    extends AbstractComponent {
 
   public static final Map<String, Class<? extends Notification>> EVENT_MAP;
   public static final Map<String, Class<? extends NotificationListener>> INTERFACE_MAP;

@@ -11,7 +11,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -91,7 +91,7 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
     this.waitTime = waitTime;
   }
 
-  class InternalMessageSource extends AbstractAnnotatedObject implements MessageSource {
+  class InternalMessageSource extends AbstractComponent implements MessageSource {
 
     Processor listener;
 

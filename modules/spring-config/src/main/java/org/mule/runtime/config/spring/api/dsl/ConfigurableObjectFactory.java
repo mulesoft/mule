@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.api.dsl;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObjectFactory<T> {
+public class ConfigurableObjectFactory<T> extends AbstractComponentFactory<T> {
 
   @Inject
   private MuleContext muleContext;

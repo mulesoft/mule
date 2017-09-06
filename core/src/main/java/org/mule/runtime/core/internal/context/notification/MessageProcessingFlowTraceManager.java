@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTr
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -158,7 +158,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   }
 
   @Override
-  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, AnnotatedObject lastProcessed) {
+  public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
     if (isFlowTrace()) {
       return singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
     } else {

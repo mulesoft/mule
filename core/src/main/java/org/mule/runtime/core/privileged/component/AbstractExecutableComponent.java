@@ -16,7 +16,7 @@ import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.InputEvent;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
@@ -38,7 +38,7 @@ import org.reactivestreams.Publisher;
  * 
  * @since 4.0
  */
-public abstract class AbstractExecutableComponent extends AbstractAnnotatedObject implements ExecutableComponent {
+public abstract class AbstractExecutableComponent extends AbstractComponent implements ExecutableComponent {
 
   @Inject
   protected MuleContext muleContext;

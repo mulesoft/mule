@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.construct;
 
 import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.source.MessageSource;
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are
  * processed using {@link MessageSource} and {@link Processor} building blocks.
  */
-public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, AnnotatedObject {
+public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Component {
 
   /**
    * @return The exception listener that will be used to handle exceptions that may be thrown at different points during the

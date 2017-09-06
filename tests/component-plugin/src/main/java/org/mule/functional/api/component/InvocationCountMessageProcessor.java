@@ -9,7 +9,7 @@ package org.mule.functional.api.component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Test message processor to keep count of number of invocations.
  */
-public class InvocationCountMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable {
+public class InvocationCountMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
   private static Map<String, AtomicInteger> invocationCountPerMessageProcessor = new HashMap<>();
   private final AtomicInteger invocationCount = new AtomicInteger();

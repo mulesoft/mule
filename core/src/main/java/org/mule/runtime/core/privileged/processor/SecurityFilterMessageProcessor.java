@@ -14,7 +14,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -27,7 +27,7 @@ import org.reactivestreams.Publisher;
  * Filters the flow using the specified {@link SecurityFilter}. If unauthorised the flow is stopped and therefore the message is
  * not send or dispatched by the transport. When unauthorised the request message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractAnnotatedObject
+public class SecurityFilterMessageProcessor extends AbstractComponent
     implements Processor, Initialisable, MuleContextAware {
 
   private MuleContext muleContext;

@@ -9,7 +9,6 @@ package org.mule.runtime.config.spring.internal.dsl.spring;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
-import static org.mule.runtime.api.meta.AnnotatedObject.PROPERTY_NAME;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
@@ -21,10 +20,10 @@ import static org.mule.runtime.core.api.execution.LocationExecutionContextProvid
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
@@ -33,7 +32,6 @@ import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.config.spring.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
@@ -64,6 +62,8 @@ import org.w3c.dom.Node;
  *        TODO MULE-9638 set visibility to package
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
+
+  public static String ANNOTATIONS_PROPERTY_NAME = "annotations";
 
   private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -142,14 +142,14 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
-    if (AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
+    if (Component.class.isAssignableFrom(componentModel.getType())) {
       XmlCustomAttributeHandler.ComponentCustomAttributeRetrieve customAttributeRetrieve = from(componentModel);
       Map<QName, Object> annotations =
           processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(), null, beanDefinitionBuilder);
       processAnnotationParameters(componentModel, annotations);
       processNestedAnnotations(componentModel, annotations);
       if (!annotations.isEmpty()) {
-        beanDefinitionBuilder.addPropertyValue(PROPERTY_NAME, annotations);
+        beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
     }
   }
@@ -160,7 +160,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     if (element == null) {
       return annotations;
     } else {
-      if (AnnotatedObject.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
+      if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
         XmlMetadataAnnotations elementMetadata = (XmlMetadataAnnotations) element.getUserData("metadataAnnotations");
         addMetadataAnnotationsFromXml(annotations, elementMetadata.getElementString());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);

@@ -7,7 +7,7 @@
 
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 import java.util.Collections;
 import java.util.Map;
@@ -20,8 +20,8 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * Extends spring's {@link AbstractFactoryBean} by adding annotations. This will then be passed to the built bean.
  */
-public abstract class AnnotatedObjectFactoryBean<B extends AnnotatedObject> extends AbstractFactoryBean<B>
-    implements AnnotatedObject {
+public abstract class ComponentFactoryBean<B extends Component> extends AbstractFactoryBean<B>
+    implements Component {
 
   /*
    * From AbstractAnnotatedObject:

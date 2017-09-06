@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.execution;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 
 import java.util.Map;
@@ -26,6 +26,6 @@ public interface ExceptionContextProvider {
    * @param notificationInfo
    * @return info entries to be added to the logged exception message
    */
-  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, AnnotatedObject lastProcessed);
+  Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed);
 
 }

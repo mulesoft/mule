@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer extends AbstractAnnotatedObject implements Transformer {
+public abstract class AbstractTransformer extends AbstractComponent implements Transformer {
 
   protected MuleContext muleContext;
 

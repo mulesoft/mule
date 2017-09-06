@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,14 +28,14 @@ import java.util.Optional;
  */
 public class SpringConfigurationComponentLocator implements ConfigurationComponentLocator {
 
-  private Map<String, AnnotatedObject> componentsMap = new HashMap<>();
+  private Map<String, Component> componentsMap = new HashMap<>();
 
   /**
    * Adds a new component to the locator.
    *
    * @param component the component to be added
    */
-  public void addComponent(AnnotatedObject component) {
+  public void addComponent(Component component) {
     this.componentsMap.put(component.getLocation().getLocation(), component);
   }
 
@@ -43,7 +43,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * {@inheritDoc}
    */
   @Override
-  public Optional<AnnotatedObject> find(Location location) {
+  public Optional<Component> find(Location location) {
     return ofNullable(componentsMap.get(location.toString()));
   }
 
@@ -51,7 +51,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * {@inheritDoc}
    */
   @Override
-  public List<AnnotatedObject> find(ComponentIdentifier componentIdentifier) {
+  public List<Component> find(ComponentIdentifier componentIdentifier) {
     return componentsMap.values().stream()
         .filter(component -> component.getLocation().getComponentIdentifier().getIdentifier().equals(componentIdentifier))
         .collect(toList());
@@ -61,7 +61,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * {@inheritDoc}
    */
   @Override
-  public List<AnnotatedObject> findAll() {
+  public List<Component> findAll() {
     return unmodifiableList(new ArrayList<>(componentsMap.values()));
   }
 }

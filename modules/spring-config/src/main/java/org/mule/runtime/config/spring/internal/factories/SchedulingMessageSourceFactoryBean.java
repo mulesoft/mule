@@ -11,9 +11,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-public class SchedulingMessageSourceFactoryBean extends AbstractAnnotatedObjectFactory<DefaultSchedulerMessageSource>
+public class SchedulingMessageSourceFactoryBean extends AbstractComponentFactory<DefaultSchedulerMessageSource>
     implements MuleContextAware {
 
   private static final long DEFAULT_FREQUENCY = 1000l;

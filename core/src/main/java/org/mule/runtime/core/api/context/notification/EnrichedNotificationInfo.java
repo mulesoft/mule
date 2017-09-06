@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 
@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 public class EnrichedNotificationInfo {
 
   private org.mule.runtime.api.event.Event event;
-  private AnnotatedObject component;
+  private Component component;
   private Exception exception;
   private FlowCallStack flowCallStack;
 
@@ -28,7 +28,7 @@ public class EnrichedNotificationInfo {
    * @param component the component (processor, source, etc) that triggered the notification
    * @return
    */
-  public static EnrichedNotificationInfo createInfo(InternalEvent event, Exception e, AnnotatedObject component) {
+  public static EnrichedNotificationInfo createInfo(InternalEvent event, Exception e, Component component) {
     EnrichedNotificationInfo notificationInfo;
 
     if (event != null) {
@@ -55,14 +55,14 @@ public class EnrichedNotificationInfo {
     throw new RuntimeException("Neither event or exception present");
   }
 
-  private static AnnotatedObject componentFromException(Exception e) {
+  private static Component componentFromException(Exception e) {
     if (e instanceof MessagingException) {
       return ((MessagingException) e).getFailingComponent();
     }
     return null;
   }
 
-  public EnrichedNotificationInfo(InternalEvent event, AnnotatedObject component, Exception exception,
+  public EnrichedNotificationInfo(InternalEvent event, Component component, Exception exception,
                                   FlowCallStack flowCallStack) {
     this.event = event;
     this.component = component;
@@ -74,7 +74,7 @@ public class EnrichedNotificationInfo {
     return event;
   }
 
-  public AnnotatedObject getComponent() {
+  public Component getComponent() {
     return component;
   }
 

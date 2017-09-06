@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.component;
 
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import org.mule.runtime.api.component.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +15,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 /**
- * This interface holds the keys used internally by the runtime for the annotations added to the
- * {@link org.mule.runtime.api.meta.AnnotatedObject}.
+ * This interface holds the keys used internally by the runtime for the annotations added to the {@link Component}.
  */
 public interface ComponentAnnotations {
 
@@ -24,15 +23,15 @@ public interface ComponentAnnotations {
   QName ANNOTATION_PARAMETERS = new QName("config", "componentParameters");
 
   /**
-   * Updates the {@link AnnotatedObject} root container name.
+   * Updates the {@link Component} root container name.
    * 
    * @param rootContainerName the root container name of the object.
-   * @param annotatedObject the {@link AnnotatedObject} to update.
+   * @param component the {@link Component} to update.
    */
-  static void updateRootContainerName(String rootContainerName, AnnotatedObject annotatedObject) {
-    Map<QName, Object> previousAnnotations = new HashMap<>(annotatedObject.getAnnotations());
+  static void updateRootContainerName(String rootContainerName, Component component) {
+    Map<QName, Object> previousAnnotations = new HashMap<>(component.getAnnotations());
     previousAnnotations.put(ROOT_CONTAINER_NAME_KEY, rootContainerName);
-    annotatedObject.setAnnotations(previousAnnotations);
+    component.setAnnotations(previousAnnotations);
   }
 
 }

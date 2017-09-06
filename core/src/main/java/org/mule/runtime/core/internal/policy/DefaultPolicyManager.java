@@ -18,7 +18,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -66,7 +66,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
 
   @Override
-  public SourcePolicy createSourcePolicyInstance(AnnotatedObject source, InternalEvent sourceEvent,
+  public SourcePolicy createSourcePolicyInstance(Component source, InternalEvent sourceEvent,
                                                  Processor flowExecutionProcessor,
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     PolicyPointcutParameters sourcePointcutParameters = createSourcePointcutParameters(source, sourceEvent);
@@ -81,7 +81,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                                                                                                         messageSourceResponseParametersProcessor)))
           .onErrorResume(Exception.class, e -> {
             MessagingException messagingException = e instanceof MessagingException ? (MessagingException) e
-                : new MessagingException(event, e, (AnnotatedObject) flowExecutionProcessor);
+                : new MessagingException(event, e, (Component) flowExecutionProcessor);
             return just(Either
                 .left(new SourcePolicyFailureResult(messagingException, () -> messageSourceResponseParametersProcessor
                     .getFailedExecutionResponseParametersFunction()
@@ -96,7 +96,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
   }
 
   @Override
-  public OperationPolicy createOperationPolicy(AnnotatedObject operation, InternalEvent event,
+  public OperationPolicy createOperationPolicy(Component operation, InternalEvent event,
                                                Map<String, Object> operationParameters,
                                                OperationExecutionFunction operationExecutionFunction) {
 
@@ -145,7 +145,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     }
   }
 
-  private PolicyPointcutParameters createSourcePointcutParameters(AnnotatedObject source,
+  private PolicyPointcutParameters createSourcePointcutParameters(Component source,
                                                                   InternalEvent sourceEvent) {
     return createPointcutParameters(source, SourcePolicyPointcutParametersFactory.class, sourcePointcutFactories,
                                     factory -> factory
@@ -154,7 +154,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                                                                       sourceEvent.getMessage().getAttributes()));
   }
 
-  private PolicyPointcutParameters createOperationPointcutParameters(AnnotatedObject operation,
+  private PolicyPointcutParameters createOperationPointcutParameters(Component operation,
                                                                      Map<String, Object> operationParameters) {
     return createPointcutParameters(operation, OperationPolicyPointcutParametersFactory.class, operationPointcutFactories,
                                     factory -> factory
@@ -163,7 +163,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
                                     factory -> factory.createPolicyPointcutParameters(operation, operationParameters));
   }
 
-  private <T> PolicyPointcutParameters createPointcutParameters(AnnotatedObject component, Class<T> factoryType,
+  private <T> PolicyPointcutParameters createPointcutParameters(Component component, Class<T> factoryType,
                                                                 Collection<T> factories, Predicate<T> factoryFilter,
                                                                 Function<T, PolicyPointcutParameters> policyPointcutParametersCreationFunction) {
     List<T> policyPointcutParametersFactories = factories.stream()

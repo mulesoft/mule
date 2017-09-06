@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications will be ignored (and warnings logged).
  */
 // TODO MULE-9638 remove usage of SmartFactoryBean
-public class MuleConfigurationConfigurator extends AbstractAnnotatedObjectFactory implements MuleContextAware, SmartFactoryBean {
+public class MuleConfigurationConfigurator extends AbstractComponentFactory implements MuleContextAware, SmartFactoryBean {
 
   private MuleContext muleContext;
 

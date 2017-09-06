@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.context.notification.ConnectorMessageNot
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -79,7 +79,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private MessageSource messageSource;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {AnnotatedObject.class})
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})
   private FlowConstruct flowConstruct;
 
   @Before

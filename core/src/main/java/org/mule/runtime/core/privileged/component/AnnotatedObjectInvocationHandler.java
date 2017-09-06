@@ -15,9 +15,9 @@ import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.internal.component.DynamicallyAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
 import java.lang.reflect.Field;
@@ -36,40 +36,40 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 /**
- * Provides {@code annotations} handling logic for CGLib enhanced classes that implement {@link AnnotatedObject} dynamically.
+ * Provides {@code annotations} handling logic for CGLib enhanced classes that implement {@link Component} dynamically.
  *
  * @since 4.0
  */
 public class AnnotatedObjectInvocationHandler {
 
   private static final Set<Method> MANAGED_METHODS =
-      unmodifiableSet(new HashSet<>(asList(AnnotatedObject.class.getDeclaredMethods())));
+      unmodifiableSet(new HashSet<>(asList(Component.class.getDeclaredMethods())));
 
   /**
-   * Enhances the given {@code nonAnnotatedClass} to be an implementation of {@link AnnotatedObject}.
+   * Enhances the given {@code nonAnnotatedClass} to be an implementation of {@link Component}.
    *
-   * @param clazz the {@link Class} to enhance to implement {@link AnnotatedObject}.
+   * @param clazz the {@link Class} to enhance to implement {@link Component}.
    * @return the enhanced class, or the given {@code clazz} if it was already annotated.
    * @throws UnsupportedOperationException if the given {@code clazz} is <b>not</b> annotated and is declared as {@code final}.
    */
-  public static <T, A extends AnnotatedObject> Class<A> addAnnotationsToClass(Class<T> clazz) {
-    if (AnnotatedObject.class.isAssignableFrom(clazz)
+  public static <T, A extends Component> Class<A> addAnnotationsToClass(Class<T> clazz) {
+    if (Component.class.isAssignableFrom(clazz)
         && asList(clazz.getMethods()).stream().anyMatch(m -> "getAnnotations".equals(m.getName()) && !m.isDefault())) {
       return (Class<A>) clazz;
     }
 
     if (isFinal(clazz.getModifiers())) {
       throw new UnsupportedOperationException("Class '" + clazz.getName() + "' must either not be final or implement '"
-          + AnnotatedObject.class.getName() + "'");
+          + Component.class.getName() + "'");
     }
 
     Enhancer enhancer = new Enhancer();
-    enhancer.setInterfaces(new Class[] {DynamicallyAnnotatedObject.class});
+    enhancer.setInterfaces(new Class[] {DynamicallyComponent.class});
     enhancer.setSuperclass(clazz);
 
-    AnnotatedObjectInterceptor annotatedObjectInvocationHandler = new AnnotatedObjectInterceptor(MANAGED_METHODS);
+    ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor(MANAGED_METHODS);
 
-    CallbackHelper callbackHelper = new CallbackHelper(clazz, new Class[] {DynamicallyAnnotatedObject.class}) {
+    CallbackHelper callbackHelper = new CallbackHelper(clazz, new Class[] {DynamicallyComponent.class}) {
 
       @Override
       protected Object getCallback(Method method) {
@@ -116,7 +116,7 @@ public class AnnotatedObjectInvocationHandler {
    * @return a newly built object.
    */
   public static <T, A> T removeDynamicAnnotations(A annotated) {
-    if (annotated instanceof DynamicallyAnnotatedObject) {
+    if (annotated instanceof DynamicallyComponent) {
       Class<?> baseClass = annotated.getClass().getSuperclass();
 
       Map<String, Field> fieldsByName = new HashMap<>();
@@ -154,11 +154,11 @@ public class AnnotatedObjectInvocationHandler {
     }
   }
 
-  private static class AnnotatedObjectInterceptor extends AbstractAnnotatedObject implements MethodInterceptor {
+  private static class ComponentInterceptor extends AbstractComponent implements MethodInterceptor {
 
     private Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
 
-    public AnnotatedObjectInterceptor(Set<Method> managedMethods) {
+    public ComponentInterceptor(Set<Method> managedMethods) {
       for (Method method : managedMethods) {
         overridingMethods.put(method, method);
       }

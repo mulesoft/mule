@@ -21,7 +21,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEvent.Builder;
@@ -55,7 +55,7 @@ import org.slf4j.Logger;
  * expressions provided. The results of the expression evaluations will automatically be transformed where possible to the method
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
-public class InvokerMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable {
+public class InvokerMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
   private static final Logger LOGGER = getLogger(InvokerMessageProcessor.class);
 

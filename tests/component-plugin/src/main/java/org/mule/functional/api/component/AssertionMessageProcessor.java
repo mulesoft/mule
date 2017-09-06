@@ -16,7 +16,7 @@ import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
@@ -27,7 +27,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
-public class AssertionMessageProcessor extends AbstractAnnotatedObject implements FlowAssertion, Processor, Startable {
+public class AssertionMessageProcessor extends AbstractComponent implements FlowAssertion, Processor, Startable {
 
   protected String expression = "#[true]";
   protected String message = "?";
@@ -118,10 +118,8 @@ public class AssertionMessageProcessor extends AbstractAnnotatedObject implement
   }
 
   /**
-   * The semantics of the count are as follows:
-   * - count was set & count processes were done => ok
-   * - count was set & count processes were not done => fail
-   * - count was not set & at least one processing were done => ok
+   * The semantics of the count are as follows: - count was set & count processes were done => ok - count was set & count
+   * processes were not done => fail - count was not set & at least one processing were done => ok
    * 
    * @return
    * @throws InterruptedException

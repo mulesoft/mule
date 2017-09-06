@@ -51,8 +51,8 @@ import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
@@ -153,11 +153,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     if (useMockInterceptor) {
       InOrder inOrder = inOrder(processor, interceptor);
 
-      inOrder.verify(interceptor).before(eq(((AnnotatedObject) processor).getLocation()), mapArgWithEntry("param", ""), any());
-      inOrder.verify(interceptor).around(eq(((AnnotatedObject) processor).getLocation()), mapArgWithEntry("param", ""), any(),
+      inOrder.verify(interceptor).before(eq(((Component) processor).getLocation()), mapArgWithEntry("param", ""), any());
+      inOrder.verify(interceptor).around(eq(((Component) processor).getLocation()), mapArgWithEntry("param", ""), any(),
                                          any());
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
-      inOrder.verify(interceptor).after(eq(((AnnotatedObject) processor).getLocation()), any(), eq(empty()));
+      inOrder.verify(interceptor).after(eq(((Component) processor).getLocation()), any(), eq(empty()));
 
       assertThat(result.getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
@@ -1511,12 +1511,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   @Test
   public void paramWithErrorExpression() throws Exception {
-    AnnotatedObject annotatedProcessor = (AnnotatedObject) processor;
+    Component annotatedProcessor = (Component) processor;
     Map<QName, Object> annotations = new HashMap<>(annotatedProcessor.getAnnotations());
     Map<String, String> params = new HashMap<>((Map<String, String>) annotations.get(ANNOTATION_PARAMETERS));
     params.put("errorExpr", "#[notAnExpression]");
     annotations.put(ANNOTATION_PARAMETERS, params);
-    ((AnnotatedObject) processor).setAnnotations(annotations);
+    ((Component) processor).setAnnotations(annotations);
 
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor);
@@ -1566,7 +1566,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     flow.start();
   }
 
-  private static class ProcessorInApp extends AbstractAnnotatedObject implements Processor {
+  private static class ProcessorInApp extends AbstractComponent implements Processor {
 
     public ProcessorInApp() {
       setAnnotations(ImmutableMap.<QName, Object>builder()
@@ -1581,7 +1581,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
   }
 
-  private static class OperationProcessorInApp extends AbstractAnnotatedObject
+  private static class OperationProcessorInApp extends AbstractComponent
       implements ParametersResolverProcessor, Processor {
 
     private final ExecutionContext executionContext = mock(ExecutionContext.class);

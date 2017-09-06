@@ -25,8 +25,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Mono;
 
-public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor>
+public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
     implements ApplicationContextAware, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
@@ -89,9 +89,9 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor
 
     // for subflows, we create a new one so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
-      Map<QName, Object> annotations = new HashMap<>(((AnnotatedObject) referencedFlow).getAnnotations());
+      Map<QName, Object> annotations = new HashMap<>(((Component) referencedFlow).getAnnotations());
       annotations.put(ROOT_CONTAINER_NAME_KEY, getRootContainerName());
-      ((AnnotatedObject) referencedFlow).setAnnotations(annotations);
+      ((Component) referencedFlow).setAnnotations(annotations);
 
       if (referencedFlow instanceof Initialisable) {
         prepareProcessor(referencedFlow);
@@ -134,7 +134,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObjectFactory<Processor
     this.muleContext = context;
   }
 
-  private class FlowRefMessageProcessor extends AbstractAnnotatedObject
+  private class FlowRefMessageProcessor extends AbstractComponent
       implements AnnotatedProcessor, Stoppable, Disposable {
 
     private LoadingCache<String, Processor> cache;

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * 'org.mule.runtime.core.api.processor.LoggerMessageProcessor' category. The level and category can both be configured to suit
  * your needs.
  */
-public class LoggerMessageProcessor extends AbstractAnnotatedObject implements Processor, Initialisable, MuleContextAware {
+public class LoggerMessageProcessor extends AbstractComponent implements Processor, Initialisable, MuleContextAware {
 
   protected transient Logger logger;
 

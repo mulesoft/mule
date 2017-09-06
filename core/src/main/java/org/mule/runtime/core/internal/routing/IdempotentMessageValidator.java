@@ -21,10 +21,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -49,7 +49,7 @@ import org.slf4j.Logger;
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
-public class IdempotentMessageValidator extends AbstractAnnotatedObject
+public class IdempotentMessageValidator extends AbstractComponent
     implements Processor, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
@@ -79,15 +79,15 @@ public class IdempotentMessageValidator extends AbstractAnnotatedObject
   }
 
   private void setupObjectStore() throws InitialisationException {
-    //Check if  OS was properly configured
+    // Check if OS was properly configured
     if (store != null && privateStore != null) {
       throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
     }
     if (store == null) {
-      if (privateStore == null) { //If no object store was defined, create one
+      if (privateStore == null) { // If no object store was defined, create one
         this.store = createMessageIdStore();
-      } else { //If object store was defined privately
+      } else { // If object store was defined privately
         this.store = privateStore;
       }
     }

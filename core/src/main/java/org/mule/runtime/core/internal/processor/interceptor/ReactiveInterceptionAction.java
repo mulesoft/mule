@@ -16,7 +16,7 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -53,7 +53,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
   @Override
   public CompletableFuture<InterceptionEvent> proceed() {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called proceed() for processor {}", ((AnnotatedObject) processor).getLocation().getLocation());
+      LOGGER.debug("Called proceed() for processor {}", ((Component) processor).getLocation().getLocation());
     }
 
     return just(interceptionEvent.resolve())
@@ -69,7 +69,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
   @Override
   public CompletableFuture<InterceptionEvent> skip() {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called skip() for processor {}", ((AnnotatedObject) processor).getLocation().getLocation());
+      LOGGER.debug("Called skip() for processor {}", ((Component) processor).getLocation().getLocation());
     }
 
     interceptionEvent.resolve();
@@ -79,23 +79,23 @@ class ReactiveInterceptionAction implements InterceptionAction {
   @Override
   public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called fail() for processor {} with cause {} ({})", ((AnnotatedObject) processor).getLocation().getLocation(),
+      LOGGER.debug("Called fail() for processor {} with cause {} ({})", ((Component) processor).getLocation().getLocation(),
                    cause.getClass(), cause.getMessage());
     }
 
-    Error newError = getErrorFromFailingProcessor(null, (AnnotatedObject) processor, cause, errorTypeLocator);
+    Error newError = getErrorFromFailingProcessor(null, (Component) processor, cause, errorTypeLocator);
 
     interceptionEvent.setError(newError.getErrorType(), cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
     completableFuture
-        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (AnnotatedObject) processor));
+        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (Component) processor));
     return completableFuture;
   }
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(ErrorType errorType) {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called fail() for processor {} with errorType {}", ((AnnotatedObject) processor).getLocation().getLocation(),
+      LOGGER.debug("Called fail() for processor {} with errorType {}", ((Component) processor).getLocation().getLocation(),
                    errorType.getIdentifier());
     }
 
@@ -103,7 +103,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
     interceptionEvent.setError(errorType, cause);
     CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
     completableFuture
-        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (AnnotatedObject) processor));
+        .completeExceptionally(new MessagingException(interceptionEvent.resolve(), cause, (Component) processor));
     return completableFuture;
   }
 }

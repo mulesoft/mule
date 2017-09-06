@@ -10,13 +10,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.internal.routing.MessageProcessorExpressionPair;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.Collection;
 
 import javax.inject.Inject;
 
-public abstract class AbstractSelectiveRouterObjectFactory extends AbstractAnnotatedObjectFactory<AbstractSelectiveRouter> {
+public abstract class AbstractSelectiveRouterObjectFactory extends AbstractComponentFactory<AbstractSelectiveRouter> {
 
   @Inject
   private MuleContext muleContext;

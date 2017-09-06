@@ -21,7 +21,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.InternalEvent;
@@ -46,15 +46,15 @@ import java.util.Optional;
  */
 public class MessagingExceptionResolver {
 
-  private final AnnotatedObject component;
+  private final Component component;
 
-  public MessagingExceptionResolver(AnnotatedObject component) {
+  public MessagingExceptionResolver(Component component) {
     this.component = component;
   }
 
   /**
-   * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an
-   * Incoming {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
+   * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an Incoming
+   * {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
    * <p>
    * This method will pick the FIRST cause exception that has a mule or extension KNOWN error as the real cause, if there is not
    * an exception in the causes that match with an Known error type then this method will try to find the error that the current
@@ -75,7 +75,7 @@ public class MessagingExceptionResolver {
 
     Throwable root = rootCause.get().getFirst();
     ErrorType rootErrorType = rootCause.get().getSecond();
-    AnnotatedObject failingComponent = getFailingProcessor(me, root).orElse(component);
+    Component failingComponent = getFailingProcessor(me, root).orElse(component);
 
     ErrorType errorType = getErrorMappings(component)
         .stream()
@@ -98,7 +98,7 @@ public class MessagingExceptionResolver {
     return enrich(result, failingComponent, event, context);
   }
 
-  private Optional<Pair<Throwable, ErrorType>> findRoot(AnnotatedObject obj, MessagingException me, ErrorTypeLocator locator) {
+  private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = collectErrors(obj, me, locator);
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();
@@ -114,7 +114,7 @@ public class MessagingExceptionResolver {
     return Optional.ofNullable(result.get());
   }
 
-  private List<Pair<Throwable, ErrorType>> collectErrors(AnnotatedObject obj, MessagingException me, ErrorTypeLocator locator) {
+  private List<Pair<Throwable, ErrorType>> collectErrors(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = new LinkedList<>();
     getExceptionsAsList(me).forEach(e -> {
       ErrorType type = errorTypeFromException(obj, locator, e);
@@ -125,7 +125,7 @@ public class MessagingExceptionResolver {
     return errors;
   }
 
-  private List<Pair<Throwable, ErrorType>> collectCritical(AnnotatedObject obj, MessagingException me, ErrorTypeLocator locator) {
+  private List<Pair<Throwable, ErrorType>> collectCritical(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = new LinkedList<>();
     getExceptionsAsList(me).forEach(e -> {
       ErrorType type = errorTypeFromException(obj, locator, e);
@@ -136,24 +136,24 @@ public class MessagingExceptionResolver {
     return errors;
   }
 
-  private MessagingException updateCurrent(MessagingException me, AnnotatedObject processor, MuleContext context) {
+  private MessagingException updateCurrent(MessagingException me, Component processor, MuleContext context) {
     InternalEvent errorEvent = createErrorEvent(me.getEvent(), processor, me, context.getErrorTypeLocator());
-    AnnotatedObject failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
+    Component failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
     MessagingException updated =
         me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
             : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
     return enrich(updated, failingProcessor, errorEvent, context);
   }
 
-  private Optional<AnnotatedObject> getFailingProcessor(MessagingException me, Throwable root) {
-    AnnotatedObject failing = me.getFailingComponent();
+  private Optional<Component> getFailingProcessor(MessagingException me, Throwable root) {
+    Component failing = me.getFailingComponent();
     if (failing == null && root instanceof MessagingException) {
       failing = ((MessagingException) root).getFailingComponent();
     }
     return Optional.ofNullable(failing);
   }
 
-  private ErrorType errorTypeFromException(AnnotatedObject failing, ErrorTypeLocator locator, Throwable e) {
+  private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
     if (isMessagingExceptionWithError(e)) {
       return ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
     } else {
@@ -166,7 +166,7 @@ public class MessagingExceptionResolver {
     return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
   }
 
-  private MessagingException enrich(MessagingException me, AnnotatedObject failing, InternalEvent event, MuleContext context) {
+  private MessagingException enrich(MessagingException me, Component failing, InternalEvent event, MuleContext context) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
     context.getExceptionContextProviders().forEach(cp -> {
       cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));

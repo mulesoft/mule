@@ -21,7 +21,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
@@ -45,7 +45,7 @@ import java.util.concurrent.ScheduledFuture;
  * {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule server.
  * </p>
  */
-public class DefaultSchedulerMessageSource extends AbstractAnnotatedObject
+public class DefaultSchedulerMessageSource extends AbstractComponent
     implements MessageSource, SchedulerMessageSource, MuleContextAware, Initialisable, Disposable {
 
   private final PeriodicScheduler scheduler;

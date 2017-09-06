@@ -22,7 +22,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -280,7 +280,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  class InternalAsyncReplyMessageProcessor extends AbstractAnnotatedObject implements Processor {
+  class InternalAsyncReplyMessageProcessor extends AbstractComponent implements Processor {
 
     @Override
     public InternalEvent process(InternalEvent event) throws MuleException {

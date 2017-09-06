@@ -21,7 +21,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public abstract class LifecycleAwareConfigurationProvider extends AbstractAnnotatedObject
+public abstract class LifecycleAwareConfigurationProvider extends AbstractComponent
     implements ConfigurationProvider, Lifecycle {
 
   private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationProvider.class);

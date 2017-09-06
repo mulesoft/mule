@@ -8,7 +8,7 @@ package org.mule.runtime.module.tls.internal.config;
 
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
@@ -17,7 +17,7 @@ import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
  *
  * @since 4.0
  */
-public class DefaultTlsContextFactoryObjectFactory extends AbstractAnnotatedObjectFactory<DefaultTlsContextFactory> {
+public class DefaultTlsContextFactoryObjectFactory extends AbstractComponentFactory<DefaultTlsContextFactory> {
 
   private String name;
   private TlsContextKeyStoreConfiguration keyStore;

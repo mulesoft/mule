@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -53,7 +53,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
   private TestMessageProcessTemplateAndContext completeMessageProcessTemplateAndContext;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SystemExceptionHandler mockExceptionListener;
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {AnnotatedObject.class})
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})
   private FlowConstruct flowConstruct;
 
   @Before

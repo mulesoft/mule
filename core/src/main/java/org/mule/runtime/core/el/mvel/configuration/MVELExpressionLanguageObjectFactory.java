@@ -8,7 +8,7 @@ package org.mule.runtime.core.el.mvel.configuration;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class MVELExpressionLanguageObjectFactory extends AbstractAnnotatedObjectFactory<MVELExpressionLanguage> {
+public class MVELExpressionLanguageObjectFactory extends AbstractComponentFactory<MVELExpressionLanguage> {
 
   @Inject
   MuleContext muleContext;

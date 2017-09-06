@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.security;
 
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 
@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class AbstractNamedEncryptionStrategy extends AbstractAnnotatedObject implements EncryptionStrategy {
+public abstract class AbstractNamedEncryptionStrategy extends AbstractComponent implements EncryptionStrategy {
 
   private String name;
 

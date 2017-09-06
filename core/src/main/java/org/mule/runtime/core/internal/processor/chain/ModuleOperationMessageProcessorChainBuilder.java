@@ -23,7 +23,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -206,7 +206,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private Object getEvaluatedValue(InternalEvent event, String value, MetadataType metadataType) {
       ComponentLocation headLocation = null;
       final Processor head = getProcessorsToExecute().get(0);
-      headLocation = ((AnnotatedObject) head).getLocation();
+      headLocation = ((Component) head).getLocation();
 
       Object evaluatedResult;
       if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {

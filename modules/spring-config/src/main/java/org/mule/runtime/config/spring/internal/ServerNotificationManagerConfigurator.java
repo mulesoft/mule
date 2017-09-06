@@ -14,7 +14,7 @@ import static org.mule.runtime.config.spring.internal.NotificationConfig.INTERFA
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AbstractAnnotatedObject;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.Notification;
@@ -39,7 +39,7 @@ import javax.inject.Inject;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
-public class ServerNotificationManagerConfigurator extends AbstractAnnotatedObject implements Initialisable {
+public class ServerNotificationManagerConfigurator extends AbstractComponent implements Initialisable {
 
   @Inject
   private MuleContext muleContext;

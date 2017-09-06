@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 
 /**
  * This notification type includes information about the event, exception and flow where it occurred.
@@ -41,7 +41,7 @@ public abstract class EnrichedServerNotification extends AbstractServerNotificat
     return notificationInfo.getEvent();
   }
 
-  public AnnotatedObject getComponent() {
+  public Component getComponent() {
     return notificationInfo.getComponent();
   }
 

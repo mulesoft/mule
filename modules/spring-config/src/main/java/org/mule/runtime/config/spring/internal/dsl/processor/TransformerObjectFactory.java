@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 /**
@@ -31,7 +31,7 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
  * {@code postProcessInstance} method can be used to do additional stuff over the transformer instance like doing additional
  * parameter configuration.
  */
-public class TransformerObjectFactory extends AbstractAnnotatedObjectFactory<Transformer> {
+public class TransformerObjectFactory extends AbstractComponentFactory<Transformer> {
 
   private Class<? extends AbstractTransformer> transformerClass;
   private String name;

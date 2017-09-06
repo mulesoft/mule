@@ -17,11 +17,11 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-public class MessageProcessorChainFactoryBean extends AbstractAnnotatedObjectFactory<MessageProcessorChain>
+public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
     implements MuleContextAware {
 
   protected List processors;

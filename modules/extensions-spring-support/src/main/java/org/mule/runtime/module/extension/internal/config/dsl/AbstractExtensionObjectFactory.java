@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDef
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser.CHILD_ELEMENT_KEY_SUFFIX;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -27,7 +27,7 @@ import java.util.Map;
  * @param <T> the generic type of the instances to be built
  * @since 4.0
  */
-public abstract class AbstractExtensionObjectFactory<T> extends AbstractAnnotatedObjectFactory<T>
+public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponentFactory<T>
     implements ObjectTypeParametersResolver {
 
   protected final MuleContext muleContext;

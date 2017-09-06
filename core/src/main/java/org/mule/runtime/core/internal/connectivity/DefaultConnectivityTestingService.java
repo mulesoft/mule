@@ -15,7 +15,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
@@ -76,7 +76,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
    */
   @Override
   public ConnectionValidationResult testConnection(Location location) {
-    Optional<AnnotatedObject> foundObjectOptional = muleContext.getConfigurationComponentLocator().find(location);
+    Optional<Component> foundObjectOptional = muleContext.getConfigurationComponentLocator().find(location);
     Object connectivityTestingObject =
         foundObjectOptional.orElseThrow((() -> new ObjectNotFoundException("No object found with path: " + location)));
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {

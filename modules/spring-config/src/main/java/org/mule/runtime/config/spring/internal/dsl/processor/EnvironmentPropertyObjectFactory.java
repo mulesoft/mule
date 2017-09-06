@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.processor;
 
-import org.mule.runtime.dsl.api.component.AbstractAnnotatedObjectFactory;
+import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.Map;
 
-public class EnvironmentPropertyObjectFactory extends AbstractAnnotatedObjectFactory<Map> {
+public class EnvironmentPropertyObjectFactory extends AbstractComponentFactory<Map> {
 
   private Map map;
 

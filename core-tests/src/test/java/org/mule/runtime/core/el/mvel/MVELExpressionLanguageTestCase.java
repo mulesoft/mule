@@ -24,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
 import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.meta.AbstractAnnotatedObject.LOCATION_KEY;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
@@ -40,7 +40,7 @@ import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -118,11 +118,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
-    flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(AnnotatedObject.class));
+    flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getName()).thenReturn("myFlow");
     final DefaultComponentLocation location = fromSingleComponent("myFlow");
-    when(((AnnotatedObject) flowConstruct).getAnnotation(LOCATION_KEY)).thenReturn(location);
-    when(((AnnotatedObject) flowConstruct).getLocation()).thenReturn(location);
+    when(((Component) flowConstruct).getAnnotation(LOCATION_KEY)).thenReturn(location);
+    when(((Component) flowConstruct).getLocation()).thenReturn(location);
   }
 
   @Test
@@ -419,10 +419,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   protected TypedValue evaluateTyped(String expression, InternalEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
       return mvel.evaluate("#[mel:" + expression + "]", event, InternalEvent.builder(event),
-                           ((AnnotatedObject) flowConstruct).getLocation(),
+                           ((Component) flowConstruct).getLocation(),
                            BindingContext.builder().build());
     } else {
-      return mvel.evaluate(expression, event, InternalEvent.builder(event), ((AnnotatedObject) flowConstruct).getLocation(),
+      return mvel.evaluate(expression, event, InternalEvent.builder(event), ((Component) flowConstruct).getLocation(),
                            BindingContext.builder().build());
     }
   }
@@ -438,10 +438,10 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   protected Object evaluate(String expression, InternalEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
       return mvel.evaluateUntyped("#[mel:" + expression + "]", event, InternalEvent.builder(event),
-                                  ((AnnotatedObject) flowConstruct).getLocation(), null);
+                                  ((Component) flowConstruct).getLocation(), null);
     } else {
       return mvel.evaluateUntyped(expression, event, InternalEvent.builder(event),
-                                  ((AnnotatedObject) flowConstruct).getLocation(), null);
+                                  ((Component) flowConstruct).getLocation(), null);
     }
   }
 
@@ -517,11 +517,11 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
     InternalEvent event = eventBuilder().message(of(new String[] {"1", "2"})).build();
     assertEquals("1", mvel.evaluateUntyped("payload[0]", event, InternalEvent.builder(event),
-                                           ((AnnotatedObject) flowConstruct).getLocation(), null));
+                                           ((Component) flowConstruct).getLocation(), null));
     event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(singletonList("1")).build())
         .build();
     assertEquals("1", mvel.evaluateUntyped("payload[0]", event, InternalEvent.builder(event),
-                                           ((AnnotatedObject) flowConstruct).getLocation(), null));
+                                           ((Component) flowConstruct).getLocation(), null));
   }
 
 }
