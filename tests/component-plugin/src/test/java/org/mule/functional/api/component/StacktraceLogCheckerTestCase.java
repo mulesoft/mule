@@ -23,7 +23,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
 
   @Test
-  public void onlyEvaluatesStacktrace() throws Exception {
+  public void onlyEvaluatesStacktracePatternMatchingLines() throws Exception {
+    //Since there is none, the test should succeed
     String log = "message" + EXCEPTION_MESSAGE_SECTION_DELIMITER + "stacktrace";
     stacktraceLogChecker.check(log);
   }

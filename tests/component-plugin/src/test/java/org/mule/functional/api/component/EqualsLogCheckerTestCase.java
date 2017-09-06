@@ -29,6 +29,13 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
   }
 
   @Test
+  public void stacktraceShouldBeAvoidedEvenWithNoDelimiter() throws Exception {
+    String log = "first line\nsecond line\nat some.package.SomeClass.theMethod(theline:56)";
+    equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
+    equalsLogChecker.check(log);
+  }
+
+  @Test
   public void whitespaceDifferencesDontCauseFailureIfFilterSet() throws Exception{
     String log = "  \t\n\nmessage\n\n\t  ";
     equalsLogChecker.setShouldFilterLogMessage(true);
@@ -65,7 +72,7 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
 
   @Test
   public void delimiterDifferencesShouldFailWithoutFilter() throws Exception {
-    String log = EXCEPTION_MESSAGE_DELIMITER + "first line" + EXCEPTION_MESSAGE_DELIMITER + "second line";
+    String log = EXCEPTION_MESSAGE_DELIMITER + "first line\n" + EXCEPTION_MESSAGE_DELIMITER + "second line";
     equalsLogChecker.setShouldFilterLogMessage(true);
     equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
     expectedException.expect(AssertionError.class);
