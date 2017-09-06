@@ -6,7 +6,7 @@
  */
 package org.mule.test.module.extension;
 
-import static com.ibm.icu.impl.Assert.fail;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class OverriddenSubstitutionGroupTestCase extends AbstractExtensionFuncti
     try {
       flowRunner("doNothing").run();
     } catch (Exception e) {
-      fail(e);
+      fail(e.getMessage());
     }
   }
 

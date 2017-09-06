@@ -8,13 +8,24 @@ package org.mule.runtime.config.spring.internal;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations.METADATA_ANNOTATIONS_KEY;
-import org.apache.commons.io.IOUtils;
+
 import org.mule.runtime.config.spring.internal.parsers.DefaultXmlMetadataAnnotations;
 import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Stack;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
 import org.springframework.beans.factory.xml.DocumentLoader;
-import org.springframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.UserDataHandler;
@@ -27,16 +38,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Stack;
-
 /**
  * Alternative to Spring's default document loader that uses <b>SAX</b> to add metadata to the <b>DOM</b> elements that are the
  * result of the default parser.
@@ -44,8 +45,6 @@ import java.util.Stack;
  * @since 3.8.0
  */
 final public class MuleDocumentLoader implements DocumentLoader {
-
-  private static final String DEFER_NODE_EXPANSION_FEATURE_KEY = "http://apache.org/xml/features/dom/defer-node-expansion";
 
   private static final UserDataHandler COPY_METADATA_ANNOTATIONS_DATA_HANDLER = new UserDataHandler() {
 
@@ -57,53 +56,7 @@ final public class MuleDocumentLoader implements DocumentLoader {
     }
   };
 
-  /**
-   * JAXP attribute used to configure the schema language for validation.
-   */
-  private static final String SCHEMA_LANGUAGE_ATTRIBUTE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-
-  /**
-   * JAXP attribute value indicating the XSD schema language.
-   */
-  private static final String XSD_SCHEMA_LANGUAGE = "http://www.w3.org/2001/XMLSchema";
-
-  private final DocumentLoader defaultLoader = new DefaultDocumentLoader() {
-
-    /**
-     * This code is the same as the corresponding Spring method, but uses our DocumentBuilderFactory because the
-     * global one is changed by Xerces through SPI.
-     *
-     * TODO: remove after MULE-13276 is completed
-     */
-    @Override
-    protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
-        throws ParserConfigurationException {
-
-      DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
-      factory.setNamespaceAware(namespaceAware);
-      if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
-        factory.setValidating(true);
-        if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
-          // Enforce namespace aware for XSD...
-          factory.setNamespaceAware(true);
-          try {
-            factory.setAttribute(SCHEMA_LANGUAGE_ATTRIBUTE, XSD_SCHEMA_LANGUAGE);
-          } catch (IllegalArgumentException ex) {
-            ParserConfigurationException pcex = new ParserConfigurationException(
-                                                                                 "Unable to validate using XSD: Your JAXP provider ["
-                                                                                     + factory +
-                                                                                     "] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? "
-                                                                                     +
-                                                                                     "Upgrade to Apache Xerces (or Java 1.5) for full XSD support.");
-            pcex.initCause(ex);
-            throw pcex;
-          }
-        }
-      }
-
-      return factory;
-    }
-  };
+  private final DocumentLoader defaultLoader = new DefaultDocumentLoader();
 
   private final XmlMetadataAnnotationsFactory metadataFactory;
 

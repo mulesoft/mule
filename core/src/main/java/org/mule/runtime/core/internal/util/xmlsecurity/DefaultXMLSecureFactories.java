@@ -20,7 +20,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,7 +61,7 @@ public class DefaultXMLSecureFactories {
       try {
         factory = DocumentBuilderFactory.newInstance(DOCUMENT_BUILDER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
       } catch (FactoryConfigurationError e) {
-        logCreationWarning("DocumentBuilderFactory", DOCUMENT_BUILDER_FACTORY, e);
+        logCreationWarning(DocumentBuilderFactory.class.getName(), DOCUMENT_BUILDER_FACTORY, e);
         factory = DocumentBuilderFactory.newInstance();
       }
     } else {
@@ -75,7 +74,7 @@ public class DefaultXMLSecureFactories {
       factory.setExpandEntityReferences(expandEntities);
       factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", !expandEntities);
     } catch (Exception e) {
-      logConfigurationWarning("DocumentBuilderFactory", factory.getClass().getName(), e);
+      logConfigurationWarning(DocumentBuilderFactory.class.getName(), factory.getClass().getName(), e);
     }
 
     return factory;
@@ -88,7 +87,7 @@ public class DefaultXMLSecureFactories {
       try {
         factory = SAXParserFactory.newInstance(SAX_PARSER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
       } catch (FactoryConfigurationError e) {
-        logCreationWarning("SAXParserFactory", SAX_PARSER_FACTORY, e);
+        logCreationWarning(SAXParserFactory.class.getName(), SAX_PARSER_FACTORY, e);
         factory = SAXParserFactory.newInstance();
       }
     } else {
@@ -100,7 +99,7 @@ public class DefaultXMLSecureFactories {
       factory.setFeature("http://xml.org/sax/features/external-parameter-entities", externalEntities);
       factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", !expandEntities);
     } catch (Exception e) {
-      logConfigurationWarning("SAXParserFactory", factory.getClass().getName(), e);
+      logConfigurationWarning(SAXParserFactory.class.getName(), factory.getClass().getName(), e);
     }
 
     return factory;
@@ -117,7 +116,7 @@ public class DefaultXMLSecureFactories {
         System.setProperty(propertyName, XML_INPUT_FACTORY);
         factory = XMLInputFactory.newFactory(propertyName, DefaultXMLSecureFactories.class.getClassLoader());
       } catch (FactoryConfigurationError e) {
-        logCreationWarning("XMLInputFactory", XML_INPUT_FACTORY, e);
+        logCreationWarning(XMLInputFactory.class.getName(), XML_INPUT_FACTORY, e);
         factory = XMLInputFactory.newInstance();
       }
     } else {
@@ -136,20 +135,12 @@ public class DefaultXMLSecureFactories {
       try {
         factory = TransformerFactory.newInstance(TRANSFORMER_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
       } catch (FactoryConfigurationError e) {
-        logCreationWarning("TransformerFactory", TRANSFORMER_FACTORY, e);
+        logCreationWarning(TransformerFactory.class.getName(), TRANSFORMER_FACTORY, e);
         factory = TransformerFactory.newInstance();
       }
     } else {
       factory = TransformerFactory.newInstance();
     }
-
-    configureTransformerFactory(factory);
-
-    return factory;
-  }
-
-  public TransformerFactory createSaxonTransformerFactory() {
-    TransformerFactory factory = new SaxonTransformerFactory();
 
     configureTransformerFactory(factory);
 
@@ -164,7 +155,7 @@ public class DefaultXMLSecureFactories {
       try {
         factory = SchemaFactory.newInstance(schemaLanguage, SCHEMA_FACTORY, DefaultXMLSecureFactories.class.getClassLoader());
       } catch (IllegalArgumentException e) {
-        logCreationWarning("SchemaFactory", SCHEMA_FACTORY, e);
+        logCreationWarning(SchemaFactory.class.getName(), SCHEMA_FACTORY, e);
         factory = SchemaFactory.newInstance(schemaLanguage);
       }
     } else {
@@ -187,7 +178,7 @@ public class DefaultXMLSecureFactories {
         factory.setAttribute(ACCESS_EXTERNAL_STYLESHEET, "");
         factory.setAttribute(ACCESS_EXTERNAL_DTD, "");
       } catch (Exception e) {
-        logConfigurationWarning("TransformerFactory", factory.getClass().getName(), e);
+        logConfigurationWarning(TransformerFactory.class.getName(), factory.getClass().getName(), e);
       }
     }
   }
@@ -198,7 +189,7 @@ public class DefaultXMLSecureFactories {
         factory.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
         factory.setProperty(ACCESS_EXTERNAL_DTD, "");
       } catch (Exception e) {
-        logConfigurationWarning("SchemaFactory", factory.getClass().getName(), e);
+        logConfigurationWarning(SchemaFactory.class.getName(), factory.getClass().getName(), e);
       }
     }
   }
@@ -209,20 +200,19 @@ public class DefaultXMLSecureFactories {
         validator.setProperty(ACCESS_EXTERNAL_STYLESHEET, "");
         validator.setProperty(ACCESS_EXTERNAL_DTD, "");
       } catch (Exception e) {
-        logConfigurationWarning("Validator", validator.getClass().getName(), e);
+        logConfigurationWarning(Validator.class.getName(), validator.getClass().getName(), e);
       }
     }
   }
 
   protected static void logConfigurationWarning(String interfaceName, String implementationName, Throwable e) {
     logger.warn(format("Can't configure XML entity expansion for %s (%s), this could introduce XXE and BL vulnerabilities",
-                       interfaceName, implementationName));
-    logger.warn(e);
+                       interfaceName, implementationName),
+                e);
   }
 
   protected static void logCreationWarning(String interfaceName, String desiredImplementation, Throwable e) {
-    logger.warn(format("Can't create %s (%s), falling back to default implementation", interfaceName, desiredImplementation));
-    logger.warn(e);
+    logger.warn(format("Can't create %s (%s), falling back to default implementation", interfaceName, desiredImplementation), e);
   }
 
   public Boolean getExternalEntities() {
