@@ -146,18 +146,36 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     public T deployPackagedArtifact(URL artifactAchivedUrl) throws DeploymentException
     {
         T artifact;
-
+        String artifactName;
         try
         {
             try
             {
-                artifact = installFrom(artifactAchivedUrl);
+                artifactName = artifactArchiveInstaller.installArtifact(artifactAchivedUrl);
+            }
+            catch (Throwable t)
+            {
+                File artifactArchive = new File(artifactAchivedUrl.toURI());
+                artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
+
+                // error text has been created by the deployer already
+                logDeploymentFailure(t, artifactName);
+
+                addZombieFile(artifactName, artifactArchive);
+
+                deploymentListener.onDeploymentFailure(artifactName, t);
+
+                throw t;
+            }
+
+            try
+            {
+                artifact = artifactFactory.createArtifact(artifactName);
                 trackArtifact(artifact);
             }
             catch (Throwable t)
             {
                 File artifactArchive = new File(artifactAchivedUrl.toURI());
-                String artifactName = removeEndIgnoreCase(artifactArchive.getName(), ZIP_FILE_SUFFIX);
 
                 // error text has been created by the deployer already
                 logDeploymentFailure(t, artifactName);
