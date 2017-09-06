@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
+import static java.lang.Thread.currentThread;
+
 class MuleAliasVariableResolver extends MuleVariableResolver<Object> {
 
   private static final long serialVersionUID = -4957789619105599831L;
@@ -30,12 +32,12 @@ class MuleAliasVariableResolver extends MuleVariableResolver<Object> {
 
   @Override
   public Object getValue() {
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+      currentThread().setContextClassLoader(this.getClass().getClassLoader());
       return executor.execute(expression, context);
     } finally {
-      Thread.currentThread().setContextClassLoader(contextClassLoader);
+      currentThread().setContextClassLoader(contextClassLoader);
     }
   }
 

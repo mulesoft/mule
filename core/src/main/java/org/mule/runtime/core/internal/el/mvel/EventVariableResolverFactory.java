@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import static java.lang.String.format;
+import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
@@ -47,8 +47,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
     if (event != null) {
       if (FLOW.equals(name) && flowName != null) {
         return new MuleImmutableVariableResolver<>(FLOW, (new FlowContext(flowName)), null);
-      } else if (MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
-        return new MuleImmutableVariableResolver<>(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE, event, null);
+      } else if (MULE_EVENT_INTERNAL_VARIABLE.equals(name)) {
+        return new MuleImmutableVariableResolver<>(MULE_EVENT_INTERNAL_VARIABLE, event, null);
       }
     }
     return super.getVariableResolver(name);
@@ -56,10 +56,10 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
 
   @Override
   public boolean isTarget(String name) {
-    boolean isDeprecatedVariable = MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE.equals(name);
+    boolean isDeprecatedVariable = MULE_EVENT_INTERNAL_VARIABLE.equals(name);
     if (isDeprecatedVariable) {
       logger.warn(String.format("Variable %s has been removed from MEL and will not work outside of compatibility mode.",
-                                MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE));
+                                MULE_EVENT_INTERNAL_VARIABLE));
     }
     return isDeprecatedVariable || FLOW.equals(name) || super.isTarget(name);
   }
