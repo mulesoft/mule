@@ -9,12 +9,13 @@ package org.mule.runtime.config.spring.internal.dsl.model.extension.xml;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * A {@link ExtensionModelsMacroExpander} goes over all the parametrized {@link ExtensionModel} by filtering them if they have
+ * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have
  * the {@link XmlExtensionModelProperty} (implies that has to be macro expanded).
  * <p/>
  * For every occurrence that happens, it will expand the operations/configurations by working with the
@@ -23,7 +24,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class ExtensionModelsMacroExpander {
+public class MacroExpansionModulesModel {
 
   private final ApplicationModel applicationModel;
   private final List<ExtensionModel> extensions;
@@ -36,7 +37,7 @@ public class ExtensionModelsMacroExpander {
    * @param extensions set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by looking up
    *        only those that are coming from an XML context through the {@link XmlExtensionModelProperty} property.
    */
-  public ExtensionModelsMacroExpander(ApplicationModel applicationModel, Set<ExtensionModel> extensions) {
+  public MacroExpansionModulesModel(ApplicationModel applicationModel, Set<ExtensionModel> extensions) {
     this.applicationModel = applicationModel;
     this.extensions = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())

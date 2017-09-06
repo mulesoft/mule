@@ -60,7 +60,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.config.GlobalPropertyCo
 import org.mule.runtime.config.spring.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.spring.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.ExtensionModelsMacroExpander;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.RuntimeConfigurationException;
@@ -898,7 +898,7 @@ public class ApplicationModel {
   }
 
   /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link ExtensionModelsMacroExpander} as
+   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
    * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
    * message processors
    *
@@ -906,7 +906,7 @@ public class ApplicationModel {
    *        expanded.
    */
   private void expandModules(Set<ExtensionModel> extensionModels) {
-    new ExtensionModelsMacroExpander(this, extensionModels).expand();
+    new MacroExpansionModulesModel(this, extensionModels).expand();
   }
 
   /**
