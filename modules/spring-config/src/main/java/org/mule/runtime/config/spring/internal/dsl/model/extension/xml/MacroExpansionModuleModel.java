@@ -158,21 +158,17 @@ public class MacroExpansionModuleModel {
                                                             List<ComponentModel> moduleGlobalElements,
                                                             Set<String> moduleGlobalElementsNames,
                                                             Map<String, String> literalsParameters) {
-
-    List<ComponentModel> globalElementsModel = new ArrayList<>();
-    globalElementsModel.addAll(moduleGlobalElements.stream()
-        .map(globalElementModel -> copyGlobalElementComponentModel(globalElementModel,
-                                                                   configRefModel.getNameAttribute(),
-                                                                   moduleGlobalElementsNames, literalsParameters))
-        .collect(Collectors.toList()));
-
     ComponentModel muleRootElement = configRefModel.getParent();
-    globalElementsModel.stream().forEach(componentModel -> {
-      componentModel.setRoot(true);
-      componentModel.setParent(muleRootElement);
-    });
+    return moduleGlobalElements.stream()
+        .map(globalElementModel -> {
+          final ComponentModel macroExpandedGlobalElement =
+              copyGlobalElementComponentModel(globalElementModel, configRefModel.getNameAttribute(), moduleGlobalElementsNames,
+                                              literalsParameters);
+          macroExpandedGlobalElement.setRoot(true);
+          macroExpandedGlobalElement.setParent(muleRootElement);
+          return macroExpandedGlobalElement;
+        }).collect(Collectors.toList());
 
-    return globalElementsModel;
   }
 
   private List<ComponentModel> getModuleGlobalElements() {
@@ -273,13 +269,7 @@ public class MacroExpansionModuleModel {
    *         updated accordingly (both global components updates plus the line number, and so on). If the value for some parameter
    */
   private ComponentModel copyComponentModel(ComponentModel modelToCopy) {
-    ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
-    operationReplacementModel
-        .setIdentifier(modelToCopy.getIdentifier())
-        .setTextContent(modelToCopy.getTextContent());
-    for (Map.Entry<String, Object> entry : modelToCopy.getCustomAttributes().entrySet()) {
-      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
-    }
+    ComponentModel.Builder operationReplacementModel = getComponentModelBuilderFrom(modelToCopy);
     for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
       operationReplacementModel.addParameter(entry.getKey(), entry.getValue(), false);
     }
@@ -287,19 +277,7 @@ public class MacroExpansionModuleModel {
       operationReplacementModel.addChildComponentModel(
                                                        copyComponentModel(operationChildModel));
     }
-
-    final String configFileName = modelToCopy.getConfigFileName()
-        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
-    final Integer lineNumber = modelToCopy.getLineNumber()
-        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
-    operationReplacementModel.setConfigFileName(configFileName);
-    operationReplacementModel.setLineNumber(lineNumber);
-
-    ComponentModel componentModel = operationReplacementModel.build();
-    for (ComponentModel child : componentModel.getInnerComponents()) {
-      child.setParent(componentModel);
-    }
-    return componentModel;
+    return buildFrom(modelToCopy, operationReplacementModel);
   }
 
   /**
@@ -367,7 +345,6 @@ public class MacroExpansionModuleModel {
    */
   private Map<String, String> extractProperties(Optional<String> configRefName) {
     Map<String, String> valuesMap = new HashMap<>();
-    //    String configParameter = operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF);
     configRefName.ifPresent(configParameter -> {
       // look for the global element which "name" attribute maps to "configParameter" value
       ComponentModel configRefComponentModel = applicationModel.getRootComponentModel().getInnerComponents().stream()
@@ -447,13 +424,7 @@ public class MacroExpansionModuleModel {
   private ComponentModel copyGlobalElementComponentModel(ComponentModel modelToCopy, String configRefName,
                                                          Set<String> moduleGlobalElementsNames,
                                                          Map<String, String> literalsParameters) {
-    ComponentModel.Builder globalElementReplacementModel = new ComponentModel.Builder();
-    globalElementReplacementModel
-        .setIdentifier(modelToCopy.getIdentifier())
-        .setTextContent(modelToCopy.getTextContent());
-    for (Map.Entry<String, Object> entry : modelToCopy.getCustomAttributes().entrySet()) {
-      globalElementReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
-    }
+    ComponentModel.Builder globalElementReplacementModel = getComponentModelBuilderFrom(modelToCopy);
 
     for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
       String value =
@@ -467,19 +438,7 @@ public class MacroExpansionModuleModel {
                                                                                            moduleGlobalElementsNames,
                                                                                            literalsParameters));
     }
-
-    final String configFileName = modelToCopy.getConfigFileName()
-        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
-    final Integer lineNumber = modelToCopy.getLineNumber()
-        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
-    globalElementReplacementModel.setConfigFileName(configFileName);
-    globalElementReplacementModel.setLineNumber(lineNumber);
-
-    ComponentModel componentModel = globalElementReplacementModel.build();
-    for (ComponentModel child : componentModel.getInnerComponents()) {
-      child.setParent(componentModel);
-    }
-    return componentModel;
+    return buildFrom(modelToCopy, globalElementReplacementModel);
   }
 
   /**
@@ -501,13 +460,7 @@ public class MacroExpansionModuleModel {
   private ComponentModel copyOperationComponentModel(ComponentModel modelToCopy, Optional<String> configRefName,
                                                      Set<String> moduleGlobalElementsNames,
                                                      Map<String, String> literalsParameters) {
-    ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
-    operationReplacementModel
-        .setIdentifier(modelToCopy.getIdentifier())
-        .setTextContent(modelToCopy.getTextContent());
-    for (Map.Entry<String, Object> entry : modelToCopy.getCustomAttributes().entrySet()) {
-      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
-    }
+    ComponentModel.Builder operationReplacementModel = getComponentModelBuilderFrom(modelToCopy);
     for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
       String value = configRefName
           .map(s -> calculateAttributeValue(s, moduleGlobalElementsNames, entry.getValue()))
@@ -524,14 +477,23 @@ public class MacroExpansionModuleModel {
                                                            literalsParameters));
       operationReplacementModel.addChildComponentModel(childMPcomponentModel);
     }
+    return buildFrom(modelToCopy, operationReplacementModel);
+  }
 
-    final String configFileName = modelToCopy.getConfigFileName()
-        .orElseThrow(() -> new IllegalArgumentException("The is no config file name for the component to macro expand"));
-    final Integer lineNumber = modelToCopy.getLineNumber()
-        .orElseThrow(() -> new IllegalArgumentException("The is no line number for the component to macro expand"));
-    operationReplacementModel.setConfigFileName(configFileName);
-    operationReplacementModel.setLineNumber(lineNumber);
+  private ComponentModel.Builder getComponentModelBuilderFrom(ComponentModel componentModelOrigin) {
+    ComponentModel.Builder operationReplacementModel = new ComponentModel.Builder();
+    operationReplacementModel
+        .setIdentifier(componentModelOrigin.getIdentifier())
+        .setTextContent(componentModelOrigin.getTextContent());
+    for (Map.Entry<String, Object> entry : componentModelOrigin.getCustomAttributes().entrySet()) {
+      operationReplacementModel.addCustomAttribute(entry.getKey(), entry.getValue());
+    }
+    return operationReplacementModel;
+  }
 
+  private ComponentModel buildFrom(ComponentModel componentModelOrigin, ComponentModel.Builder operationReplacementModel) {
+    componentModelOrigin.getConfigFileName().ifPresent(operationReplacementModel::setConfigFileName);
+    componentModelOrigin.getLineNumber().ifPresent(operationReplacementModel::setLineNumber);
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);
