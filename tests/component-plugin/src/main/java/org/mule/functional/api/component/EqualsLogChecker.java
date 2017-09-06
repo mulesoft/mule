@@ -1,13 +1,15 @@
 package org.mule.functional.api.component;
 
+import static java.lang.System.lineSeparator;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class EqualsLogChecker extends AbstractLogChecker {
-
-  private static final String LINE_JUMP = "\n";
 
   private String expectedLogMessage;
   private boolean shouldFilterLogMessage;
@@ -35,9 +37,9 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
   private void checkLineCount(String[] expectedLog, String[] actualLog, StringBuilder errorCatcher) {
     if(expectedLog.length != actualLog.length) {
-      errorCatcher.append(LINE_JUMP);
+      errorCatcher.append(lineSeparator());
       errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",actualLog.length,expectedLog.length));
-      errorCatcher.append(LINE_JUMP);
+      errorCatcher.append(lineSeparator());
     }
   }
 
@@ -49,22 +51,29 @@ public class EqualsLogChecker extends AbstractLogChecker {
       }else {
         if(!(expectedLogLines[i].trim().equals(actualLogLines[i].trim()))) {
           errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n",i,expectedLogLines[i].trim(), actualLogLines[i].trim()));
-          errorCatcher.append(LINE_JUMP);
+          errorCatcher.append(lineSeparator());
         }
       }
     }
     if(actualLogLines.length > expectedLogLines.length) {
-      errorCatcher.append("Found log has extra lines:\n");
+      errorCatcher.append("Actual log has extra lines:\n");
       for(int j = i;j < actualLogLines.length; j++) {
         errorCatcher.append(actualLogLines[j]);
-        errorCatcher.append(LINE_JUMP);
+        errorCatcher.append(lineSeparator());
       }
-      errorCatcher.append(LINE_JUMP);
+      errorCatcher.append(lineSeparator());
     }
   }
 
   private String[] splitLines(String wholeMessage) {
-    return Arrays.stream(wholeMessage.split(LINE_JUMP)).filter(StringUtils::isNotBlank).toArray(String[]::new);
+    if(shouldFilterLogMessage){
+      return splitLines(wholeMessage, (line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim()));
+    }
+    return splitLines(wholeMessage,(line) -> true);
+  }
+
+  private String[] splitLines(String wholeMessage, Predicate<String> filter) {
+    return Arrays.stream(wholeMessage.split(lineSeparator())).filter(filter).toArray(String[]::new);
   }
 
   private String filterLogMessage(String logMessage) {

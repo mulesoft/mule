@@ -1,6 +1,9 @@
 package org.mule.functional.api.component;
 
 
+import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
 public abstract class AbstractLogChecker implements LogChecker {
 
   @Override
@@ -12,7 +15,7 @@ public abstract class AbstractLogChecker implements LogChecker {
    * @return a string with the log message
    */
   protected String getLogMessage(String initialLog) {
-    return null;
+    return initialLog.split(EXCEPTION_MESSAGE_SECTION_DELIMITER)[0];
   }
 
   /**
@@ -21,7 +24,11 @@ public abstract class AbstractLogChecker implements LogChecker {
    * @return a string with the log stack trace.
    */
   protected String getStackTrace(String initialLog) {
-    return null;
+    String[] splittedLog = initialLog.split(EXCEPTION_MESSAGE_SECTION_DELIMITER);
+    if(splittedLog.length < 2) {
+      return EMPTY;
+    }
+    return initialLog.split(EXCEPTION_MESSAGE_SECTION_DELIMITER)[1];
   }
 
 }

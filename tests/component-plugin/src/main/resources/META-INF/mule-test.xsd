@@ -416,27 +416,27 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="abstractLogCheckerType" abstract="true"/>
+    <xsd:element name="check-equals" substitutionGroup="abstract-log-checker" type="checkEqualsType">
+        <xsd:annotation>
+                <xsd:documentation>
+                    Evaluates the expected and actual logs line by line expecting them to be equal
+                </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-    <xsd:element name="check-equals" substitutionGroup="abstract-log-checker" type="xsd:string"/>
-
-    <!--<xsd:complexType name="checkEqualsType">-->
-        <!--<xsd:complexContent>-->
-            <!--<xsd:extension base="abstractLogCheckerType">-->
-                <!--<xsd:sequence minOccurs="0" maxOccurs="1">-->
-                    <!--<xsd:element name="expected-log-message" type="xsd:string">-->
-                        <!--<xsd:annotation>-->
-                            <!--<xsd:documentation>-->
-                                <!--The log message to compare to-->
-                            <!--</xsd:documentation>-->
-                        <!--</xsd:annotation>-->
-                    <!--</xsd:element>-->
-                <!--</xsd:sequence>-->
-                <!--<xsd:attribute type="xsd:boolean" name="filterLog" default="true"/>-->
-            <!--</xsd:extension>-->
-        <!--</xsd:complexContent>-->
-    <!--</xsd:complexType>-->
-
+    <xsd:complexType name="checkEqualsType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="filterLog" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
 
 
 </xsd:schema>
