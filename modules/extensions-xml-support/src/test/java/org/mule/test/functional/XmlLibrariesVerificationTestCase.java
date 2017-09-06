@@ -15,11 +15,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 /**
  * Make sure third party libraries in the container can't override default Java factories by SPI with META-INF/services.
  */
+@Feature("Security")
+@Story("Provide correct XML factories with isolation")
 public class XmlLibrariesVerificationTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override

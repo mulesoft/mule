@@ -18,11 +18,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.validation.SchemaFactory;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
 /**
  * Make sure our XML factories provide the Java defaults independently of the classloader.
  */
+@Feature("Security")
+@Story("Provide correct XML factories even without isolation")
 public class XmlSecureLibrariesVerificationTestCase extends AbstractMuleTestCase {
 
   @Test
