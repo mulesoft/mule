@@ -228,7 +228,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    */
   private ReactiveProcessor dispatchToFlow(Sink sink) {
     if (source.getBackPressureStrategy() == WAIT) {
-      // If back-pressure strategy is WAIT then using blocking `accept(Event event)` to dispatch Event
+      // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
       return publisher -> from(publisher)
           .doOnNext(event -> {
             try {
