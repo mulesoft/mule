@@ -438,5 +438,34 @@
         </xsd:simpleContent>
     </xsd:complexType>
 
+    <xsd:element name="check-stacktrace" substitutionGroup="abstract-log-checker" type="checkStacktraceType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Evaluates the stacktrace to be logged, checking that it goes through defined method calls
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="checkStacktraceType">
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref="method-call"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="method-call" type="methodCallType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element with information about stacktraces method calls
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="methodCallType">
+        <xsd:attribute name="package" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="method" type="xsd:string" use="required"/>
+        <xsd:attribute name="lineNumber" type="xsd:int" use="optional"/>
+    </xsd:complexType>
+
 
 </xsd:schema>

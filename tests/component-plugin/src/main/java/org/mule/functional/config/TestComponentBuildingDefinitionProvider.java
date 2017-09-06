@@ -29,6 +29,7 @@ import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
+import org.mule.functional.api.component.StacktraceLogChecker;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
@@ -182,6 +183,11 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class)).withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-stacktrace").withTypeDefinition(fromType(StacktraceLogChecker.class)).withSetterParameterDefinition("expectedCalls", fromChildCollectionConfiguration(StacktraceLogChecker.MethodCall.class).build()).build());
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("method-call").withTypeDefinition(fromType(StacktraceLogChecker.MethodCall.class)).withSetterParameterDefinition("packageName", fromSimpleParameter("package").build()).withSetterParameterDefinition("clazz",fromSimpleParameter("class").build())
+                                             .withSetterParameterDefinition("method",fromSimpleParameter("method").build()).withSetterParameterDefinition("lineNumber",fromSimpleParameter("lineNumber").build()).build());
 
     return componentBuildingDefinitions;
   }

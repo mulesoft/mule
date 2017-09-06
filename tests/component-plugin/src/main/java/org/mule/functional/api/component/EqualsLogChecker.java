@@ -17,12 +17,9 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
   @Override
   public void check(String logMessage) {
-    if(shouldFilterLogMessage) {
-      logMessage = filterLogMessage(logMessage);
-    }
     StringBuilder errors = new StringBuilder();
-    String[] expectedLines = splitLines(expectedLogMessage);
-    String[] actualLines = splitLines(logMessage);
+    String[] expectedLines = splitLines(extractMessageFromLog(expectedLogMessage));
+    String[] actualLines = splitLines(extractMessageFromLog(logMessage));
 
     checkLineCount(expectedLines, actualLines, errors);
 
@@ -65,19 +62,16 @@ public class EqualsLogChecker extends AbstractLogChecker {
     }
   }
 
-  private String[] splitLines(String wholeMessage) {
+  @Override
+  protected String[] splitLines(String wholeMessage) {
     if(shouldFilterLogMessage){
-      return splitLines(wholeMessage, (line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim()));
+      return filterLines(super.splitLines(wholeMessage));
     }
-    return splitLines(wholeMessage,(line) -> true);
+    return super.splitLines(wholeMessage);
   }
 
-  private String[] splitLines(String wholeMessage, Predicate<String> filter) {
-    return Arrays.stream(wholeMessage.split(lineSeparator())).filter(filter).toArray(String[]::new);
-  }
-
-  private String filterLogMessage(String logMessage) {
-    return logMessage;
+  private String[] filterLines(String[] splittedLog) {
+    return Arrays.stream(splittedLog).filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim())).toArray(String[]::new);
   }
 
   public void setExpectedLogMessage(String expectedLogMessage) {
