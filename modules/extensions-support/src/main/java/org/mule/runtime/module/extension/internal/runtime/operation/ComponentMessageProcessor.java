@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
@@ -222,7 +223,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     initialiseIfNeeded(componentExecutor, true, muleContext);
   }
 
-  protected abstract ReturnDelegate createReturnDelegate();
+  protected ReturnDelegate createReturnDelegate() {
+    if (isVoid(componentModel)) {
+      return VoidReturnDelegate.INSTANCE;
+    }
+
+    return !isTargetPresent()
+        ? getValueReturnDelegate()
+        : getTargetReturnDelegate();
+  }
+
 
   protected TargetReturnDelegate getTargetReturnDelegate() {
     return new TargetReturnDelegate(target, targetValue, componentModel, cursorProviderFactory, muleContext);

@@ -63,17 +63,6 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  protected ReturnDelegate createReturnDelegate() {
-    if (isVoid(componentModel)) {
-      return VoidReturnDelegate.INSTANCE;
-    }
-
-    return !isTargetPresent()
-        ? getValueReturnDelegate()
-        : getTargetReturnDelegate();
-  }
-
-  @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),

@@ -41,11 +41,6 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
   }
 
   @Override
-  protected ReturnDelegate createReturnDelegate() {
-    return !isTargetPresent() ? getValueReturnDelegate() : getTargetReturnDelegate();
-  }
-
-  @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     // Constructs are config-less
   }
