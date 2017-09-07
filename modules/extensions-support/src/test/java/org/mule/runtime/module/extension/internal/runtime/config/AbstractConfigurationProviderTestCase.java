@@ -15,7 +15,7 @@ import static org.mule.tck.MuleTestUtils.spyInjector;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -44,7 +44,7 @@ public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractM
   protected DefaultExecutionContext operationContext;
 
   @Mock
-  protected InternalEvent event;
+  protected BaseEvent event;
 
   protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
   protected LifecycleAwareConfigurationProvider provider;

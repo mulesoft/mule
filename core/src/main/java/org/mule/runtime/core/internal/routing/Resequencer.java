@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Router;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
@@ -56,13 +56,13 @@ public class Resequencer extends AbstractAggregator implements Router {
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
-    InternalEvent result = eventCorrelator.process(event);
+  public BaseEvent process(BaseEvent event) throws MuleException {
+    BaseEvent result = eventCorrelator.process(event);
     if (!isEventValid(result)) {
       return result;
     }
-    InternalEvent last = null;
-    for (InternalEvent muleEvent : (InternalEvent[]) result.getMessage().getPayload().getValue()) {
+    BaseEvent last = null;
+    for (BaseEvent muleEvent : (BaseEvent[]) result.getMessage().getPayload().getValue()) {
       last = processNext(muleEvent);
     }
     // Respect existing behaviour by returning last event

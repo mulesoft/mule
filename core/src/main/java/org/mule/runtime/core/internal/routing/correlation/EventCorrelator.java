@@ -31,11 +31,11 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -132,7 +132,7 @@ public class EventCorrelator implements Startable, Stoppable {
     }
   }
 
-  public InternalEvent process(InternalEvent event) throws RoutingException {
+  public BaseEvent process(BaseEvent event) throws RoutingException {
     // the correlationId of the event's message
     final String groupId = event.getCorrelationId();
 
@@ -200,7 +200,7 @@ public class EventCorrelator implements Startable, Stoppable {
         // check to see if the event group is ready to be aggregated
         if (callback.shouldAggregateEvents(group)) {
           // create the response event
-          InternalEvent returnEvent = null;
+          BaseEvent returnEvent = null;
           try {
             returnEvent = callback.aggregateEvents(group);
           } catch (RoutingException routingException) {
@@ -301,7 +301,7 @@ public class EventCorrelator implements Startable, Stoppable {
     }
 
     if (isFailOnTimeout()) {
-      InternalEvent messageCollectionEvent = group.getMessageCollectionEvent();
+      BaseEvent messageCollectionEvent = group.getMessageCollectionEvent();
       notificationFirer.dispatch(new RoutingNotification(messageCollectionEvent.getMessage(), null, CORRELATION_TIMEOUT));
       try {
         group.clear();
@@ -321,7 +321,7 @@ public class EventCorrelator implements Startable, Stoppable {
 
       try {
         if (!(group.getCreated() + DAYS.toMillis(1) < currentTimeMillis())) {
-          InternalEvent newEvent = InternalEvent.builder(callback.aggregateEvents(group)).build();
+          BaseEvent newEvent = BaseEvent.builder(callback.aggregateEvents(group)).build();
           group.clear();
 
           if (!correlatorStore.contains((String) group.getGroupId(), getExpiredAndDispatchedPartitionKey())) {

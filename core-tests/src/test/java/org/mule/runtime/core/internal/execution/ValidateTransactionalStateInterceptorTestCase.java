@@ -7,7 +7,8 @@
 package org.mule.runtime.core.internal.execution;
 
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -54,7 +55,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       new HashMap<Boolean, Map<MuleTransactionConfig, Boolean>>();
   private boolean hasTransactionInContext;
   private TransactionConfig transactionConfig;
-  private InternalEvent mockMuleEvent = Mockito.mock(InternalEvent.class);
+  private BaseEvent mockMuleEvent = Mockito.mock(BaseEvent.class);
   private Transaction mockTransaction = Mockito.mock(Transaction.class);
 
   @Parameterized.Parameters
@@ -105,18 +106,18 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   public void testTransactionalState() throws Exception {
     boolean shouldThrowException = resultMap.get(hasTransactionInContext).get(transactionConfig);
     Exception thrownException = null;
-    InternalEvent result = null;
+    BaseEvent result = null;
     if (hasTransactionInContext) {
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     }
-    ValidateTransactionalStateInterceptor<InternalEvent> interceptor =
-        new ValidateTransactionalStateInterceptor<InternalEvent>(new ExecuteCallbackInterceptor<InternalEvent>(),
-                                                                 transactionConfig);
+    ValidateTransactionalStateInterceptor<BaseEvent> interceptor =
+        new ValidateTransactionalStateInterceptor<BaseEvent>(new ExecuteCallbackInterceptor<BaseEvent>(),
+                                                             transactionConfig);
     try {
-      result = interceptor.execute(new ExecutionCallback<InternalEvent>() {
+      result = interceptor.execute(new ExecutionCallback<BaseEvent>() {
 
         @Override
-        public InternalEvent process() throws Exception {
+        public BaseEvent process() throws Exception {
           return mockMuleEvent;
         }
       }, new ExecutionContext());

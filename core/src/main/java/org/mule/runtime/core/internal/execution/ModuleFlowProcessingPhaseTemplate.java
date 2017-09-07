@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.functional.Either;
@@ -30,21 +30,21 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
   Message getMessage() throws MuleException;
 
   /**
-   * Routes the {@link InternalEvent} through the processors chain
+   * Routes the {@link BaseEvent} through the processors chain
    *
-   * @param event {@link InternalEvent} created from the raw message of this context
-   * @return the response {@link InternalEvent}
+   * @param event {@link BaseEvent} created from the raw message of this context
+   * @return the response {@link BaseEvent}
    * @throws MuleException
    */
-  InternalEvent routeEvent(InternalEvent event) throws MuleException;
+  BaseEvent routeEvent(BaseEvent event) throws MuleException;
 
   /**
-   * Routes the {@link InternalEvent} through the processors chain using async API.
+   * Routes the {@link BaseEvent} through the processors chain using async API.
    *
-   * @param event {@link InternalEvent} created from the raw message of this context
+   * @param event {@link BaseEvent} created from the raw message of this context
    * @return the {@link Publisher} that will ne siganlled on processing completion
    */
-  Publisher<InternalEvent> routeEventAsync(InternalEvent event);
+  Publisher<BaseEvent> routeEventAsync(BaseEvent event);
 
   /**
    * Template method to send a response after processing the message.
@@ -55,7 +55,7 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * @param parameters the resolved set of parameters required to send the response.
    * @return void publisher that will signal the success or failure of sending response to client.
    */
-  Publisher<Void> sendResponseToClient(InternalEvent response, Map<String, Object> parameters);
+  Publisher<Void> sendResponseToClient(BaseEvent response, Map<String, Object> parameters);
 
 
   /**
@@ -74,9 +74,9 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * 
    * @param either that communicates the result of the flow execution.
    *        <ul>
-   *        <li>{@link InternalEvent} if the execution finished correctly</li>
+   *        <li>{@link BaseEvent} if the execution finished correctly</li>
    *        <li>{@link MessagingException} if an error occurred during the execution</li>
    *        </ul>
    */
-  void afterPhaseExecution(Either<MessagingException, InternalEvent> either);
+  void afterPhaseExecution(Either<MessagingException, BaseEvent> either);
 }

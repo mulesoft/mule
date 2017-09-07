@@ -9,14 +9,14 @@ package org.mule;
 import static java.lang.Class.forName;
 import static java.lang.Thread.sleep;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -49,7 +49,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor cpuIntensiveProcessor = new Processor() {
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       // Roughly 5mS on modern CPU.
       consumeCPU(2500000);
       return event;
@@ -64,7 +64,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor blockingProcessor = new Processor() {
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       try {
         sleep(20);
       } catch (InterruptedException e) {
@@ -138,8 +138,8 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public InternalEvent processSourceBlocking() throws MuleException {
-    return source.trigger(InternalEvent.builder(create(flow, CONNECTOR_LOCATION))
+  public BaseEvent processSourceBlocking() throws MuleException {
+    return source.trigger(BaseEvent.builder(create(flow, CONNECTOR_LOCATION))
         .message(of(PAYLOAD)).build());
   }
 
@@ -147,7 +147,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   public CountDownLatch processSourceStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(InternalEvent.builder(create(flow, CONNECTOR_LOCATION))
+      Mono.just(BaseEvent.builder(create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }

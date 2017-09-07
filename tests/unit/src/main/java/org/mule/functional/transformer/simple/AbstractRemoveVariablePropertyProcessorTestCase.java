@@ -21,10 +21,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,7 +50,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   public static final String NULL_EXPRESSION_VALUE = null;
 
   private Message message;
-  private InternalEvent event;
+  private BaseEvent event;
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue<String> typedValue;
@@ -72,7 +72,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     removeVariableProcessor.setMuleContext(mockMuleContext);
   }
 
-  protected InternalEvent createTestEvent(final Message message) throws MuleException {
+  protected BaseEvent createTestEvent(final Message message) throws MuleException {
     return eventBuilder().message(message).build();
   }
 
@@ -121,10 +121,10 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     verifyNotRemoved(event, "SomeVar");
   }
 
-  protected abstract void addMockedPropeerties(InternalEvent event, Set<String> properties);
+  protected abstract void addMockedPropeerties(BaseEvent event, Set<String> properties);
 
-  protected abstract void verifyRemoved(InternalEvent mockEvent, String key);
+  protected abstract void verifyRemoved(BaseEvent mockEvent, String key);
 
-  protected abstract void verifyNotRemoved(InternalEvent mockEvent, String somevar);
+  protected abstract void verifyNotRemoved(BaseEvent mockEvent, String somevar);
 
 }

@@ -45,7 +45,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.param.RefName;
@@ -129,7 +129,7 @@ public class MuleExtensionUtils {
     return false;
   }
 
-  public static Map<String, Object> toMap(ResolverSet resolverSet, InternalEvent event) throws MuleException {
+  public static Map<String, Object> toMap(ResolverSet resolverSet, BaseEvent event) throws MuleException {
     final ValueResolvingContext ctx = from(event);
     ImmutableMap.Builder<String, Object> map = ImmutableMap.builder();
     for (Entry<String, ValueResolver<?>> entry : resolverSet.getResolvers().entrySet()) {

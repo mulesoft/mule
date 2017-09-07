@@ -21,8 +21,8 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -59,7 +59,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   private int maxRetries = DEFAULT_RETRIES;
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
-  private Predicate<InternalEvent> shouldRetry;
+  private Predicate<BaseEvent> shouldRetry;
   private SimpleRetryPolicyTemplate policyTemplate;
   private Scheduler timer;
   private ProcessingStrategy processingStrategy;
@@ -93,12 +93,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
         .flatMap(event -> Mono.from(processWithChildContext(event,
                                                             scheduleRoute(p -> Mono.from(p).transform(nestedChain)),
@@ -111,7 +111,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Router {
     return e -> (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
   }
 
-  private Function<Throwable, Throwable> getThrowableFunction(InternalEvent event) {
+  private Function<Throwable, Throwable> getThrowableFunction(BaseEvent event) {
     return throwable -> {
       Throwable cause = getMessagingExceptionCause(throwable);
       return new MessagingException(event,

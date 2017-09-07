@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Collections.emptyMap;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 
 import java.util.Map;
@@ -24,7 +25,7 @@ import reactor.core.publisher.Mono;
 public class NullSourceCompletionHandler implements SourceCompletionHandler {
 
   @Override
-  public Publisher<Void> onCompletion(InternalEvent event, Map<String, Object> parameters) {
+  public Publisher<Void> onCompletion(BaseEvent event, Map<String, Object> parameters) {
     return Mono.empty();
   }
 
@@ -34,17 +35,17 @@ public class NullSourceCompletionHandler implements SourceCompletionHandler {
   }
 
   @Override
-  public void onTerminate(Either<MessagingException, InternalEvent> eventOrException) {
+  public void onTerminate(Either<MessagingException, BaseEvent> eventOrException) {
     // Nothing to do.
   }
 
   @Override
-  public Map<String, Object> createResponseParameters(InternalEvent event) {
+  public Map<String, Object> createResponseParameters(BaseEvent event) {
     return emptyMap();
   }
 
   @Override
-  public Map<String, Object> createFailureResponseParameters(InternalEvent event) {
+  public Map<String, Object> createFailureResponseParameters(BaseEvent event) {
     return emptyMap();
   }
 }

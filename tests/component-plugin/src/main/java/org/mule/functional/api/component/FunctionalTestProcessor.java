@@ -21,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -30,25 +31,25 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 
 /**
  * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
@@ -93,7 +94,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * Keeps a list of any messages received on this service. Note that only references to the messages (objects) are stored, so any
    * subsequent changes to the objects will change the history.
    */
-  private List<InternalEvent> messageHistory;
+  private List<BaseEvent> messageHistory;
 
 
   @Override
@@ -149,7 +150,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     try {
       if (isThrowException()) {
         throwException();
@@ -191,18 +192,18 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * @param event the current event
    * @return a concatenated string of the current payload and the appendString
    */
-  protected String append(String contents, InternalEvent event) {
+  protected String append(String contents, BaseEvent event) {
     return contents + expressionManager.parse(appendString, event, getLocation());
   }
 
   /**
    * The service method that implements the test component logic.
    *
-   * @param event the current {@link InternalEvent}
+   * @param event the current {@link BaseEvent}
    * @return a new message payload according to the configuration of the component
    * @throws Exception if there is a general failure or if {@link #isThrowException()} is true.
    */
-  protected InternalEvent doProcess(InternalEvent event) throws Exception {
+  protected BaseEvent doProcess(BaseEvent event) throws Exception {
     if (enableMessageHistory) {
       messageHistory.add(event);
     }
@@ -243,10 +244,11 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
       }
     } else {
       if (appendString != null) {
-        replyBuilder = replyBuilder.value(append(event.getMessageAsString(muleContext), event));
+        replyBuilder = replyBuilder.value(append(muleContext.getTransformationService()
+            .transform(event.getMessage(), DataType.STRING).getPayload().getValue().toString(), event));
       }
     }
-    InternalEvent replyMessage = InternalEvent.builder(event).message(replyBuilder.build()).build();
+    BaseEvent replyMessage = BaseEvent.builder(event).message(replyBuilder.build()).build();
 
     if (isEnableNotifications()) {
       notificationFirer
@@ -351,7 +353,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
 
   /**
    * If enableMessageHistory = true, returns the number of messages received by this service.
-   * 
+   *
    * @return -1 if no message history, otherwise the history size
    */
   public int getReceivedMessagesCount() {
@@ -367,8 +369,8 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
    * getReceivedMessage(1) returns the first message received by the service, getReceivedMessage(2) returns the second message
    * received by the service, etc.
    */
-  public InternalEvent getReceivedMessage(int number) {
-    InternalEvent message = null;
+  public BaseEvent getReceivedMessage(int number) {
+    BaseEvent message = null;
     if (messageHistory != null) {
       if (number <= messageHistory.size()) {
         message = messageHistory.get(number - 1);
@@ -380,7 +382,7 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   /**
    * If enableMessageHistory = true, returns the last message received by the service in chronological order.
    */
-  public InternalEvent getLastReceivedMessage() {
+  public BaseEvent getLastReceivedMessage() {
     if (messageHistory != null) {
       return messageHistory.get(messageHistory.size() - 1);
     } else {

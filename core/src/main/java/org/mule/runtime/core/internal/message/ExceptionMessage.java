@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.message;
 
-import org.mule.runtime.core.api.InternalEvent;
-
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -16,6 +14,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class ExceptionMessage implements Serializable {
   private String connectorName;
   private Date timeStamp;
 
-  public ExceptionMessage(InternalEvent event, Throwable exception, String componentName, String connectorName) {
+  public ExceptionMessage(BaseEvent event, Throwable exception, String componentName, String connectorName) {
     this.payload = event.getMessage().getPayload().getValue();
     properties = new HashMap<>();
     this.exception = exception;

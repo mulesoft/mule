@@ -7,8 +7,9 @@
 package org.mule.runtime.core.internal.routing.correlation;
 
 import static org.mule.runtime.api.message.Message.of;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
@@ -24,9 +25,9 @@ import java.util.Comparator;
  */
 public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
 
-  protected Comparator<InternalEvent> eventComparator;
+  protected Comparator<BaseEvent> eventComparator;
 
-  public ResequenceCorrelatorCallback(Comparator<InternalEvent> eventComparator, MuleContext muleContext, String storePrefix) {
+  public ResequenceCorrelatorCallback(Comparator<BaseEvent> eventComparator, MuleContext muleContext, String storePrefix) {
     super(muleContext, storePrefix);
     this.eventComparator = eventComparator;
   }
@@ -41,8 +42,8 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
    *         exception handler for this componenet
    */
   @Override
-  public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
-    InternalEvent results[];
+  public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
+    BaseEvent results[];
 
     try {
       results = events.toArray(false);
@@ -53,7 +54,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
     Arrays.sort(results, eventComparator);
     // This is a bit of a hack since we wrap the the collection of events in a
     // Mule Message to pass back
-    return InternalEvent.builder(results[0]).message(of(results)).build();
+    return BaseEvent.builder(results[0]).message(of(results)).build();
   }
 
 }

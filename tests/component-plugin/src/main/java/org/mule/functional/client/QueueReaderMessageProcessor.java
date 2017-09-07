@@ -11,13 +11,13 @@ import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 
 /**
- * Reads {@link InternalEvent} from a test connector's queue.
+ * Reads {@link BaseEvent} from a test connector's queue.
  */
 public class QueueReaderMessageProcessor implements Processor {
 
@@ -45,7 +45,7 @@ public class QueueReaderMessageProcessor implements Processor {
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
 
     if (timeout == null) {

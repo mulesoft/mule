@@ -9,21 +9,23 @@ package org.mule.runtime.core.internal.routing.requestreply;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.routing.requestreply.AbstractReplyToPropertyRequestReplyReplier;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester implements Startable, Stoppable {
@@ -31,8 +33,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected Processor requestMessageProcessor;
 
   @Override
-  protected void sendAsyncRequest(InternalEvent event) throws MuleException {
-    event = InternalEvent.builder(event)
+  protected void sendAsyncRequest(BaseEvent event) throws MuleException {
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
             .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getRootContainerName())
             .build())
@@ -113,13 +115,13 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     }
 
     @Override
-    protected boolean shouldProcessEvent(InternalEvent event) {
+    protected boolean shouldProcessEvent(BaseEvent event) {
       // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
       MessageExchangePattern mep = REQUEST_RESPONSE;
       if (source instanceof LegacyImmutableEndpoint) {
         mep = ((LegacyImmutableEndpoint) source).getExchangePattern();
       }
-      return !mep.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
+      return !mep.hasResponse() && ((PrivilegedEvent) event).getReplyToHandler() instanceof DefaultReplyToHandler;
     }
 
   }

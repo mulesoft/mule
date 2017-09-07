@@ -9,23 +9,24 @@ package org.mule.runtime.core.privileged.routing.requestreply;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 
 public abstract class AbstractReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
     implements RequestReplyReplierMessageProcessor, InternalProcessor {
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
-    InternalEvent resultEvent;
+  public BaseEvent process(BaseEvent event) throws MuleException {
+    BaseEvent resultEvent;
     if (shouldProcessEvent(event)) {
-      Object replyTo = event.getReplyToDestination();
-      ReplyToHandler replyToHandler = event.getReplyToHandler();
+      Object replyTo = ((PrivilegedEvent) event).getReplyToDestination();
+      ReplyToHandler replyToHandler = ((PrivilegedEvent) event).getReplyToHandler();
 
       resultEvent = processNext(event);
 
@@ -40,9 +41,9 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
     return resultEvent;
   }
 
-  protected abstract boolean shouldProcessEvent(InternalEvent event);
+  protected abstract boolean shouldProcessEvent(BaseEvent event);
 
-  protected InternalEvent processReplyTo(InternalEvent event, InternalEvent result, ReplyToHandler replyToHandler, Object replyTo)
+  protected BaseEvent processReplyTo(BaseEvent event, BaseEvent result, ReplyToHandler replyToHandler, Object replyTo)
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = ((InternalMessage) result.getMessage()).getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);

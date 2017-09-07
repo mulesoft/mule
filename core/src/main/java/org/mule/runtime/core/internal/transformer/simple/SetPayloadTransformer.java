@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
@@ -35,7 +35,7 @@ public class SetPayloadTransformer extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
+  public Object transformMessage(BaseEvent event, Charset outputEncoding) throws MessageTransformerException {
     if (valueEvaluator.getRawValue() == null) {
       return null;
     }

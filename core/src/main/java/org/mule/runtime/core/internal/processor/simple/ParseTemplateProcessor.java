@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
@@ -58,20 +58,20 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) {
+  public BaseEvent process(BaseEvent event) {
     evaluateCorrectArguments();
     Object result = muleContext.getExpressionManager().parse(content, event, null);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
-      return InternalEvent.builder(event).message(resultMessage).build();
+      return BaseEvent.builder(event).message(resultMessage).build();
     } else {
       if (targetValue == null) { //Return the whole message
-        return InternalEvent.builder(event).addVariable(target, resultMessage).build();
+        return BaseEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
-        return InternalEvent.builder(event).addVariable(target,
-                                                        muleContext.getExpressionManager()
-                                                            .evaluate(targetValue, InternalEvent.builder(event)
-                                                                .message(resultMessage).build()))
+        return BaseEvent.builder(event).addVariable(target,
+                                                    muleContext.getExpressionManager()
+                                                        .evaluate(targetValue, BaseEvent.builder(event)
+                                                            .message(resultMessage).build()))
             .build();
       }
 

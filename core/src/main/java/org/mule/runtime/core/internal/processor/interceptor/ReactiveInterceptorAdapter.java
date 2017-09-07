@@ -16,6 +16,7 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,16 +26,21 @@ import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.internal.message.ReallyInternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,9 +51,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -128,10 +131,10 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     }
   }
 
-  private Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
-                                                          Map<String, String> dslParameters) {
+  private Function<BaseEvent, BaseEvent> doBefore(ProcessorInterceptor interceptor, Processor component,
+                                                  Map<String, String> dslParameters) {
     return event -> {
-      final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
+      final BaseEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
       if (LOGGER.isDebugEnabled()) {
@@ -149,10 +152,10 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     };
   }
 
-  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
-                                                    Processor component, Map<String, String> dslParameters,
-                                                    ReactiveProcessor next) {
-    final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
+  private CompletableFuture<BaseEvent> doAround(BaseEvent event, ProcessorInterceptor interceptor,
+                                                Processor component, Map<String, String> dslParameters,
+                                                ReactiveProcessor next) {
+    final BaseEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
@@ -182,15 +185,15 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     }
   }
 
-  private Map<String, ProcessorParameterValue> getResolvedParams(final InternalEvent eventWithResolvedParams) {
-    return (Map<String, ProcessorParameterValue>) eventWithResolvedParams.getInternalParameters()
+  private Map<String, ProcessorParameterValue> getResolvedParams(final BaseEvent eventWithResolvedParams) {
+    return (Map<String, ProcessorParameterValue>) ((ReallyInternalEvent) eventWithResolvedParams).getInternalParameters()
         .get(INTERCEPTION_RESOLVED_PARAMS);
   }
 
-  private Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Processor component,
-                                                         Optional<Throwable> thrown) {
+  private Function<BaseEvent, BaseEvent> doAfter(ProcessorInterceptor interceptor, Processor component,
+                                                 Optional<Throwable> thrown) {
     return event -> {
-      final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
+      final BaseEvent eventWithResolvedParams = removeResolvedParameters(event);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
       if (LOGGER.isDebugEnabled()) {
@@ -211,21 +214,21 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return ((Component) component).getLocation() != null;
   }
 
-  private InternalEvent addResolvedParameters(InternalEvent event, Processor component, Map<String, String> dslParameters) {
-    boolean sameComponent = event.getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
-        ? component.equals(event.getInternalParameters().get(INTERCEPTION_COMPONENT))
+  private BaseEvent addResolvedParameters(BaseEvent event, Processor component, Map<String, String> dslParameters) {
+    boolean sameComponent = ((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
+        ? component.equals(((ReallyInternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT))
         : false;
 
-    if (!sameComponent || !event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
+    if (!sameComponent || !((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
       return resolveParameters(removeResolvedParameters(event), component, dslParameters);
     } else {
       return event;
     }
   }
 
-  private InternalEvent removeResolvedParameters(InternalEvent event) {
-    if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-      Processor processor = (Processor) event.getInternalParameters().get(INTERCEPTION_COMPONENT);
+  private BaseEvent removeResolvedParameters(BaseEvent event) {
+    if (((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      Processor processor = (Processor) ((ReallyInternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT);
 
       if (processor instanceof ParametersResolverProcessor) {
         if (LOGGER.isDebugEnabled()) {
@@ -234,19 +237,19 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         }
 
         ((ParametersResolverProcessor) processor)
-            .disposeResolvedParameters((ExecutionContext) event.getInternalParameters()
+            .disposeResolvedParameters((ExecutionContext) ((ReallyInternalEvent) event).getInternalParameters()
                 .get(INTERCEPTION_RESOLVED_CONTEXT));
       }
     }
 
-    return InternalEvent.builder(event)
+    return BaseEvent.builder(event)
         .removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS)
         .removeInternalParameter(INTERCEPTION_COMPONENT)
         .removeInternalParameter(INTERCEPTION_RESOLVED_CONTEXT)
         .build();
   }
 
-  private InternalEvent resolveParameters(InternalEvent event, Processor processor, Map<String, String> parameters) {
+  private BaseEvent resolveParameters(BaseEvent event, Processor processor, Map<String, String> parameters) {
     Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       String providedValue = entry.getValue();
@@ -263,7 +266,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       }));
     }
 
-    InternalEvent.Builder builder = InternalEvent.builder(event);
+    BaseEvent.Builder builder = BaseEvent.builder(event);
 
     if (processor instanceof ParametersResolverProcessor) {
       try {
@@ -290,7 +293,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return builder.build();
   }
 
-  private MessagingException createMessagingException(InternalEvent event, Throwable cause, Component processor) {
+  private MessagingException createMessagingException(BaseEvent event, Throwable cause, Component processor) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
 

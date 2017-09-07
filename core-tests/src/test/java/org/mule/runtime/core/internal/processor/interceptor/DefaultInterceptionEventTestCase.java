@@ -13,9 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -24,37 +25,37 @@ public class DefaultInterceptionEventTestCase extends AbstractMuleTestCase {
 
   @Test
   public void addSession() throws MuleException {
-    final InternalEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
+    final BaseEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = mock(MuleSession.class);
     interceptionEvent.session(session);
 
-    assertThat(interceptionEvent.resolve().getSession(), sameInstance(session));
+    assertThat(((PrivilegedEvent) interceptionEvent.resolve()).getSession(), sameInstance(session));
   }
 
   @Test
   public void changeSession() throws MuleException {
-    final InternalEvent event =
+    final BaseEvent event =
         getEventBuilder().message(of(TEST_PAYLOAD)).session(mock(MuleSession.class)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = mock(MuleSession.class);
     interceptionEvent.session(session);
 
-    assertThat(interceptionEvent.resolve().getSession(), sameInstance(session));
+    assertThat(((PrivilegedEvent) interceptionEvent.resolve()).getSession(), sameInstance(session));
   }
 
   @Test
   public void updateSession() throws MuleException {
-    final InternalEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
+    final BaseEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
-    final MuleSession session = event.getSession();
+    final MuleSession session = ((PrivilegedEvent) event).getSession();
     session.setProperty("myKey", "myValue");
 
     interceptionEvent.session(session);
 
-    assertThat(interceptionEvent.resolve().getSession().getProperty("myKey"), is("myValue"));
+    assertThat(((PrivilegedEvent) interceptionEvent.resolve()).getSession().getProperty("myKey"), is("myValue"));
   }
 }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
@@ -31,7 +31,7 @@ public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObje
   }
 
   @Override
-  public boolean accept(InternalEvent event) {
+  public boolean accept(BaseEvent event) {
     if (delegate instanceof MessagingExceptionHandlerAcceptor) {
       return ((MessagingExceptionHandlerAcceptor) delegate).accept(event);
     }
@@ -47,12 +47,12 @@ public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObje
   }
 
   @Override
-  public InternalEvent handleException(MessagingException exception, InternalEvent event) {
+  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     return delegate.handleException(exception, event);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(MessagingException exception) {
+  public Publisher<BaseEvent> apply(MessagingException exception) {
     return delegate.apply(exception);
   }
 

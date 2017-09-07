@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
@@ -28,7 +28,7 @@ public class EnrichedNotificationInfo {
    * @param component the component (processor, source, etc) that triggered the notification
    * @return
    */
-  public static EnrichedNotificationInfo createInfo(InternalEvent event, Exception e, Component component) {
+  public static EnrichedNotificationInfo createInfo(BaseEvent event, Exception e, Component component) {
     EnrichedNotificationInfo notificationInfo;
 
     if (event != null) {
@@ -62,7 +62,7 @@ public class EnrichedNotificationInfo {
     return null;
   }
 
-  public EnrichedNotificationInfo(InternalEvent event, Component component, Exception exception,
+  public EnrichedNotificationInfo(BaseEvent event, Component component, Exception exception,
                                   FlowCallStack flowCallStack) {
     this.event = event;
     this.component = component;

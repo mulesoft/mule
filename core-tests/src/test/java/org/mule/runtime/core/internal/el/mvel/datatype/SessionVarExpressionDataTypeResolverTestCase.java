@@ -10,7 +10,8 @@ package org.mule.runtime.core.internal.el.mvel.datatype;
 import static org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory.SESSION_VARS;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.io.Serializable;
 
@@ -21,8 +22,8 @@ public class SessionVarExpressionDataTypeResolverTestCase extends AbstractVarExp
   }
 
   @Override
-  protected InternalEvent setVariable(InternalEvent event, Object propertyValue, DataType dataType) {
-    event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
+  protected BaseEvent setVariable(BaseEvent event, Object propertyValue, DataType dataType) {
+    ((PrivilegedEvent) event).getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
     return event;
   }
 }

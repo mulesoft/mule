@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
@@ -25,22 +25,22 @@ import reactor.core.publisher.Mono;
 public class StreamPerEventSink implements Sink {
 
   private ReactiveProcessor processor;
-  private Consumer<InternalEvent> eventConsumer;
+  private Consumer<BaseEvent> eventConsumer;
 
   /**
    * Creates a {@link StreamPerEventSink}.
    *
    * @param processor the processor to process events emitted onto stream, typically this processor will represent the flow
    *        pipeline.
-   * @param eventConsumer event consumer called just before {@link InternalEvent}'s emission.
+   * @param eventConsumer event consumer called just before {@link BaseEvent}'s emission.
    */
-  public StreamPerEventSink(ReactiveProcessor processor, Consumer<InternalEvent> eventConsumer) {
+  public StreamPerEventSink(ReactiveProcessor processor, Consumer<BaseEvent> eventConsumer) {
     this.processor = processor;
     this.eventConsumer = eventConsumer;
   }
 
   @Override
-  public void accept(InternalEvent event) {
+  public void accept(BaseEvent event) {
     just(event)
         .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)
@@ -48,7 +48,7 @@ public class StreamPerEventSink implements Sink {
   }
 
   @Override
-  public boolean emit(InternalEvent event) {
+  public boolean emit(BaseEvent event) {
     accept(event);
     return true;
   }

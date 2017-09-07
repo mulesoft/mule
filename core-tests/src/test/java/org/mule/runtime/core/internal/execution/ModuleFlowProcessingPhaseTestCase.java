@@ -40,9 +40,9 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
@@ -83,7 +83,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private SourcePolicy sourcePolicy;
   private SourcePolicySuccessResult successResult;
   private SourcePolicyFailureResult failureResult;
-  private InternalEvent event;
+  private BaseEvent event;
   private MessagingException messagingException;
   private RuntimeException mockException;
 
@@ -91,7 +91,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private Supplier<Map<String, Object>> failingParameterSupplier = () -> {
     throw mockException;
   };
-  private Function<InternalEvent, Map<String, Object>> failingParameterFunction = event -> {
+  private Function<BaseEvent, Map<String, Object>> failingParameterFunction = event -> {
     throw mockException;
   };
 
@@ -106,7 +106,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     when(muleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
-    event = mock(InternalEvent.class);
+    event = mock(BaseEvent.class);
     mockException = mock(RuntimeException.class);
 
     final PolicyManager policyManager = mock(PolicyManager.class);
@@ -120,7 +120,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      event = invocation.getArgumentAt(0, InternalEvent.class);
+      event = invocation.getArgumentAt(0, BaseEvent.class);
       return just(right(successResult));
     });
 
@@ -333,7 +333,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any());
-    verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(InternalEvent.class))));
+    verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(BaseEvent.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
     verify(template).afterPhaseExecution(any());
@@ -374,7 +374,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      messagingException = buildFailingFlowException(invocation.getArgumentAt(0, InternalEvent.class), failure);
+      messagingException = buildFailingFlowException(invocation.getArgumentAt(0, BaseEvent.class), failure);
       messagingException.setInErrorHandler(inErrorHandler);
       return just(left(failureResult));
     });
@@ -389,8 +389,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
 
-  private MessagingException buildFailingFlowException(final InternalEvent event, final Exception exception) {
-    return new MessagingException(InternalEvent.builder(event)
+  private MessagingException buildFailingFlowException(final BaseEvent event, final Exception exception) {
+    return new MessagingException(BaseEvent.builder(event)
         .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
         .build(), exception);
   }

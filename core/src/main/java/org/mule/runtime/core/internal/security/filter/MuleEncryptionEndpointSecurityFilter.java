@@ -15,7 +15,7 @@ import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CredentialsNotSetException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -41,7 +41,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
   }
 
   @Override
-  protected InternalEvent authenticateInbound(InternalEvent event) throws SecurityException, SecurityProviderNotFoundException,
+  protected SecurityContext authenticateInbound(BaseEvent event) throws SecurityException, SecurityProviderNotFoundException,
       CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) credentialsAccessor.getCredentials(event);
     if (userHeader == null) {
@@ -68,7 +68,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
 
     SecurityContext context = getSecurityManager().createSecurityContext(authentication);
     context.setAuthentication(authentication);
-    return InternalEvent.builder(event).securityContext(context).build();
+    return context;
   }
 
   @Override

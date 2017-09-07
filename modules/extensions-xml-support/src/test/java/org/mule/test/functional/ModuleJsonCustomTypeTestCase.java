@@ -8,8 +8,10 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
+import org.mule.runtime.core.api.event.BaseEvent;
+
 import org.junit.Test;
-import org.mule.runtime.core.api.InternalEvent;
 
 import java.util.Map;
 
@@ -30,13 +32,13 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
     final Map<String, Object> payload = new java.util.HashMap<>();
     payload.put("street_type", "Avenue");
     payload.put("street_name", "calle 7");
-    final InternalEvent muleEvent = flowRunner("testIsJsonType1FromPayloadFlow").withPayload(payload).run();
+    final BaseEvent muleEvent = flowRunner("testIsJsonType1FromPayloadFlow").withPayload(payload).run();
     assertIsJsonType1(muleEvent);
   }
 
   @Test
   public void testSendingJsonType1FromExpression() throws Exception {
-    final InternalEvent muleEvent = flowRunner("testIsJsonType1FromExpressionFlow").run();
+    final BaseEvent muleEvent = flowRunner("testIsJsonType1FromExpressionFlow").run();
     assertIsJsonType1(muleEvent);
   }
 
@@ -46,22 +48,22 @@ public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifa
     payload.put("firstName", "Dardo");
     payload.put("lastName", "Rocha");
     payload.put("age", 83);
-    final InternalEvent muleEvent = flowRunner("testIsJsonType2FromPayloadFlow").withPayload(payload).run();
+    final BaseEvent muleEvent = flowRunner("testIsJsonType2FromPayloadFlow").withPayload(payload).run();
     assertIsJsonType2(muleEvent);
   }
 
   @Test
   public void testSendingJsonType2FromExpression() throws Exception {
-    final InternalEvent muleEvent = flowRunner("testIsJsonType2FromExpressionFlow").run();
+    final BaseEvent muleEvent = flowRunner("testIsJsonType2FromExpressionFlow").run();
     assertIsJsonType2(muleEvent);
   }
 
-  private void assertIsJsonType1(InternalEvent muleEvent) {
+  private void assertIsJsonType1(BaseEvent muleEvent) {
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("{\n  \"street_type\": \"Avenue\",\n  \"street_name\": \"calle 7\"\n}"));
   }
 
-  private void assertIsJsonType2(InternalEvent muleEvent) {
+  private void assertIsJsonType2(BaseEvent muleEvent) {
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("{\n  \"firstName\": \"Dardo\",\n  \"lastName\": \"Rocha\",\n  \"age\": 83\n}"));
   }

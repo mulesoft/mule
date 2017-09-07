@@ -14,7 +14,8 @@ import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.N
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.metadata.extension.LocationKey;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
 
@@ -49,35 +50,35 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
 
   @Test
   public void injectTranslatedNativeQuery() throws Exception {
-    InternalEvent event = flowRunner(QUERY_FLOW).run();
+    BaseEvent event = flowRunner(QUERY_FLOW).run();
     String nativeQuery = (String) event.getMessage().getPayload().getValue();
     assertThat(nativeQuery, is(NATIVE_QUERY));
   }
 
   @Test
   public void injectNonTranslatedNativeQuery() throws Exception {
-    InternalEvent event = flowRunner(NATIVE_QUERY_FLOW).run();
+    BaseEvent event = flowRunner(NATIVE_QUERY_FLOW).run();
     String nativeQuery = (String) event.getMessage().getPayload().getValue();
     assertThat(nativeQuery.trim(), is(NATIVE_QUERY));
   }
 
   @Test
   public void enumMetadataKey() throws Exception {
-    InternalEvent event = flowRunner(ENUM_METADATA_KEY).run();
+    BaseEvent event = flowRunner(ENUM_METADATA_KEY).run();
     AnimalClade key = (AnimalClade) event.getMessage().getPayload().getValue();
     assertThat(key, is(AnimalClade.MAMMAL));
   }
 
   @Test
   public void booleanMetadataKey() throws Exception {
-    InternalEvent event = flowRunner(BOOLEAN_METADATA_KEY).run();
+    BaseEvent event = flowRunner(BOOLEAN_METADATA_KEY).run();
     boolean key = (boolean) event.getMessage().getPayload().getValue();
     assertThat(key, is(true));
   }
 
   @Test
   public void metadataKeyDefaultValue() throws Exception {
-    InternalEvent event = flowRunner(METADATA_KEY_DEFAULT_VALUE).run();
+    BaseEvent event = flowRunner(METADATA_KEY_DEFAULT_VALUE).run();
     assertThat(event.getMessage().getPayload().getValue(), is(CAR));
   }
 }

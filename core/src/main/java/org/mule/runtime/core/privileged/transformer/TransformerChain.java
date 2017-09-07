@@ -10,8 +10,8 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -54,7 +54,7 @@ public class TransformerChain extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(InternalEvent event, Charset outputEncoding) throws MessageTransformerException {
+  public Object transformMessage(BaseEvent event, Charset outputEncoding) throws MessageTransformerException {
     Message result = event.getMessage();
     Object temp = event.getMessage();
     Transformer lastTransformer = null;
@@ -69,7 +69,7 @@ public class TransformerChain extends AbstractMessageTransformer {
         result = (Message) temp;
       } else {
         result = Message.builder(event.getMessage()).value(temp).build();
-        event = InternalEvent.builder(event).message(result).build();
+        event = BaseEvent.builder(event).message(result).build();
       }
     }
     if (lastTransformer != null && Message.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {

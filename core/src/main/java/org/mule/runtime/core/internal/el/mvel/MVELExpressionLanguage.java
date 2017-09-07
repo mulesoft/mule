@@ -35,10 +35,10 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
@@ -130,7 +130,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
     return (T) evaluateInternal(expression, context);
   }
 
-  public <T> T evaluateUntyped(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public <T> T evaluateUntyped(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                                ComponentLocation componentLocation,
                                Map<String, Object> vars) {
     if (event == null) {
@@ -153,7 +153,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                      ComponentLocation componentLocation,
                      Object object) {
     expression = removeExpressionMarker(expression);
@@ -162,7 +162,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                      ComponentLocation componentLocation,
                      TypedValue typedValue) {
     expression = removeExpressionMarker(expression);
@@ -177,7 +177,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, ComponentLocation componentLocation,
+  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, componentLocation, bindingContext);
@@ -186,7 +186,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     TypedValue evaluate = evaluate(expression, event, bindingContext);
     return MVELSplitDataIterator.createFrom(evaluate.getValue());
@@ -199,18 +199,18 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, BindingContext context) {
-    return evaluate(expression, event, InternalEvent.builder(event), null, context);
+  public TypedValue evaluate(String expression, BaseEvent event, BindingContext context) {
+    return evaluate(expression, event, BaseEvent.builder(event), null, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event, BindingContext context)
+  public TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event, BindingContext context)
       throws ExpressionRuntimeException {
     return evaluate(expression, expectedOutputType, event, null, context, false);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, InternalEvent event,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event,
                              ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
@@ -218,13 +218,13 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation,
                              BindingContext bindingContext) {
-    return evaluate(expression, event, InternalEvent.builder(event), componentLocation, bindingContext);
+    return evaluate(expression, event, BaseEvent.builder(event), componentLocation, bindingContext);
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                              ComponentLocation componentLocation,
                              BindingContext bindingContext) {
     expression = removeExpressionMarker(expression);
@@ -346,8 +346,8 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
     this.globalFunctionsFile = globalFunctionsFile;
   }
 
-  protected VariableResolverFactory createVariableVariableResolverFactory(InternalEvent event,
-                                                                          InternalEvent.Builder eventBuilder) {
+  protected VariableResolverFactory createVariableVariableResolverFactory(BaseEvent event,
+                                                                          BaseEvent.Builder eventBuilder) {
     if (autoResolveVariables) {
       return new VariableVariableResolverFactory(parserConfiguration, muleContext, event, eventBuilder);
     } else {

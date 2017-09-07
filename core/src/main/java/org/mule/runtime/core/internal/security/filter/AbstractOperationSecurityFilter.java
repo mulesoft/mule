@@ -10,10 +10,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.api.security.SecurityContext;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the
@@ -23,21 +24,21 @@ import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
 public abstract class AbstractOperationSecurityFilter extends AbstractAuthenticationFilter {
 
   @Override
-  public InternalEvent doFilter(InternalEvent event)
+  public SecurityContext doFilter(BaseEvent event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     return super.doFilter(event);
   }
 
   @Override
-  public InternalEvent authenticate(InternalEvent event)
+  public SecurityContext authenticate(BaseEvent event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     // TODO - See MULE-9307 - define proper way to identify if the component should do inbound or outbound authentication
     return authenticateInbound(event);
   }
 
-  protected abstract InternalEvent authenticateInbound(InternalEvent event) throws SecurityException, CryptoFailureException,
+  protected abstract SecurityContext authenticateInbound(BaseEvent event) throws SecurityException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
 }

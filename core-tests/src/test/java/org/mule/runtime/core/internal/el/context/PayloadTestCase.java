@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.internal.el.context;
 
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,22 +28,19 @@ import org.mockito.ArgumentCaptor;
 
 public class PayloadTestCase extends AbstractELTestCase {
 
-  private InternalEvent event;
+  private BaseEvent event;
   private Message message;
-  private InternalEvent.Builder eventBuilder;
+  private BaseEvent.Builder eventBuilder;
 
   public PayloadTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
   }
 
   @Before
-  public void setup() {
-    event = mock(InternalEvent.class);
-    eventBuilder = mock(InternalEvent.Builder.class);
-    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-    when(event.getError()).thenReturn(empty());
+  public void setup() throws MuleException {
     message = mock(InternalMessage.class);
-    when(event.getMessage()).thenAnswer(invocation -> message);
+    event = getEventBuilder().message(message).build();
+    eventBuilder = spy(BaseEvent.builder(event));
   }
 
   @Test
@@ -55,7 +53,7 @@ public class PayloadTestCase extends AbstractELTestCase {
   @Test
   public void assignPayload() throws Exception {
     message = of("");
-    when(event.getMessage()).thenReturn(message);
+    event = getEventBuilder().message(message).build();
     evaluate("payload = 'foo'", event, eventBuilder);
     ArgumentCaptor<InternalMessage> argument = ArgumentCaptor.forClass(InternalMessage.class);
     verify(eventBuilder).message(argument.capture());

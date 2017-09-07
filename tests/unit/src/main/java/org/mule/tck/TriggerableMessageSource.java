@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Flux.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -30,11 +30,11 @@ public class TriggerableMessageSource extends AbstractComponent implements Messa
     this.backPressureStrategy = backPressureStrategy;
   }
 
-  public InternalEvent trigger(InternalEvent event) throws MuleException {
+  public BaseEvent trigger(BaseEvent event) throws MuleException {
     return listener.process(event);
   }
 
-  public Publisher<InternalEvent> triggerAsync(InternalEvent event) {
+  public Publisher<BaseEvent> triggerAsync(BaseEvent event) {
     return just(event).transform(listener);
   }
 

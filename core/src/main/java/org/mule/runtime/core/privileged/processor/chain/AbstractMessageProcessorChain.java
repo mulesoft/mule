@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.replace;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.createFrom;
@@ -19,18 +18,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -41,6 +43,10 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,9 +57,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -80,14 +83,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = resolveInterceptors();
-    Flux<InternalEvent> stream = from(publisher);
+    Flux<BaseEvent> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
@@ -129,7 +132,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .add((processor, next) -> processingStrategy.onProcessor(new ReactiveProcessor() {
 
             @Override
-            public Publisher<InternalEvent> apply(Publisher<InternalEvent> eventPublisher) {
+            public Publisher<BaseEvent> apply(Publisher<BaseEvent> eventPublisher) {
               return next.apply(eventPublisher);
             }
 
@@ -166,19 +169,19 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
         .onErrorResume(RejectedExecutionException.class,
-                       throwable -> Mono.from(event.getContext()
+                       throwable -> Mono.from(((BaseEventContext) event.getContext())
                            .error(resolveException((Component) processor, event, throwable)))
                            .then(Mono.empty()))
         .onErrorResume(MessagingException.class,
                        throwable -> {
                          throwable = resolveMessagingException(processor).apply(throwable);
-                         return Mono.from(event.getContext().error(throwable)).then(Mono.empty());
+                         return Mono.from(((BaseEventContext) event.getContext()).error(throwable)).then(Mono.empty());
                        })));
 
     return interceptors;
   }
 
-  private MessagingException resolveException(Component processor, InternalEvent event, Throwable throwable) {
+  private MessagingException resolveException(Component processor, BaseEvent event, Throwable throwable) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
@@ -192,18 +195,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<InternalEvent> preNotification(Processor processor) {
+  private Consumer<BaseEvent> preNotification(Processor processor) {
     return event -> {
-      if (event.isNotificationsEnabled()) {
+      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
   }
 
-  private Consumer<InternalEvent> postNotification(Processor processor) {
+  private Consumer<BaseEvent> postNotification(Processor processor) {
     return event -> {
-      if (event.isNotificationsEnabled()) {
+      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_POST_INVOKE);
 
@@ -213,14 +216,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private Consumer<MessagingException> errorNotification(Processor processor) {
     return exception -> {
-      if (exception.getEvent().isNotificationsEnabled()) {
+      if (((PrivilegedEvent) exception.getEvent()).isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), exception.getEvent(), processor, exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, InternalEvent event, Processor processor,
+  private void fireNotification(ServerNotificationManager serverNotificationManager, BaseEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {

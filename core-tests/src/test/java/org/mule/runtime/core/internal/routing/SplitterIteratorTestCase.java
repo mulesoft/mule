@@ -18,10 +18,10 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class SplitterIteratorTestCase extends AbstractMuleTestCase {
 
-  private InternalEvent muleEvent;
+  private BaseEvent muleEvent;
   private MuleContext muleContext = mock(MuleContext.class);
   private ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
   private final List<TypedValue<?>> integers = createListOfIntegers();
@@ -47,7 +47,7 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
     splitter.setMuleContext(muleContext);
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
     when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
-    when(expressionManager.split(any(String.class), any(InternalEvent.class), any(BindingContext.class)))
+    when(expressionManager.split(any(String.class), any(BaseEvent.class), any(BindingContext.class)))
         .thenReturn(integers.iterator());
     muleEvent = testEvent();
     splitter.initialise();
@@ -55,7 +55,7 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testExpressionSplitterWithIteratorInput() throws Exception {
-    InternalEvent result = splitter.process(muleEvent);
+    BaseEvent result = splitter.process(muleEvent);
     List<?> values = (List<?>) result.getMessage().getPayload().getValue();
     assertThat(values.size(), is(integers.size()));
     assertListValues(values);

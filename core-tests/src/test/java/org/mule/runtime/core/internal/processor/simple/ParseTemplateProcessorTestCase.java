@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,7 +29,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Optional;
 
 @SmallTest
 public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
@@ -39,35 +37,31 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   private static final String INVALID_LOCATION = "wrong_error.html";
 
   private ParseTemplateProcessor parseTemplateProcessor;
-  private InternalEvent mockMuleEvent = mock(InternalEvent.class);
+  private BaseEvent event;
   private InternalMessage mockMuleMessage = mock(InternalMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
 
   @Before
-  public void setUp() {
+  public void setUp() throws MuleException {
+    event = getEventBuilder().message(mockMuleMessage).build();
+
     parseTemplateProcessor = new ParseTemplateProcessor();
     parseTemplateProcessor.setMuleContext(mockMuleContext);
-    FlowCallStack flowCallStack = mock(FlowCallStack.class);
-    Optional<Error> error = empty();
-    when(flowCallStack.clone()).thenReturn(null);
-    when(mockMuleEvent.getError()).thenReturn(error);
-    when(mockMuleEvent.getFlowCallStack()).thenReturn(flowCallStack);
-    when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testParseTemplateNullTemplate() throws InitialisationException {
     parseTemplateProcessor.setLocation(LOCATION);
-    parseTemplateProcessor.process(mockMuleEvent);
+    parseTemplateProcessor.process(event);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testParseTemplateNullLocation() throws InitialisationException {
     parseTemplateProcessor.setLocation(null);
     parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(mockMuleEvent);
+    parseTemplateProcessor.process(event);
   }
 
   @Test(expected = InitialisationException.class)
@@ -75,7 +69,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setLocation(INVALID_LOCATION);
     addMockComponentLocation(parseTemplateProcessor);
     parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(mockMuleEvent);
+    parseTemplateProcessor.process(event);
   }
 
   @Test(expected = InitialisationException.class)
@@ -89,7 +83,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalArgumentException.class)
   public void testParseTemplateNullContent() throws InitialisationException {
     parseTemplateProcessor.initialise();
-    parseTemplateProcessor.process(mockMuleEvent);
+    parseTemplateProcessor.process(event);
   }
 
   @Test
@@ -101,14 +95,14 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of("Parsed"));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(expectedExpression, mockMuleEvent, null)).thenReturn("Parsed");
+    when(mockExpressionManager.parse(expectedExpression, event, null)).thenReturn("Parsed");
 
-    InternalEvent response = parseTemplateProcessor.process(mockMuleEvent);
+    BaseEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals("Parsed", response.getMessage().getPayload().getValue());
 
     // Call a second time to make sure the template is stored once the transformer has been initialized
-    response = parseTemplateProcessor.process(mockMuleEvent);
+    response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals("Parsed", response.getMessage().getPayload().getValue());
   }
@@ -121,16 +115,16 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
     when(mockMuleMessage.getPayload()).thenReturn(TypedValue.of(template));
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
-    when(mockExpressionManager.parse(template, mockMuleEvent, null)).thenReturn(template);
+    when(mockExpressionManager.parse(template, event, null)).thenReturn(template);
 
-    InternalEvent response = parseTemplateProcessor.process(mockMuleEvent);
+    BaseEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
-    assertEquals(template, (String) response.getMessage().getPayload().getValue());
+    assertEquals(template, response.getMessage().getPayload().getValue());
 
     // Call a second time to make sure the template is stored once the transformer has been initialized
-    response = parseTemplateProcessor.process(mockMuleEvent);
+    response = parseTemplateProcessor.process(event);
     assertNotNull(response);
-    assertEquals(template, (String) response.getMessage().getPayload().getValue());
+    assertEquals(template, response.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -145,7 +139,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
     when(mockExpressionManager.parse(any(), any(), any())).thenReturn("Parsed");
 
-    InternalEvent response = parseTemplateProcessor.process(mockMuleEvent);
+    BaseEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals(payload, response.getMessage().getPayload().getValue());
     assertEquals("Parsed",

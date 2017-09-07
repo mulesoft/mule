@@ -26,8 +26,8 @@ import static org.mule.runtime.api.metadata.DataType.fromObject;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,7 +39,7 @@ import org.junit.Test;
 public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
 
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
-  private InternalEvent event = mock(InternalEvent.class);
+  private BaseEvent event = mock(BaseEvent.class);
 
   @Test
   public void plainTextValue() {
@@ -48,37 +48,37 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager, never()).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager, never()).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
   public void expressionValue() {
     String attributeValue = "#[mel:eval:express]";
-    when(mockExpressionManager.evaluate(eq(attributeValue), any(InternalEvent.class))).thenReturn(new TypedValue(null, OBJECT));
+    when(mockExpressionManager.evaluate(eq(attributeValue), any(BaseEvent.class))).thenReturn(new TypedValue(null, OBJECT));
     when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager, never()).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager, never()).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
   public void expressionValueNoEvaluator() {
     String attributeValue = "#[mel:express]";
-    when(mockExpressionManager.evaluate(eq(attributeValue), any(InternalEvent.class))).thenReturn(new TypedValue(null, OBJECT));
+    when(mockExpressionManager.evaluate(eq(attributeValue), any(BaseEvent.class))).thenReturn(new TypedValue(null, OBJECT));
     when(mockExpressionManager.isExpression(attributeValue)).thenReturn(true);
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator(attributeValue);
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager, never()).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager, never()).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
@@ -87,9 +87,9 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
 
   }
 
@@ -99,9 +99,9 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
@@ -110,21 +110,21 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
   public void parenthesesInExpression() {
-    when(mockExpressionManager.evaluate(anyString(), any(InternalEvent.class))).thenReturn(new TypedValue(null, OBJECT));
+    when(mockExpressionManager.evaluate(anyString(), any(BaseEvent.class))).thenReturn(new TypedValue(null, OBJECT));
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[mel:(1)]");
     attributeEvaluator.initialize(mockExpressionManager);
 
     attributeEvaluator.resolveValue(event);
-    verify(mockExpressionManager, never()).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager, never()).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
   @Test
@@ -134,7 +134,7 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     final String expectedValue = "123";
     doReturn(new TypedValue<>(Integer.parseInt(expectedValue), NUMBER))
         .when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
     assertThat(attributeEvaluator.resolveValue(event), is(Integer.parseInt(expectedValue)));
   }
 
@@ -145,7 +145,7 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     final long expectedValue = 1234l;
     doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue)))
         .when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
     assertThat(attributeEvaluator.resolveValue(event), is(expectedValue));
   }
 
@@ -156,7 +156,7 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     final String expectedValue = "true";
     doReturn(new TypedValue<>(Boolean.valueOf(expectedValue), BOOLEAN))
         .when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
     assertThat(attributeEvaluator.resolveValue(event), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -167,7 +167,7 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     final Boolean expectedValue = true;
     doReturn(new TypedValue<>(expectedValue, fromObject(expectedValue)))
         .when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
     assertThat(attributeEvaluator.resolveValue(event), is(Boolean.valueOf(expectedValue)));
   }
 
@@ -176,7 +176,7 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     AttributeEvaluator attributeEvaluator = new AttributeEvaluator("#[mel:expression]", NUMBER);
     attributeEvaluator.initialize(mockExpressionManager);
     doThrow(ExpressionRuntimeException.class).when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
     attributeEvaluator.resolveValue(event);
   }
 
@@ -186,12 +186,12 @@ public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
     nullAttributeEvaluator.initialize(mockExpressionManager);
     doReturn(new TypedValue<>(null, OBJECT))
         .when(mockExpressionManager)
-        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(InternalEvent.class));
+        .evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(BaseEvent.class));
 
     assertThat(nullAttributeEvaluator.resolveValue(event), nullValue());
-    verify(mockExpressionManager, never()).parse(anyString(), any(InternalEvent.class), any());
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(InternalEvent.class));
-    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(InternalEvent.class));
+    verify(mockExpressionManager, never()).parse(anyString(), any(BaseEvent.class), any());
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(BaseEvent.class));
+    verify(mockExpressionManager, never()).evaluate(anyString(), any(DataType.class), any(), any(BaseEvent.class));
   }
 
 }

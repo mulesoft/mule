@@ -9,17 +9,18 @@ package org.mule.runtime.core.internal.routing.correlation;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.MuleSession;
+import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
-
-import java.text.MessageFormat;
-import java.util.Optional;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Optional;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
@@ -42,22 +43,22 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
   /**
    * This method is invoked if the shouldAggregate method is called and returns true. Once this method returns an aggregated
    * message, the event group is removed from the router.
-   * 
+   *
    * @param events the event group for this request
    * @return an aggregated message
    * @throws AggregationException if the aggregation fails. in this scenario the whole event group is removed and passed to the
    *         exception handler for this component
    */
   @Override
-  public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
+  public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
     return events.getMessageCollectionEvent();
   }
 
-  protected MuleSession getMergedSession(InternalEvent[] events) {
-    MuleSession session = new DefaultMuleSession(events[0].getSession());
+  protected MuleSession getMergedSession(BaseEvent[] events) {
+    MuleSession session = new DefaultMuleSession(((PrivilegedEvent) events[0]).getSession());
     for (int i = 1; i < events.length; i++) {
-      for (String name : events[i].getSession().getPropertyNamesAsSet()) {
-        session.setProperty(name, events[i].getSession().getProperty(name));
+      for (String name : ((PrivilegedEvent) events[i]).getSession().getPropertyNamesAsSet()) {
+        session.setProperty(name, ((PrivilegedEvent) events[i]).getSession().getProperty(name));
       }
     }
     return session;
@@ -67,7 +68,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    * Creates a new EventGroup that will expect the number of events as returned by {@link org.mule.runtime.core.api.message.GroupCorrelation#getGroupSize()}.
    */
   @Override
-  public EventGroup createEventGroup(InternalEvent event, Object groupId) {
+  public EventGroup createEventGroup(BaseEvent event, Object groupId) {
     return new EventGroup(groupId, muleContext,
                           event.getGroupCorrelation().isPresent() ? event.getGroupCorrelation().get().getGroupSize().isPresent()
                               ? Optional.of(event.getGroupCorrelation().get().getGroupSize().getAsInt())

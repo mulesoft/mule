@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -23,8 +24,9 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
@@ -152,7 +154,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     boolean exceptionSeen = false;
     boolean tooMany = false;
     AtomicInteger counter = null;
@@ -182,8 +184,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        InternalEvent returnEvent =
-            processNext(InternalEvent.builder(DefaultEventContext.child(event.getContext(), empty()), event).build());
+        BaseEvent returnEvent =
+            processNext(BaseEvent
+                .builder(DefaultEventContext.child((BaseEventContext) event.getContext(), empty()), event).build());
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);
@@ -227,13 +230,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     return counter;
   }
 
-  private String getIdForEvent(InternalEvent event) throws Exception {
+  private String getIdForEvent(BaseEvent event) throws Exception {
     if (useSecureHash) {
       Object payload = event.getMessage().getPayload().getValue();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event = InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(bytes).build()).build();
+        event = BaseEvent.builder(event).message(Message.builder(event.getMessage()).value(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

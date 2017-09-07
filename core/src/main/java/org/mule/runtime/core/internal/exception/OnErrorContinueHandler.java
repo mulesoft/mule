@@ -12,8 +12,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
@@ -69,18 +69,18 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected InternalEvent nullifyExceptionPayloadIfRequired(InternalEvent event) {
-    return InternalEvent.builder(event).error(null)
+  protected BaseEvent nullifyExceptionPayloadIfRequired(BaseEvent event) {
+    return BaseEvent.builder(event).error(null)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
         .build();
   }
 
   @Override
-  public boolean accept(InternalEvent event) {
+  public boolean accept(BaseEvent event) {
     return !sourceError(event) && super.accept(event);
   }
 
-  private boolean sourceError(InternalEvent event) {
+  private boolean sourceError(BaseEvent event) {
     return event.getError().filter(error -> sourceErrorMatcher.match(event.getError().get().getErrorType())).isPresent();
   }
 }

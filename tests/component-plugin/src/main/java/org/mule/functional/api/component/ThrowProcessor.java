@@ -14,8 +14,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,7 +39,7 @@ public class ThrowProcessor extends AbstractComponent implements Processor {
   private MuleContext muleContext;
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     if (count == -1 || count-- > 0) {
       try {
         Throwable instantiatedException = exception.newInstance();

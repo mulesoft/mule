@@ -15,8 +15,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -54,7 +55,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void shapeRetriever() throws Exception {
-    InternalEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(ParentShape.class));
 
@@ -64,7 +65,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void doorRetriever() throws Exception {
-    InternalEvent responseEvent = flowRunner("doorRetriever").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("doorRetriever").withPayload("").run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(CarDoor.class));
 
@@ -74,7 +75,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void configRetriever() throws Exception {
-    InternalEvent responseEvent = flowRunner("configRetriever").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("configRetriever").withPayload("").run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(SubTypesMappingConnector.class));
 
@@ -114,7 +115,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void connectionRetriever() throws Exception {
-    InternalEvent responseEvent = flowRunner("connectionRetriever").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("connectionRetriever").withPayload("").run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(SubTypesConnectorConnection.class));
 
@@ -126,7 +127,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void subtypedAndConcreteParameters() throws Exception {
-    InternalEvent responseEvent = flowRunner("subtypedAndConcreteParameters").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("subtypedAndConcreteParameters").withPayload("").run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
 
@@ -160,7 +161,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void subtypedAndConcreteParametersAsAttributes() throws Exception {
-    InternalEvent responseEvent = flowRunner("subtypedAndConcreteParametersAsAttributes").withPayload("").run();
+    BaseEvent responseEvent = flowRunner("subtypedAndConcreteParametersAsAttributes").withPayload("").run();
     assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
 
     List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload().getValue();

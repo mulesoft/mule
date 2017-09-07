@@ -7,14 +7,14 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -42,8 +42,8 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
     if (getCurrentEvent() != null) {
-      InternalEvent currentEvent = getCurrentEvent();
-      currentEvent = InternalEvent.builder(currentEvent)
+      BaseEvent currentEvent = getCurrentEvent();
+      currentEvent = BaseEvent.builder(currentEvent)
           .message(InternalMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
       setCurrentEvent(currentEvent);
     }

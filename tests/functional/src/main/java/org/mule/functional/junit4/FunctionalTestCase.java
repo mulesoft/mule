@@ -12,10 +12,10 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -154,7 +154,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  protected InternalEvent runFlow(String flowName) throws Exception {
+  protected BaseEvent runFlow(String flowName) throws Exception {
     return flowRunner(flowName).run();
   }
 

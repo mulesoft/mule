@@ -17,18 +17,18 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEvent.builder;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,10 +50,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeException exception = new IllegalArgumentException();
-  private InternalEventContext eventContext;
-  private InternalEvent input;
-  private InternalEvent output;
-  private InternalEvent response;
+  private BaseEventContext eventContext;
+  private BaseEvent input;
+  private BaseEvent output;
+  private BaseEvent response;
   private Flow flow;
 
   @Before
@@ -80,17 +80,17 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private InternalReactiveProcessor map = publisher -> from(publisher).map(in -> output);
   private InternalReactiveProcessor ackAndStop = publisher -> from(publisher).then(in -> {
-    in.getContext().success();
+    ((BaseEventContext) in.getContext()).success();
     return empty();
   });
   private InternalReactiveProcessor respondAndStop = publisher -> from(publisher).then(in -> {
-    in.getContext().success(response);
+    ((BaseEventContext) in.getContext()).success(response);
     return empty();
   });
   private InternalReactiveProcessor ackAndMap =
-      publisher -> from(publisher).doOnNext(in -> in.getContext().success()).map(in -> output);
+      publisher -> from(publisher).doOnNext(in -> ((BaseEventContext) in.getContext()).success()).map(in -> output);
   private InternalReactiveProcessor respondAndMap =
-      publisher -> from(publisher).doOnNext(in -> in.getContext().success(response)).map(in -> output);
+      publisher -> from(publisher).doOnNext(in -> ((BaseEventContext) in.getContext()).success(response)).map(in -> output);
   private InternalReactiveProcessor error = publisher -> from(publisher).map(in -> {
     throw exception;
   });
@@ -393,12 +393,12 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
       return delegate.apply(publisher);
     }
   }

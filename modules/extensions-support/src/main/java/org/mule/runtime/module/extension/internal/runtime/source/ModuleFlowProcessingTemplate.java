@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
@@ -37,12 +37,12 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public CheckedFunction<InternalEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
+  public CheckedFunction<BaseEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
     return completionHandler::createResponseParameters;
   }
 
   @Override
-  public CheckedFunction<InternalEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
+  public CheckedFunction<BaseEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
     return completionHandler::createFailureResponseParameters;
   }
 
@@ -52,17 +52,17 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public InternalEvent routeEvent(InternalEvent muleEvent) throws MuleException {
+  public BaseEvent routeEvent(BaseEvent muleEvent) throws MuleException {
     return messageProcessor.process(muleEvent);
   }
 
   @Override
-  public Publisher<InternalEvent> routeEventAsync(InternalEvent event) {
+  public Publisher<BaseEvent> routeEventAsync(BaseEvent event) {
     return just(event).transform(messageProcessor);
   }
 
   @Override
-  public Publisher<Void> sendResponseToClient(InternalEvent response, Map<String, Object> parameters) {
+  public Publisher<Void> sendResponseToClient(BaseEvent response, Map<String, Object> parameters) {
     return completionHandler.onCompletion(response, parameters);
   }
 
@@ -73,10 +73,10 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public void afterPhaseExecution(Either<MessagingException, InternalEvent> either) {
+  public void afterPhaseExecution(Either<MessagingException, BaseEvent> either) {
     either.apply((CheckedConsumer<MessagingException>) messagingException -> completionHandler
         .onTerminate(left(messagingException)),
-                 (CheckedConsumer<InternalEvent>) event -> completionHandler.onTerminate(either));
+                 (CheckedConsumer<BaseEvent>) event -> completionHandler.onTerminate(either));
   }
 
 }

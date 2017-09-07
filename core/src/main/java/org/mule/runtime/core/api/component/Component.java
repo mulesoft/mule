@@ -8,12 +8,12 @@ package org.mule.runtime.core.api.component;
 
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * A <code>Component</code> component processes a {@link InternalEvent} by invoking the component instance that has been configured,
+ * A <code>Component</code> component processes a {@link BaseEvent} by invoking the component instance that has been configured,
  * optionally returning a result.
  * <p/>
  * Implementations of <code>Component</code> can use different types of component implementation, implement component instance

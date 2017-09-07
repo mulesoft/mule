@@ -13,9 +13,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.io.IOException;
@@ -44,8 +44,8 @@ public class ExpressionLanguageComponent extends AbstractComponent implements Pr
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+  public BaseEvent process(BaseEvent event) throws MuleException {
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     expressionMgr.evaluate(expression, event, eventBuilder, getLocation());
     return eventBuilder.build();
   }

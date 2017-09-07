@@ -7,15 +7,17 @@
 package org.mule.tck.security;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
+import org.mule.runtime.core.api.security.CryptoFailureException;
+import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.api.security.UnauthorisedException;
 
 public class TestSecurityFilter extends AbstractAuthenticationFilter {
 
@@ -29,14 +31,14 @@ public class TestSecurityFilter extends AbstractAuthenticationFilter {
   }
 
   @Override
-  public InternalEvent authenticate(InternalEvent event)
+  public SecurityContext authenticate(BaseEvent event)
       throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
       EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     called = true;
     if (!accept) {
       throw new StaticMessageUnauthorisedException();
     }
-    return event;
+    return event.getSecurityContext();
   }
 
   @Override

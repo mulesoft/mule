@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.keygenerator;
 
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
   private AttributeEvaluator attributeEvaluator;
 
   @Override
-  public String generateKey(InternalEvent event) {
+  public String generateKey(BaseEvent event) {
     Object key = attributeEvaluator.resolveValue(event);
 
     if (logger.isDebugEnabled()) {

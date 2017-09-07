@@ -19,7 +19,7 @@ import java.util.List;
 import org.junit.Test;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
@@ -42,7 +42,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   @Description("This strategy waits for all routes to return and then collects results into a list.")
   public void collectList() throws Throwable {
 
-    InternalEvent original = testEvent();
+    BaseEvent original = testEvent();
     Message route1Result = of(1);
     Message route2Result = of(2);
     Message route3Result = of(3);
@@ -51,7 +51,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
     RoutingPair pair2 = createRoutingPair(route2Result);
     RoutingPair pair3 = createRoutingPair(route3Result);
 
-    InternalEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
+    BaseEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 
     assertThat(result.getMessage().getPayload().getValue(), instanceOf(List.class));
     List<Message> resultList = (List<Message>) result.getMessage().getPayload().getValue();

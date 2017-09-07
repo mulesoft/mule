@@ -12,8 +12,8 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import org.slf4j.Logger;
 
@@ -25,8 +25,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   private final String FLOW = "flow";
   private String flowName;
 
-  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, InternalEvent event,
-                                      InternalEvent.Builder eventBuilder, ComponentLocation componentLocation) {
+  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, BaseEvent event,
+                                      BaseEvent.Builder eventBuilder, ComponentLocation componentLocation) {
     super(parserConfiguration, muleContext, event, eventBuilder);
     this.flowName = componentLocation != null ? componentLocation.getRootContainerName() : null;
   }
@@ -35,8 +35,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
    * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without and performance overhead
    * incurred by using a builder.
    */
-  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, InternalEvent event,
-                                      InternalEvent.Builder eventBuilder, ComponentLocation componentLocation,
+  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, BaseEvent event,
+                                      BaseEvent.Builder eventBuilder, ComponentLocation componentLocation,
                                       VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder, componentLocation);
     setNextFactory(next);

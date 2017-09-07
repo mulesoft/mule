@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Map;
@@ -34,7 +34,7 @@ public interface PolicyManager {
    *        source.
    * @return a {@link SourcePolicy} associated to that source.
    */
-  SourcePolicy createSourcePolicyInstance(Component source, InternalEvent sourceEvent,
+  SourcePolicy createSourcePolicyInstance(Component source, BaseEvent sourceEvent,
                                           Processor flowExecutionProcessor,
                                           MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
@@ -49,7 +49,7 @@ public interface PolicyManager {
    * @param operationExecutionFunction the function that executes the operation.
    * @return a {@link OperationPolicy} associated to that source.
    */
-  OperationPolicy createOperationPolicy(Component operation, InternalEvent operationEvent,
+  OperationPolicy createOperationPolicy(Component operation, BaseEvent operationEvent,
                                         Map<String, Object> operationParameters,
                                         OperationExecutionFunction operationExecutionFunction);
 

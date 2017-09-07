@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming;
 
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.event.BaseEventContext;
 
 /**
  * Groups a {@link CursorProvider} with information about its context
@@ -17,15 +17,15 @@ import org.mule.runtime.core.api.InternalEventContext;
 public final class CursorContext {
 
   private final CursorProvider cursorProvider;
-  private final InternalEventContext ownerContext;
+  private final BaseEventContext ownerContext;
 
   /**
    * Creates a new instance
    *
    * @param cursorProvider the {@link CursorProvider} which will be managed
-   * @param ownerContext   the {@link InternalEventContext} which owns the {@code cursorProvider}
+   * @param ownerContext   the {@link BaseEventContext} which owns the {@code cursorProvider}
    */
-  public CursorContext(CursorProvider cursorProvider, InternalEventContext ownerContext) {
+  public CursorContext(CursorProvider cursorProvider, BaseEventContext ownerContext) {
     this.cursorProvider = cursorProvider;
     this.ownerContext = ownerContext;
   }
@@ -38,9 +38,9 @@ public final class CursorContext {
   }
 
   /**
-   * @return the {@link InternalEventContext} which owns the {@code cursorProvider}
+   * @return the {@link BaseEventContext} which owns the {@code cursorProvider}
    */
-  public InternalEventContext getOwnerContext() {
+  public BaseEventContext getOwnerContext() {
     return ownerContext;
   }
 }

@@ -17,7 +17,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
 
@@ -32,8 +32,8 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
 
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
-    InternalEvent anotherEvent = testEvent();
+    BaseEvent event = getHeisenbergEvent();
+    BaseEvent anotherEvent = testEvent();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));
@@ -41,8 +41,8 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
 
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
-    InternalEvent anotherEvent = InternalEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
+    BaseEvent event = getHeisenbergEvent();
+    BaseEvent anotherEvent = BaseEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
     assertThat(config, is(not(sameInstance(anotherConfig))));
@@ -50,7 +50,7 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
 
   @Test
   public void initializedOptionalValueWithoutDefaultValue() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
+    BaseEvent event = getHeisenbergEvent();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION_BYREF, event);
     assertThat(config.getWeapon(), is(not(nullValue())));
     assertThat(config.getWeapon(), is(instanceOf(Ricin.class)));

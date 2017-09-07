@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 
 import java.util.function.Consumer;
 
 /**
- * Used to dispatch {@link InternalEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained
- * by subscribing to the {@link InternalEvent}'s {@link InternalEventContext}.
+ * Used to dispatch {@link BaseEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained
+ * by subscribing to the {@link BaseEvent}'s {@link BaseEventContext}.
  * <p/>
  * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
  * handle this, i.e.
@@ -25,24 +25,24 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public interface Sink extends Consumer<InternalEvent> {
+public interface Sink extends Consumer<BaseEvent> {
 
   /**
-   * Submit the given {@link InternalEvent} for processing without a timeout. If the {@link InternalEvent} cannot be processed
+   * Submit the given {@link BaseEvent} for processing without a timeout. If the {@link BaseEvent} cannot be processed
    * immediately due to back-pressure then this method will block until in can be processed.
    *
-   * @param event the {@link InternalEvent} to dispatch for processing
+   * @param event the {@link BaseEvent} to dispatch for processing
    */
   @Override
-  void accept(InternalEvent event);
+  void accept(BaseEvent event);
 
   /**
-   * Submit the given {@link InternalEvent} for processing. If the {@link InternalEvent} cannot be processed immediately due to
+   * Submit the given {@link BaseEvent} for processing. If the {@link BaseEvent} cannot be processed immediately due to
    * back-pressure then this method will return {@code false}.
    *
-   * @param event the {@link InternalEvent} to dispatch for processing
-   * @return {@code true} is the {@link InternalEvent} was submitted for processing successfully, {@code false} otherwise.
+   * @param event the {@link BaseEvent} to dispatch for processing
+   * @return {@code true} is the {@link BaseEvent} was submitted for processing successfully, {@code false} otherwise.
    */
-  boolean emit(InternalEvent event);
+  boolean emit(BaseEvent event);
 
 }

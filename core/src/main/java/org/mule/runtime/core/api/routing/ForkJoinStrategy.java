@@ -10,8 +10,8 @@ package org.mule.runtime.core.api.routing;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Objects;
@@ -19,21 +19,21 @@ import java.util.Objects;
 import org.reactivestreams.Publisher;
 
 /**
- * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link InternalEvent} will
- * be processed and a single result {@link InternalEvent} returned. This will normally be used for:
+ * Strategy that defines how a set of {@link RoutingPair}'s each consisting of a {@link Processor} and {@link BaseEvent} will
+ * be processed and a single result {@link BaseEvent} returned. This will normally be used for:
  * <ul>
- * <li>Routing {@code n} {@link InternalEvent}'s to the same {@link MessageProcessorChain}.
- * <li>Routing a single {@link InternalEvent} to {@code n} {@link MessageProcessorChain}'s.
+ * <li>Routing {@code n} {@link BaseEvent}'s to the same {@link MessageProcessorChain}.
+ * <li>Routing a single {@link BaseEvent} to {@code n} {@link MessageProcessorChain}'s.
  * </ul>
  * <p>
  * Implementations will typically implement parallel behavior where the invocation of each route is independent and then results
  * are aggregated, but other implements such as strict sequential invocation or even the use of a shared context between
  * invocations are possible.
  * <p>
- * While the result of this strategy is a single {@link InternalEvent} implementations are free to decide if the event should be
+ * While the result of this strategy is a single {@link BaseEvent} implementations are free to decide if the event should be
  * emitted only once all results are available, or if it emits the event immediately and then makes the results available via an
  * {@link java.util.Iterator} or {@link Publisher< InternalEvent >} payload. Implementations may also return the original
- * {@link InternalEvent} therefore performing a simple join with no aggregation.
+ * {@link BaseEvent} therefore performing a simple join with no aggregation.
  * 
  * @since 4.0
  */
@@ -46,23 +46,23 @@ public interface ForkJoinStrategy {
    * @param routingPairs the routing paris to be processed
    * @return the aggregated result of processing the routing pairs
    */
-  Publisher<InternalEvent> forkJoin(InternalEvent original, Publisher<RoutingPair> routingPairs);
+  Publisher<BaseEvent> forkJoin(BaseEvent original, Publisher<RoutingPair> routingPairs);
 
   /**
-   * Define the tuple of {@link MessageProcessorChain} and {@link InternalEvent} used for a
+   * Define the tuple of {@link MessageProcessorChain} and {@link BaseEvent} used for a
    * {@link org.mule.runtime.core.internal.routing.AbstractForkJoinRouter} to define the parts/routes to be processed and used by
    * implementations of {@link ForkJoinStrategy} to implement specific logic around how these are processed and aggregated.
    */
   final class RoutingPair {
 
     private MessageProcessorChain route;
-    private InternalEvent event;
+    private BaseEvent event;
 
-    public static RoutingPair of(InternalEvent event, MessageProcessorChain route) {
+    public static RoutingPair of(BaseEvent event, MessageProcessorChain route) {
       return new RoutingPair(event, route);
     }
 
-    private RoutingPair(InternalEvent event, MessageProcessorChain route) {
+    private RoutingPair(BaseEvent event, MessageProcessorChain route) {
 
       this.event = requireNonNull(event);
       this.route = requireNonNull(route);
@@ -72,7 +72,7 @@ public interface ForkJoinStrategy {
       return route;
     }
 
-    public InternalEvent getEvent() {
+    public BaseEvent getEvent() {
       return event;
     }
 

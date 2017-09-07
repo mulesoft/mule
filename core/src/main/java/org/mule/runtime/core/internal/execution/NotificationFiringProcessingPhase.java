@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   protected MuleContext muleContext;
 
-  protected void fireNotification(Component source, InternalEvent event, FlowConstruct flow, int action) {
+  protected void fireNotification(Component source, BaseEvent event, FlowConstruct flow, int action) {
     try {
       if (event == null) {
         // Null result only happens when there's a filter in the chain.

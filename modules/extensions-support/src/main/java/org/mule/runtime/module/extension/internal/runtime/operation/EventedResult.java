@@ -10,13 +10,13 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;
 
 /**
- * An operation execution {@link Result} that is created based on the resulting {@link InternalEvent}
+ * An operation execution {@link Result} that is created based on the resulting {@link BaseEvent}
  * of that execution.
  * This allows for executions to be concatenated by the plugin's developer without losing
  * information of the event propagated through the flow.
@@ -27,23 +27,23 @@ import java.util.Optional;
  */
 public final class EventedResult<T, A> extends Result<T, A> {
 
-  private final InternalEvent event;
+  private final BaseEvent event;
 
-  private EventedResult(InternalEvent event) {
+  private EventedResult(BaseEvent event) {
     this.event = event;
   }
 
-  public static <T, A> EventedResult<T, A> from(InternalEvent event) {
+  public static <T, A> EventedResult<T, A> from(BaseEvent event) {
     return new EventedResult<>(event);
   }
 
-  public InternalEvent getEvent() {
+  public BaseEvent getEvent() {
     return event;
   }
 
   @Override
   public Builder<T, A> copy() {
-    final InternalEvent.Builder product = InternalEvent.builder(event);
+    final BaseEvent.Builder product = BaseEvent.builder(event);
     final Message.Builder message = Message.builder(event.getMessage());
 
     return new Result.Builder<T, A>() {

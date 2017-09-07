@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -42,7 +42,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected ComponentModel componentModel;
 
-  protected InternalEvent event;
+  protected BaseEvent event;
 
   @Mock
   protected Object attributes;
@@ -60,7 +60,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Test
   public void returnsSingleValue() {
     byte[] value = new byte[] {};
-    InternalEvent result = delegate.asReturnValue(value, operationContext);
+    BaseEvent result = delegate.asReturnValue(value, operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -73,7 +73,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     Object payload = new Object();
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-    InternalEvent result =
+    BaseEvent result =
         delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
     Message message = getOutputMessage(result);
@@ -87,7 +87,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
     Object payload = "hello world!";
 
-    InternalEvent result = delegate.asReturnValue(Result.builder().output(payload).build(), operationContext);
+    BaseEvent result = delegate.asReturnValue(Result.builder().output(payload).build(), operationContext);
 
     Message message = getOutputMessage(result);
 
@@ -101,7 +101,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     Object payload = "hello world!";
     Object newAttributes = mock(Object.class);
 
-    InternalEvent result =
+    BaseEvent result =
         delegate.asReturnValue(Result.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
     Message message = getOutputMessage(result);
@@ -113,5 +113,5 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   protected abstract ReturnDelegate createReturnDelegate();
 
-  protected abstract Message getOutputMessage(InternalEvent result);
+  protected abstract Message getOutputMessage(BaseEvent result);
 }

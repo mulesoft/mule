@@ -7,9 +7,10 @@
 package org.mule.runtime.core.privileged.el.context;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.api.InternalEvent.getVariableValueOrNull;
-import org.mule.runtime.core.api.InternalEvent;
+import static org.mule.runtime.core.api.event.BaseEvent.getVariableValueOrNull;
+
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +21,11 @@ import java.util.Set;
  */
 public class EventVariablesMapContext extends AbstractMapContext<Object> {
 
-  private InternalEvent event;
-  private InternalEvent.Builder eventBuider;
+  private BaseEvent event;
+  private BaseEvent.Builder eventBuider;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public EventVariablesMapContext(InternalEvent event, InternalEvent.Builder eventBuider) {
+  public EventVariablesMapContext(BaseEvent event, BaseEvent.Builder eventBuider) {
     this.event = event;
     this.eventBuider = eventBuider;
   }

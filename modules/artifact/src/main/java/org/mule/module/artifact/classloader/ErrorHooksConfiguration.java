@@ -8,7 +8,8 @@ package org.mule.module.artifact.classloader;
 
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 
 import org.slf4j.Logger;
@@ -33,9 +34,9 @@ public class ErrorHooksConfiguration {
       // Unwrap all throwables to be consistent with reactor default hook.
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
-      if (signal instanceof InternalEvent) {
+      if (signal instanceof BaseEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((InternalEvent) signal, throwable);
+            : new MessagingException((BaseEvent) signal, throwable);
       } else {
         return throwable;
       }

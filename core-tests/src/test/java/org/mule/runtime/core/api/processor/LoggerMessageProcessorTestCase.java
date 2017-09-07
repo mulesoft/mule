@@ -21,9 +21,9 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -72,7 +72,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Verifies if the right call to the logger was made depending on the level enabled
   private void verifyLogCall(LoggerMessageProcessor loggerMessageProcessor, String logLevel, String enabledLevel,
-                             InternalEvent muleEvent, String message) {
+                             BaseEvent muleEvent, String message) {
     when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
@@ -88,7 +88,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Verifies if the Mule expression is called or not depending on the logging level enabled
   private void verifyExpressionEvaluation(LoggerMessageProcessor loggerMessageProcessor, String level, String enabledLevel,
-                                          InternalEvent muleEvent, VerificationMode timesEvaluateExpression) {
+                                          BaseEvent muleEvent, VerificationMode timesEvaluateExpression) {
     when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
@@ -112,7 +112,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   // Orchestrates the verifications for a call with a MuleEvent
   private void verifyMuleEventByLevel(String level) {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    InternalEvent muleEvent = buildMuleEvent();
+    BaseEvent muleEvent = buildMuleEvent();
     verifyLogCall(loggerMessageProcessor, level, level, muleEvent, muleEvent.getMessage().toString()); // Level is enabled
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     // Level is disabled by prepending it with "not"
@@ -121,7 +121,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Orchestrates the verifications for a call with a 'message' set on the logger
   private void verifyLoggerMessageByLevel(String level) {
-    InternalEvent muleEvent = buildMuleEvent();
+    BaseEvent muleEvent = buildMuleEvent();
     // Level is enabled
     verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, "text to log".toString());
     // Level is disabled by prepending it with "not"
@@ -168,8 +168,8 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     return loggerMessageProcessor;
   }
 
-  private InternalEvent buildMuleEvent() {
-    InternalEvent event = mock(InternalEvent.class);
+  private BaseEvent buildMuleEvent() {
+    BaseEvent event = mock(BaseEvent.class);
     InternalMessage message = mock(InternalMessage.class);
     when(message.toString()).thenReturn("text to log");
     when(event.getMessage()).thenReturn(message);
@@ -178,7 +178,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExtendedExpressionManager buildExpressionManager() {
     ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
-    when(expressionLanguage.parse(anyString(), any(InternalEvent.class), eq(((Component) flow).getLocation())))
+    when(expressionLanguage.parse(anyString(), any(BaseEvent.class), eq(((Component) flow).getLocation())))
         .thenReturn("text to log");
     return expressionLanguage;
   }

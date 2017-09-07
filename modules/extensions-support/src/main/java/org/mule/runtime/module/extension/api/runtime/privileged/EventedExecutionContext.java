@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 /**
- * A specialization of {@link ExecutionContext} which contains an {@link InternalEvent}
+ * A specialization of {@link ExecutionContext} which contains an {@link BaseEvent}
  *
  * @param <M> the generic type of of the model which represents the component being executed
  * @since 4.0
@@ -19,15 +19,15 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 public interface EventedExecutionContext<M extends ComponentModel> extends ExecutionContext<M> {
 
   /**
-   * Returns the {@link InternalEvent} on which an operation is to be executed
+   * Returns the {@link BaseEvent} on which an operation is to be executed
    */
-  InternalEvent getEvent();
+  BaseEvent getEvent();
 
   /**
-   * Changes the {@link InternalEvent} on which an operation is to be executed. Not null.
+   * Changes the {@link BaseEvent} on which an operation is to be executed. Not null.
    *
    * @param updated the event to use
    */
-  void changeEvent(InternalEvent updated);
+  void changeEvent(BaseEvent updated);
 
 }

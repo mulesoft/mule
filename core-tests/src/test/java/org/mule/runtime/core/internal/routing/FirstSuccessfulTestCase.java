@@ -17,19 +17,20 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.message.ReallyInternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testRouteReturnsNullMessage() throws Exception {
-    Processor nullEventMp = event -> InternalEvent.builder(event).message(null).build();
+    Processor nullEventMp = event -> BaseEvent.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
@@ -100,7 +101,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     Message msg = of(message);
     try {
-      InternalEvent event = mp.process(eventBuilder().message(msg).session(session).build());
+      BaseEvent event = mp.process(eventBuilder().message(msg).session(session).build());
       Message returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -121,11 +122,11 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       try {
         Message msg;
         Error error = null;
-        String payload = event.getMessageAsString(muleContext);
+        String payload = ((ReallyInternalEvent) event).getMessageAsString(muleContext);
         if (payload.indexOf(rejectIfMatches) >= 0) {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
@@ -135,7 +136,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = of("No " + rejectIfMatches);
         }
-        InternalEvent muleEvent = eventBuilder().message(msg).error(error).build();
+        BaseEvent muleEvent = eventBuilder().message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

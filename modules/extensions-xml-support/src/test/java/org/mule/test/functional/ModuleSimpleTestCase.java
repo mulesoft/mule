@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -54,63 +54,63 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlow() throws Exception {
-    InternalEvent event = flowRunner("testSetPayloadHardcodedFlow").run();
+    BaseEvent event = flowRunner("testSetPayloadHardcodedFlow").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 
   @Test
   public void testSetPayloadParamFlow() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadParamFlow").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadParamFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload"));
   }
 
   @Test
   public void testSetPayloadParamDefaultFlow() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadParamDefaultUseOptionalFlow() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
     assertThat(muleEvent.getVariables().get("testVar").getValue(), is("unchanged value"));
   }
 
   @Test
   public void testDoNothingFlow() throws Exception {
-    InternalEvent muleEvent = flowRunner("testDoNothingFlow").run();
+    BaseEvent muleEvent = flowRunner("testDoNothingFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("before calling"));
     assertThat(muleEvent.getVariables().get("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
   }
 
   @Test
   public void testSetPayloadParamValueAppender() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload from module"));
   }
 
   @Test
   public void testSetPayloadConcatParamsValues() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("105"));
   }
 
   @Test
   public void testSetPayloadUsingUndefinedParam() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadHardcodedFlowWithTarget() throws Exception {
-    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
+    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
     assertThat(targetVariable, notNullValue());
@@ -121,7 +121,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable() throws Exception {
-    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
+    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
@@ -132,7 +132,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload() throws Exception {
-    InternalEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload").run();
+    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
@@ -143,13 +143,13 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadUsingOptionalParam() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadUsingParamValueMoreThanOnceFlow() throws Exception {
-    InternalEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
+    BaseEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("a payload written 2 or more times in the same operation using the same parameter"));
   }

@@ -34,6 +34,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -75,7 +76,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Mock
   private MuleContext mockContext;
 
-  private InternalEvent testEvent;
+  private BaseEvent testEvent;
 
   @Mock
   private FlowConstruct flowConstruct;
@@ -335,7 +336,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoNonConsumable() throws Exception {
     MuleException.verboseExceptions = true;
 
-    InternalEvent testEvent = mock(InternalEvent.class);
+    BaseEvent testEvent = mock(BaseEvent.class);
     Object payload = mock(Object.class);
     // This has to be done this way since mockito doesn't allow to verify toString()
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
@@ -352,7 +353,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoConsumable() throws Exception {
     MuleException.verboseExceptions = true;
 
-    InternalEvent testEvent = mock(InternalEvent.class);
+    BaseEvent testEvent = mock(BaseEvent.class);
     final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
     Message muleMessage = of(payload);
     when(testEvent.getMessage()).thenReturn(muleMessage);
@@ -368,7 +369,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoException() throws Exception {
     MuleException.verboseExceptions = true;
 
-    InternalEvent testEvent = mock(InternalEvent.class);
+    BaseEvent testEvent = mock(BaseEvent.class);
     Object payload = mock(Object.class);
     // This has to be done this way since mockito doesn't allow to verify toString()
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
@@ -387,7 +388,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void payloadInfoNonVerbose() throws Exception {
     MuleException.verboseExceptions = false;
 
-    InternalEvent testEvent = mock(InternalEvent.class);
+    BaseEvent testEvent = mock(BaseEvent.class);
     Message muleMessage = spy(of(""));
     when(testEvent.getMessage()).thenReturn(muleMessage);
     MessagingException e = new MessagingException(createStaticMessage(message), testEvent);

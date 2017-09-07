@@ -16,7 +16,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
-import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.api.util.ObjectUtils.getDouble;
@@ -25,6 +24,7 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
@@ -41,6 +41,9 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -56,9 +59,6 @@ import java.util.TreeSet;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder {
@@ -533,7 +533,9 @@ public class DefaultMessageBuilder
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
           String name = entry.getKey();
           // TODO MULE-10013 remove this logic from here
-          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), getCurrentEvent().getMuleContext()));
+          toWrite
+              .put(name,
+                   new SerializedDataHandler(name, entry.getValue(), ((ReallyInternalEvent) getCurrentEvent()).getMuleContext()));
         }
       }
 
@@ -548,7 +550,7 @@ public class DefaultMessageBuilder
       } else {
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
-        byte[] valueAsByteArray = (byte[]) getCurrentEvent().getMuleContext().getTransformationService()
+        byte[] valueAsByteArray = (byte[]) ((ReallyInternalEvent) getCurrentEvent()).getMuleContext().getTransformationService()
             .internalTransform(this, DataType.BYTE_ARRAY).getPayload().getValue();
         out.writeInt(valueAsByteArray.length);
         new DataOutputStream(out).write(valueAsByteArray);
@@ -591,7 +593,7 @@ public class DefaultMessageBuilder
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current mulecontext.
-     * 
+     *
      * @param context the current muleContext instance
      * @throws MuleException if there is an error initializing
      */

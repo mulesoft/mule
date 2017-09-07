@@ -12,7 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -74,46 +75,46 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
 
   @Test
   public void testSetPayloadThruInternalSetPayloadHardcodedValue() throws Exception {
-    InternalEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadHardcodedValue");
+    BaseEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadHardcodedValue");
     assertThat(event.getMessage().getPayload().getValue(), is(HARDCODED_VALUE));
   }
 
   @Test
   public void testSetPayloadThruInternalSetPayloadHardcodedValueTwoTimes() throws Exception {
-    InternalEvent event =
+    BaseEvent event =
         runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadHardcodedValueTwoTimes");
     assertThat(event.getMessage().getPayload().getValue(), is(HARDCODED_VALUE));
   }
 
   @Test
   public void testSetPayloadThruInternalSetPayloadParamValue() throws Exception {
-    InternalEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadParamValue");
+    BaseEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadParamValue");
     assertThat(event.getMessage().getPayload().getValue(), is(SIMPLE_VARIABLE_VALUE));
   }
 
   @Test
   public void testSetPayloadContentThruInternalSetPayloadParamValue() throws Exception {
-    InternalEvent event =
+    BaseEvent event =
         runFlowWithContentVariable("testSetPayloadContentThruInternalSetPayloadParamValue");
     assertThat(event.getMessage().getPayload().getValue(), is(FIRST_PART + SECOND_PART));
   }
 
   @Test
   public void testSetPayloadThruInternalSetPayloadUsingContentParameter() throws Exception {
-    InternalEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadUsingContentParameter");
+    BaseEvent event = runFlowWithDefaultVariable("testSetPayloadThruInternalSetPayloadUsingContentParameter");
     assertThat(event.getMessage().getPayload().getValue(), is(SIMPLE_VARIABLE_VALUE));
   }
 
   @Test
   public void testSetPayloadContentThruInternalSetPayloadUsingContentParameter() throws Exception {
-    InternalEvent event =
+    BaseEvent event =
         runFlowWithContentVariable("testSetPayloadContentThruInternalSetPayloadUsingContentParameter");
     assertThat(event.getMessage().getPayload().getValue(), is(FIRST_PART + SECOND_PART));
   }
 
   @Test
   public void testSetPayloadThruInternalSetPayloadUsingContentAndPrimaryAndSimpleParameter() throws Exception {
-    InternalEvent event =
+    BaseEvent event =
         runFlowWithContentAndDefaultVariables("testSetPayloadThruInternalSetPayloadUsingContentAndPrimaryAndSimpleParameter");
     assertThat(event.getMessage().getPayload().getValue(),
                is(format("attribute value:[%s], value of content:[%s], value of primary:[%s]", SIMPLE_VARIABLE_VALUE, FIRST_PART,
@@ -122,14 +123,14 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
 
   @Test
   public void testSetPayloadThruNestedMadness() throws Exception {
-    InternalEvent event = runFlowWithDefaultVariable("testSetPayloadThruNestedMadness");
+    BaseEvent event = runFlowWithDefaultVariable("testSetPayloadThruNestedMadness");
     assertThat(event.getMessage().getPayload().getValue(),
                is(format(NESTED_MADNESS_EXPECTED, SIMPLE_VARIABLE_VALUE)));
   }
 
   @Test
   public void testSetPayloadThruNestedMadnessPipingItThreeTimes() throws Exception {
-    InternalEvent event = runFlowWithDefaultVariable("testSetPayloadThruNestedMadnessPipingItThreeTimes");
+    BaseEvent event = runFlowWithDefaultVariable("testSetPayloadThruNestedMadnessPipingItThreeTimes");
     final String expected =
         format(NESTED_MADNESS_EXPECTED, format(NESTED_MADNESS_EXPECTED, format(NESTED_MADNESS_EXPECTED, SIMPLE_VARIABLE_VALUE)));
     assertThat(event.getMessage().getPayload().getValue(),
@@ -139,7 +140,7 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   @Test
   public void testSetPayloadThruNestedMadnessPipingWithForeach() throws Exception {
     final int amount = 3;
-    InternalEvent event = runFlowWithAmountVariable("testSetPayloadThruNestedMadnessPipingWithForeach", amount);
+    BaseEvent event = runFlowWithAmountVariable("testSetPayloadThruNestedMadnessPipingWithForeach", amount);
     StringBuilder expected = new StringBuilder();
     for (int i = 1; i <= amount; i++) {
       expected.append(format(NESTED_MADNESS_EXPECTED, String.valueOf(i)));
@@ -150,7 +151,7 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
   @Test
   public void testSetPayloadThruNestedMadnessPipingWithNestedForeachs() throws Exception {
     final int amount = 3;
-    InternalEvent event = runFlowWithAmountVariable("testSetPayloadThruNestedMadnessPipingWithNestedForeachs", amount);
+    BaseEvent event = runFlowWithAmountVariable("testSetPayloadThruNestedMadnessPipingWithNestedForeachs", amount);
     StringBuilder expected = new StringBuilder();
     for (int i = 1; i <= amount; i++) {
       expected.append(format(NESTED_MADNESS_EXPECTED, String.valueOf(i)));
@@ -161,26 +162,26 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExte
     assertThat(event.getMessage().getPayload().getValue(), is(expected.toString()));
   }
 
-  private InternalEvent runFlowWithDefaultVariable(String flowName) throws Exception {
+  private BaseEvent runFlowWithDefaultVariable(String flowName) throws Exception {
     return flowRunner(flowName)
         .withVariable("simpleParameter", SIMPLE_VARIABLE_VALUE)
         .run();
   }
 
-  private InternalEvent runFlowWithAmountVariable(String flowName, int amount) throws Exception {
+  private BaseEvent runFlowWithAmountVariable(String flowName, int amount) throws Exception {
     return flowRunner(flowName)
         .withVariable("amount", amount)
         .run();
   }
 
-  private InternalEvent runFlowWithContentVariable(String flowName) throws Exception {
+  private BaseEvent runFlowWithContentVariable(String flowName) throws Exception {
     return flowRunner(flowName)
         .withVariable("firstPart", FIRST_PART)
         .withVariable("secondPart", SECOND_PART)
         .run();
   }
 
-  private InternalEvent runFlowWithContentAndDefaultVariables(String flowName) throws Exception {
+  private BaseEvent runFlowWithContentAndDefaultVariables(String flowName) throws Exception {
     return flowRunner(flowName)
         .withVariable("simpleParameter", SIMPLE_VARIABLE_VALUE)
         .withVariable("firstPart", FIRST_PART)

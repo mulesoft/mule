@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
@@ -26,22 +26,22 @@ public class AddFlowVariableProcessorTestCase extends AbstractAddVariablePropert
   }
 
   @Override
-  protected void verifyAdded(InternalEvent event, String key, String value) {
+  protected void verifyAdded(BaseEvent event, String key, String value) {
     assertThat(event.getVariables().get(key).getValue(), is(value));
   }
 
   @Override
-  protected void verifyNotAdded(InternalEvent event) {
+  protected void verifyNotAdded(BaseEvent event) {
     assertThat(event.getVariables().keySet(), empty());
   }
 
   @Override
-  protected void verifyRemoved(InternalEvent event, String key) {
+  protected void verifyRemoved(BaseEvent event, String key) {
     assertThat(event.getVariables().keySet(), not(contains(key)));
   }
 
   @Override
-  protected DataType getVariableDataType(InternalEvent event, String key) {
+  protected DataType getVariableDataType(BaseEvent event, String key) {
     return event.getVariables().get(key).getDataType();
   }
 

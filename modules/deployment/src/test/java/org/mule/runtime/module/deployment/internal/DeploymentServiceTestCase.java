@@ -61,8 +61,8 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
@@ -101,9 +101,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
@@ -4104,7 +4104,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     Message muleMessage = of(TEST_MESSAGE);
 
-    mainFlow.process(InternalEvent.builder(create(mainFlow, TEST_CONNECTOR_LOCATION)).message(muleMessage)
+    mainFlow.process(BaseEvent.builder(create(mainFlow, TEST_CONNECTOR_LOCATION)).message(muleMessage)
         .flow(mainFlow)
         .build());
   }
@@ -4190,7 +4190,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     public static volatile String policyParametrization = "";
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       invocationCount++;
       String variableName = "policyParameter";
       if (event.getVariables().keySet().contains(variableName)) {

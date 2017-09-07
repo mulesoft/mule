@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
+
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
@@ -27,19 +28,19 @@ public final class Operators {
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
    * {@code null} and this should be interpreted as empty rather than causing an error. If null is return by the function then the
-   * {@link InternalEventContext} is also completed.
-   * 
+   * {@link BaseEventContext} is also completed.
+   *
    * @param mapper map function
    * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
    */
-  public static BiConsumer<InternalEvent, SynchronousSink<InternalEvent>> nullSafeMap(Function<InternalEvent, InternalEvent> mapper) {
+  public static BiConsumer<BaseEvent, SynchronousSink<BaseEvent>> nullSafeMap(Function<BaseEvent, BaseEvent> mapper) {
     return (event, sink) -> {
       if (event != null) {
-        InternalEvent result = mapper.apply(event);
+        BaseEvent result = mapper.apply(event);
         if (result != null) {
           sink.next(result);
         } else {
-          event.getContext().success();
+          ((BaseEventContext) event.getContext()).success();
         }
       }
     };
@@ -53,7 +54,7 @@ public final class Operators {
    */
   @SuppressWarnings("unchecked")
   public static <T> Subscriber<T> requestUnbounded() {
-    return (Subscriber<T>) RequstMaxSubscriber.INSTANCE;
+    return RequstMaxSubscriber.INSTANCE;
   }
 
   final static class RequstMaxSubscriber<T> implements Subscriber<T> {

@@ -10,13 +10,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -45,17 +46,17 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     Message message2 = of("test event B");
     Message message3 = of("test event C");
 
-    InternalEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    BaseEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
-    InternalEvent event1 =
-        InternalEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
+    BaseEvent event1 =
+        BaseEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
             .session(session).build();
-    InternalEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
-    InternalEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
+    BaseEvent event2 = BaseEvent.builder(context).message(message2).flow(flow).session(session).build();
+    BaseEvent event3 = BaseEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
-    InternalEvent resultEvent = router.process(event3);
+    BaseEvent resultEvent = router.process(event3);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);

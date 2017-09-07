@@ -8,17 +8,22 @@ package org.mule.functional.api.flow;
 
 import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.mockito.Mockito;
+import org.reactivestreams.Publisher;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -28,9 +33,6 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
-
-import org.mockito.Mockito;
-import org.reactivestreams.Publisher;
 
 /**
  * Provides a fluent API for building events for testing.
@@ -54,7 +56,7 @@ public class TestEventBuilder {
   private ReplyToHandler replyToHandler;
 
   private Function<Message, Message> spyMessage = input -> input;
-  private Function<InternalEvent, InternalEvent> spyEvent = input -> input;
+  private Function<BaseEvent, BaseEvent> spyEvent = input -> input;
 
   private Publisher<Void> externalCompletionCallback = null;
 
@@ -72,7 +74,7 @@ public class TestEventBuilder {
 
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link InternalEvent} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link BaseEvent} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -169,7 +171,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link InternalEvent#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link BaseEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -180,7 +182,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link InternalEvent#getGroupCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link BaseEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -231,7 +233,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Will spy the built {@link Message} and {@link InternalEvent}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link BaseEvent}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -253,7 +255,7 @@ public class TestEventBuilder {
    * @param flow the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
-  public InternalEvent build(FlowConstruct flow) {
+  public BaseEvent build(FlowConstruct flow) {
     final Message.Builder messageBuilder;
 
     messageBuilder = Message.builder().value(payload).mediaType(mediaType);
@@ -266,26 +268,26 @@ public class TestEventBuilder {
     }
     final Message muleMessage = messageBuilder.build();
 
-    InternalEventContext eventContext;
+    EventContext eventContext;
     if (externalCompletionCallback != null) {
       eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
     } else {
       eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
-    InternalEvent.Builder builder = InternalEvent.builder(eventContext)
+    BaseEvent.Builder builder = BaseEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
-    InternalEvent event = builder.build();
+    BaseEvent event = builder.build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
     }
     for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet()) {
-      event.getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
+      ((PrivilegedEvent) event).getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
     }
 
     return spyEvent.apply(event);
@@ -312,6 +314,6 @@ public class TestEventBuilder {
 
   private interface Attachment {
 
-    InternalEvent addOutboundTo(InternalEvent event, String key);
+    BaseEvent addOutboundTo(BaseEvent event, String key);
   }
 }

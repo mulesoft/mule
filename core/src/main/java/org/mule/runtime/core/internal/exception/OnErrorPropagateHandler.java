@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -55,7 +55,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<InternalEvent, InternalEvent> beforeRouting(MessagingException exception) {
+  protected Function<BaseEvent, BaseEvent> beforeRouting(MessagingException exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
       if (!isRedeliveryExhausted(exception)) {
@@ -75,7 +75,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<InternalEvent, Publisher<InternalEvent>> route(MessagingException exception) {
+  protected Function<BaseEvent, Publisher<BaseEvent>> route(MessagingException exception) {
     if (isRedeliveryExhausted(exception)) {
       logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
     } else {
@@ -85,7 +85,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected InternalEvent processReplyTo(InternalEvent event, Exception e) {
+  protected BaseEvent processReplyTo(BaseEvent event, Exception e) {
     if (isRedeliveryExhausted(e)) {
       return super.processReplyTo(event, e);
     } else {

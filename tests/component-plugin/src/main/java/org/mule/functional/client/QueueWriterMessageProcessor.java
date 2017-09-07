@@ -9,20 +9,20 @@ package org.mule.functional.client;
 
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 
 /**
- * Writes {@link InternalEvent} to a test connector's queue.
+ * Writes {@link BaseEvent} to a test connector's queue.
  */
 public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, MuleContextAware, Initialisable {
 
@@ -33,19 +33,18 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
   private Class contentJavaType;
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    InternalEvent copy;
+    BaseEvent copy;
     if (attributeEvaluator == null) {
-      copy = InternalEvent.builder(event).session(new DefaultMuleSession(event.getSession()))
+      copy = BaseEvent.builder(event)
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)
           .build();
     } else {
       Object payloadValue = attributeEvaluator.resolveTypedValue(event).getValue();
-      copy = InternalEvent.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
-          .session(new DefaultMuleSession(event.getSession()))
+      copy = BaseEvent.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)

@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import org.junit.Test;
 
@@ -26,13 +26,13 @@ public class FlowTestCase extends AbstractELTestCase {
 
   @Test
   public void flowName() throws Exception {
-    InternalEvent event = InternalEvent.builder(context).message(of("")).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(of("")).flow(flowConstruct).build();
     assertEquals("flowName", evaluate("flow.name", event));
   }
 
   @Test
   public void assignToFlowName() throws Exception {
-    InternalEvent event = InternalEvent.builder(context).message(of("")).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(of("")).flow(flowConstruct).build();
     assertFinalProperty("flow.name='foo'", event);
   }
 

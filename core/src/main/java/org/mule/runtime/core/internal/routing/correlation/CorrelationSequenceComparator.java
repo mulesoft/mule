@@ -9,19 +9,19 @@ package org.mule.runtime.core.internal.routing.correlation;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.Comparator;
 import java.util.Optional;
 
 /**
- * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for {@link InternalEvent}s using their respective correlation
+ * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for {@link BaseEvent}s using their respective correlation
  * sequences.
  */
-public final class CorrelationSequenceComparator implements Comparator<InternalEvent> {
+public final class CorrelationSequenceComparator implements Comparator<BaseEvent> {
 
   @Override
-  public int compare(InternalEvent event1, InternalEvent event2) {
+  public int compare(BaseEvent event1, BaseEvent event2) {
     Optional<Integer> val1 = event1.getGroupCorrelation().map(gc -> of(gc.getSequence())).orElse(empty());
     Optional<Integer> val2 = event2.getGroupCorrelation().map(gc -> of(gc.getSequence())).orElse(empty());
 

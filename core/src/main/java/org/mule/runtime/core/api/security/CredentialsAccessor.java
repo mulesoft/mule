@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.io.Serializable;
 
@@ -15,6 +15,6 @@ import java.io.Serializable;
  */
 public interface CredentialsAccessor {
 
-  Serializable getCredentials(InternalEvent event);
+  Serializable getCredentials(BaseEvent event);
 
 }

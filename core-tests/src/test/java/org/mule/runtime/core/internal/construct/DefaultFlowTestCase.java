@@ -33,14 +33,15 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
@@ -65,19 +66,19 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow flow;
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
-  private BiFunction<Processor, InternalEvent, InternalEvent> triggerFunction;
+  private BiFunction<Processor, BaseEvent, BaseEvent> triggerFunction;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  public DefaultFlowTestCase(BiFunction<Processor, InternalEvent, InternalEvent> triggerFunction) {
+  public DefaultFlowTestCase(BiFunction<Processor, BaseEvent, BaseEvent> triggerFunction) {
     this.triggerFunction = triggerFunction;
   }
 
   @Parameters
   public static Collection<Object[]> parameters() {
-    BiFunction<Processor, InternalEvent, InternalEvent> blocking = (listener, event) -> just(event).transform(listener).block();
-    BiFunction<Processor, InternalEvent, InternalEvent> async = (listener, event) -> {
+    BiFunction<Processor, BaseEvent, BaseEvent> blocking = (listener, event) -> just(event).transform(listener).block();
+    BiFunction<Processor, BaseEvent, BaseEvent> async = (listener, event) -> {
       try {
         return listener.process(event);
       } catch (MuleException e) {
@@ -100,7 +101,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     processors.add(new StringAppendTransformer("a"));
     processors.add(new StringAppendTransformer("b"));
     processors.add(new StringAppendTransformer("c"));
-    processors.add(event -> InternalEvent.builder(event).addVariable("thread", currentThread()).build());
+    processors.add(event -> BaseEvent.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
 
     flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
@@ -144,10 +145,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    InternalEvent event = eventBuilder()
+    BaseEvent event = eventBuilder()
         .message(of(TEST_PAYLOAD))
         .build();
-    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
+    BaseEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
     assertSucessfulProcessing(response);
   }
@@ -156,16 +157,17 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
+    BaseEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
 
     assertSucessfulProcessing(response);
   }
 
-  private void assertSucessfulProcessing(InternalEvent response) throws MuleException {
-    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
+  private void assertSucessfulProcessing(BaseEvent response) throws MuleException {
+    assertThat(((PrivilegedEvent) response).getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(response.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
 
-    assertThat(sensingMessageProcessor.event.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abc"));
+    assertThat(((PrivilegedEvent) sensingMessageProcessor.event).getMessageAsString(muleContext),
+               equalTo(TEST_PAYLOAD + "abc"));
     assertThat(sensingMessageProcessor.event.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
   }
 
@@ -196,7 +198,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.stop();
     flow.start();
 
-    InternalEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
+    BaseEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
     assertThat(response, not(nullValue()));
   }
 

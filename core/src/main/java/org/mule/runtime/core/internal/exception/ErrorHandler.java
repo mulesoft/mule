@@ -18,9 +18,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -58,7 +58,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public InternalEvent handleException(MessagingException exception, InternalEvent event) {
+  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     event = addExceptionPayload(exception, event);
     if (isCriticalException(exception)) {
       return event;
@@ -72,11 +72,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Publisher<InternalEvent> apply(MessagingException exception) {
+  public Publisher<BaseEvent> apply(MessagingException exception) {
     if (isCriticalException(exception)) {
       return error(exception);
     } else {
-      InternalEvent event = addExceptionPayload(exception, exception.getEvent());
+      BaseEvent event = addExceptionPayload(exception, exception.getEvent());
       exception.setProcessedEvent(event);
       for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
         if (exceptionListener.accept(event)) {
@@ -93,7 +93,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public boolean accept(InternalEvent event) {
+  public boolean accept(BaseEvent event) {
     return true;
   }
 
@@ -102,8 +102,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     return true;
   }
 
-  private InternalEvent addExceptionPayload(MessagingException exception, InternalEvent event) {
-    return InternalEvent.builder(event)
+  private BaseEvent addExceptionPayload(MessagingException exception, BaseEvent event) {
+    return BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
   }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.transformer;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.nio.charset.Charset;
 
@@ -24,7 +24,7 @@ public interface MessageTransformer extends Transformer {
    * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as
    *         the transformed data
    */
-  Object transform(Object src, InternalEvent event) throws MessageTransformerException;
+  Object transform(Object src, BaseEvent event) throws MessageTransformerException;
 
   /**
    * Transforms the supplied data and returns the result
@@ -37,5 +37,5 @@ public interface MessageTransformer extends Transformer {
    * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as
    *         the transformed data
    */
-  Object transform(Object src, Charset encoding, InternalEvent event) throws MessageTransformerException;
+  Object transform(Object src, Charset encoding, BaseEvent event) throws MessageTransformerException;
 }

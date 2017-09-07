@@ -39,14 +39,15 @@ import org.mule.test.runner.api.ClassPathClassifier;
 import org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
 import org.mule.test.runner.api.IsolatedServiceProviderDiscoverer;
 
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
 /**
  * Base class for running {@link FunctionalTestCase} with class loader isolation using {@link ArtifactClassLoaderRunner}, a JUnit
@@ -107,6 +108,12 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @BeforeClass
   public static void configureClassLoaderRepository() throws RegistrationException {
     classLoaderRepository = new TestClassLoaderRepository();
+  }
+
+  @Override
+  @After
+  public final void clearRequestContext() {
+    // Nothing to do.
   }
 
   @Override

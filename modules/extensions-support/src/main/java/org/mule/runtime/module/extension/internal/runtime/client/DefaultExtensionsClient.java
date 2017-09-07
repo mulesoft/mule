@@ -20,8 +20,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
@@ -96,7 +96,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
       throws MuleException {
     OperationMessageProcessor processor = createProcessor(extension, operation, params);
     try {
-      InternalEvent process = processor.process(getInitialiserEvent(muleContext));
+      BaseEvent process = processor.process(getInitialiserEvent(muleContext));
       return Result.<T, A>builder(process.getMessage()).build();
     } finally {
       disposeProcessor(processor);
@@ -126,7 +126,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     }
   }
 
-  private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, InternalEvent event) {
+  private Map<String, ValueResolver> resolveParameters(Map<String, Object> parameters, BaseEvent event) {
     LinkedHashMap<String, ValueResolver> values = new LinkedHashMap<>();
     parameters.forEach((name, value) -> {
       if (value instanceof ComplexParameter) {

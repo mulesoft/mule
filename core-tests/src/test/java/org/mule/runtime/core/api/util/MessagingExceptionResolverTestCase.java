@@ -11,10 +11,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -22,12 +24,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
@@ -41,12 +42,13 @@ import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import javax.xml.namespace.QName;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import javax.xml.namespace.QName;
 
 @SmallTest
 public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
@@ -55,7 +57,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private static final String EXPECTED_MESSAGE = "THIS MESSAGE SHOULD BE THROWN";
 
   private Component processor = mock(Component.class);
-  private InternalEvent event = mock(InternalEvent.class);
+  private BaseEvent event;
   private MuleContext context = mock(MuleContext.class);
   private FlowCallStack flowCallStack = mock(FlowCallStack.class);
   private Message message = mock(Message.class);
@@ -78,14 +80,12 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private final MessagingExceptionResolver resolver = new MessagingExceptionResolver(processor);
 
   @Before
-  public void setup() {
-    when(event.getFlowCallStack()).thenReturn(flowCallStack);
-    when(event.getMessage()).thenReturn(message);
-    when(event.getError()).thenReturn(Optional.empty());
-    when(context.getErrorTypeLocator()).thenReturn(locator);
-
+  public void setup() throws MuleException {
     when(message.getPayload()).thenReturn(new TypedValue<>(null, DataType.STRING));
     when(message.getAttributes()).thenReturn(new TypedValue<>(null, DataType.STRING));
+    event = spy(getEventBuilder().message(message).build());
+
+    when(context.getErrorTypeLocator()).thenReturn(locator);
   }
 
   @Test
@@ -204,7 +204,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     assertThat(error.get().getErrorType(), is(expected));
   }
 
-  private MessagingException newMessagingException(Throwable e, InternalEvent event, Component processor) {
+  private MessagingException newMessagingException(Throwable e, BaseEvent event, Component processor) {
     return new MessagingException(createStaticMessage(ERROR_MESSAGE), event, e, processor);
   }
 
@@ -218,7 +218,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public class TestProcessor implements AnnotatedProcessor {
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       return nullPayloadEvent();
     }
 

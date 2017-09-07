@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.streaming;
 
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 /**
  * Creates instances of {@link org.mule.runtime.api.streaming.bytes.CursorStreamProvider}
@@ -28,7 +28,7 @@ public interface CursorProviderFactory<T> {
    * @param value the stream to be cursored
    * @return A {@link CursorProvider} or the same given {@code inputStream}
    */
-  Object of(InternalEvent event, T value);
+  Object of(BaseEvent event, T value);
 
   /**
    * @param value a stream

@@ -19,9 +19,9 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.reactivestreams.Publisher;
@@ -46,12 +46,12 @@ public class TestNonBlockingProcessor extends AbstractComponent
   }
 
   @Override
-  public InternalEvent process(final InternalEvent event) throws MuleException {
+  public BaseEvent process(final BaseEvent event) throws MuleException {
     return event;
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher).flatMap(event -> {
       if (isTransactionActive()) {
         return publisher;

@@ -27,7 +27,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -57,7 +57,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private static final String DW_CAR_LIST = "#[[{color : 'RED', price: 1000}]]";
   private static final DataType CAR_DATA_TYPE = DataType.fromType(Car.class);
   private static final DataType CAR_LIST_DATA_TYPE = DataType.builder().collectionType(List.class).itemType(Car.class).build();
-  private InternalEvent mockMuleEvent = mock(InternalEvent.class);
+  private BaseEvent mockMuleEvent = mock(BaseEvent.class);
   private DefaultExpressionManager expressionManager;
 
   @Mock
@@ -65,7 +65,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setUp() throws RegistrationException {
-    when(streamingManager.manage(any(CursorProvider.class), any(InternalEvent.class))).then(returnsFirstArg());
+    when(streamingManager.manage(any(CursorProvider.class), any(BaseEvent.class))).then(returnsFirstArg());
     expressionManager = new DefaultExpressionManager(muleContext, streamingManager);
   }
 
@@ -79,7 +79,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaStringFromIntJsonProperty() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]", STRING);
-    InternalEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
+    BaseEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
     Object port = attributeEvaluator.resolveValue(event);
     assertThat(port, is("8081"));
   }
@@ -87,7 +87,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaIntFromIntJsonProperty() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.port]", NUMBER);
-    InternalEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
+    BaseEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
     Object port = attributeEvaluator.resolveValue(event);
     assertThat(port, is(8081));
   }
@@ -95,7 +95,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaStringFromStringJsonProperty() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.host]", STRING);
-    InternalEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
+    BaseEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
     Object host = attributeEvaluator.resolveValue(event);
     assertThat(host, is("0.0.0.0"));
   }
@@ -103,7 +103,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaObjectFromStringJsonProperty() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.host]", OBJECT);
-    InternalEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
+    BaseEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
     Object resolveValue = attributeEvaluator.resolveValue(event);
     assertThat(IOUtils.toString((InputStream) ((CursorProvider) resolveValue).openCursor()), is("\"0.0.0.0\""));
   }
@@ -111,7 +111,7 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void getJavaInputStreamFromStringJsonProperty() throws MuleException {
     AttributeEvaluator attributeEvaluator = getAttributeEvaluator("#[payload.host]", INPUT_STREAM);
-    InternalEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
+    BaseEvent event = newEvent(HOST_PORT_JSON, APPLICATION_JSON);
     Object resolveValue = attributeEvaluator.resolveValue(event);
     assertThat(IOUtils.toString((InputStream) ((CursorProvider) resolveValue).openCursor()), is("\"0.0.0.0\""));
   }
@@ -200,8 +200,8 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
     assertThat(bool, is(true));
   }
 
-  private InternalEvent newEvent(Object payload, MediaType applicationJson) throws MuleException {
-    return InternalEvent.builder(newEvent())
+  private BaseEvent newEvent(Object payload, MediaType applicationJson) throws MuleException {
+    return BaseEvent.builder(newEvent())
         .message(Message.builder()
             .value(payload)
             .mediaType(applicationJson)
