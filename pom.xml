@@ -229,7 +229,7 @@
         <muleHttpConnectorTestVersion>0.9.0-SNAPSHOT</muleHttpConnectorTestVersion>
         <muleSocketsConnectorTestVersion>0.9.0-SNAPSHOT</muleSocketsConnectorTestVersion>
         <muleFileConnectorTestVersion>0.9.0-SNAPSHOT</muleFileConnectorTestVersion>
-        <muleJmsConnectorTestVersion>1.0.0-SNAPSHOT</muleJmsConnectorTestVersion>
+        <muleJmsConnectorTestVersion>0.9.0-SNAPSHOT</muleJmsConnectorTestVersion>
 
         <muleFileCommonsTestVersion>0.9.0-SNAPSHOT</muleFileCommonsTestVersion>
 
