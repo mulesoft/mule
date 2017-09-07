@@ -132,7 +132,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                 .map(MethodWrapper::new)
                 .ifPresent(methodElement -> new MethodStereotypeResolver(methodElement, declaration, namespace, PROCESSOR,
                                                                          stereotypes)
-                  .resolveStereotype());
+                                                                             .resolveStereotype());
           }
 
           @Override

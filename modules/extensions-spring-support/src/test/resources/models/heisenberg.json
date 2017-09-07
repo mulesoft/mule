@@ -12337,9 +12337,9 @@
           "format": "java",
           "type": "Object",
           "annotations": {
-            "typeId": "org.mule.runtime.extension.api.runtime.process.Chain",
+            "typeId": "org.mule.runtime.extension.api.runtime.route.Chain",
             "classInformation": {
-              "classname": "org.mule.runtime.extension.api.runtime.process.Chain",
+              "classname": "org.mule.runtime.extension.api.runtime.route.Chain",
               "hasDefaultConstructor": false,
               "isInterface": true,
               "isInstantiable": false,
@@ -17818,6 +17818,63 @@
       "description": "",
       "modelProperties": {},
       "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [
+        {
+          "type": "VALIDATION",
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "VALIDATION",
+            "namespace": "MULE",
+            "parent": {
+              "type": "ANY",
+              "namespace": "MULE"
+            }
+          }
+        }
+      ],
+      "stereotype": {
+        "type": "VALIDATOR",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "VALIDATOR",
+          "namespace": "MULE",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [],
+      "name": "validateMoney",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
     }
   ],
   "functions": [],
@@ -19459,6 +19516,18 @@
       }
     },
     {
+      "type": "VALIDATION",
+      "namespace": "HEISENBERG",
+      "parent": {
+        "type": "VALIDATION",
+        "namespace": "MULE",
+        "parent": {
+          "type": "ANY",
+          "namespace": "MULE"
+        }
+      }
+    },
+    {
       "type": "OAUTH2",
       "namespace": "HEISENBERG",
       "parent": {
@@ -19472,6 +19541,14 @@
             "namespace": "MULE"
           }
         }
+      }
+    },
+    {
+      "type": "VALIDATION",
+      "namespace": "MULE",
+      "parent": {
+        "type": "ANY",
+        "namespace": "MULE"
       }
     },
     {
