@@ -8,9 +8,9 @@ package org.mule.runtime.config.spring.internal.dsl.spring;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.spring.internal.dsl.spring.CommonBeanDefinitionCreator.ANNOTATIONS_PROPERTY_NAME;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;

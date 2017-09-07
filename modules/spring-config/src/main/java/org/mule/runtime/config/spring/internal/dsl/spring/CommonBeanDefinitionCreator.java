@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.internal.dsl.spring;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
+import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
@@ -62,8 +63,6 @@ import org.w3c.dom.Node;
  *        TODO MULE-9638 set visibility to package
  */
 public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
-
-  public static String ANNOTATIONS_PROPERTY_NAME = "annotations";
 
   private static Set<ComponentIdentifier> genericPropertiesCustomProcessingIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
