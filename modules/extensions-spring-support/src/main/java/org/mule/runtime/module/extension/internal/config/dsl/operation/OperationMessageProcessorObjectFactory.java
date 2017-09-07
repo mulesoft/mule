@@ -10,15 +10,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
-
-import java.util.List;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
@@ -27,8 +24,6 @@ import java.util.List;
  */
 public class OperationMessageProcessorObjectFactory
     extends ComponentMessageProcessorObjectFactory<OperationModel, OperationMessageProcessor> {
-
-  protected List<Processor> nestedProcessors;
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel componentModel,
@@ -41,26 +36,8 @@ public class OperationMessageProcessorObjectFactory
   }
 
   @Override
-  public OperationMessageProcessor doGetObject() throws Exception {
-    if (nestedProcessors != null) {
-      componentModel.getNestedComponents().stream()
-          .filter(component -> component instanceof NestedChainModel)
-          .findFirst()
-          .ifPresent(chain -> parameters.put(chain.getName(), new ProcessorChainValueResolver(nestedProcessors)));
-    }
-
-    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext)
-        .setConfigurationProvider(configurationProvider)
-        .setParameters(parameters)
-        .setTarget(target)
-        .setTargetValue(targetValue)
-        .setCursorProviderFactory(cursorProviderFactory)
-        .setRetryPolicyTemplate(retryPolicyTemplate)
-        .build();
-  }
-
-  public void setNestedProcessors(List<Processor> nestedProcessors) {
-    this.nestedProcessors = nestedProcessors;
+  protected OperationMessageProcessorBuilder getMessageProcessorBuilder() {
+    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext);
   }
 
 }

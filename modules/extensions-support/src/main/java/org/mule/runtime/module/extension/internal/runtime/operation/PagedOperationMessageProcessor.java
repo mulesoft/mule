@@ -69,7 +69,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   @Override
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
-                                        operationModel,
+                                        componentModel,
                                         connectionManager,
                                         muleContext.getErrorTypeRepository(),
                                         transformPagingDelegate());

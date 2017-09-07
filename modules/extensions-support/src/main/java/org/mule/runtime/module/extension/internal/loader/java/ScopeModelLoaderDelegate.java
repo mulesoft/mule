@@ -17,7 +17,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
@@ -79,7 +79,7 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     final OperationDeclarer scope = actualDeclarer.withOperation(scopeMethod.getAlias())
         .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new OperationExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
+        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
                                                                                                        method)));
 
     processNonBlockingOperation(scope, scopeMethod, false, loader.getTypeLoader());

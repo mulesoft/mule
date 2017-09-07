@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,7 +16,7 @@ import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
- *  Provides instances of {@link OperationMessageProcessor} for a given {@link OperationModel}
+ * Provides instances of {@link OperationMessageProcessor} for a given {@link OperationModel}
  *
  * @since 4.0
  */
@@ -34,41 +31,25 @@ public final class OperationMessageProcessorBuilder
     super(extensionModel, operationModel, policyManager, muleContext);
   }
 
-  public OperationMessageProcessor build() {
-    return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      try {
+  @Override
+  protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
+    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+      return new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                                arguments,
+                                                cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
+                                                extensionConnectionSupplier);
+    }
 
-        final ExtensionManager extensionManager = muleContext.getExtensionManager();
-        final ResolverSet operationArguments = getArgumentsResolverSet();
-
-        OperationMessageProcessor processor;
-
-        if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-          processor =
-              new PagedOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                 operationArguments,
-                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                 extensionConnectionSupplier);
-        } else if (supportsOAuth(extensionModel)) {
-          processor =
-              new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
-                                                 operationArguments,
-                                                 cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
-                                                 oauthManager);
-        } else {
-          processor = new OperationMessageProcessor(extensionModel, operationModel,
-                                                    configurationProvider, target, targetValue,
-                                                    operationArguments,
-                                                    cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                                    policyManager);
-        }
-        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-        muleContext.getInjector().inject(processor);
-        return processor;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
+    if (supportsOAuth(extensionModel)) {
+      return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
+                                                arguments,
+                                                cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager,
+                                                oauthManager);
+    }
+    return new OperationMessageProcessor(extensionModel, operationModel,
+                                         configurationProvider, target, targetValue,
+                                         arguments,
+                                         cursorProviderFactory, retryPolicyTemplate, extensionManager,
+                                         policyManager);
   }
-
 }

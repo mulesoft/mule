@@ -6,18 +6,17 @@
  */
 package org.mule.runtime.module.extension.api.loader.java.property;
 
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 
 /**
- * A {@link ModelProperty} meant to be used on {@link OperationModel operation models},
- * which provides access to a {@link ComponentExecutorFactory} used to execute such
- * operation
+ * A {@link ModelProperty} meant to be used on {@link ComponentModel component models},
+ * which provides access to a {@link ComponentExecutorFactory} used to execute such component
  *
  * @since 4.0
  */
-public final class OperationExecutorModelProperty implements ModelProperty {
+public final class ComponentExecutorModelProperty implements ModelProperty {
 
   private final ComponentExecutorFactory executorFactory;
 
@@ -26,7 +25,7 @@ public final class OperationExecutorModelProperty implements ModelProperty {
    *
    * @param executorFactory a {@link ComponentExecutorFactory}
    */
-  public OperationExecutorModelProperty(ComponentExecutorFactory executorFactory) {
+  public ComponentExecutorModelProperty(ComponentExecutorFactory executorFactory) {
     this.executorFactory = executorFactory;
   }
 

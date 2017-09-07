@@ -8,11 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -62,8 +65,36 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.operationModel = operationModel;
     this.policyManager = policyManager;
     this.muleContext = muleContext;
-    extensionConnectionSupplier = lookup(ExtensionConnectionSupplier.class);
-    oauthManager = lookup(ExtensionsOAuthManager.class);
+    this.extensionConnectionSupplier = lookup(ExtensionConnectionSupplier.class);
+    this.oauthManager = lookup(ExtensionsOAuthManager.class);
+  }
+
+  public P build() {
+    return withContextClassLoader(getClassLoader(extensionModel), () -> {
+      try {
+        final ExtensionManager extensionManager = muleContext.getExtensionManager();
+        final ResolverSet operationArguments = getArgumentsResolverSet();
+
+        P processor = createMessageProcessor(extensionManager, operationArguments);
+        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
+        muleContext.getInjector().inject(processor);
+        return processor;
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
+    });
+  }
+
+  protected abstract P createMessageProcessor(ExtensionManager extensionManager, ResolverSet operationArguments);
+
+  protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
+    final ResolverSet parametersResolverSet =
+        ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
+
+    final ResolverSet childsResolverSet =
+        ParametersResolver.fromValues(parameters, muleContext).getNestedComponentsAsResolverSet(operationModel);
+
+    return parametersResolverSet.merge(childsResolverSet);
   }
 
   private <T> T lookup(Class<T> type) {
@@ -109,15 +140,4 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     return this;
   }
 
-  public abstract P build();
-
-  protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
-    final ResolverSet parametersResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
-
-    final ResolverSet childsResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext).getNestedComponentsAsResolverSet(operationModel);
-
-    return parametersResolverSet.merge(childsResolverSet);
-  }
 }

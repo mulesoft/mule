@@ -12,7 +12,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import org.mule.runtime.api.meta.model.ExecutableComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
@@ -149,7 +149,7 @@ final public class ExportedArtifactsCollector {
     }.walk(extensionModel);
   }
 
-  private void collectReturnTypes(ExecutableComponentModel model) {
+  private void collectReturnTypes(ConnectableComponentModel model) {
     exportedClasses.addAll(collectRelativeClasses(model.getOutput().getType(), extensionClassloader));
     exportedClasses.addAll(collectRelativeClasses(model.getOutputAttributes().getType(), extensionClassloader));
   }

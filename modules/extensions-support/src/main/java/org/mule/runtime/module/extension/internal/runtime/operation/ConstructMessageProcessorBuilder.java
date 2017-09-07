@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -17,7 +14,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
 /**
- *  Provides instances of {@link ConstructMessageProcessor} for a given {@link ConstructModel}
+ * Provides instances of {@link ConstructMessageProcessor} for a given {@link ConstructModel}
  *
  * @since 4.0
  */
@@ -32,25 +29,13 @@ public final class ConstructMessageProcessorBuilder
     super(extensionModel, operationModel, policyManager, muleContext);
   }
 
-  public ConstructMessageProcessor build() {
-    return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      try {
-        final ExtensionManager extensionManager = muleContext.getExtensionManager();
-        final ResolverSet operationArguments = getArgumentsResolverSet();
-
-        ConstructMessageProcessor processor = new ConstructMessageProcessor(extensionModel, operationModel,
-                                                                            configurationProvider, target, targetValue,
-                                                                            operationArguments,
-                                                                            cursorProviderFactory, retryPolicyTemplate,
-                                                                            extensionManager,
-                                                                            policyManager);
-        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-        muleContext.getInjector().inject(processor);
-        return processor;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
+  protected ConstructMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
+    return new ConstructMessageProcessor(extensionModel, operationModel,
+                                         configurationProvider, target, targetValue,
+                                         arguments,
+                                         cursorProviderFactory, retryPolicyTemplate,
+                                         extensionManager,
+                                         policyManager);
   }
 
 }

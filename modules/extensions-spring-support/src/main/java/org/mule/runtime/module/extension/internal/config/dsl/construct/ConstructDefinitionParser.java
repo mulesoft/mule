@@ -30,8 +30,10 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.module.extension.internal.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
 
 import java.util.List;
@@ -43,64 +45,22 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class ConstructDefinitionParser extends ExtensionDefinitionParser {
-
-  private final ExtensionModel extensionModel;
-  private final ConstructModel constructModel;
-  private final DslElementSyntax constructDsl;
+public class ConstructDefinitionParser extends AbstractComponentDefinitionParser<ConstructModel> {
 
   public ConstructDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                    ConstructModel constructModel,
                                    DslSyntaxResolver dslSyntaxResolver,
                                    ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
-    this.extensionModel = extensionModel;
-    this.constructModel = constructModel;
-    this.constructDsl = dslSyntaxResolver.resolve(constructModel);
+    super(definition, extensionModel, constructModel, dslSyntaxResolver, parsingContext);
   }
 
   @Override
-  protected Builder doParse(Builder definitionBuilder)
-      throws ConfigurationException {
-    Builder finalBuilder = definitionBuilder.withIdentifier(constructDsl.getElementName())
-        .withTypeDefinition(fromType(ConstructMessageProcessor.class))
-        .withObjectFactoryType(ConstructMessageProcessorObjectFactory.class)
-        .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(constructModel).build())
-        .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
-        .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
-                                       fromSimpleParameter(TARGET_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(TARGET_VALUE_PARAMETER_NAME,
-                                       fromSimpleParameter(TARGET_VALUE_PARAMETER_NAME).build())
-        .withSetterParameterDefinition(CONFIG_PROVIDER_ATTRIBUTE_NAME,
-                                       fromSimpleReferenceParameter(CONFIG_ATTRIBUTE_NAME).build())
-        .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
-                                       fromChildConfiguration(CursorProviderFactory.class).build())
-        .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
+  protected Class<ConstructMessageProcessor> getMessageProcessorType() {
+    return ConstructMessageProcessor.class;
+  }
 
-    Optional<? extends NestableElementModel> nestedChain = constructModel.getNestedComponents().stream()
-        .filter(c -> c instanceof NestedChainModel)
-        .findFirst();
-
-    if (nestedChain.isPresent()) {
-      // TODO improve to support things like [source, chainOfProcessors, errorHandler] or [chainOfProcessors, errorHandler]
-      finalBuilder = finalBuilder.withSetterParameterDefinition("nestedProcessors",
-                                                                fromChildCollectionConfiguration(Processor.class).build());
-
-      parseParameters(constructModel.getAllParameterModels());
-    } else {
-
-      List<ParameterGroupModel> inlineGroups = getInlineGroups(constructModel);
-      parseParameters(getFlatParameters(inlineGroups, constructModel.getAllParameterModels()));
-      for (ParameterGroupModel group : inlineGroups) {
-        parseInlineParameterGroup(group);
-      }
-
-      // TODO improve to support things like [source, chainOfProcessors, errorHandler] or [chainOfProcessors, errorHandler]
-      parseNestedComponents(constructModel.getNestedComponents());
-    }
-
-    return finalBuilder;
+  @Override
+  protected Class<ConstructMessageProcessorObjectFactory> getMessageProcessorFactoryType() {
+    return ConstructMessageProcessorObjectFactory.class;
   }
 }

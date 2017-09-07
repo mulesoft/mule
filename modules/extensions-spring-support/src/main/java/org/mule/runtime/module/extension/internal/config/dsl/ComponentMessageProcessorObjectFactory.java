@@ -10,19 +10,26 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
+import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
+
+import java.util.List;
 
 /**
  * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
  *
  * @since 4.0
  */
-public abstract class ComponentMessageProcessorObjectFactory<M extends ComponentModel, P extends ExtensionComponent>
+public abstract class ComponentMessageProcessorObjectFactory<M extends ComponentModel, P extends ComponentMessageProcessor>
     extends AbstractExtensionObjectFactory<P> {
 
   protected final ExtensionModel extensionModel;
@@ -33,6 +40,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
   protected String targetValue = PAYLOAD;
   protected CursorProviderFactory cursorProviderFactory;
   protected RetryPolicyTemplate retryPolicyTemplate;
+  protected List<Processor> nestedProcessors;
 
   public ComponentMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 M componentModel,
@@ -43,6 +51,27 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
     this.componentModel = componentModel;
     this.policyManager = policyManager;
   }
+
+  @Override
+  public P doGetObject() throws Exception {
+    if (nestedProcessors != null) {
+      componentModel.getNestedComponents().stream()
+          .filter(component -> component instanceof NestedChainModel)
+          .findFirst()
+          .ifPresent(chain -> parameters.put(chain.getName(), new ProcessorChainValueResolver(nestedProcessors)));
+    }
+
+    return getMessageProcessorBuilder()
+        .setConfigurationProvider(configurationProvider)
+        .setParameters(parameters)
+        .setTarget(target)
+        .setTargetValue(targetValue)
+        .setCursorProviderFactory(cursorProviderFactory)
+        .setRetryPolicyTemplate(retryPolicyTemplate)
+        .build();
+  }
+
+  protected abstract ComponentMessageProcessorBuilder<M, P> getMessageProcessorBuilder();
 
   public void setConfigurationProvider(ConfigurationProvider configuration) {
     this.configurationProvider = configuration;
@@ -62,6 +91,10 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
   public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
     this.retryPolicyTemplate = retryPolicyTemplate;
+  }
+
+  public void setNestedProcessors(List<Processor> processors) {
+    this.nestedProcessors = processors;
   }
 
 }

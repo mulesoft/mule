@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
@@ -72,7 +72,7 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     final ConstructDeclarer router = actualDeclarer.withConstruct(routerMethod.getAlias())
         .withModelProperty(new ImplementingMethodModelProperty(method))
-        .withModelProperty(new OperationExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method)));
+        .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method)));
 
     List<ExtensionParameter> callbackParameters = routerMethod.getParameters().stream()
         .filter(p -> RouterCompletionCallback.class.equals(p.getType().getDeclaringClass()))

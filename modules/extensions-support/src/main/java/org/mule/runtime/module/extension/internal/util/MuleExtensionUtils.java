@@ -74,7 +74,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
@@ -390,7 +390,7 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code operationModel} for a {@link OperationExecutorModelProperty} and if present it returns the enclosed
+   * Tests the given {@code operationModel} for a {@link ComponentExecutorModelProperty} and if present it returns the enclosed
    * {@link ComponentExecutorFactory}. If no such property is found, then a {@link IllegalOperationModelDefinitionException} is
    * thrown.
    *
@@ -401,8 +401,8 @@ public class MuleExtensionUtils {
   public static <T extends ComponentModel> ComponentExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
     ComponentExecutorFactory executorFactory =
         fromModelProperty(operationModel,
-                          OperationExecutorModelProperty.class,
-                          OperationExecutorModelProperty::getExecutorFactory,
+                          ComponentExecutorModelProperty.class,
+                          ComponentExecutorModelProperty::getExecutorFactory,
                           () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
                                                                                     operationModel.getName(),
                                                                                     ComponentExecutorFactory.class
