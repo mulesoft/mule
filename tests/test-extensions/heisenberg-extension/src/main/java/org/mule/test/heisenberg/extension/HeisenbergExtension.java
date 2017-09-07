@@ -74,7 +74,6 @@ public class HeisenbergExtension implements Lifecycle {
   public static final String HEISENBERG_LIB_CLASS_NAME = "org.heisenberg.HeisenbergJNI";
 
   public static final String AGE = "50";
-  public static final String EXTENSION_DESCRIPTION = "My Test Extension just to unit test";
   public static final String RICIN_GROUP_NAME = "Dangerous-Ricin";
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
