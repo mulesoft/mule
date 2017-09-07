@@ -21,22 +21,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.policy.Policy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
@@ -198,7 +197,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
   }
 
   private InternalEvent createTestEvent() {
-    return InternalEvent.builder(DefaultEventContext.create(mockFlowConstruct, fromSingleComponent("http")))
+    return InternalEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build()).build();
   }
 

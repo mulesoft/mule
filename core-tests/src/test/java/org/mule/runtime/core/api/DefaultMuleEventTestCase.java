@@ -13,12 +13,12 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -48,7 +48,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
-    messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+    messageContext = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = builder(messageContext).message(muleMessage).flow(flow).build();
   }
 

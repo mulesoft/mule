@@ -10,12 +10,11 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -45,7 +44,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    InternalEventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");

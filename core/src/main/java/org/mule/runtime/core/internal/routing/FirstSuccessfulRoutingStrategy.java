@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.DispatchException;

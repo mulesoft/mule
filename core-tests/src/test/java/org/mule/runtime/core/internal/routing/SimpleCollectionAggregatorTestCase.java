@@ -14,9 +14,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -50,7 +50,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    InternalEventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
@@ -97,7 +97,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    InternalEventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
     Message message1 = of("test event A");
 
     InternalEvent event1 =
@@ -128,7 +128,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    InternalEventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    InternalEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = of("test event A");
     Message message2 = of("test event B");

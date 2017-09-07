@@ -14,10 +14,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleSession;
@@ -110,8 +110,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
         InternalEvent event =
-            InternalEvent.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg)
-                .flow(flowConstruct).session(session).build();
+            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
+                .session(session).build();
         try {
           target.process(event);
         } catch (MuleException e) {

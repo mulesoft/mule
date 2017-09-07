@@ -13,13 +13,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
@@ -33,8 +32,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-
-import java.util.Optional;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -94,7 +91,7 @@ public class MuleContextUtils {
    */
   public static Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
-    return InternalEvent.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
 }
