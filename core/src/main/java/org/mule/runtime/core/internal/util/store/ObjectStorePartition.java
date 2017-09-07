@@ -15,6 +15,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -78,6 +79,11 @@ public class ObjectStorePartition<T extends Serializable> extends TemplateObject
   @Override
   public List<String> allKeys() throws ObjectStoreException {
     return partitionedObjectStore.allKeys(partitionName);
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    return partitionedObjectStore.retrieveAll(partitionName);
   }
 
   public PartitionableObjectStore<T> getBaseStore() {

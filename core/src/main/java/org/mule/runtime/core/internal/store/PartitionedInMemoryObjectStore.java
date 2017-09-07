@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.component.InternalComponent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,6 +88,11 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   @Override
   public List<String> allKeys(String partitionName) throws ObjectStoreException {
     return new ArrayList<>(getPartition(partitionName).keySet());
+  }
+
+  @Override
+  public Map<String, T> retrieveAll(String partitionName) throws ObjectStoreException {
+    return new LinkedHashMap<>(getPartition(partitionName));
   }
 
   @Override

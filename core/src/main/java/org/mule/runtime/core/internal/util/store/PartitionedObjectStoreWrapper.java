@@ -16,7 +16,9 @@ import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.util.Pair;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -104,6 +106,21 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> extends Templ
         .filter(key -> key.getFirst().equals(partitionName))
         .map(Pair::getSecond)
         .collect(toList());
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    Map<String, T> all = getStore().retrieveAll();
+    Map<String, T> result = new LinkedHashMap<>();
+
+    all.forEach((k, v) -> {
+      Pair<String, String> key = splitKey(k);
+      if (partitionName.equals(key.getFirst())) {
+        result.put(key.getSecond(), v);
+      }
+    });
+
+    return result;
   }
 
   private ObjectStore<T> getStore() {

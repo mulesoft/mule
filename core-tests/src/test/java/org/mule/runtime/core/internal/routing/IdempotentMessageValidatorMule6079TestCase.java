@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -168,6 +169,11 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     @Override
     public List<String> allKeys() throws ObjectStoreException {
       return new ArrayList<>(map.keySet());
+    }
+
+    @Override
+    public Map<String, String> retrieveAll() throws ObjectStoreException {
+      return unmodifiableMap(map);
     }
   }
 }

@@ -15,6 +15,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractPartitionableObjectStore<T extends Serializable> extends AbstractObjectStoreSupport<T>
     implements PartitionableObjectStore<T> {
@@ -32,6 +33,11 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
   @Override
   public List<String> allKeys() throws ObjectStoreException {
     return allKeys(DEFAULT_PARTITION_NAME);
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    return retrieveAll(DEFAULT_PARTITION_NAME);
   }
 
   @Override

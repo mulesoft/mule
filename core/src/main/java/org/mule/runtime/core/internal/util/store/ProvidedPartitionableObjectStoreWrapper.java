@@ -12,6 +12,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -85,6 +86,11 @@ public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> ext
   @Override
   public List<String> allKeys(String partitionName) throws ObjectStoreException {
     return wrapped.allKeys(partitionName);
+  }
+
+  @Override
+  public Map<String, T> retrieveAll(String partitionName) throws ObjectStoreException {
+    return wrapped.retrieveAll(partitionName);
   }
 
   @Override

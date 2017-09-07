@@ -8,7 +8,9 @@ package org.mule.runtime.core.internal.util.store;
 
 import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -18,15 +20,15 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.concurrent.ScheduledFuture;
 
@@ -90,6 +92,11 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   @Override
   protected T doRetrieve(String key) throws ObjectStoreException {
     return getStore().retrieve(key).getItem();
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    return getStore().retrieveAll().values().stream().collect(toMap(StoredObject::getKey, StoredObject::getItem));
   }
 
   @Override

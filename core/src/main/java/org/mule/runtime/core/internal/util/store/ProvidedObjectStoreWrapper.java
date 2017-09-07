@@ -13,6 +13,7 @@ import org.mule.runtime.api.store.TemplateObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -94,6 +95,11 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
   @Override
   public List<String> allKeys() throws ObjectStoreException {
     return getWrapped().allKeys();
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    return getWrapped().retrieveAll();
   }
 
   protected ObjectStore<T> getWrapped() {

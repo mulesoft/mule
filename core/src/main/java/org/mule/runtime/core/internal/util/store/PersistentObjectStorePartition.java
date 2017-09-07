@@ -41,7 +41,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.TreeBidiMap;
@@ -152,10 +154,29 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
       if (!realKeyToUUIDIndex.containsKey(key)) {
         throw new ObjectDoesNotExistException(createStaticMessage("Key does not exist: " + key));
       }
-      String filename = (String) realKeyToUUIDIndex.get(key);
-      File file = getValueFile(filename);
-      return deserialize(file).getValue();
+      return load(key);
     }
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    assureLoaded();
+
+    synchronized (realKeyToUUIDIndex) {
+      Map<String, T> values = new LinkedHashMap<>(realKeyToUUIDIndex.size());
+      for (Object k : realKeyToUUIDIndex.keySet()) {
+        String key = (String) k;
+        values.put(key, load(key));
+      }
+
+      return values;
+    }
+  }
+
+  private T load(String key) throws ObjectStoreException {
+    String filename = (String) realKeyToUUIDIndex.get(key);
+    File file = getValueFile(filename);
+    return deserialize(file).getValue();
   }
 
   @Override
