@@ -7,7 +7,6 @@
 package org.mule.routing;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -201,7 +200,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
         {
             assertTrue(msg.getPayload() instanceof String);
             assertEquals(counted ? count : -1,
-                msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
+                         (int)msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
             actualSequences.add(msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
             String str = (String)msg.getPayload();
             assertTrue(TEST_LIST_MULTIPLE.contains(str));

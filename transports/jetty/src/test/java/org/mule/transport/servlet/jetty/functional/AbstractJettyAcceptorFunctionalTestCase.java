@@ -110,7 +110,7 @@ public abstract class AbstractJettyAcceptorFunctionalTestCase extends Functional
     {
         final MuleClient client = muleContext.getClient();
         final MuleMessage message = client.send(String.format("%s://localhost:%s", protocol, port1.getNumber()), getTestMuleMessage(TEST_MESSAGE), getRequestOptionsBuilder().build());
-        assertEquals(200, message.getInboundProperty("http.status"));
+        assertEquals(200, (int)message.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", message.getPayloadAsString());
     }
 

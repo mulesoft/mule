@@ -320,7 +320,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private static DataType<?> createDefaultDataType(Object payload, MuleContext muleContext)
     {
-        DataType<?> dataType = DataTypeFactory.create(payload == null ? Object.class : payload.getClass());
+        Class<?> type = payload == null ? Object.class : payload.getClass();
+        DataType<?> dataType = DataTypeFactory.create(type);
         dataType.setEncoding(SystemUtils.getDefaultEncoding(muleContext));
 
         return dataType;

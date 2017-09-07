@@ -790,7 +790,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
             Class<?> clazz = endpoint.getMuleContext().getExecutionClassLoader().loadClass(comparatorClassName.toString());
             Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
-            return reverse ? new ReverseComparator(comparator) : comparator;
+            return reverse ? new ReverseComparator(comparator) : (Comparator<File>)comparator;
         }
         return null;
     }
