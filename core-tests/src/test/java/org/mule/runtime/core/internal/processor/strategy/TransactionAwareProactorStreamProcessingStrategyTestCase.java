@@ -13,17 +13,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
+import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamProcessingStrategyFactory.TransactionAwareProactorStreamProcessingStrategy;
-import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import io.qameta.allure.Description;
@@ -34,14 +33,14 @@ import io.qameta.allure.Story;
 @Story(DEFAULT)
 public class TransactionAwareProactorStreamProcessingStrategyTestCase extends ProactorStreamProcessingStrategyTestCase {
 
-  public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractReactiveProcessorTestCase.Mode mode) {
+  public TransactionAwareProactorStreamProcessingStrategyTestCase(AbstractProcessingStrategyTestCase.Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new TransactionAwareProactorStreamProcessingStrategy(() -> blocking,
-                                                                DEFAULT_BUFFER_SIZE,
+                                                                XS_BUFFER_SIZE,
                                                                 DEFAULT_SUBSCRIBER_COUNT,
                                                                 DEFAULT_WAIT_STRATEGY,
                                                                 () -> cpuLight,
@@ -60,7 +59,7 @@ public class TransactionAwareProactorStreamProcessingStrategyTestCase extends Pr
 
     TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
 
-    process(flow, testEvent());
+    processFlow(testEvent());
 
     assertThat(threads, hasSize(equalTo(1)));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

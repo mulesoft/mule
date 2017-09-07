@@ -10,7 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
@@ -20,29 +22,33 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
+import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
@@ -55,7 +61,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
     return new ProactorStreamProcessingStrategy(() -> ringBuffer,
-                                                DEFAULT_BUFFER_SIZE,
+                                                XS_BUFFER_SIZE,
                                                 DEFAULT_SUBSCRIBER_COUNT,
                                                 DEFAULT_WAIT_STRATEGY,
                                                 () -> cpuLight,
@@ -182,7 +188,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Override
@@ -222,7 +228,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         .build();
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
     verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
     verify(blockingSchedulerSpy, times(1)).submit(any(Runnable.class));
     assertThat(threads, hasSize(1));
@@ -250,7 +256,7 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
         .build();
     flow.initialise();
     flow.start();
-    process(flow, testEvent());
+    processFlow(testEvent());
     verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
     verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Runnable.class));
     assertThat(threads, hasSize(1));
@@ -332,6 +338,30 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     testAsyncCpuLightNotificationThreads(beforeThread, afterThread);
     assertThat(beforeThread.get().getName(), startsWith(CPU_LIGHT));
     assertThat(afterThread.get().getName(), startsWith(CPU_LIGHT));
+  }
+
+  @Test
+  @Description("When back-pressure strategy is 'WAIT' the source thread blocks and all requests are processed.")
+  public void sourceBackPressureWait() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
+    }
+  }
+
+  @Test
+  @Description("When back-pressure strategy is 'FAIL' some requests fail with an OVERLOAD error.")
+  public void sourceBackPressureFail() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(FAIL, lessThan(STREAM_ITERATIONS), greaterThan(0), equalTo(STREAM_ITERATIONS));
+    }
+  }
+
+  @Test
+  @Description("When back-pressure strategy is 'DROP' some requests fail with and are dropped.")
+  public void sourceBackPressureDrop() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(DROP, lessThan(STREAM_ITERATIONS), equalTo(0), lessThan(STREAM_ITERATIONS));
+    }
   }
 
 }

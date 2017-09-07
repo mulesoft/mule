@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
 import java.util.concurrent.ExecutorService;
@@ -94,8 +95,7 @@ class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStr
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
       Sink proactorSink = super.createSink(flowConstruct, pipeline);
       Sink syncSink = BLOCKING_PROCESSING_STRATEGY_INSTANCE.createSink(flowConstruct, pipeline);
-      return new TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy.DelegateSink(syncSink,
-                                                                                                                             proactorSink);
+      return new DelegateSink(syncSink, proactorSink);
     }
 
     @Override

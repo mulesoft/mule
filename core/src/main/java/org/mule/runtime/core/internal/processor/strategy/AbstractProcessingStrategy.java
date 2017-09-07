@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static reactor.core.publisher.BlockingSink.Emission.BACKPRESSURED;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -69,8 +70,13 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public void accept(InternalEvent event) {
       onEventConsumer.accept(event);
-      // TODO MULE-11449 Implement handling of back-pressure via OVERLOAD exception type.
       blockingSink.accept(event);
+    }
+
+    @Override
+    public boolean emit(InternalEvent event) {
+      onEventConsumer.accept(event);
+      return blockingSink.emit(event) != BACKPRESSURED;
     }
 
     @Override

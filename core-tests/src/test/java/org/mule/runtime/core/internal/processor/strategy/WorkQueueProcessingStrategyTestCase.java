@@ -19,24 +19,30 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory.WorkQueueProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
@@ -44,6 +50,14 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
 
   public WorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
+  }
+
+  @Before
+  public void before() throws RegistrationException {
+    super.before();
+    // This processing strategy depends on blocking scheduler not rejecting work from caller thread in order to apply
+    // back-pressure.
+    blocking = new TestScheduler(4, IO, false);
   }
 
   @Override
@@ -140,7 +154,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
     expectedException.expectCause(hasMessage(equalTo(TRANSACTIONAL_ERROR_MESSAGE)));
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Override
@@ -183,7 +197,6 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(4l));
   }
 
-
   @Test
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void rejectedExecution() throws Exception {
@@ -193,14 +206,15 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     flow.initialise();
     flow.start();
     expectRejected();
-    process(flow, testEvent());
+    processFlow(testEvent());
   }
 
   @Test
   @Description("If IO pool has maximum size of 1 only 1 thread is used for CPU_LIGHT processor and further requests block.")
   public void singleCpuLightConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO))), true,
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO, true))),
+                       true,
                        CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
@@ -213,7 +227,8 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
   @Description("If IO pool has maximum size of 1 only 1 thread is used  for BLOCKING processor and further requests block.")
   public void singleBlockingConcurrentMaxConcurrency1() throws Exception {
     internalConcurrent(flowBuilder.get()
-        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO))), true,
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> new TestScheduler(1, IO, true))),
+                       true,
                        BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
@@ -230,6 +245,30 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     testAsyncCpuLightNotificationThreads(beforeThread, afterThread);
     assertThat(beforeThread.get().getName(), startsWith(IO));
     assertThat(afterThread.get().getName(), startsWith(IO));
+  }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureWait() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(WAIT, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
+    }
+  }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureFail() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(FAIL, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
+    }
+  }
+
+  @Test
+  @Description("Regardless of back-pressure strategy this processing strategy blocks and processes all events")
+  public void sourceBackPressureDrop() throws Exception {
+    if (mode.equals(SOURCE)) {
+      testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
+    }
   }
 
 }

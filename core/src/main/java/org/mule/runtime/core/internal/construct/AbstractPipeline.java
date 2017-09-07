@@ -6,21 +6,29 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.empty;
+import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -33,6 +41,7 @@ import org.mule.runtime.core.api.context.notification.PipelineMessageNotificatio
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
+import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -50,17 +59,15 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import org.reactivestreams.Publisher;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -78,12 +85,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final MessageSource source;
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
+  private static String OVERLOAD_ERROR_MESSAGE = "Flow '%s' is unable to accept new events at this time";
+  private final ErrorType overloadErrorType;
 
   private final ProcessingStrategy processingStrategy;
 
   private volatile boolean canProcessMessage = false;
   private final Cache<String, InternalEventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
-  private volatile Sink sink;
+  private Sink sink;
   private final int maxConcurrency;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
@@ -107,6 +116,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       ((AsyncProcessingStrategyFactory) psFactory).setMaxConcurrency(maxConcurrency);
     }
     processingStrategy = psFactory.create(muleContext, getName());
+    overloadErrorType = muleContext.getErrorTypeRepository().getErrorType(OVERLOAD).orElse(null);
   }
 
   /**
@@ -201,16 +211,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
           return from(publisher)
               .doOnNext(assertStarted())
-              .<InternalEvent>handle((event, handleSink) -> {
-                try {
-                  getSink().accept(event);
-                  handleSink.next(event);
-                } catch (RejectedExecutionException ree) {
-                  MessagingException me = new MessagingException(event, ree, AbstractPipeline.this);
-                  event.getContext().error(exceptionResolver.resolve(me, getMuleContext()));
-                }
-              })
-              .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
+              .transform(dispatchToFlow(sink));
         }
       });
     }
@@ -219,6 +220,49 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     injectFlowConstructMuleContext(pipeline);
     initialiseIfInitialisable(source);
     initialiseIfInitialisable(pipeline);
+  }
+
+  /*
+   * Processor that dispatches incoming source Events to the internal pipeline the Sink. The way in which the Event is dispatched
+   * and how overload is handled depends on the Source back-pressure strategy.
+   */
+  private ReactiveProcessor dispatchToFlow(Sink sink) {
+    if (source.getBackPressureStrategy() == WAIT) {
+      // If back-pressure strategy is WAIT then use blocking `accept(Event event)` to dispatch Event
+      return publisher -> from(publisher)
+          .doOnNext(event -> {
+            try {
+              sink.accept(event);
+            } catch (RejectedExecutionException ree) {
+              MessagingException me = new MessagingException(event, ree, this);
+              event.getContext().error(exceptionResolver.resolve(me, getMuleContext()));
+            }
+          })
+          .flatMap(event -> Mono.from(event.getContext().getResponsePublisher()));
+    } else {
+      // If back-pressure strategy is FAIL/DROP then using back-pressure aware `accept(Event event)` to dispatch Event
+      return publisher -> from(publisher).flatMap(event -> {
+        if (sink.emit(event)) {
+          return event.getContext().getResponsePublisher();
+        } else {
+          if (source.getBackPressureStrategy() == DROP) {
+            // If Event is not accepted and the back-pressure strategy is DROP then drop Event.
+            return empty();
+          } else {
+            // If Event is not accepted and the back-pressure strategy is FAIL then respond to Source with an OVERLOAD error.
+            RejectedExecutionException rejectedExecutionException =
+                new RejectedExecutionException(format(OVERLOAD_ERROR_MESSAGE, getName()));
+            return error(exceptionResolver.resolve(new MessagingException(builder(event)
+                .error(ErrorBuilder.builder().errorType(overloadErrorType)
+                    .description(format("Flow '%s' Busy.", getName()))
+                    .detailedDescription(format(OVERLOAD_ERROR_MESSAGE, getName()))
+                    .exception(rejectedExecutionException)
+                    .build())
+                .build(), rejectedExecutionException, this), muleContext));
+          }
+        }
+      });
+    }
   }
 
   protected ReactiveProcessor processFlowFunction() {

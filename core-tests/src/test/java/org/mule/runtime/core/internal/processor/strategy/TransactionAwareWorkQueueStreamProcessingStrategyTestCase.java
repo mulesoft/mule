@@ -12,36 +12,40 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
-import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
+import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
+import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory.TransactionAwareWorkQueueProcessingStrategy;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory.TransactionAwareWorkQueueStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import io.qameta.allure.junit4.DisplayName;
-import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
-@Story(DEFAULT)
-@DisplayName("Default processing strategy (used when no processing strategy is configured)")
-public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
+@Story(WORK_QUEUE)
+public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase {
 
-  public TransactionAwareWorkQueueProcessingStrategyTestCase(Mode mode) {
+  public TransactionAwareWorkQueueStreamProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
 
   @Override
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix) {
-    return new TransactionAwareWorkQueueProcessingStrategy(() -> blocking);
+    return new TransactionAwareWorkQueueStreamProcessingStrategy(() -> blocking,
+                                                                 XS_BUFFER_SIZE,
+                                                                 DEFAULT_SUBSCRIBER_COUNT,
+                                                                 DEFAULT_WAIT_STRATEGY,
+                                                                 () -> blocking,
+                                                                 4);
   }
 
-  @Test
   @Override
   @Description("Unlike with the MultiReactorProcessingStrategy, the TransactionAwareWorkQueueProcessingStrategy does not fail if a transaction "
       + "is active, but rather executes these events synchronously in the caller thread transparently.")

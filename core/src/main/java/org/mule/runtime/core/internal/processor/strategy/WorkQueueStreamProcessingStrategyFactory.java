@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.scheduler.Schedulers.decorateExecutorService;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -75,7 +76,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       if (maxConcurrency > subscribers) {
         return publisher -> from(publisher)
-            .flatMap(event -> just(event).transform(pipeline).subscribeOn(fromExecutorService(blockingScheduler)),
+            .flatMap(event -> just(event).transform(pipeline)
+                .subscribeOn(fromExecutorService(decorateScheduler(blockingScheduler))),
                      maxConcurrency);
       } else {
         return super.onPipeline(pipeline);
@@ -85,7 +87,8 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher).transform(processor).publishOn(fromExecutorService(blockingScheduler));
+        return publisher -> from(publisher).transform(processor)
+            .publishOn(fromExecutorService(decorateScheduler(blockingScheduler)));
       } else {
         return super.onProcessor(processor);
       }
@@ -104,6 +107,5 @@ public class WorkQueueStreamProcessingStrategyFactory extends AbstractStreamProc
     }
 
   }
-
 
 }

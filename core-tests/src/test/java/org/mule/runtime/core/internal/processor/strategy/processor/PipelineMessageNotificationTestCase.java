@@ -52,6 +52,11 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,9 +65,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 
 
 @RunWith(Parameterized.class)
