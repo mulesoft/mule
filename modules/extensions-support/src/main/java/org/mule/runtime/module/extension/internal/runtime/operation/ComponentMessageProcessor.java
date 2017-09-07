@@ -88,7 +88,7 @@ import reactor.core.publisher.Mono;
  * allowing the policy to execute logic over the operation parameters, change those parameters and then execute logic with the
  * operation response.
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public abstract class ComponentMessageProcessor<T extends ComponentModel> extends ExtensionComponent<T>
     implements Processor, ParametersResolverProcessor<T>, Lifecycle {

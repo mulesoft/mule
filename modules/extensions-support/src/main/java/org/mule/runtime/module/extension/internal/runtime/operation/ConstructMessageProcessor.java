@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link ConstructModel construct models}
  *
- * @since 3.7.0
+ * @since 4.0
  */
 public class ConstructMessageProcessor extends ComponentMessageProcessor<ConstructModel>
     implements Processor, ParametersResolverProcessor<ConstructModel> {
