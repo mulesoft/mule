@@ -49,7 +49,6 @@ import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -207,16 +206,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Override
   protected InternalEvent.Builder getEventBuilder() throws MuleException {
-    return InternalEvent
-        .builder(create(muleContext.getUniqueIdString(), muleContext.getConfiguration().getId(), TEST_CONNECTOR_LOCATION,
-                        NullExceptionHandler.getInstance()));
+    return InternalEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
 
   @After
-  public void after() {
+  public void after() throws MuleException {
     if (flow != null) {
+      flow.stop();
       flow.dispose();
     }
     cpuLight.stop();
