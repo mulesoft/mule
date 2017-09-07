@@ -161,7 +161,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(((NestedComponentModel) source).getAllowedStereotypes(), contains(SOURCE));
 
     NestableElementModel chain = nestedComponents.get(1);
-    assertThat(chain.getName(), is("main"));
+    assertThat(chain.getName(), is("processors"));
     assertThat(chain.isRequired(), is(true));
     assertThat(chain, instanceOf(NestedChainModel.class));
     assertThat(((NestedChainModel) chain).getAllowedStereotypes().stream()
@@ -224,7 +224,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     final OperationModel foreach = coreExtensionModel.getOperationModel("foreach").get();
 
     assertThat(foreach.getNestedComponents().size(), is(1));
-    assertThat(foreach.getNestedComponents().get(0), instanceOf(NestedChainModel.class));
+    NestableElementModel processorsChain = foreach.getNestedComponents().get(0);
+    assertThat(processorsChain, instanceOf(NestedChainModel.class));
+    assertThat(processorsChain.isRequired(), is(true));
 
     assertThat(foreach.getAllParameterModels(), hasSize(4));
 
@@ -369,7 +371,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     final OperationModel asyncModel = coreExtensionModel.getOperationModel("async").get();
 
     assertThat(asyncModel.getNestedComponents(), hasSize(1));
-    assertThat(asyncModel.getNestedComponents().get(0), instanceOf(NestedChainModel.class));
+    NestableElementModel processors = asyncModel.getNestedComponents().get(0);
+    assertThat(processors, instanceOf(NestedChainModel.class));
+    assertThat(processors.isRequired(), is(true));
 
     assertThat(asyncModel.getAllParameterModels(), hasSize(1));
     assertThat(asyncModel.getAllParameterModels().get(0).getName(), is("name"));

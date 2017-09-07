@@ -14,10 +14,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 
 import java.util.List;
@@ -28,26 +28,26 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Decorates an {@link OperationExecutor} adding the behavior defined in {@link AbstractInterceptable}.
+ * Decorates an {@link ComponentExecutor} adding the behavior defined in {@link AbstractInterceptable}.
  * <p>
  * Dependency injection and lifecycle phases will also be propagated to the {@link #delegate}
  *
  * @since 4.0
  */
-public final class InterceptableOperationExecutorWrapper extends AbstractInterceptable
-    implements OperationExecutor, OperationArgumentResolverFactory {
+public final class InterceptableOperationExecutorWrapper<M extends ComponentModel> extends AbstractInterceptable
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M> {
 
   private static final Logger LOGGER = getLogger(InterceptableOperationExecutorWrapper.class);
 
-  private final OperationExecutor delegate;
+  private final ComponentExecutor delegate;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link OperationExecutor} to be decorated
+   * @param delegate the {@link ComponentExecutor} to be decorated
    * @param interceptors the {@link Interceptor interceptors} that should apply to the {@code delegate}
    */
-  public InterceptableOperationExecutorWrapper(OperationExecutor delegate, List<Interceptor> interceptors) {
+  public InterceptableOperationExecutorWrapper(ComponentExecutor<M> delegate, List<Interceptor> interceptors) {
     super(interceptors);
     this.delegate = delegate;
   }
@@ -56,7 +56,7 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
    * Directly delegates into {@link #delegate} {@inheritDoc}
    */
   @Override
-  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+  public Publisher<Object> execute(ExecutionContext<M> executionContext) {
     return delegate.execute(executionContext);
   }
 
@@ -107,7 +107,7 @@ public final class InterceptableOperationExecutorWrapper extends AbstractInterce
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+  public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
         ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
         : ec -> emptyMap();

@@ -16,7 +16,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ExecutableComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -267,6 +267,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   }
 
   private boolean isTransactional(M componentModel) {
-    return componentModel instanceof ExecutableComponentModel && ((ExecutableComponentModel) componentModel).isTransactional();
+    return componentModel instanceof ConnectableComponentModel && ((ConnectableComponentModel) componentModel).isTransactional();
   }
 }

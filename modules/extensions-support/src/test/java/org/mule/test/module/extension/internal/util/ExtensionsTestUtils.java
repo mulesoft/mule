@@ -72,14 +72,14 @@ import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -365,9 +365,9 @@ public final class ExtensionsTestUtils {
     when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(property);
   }
 
-  public static void mockExecutorFactory(OperationModel operationModel, OperationExecutorFactory operationExecutorFactory) {
-    when(operationModel.getModelProperty(OperationExecutorModelProperty.class))
-        .thenReturn(of(new OperationExecutorModelProperty(operationExecutorFactory)));
+  public static void mockExecutorFactory(OperationModel operationModel, ComponentExecutorFactory operationExecutorFactory) {
+    when(operationModel.getModelProperty(ComponentExecutorModelProperty.class))
+        .thenReturn(of(new ComponentExecutorModelProperty(operationExecutorFactory)));
   }
 
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory(MuleContext muleContext) {

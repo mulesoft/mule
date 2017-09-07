@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
- * A delegate interface to decouple a {@link OperationExecutor}'s return value from how it is transformed
+ * A delegate interface to decouple a {@link ComponentExecutor}'s return value from how it is transformed
  * into an {@link InternalEvent} to be handed back into the pipeline
  *
  * @since 4.0

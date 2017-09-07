@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -20,7 +21,7 @@ import java.util.function.BiConsumer;
  *
  * @since 4.0
  */
-public interface ParametersResolverProcessor {
+public interface ParametersResolverProcessor<T extends ComponentModel> {
 
   /**
    * Resolve the parameters of this operation before executing it. This is useful to do any handling of any synthetic parameters
@@ -41,6 +42,6 @@ public interface ParametersResolverProcessor {
    *
    * @param executionContext the context that contains the resolved parameters
    */
-  void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext);
+  void disposeResolvedParameters(ExecutionContext<T> executionContext);
 
 }

@@ -54,7 +54,7 @@ import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT, minMuleVersion = "4.1")
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
-    KillingOperations.class, HeisenbergScopes.class})
+    KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
 @OnException(HeisenbergConnectionExceptionEnricher.class)
 @ConnectionProviders(HeisenbergConnectionProvider.class)
 @Sources({HeisenbergSource.class, DEARadioSource.class, AsyncHeisenbergSource.class, ReconnectableHeisenbergSource.class})

@@ -45,7 +45,7 @@ import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
@@ -94,10 +94,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private MutableConfigurationStats configurationStats;
 
   @Mock(extraInterfaces = Interceptable.class)
-  private OperationExecutor operationExecutor;
+  private ComponentExecutor operationExecutor;
 
   @Mock
-  private OperationExecutor operationExceptionExecutor;
+  private ComponentExecutor operationExceptionExecutor;
 
   @Mock
   private Interceptor configurationInterceptor1;

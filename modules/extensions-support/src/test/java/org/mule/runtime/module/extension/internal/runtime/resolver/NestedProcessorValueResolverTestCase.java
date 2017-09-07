@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.extension.api.runtime.process.Chain;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;

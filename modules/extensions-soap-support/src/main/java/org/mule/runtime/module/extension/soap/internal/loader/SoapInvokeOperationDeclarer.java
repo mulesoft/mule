@@ -36,7 +36,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputAttachmentsTypeResolver;
@@ -92,7 +92,7 @@ public class SoapInvokeOperationDeclarer {
         .describedAs(OPERATION_DESCRIPTION)
         .requiresConnection(true)
         .blocking(true)
-        .withModelProperty(new OperationExecutorModelProperty(new SoapOperationExecutorFactory()))
+        .withModelProperty(new ComponentExecutorModelProperty(new SoapOperationExecutorFactory()))
         .withModelProperty(new ConnectivityModelProperty(ForwardingSoapClient.class));
 
     soapErrors.forEach(operation::withErrorModel);

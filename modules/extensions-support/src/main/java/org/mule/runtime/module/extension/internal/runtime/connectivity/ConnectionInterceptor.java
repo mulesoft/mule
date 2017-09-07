@@ -30,7 +30,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class ConnectionInterceptor implements Interceptor {
+public final class ConnectionInterceptor implements Interceptor<ComponentModel> {
 
   private static final String CLOSE_CONNECTION_COMMAND = "closeCommand";
 
@@ -46,7 +46,7 @@ public final class ConnectionInterceptor implements Interceptor {
    *                                  {@link ExtensionProperties#CONNECTION_PARAM}
    */
   @Override
-  public void before(ExecutionContext<OperationModel> executionContext) throws Exception {
+  public void before(ExecutionContext<ComponentModel> executionContext) throws Exception {
     if (executionContext.getComponentModel().getModelProperty(PagedOperationModelProperty.class).isPresent()) {
       return;
     }
@@ -59,7 +59,7 @@ public final class ConnectionInterceptor implements Interceptor {
   }
 
   @Override
-  public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
+  public Throwable onError(ExecutionContext<ComponentModel> executionContext, Throwable exception) {
     extractConnectionException(exception).ifPresent(
                                                     e -> setCloseCommand(executionContext,
                                                                          () -> onConnection(executionContext,
@@ -74,7 +74,7 @@ public final class ConnectionInterceptor implements Interceptor {
    * interception cycle.
    */
   @Override
-  public void after(ExecutionContext<OperationModel> executionContext, Object result) {
+  public void after(ExecutionContext<ComponentModel> executionContext, Object result) {
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
 
     Runnable closeCommand = context.removeVariable(CLOSE_CONNECTION_COMMAND);
@@ -83,19 +83,19 @@ public final class ConnectionInterceptor implements Interceptor {
     }
   }
 
-  private void release(ExecutionContext<OperationModel> executionContext) {
+  private void release(ExecutionContext<ComponentModel> executionContext) {
     onConnection(executionContext, ConnectionHandler::release);
   }
 
-  private void onConnection(ExecutionContext<OperationModel> executionContext, Consumer<ConnectionHandler> consumer) {
-    ConnectionHandler handler = ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CONNECTION_PARAM);
+  private void onConnection(ExecutionContext<ComponentModel> executionContext, Consumer<ConnectionHandler> consumer) {
+    ConnectionHandler handler = ((ExecutionContextAdapter<ComponentModel>) executionContext).removeVariable(CONNECTION_PARAM);
     if (handler != null) {
       consumer.accept(handler);
     }
   }
 
-  private void setCloseCommand(ExecutionContext<OperationModel> executionContext, Runnable command) {
-    ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
+  private void setCloseCommand(ExecutionContext<ComponentModel> executionContext, Runnable command) {
+    ExecutionContextAdapter<ComponentModel> context = (ExecutionContextAdapter) executionContext;
     context.setVariable(CLOSE_CONNECTION_COMMAND, command);
   }
 
