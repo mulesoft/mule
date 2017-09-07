@@ -144,7 +144,7 @@
 
         <activemqVersion>5.15.0</activemqVersion>
         <antVersion>1.9.6</antVersion>
-        <antlrVersion>3.5</antlrVersion>
+        <antlrVersion>3.5.2</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
         <asyncHttpClientVersion>1.13</asyncHttpClientVersion>
