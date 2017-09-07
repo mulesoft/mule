@@ -145,7 +145,6 @@ public class ComponentBuildingDefinition<T> {
   /**
    * Builder for {@code ComponentBuildingDefinition}
    * <p/>
-   * TODO MULE-9693 Improve builder so the copy is not required to reuse the namespace value.
    */
   public static class Builder<T> {
 
@@ -157,7 +156,7 @@ public class ComponentBuildingDefinition<T> {
      * Adds a new constructor parameter to be used during the object instantiation.
      *
      * @param attributeDefinition the constructor argument definition.
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withConstructorParameterDefinition(AttributeDefinition attributeDefinition) {
       Builder<T> next = copy();
@@ -170,7 +169,7 @@ public class ComponentBuildingDefinition<T> {
      *
      * @param fieldName the name of the field in which the value must be injected
      * @param attributeDefinition the setter parameter definition
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withSetterParameterDefinition(String fieldName, AttributeDefinition attributeDefinition) {
       Builder<T> next = copy();
@@ -183,7 +182,7 @@ public class ComponentBuildingDefinition<T> {
      * <http:listener> has as identifier listener
      *
      * @param identifier configuration element identifier
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withIdentifier(String identifier) {
       Builder<T> next = copy();
@@ -196,7 +195,7 @@ public class ComponentBuildingDefinition<T> {
      * <http:listener> has as namespace http
      *
      * @param namespace configuration element namespace
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withNamespace(String namespace) {
       Builder<T> next = copy();
@@ -210,7 +209,7 @@ public class ComponentBuildingDefinition<T> {
      * which means that the object type is declared within the configuration using a config attribute.
      *
      * @param typeDefinition the type definition to discover the objecvt type
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withTypeDefinition(TypeDefinition<T> typeDefinition) {
       Builder<T> next = copy();
@@ -225,8 +224,7 @@ public class ComponentBuildingDefinition<T> {
      * or string.
      *
      * @param typeConverter converter from the configuration value to a custom type.
-     * @return {@code this} builder
-     * @return
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withTypeConverter(TypeConverter typeConverter) {
       Builder<T> next = copy();
@@ -241,8 +239,7 @@ public class ComponentBuildingDefinition<T> {
      * or string.
      *
      * @param typeConverter converter from the configuration value to a custom type.
-     * @return {@code this} builder
-     * @return
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withKeyTypeConverter(TypeConverter typeConverter) {
       Builder<T> next = copy();
@@ -253,7 +250,7 @@ public class ComponentBuildingDefinition<T> {
     /**
      * Used to declare that the object to be created is an scope.
      *
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> asScope() {
       Builder<T> next = copy();
@@ -264,7 +261,7 @@ public class ComponentBuildingDefinition<T> {
     /**
      * Used to declare that the object to be created has a name attribute
      * 
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> asNamed() {
       Builder<T> next = copy();
@@ -277,7 +274,7 @@ public class ComponentBuildingDefinition<T> {
      * complex logic.
      *
      * @param objectFactoryType {@code Class} for the factory to use to create the object
-     * @return {@code this} builder
+     * @return a copy of {@code this} builder
      */
     public Builder<T> withObjectFactoryType(Class<? extends ObjectFactory<T>> objectFactoryType) {
       Builder<T> next = copy();
@@ -291,7 +288,7 @@ public class ComponentBuildingDefinition<T> {
      * don't want to included them in the process of building the object.
      *
      * @param parameterName the configuration parameter name.
-     * @return {@code this} builder.
+     * @return a copy of {@code this} builder.
      */
     public Builder<T> withIgnoredConfigurationParameter(String parameterName) {
       Builder<T> next = copy();

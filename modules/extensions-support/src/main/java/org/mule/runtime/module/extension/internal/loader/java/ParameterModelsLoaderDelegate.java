@@ -15,6 +15,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
@@ -24,10 +25,12 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasNestedComponentsDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
@@ -75,22 +78,28 @@ public final class ParameterModelsLoaderDelegate {
     this.typeLoader = loader;
   }
 
-  public List<ParameterDeclarer> declare(ParameterizedDeclarer component,
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
                                          List<? extends ExtensionParameter> parameters,
                                          ParameterDeclarationContext declarationContext) {
     return declare(component, parameters, declarationContext, null);
   }
 
-  public List<ParameterDeclarer> declare(ParameterizedDeclarer component,
+  public List<ParameterDeclarer> declare(HasParametersDeclarer component,
                                          List<? extends ExtensionParameter> parameters,
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
     checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
 
+    boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
 
+
       if (!extensionParameter.shouldBeAdvertised()) {
+        continue;
+      }
+
+      if (supportsNestedElements && declaredAsNestedComponent((HasNestedComponentsDeclarer) component, extensionParameter)) {
         continue;
       }
 
@@ -125,6 +134,18 @@ public final class ParameterModelsLoaderDelegate {
     return declarerList;
   }
 
+  private boolean declaredAsNestedComponent(HasNestedComponentsDeclarer component, ExtensionParameter extensionParameter) {
+    if (isProcessorChain(extensionParameter)) {
+      component.withChain(extensionParameter.getAlias())
+          .setRequired(extensionParameter.isRequired())
+          .describedAs(extensionParameter.getDescription());
+
+      return true;
+    }
+
+    return false;
+  }
+
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.getAnnotation(ConfigOverride.class).isPresent()) {
       parameter.asConfigOverride();
@@ -139,7 +160,7 @@ public final class ParameterModelsLoaderDelegate {
     }
   }
 
-  private boolean declaredAsGroup(ParameterizedDeclarer component,
+  private boolean declaredAsGroup(HasParametersDeclarer component,
                                   ParameterDeclarationContext declarationContext,
                                   ExtensionParameter groupParameter)
       throws IllegalParameterModelDefinitionException {
@@ -154,8 +175,10 @@ public final class ParameterModelsLoaderDelegate {
       throw new IllegalParameterModelDefinitionException(
                                                          format("%s '%s' defines parameter group of name '%s' which is the default one. "
                                                              + "@%s cannot be used with the default group name",
-                                                                getComponentDeclarationTypeName(component.getDeclaration()),
-                                                                ((NamedDeclaration) component.getDeclaration()).getName(),
+                                                                getComponentDeclarationTypeName(((Declarer) component)
+                                                                    .getDeclaration()),
+                                                                ((NamedDeclaration) ((Declarer) component).getDeclaration())
+                                                                    .getName(),
                                                                 groupName,
                                                                 ParameterGroup.class.getSimpleName()));
     }
@@ -173,8 +196,6 @@ public final class ParameterModelsLoaderDelegate {
                                                                     .collect(joining(","))));
     }
 
-    final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
-
     if (groupParameter.isAnnotatedWith(org.mule.runtime.extension.api.annotation.param.Optional.class)) {
       throw new IllegalParameterModelDefinitionException(format(
                                                                 "@%s can not be applied alongside with @%s. Affected parameter is [%s].",
@@ -188,8 +209,10 @@ public final class ParameterModelsLoaderDelegate {
     if (declarer.getDeclaration().getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
       throw new IllegalParameterModelDefinitionException(format("Parameter group '%s' has already been declared on %s '%s'",
                                                                 groupName,
-                                                                getComponentDeclarationTypeName(component.getDeclaration()),
-                                                                ((NamedDeclaration) component.getDeclaration()).getName()));
+                                                                getComponentDeclarationTypeName(((Declarer) component)
+                                                                    .getDeclaration()),
+                                                                ((NamedDeclaration) ((Declarer) component).getDeclaration())
+                                                                    .getName()));
     } else {
       declarer.withModelProperty(new ParameterGroupModelProperty(
                                                                  new ParameterGroupDescriptor(groupName, type,
@@ -199,6 +222,7 @@ public final class ParameterModelsLoaderDelegate {
                                                                                                   .getDeclaringElement())));
     }
 
+    final List<FieldElement> annotatedParameters = type.getAnnotatedFields(Parameter.class);
     type.getAnnotation(ExclusiveOptionals.class).ifPresent(annotation -> {
       Set<String> optionalParamNames = annotatedParameters.stream()
           .filter(f -> !f.isRequired())

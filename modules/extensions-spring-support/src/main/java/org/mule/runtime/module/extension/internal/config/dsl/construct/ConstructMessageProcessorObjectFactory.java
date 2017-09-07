@@ -4,44 +4,42 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config.dsl.operation;
+package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 
 import java.util.List;
 
 /**
- * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
+ * An {@link AbstractExtensionObjectFactory} which produces {@link ConstructMessageProcessor} instances
  *
  * @since 4.0
  */
-public class OperationMessageProcessorObjectFactory
-    extends ComponentMessageProcessorObjectFactory<OperationModel, OperationMessageProcessor> {
+public class ConstructMessageProcessorObjectFactory
+    extends ComponentMessageProcessorObjectFactory<ConstructModel, ConstructMessageProcessor> {
 
   protected List<Processor> nestedProcessors;
 
-  public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
-                                                OperationModel componentModel,
+  public ConstructMessageProcessorObjectFactory(ExtensionModel extensionModel,
+                                                ConstructModel componentModel,
                                                 MuleContext muleContext,
                                                 PolicyManager policyManager) {
-    super(extensionModel,
-          componentModel,
-          muleContext,
-          policyManager);
+    super(extensionModel, componentModel, muleContext, policyManager);
   }
 
   @Override
-  public OperationMessageProcessor doGetObject() throws Exception {
+  public ConstructMessageProcessor doGetObject() throws Exception {
+
     if (nestedProcessors != null) {
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
@@ -49,7 +47,7 @@ public class OperationMessageProcessorObjectFactory
           .ifPresent(chain -> parameters.put(chain.getName(), new ProcessorChainValueResolver(nestedProcessors)));
     }
 
-    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext)
+    return new ConstructMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext)
         .setConfigurationProvider(configurationProvider)
         .setParameters(parameters)
         .setTarget(target)
@@ -59,8 +57,8 @@ public class OperationMessageProcessorObjectFactory
         .build();
   }
 
-  public void setNestedProcessors(List<Processor> nestedProcessors) {
-    this.nestedProcessors = nestedProcessors;
+  public void setNestedProcessors(List<Processor> processors) {
+    this.nestedProcessors = processors;
   }
 
 }

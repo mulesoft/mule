@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -24,7 +25,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.0
  */
-public interface ExecutionMediator {
+public interface ExecutionMediator<T extends ComponentModel> {
 
   /**
    * Coordinates the execution of the {@code executor} using the given {@code context}
@@ -33,5 +34,5 @@ public interface ExecutionMediator {
    * @param context an {@link ExecutionContextAdapter}
    * @return a {@link Mono} with the operation's result
    */
-  Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context);
+  Publisher<Object> execute(OperationExecutor<T> executor, ExecutionContextAdapter<T> context);
 }

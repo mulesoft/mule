@@ -8,6 +8,7 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
@@ -138,6 +139,15 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
     assertThat(event.getMessage().getPayload().getValue(), is("SUCCESS"));
     assertThat(event.getVariables().get("varName").getValue(), is("varValue"));
+  }
+
+  @Test
+  public void payloadModifier() throws Exception {
+    InternalEvent event = flowRunner("payloadModifier").run();
+
+    assertThat(event.getMessage().getPayload().getValue(), is("MESSAGE"));
+    assertThat(event.getVariables().get("newPayload").getValue(), is("MESSAGE"));
+    assertThat(event.getVariables().get("newAttributes").getValue(), is(notNullValue()));
   }
 
   @Test

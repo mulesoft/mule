@@ -11,10 +11,9 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -26,6 +25,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -46,6 +46,7 @@ import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefini
 import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderDefinitionParser;
+import org.mule.runtime.module.extension.internal.config.dsl.construct.ConstructDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigPolicyObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigurationExpiration;
 import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigurationExpirationObjectFactory;
@@ -157,6 +158,12 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
           public void onConfiguration(ConfigurationModel model) {
             parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
                                                         parsingContext));
+          }
+
+          @Override
+          protected void onConstruct(ConstructModel model) {
+            parseWith(new ConstructDefinitionParser(definitionBuilder, extensionModel,
+                                                    model, dslSyntaxResolver, parsingContext));
           }
 
           @Override

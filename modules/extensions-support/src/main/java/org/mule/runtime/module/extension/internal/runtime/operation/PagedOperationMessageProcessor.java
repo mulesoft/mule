@@ -15,11 +15,14 @@ import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
+
+import java.util.Optional;
 
 /**
  * A specialization of {@link OperationMessageProcessor} which supports auto paging by the means of a
@@ -52,9 +55,9 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       if (value == null) {
         throw new IllegalStateException("Obtained paging delegate cannot be null");
       }
-
+      Optional<ConfigurationInstance> config = operationContext.getConfiguration();
       Producer<?> producer =
-          new PagingProviderProducer((PagingProvider) value, operationContext.getConfiguration().get(),
+          new PagingProviderProducer((PagingProvider) value, config.get(),
                                      operationContext, connectionSupplier);
 
       ListConsumer<?> consumer = new ListConsumer(producer);

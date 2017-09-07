@@ -11,12 +11,12 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
@@ -24,13 +24,16 @@ import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGe
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
+
+import java.io.StringWriter;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 /**
  * Default {@link ExtensionSchemaGenerator} implementation.
@@ -54,6 +57,11 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
       @Override
       public void onConfiguration(ConfigurationModel model) {
         schemaBuilder.registerConfigElement(model);
+      }
+
+      @Override
+      protected void onConstruct(ConstructModel model) {
+        schemaBuilder.registerOperation(model);
       }
 
       @Override

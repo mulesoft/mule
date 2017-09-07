@@ -398,7 +398,7 @@ public class MuleExtensionUtils {
    * @return a {@link OperationExecutorFactory}
    * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
    */
-  public static OperationExecutorFactory getOperationExecutorFactory(OperationModel operationModel) {
+  public static <T extends ComponentModel> OperationExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
     OperationExecutorFactory executorFactory =
         fromModelProperty(operationModel,
                           OperationExecutorModelProperty.class,

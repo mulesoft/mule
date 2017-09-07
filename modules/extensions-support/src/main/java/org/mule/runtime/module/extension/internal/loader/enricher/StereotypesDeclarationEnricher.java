@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
+import static java.util.stream.Collectors.toMap;
 import static java.lang.String.format;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
@@ -14,6 +15,8 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRoute;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
@@ -25,11 +28,17 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestableElementDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithAllowedStereotypesDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithConstructsDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithStereotypesDeclaration;
@@ -46,7 +55,6 @@ import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeType
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.process.Chain;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
@@ -118,6 +126,16 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           }
 
           @Override
+          protected void onConstruct(WithConstructsDeclaration owner, ConstructDeclaration declaration) {
+            declaration.getModelProperty(ImplementingMethodModelProperty.class)
+                .map(ImplementingMethodModelProperty::getMethod)
+                .map(MethodWrapper::new)
+                .ifPresent(methodElement -> new MethodStereotypeResolver(methodElement, declaration, namespace, PROCESSOR,
+                                                                         stereotypes)
+                  .resolveStereotype());
+          }
+
+          @Override
           public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
             declaration.getModelProperty(ImplementingMethodModelProperty.class)
                 .map(ImplementingMethodModelProperty::getMethod)
@@ -175,7 +193,43 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       });
     }
 
+    // private void addStereotypes(String namespace, MethodWrapper methodElement,
+    //                             ComponentDeclaration declaration, StereotypeModel defaultStereotype) {
+    //
+    //   Stereotype stereotypes = methodElement.getMethod().getAnnotation(Stereotype.class);
+    //   if (stereotypes == null) {
+    //     addStereotypes(namespace, methodElement.getDeclaringClass(), declaration, defaultStereotype);
+    //   } else {
+    //     addStereotypes(namespace, declaration, stereotypes, defaultStereotype);
+    //   }
+    //
+    //   addAllowedStereotypes(namespace, declaration, methodElement);
+    // }
 
+    // void addStereotypes(String namespace, Class<?> annotatedClass,
+    //                     WithStereotypesDeclaration declaration, StereotypeModel defaultStereotype) {
+    //   addStereotypes(namespace, declaration, getAnnotation(annotatedClass, Stereotype.class),
+    //                  defaultStereotype);
+    // }
+    //
+    // private void addStereotypes(String namespace, WithStereotypesDeclaration declaration,
+    //                             Stereotype customStereotype, StereotypeModel defaultStereotype) {
+    //
+    //   if (customStereotype != null) {
+    //     declaration.withStereotype(getStereotype(customStereotype.value(), namespace));
+    //   } else {
+    //     declaration.withStereotype(defaultStereotype);
+    //   }
+    // }
+
+    // private StereotypeModel getStereotype(Class<? extends StereotypeDefinition> definitionClass, String namespace) {
+    //   try {
+    //     return getStereotype(instantiateClass(definitionClass), namespace);
+    //   } catch (Exception e) {
+    //     throw new IllegalModelDefinitionException("Invalid StereotypeDefinition found with name: "
+    //         + definitionClass.getName(), e);
+    //   }
+    // }
 
     private String getStereotypePrefix(ExtensionDeclarer extensionDeclarer) {
       return extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
@@ -272,25 +326,23 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
   private static class MethodStereotypeResolver extends StereotypeResolver<MethodElement> {
 
-    public MethodStereotypeResolver(MethodElement annotatedElement,
-                                    WithStereotypesDeclaration declaration,
+
+    private final MethodWrapper methodElement;
+
+    public MethodStereotypeResolver(MethodWrapper methodElement,
+                                    ComponentDeclaration declaration,
                                     String namespace,
                                     StereotypeModel fallbackStereotype,
                                     Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
-      super(annotatedElement, declaration, namespace, fallbackStereotype, stereotypesCache);
+      super(methodElement, declaration, namespace, fallbackStereotype, stereotypesCache);
+      this.methodElement = methodElement;
     }
 
     @Override
     protected void resolveStereotype() {
       super.resolveStereotype();
 
-      annotatedElement.getParameters().stream()
-          .filter(p -> Chain.class.equals(p.getType().getDeclaringClass()))
-          .findFirst()
-          .ifPresent(param -> ((ComponentDeclaration) declaration).getNestedComponents().stream()
-              .filter(NestedChainDeclaration.class::isInstance)
-              .findFirst()
-              .ifPresent(model -> addAllowedStereotypes(param, (NestedChainDeclaration) model)));
+      addAllowedStereotypes(namespace, (ComponentDeclaration<?>) declaration, methodElement);
     }
 
     @Override
@@ -302,14 +354,46 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                                   stereotypesCache).resolveStereotype();
     }
 
-    private void addAllowedStereotypes(ExtensionParameter parameter,
-                                       NestedChainDeclaration declaration) {
+    private void addAllowedStereotypes(String namespace, ComponentDeclaration<?> declaration, MethodWrapper methodElement) {
+
+      Map<String, NestableElementDeclaration<?>> nested = declaration.getNestedComponents().stream()
+          .collect(toMap(NamedDeclaration::getName, n -> n));
+
+      methodElement.getParameters().stream()
+          .filter(p -> nested.containsKey(p.getAlias()))
+          .forEach(parameter -> {
+            if (isProcessorChain(parameter)) {
+              addAllowedStereotypes(namespace, parameter, (WithAllowedStereotypesDeclaration) nested.get(parameter.getAlias()));
+
+            } else if (isRoute(parameter)) {
+              NestedRouteDeclaration route = (NestedRouteDeclaration) nested.get(parameter.getAlias());
+              Optional<AllowedStereotypes> allowedStereotypes = parameter.getType().getAnnotation(AllowedStereotypes.class);
+              allowedStereotypes.ifPresent(processorsStereotypes -> {
+                NestableElementDeclaration processorsChain = route.getNestedComponents().stream()
+                    .filter(routeChild -> routeChild instanceof NestedChainDeclaration)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Missing Chain component in Route declaration"));
+
+                addAllowedStereotypes((WithAllowedStereotypesDeclaration) processorsChain,
+                                      processorsStereotypes.value(), namespace);
+              });
+            }
+          });
+    }
+
+    private void addAllowedStereotypes(WithAllowedStereotypesDeclaration declaration,
+                                       Class<? extends StereotypeDefinition>[] stereotypes, String namespace) {
+      for (Class<? extends StereotypeDefinition> definition : stereotypes) {
+        declaration.addAllowedStereotype(createCustomStereotype(definition, namespace, stereotypesCache));
+      }
+    }
+
+    private void addAllowedStereotypes(String namespace, ExtensionParameter parameter,
+                                       WithAllowedStereotypesDeclaration declaration) {
       Optional<AllowedStereotypes> allowedStereotypes = parameter.getAnnotation(AllowedStereotypes.class);
 
       if (allowedStereotypes.isPresent()) {
-        for (Class<? extends StereotypeDefinition> definitionClass : allowedStereotypes.get().value()) {
-          declaration.addAllowedStereotype(createCustomStereotype(definitionClass, namespace, stereotypesCache));
-        }
+        addAllowedStereotypes(declaration, allowedStereotypes.get().value(), namespace);
       } else {
         declaration.addAllowedStereotype(PROCESSOR);
       }

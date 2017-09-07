@@ -9,29 +9,30 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInputStream;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.handleByteStreaming;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isAutoPaging;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isNonBlocking;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGenerics;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.springframework.core.ResolvableType.forMethodReturnType;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
-import org.mule.runtime.extension.api.runtime.process.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.OperationContainerElement;
@@ -55,12 +56,15 @@ import org.springframework.core.ResolvableType;
 final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
   private static final String OPERATION = "Operation";
-  private static final String SCOPE = "Scope";
 
   private final Map<MethodElement, OperationDeclarer> operationDeclarers = new HashMap<>();
+  private final ScopeModelLoaderDelegate scopesDelegate;
+  private final RouterModelLoaderDelegate routersDelegate;
 
   OperationModelLoaderDelegate(DefaultJavaModelLoaderDelegate delegate) {
     super(delegate);
+    scopesDelegate = new ScopeModelLoaderDelegate(delegate);
+    routersDelegate = new RouterModelLoaderDelegate(delegate);
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer, HasOperationDeclarer declarer,
@@ -73,11 +77,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                          OperationContainerElement operationsContainer) {
     declareOperations(extensionDeclarer, declarer, operationsContainer.getDeclaringClass(), operationsContainer.getOperations(),
                       true);
-  }
-
-
-  private boolean isScope(MethodElement methodElement) {
-    return methodElement.getParameters().stream().anyMatch(this::isProcessorChain);
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
@@ -93,6 +92,17 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       final Method method = operationMethod.getMethod();
       final Optional<ExtensionParameter> configParameter = loader.getConfigParameter(operationMethod);
       final Optional<ExtensionParameter> connectionParameter = loader.getConnectionParameter(operationMethod);
+
+      if (isScope(operationMethod)) {
+        scopesDelegate.declareScope(extensionDeclarer, ownerDeclarer, methodOwnerClass, operationMethod, method, configParameter,
+                                    connectionParameter);
+        continue;
+      } else if (isRouter(operationMethod)) {
+        routersDelegate.declareRouter(extensionDeclarer, ownerDeclarer, methodOwnerClass, operationMethod, method,
+                                      configParameter,
+                                      connectionParameter);
+        continue;
+      }
 
       checkDefinition(!loader.isInvalidConfigSupport(supportsConfig, configParameter, connectionParameter),
                       format("Operation '%s' is defined at the extension level but it requires a config. "
@@ -114,57 +124,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);
 
-      if (isScope(operationMethod)) {
-        declareScope(operationDeclarer, operationMethod, method, configParameter, connectionParameter);
-      } else {
-        declareOperation(operationDeclarer, supportsConfig, operationMethod, method);
-      }
+      declareOperation(operationDeclarer, supportsConfig, operationMethod, method);
 
       operationDeclarers.put(operationMethod, operationDeclarer);
     }
-  }
-
-  private void declareScope(OperationDeclarer scope, MethodElement scopeMethod, Method method,
-                            Optional<ExtensionParameter> configParameter, Optional<ExtensionParameter> connectionParameter) {
-
-    checkDefinition(!configParameter.isPresent(),
-                    format("Scope '%s' requires a config, but that is not allowed, remove such parameter",
-                           method.getName()));
-
-    checkDefinition(!connectionParameter.isPresent(),
-                    format("Scope '%s' requires a connection, but that is not allowed, remove such parameter",
-                           method.getName()));
-
-    checkDefinition(isNonBlocking(scopeMethod),
-                    format("Scope '%s' does not declare a '%s' parameter. One is required for all operations "
-                        + "that receive and execute a Chain of other components",
-                           scopeMethod.getAlias(),
-                           CompletionCallback.class.getSimpleName()));
-
-    processNonBlockingOperation(scope, scopeMethod, false);
-
-    loader.getMethodParametersLoader().declare(scope,
-                                               scopeMethod.getParameters(),
-                                               new ParameterDeclarationContext(SCOPE, scope.getDeclaration()));
-
-    List<ExtensionParameter> processorChain =
-        scopeMethod.getParameters().stream().filter(this::isProcessorChain).collect(toList());
-
-    checkDefinition(processorChain.size() <= 1,
-                    format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
-                        + "Offending parameters are: %s",
-                           scopeMethod.getAlias(),
-                           Chain.class.getSimpleName(),
-                           processorChain.stream().map(ExtensionParameter::getName).collect(toList())));
-
-    ExtensionParameter chainParameter = processorChain.get(0);
-    scope.withChain(chainParameter.getAlias())
-        .describedAs(chainParameter.getDescription())
-        .setRequired(chainParameter.isRequired());
-  }
-
-  private boolean isProcessorChain(ExtensionParameter parameter) {
-    return Chain.class.equals(parameter.getType().getDeclaringClass());
   }
 
   private void declareOperation(OperationDeclarer operation, boolean supportsConfig, MethodElement operationMethod,
@@ -172,7 +135,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     processComponentConnectivity(operation, operationMethod, operationMethod);
 
     if (isNonBlocking(operationMethod)) {
-      processNonBlockingOperation(operation, operationMethod, true);
+      processNonBlockingOperation(operation, operationMethod, true, loader.getTypeLoader());
     } else {
       processBlockingOperation(supportsConfig, operationMethod, method, operation);
     }
@@ -199,10 +162,6 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     }
   }
 
-  private void handleByteStreaming(Method method, ExecutableComponentDeclarer executableComponent, MetadataType outputType) {
-    executableComponent.supportsStreaming(isInputStream(outputType) || method.getAnnotation(Streaming.class) != null);
-  }
-
   private HasOperationDeclarer selectDeclarer(ExtensionDeclarer extensionDeclarer, Declarer declarer,
                                               MethodElement operationMethod, Optional<ExtensionParameter> configParameter,
                                               Optional<ExtensionParameter> connectionParameter) {
@@ -214,11 +173,8 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
                                                                      connectionParameter);
   }
 
-  private boolean isNonBlocking(MethodElement method) {
-    return method.getParameters().stream().anyMatch(p -> CompletionCallback.class.equals(p.getType().getDeclaringClass()));
-  }
-
-  private void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming) {
+  static void processNonBlockingOperation(OperationDeclarer operation, MethodElement operationMethod, boolean allowStreaming,
+                                          ClassTypeLoader typeLoader) {
     List<ExtensionParameter> callbackParameters = operationMethod.getParameters().stream()
         .filter(p -> CompletionCallback.class.equals(p.getType().getDeclaringClass()))
         .collect(toList());
@@ -240,7 +196,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     ExtensionParameter callbackParameter = callbackParameters.get(0);
     java.lang.reflect.Parameter methodParameter = (java.lang.reflect.Parameter) callbackParameter.getDeclaringElement();
-    List<MetadataType> genericTypes = getGenerics(methodParameter.getParameterizedType(), loader.getTypeLoader());
+    List<MetadataType> genericTypes = getGenerics(methodParameter.getParameterizedType(), typeLoader);
 
     if (genericTypes.isEmpty()) {
       throw new IllegalParameterModelDefinitionException(format("Generics are mandatory on the %s parameter of Operation '%s'",
@@ -286,11 +242,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     operation.transactional(TransactionalConnection.class.isAssignableFrom(connectionType.getRawClass()));
   }
 
-  private boolean isAutoPaging(MethodElement operationMethod) {
-    return PagingProvider.class.isAssignableFrom(operationMethod.getReturnType());
-  }
-
-  private void checkDefinition(boolean condition, String message) {
+  static void checkDefinition(boolean condition, String message) {
     if (!condition) {
       throw new IllegalOperationModelDefinitionException(message);
     }

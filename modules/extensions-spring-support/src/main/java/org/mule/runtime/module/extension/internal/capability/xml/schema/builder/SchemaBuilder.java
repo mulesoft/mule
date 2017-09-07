@@ -691,6 +691,10 @@ public final class SchemaBuilder {
     return element;
   }
 
+  ObjectTypeSchemaDelegate getObjectSchemaDelegate() {
+    return objectTypeDelegate;
+  }
+
   ExtensionModel getExtensionModel() {
     return extensionModel;
   }

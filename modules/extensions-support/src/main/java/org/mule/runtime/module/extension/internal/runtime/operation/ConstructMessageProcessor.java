@@ -10,14 +10,11 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -25,7 +22,6 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -34,19 +30,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.metadata.EntityMetadataProvider;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -59,16 +48,14 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
-import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
@@ -94,7 +81,7 @@ import reactor.core.publisher.Mono;
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
  * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
  * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
- * not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this}
+ * not be shared with other instances of {@link ConstructMessageProcessor}. All the {@link Lifecycle} events that {@code this}
  * instance receives will be propagated to the {@link #operationExecutor}.
  * <p>
  * The {@link #operationExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
@@ -106,28 +93,30 @@ import reactor.core.publisher.Mono;
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessor extends ExtensionComponent<OperationModel>
-    implements Processor, ParametersResolverProcessor<OperationModel>, EntityMetadataProvider, Lifecycle {
+public class ConstructMessageProcessor extends ExtensionComponent<ConstructModel>
+    implements Processor, ParametersResolverProcessor<ConstructModel> {
 
-  private static final Logger LOGGER = getLogger(OperationMessageProcessor.class);
+  private static final Logger LOGGER = getLogger(ConstructMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   protected final ExtensionModel extensionModel;
-  protected final OperationModel operationModel;
+  protected final ConstructModel constructModel;
   private final ResolverSet resolverSet;
   private final String target;
   private final String targetValue;
-  private final EntityMetadataMediator entityMetadataMediator;
   private final RetryPolicyTemplate retryPolicyTemplate;
 
   private ExecutionMediator executionMediator;
-  private OperationExecutor operationExecutor;
+  private OperationExecutor<ConstructModel> operationExecutor;
   private PolicyManager policyManager;
   protected ReturnDelegate returnDelegate;
+  protected final ExtensionManager extensionManager;
+  protected final ClassLoader classLoader;
+  private CursorProviderFactory cursorProviderFactory;
 
-  public OperationMessageProcessor(ExtensionModel extensionModel,
-                                   OperationModel operationModel,
+  public ConstructMessageProcessor(ExtensionModel extensionModel,
+                                   ConstructModel constructModel,
                                    ConfigurationProvider configurationProvider,
                                    String target,
                                    String targetValue,
@@ -136,15 +125,18 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager) {
-    super(extensionModel, operationModel, configurationProvider, cursorProviderFactory, extensionManager);
+    super(extensionModel, constructModel, configurationProvider, cursorProviderFactory, extensionManager);
+
+    this.classLoader = getClassLoader(extensionModel);
+    this.extensionManager = extensionManager;
     this.extensionModel = extensionModel;
-    this.operationModel = operationModel;
+    this.constructModel = constructModel;
     this.resolverSet = resolverSet;
     this.target = target;
     this.targetValue = targetValue;
-    this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
+    this.cursorProviderFactory = cursorProviderFactory;
   }
 
   @Override
@@ -155,23 +147,18 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   @Override
   public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
-      Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
       if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
-        ExecutionContextAdapter<OperationModel> operationContext = getPrecalculatedContext(event);
-        configuration = operationContext.getConfiguration();
+        ExecutionContextAdapter<ConstructModel> operationContext = getPrecalculatedContext(event);
 
-        operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationEvent, operationContext);
+        operationExecutionFunction = (parameters, operationEvent) -> doProcess(operationContext);
       } else {
-        // Otherwise, generate the context as usual.
-        configuration = getConfiguration(event);
-
         operationExecutionFunction = (parameters, operationEvent) -> {
-          ExecutionContextAdapter<OperationModel> operationContext;
+          ExecutionContextAdapter<ConstructModel> operationContext;
           try {
-            operationContext = createExecutionContext(configuration, parameters, operationEvent);
+            operationContext = createExecutionContext(parameters, operationEvent);
           } catch (MuleException e) {
             return error(e);
           }
@@ -182,35 +169,35 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
           // performance overhead associated with the addition of many additional flatMaps. It would be slightly clearer to
           // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
           // to the processor there.
-          return doProcess(operationEvent, operationContext)
+          return doProcess(operationContext)
               .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, this));
         };
       }
       if (getLocation() != null) {
         return policyManager
-            .createOperationPolicy(this, event, getResolutionResult(event, configuration), operationExecutionFunction)
+            .createOperationPolicy(this, event, getResolutionResult(event), operationExecutionFunction)
             .process(event);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
-        return operationExecutionFunction.execute(getResolutionResult(event, configuration), event);
+        return operationExecutionFunction.execute(getResolutionResult(event), event);
       }
     }, MuleException.class, e -> {
       throw new DefaultMuleException(e);
     })));
   }
 
-  private PrecalculatedExecutionContextAdapter<OperationModel> getPrecalculatedContext(InternalEvent event) {
+  private PrecalculatedExecutionContextAdapter<ConstructModel> getPrecalculatedContext(InternalEvent event) {
     return (PrecalculatedExecutionContextAdapter) (event.getInternalParameters().get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
-  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<InternalEvent> doProcess(ExecutionContextAdapter<ConstructModel> operationContext) {
     return executeOperation(operationContext)
         .map(value -> asReturnValue(operationContext, value))
         .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null)))
         .onErrorMap(Exceptions::unwrap);
   }
 
-  private InternalEvent asReturnValue(ExecutionContextAdapter<OperationModel> operationContext, Object value) {
+  private InternalEvent asReturnValue(ExecutionContextAdapter<ConstructModel> operationContext, Object value) {
     if (value instanceof InternalEvent) {
       return (InternalEvent) value;
     } else {
@@ -222,33 +209,28 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     return Mono.from(executionMediator.execute(operationExecutor, operationContext));
   }
 
-  private ExecutionContextAdapter<OperationModel> createExecutionContext(Optional<ConfigurationInstance> configuration,
-                                                                         Map<String, Object> resolvedParameters,
+  private ExecutionContextAdapter<ConstructModel> createExecutionContext(Map<String, Object> resolvedParameters,
                                                                          InternalEvent event)
       throws MuleException {
 
-    return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, operationModel, event,
-                                         getCursorProviderFactory(), streamingManager, getLocation(), retryPolicyTemplate,
+    return new DefaultExecutionContext<>(extensionModel, empty(), resolvedParameters, constructModel, event,
+                                         cursorProviderFactory, streamingManager, getLocation(), retryPolicyTemplate,
                                          muleContext);
   }
 
   @Override
   protected void doInitialise() throws InitialisationException {
     returnDelegate = createReturnDelegate();
-    operationExecutor = getOperationExecutorFactory(operationModel).createExecutor(operationModel);
+    operationExecutor = getOperationExecutorFactory(constructModel).createExecutor(constructModel);
     executionMediator = createExecutionMediator();
     initialiseIfNeeded(resolverSet, muleContext);
     initialiseIfNeeded(operationExecutor, true, muleContext);
   }
 
   private ReturnDelegate createReturnDelegate() {
-    if (isVoid(operationModel)) {
-      return VoidReturnDelegate.INSTANCE;
-    }
-
     return !isTargetPresent()
-        ? new ValueReturnDelegate(operationModel, getCursorProviderFactory(), muleContext)
-        : new TargetReturnDelegate(target, targetValue, operationModel, getCursorProviderFactory(), muleContext);
+        ? new ValueReturnDelegate(constructModel, cursorProviderFactory, muleContext)
+        : new TargetReturnDelegate(target, targetValue, constructModel, cursorProviderFactory, muleContext);
   }
 
   private boolean isTargetPresent() {
@@ -258,11 +240,11 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
 
     if (muleContext.getExpressionManager().isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
-                                                 operationModel.getName(),
+                                                 constructModel.getName(),
                                                  "an expression", TARGET_PARAMETER_NAME));
     } else if (!muleContext.getExpressionManager().isExpression(targetValue)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
-                                                 operationModel.getName(), "something that is not an expression",
+                                                 constructModel.getName(), "something that is not an expression",
                                                  TARGET_VALUE_PARAMETER_NAME));
     }
 
@@ -288,65 +270,13 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     disposeIfNeeded(operationExecutor, LOGGER);
   }
 
-  @Override
-  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(context -> withContextClassLoader(getClassLoader(this.extensionModel),
-                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
-  @Override
-  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
-    try {
-      return runWithMetadataContext(context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
-          .getEntityMetadata(context, key)));
-    } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
-    }
-  }
-
   protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, operationModel, connectionManager, muleContext.getErrorTypeRepository());
-  }
-
-  /**
-   * Validates that the {@link #operationModel} is valid for the given {@code configurationProvider}
-   *
-   * @throws IllegalOperationException If the validation fails
-   */
-  @Override
-  protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
-    ConfigurationModel configurationModel = configurationProvider.getConfigurationModel();
-    if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
-        !configurationProvider.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
-      throw new IllegalOperationException(format(
-                                                 "Root component '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                                                     + "The selected config does not support that operation.",
-                                                 getLocation().getRootContainerName(), operationModel.getName(),
-                                                 configurationProvider.getName()));
-    }
-  }
-
-  @Override
-  protected ParameterValueResolver getParameterValueResolver() {
-    final InternalEvent event = getInitialiserEvent(muleContext);
-    return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, operationModel, extensionModel,
-                                                                          from(event)));
+    return new DefaultExecutionMediator(extensionModel, constructModel, connectionManager, muleContext.getErrorTypeRepository());
   }
 
   @Override
   public ProcessingType getProcessingType() {
-    ProcessingType processingType = asProcessingType(operationModel.getExecutionType());
-    if (processingType == CPU_LITE && !operationModel.isBlocking()) {
-      // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can
-      // return processing to a Flow thread.
-      return CPU_LITE_ASYNC;
-    } else {
-      return processingType;
-    }
+    return CPU_LITE_ASYNC;
   }
 
   @Override
@@ -355,7 +285,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       throws MuleException {
     if (operationExecutor instanceof OperationArgumentResolverFactory) {
       PrecalculatedExecutionContextAdapter executionContext =
-          new PrecalculatedExecutionContextAdapter(createExecutionContext(eventBuilder.build()), operationExecutor);
+          new PrecalculatedExecutionContextAdapter<>(createExecutionContext(eventBuilder.build()), operationExecutor);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
 
@@ -364,8 +294,8 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
       InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
 
       if (beforeExecutionResult.isOk()) {
-        final Map<String, Object> resolvedArguments = ((OperationArgumentResolverFactory<OperationModel>) operationExecutor)
-            .createArgumentResolver(operationModel).apply(executionContext);
+        final Map<String, Object> resolvedArguments = ((OperationArgumentResolverFactory<ConstructModel>) operationExecutor)
+            .createArgumentResolver(null).apply(executionContext);
 
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
@@ -377,7 +307,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   }
 
   @Override
-  public void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext) {
+  public void disposeResolvedParameters(ExecutionContext<ConstructModel> executionContext) {
     final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
     List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
                                                                   executionContext instanceof PrecalculatedExecutionContextAdapter
@@ -388,19 +318,32 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
     disposeResolvedParameters(executionContext, interceptors);
   }
 
-  private void disposeResolvedParameters(ExecutionContext<OperationModel> executionContext, List<Interceptor> interceptors) {
+  private void disposeResolvedParameters(ExecutionContext<ConstructModel> executionContext, List<Interceptor> interceptors) {
     final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
 
     mediator.after(executionContext, null, interceptors);
   }
 
-  private ExecutionContextAdapter<OperationModel> createExecutionContext(InternalEvent event) throws MuleException {
-    Optional<ConfigurationInstance> configuration = getConfiguration(event);
-    return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
+  private ExecutionContextAdapter<ConstructModel> createExecutionContext(InternalEvent event) throws MuleException {
+    return createExecutionContext(getResolutionResult(event), event);
   }
 
-  private Map<String, Object> getResolutionResult(InternalEvent event, Optional<ConfigurationInstance> configuration)
+  private Map<String, Object> getResolutionResult(InternalEvent event)
       throws MuleException {
-    return resolverSet.resolve(from(event, configuration)).asMap();
+    return resolverSet.resolve(from(event, empty())).asMap();
   }
+
+
+  @Override
+  protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
+
+  }
+
+  @Override
+  protected ParameterValueResolver getParameterValueResolver() {
+    final InternalEvent event = getInitialiserEvent(muleContext);
+    return new OperationParameterValueResolver<>(new LazyExecutionContext<>(resolverSet, constructModel, extensionModel,
+                                                                            from(event)));
+  }
+
 }

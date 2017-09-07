@@ -14,10 +14,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -31,7 +31,6 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -44,12 +43,12 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.0
  */
-public final class ReactiveOperationExecutionWrapper
-    implements OperationExecutor, OperationArgumentResolverFactory, Lifecycle, MuleContextAware {
+public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
+    implements OperationExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(ReactiveOperationExecutionWrapper.class);
 
-  private final OperationExecutor delegate;
+  private final OperationExecutor<M> delegate;
   private MuleContext muleContext;
 
   public ReactiveOperationExecutionWrapper(OperationExecutor delegate) {
@@ -57,12 +56,13 @@ public final class ReactiveOperationExecutionWrapper
   }
 
   @Override
-  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
-    if (executionContext.getComponentModel().isBlocking()) {
+  public Publisher<Object> execute(ExecutionContext<M> executionContext) {
+    M componentModel = executionContext.getComponentModel();
+    if (componentModel instanceof OperationModel && ((OperationModel) componentModel).isBlocking()) {
       return delegate.execute(executionContext);
     }
 
-    ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
+    ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
     return Mono.create(sink -> {
       ReactorCompletionCallback callback = new ReactorCompletionCallback(sink);
       context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, callback);
@@ -101,7 +101,7 @@ public final class ReactiveOperationExecutionWrapper
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+  public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
         ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
         : ec -> emptyMap();

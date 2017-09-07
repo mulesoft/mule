@@ -19,7 +19,7 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
@@ -53,7 +53,7 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public final class SoapOperationExecutor implements OperationExecutor {
+public final class SoapOperationExecutor implements OperationExecutor<ComponentModel> {
 
   @Inject
   private MuleExpressionLanguage expressionExecutor;
@@ -69,7 +69,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Publisher<Object> execute(ExecutionContext<OperationModel> context) {
+  public Publisher<Object> execute(ExecutionContext<ComponentModel> context) {
     try {
       String serviceId = context.getParameter(SERVICE_PARAM);
       ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context);
@@ -89,7 +89,7 @@ public final class SoapOperationExecutor implements OperationExecutor {
   /**
    * Builds a Soap Request with the execution context to be sent using the {@link SoapClient}.
    */
-  private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders)
+  private SoapRequest getRequest(ExecutionContext<ComponentModel> context, Map<String, String> fixedHeaders)
       throws MessageTransformerException, MessagingException, TransformerException {
     SoapRequestBuilder builder = SoapRequest.builder().operation(getOperation(context));
     builder.soapHeaders(fixedHeaders);
@@ -118,12 +118,12 @@ public final class SoapOperationExecutor implements OperationExecutor {
     return builder.build();
   }
 
-  private String getOperation(ExecutionContext<OperationModel> context) {
+  private String getOperation(ExecutionContext<ComponentModel> context) {
     return (String) getParam(context, OPERATION_PARAM)
         .orElseThrow(() -> new IllegalStateException("Execution Context does not have the required operation parameter"));
   }
 
-  private <T> Optional<T> getParam(ExecutionContext<OperationModel> context, String param) {
+  private <T> Optional<T> getParam(ExecutionContext<ComponentModel> context, String param) {
     return context.hasParameter(param) ? Optional.ofNullable(context.getParameter(param)) : Optional.empty();
   }
 

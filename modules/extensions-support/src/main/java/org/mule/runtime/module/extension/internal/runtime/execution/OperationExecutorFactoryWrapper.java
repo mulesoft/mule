@@ -7,8 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Collections.emptyMap;
-
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
@@ -24,7 +23,8 @@ import java.util.function.Function;
  *
  * @since 4.0
  */
-public final class OperationExecutorFactoryWrapper implements OperationExecutorFactory, OperationArgumentResolverFactory {
+public final class OperationExecutorFactoryWrapper<T extends ComponentModel>
+    implements OperationExecutorFactory<T>, OperationArgumentResolverFactory<T> {
 
   private final OperationExecutorFactory delegate;
   private final List<Interceptor> interceptors;
@@ -35,7 +35,7 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
    * @param delegate the {@link OperationExecutorFactory} to be decorated
    * @param interceptors a {@link List} with the {@link Interceptor interceptors} that should aply
    */
-  public OperationExecutorFactoryWrapper(OperationExecutorFactory delegate, List<Interceptor> interceptors) {
+  public OperationExecutorFactoryWrapper(OperationExecutorFactory<T> delegate, List<Interceptor> interceptors) {
     this.delegate = delegate;
     this.interceptors = interceptors;
   }
@@ -45,7 +45,7 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
    *         {@link #delegate}
    */
   @Override
-  public OperationExecutor createExecutor(OperationModel operationModel) {
+  public OperationExecutor<T> createExecutor(T operationModel) {
     OperationExecutor executor = delegate.createExecutor(operationModel);
     executor = new ReactiveOperationExecutionWrapper(executor);
     executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
@@ -54,7 +54,7 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+  public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
         ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
         : ec -> emptyMap();

@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -18,8 +18,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.module.extension.internal.runtime.AbstractExecutionContextAdapterDecorator;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.AbstractExecutionContextAdapterDecorator;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,12 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.reactivestreams.Publisher;
 
-class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapterDecorator<OperationModel> {
+class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends AbstractExecutionContextAdapterDecorator<T> {
 
   private Optional<ConfigurationInstance> configuration;
-  private OperationExecutor operation;
+  private OperationExecutor<T> operation;
 
-  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<OperationModel> decorated, OperationExecutor operation) {
+  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<T> decorated, OperationExecutor<T> operation) {
     super(decorated);
 
     configuration = decorated.getConfiguration().map(config -> {
@@ -46,7 +46,7 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
       }
     });
 
-    this.operation = new OperationExecutorDecorator(operation);
+    this.operation = new OperationExecutorDecorator<>(operation);
   }
 
   @Override
@@ -58,12 +58,12 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
     return operation;
   }
 
-  private static class OperationExecutorDecorator implements OperationExecutor, Interceptable {
+  private static class OperationExecutorDecorator<M extends ComponentModel> implements OperationExecutor<M>, Interceptable {
 
     private OperationExecutor decorated;
     private List<Interceptor> operationExecutorInterceptors;
 
-    public OperationExecutorDecorator(OperationExecutor decorated) {
+    public OperationExecutorDecorator(OperationExecutor<M> decorated) {
       this.decorated = decorated;
 
       if (decorated instanceof Interceptable) {
@@ -76,7 +76,7 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
     }
 
     @Override
-    public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+    public Publisher<Object> execute(ExecutionContext<M> executionContext) {
       return decorated.execute(executionContext);
     }
 
@@ -134,7 +134,7 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
 
   }
 
-  private static class InterceptorDecorator implements Interceptor {
+  private static class InterceptorDecorator<M extends ComponentModel> implements Interceptor<M> {
 
     private AtomicInteger beforeCalled = new AtomicInteger();
     private Interceptor decorated;
@@ -144,24 +144,24 @@ class PrecalculatedExecutionContextAdapter extends AbstractExecutionContextAdapt
     }
 
     @Override
-    public void before(ExecutionContext<OperationModel> executionContext) throws Exception {
+    public void before(ExecutionContext<M> executionContext) throws Exception {
       if (beforeCalled.getAndIncrement() == 0) {
         decorated.before(executionContext);
       }
     }
 
     @Override
-    public void onSuccess(ExecutionContext<OperationModel> executionContext, Object result) {
+    public void onSuccess(ExecutionContext<M> executionContext, Object result) {
       decorated.onSuccess(executionContext, result);
     }
 
     @Override
-    public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
+    public Throwable onError(ExecutionContext<M> executionContext, Throwable exception) {
       return decorated.onError(executionContext, exception);
     }
 
     @Override
-    public void after(ExecutionContext<OperationModel> executionContext, Object result) {
+    public void after(ExecutionContext<M> executionContext, Object result) {
       if (beforeCalled.decrementAndGet() == 0) {
         decorated.after(executionContext, result);
       }

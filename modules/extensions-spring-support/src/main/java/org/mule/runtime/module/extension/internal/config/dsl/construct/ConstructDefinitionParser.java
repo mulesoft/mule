@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config.dsl.operation;
+package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -17,9 +17,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -27,47 +27,46 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
- * {@link OperationMessageProcessorObjectFactory}
+ * A {@link ExtensionDefinitionParser} for parsing {@link ConstructMessageProcessor} instances through a
+ * {@link ConstructMessageProcessorObjectFactory}
  *
  * @since 4.0
  */
-public class OperationDefinitionParser extends ExtensionDefinitionParser {
+public class ConstructDefinitionParser extends ExtensionDefinitionParser {
 
   private final ExtensionModel extensionModel;
-  private final OperationModel operationModel;
-  private final DslElementSyntax operationDsl;
+  private final ConstructModel constructModel;
+  private final DslElementSyntax constructDsl;
 
-  public OperationDefinitionParser(Builder definition, ExtensionModel extensionModel,
-                                   OperationModel operationModel,
+  public ConstructDefinitionParser(Builder definition, ExtensionModel extensionModel,
+                                   ConstructModel constructModel,
                                    DslSyntaxResolver dslSyntaxResolver,
                                    ExtensionParsingContext parsingContext) {
     super(definition, dslSyntaxResolver, parsingContext);
     this.extensionModel = extensionModel;
-    this.operationModel = operationModel;
-    this.operationDsl = dslSyntaxResolver.resolve(operationModel);
+    this.constructModel = constructModel;
+    this.constructDsl = dslSyntaxResolver.resolve(constructModel);
   }
 
   @Override
-  protected ComponentBuildingDefinition.Builder doParse(ComponentBuildingDefinition.Builder definitionBuilder)
+  protected Builder doParse(Builder definitionBuilder)
       throws ConfigurationException {
-    ComponentBuildingDefinition.Builder finalBuilder = definitionBuilder.withIdentifier(operationDsl.getElementName())
-        .withTypeDefinition(fromType(OperationMessageProcessor.class))
-        .withObjectFactoryType(OperationMessageProcessorObjectFactory.class)
+    Builder finalBuilder = definitionBuilder.withIdentifier(constructDsl.getElementName())
+        .withTypeDefinition(fromType(ConstructMessageProcessor.class))
+        .withObjectFactoryType(ConstructMessageProcessorObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        .withConstructorParameterDefinition(fromFixedValue(operationModel).build())
+        .withConstructorParameterDefinition(fromFixedValue(constructModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
@@ -80,7 +79,7 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
                                        fromChildConfiguration(CursorProviderFactory.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
 
-    Optional<? extends NestableElementModel> nestedChain = operationModel.getNestedComponents().stream()
+    Optional<? extends NestableElementModel> nestedChain = constructModel.getNestedComponents().stream()
         .filter(c -> c instanceof NestedChainModel)
         .findFirst();
 
@@ -89,17 +88,17 @@ public class OperationDefinitionParser extends ExtensionDefinitionParser {
       finalBuilder = finalBuilder.withSetterParameterDefinition("nestedProcessors",
                                                                 fromChildCollectionConfiguration(Processor.class).build());
 
-      parseParameters(operationModel.getAllParameterModels());
+      parseParameters(constructModel.getAllParameterModels());
     } else {
 
-      List<ParameterGroupModel> inlineGroups = getInlineGroups(operationModel);
-      parseParameters(getFlatParameters(inlineGroups, operationModel.getAllParameterModels()));
+      List<ParameterGroupModel> inlineGroups = getInlineGroups(constructModel);
+      parseParameters(getFlatParameters(inlineGroups, constructModel.getAllParameterModels()));
       for (ParameterGroupModel group : inlineGroups) {
         parseInlineParameterGroup(group);
       }
 
       // TODO improve to support things like [source, chainOfProcessors, errorHandler] or [chainOfProcessors, errorHandler]
-      parseNestedComponents(operationModel.getNestedComponents());
+      parseNestedComponents(constructModel.getNestedComponents());
     }
 
     return finalBuilder;

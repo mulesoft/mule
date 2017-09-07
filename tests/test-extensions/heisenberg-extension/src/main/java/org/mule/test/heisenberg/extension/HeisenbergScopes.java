@@ -8,6 +8,7 @@ package org.mule.test.heisenberg.extension;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -49,8 +50,11 @@ public class HeisenbergScopes implements Initialisable {
     chain.process(cb::success, (t, e) -> cb.error(t));
   }
 
-  public void payloadModifier(Chain chain, CompletionCallback<Void, Void> cb,
-                              Object payload, Map<String, String> attributes) {
+  @OutputResolver(output = HeisenbergOutputResolver.class)
+  public void payloadModifier(Chain chain,
+                              CompletionCallback<Object, Object> cb,
+                              Object payload,
+                              @ParameterDsl(allowInlineDefinition = false) Map<String, String> attributes) {
     chain.process(payload, attributes, cb::success, (t, e) -> cb.error(t));
   }
 

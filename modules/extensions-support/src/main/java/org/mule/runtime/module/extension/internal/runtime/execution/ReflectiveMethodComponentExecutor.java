@@ -14,12 +14,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -41,7 +39,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
-    implements MuleContextAware, Lifecycle, OperationArgumentResolverFactory {
+    implements MuleContextAware, Lifecycle, OperationArgumentResolverFactory<M> {
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
@@ -112,19 +110,17 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
-    return ec -> {
-      return withContextClassLoader(extensionClassLoader,
-                                    () -> {
-                                      final Object[] resolved =
-                                          getParameterValues((ExecutionContext<M>) ec, method.getParameterTypes());
+  public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
+    return ec -> withContextClassLoader(extensionClassLoader,
+                                        () -> {
+                                          final Object[] resolved =
+                                              getParameterValues(ec, method.getParameterTypes());
 
-                                      final Map<String, Object> resolvedParams = new HashMap<>();
-                                      for (int i = 0; i < method.getParameterCount(); ++i) {
-                                        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
-                                      }
-                                      return resolvedParams;
-                                    });
-    };
+                                          final Map<String, Object> resolvedParams = new HashMap<>();
+                                          for (int i = 0; i < method.getParameterCount(); ++i) {
+                                            resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+                                          }
+                                          return resolvedParams;
+                                        });
   }
 }
