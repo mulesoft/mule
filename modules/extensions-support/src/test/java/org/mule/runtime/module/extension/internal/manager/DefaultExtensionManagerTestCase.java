@@ -56,8 +56,8 @@ import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -132,10 +132,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
   @Mock
-  private OperationExecutorFactory executorFactory;
+  private ComponentExecutorFactory executorFactory;
 
   @Mock
-  private OperationExecutor executor;
+  private ComponentExecutor executor;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private InternalEvent event;

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getGroupModelContainerName;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -27,13 +27,13 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class OperationParameterValueResolver implements ParameterValueResolver {
+public final class OperationParameterValueResolver<T extends ComponentModel> implements ParameterValueResolver {
 
-  private final OperationModel operationModel;
-  private final ExecutionContext<OperationModel> executionContext;
+  private final T operationModel;
+  private final ExecutionContext<T> executionContext;
   private final Map<String, String> showInDslParameters;
 
-  OperationParameterValueResolver(ExecutionContext<OperationModel> executionContext) {
+  OperationParameterValueResolver(ExecutionContext<T> executionContext) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
     this.showInDslParameters = getShowInDslParameters();

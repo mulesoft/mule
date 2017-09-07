@@ -75,6 +75,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.module.extension.internal.config.dsl.construct.RouteComponentParser;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultValueResolverParsingDelegate;
@@ -88,6 +89,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTyp
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TypedInlineParameterGroupParser;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
@@ -234,7 +236,7 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       public void visit(NestedRouteModel component) {
-        // not yet implemented, support this when SDK the user to receive routes
+        parseRoute(component);
       }
     }));
   }
@@ -969,6 +971,26 @@ public abstract class ExtensionDefinitionParser {
         .withTypeDefinition(fromType(ProcessorChainValueResolver.class))
         .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
         .build());
+  }
+
+  private void parseRoute(NestedRouteModel routeModel) {
+    DslElementSyntax routeDsl = dslResolver.resolve(routeModel);
+
+    Class<?> type = routeModel.getModelProperty(ImplementingTypeModelProperty.class)
+        .map(ImplementingTypeModelProperty::getType)
+        .orElseThrow(() -> new IllegalStateException("Missing route information"));
+
+    MetadataType metadataType = typeLoader.load(type);
+    addParameter(getChildKey(routeModel.getName()),
+                 new DefaultObjectParsingDelegate().parse(routeModel.getName(), (ObjectType) metadataType, routeDsl));
+
+    try {
+      new RouteComponentParser(baseDefinitionBuilder, routeModel, metadataType, getContextClassLoader(), routeDsl,
+                               dslResolver, parsingContext).parse()
+                                   .forEach(this::addDefinition);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(new ConfigurationException(e));
+    }
   }
 
   private boolean isParameterResolver(Set<ModelProperty> modelProperties, MetadataType expectedType) {

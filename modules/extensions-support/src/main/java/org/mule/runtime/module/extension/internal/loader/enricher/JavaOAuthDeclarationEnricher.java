@@ -41,7 +41,7 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.UnauthorizeOperationExecutor;
 
@@ -160,7 +160,7 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
       operation.setRequiresConnection(false);
       operation.setSupportsStreaming(false);
       operation.setTransactional(false);
-      operation.addModelProperty(new OperationExecutorModelProperty(model -> new UnauthorizeOperationExecutor()));
+      operation.addModelProperty(new ComponentExecutorModelProperty(model -> new UnauthorizeOperationExecutor()));
 
       ParameterGroupDeclaration group = operation.getParameterGroup(DEFAULT_GROUP_NAME);
       group.showInDsl(false);

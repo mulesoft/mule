@@ -7,35 +7,35 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Collections.emptyMap;
-
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Decorates a {@link OperationExecutorFactory} so that the instances that it generates are also decorated through a
+ * Decorates a {@link ComponentExecutorFactory} so that the instances that it generates are also decorated through a
  * {@link InterceptableOperationExecutorWrapper}, so that the items in the {@link #interceptors} list can apply.
  *
  * @since 4.0
  */
-public final class OperationExecutorFactoryWrapper implements OperationExecutorFactory, OperationArgumentResolverFactory {
+public final class OperationExecutorFactoryWrapper<T extends ComponentModel>
+    implements ComponentExecutorFactory<T>, OperationArgumentResolverFactory<T> {
 
-  private final OperationExecutorFactory delegate;
+  private final ComponentExecutorFactory delegate;
   private final List<Interceptor> interceptors;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link OperationExecutorFactory} to be decorated
+   * @param delegate the {@link ComponentExecutorFactory} to be decorated
    * @param interceptors a {@link List} with the {@link Interceptor interceptors} that should aply
    */
-  public OperationExecutorFactoryWrapper(OperationExecutorFactory delegate, List<Interceptor> interceptors) {
+  public OperationExecutorFactoryWrapper(ComponentExecutorFactory<T> delegate, List<Interceptor> interceptors) {
     this.delegate = delegate;
     this.interceptors = interceptors;
   }
@@ -45,8 +45,8 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
    *         {@link #delegate}
    */
   @Override
-  public OperationExecutor createExecutor(OperationModel operationModel) {
-    OperationExecutor executor = delegate.createExecutor(operationModel);
+  public ComponentExecutor<T> createExecutor(T operationModel) {
+    ComponentExecutor executor = delegate.createExecutor(operationModel);
     executor = new ReactiveOperationExecutionWrapper(executor);
     executor = new InterceptableOperationExecutorWrapper(executor, interceptors);
 
@@ -54,7 +54,7 @@ public final class OperationExecutorFactoryWrapper implements OperationExecutorF
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+  public Function<ExecutionContext<T>, Map<String, Object>> createArgumentResolver(T operationModel) {
     return delegate instanceof OperationArgumentResolverFactory
         ? ((OperationArgumentResolverFactory) delegate).createArgumentResolver(operationModel)
         : ec -> emptyMap();

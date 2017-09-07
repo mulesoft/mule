@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
@@ -45,6 +46,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgume
 import org.mule.runtime.module.extension.internal.runtime.resolver.MediaTypeArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.RouterCallbackArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SecurityContextHandlerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCallbackContextArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.SourceCompletionCallbackArgumentResolver;
@@ -75,6 +77,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
   private static final ArgumentResolver<CompletionCallback> NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER =
       new CompletionCallbackArgumentResolver();
+  private static final ArgumentResolver<RouterCompletionCallback> ROUTER_CALLBACK_ARGUMENT_RESOLVER =
+      new RouterCallbackArgumentResolver();
   private static final ArgumentResolver<SourceCompletionCallback> ASYNC_SOURCE_COMPLETION_CALLBACK_ARGUMENT_RESOLVER =
       new SourceCompletionCallbackArgumentResolver();
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
@@ -143,6 +147,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new LiteralArgumentResolver<>(paramNames.get(i), parameterType);
       } else if (CompletionCallback.class.equals(parameterType)) {
         argumentResolver = NON_BLOCKING_CALLBACK_ARGUMENT_RESOLVER;
+      } else if (RouterCompletionCallback.class.equals(parameterType)) {
+        argumentResolver = ROUTER_CALLBACK_ARGUMENT_RESOLVER;
       } else if (MediaType.class.equals(parameterType)) {
         argumentResolver = MEDIA_TYPE_ARGUMENT_RESOLVER;
       } else if (AuthenticationHandler.class.equals(parameterType)) {
