@@ -21,7 +21,12 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR_DEFINITION;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
@@ -38,6 +43,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -46,6 +52,7 @@ import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
@@ -180,6 +187,46 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
         .get();
 
     assertStreamingStrategy(streamingParameter);
+  }
+
+  @Test
+  public void customStereotype() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    OperationModel operation = extensionModel.getConfigurationModels().get(0).getOperationModel("callSaul").get();
+
+    StereotypeModel stereotypeModel = operation.getStereotype();
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+
+    assertThat(stereotypeModel.getName(), is(new EmpireStereotype().getName()));
+    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
+    assertThat(stereotypeModel.getParent().get(), is(PROCESSOR));
+  }
+
+  @Test
+  public void validatorStereotype() {
+    ExtensionModel extensionModel = createExtension(HeisenbergExtension.class);
+    OperationModel operation = extensionModel.getOperationModel("validateMoney").get();
+
+    StereotypeModel stereotypeModel = operation.getStereotype();
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+    assertThat(stereotypeModel.isAssignableTo(VALIDATOR), is(true));
+
+    assertThat(stereotypeModel.getName(), is(VALIDATOR_DEFINITION.getName()));
+    assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
+    assertThat(stereotypeModel.getParent().get(), is(VALIDATOR));
+  }
+
+  @Test
+  public void defaultStereotype() {
+    ExtensionModel extensionModel = createExtension(VeganExtension.class);
+    OperationModel operation = extensionModel.getConfigurationModel(APPLE).get().getOperationModel("eatApple").get();
+
+    StereotypeModel stereotypeModel = operation.getStereotype();
+    assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
+
+    assertThat(stereotypeModel.getName(), is(PROCESSOR_DEFINITION.getName()));
+    assertThat(stereotypeModel.getNamespace(), is("MULE"));
+    assertThat(stereotypeModel.getParent().isPresent(), is(false));
   }
 
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
