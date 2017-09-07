@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;

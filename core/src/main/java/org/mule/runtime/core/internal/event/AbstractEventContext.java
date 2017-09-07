@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.core.internal.event;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
