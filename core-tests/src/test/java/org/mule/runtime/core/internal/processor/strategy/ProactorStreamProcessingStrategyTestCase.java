@@ -48,10 +48,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
+@Ignore("MULE-13478")
 public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   public ProactorStreamProcessingStrategyTestCase(Mode mode) {

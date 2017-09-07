@@ -34,10 +34,12 @@ import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessi
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
+@Ignore("MULE-13478")
 public class WorkQueueStreamProcessingStrategyTestCase extends WorkQueueProcessingStrategyTestCase {
 
   public WorkQueueStreamProcessingStrategyTestCase(Mode mode) {

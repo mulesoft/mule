@@ -27,9 +27,11 @@ import org.mule.tck.testmodels.mule.TestTransaction;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(WORK_QUEUE)
+@Ignore("MULE-13478")
 public class TransactionAwareWorkQueueStreamProcessingStrategyTestCase extends WorkQueueStreamProcessingStrategyTestCase {
 
   public TransactionAwareWorkQueueStreamProcessingStrategyTestCase(Mode mode) {
