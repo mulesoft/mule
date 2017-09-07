@@ -9,15 +9,14 @@ package org.mule.runtime.core.privileged.component;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static reactor.core.publisher.Mono.from;
-
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.InputEvent;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -89,8 +88,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   }
 
   protected InternalEventContext createEventContext() {
-    return DefaultEventContext.create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(),
-                                      NullExceptionHandler.getInstance());
+    return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), NullExceptionHandler.getInstance());
   }
 
   /**

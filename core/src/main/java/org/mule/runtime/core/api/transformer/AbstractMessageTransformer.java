@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transformer;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.i18n.I18nMessage;

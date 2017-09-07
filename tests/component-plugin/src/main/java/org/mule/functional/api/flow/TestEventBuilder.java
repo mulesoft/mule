@@ -8,12 +8,12 @@ package org.mule.functional.api.flow;
 
 import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -268,10 +268,9 @@ public class TestEventBuilder {
 
     InternalEventContext eventContext;
     if (externalCompletionCallback != null) {
-      eventContext =
-          DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
+      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId, externalCompletionCallback);
     } else {
-      eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
+      eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
     InternalEvent.Builder builder = InternalEvent.builder(eventContext)

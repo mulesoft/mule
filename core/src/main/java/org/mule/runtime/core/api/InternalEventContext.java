@@ -8,14 +8,18 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
 import java.time.OffsetTime;
 import java.util.Optional;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
@@ -148,5 +152,80 @@ public interface InternalEventContext extends EventContext {
    * @return publisher that completes when this {@link InternalEventContext} and all child context have completed.
    */
   Publisher<Void> getCompletionPublisher();
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param flow the flow that processes events of this context.
+   * @param location the location of the component that received the first message for this context.
+   */
+  static InternalEventContext create(FlowConstruct flow, ComponentLocation location) {
+    return create(flow, location, null);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters and an empty publisher.
+   *
+   * @param flow the flow that processes events of this context.
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
+   */
+  static InternalEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
+    return create(flow, location, correlationId, Mono.empty());
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *  @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   * @param exceptionHandler the exception handler that will deal with an error context
+   */
+  static InternalEventContext create(String id, String serverId, ComponentLocation location,
+                                     MessagingExceptionHandler exceptionHandler) {
+    return create(id, serverId, location, null, exceptionHandler);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters and an empty publisher.
+   *  @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
+   * @param exceptionHandler the exception handler that will deal with an error context
+   */
+  static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
+                                     MessagingExceptionHandler exceptionHandler) {
+    return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param flow the flow that processes events of this context.
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link InternalEventContext} to depend on completion of source.
+   */
+  static InternalEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
+                                     Publisher<Void> externalCompletionPublisher) {
+    return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *  @param id the unique id for this event context.
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId See {@link InternalEventContext#getCorrelationId()}.
+   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
+   *        {@link InternalEventContext} to depend on completion of source.
+   * @param exceptionHandler the exception handler that will deal with an error context
+   */
+  static InternalEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
+                                     Publisher<Void> externalCompletionPublisher,
+                                     MessagingExceptionHandler exceptionHandler) {
+    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
+  }
 
 }

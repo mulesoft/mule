@@ -18,15 +18,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
@@ -41,6 +40,8 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,9 +50,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -98,7 +96,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     when(muleContext.getRegistry().lookupFlowConstruct(anyString()).getProcessingStrategy())
         .thenReturn(flow.getProcessingStrategy());
 
-    context = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+    context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
   }
 

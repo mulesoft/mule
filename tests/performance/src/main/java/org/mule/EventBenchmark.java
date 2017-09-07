@@ -7,17 +7,17 @@
 package org.mule;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
@@ -43,7 +43,7 @@ public class EventBenchmark extends AbstractBenchmark {
     muleContext.getRegistry().registerFlowConstruct(flow);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     InternalEvent.Builder eventBuilder =
-        InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
+        InternalEvent.builder(create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
     event = eventBuilder.build();
     eventWith10VariablesProperties = createMuleEventWithFlowVarsAndProperties(10);
     eventWith50VariablesProperties = createMuleEventWithFlowVarsAndProperties(50);
@@ -58,7 +58,7 @@ public class EventBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public InternalEvent createEvent() {
-    return InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
+    return InternalEvent.builder(create(flow, CONNECTOR_LOCATION)).message(of(PAYLOAD)).build();
   }
 
   @Benchmark
@@ -167,7 +167,7 @@ public class EventBenchmark extends AbstractBenchmark {
   private InternalEvent createMuleEvent(Message message, int numProperties) {
     final Builder builder;
     try {
-      builder = InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION)).message(message);
+      builder = InternalEvent.builder(create(flow, CONNECTOR_LOCATION)).message(message);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

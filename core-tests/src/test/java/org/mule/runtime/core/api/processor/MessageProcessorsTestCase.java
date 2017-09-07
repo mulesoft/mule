@@ -18,14 +18,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -35,14 +34,14 @@ import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Optional;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import java.util.Optional;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
@@ -65,7 +64,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     exceptionHandler.setNotificationFirer(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
     exceptionHandler.initialise();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
-    eventContext = DefaultEventContext.create(flow, TEST_CONNECTOR_LOCATION);
+    eventContext = create(flow, TEST_CONNECTOR_LOCATION);
     input = builder(eventContext).message(of(TEST_MESSAGE)).build();
     output = builder(eventContext).message(of(TEST_MESSAGE)).build();
     response = builder(eventContext).message(of(TEST_MESSAGE)).build();

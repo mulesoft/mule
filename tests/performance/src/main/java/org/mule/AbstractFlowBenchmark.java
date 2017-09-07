@@ -9,12 +9,11 @@ package org.mule;
 import static java.lang.Class.forName;
 import static java.lang.Thread.sleep;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -140,7 +139,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public InternalEvent processSourceBlocking() throws MuleException {
-    return source.trigger(InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
+    return source.trigger(InternalEvent.builder(create(flow, CONNECTOR_LOCATION))
         .message(of(PAYLOAD)).build());
   }
 
@@ -148,7 +147,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   public CountDownLatch processSourceStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(InternalEvent.builder(DefaultEventContext.create(flow, CONNECTOR_LOCATION))
+      Mono.just(InternalEvent.builder(create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }

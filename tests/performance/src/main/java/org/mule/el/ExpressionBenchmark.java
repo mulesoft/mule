@@ -8,7 +8,7 @@ package org.mule.el;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.AbstractBenchmark;

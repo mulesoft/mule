@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
