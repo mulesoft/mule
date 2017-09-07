@@ -63,8 +63,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
@@ -92,8 +92,8 @@ import reactor.core.publisher.Mono;
  * {@link ExtensionModel}.
  * <p>
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
- * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
+ * through which a {@link ComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
+ * obtained {@link ComponentExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
  * not be shared with other instances of {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this}
  * instance receives will be propagated to the {@link #operationExecutor}.
  * <p>
@@ -122,7 +122,7 @@ public class OperationMessageProcessor extends ExtensionComponent<OperationModel
   private final RetryPolicyTemplate retryPolicyTemplate;
 
   private ExecutionMediator executionMediator;
-  private OperationExecutor operationExecutor;
+  private ComponentExecutor operationExecutor;
   private PolicyManager policyManager;
   protected ReturnDelegate returnDelegate;
 

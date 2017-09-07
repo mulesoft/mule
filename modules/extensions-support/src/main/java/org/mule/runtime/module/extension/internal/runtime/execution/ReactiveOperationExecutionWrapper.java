@@ -22,7 +22,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
- * Decorates an {@link OperationExecutor} adding the necessary logic to execute non blocking operations.
+ * Decorates an {@link ComponentExecutor} adding the necessary logic to execute non blocking operations.
  * <p>
  * If the operation being executed is blocking, then it delegates to the wrapped executor transparently. If the operation is non
  * blocking, then it creates and injects a {@link CompletionCallback} on which the operation result will be notified.
@@ -44,14 +44,14 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
-    implements OperationExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle, MuleContextAware {
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle, MuleContextAware {
 
   private static final Logger LOGGER = getLogger(ReactiveOperationExecutionWrapper.class);
 
-  private final OperationExecutor<M> delegate;
+  private final ComponentExecutor<M> delegate;
   private MuleContext muleContext;
 
-  public ReactiveOperationExecutionWrapper(OperationExecutor delegate) {
+  public ReactiveOperationExecutionWrapper(ComponentExecutor delegate) {
     this.delegate = delegate;
   }
 

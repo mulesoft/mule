@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 
 /**
- * An base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
+ * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
  *
  * @since 4.0
  */

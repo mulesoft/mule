@@ -94,12 +94,14 @@ public final class ParameterModelsLoaderDelegate {
     boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
 
-
-      if (!extensionParameter.shouldBeAdvertised()) {
+      // If the element being resolved accepts components to be declared as NestableElements, like any ComponentModel,
+      // then we will parse it as a component instead of a parameter.
+      // Both nested components and parameters are declared using the @Parameter annotation in order to simplify the API
+      if (supportsNestedElements && declaredAsNestedComponent((HasNestedComponentsDeclarer) component, extensionParameter)) {
         continue;
       }
 
-      if (supportsNestedElements && declaredAsNestedComponent((HasNestedComponentsDeclarer) component, extensionParameter)) {
+      if (!extensionParameter.shouldBeAdvertised()) {
         continue;
       }
 

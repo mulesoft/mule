@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.AbstractExecutionContextAdapterDecorator;
 
@@ -30,9 +30,9 @@ import org.reactivestreams.Publisher;
 class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends AbstractExecutionContextAdapterDecorator<T> {
 
   private Optional<ConfigurationInstance> configuration;
-  private OperationExecutor<T> operation;
+  private ComponentExecutor<T> operation;
 
-  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<T> decorated, OperationExecutor<T> operation) {
+  PrecalculatedExecutionContextAdapter(ExecutionContextAdapter<T> decorated, ComponentExecutor<T> operation) {
     super(decorated);
 
     configuration = decorated.getConfiguration().map(config -> {
@@ -46,7 +46,7 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
       }
     });
 
-    this.operation = new OperationExecutorDecorator<>(operation);
+    this.operation = new ComponentExecutorDecorator<>(operation);
   }
 
   @Override
@@ -54,16 +54,16 @@ class PrecalculatedExecutionContextAdapter<T extends ComponentModel> extends Abs
     return configuration;
   }
 
-  public OperationExecutor getOperationExecutor() {
+  public ComponentExecutor getOperationExecutor() {
     return operation;
   }
 
-  private static class OperationExecutorDecorator<M extends ComponentModel> implements OperationExecutor<M>, Interceptable {
+  private static class ComponentExecutorDecorator<M extends ComponentModel> implements ComponentExecutor<M>, Interceptable {
 
-    private OperationExecutor decorated;
+    private ComponentExecutor decorated;
     private List<Interceptor> operationExecutorInterceptors;
 
-    public OperationExecutorDecorator(OperationExecutor<M> decorated) {
+    public ComponentExecutorDecorator(ComponentExecutor<M> decorated) {
       this.decorated = decorated;
 
       if (decorated instanceof Interceptable) {

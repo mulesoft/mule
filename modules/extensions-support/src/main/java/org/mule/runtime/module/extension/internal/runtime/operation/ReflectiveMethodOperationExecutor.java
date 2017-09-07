@@ -24,7 +24,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
@@ -38,12 +38,12 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link OperationExecutor} which works by using reflection to invoke a method from a class.
+ * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
  */
 public final class ReflectiveMethodOperationExecutor<M extends ComponentModel>
-    implements OperationExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 

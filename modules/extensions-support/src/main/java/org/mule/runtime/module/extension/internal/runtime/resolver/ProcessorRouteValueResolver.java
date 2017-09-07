@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectNameHelper;
-import org.mule.runtime.extension.api.runtime.process.Chain;
+import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -34,18 +34,20 @@ import javax.inject.Inject;
 public final class ProcessorRouteValueResolver implements ValueResolver<Chain> {
 
   private final MessageProcessorChain chain;
-
-  private AtomicBoolean initialised = new AtomicBoolean(false);
+  private final Once initialiser;
 
   @Inject
   private MuleContext muleContext;
 
+
   public ProcessorRouteValueResolver(MessageProcessorChain chain) {
     this.chain = chain;
+    initialiser = getInitialiaser();
   }
 
   public ProcessorRouteValueResolver(List<Processor> processors) {
     chain = newChain(empty(), processors);
+    initialiser = getInitialiaser();
   }
 
   /**
@@ -57,7 +59,7 @@ public final class ProcessorRouteValueResolver implements ValueResolver<Chain> {
    */
   @Override
   public Chain resolve(ValueResolvingContext context) throws MuleException {
-    initialiseIfNeeded();
+    initialiser.runOnce();
     return new ImmutableProcessorChainExecutor(context.getEvent(), chain);
   }
 
@@ -69,16 +71,15 @@ public final class ProcessorRouteValueResolver implements ValueResolver<Chain> {
     return false;
   }
 
-  private void initialiseIfNeeded() {
-    if (!initialised.get()) {
+  private Once getInitialiaser() {
+    return Once.of(() -> {
       try {
         muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), chain);
         LifecycleUtils.initialiseIfNeeded(chain, muleContext);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);
       }
-      initialised.set(true);
-    }
+    });
   }
 
 }

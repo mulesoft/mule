@@ -16,6 +16,11 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+/**
+ *  Provides instances of {@link ConstructMessageProcessor} for a given {@link ConstructModel}
+ *
+ * @since 4.0
+ */
 public final class ConstructMessageProcessorBuilder
     extends ComponentMessageProcessorBuilder<ConstructModel, ConstructMessageProcessor> {
 

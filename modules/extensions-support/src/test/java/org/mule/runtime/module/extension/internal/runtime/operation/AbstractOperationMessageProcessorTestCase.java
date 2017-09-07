@@ -75,8 +75,8 @@ import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
@@ -119,10 +119,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ConnectionManagerAdapter connectionManagerAdapter;
   @Mock
-  protected OperationExecutorFactory operationExecutorFactory;
+  protected ComponentExecutorFactory operationExecutorFactory;
 
   @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
-  protected OperationExecutor operationExecutor;
+  protected ComponentExecutor operationExecutor;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected ResolverSet resolverSet;

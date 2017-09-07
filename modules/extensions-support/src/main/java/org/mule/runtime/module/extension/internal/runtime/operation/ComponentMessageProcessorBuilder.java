@@ -27,6 +27,11 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *  Base class for creating MessageProcessor instances of a given {@link ComponentModel}
+ *
+ * @since 4.0
+ */
 public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel, P extends ExtensionComponent> {
 
   protected final ExtensionModel extensionModel;

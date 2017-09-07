@@ -18,6 +18,11 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+/**
+ *  Provides instances of {@link OperationMessageProcessor} for a given {@link OperationModel}
+ *
+ * @since 4.0
+ */
 public final class OperationMessageProcessorBuilder
     extends ComponentMessageProcessorBuilder<OperationModel, OperationMessageProcessor> {
 

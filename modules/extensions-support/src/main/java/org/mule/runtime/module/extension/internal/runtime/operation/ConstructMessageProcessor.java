@@ -23,7 +23,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,10 +48,10 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
@@ -79,8 +78,8 @@ import reactor.core.publisher.Mono;
  * {@link ExtensionModel}.
  * <p>
  * A {@link #operationExecutor} is obtained by testing the {@link OperationModel} for a {@link OperationExecutorModelProperty}
- * through which a {@link OperationExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link OperationExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
+ * through which a {@link ComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
+ * obtained {@link ComponentExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
  * not be shared with other instances of {@link ConstructMessageProcessor}. All the {@link Lifecycle} events that {@code this}
  * instance receives will be propagated to the {@link #operationExecutor}.
  * <p>
@@ -108,7 +107,7 @@ public class ConstructMessageProcessor extends ExtensionComponent<ConstructModel
   private final RetryPolicyTemplate retryPolicyTemplate;
 
   private ExecutionMediator executionMediator;
-  private OperationExecutor<ConstructModel> operationExecutor;
+  private ComponentExecutor<ConstructModel> operationExecutor;
   private PolicyManager policyManager;
   protected ReturnDelegate returnDelegate;
   protected final ExtensionManager extensionManager;

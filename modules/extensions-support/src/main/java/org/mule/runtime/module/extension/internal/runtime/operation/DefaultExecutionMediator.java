@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
@@ -101,13 +101,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   /**
    * Executes the operation per the specification in this classes' javadoc
    *
-   * @param executor an {@link OperationExecutor}
+   * @param executor an {@link ComponentExecutor}
    * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Publisher<Object> execute(OperationExecutor<T> executor, ExecutionContextAdapter<T> context) {
+  public Publisher<Object> execute(ComponentExecutor<T> executor, ExecutionContextAdapter<T> context) {
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
     stats.ifPresent(s -> s.addInflightOperation());
 
@@ -121,7 +121,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     }
   }
 
-  private Mono<Object> executeWithInterceptors(OperationExecutor<T> executor,
+  private Mono<Object> executeWithInterceptors(ComponentExecutor<T> executor,
                                                ExecutionContextAdapter<T> context,
                                                final List<Interceptor> interceptors,
                                                Optional<MutableConfigurationStats> stats) {
@@ -264,7 +264,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
         .map(s -> (MutableConfigurationStats) s);
   }
 
-  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, OperationExecutor<T> executor) {
+  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, ComponentExecutor<T> executor) {
     return collectInterceptors(context.getConfiguration(),
                                context instanceof PrecalculatedExecutionContextAdapter
                                    ? ((PrecalculatedExecutionContextAdapter) context).getOperationExecutor()
@@ -272,7 +272,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
   }
 
   List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
-                                        OperationExecutor executor) {
+                                        ComponentExecutor executor) {
     List<Interceptor> accumulator = new LinkedList<>();
     configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
     collectInterceptors(accumulator, executor);

@@ -10,9 +10,9 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isI
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
 import org.mule.runtime.extension.api.annotation.Streaming;
-import org.mule.runtime.extension.api.runtime.process.Chain;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.extension.api.runtime.process.Route;
+import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;

@@ -11,7 +11,7 @@ import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext.DEFAULT
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 
 import javax.inject.Inject;
 
@@ -19,11 +19,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
- * Synthetic {@link OperationExecutor} which invalidates a given user's OAuth context.
+ * Synthetic {@link ComponentExecutor} which invalidates a given user's OAuth context.
  *
  * @since 4.0
  */
-public class UnauthorizeOperationExecutor implements OperationExecutor<ComponentModel> {
+public class UnauthorizeOperationExecutor implements ComponentExecutor<ComponentModel> {
 
   @Inject
   private ExtensionsOAuthManager oauthManager;

@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.route;
 
-import org.mule.runtime.extension.api.runtime.process.Route;
+import org.mule.runtime.extension.api.runtime.route.Route;
 
 public class AfterCall extends Route {
 
