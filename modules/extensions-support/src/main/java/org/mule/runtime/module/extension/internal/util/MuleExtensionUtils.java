@@ -61,7 +61,7 @@ import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
@@ -74,7 +74,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.OperationExecutorModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
@@ -390,22 +390,22 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code operationModel} for a {@link OperationExecutorModelProperty} and if present it returns the enclosed
-   * {@link OperationExecutorFactory}. If no such property is found, then a {@link IllegalOperationModelDefinitionException} is
+   * Tests the given {@code operationModel} for a {@link ComponentExecutorModelProperty} and if present it returns the enclosed
+   * {@link ComponentExecutorFactory}. If no such property is found, then a {@link IllegalOperationModelDefinitionException} is
    * thrown.
    *
    * @param operationModel an {@link OperationModel}
-   * @return a {@link OperationExecutorFactory}
+   * @return a {@link ComponentExecutorFactory}
    * @throws IllegalOperationModelDefinitionException if the operation is not properly enriched
    */
-  public static OperationExecutorFactory getOperationExecutorFactory(OperationModel operationModel) {
-    OperationExecutorFactory executorFactory =
+  public static <T extends ComponentModel> ComponentExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
+    ComponentExecutorFactory executorFactory =
         fromModelProperty(operationModel,
-                          OperationExecutorModelProperty.class,
-                          OperationExecutorModelProperty::getExecutorFactory,
+                          ComponentExecutorModelProperty.class,
+                          ComponentExecutorModelProperty::getExecutorFactory,
                           () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
                                                                                     operationModel.getName(),
-                                                                                    OperationExecutorFactory.class
+                                                                                    ComponentExecutorFactory.class
                                                                                         .getSimpleName())));
 
     return new OperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));

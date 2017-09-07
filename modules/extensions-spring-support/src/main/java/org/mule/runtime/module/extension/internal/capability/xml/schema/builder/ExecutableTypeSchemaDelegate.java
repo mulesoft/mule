@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_OPERATOR;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_VALIDATOR;
@@ -45,6 +45,7 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ob
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
+import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +121,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   protected ExtensionType registerNestedComponents(ExtensionType type, List<? extends NestableElementModel> nestedComponents) {
-    List<TopLevelElement> childElements = new LinkedList<>();
+    initialiseSequence(type);
     nestedComponents.forEach(component -> component.accept(new NestableElementModelVisitor() {
 
       @Override
@@ -128,14 +129,15 @@ abstract class ExecutableTypeSchemaDelegate {
 
       @Override
       public void visit(NestedChainModel component) {
-        childElements.add(generateNestedProcessorElement(dsl.resolve(component), component));
+        generateNestedProcessorElement(type, component);
       }
 
       @Override
-      public void visit(NestedRouteModel component) {}
+      public void visit(NestedRouteModel component) {
+        generateNestedRouteElement(type, dsl.resolve(component), component);
+      }
     }));
 
-    appendToSequence(type, childElements);
     return type;
   }
 
@@ -156,14 +158,31 @@ abstract class ExecutableTypeSchemaDelegate {
     }
   }
 
-  private TopLevelElement generateNestedProcessorElement(DslElementSyntax paramDsl, NestedChainModel chainModel) {
-    TopLevelElement collectionElement = new TopLevelElement();
-    collectionElement.setName(paramDsl.getElementName());
-    collectionElement.setMinOccurs(chainModel.isRequired() ? ONE : ZERO);
-    collectionElement.setAnnotation(builder.createDocAnnotation(EMPTY));
+  private void generateNestedRouteElement(ExtensionType type, DslElementSyntax routeDsl, NestedRouteModel routeModel) {
+    NestedChainModel chain = (NestedChainModel) routeModel.getNestedComponents().get(0);
 
-    LocalComplexType complexType = new LocalComplexType();
+    LocalComplexType complexType = builder.getObjectSchemaDelegate().createTypeExtension(MULE_ABSTRACT_EXTENSION_TYPE);
+    ExplicitGroup routeSequence = new ExplicitGroup();
+    complexType.getComplexContent().getExtension().setSequence(routeSequence);
+
+    generateNestedProcessorElement(complexType.getComplexContent().getExtension(), chain);
+
+    registerParameters(complexType.getComplexContent().getExtension(), routeModel.getAllParameterModels());
+    TopLevelElement routeElement = builder.createTopLevelElement(routeDsl.getElementName(),
+                                                                 BigInteger.valueOf(routeModel.getMinOccurs()), MAX_ONE);
+    routeElement.setComplexType(complexType);
+
+    type.getSequence().getParticle().add(objectFactory.createElement(routeElement));
+
+    if (routeModel.getMinOccurs() > 0) {
+      type.getSequence().setMinOccurs(ONE);
+    }
+  }
+
+  private void generateNestedProcessorElement(ExtensionType type, NestedChainModel chainModel) {
     final ExplicitGroup choice = new ExplicitGroup();
+    choice.setMinOccurs(chainModel.isRequired() ? ONE : ZERO);
+    choice.setMaxOccurs(UNBOUNDED);
     chainModel.getAllowedStereotypes().forEach(stereotype -> {
       // We need this to support both message-processor and mixed-content-message-processor
       if (stereotype.equals(PROCESSOR)) {
@@ -175,13 +194,11 @@ abstract class ExecutableTypeSchemaDelegate {
       }
     });
 
-    ExplicitGroup sequence = new ExplicitGroup();
-    sequence.setMinOccurs(ONE);
-    sequence.setMaxOccurs(UNBOUNDED);
-    sequence.getParticle().add(objectFactory.createChoice(choice));
-    complexType.setSequence(sequence);
-    collectionElement.setComplexType(complexType);
-    return collectionElement;
+    type.getSequence().getParticle().add(objectFactory.createChoice(choice));
+
+    if (chainModel.isRequired()) {
+      type.getSequence().setMinOccurs(ONE);
+    }
   }
 
   protected QName getSubstitutionGroup(StereotypeModel stereotypeDefinition) {

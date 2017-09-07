@@ -319,12 +319,13 @@ class MuleExtensionModelDeclarer {
             + "or throws an exception if not configured.");
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
+    when.withChain();
     when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
         .ofType(typeLoader.load(boolean.class))
         .describedAs("The expression to evaluate.");
 
-    choice.withRoute("otherwise").withMaxOccurs(1);
+    choice.withRoute("otherwise").withMaxOccurs(1).withChain();
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -349,7 +350,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer scatterGather = extensionDeclarer.withConstruct("scatterGather")
         .describedAs("Sends the same message to multiple message processors in parallel.");
 
-    scatterGather.withRoute("route").withMinOccurs(2);
+    scatterGather.withRoute("route").withMinOccurs(2).withChain();
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")

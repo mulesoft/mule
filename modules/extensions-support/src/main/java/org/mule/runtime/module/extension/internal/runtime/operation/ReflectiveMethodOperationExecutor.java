@@ -20,11 +20,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
@@ -38,19 +38,19 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link OperationExecutor} which works by using reflection to invoke a method from a class.
+ * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
  *
  * @since 3.7.0
  */
-public final class ReflectiveMethodOperationExecutor
-    implements OperationExecutor, OperationArgumentResolverFactory, MuleContextAware, Lifecycle {
+public final class ReflectiveMethodOperationExecutor<M extends ComponentModel>
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 
-  private final ReflectiveMethodComponentExecutor<OperationModel> executor;
+  private final ReflectiveMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public ReflectiveMethodOperationExecutor(OperationModel operationModel, Method operationMethod, Object operationInstance) {
+  public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor =
         new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
   }
@@ -59,17 +59,17 @@ public final class ReflectiveMethodOperationExecutor
    * {@inheritDoc}
    */
   @Override
-  public Publisher<Object> execute(ExecutionContext<OperationModel> executionContext) {
+  public Publisher<Object> execute(ExecutionContext<M> executionContext) {
     try {
       return justOrEmpty(executor.execute(executionContext));
     } catch (Exception e) {
-      return handleError(e, (ExecutionContextAdapter<OperationModel>) executionContext);
+      return handleError(e, (ExecutionContextAdapter<M>) executionContext);
     } catch (Throwable t) {
-      return handleError(wrapFatal(t), (ExecutionContextAdapter<OperationModel>) executionContext);
+      return handleError(wrapFatal(t), (ExecutionContextAdapter<M>) executionContext);
     }
   }
 
-  private Publisher<Object> handleError(Throwable t, ExecutionContextAdapter<OperationModel> executionContext) {
+  private Publisher<Object> handleError(Throwable t, ExecutionContextAdapter<M> executionContext) {
     CompletionCallback completionCallback = executionContext.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
     if (completionCallback != null) {
       if (t instanceof Exception) {
@@ -109,7 +109,7 @@ public final class ReflectiveMethodOperationExecutor
   }
 
   @Override
-  public Function<ExecutionContext<OperationModel>, Map<String, Object>> createArgumentResolver(OperationModel operationModel) {
+  public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     return executor instanceof OperationArgumentResolverFactory
         ? executor.createArgumentResolver(operationModel)
         : ec -> emptyMap();

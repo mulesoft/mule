@@ -38,48 +38,42 @@
 
     <!--TODO MULE-13440-->
     <!--<flow name="killMany">-->
-        <!--<heisenberg:kill-many reason="${killingReason}">-->
-            <!--<heisenberg:kill-operations>-->
-                <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
-                <!--<heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>-->
-                <!--<heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>-->
-            <!--</heisenberg:kill-operations>-->
-        <!--</heisenberg:kill-many>-->
+    <!--<heisenberg:kill-many reason="${killingReason}">-->
+    <!--<heisenberg:kill-operations>-->
+    <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
+    <!--<heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>-->
+    <!--<heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>-->
+    <!--</heisenberg:kill-operations>-->
+    <!--</heisenberg:kill-many>-->
     <!--</flow>-->
 
     <!--<flow name="killManyButOnlyOneProvided">-->
-        <!--<heisenberg:kill-many reason="${killingReason}">-->
-            <!--<heisenberg:kill-operations>-->
-                <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
-            <!--</heisenberg:kill-operations>-->
-        <!--</heisenberg:kill-many>-->
+    <!--<heisenberg:kill-many reason="${killingReason}">-->
+    <!--<heisenberg:kill-operations>-->
+    <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
+    <!--</heisenberg:kill-operations>-->
+    <!--</heisenberg:kill-many>-->
     <!--</flow>-->
 
     <flow name="executeAnything">
         <heisenberg:execute-anything>
-            <heisenberg:chain>
-                <try>
-                    <set-payload value="New Payload"/>
-                </try>
-            </heisenberg:chain>
+            <try>
+                <set-payload value="New Payload"/>
+            </try>
         </heisenberg:execute-anything>
     </flow>
 
     <flow name="neverFailsWrapperSuccessChain">
         <heisenberg:never-fails-wrapper>
-            <heisenberg:optional-processors>
-                <set-variable variableName="varName" value="varValue"/>
-                <set-payload value="#['newPayload']"/>
-            </heisenberg:optional-processors>
+            <set-variable variableName="varName" value="varValue"/>
+            <set-payload value="#['newPayload']"/>
         </heisenberg:never-fails-wrapper>
     </flow>
 
     <flow name="neverFailsWrapperFailingChain">
         <heisenberg:never-fails-wrapper>
-            <heisenberg:optional-processors>
-                <set-variable variableName="varName" value="varValue"/>
-                <set-payload value="#[dummy.error]"/>
-            </heisenberg:optional-processors>
+            <set-variable variableName="varName" value="varValue"/>
+            <set-payload value="#[dummy.error]"/>
         </heisenberg:never-fails-wrapper>
     </flow>
 
@@ -89,51 +83,39 @@
 
     <flow name="alwaysFailsWrapperSuccess">
         <heisenberg:always-fails-wrapper>
-            <heisenberg:processors>
-                <logger message="#[payload]"/>
-            </heisenberg:processors>
+            <logger message="#[payload]"/>
         </heisenberg:always-fails-wrapper>
     </flow>
 
     <flow name="alwaysFailsWrapperFailure">
         <heisenberg:always-fails-wrapper>
-            <heisenberg:processors>
-                <set-payload value="#[dummy.error]"/>
-            </heisenberg:processors>
+            <set-payload value="#[dummy.error]"/>
         </heisenberg:always-fails-wrapper>
     </flow>
 
     <flow name="exceptionOnCallbacksSuccess">
         <heisenberg:exception-on-callbacks>
-            <heisenberg:processors>
-                <logger message="#[payload]"/>
-            </heisenberg:processors>
+            <logger message="#[payload]"/>
         </heisenberg:exception-on-callbacks>
     </flow>
 
     <flow name="exceptionOnCallbacksFailure">
         <heisenberg:exception-on-callbacks>
-            <heisenberg:processors>
-                <set-payload value="#[dummy.error]"/>
-            </heisenberg:processors>
+            <set-payload value="#[dummy.error]"/>
         </heisenberg:exception-on-callbacks>
     </flow>
 
     <flow name="payloadModifier">
-        <heisenberg:payload-modifier payload="MESSAGE" attributes="#[{'some': 'var'}]">
-            <heisenberg:chain>
-                <set-variable variableName="newPayload" value="#[payload]"/>
-                <set-variable variableName="newAttributes" value="#[attributes]"/>
-            </heisenberg:chain>
+        <heisenberg:payload-modifier payload="#['MESSAGE']" attributes="#[{'some': 'var'}]">
+            <set-variable variableName="newPayload" value="#[payload]"/>
+            <set-variable variableName="newAttributes" value="#[attributes]"/>
         </heisenberg:payload-modifier>
     </flow>
 
     <flow name="getChain">
         <heisenberg:get-chain>
-            <heisenberg:chain>
-                <set-variable variableName="newPayload" value="#[payload]"/>
-                <set-variable variableName="newAttributes" value="#[attributes]"/>
-            </heisenberg:chain>
+            <set-variable variableName="newPayload" value="#[payload]"/>
+            <set-variable variableName="newAttributes" value="#[attributes]"/>
         </heisenberg:get-chain>
     </flow>
 

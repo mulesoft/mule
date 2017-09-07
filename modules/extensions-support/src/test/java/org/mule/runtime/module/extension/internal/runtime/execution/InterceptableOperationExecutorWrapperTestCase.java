@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class InterceptableOperationExecutorWrapperTestCase
     extends AbstractInterceptableContractTestCase<InterceptableOperationExecutorWrapper> {
 
   @Mock(extraInterfaces = Lifecycle.class)
-  private OperationExecutor executor;
+  private ComponentExecutor executor;
 
   @Mock
   private ExecutionContext<OperationModel> executionContext;

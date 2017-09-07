@@ -6,75 +6,38 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
+import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
  *
  * @since 4.0
  */
-public class OperationMessageProcessorObjectFactory extends AbstractExtensionObjectFactory<OperationMessageProcessor> {
-
-  private final ExtensionModel extensionModel;
-  private final OperationModel componentModel;
-  private final PolicyManager policyManager;
-  private ConfigurationProvider configurationProvider;
-  private String target = EMPTY;
-  private String targetValue = PAYLOAD;
-  private CursorProviderFactory cursorProviderFactory;
-  private RetryPolicyTemplate retryPolicyTemplate;
+public class OperationMessageProcessorObjectFactory
+    extends ComponentMessageProcessorObjectFactory<OperationModel, OperationMessageProcessor> {
 
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel componentModel,
                                                 MuleContext muleContext,
                                                 PolicyManager policyManager) {
-    super(muleContext);
-    this.extensionModel = extensionModel;
-    this.componentModel = componentModel;
-    this.policyManager = policyManager;
+    super(extensionModel,
+          componentModel,
+          muleContext,
+          policyManager);
   }
 
   @Override
-  public OperationMessageProcessor doGetObject() throws Exception {
-    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext)
-        .setConfigurationProvider(configurationProvider)
-        .setParameters(parameters)
-        .setTarget(target)
-        .setTargetValue(targetValue)
-        .setCursorProviderFactory(cursorProviderFactory)
-        .setRetryPolicyTemplate(retryPolicyTemplate)
-        .build();
+  protected OperationMessageProcessorBuilder getMessageProcessorBuilder() {
+    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext);
   }
 
-  public void setConfigurationProvider(ConfigurationProvider configuration) {
-    this.configurationProvider = configuration;
-  }
-
-  public void setTarget(String target) {
-    this.target = target;
-  }
-
-  public void setTargetValue(String targetValue) {
-    this.targetValue = targetValue;
-  }
-
-  public void setCursorProviderFactory(CursorProviderFactory cursorProviderFactory) {
-    this.cursorProviderFactory = cursorProviderFactory;
-  }
-
-  public void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate) {
-    this.retryPolicyTemplate = retryPolicyTemplate;
-  }
 }

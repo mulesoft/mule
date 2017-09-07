@@ -16,7 +16,6 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromFuture;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,7 +25,6 @@ import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -236,7 +234,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         }
 
         ((ParametersResolverProcessor) processor)
-            .disposeResolvedParameters((ExecutionContext<OperationModel>) event.getInternalParameters()
+            .disposeResolvedParameters((ExecutionContext) event.getInternalParameters()
                 .get(INTERCEPTION_RESOLVED_CONTEXT));
       }
     }
@@ -269,7 +267,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
     if (processor instanceof ParametersResolverProcessor) {
       try {
-        ((ParametersResolverProcessor) processor).resolveParameters(builder, (params, context) -> {
+        ((ParametersResolverProcessor<?>) processor).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
               .collect(toMap(e -> e.getKey(), e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue()))));
           Map<String, Object> interceptionEventParams = new HashMap<>();

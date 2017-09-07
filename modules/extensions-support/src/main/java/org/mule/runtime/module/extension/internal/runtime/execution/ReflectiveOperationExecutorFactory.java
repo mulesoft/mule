@@ -9,20 +9,20 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
 
 /**
- * An implementation of {@link OperationExecutorFactory} which produces instances of {@link ReflectiveMethodOperationExecutor}.
+ * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReflectiveMethodOperationExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0
  */
-public final class ReflectiveOperationExecutorFactory<T> implements OperationExecutorFactory {
+public final class ReflectiveOperationExecutorFactory<T, M extends ComponentModel> implements ComponentExecutorFactory<M> {
 
   private final Class<T> implementationClass;
   private final Method operationMethod;
@@ -37,7 +37,7 @@ public final class ReflectiveOperationExecutorFactory<T> implements OperationExe
   }
 
   @Override
-  public OperationExecutor createExecutor(OperationModel operationModel) {
+  public ComponentExecutor<M> createExecutor(M operationModel) {
     Object delegate;
     try {
       delegate = implementationClass.newInstance();

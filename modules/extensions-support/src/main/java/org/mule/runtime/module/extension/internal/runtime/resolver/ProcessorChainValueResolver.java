@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectNameHelper;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
-import org.mule.runtime.extension.api.runtime.process.Chain;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

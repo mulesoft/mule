@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 
 /**
- * {@link OperationExecutorFactory} that creates instances of {@link SoapOperationExecutor}.
+ * {@link ComponentExecutorFactory} that creates instances of {@link SoapOperationExecutor}.
  */
-public final class SoapOperationExecutorFactory implements OperationExecutorFactory {
+public final class SoapOperationExecutorFactory implements ComponentExecutorFactory<OperationModel> {
 
   /**
    * Creates a new executor for soap operations.
@@ -22,7 +22,7 @@ public final class SoapOperationExecutorFactory implements OperationExecutorFact
    * @return a new {@link SoapOperationExecutor}
    */
   @Override
-  public OperationExecutor createExecutor(OperationModel operationModel) {
+  public ComponentExecutor createExecutor(OperationModel operationModel) {
     return new SoapOperationExecutor();
   }
 }

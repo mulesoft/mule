@@ -15,10 +15,10 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
@@ -68,7 +68,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.0
  */
-public final class DefaultExecutionMediator implements ExecutionMediator {
+public final class DefaultExecutionMediator<T extends ComponentModel> implements ExecutionMediator<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
 
@@ -82,12 +82,12 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
 
 
   @FunctionalInterface
-  public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter<OperationModel>, Object, Object> {
+  public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
 
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
-                                  ComponentModel operationModel,
+                                  T operationModel,
                                   ConnectionManagerAdapter connectionManager,
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
@@ -101,18 +101,18 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   /**
    * Executes the operation per the specification in this classes' javadoc
    *
-   * @param executor an {@link OperationExecutor}
+   * @param executor an {@link ComponentExecutor}
    * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
   @Override
-  public Publisher<Object> execute(OperationExecutor executor, ExecutionContextAdapter context) {
+  public Publisher<Object> execute(ComponentExecutor<T> executor, ExecutionContextAdapter<T> context) {
     final Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(context);
     stats.ifPresent(s -> s.addInflightOperation());
 
     try {
-      return (Mono<Object>) getExecutionTemplate(context)
+      return (Mono<Object>) getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context)
           .execute(() -> executeWithInterceptors(executor, context, collectInterceptors(context, executor), stats));
     } catch (Exception e) {
       return error(e);
@@ -121,8 +121,8 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     }
   }
 
-  private Mono<Object> executeWithInterceptors(OperationExecutor executor,
-                                               ExecutionContextAdapter context,
+  private Mono<Object> executeWithInterceptors(ComponentExecutor<T> executor,
+                                               ExecutionContextAdapter<T> context,
                                                final List<Interceptor> interceptors,
                                                Optional<MutableConfigurationStats> stats) {
 
@@ -239,32 +239,32 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     });
   }
 
-  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<OperationModel> context) {
+  private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
     return context.getTransactionConfig()
         .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
-  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<OperationModel> context) {
-    return context.getRetryPolicyTemplate().orElseGet(() -> (RetryPolicyTemplate) context.getConfiguration()
+  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<T> context) {
+    return context.getRetryPolicyTemplate().orElseGet(() -> context.getConfiguration()
         .flatMap(ConfigurationInstance::getConnectionProvider)
         .map(provider -> {
           if (provider instanceof ConnectionProviderWrapper) {
             return ((ConnectionProviderWrapper) provider).getRetryPolicyTemplate();
           }
 
-          return connectionManager.getRetryTemplateFor(provider);
+          return connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider);
         }).orElse(fallbackRetryPolicyTemplate));
   }
 
-  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<ComponentModel> context) {
+  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {
     return context.getConfiguration()
         .map(ConfigurationInstance::getStatistics)
         .filter(s -> s instanceof MutableConfigurationStats)
         .map(s -> (MutableConfigurationStats) s);
   }
 
-  private List<Interceptor> collectInterceptors(ExecutionContextAdapter context, OperationExecutor executor) {
+  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, ComponentExecutor<T> executor) {
     return collectInterceptors(context.getConfiguration(),
                                context instanceof PrecalculatedExecutionContextAdapter
                                    ? ((PrecalculatedExecutionContextAdapter) context).getOperationExecutor()
@@ -272,7 +272,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
   }
 
   List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
-                                        OperationExecutor executor) {
+                                        ComponentExecutor executor) {
     List<Interceptor> accumulator = new LinkedList<>();
     configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
     collectInterceptors(accumulator, executor);

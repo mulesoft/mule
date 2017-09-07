@@ -27,8 +27,8 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.soap.SoapAttachment;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelperArgumentResolver;
@@ -49,11 +49,11 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 
 /**
- * {@link OperationExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
+ * {@link ComponentExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
  *
  * @since 4.0
  */
-public final class SoapOperationExecutor implements OperationExecutor {
+public final class SoapOperationExecutor implements ComponentExecutor<OperationModel> {
 
   @Inject
   private MuleExpressionLanguage expressionExecutor;
