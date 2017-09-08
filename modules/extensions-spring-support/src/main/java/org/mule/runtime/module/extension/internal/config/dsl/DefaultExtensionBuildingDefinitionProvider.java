@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -31,6 +31,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -203,7 +204,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   /**
    * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
    * the macro expanded code, so that
-   * {@link org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper#isProcessor(org.mule.runtime.config.spring.dsl.model.ComponentModel)}
+   * {@link org.mule.runtime.config.spring.internal.dsl.spring.ComponentModelHelper#isProcessor(ComponentModel)}
    * can properly determine it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as
    * those will be properly handled by the {@link ComponentLocationVisitor}.
    *

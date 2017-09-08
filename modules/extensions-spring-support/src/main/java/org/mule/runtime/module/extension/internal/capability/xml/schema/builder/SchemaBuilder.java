@@ -35,9 +35,9 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_OP
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.USE_REQUIRED;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.XML_NAMESPACE;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.isContent;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
@@ -48,7 +48,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
