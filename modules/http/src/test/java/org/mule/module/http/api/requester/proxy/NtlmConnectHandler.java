@@ -4,7 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.eclipse.jetty.proxy;
+
+package org.mule.module.http.api.requester.proxy;
 
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -14,7 +15,6 @@ import static org.glassfish.grizzly.http.server.Constants.CONNECTION;
 import static org.glassfish.grizzly.http.server.Constants.KEEPALIVE;
 
 import org.mule.module.http.api.requester.proxy.TestAuthorizer;
-import org.mule.module.http.functional.requester.AbstractNtlmTestCase;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -31,6 +31,7 @@ import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.io.SelectChannelEndPoint;
 import org.eclipse.jetty.io.SelectorManager;
+import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.thread.Scheduler;
@@ -39,16 +40,13 @@ import org.eclipse.jetty.util.thread.Scheduler;
  * Connect Handler to mantain the same connection during the HTTPS CONNECT. This is needed as the server must not close
  * the Connection during NTLM handling and Jetty closes the connection after the first 407 Error
  */
-public class NTLMConnectHandler extends ConnectHandler
+public class NtlmConnectHandler extends ConnectHandler
 {
-    private static final String TARGET_RESPONSE = "Response";
-    boolean authenticated = false;
-    AbstractNtlmTestCase testCase = null;
     protected String requestUrl;
     private TestAuthorizer testAuthorizer;
     private SelectorManager selector;
 
-    public NTLMConnectHandler(TestAuthorizer testAuthorizer) throws Exception
+    public NtlmConnectHandler(TestAuthorizer testAuthorizer) throws Exception
     {
         this.testAuthorizer = testAuthorizer;
     }
@@ -153,8 +151,7 @@ public class NTLMConnectHandler extends ConnectHandler
     {
         try
         {
-            authenticated = testAuthorizer.authorizeRequest(address, request, response, false);
-            return authenticated;
+            return testAuthorizer.authorizeRequest(address, request, response, false);
         }
         catch (IOException e)
         {
@@ -165,7 +162,6 @@ public class NTLMConnectHandler extends ConnectHandler
     private void simpleResponseFromTarget(HttpServletResponse response) throws IOException
     {
         response.setHeader(CONNECTION, CLOSE);
-        response.getOutputStream().print(TARGET_RESPONSE);
         response.setStatus(SC_OK);
         response.getOutputStream().flush();
         response.getOutputStream().close();

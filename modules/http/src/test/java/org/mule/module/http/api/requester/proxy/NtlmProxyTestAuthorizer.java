@@ -21,7 +21,7 @@ import com.ning.http.client.ntlm.NTLMEngine;
 /**
  * Authorizer to handle NTLM authorizations in tests
  */
-public class NTLMProxyTestAuthorizer implements TestAuthorizer
+public class NtlmProxyTestAuthorizer implements TestAuthorizer
 {
 
     private static final String TYPE_2_MESSAGE_CHALLENGE = "TlRMTVNTUAACAAAAAAAAACgAAAABggAAU3J2Tm9uY2UAAAAAAAAAAA==";
@@ -40,7 +40,7 @@ public class NTLMProxyTestAuthorizer implements TestAuthorizer
     private String type3Message;
 
 
-    public NTLMProxyTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader, String user, String password, String domain, String workstation)
+    public NtlmProxyTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader, String user, String password, String domain, String workstation)
     {
         this.clientAuthHeader = clientAuthHeader;
         this.serverAuthHeader = serverAuthHeader;
@@ -142,9 +142,9 @@ public class NTLMProxyTestAuthorizer implements TestAuthorizer
             return this;
         }
 
-        public NTLMProxyTestAuthorizer build() throws Exception
+        public NtlmProxyTestAuthorizer build() throws Exception
         {
-            NTLMProxyTestAuthorizer testAuthorizer = new NTLMProxyTestAuthorizer(clientAuthHeader, serverAuthHeader, unauthorizedHeader, user, password, domain, workstation);
+            NtlmProxyTestAuthorizer testAuthorizer = new NtlmProxyTestAuthorizer(clientAuthHeader, serverAuthHeader, unauthorizedHeader, user, password, domain, workstation);
             testAuthorizer.setUp();
             
             return testAuthorizer;

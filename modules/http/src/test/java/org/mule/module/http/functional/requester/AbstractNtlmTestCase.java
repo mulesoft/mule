@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.api.MuleEvent;
-import org.mule.module.http.api.requester.proxy.NTLMProxyTestAuthorizer;
+import org.mule.module.http.api.requester.proxy.NtlmProxyTestAuthorizer;
 import org.mule.module.http.api.requester.proxy.TestAuthorizer;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase
     {
         try
         {
-            TestAuthorizer testAuthorizer = new NTLMProxyTestAuthorizer.Builder().setClientAuthHeader(clientAuthHeader)
+            TestAuthorizer testAuthorizer = new NtlmProxyTestAuthorizer.Builder().setClientAuthHeader(clientAuthHeader)
                                                                                  .setServerAuthHeader(serverAuthHeader)
                                                                                  .setUnauthorizedHeader(unauthorizedHeader)
                                                                                  .setUser(USER)
