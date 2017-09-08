@@ -27,6 +27,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
+import org.apache.logging.log4j.ThreadContext;
 
 /**
  * Represents any data event occurring in the Mule environment. All data sent or received within the mule environment will be
@@ -494,6 +496,13 @@ public interface InternalEvent extends Serializable, Event {
    */
   static void setCurrentEvent(InternalEvent event) {
     CurrentEventHolder.currentEvent.set(event);
+    if (event == null) {
+      ThreadContext.remove("correlationId");
+      ThreadContext.remove("originatingLocation");
+    } else {
+      ThreadContext.put("correlationId", event.getCorrelationId());
+      ThreadContext.put("originatingLocation", event.getContext().getOriginatingLocation().getLocation());
+    }
   }
 
 }
