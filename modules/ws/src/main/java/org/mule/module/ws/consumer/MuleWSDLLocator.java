@@ -10,6 +10,7 @@ import static org.apache.xmlbeans.impl.schema.StscImporter.resolveRelativePathIn
 import static org.mule.module.ws.consumer.WSDLUtils.getBasePath;
 import static org.mule.transport.http.HttpConnector.HTTPS_URL_PROTOCOL;
 import static org.mule.transport.http.HttpConnector.HTTP_URL_PROTOCOL;
+import static org.apache.commons.io.FilenameUtils.normalize;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -87,11 +88,11 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
                 URL url = IOUtils.getResourceAsUrl(parentLocation, getClass());
                 if (mustResolveRelativePaths(url))
                 {
-                    latestImportedURI = resolveRelativePathInArchives(getBasePath(url.toString()) + importLocation);
+                    latestImportedURI = resolveRelativePathInArchives(normalize(getBasePath(url.toString())) + importLocation);
                 }
                 else
                 {
-                    latestImportedURI = getBasePath(url.toString()) + importLocation;
+                    latestImportedURI = normalize((getBasePath(url.toString()) + importLocation));
                 }
 
             }
