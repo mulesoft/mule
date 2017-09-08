@@ -68,6 +68,25 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
 
+  @Test
+  public void methodWithNumbersInNameIsFound() throws Exception {
+    stacktraceLogChecker.setExpectedCalls(asList(
+            new StacktraceLogChecker.MethodCall("package","Class","method0",0),
+            new StacktraceLogChecker.MethodCall("package","Class","0method",1),
+            new StacktraceLogChecker.MethodCall("package","Class","method0method",2)
+    ));
+    stacktraceLogChecker.check("at package.Class.method0(whatever:0)\nat package.Class.0method(whatever:1)\nat package.Class.method0method(whatever:2)");
+  }
+
+  @Test
+  public void classWithNumbersInNameIsFound() throws Exception {
+    stacktraceLogChecker.setExpectedCalls(asList(
+            new StacktraceLogChecker.MethodCall("package","Class0","method",0),
+            new StacktraceLogChecker.MethodCall("package","0Class","method",1),
+            new StacktraceLogChecker.MethodCall("package","Class0class","method",2)
+    ));
+    stacktraceLogChecker.check("at package.Class0.method(whatever:0)\nat package.0Class.method(whatever:1)\nat package.Class0class.method(whatever:2)");
+  }
 
 
 

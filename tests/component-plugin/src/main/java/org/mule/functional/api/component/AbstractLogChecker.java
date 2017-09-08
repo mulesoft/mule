@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractLogChecker implements LogChecker {
 
-  protected static final Pattern PARSING_REGEX_PATTERN = Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
+  protected static final Pattern PARSING_REGEX_PATTERN = Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
 
   @Override
   public abstract void check(String logMessage);
