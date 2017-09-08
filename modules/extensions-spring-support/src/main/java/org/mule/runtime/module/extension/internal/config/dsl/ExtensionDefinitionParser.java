@@ -25,8 +25,9 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -70,7 +71,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.declaration.type.TypeUtils;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
@@ -454,7 +454,7 @@ public abstract class ExtensionDefinitionParser {
   private void parseField(ObjectType type, DslElementSyntax typeDsl, ObjectFieldType objectField) {
     final MetadataType fieldType = objectField.getValue();
     final String fieldName = objectField.getKey().getName().getLocalPart();
-    final boolean acceptsReferences = TypeUtils.acceptsReferences(objectField);
+    final boolean acceptsReferences = ExtensionMetadataTypeUtils.acceptsReferences(objectField);
     final Object defaultValue = getDefaultValue(fieldType).orElse(null);
     final ExpressionSupport expressionSupport = getExpressionSupport(objectField);
     Optional<DslElementSyntax> fieldDsl = typeDsl.getContainedElement(fieldName);
@@ -469,7 +469,7 @@ public abstract class ExtensionDefinitionParser {
       return;
     }
 
-    final boolean isContent = TypeUtils.isContent(objectField);
+    final boolean isContent = isContent(objectField);
     fieldType.accept(new MetadataTypeVisitor() {
 
       @Override
