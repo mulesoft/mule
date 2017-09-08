@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
+public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
 
   private EqualsLogChecker equalsLogChecker = new EqualsLogChecker();
 
@@ -36,7 +36,7 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
   }
 
   @Test
-  public void whitespaceDifferencesDontCauseFailureIfFilterSet() throws Exception{
+  public void whitespaceDifferencesDontCauseFailureIfFilterSet() throws Exception {
     String log = "  \t\n\nmessage\n\n\t  ";
     equalsLogChecker.setShouldFilterLogMessage(true);
     equalsLogChecker.setExpectedLogMessage("message");
@@ -44,7 +44,7 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
   }
 
   @Test
-  public void whitepaceDifferencesCauseFailureIfFilterNotSet() throws Exception{
+  public void whitepaceDifferencesCauseFailureIfFilterNotSet() throws Exception {
     String log = "  \t\n\nmessage\n\n\t  ";
     equalsLogChecker.setShouldFilterLogMessage(false);
     equalsLogChecker.setExpectedLogMessage("message");
@@ -53,7 +53,7 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase{
   }
 
   @Test
-  public void whitespaceDifferencesBeforeAndAfterSucceedWithAndWithoutFilter() throws Exception{
+  public void whitespaceDifferencesBeforeAndAfterSucceedWithAndWithoutFilter() throws Exception {
     String log = "first line\n   second line   \n\tthird line\t";
     equalsLogChecker.setExpectedLogMessage("first line\nsecond line\nthird line");
     equalsLogChecker.setShouldFilterLogMessage(false);

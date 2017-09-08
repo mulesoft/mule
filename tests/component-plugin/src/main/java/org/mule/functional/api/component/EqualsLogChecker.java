@@ -32,35 +32,37 @@ public class EqualsLogChecker extends AbstractLogChecker {
     compareLines(expectedLines, actualLines, errors);
 
     String errorMessage = errors.toString();
-    if(!StringUtils.isBlank(errorMessage)) {
+    if (!StringUtils.isBlank(errorMessage)) {
       fail(errors.toString());
     }
 
   }
 
   private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {
-    if(expectedLog.size() != actualLog.size()) {
+    if (expectedLog.size() != actualLog.size()) {
       errorCatcher.append(lineSeparator());
-      errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",actualLog.size(),expectedLog.size()));
+      errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",
+                                        actualLog.size(), expectedLog.size()));
       errorCatcher.append(lineSeparator());
     }
   }
 
   private void compareLines(List<String> expectedLogLines, List<String> actualLogLines, StringBuilder errorCatcher) {
     int i;
-    for(i = 0; i < expectedLogLines.size() ; i++) {
-      if(i >= actualLogLines.size()) {
-        errorCatcher.append(String.format("Missing expected line[%d]: %s\n",i,expectedLogLines.get(i)));
-      }else {
-        if(!(expectedLogLines.get(i).trim().equals(actualLogLines.get(i).trim()))) {
-          errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n",i,expectedLogLines.get(i).trim(), actualLogLines.get(i).trim()));
+    for (i = 0; i < expectedLogLines.size(); i++) {
+      if (i >= actualLogLines.size()) {
+        errorCatcher.append(String.format("Missing expected line[%d]: %s\n", i, expectedLogLines.get(i)));
+      } else {
+        if (!(expectedLogLines.get(i).trim().equals(actualLogLines.get(i).trim()))) {
+          errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n", i,
+                                            expectedLogLines.get(i).trim(), actualLogLines.get(i).trim()));
           errorCatcher.append(lineSeparator());
         }
       }
     }
-    if(actualLogLines.size() > expectedLogLines.size()) {
+    if (actualLogLines.size() > expectedLogLines.size()) {
       errorCatcher.append("Actual log has extra lines:\n");
-      for(int j = i;j < actualLogLines.size(); j++) {
+      for (int j = i; j < actualLogLines.size(); j++) {
         errorCatcher.append(actualLogLines.get(j));
         errorCatcher.append(lineSeparator());
       }
@@ -71,14 +73,16 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
   @Override
   protected List<String> splitLines(String wholeMessage) {
-    if(shouldFilterLogMessage){
+    if (shouldFilterLogMessage) {
       return filterLines(super.splitLines(wholeMessage));
     }
     return super.splitLines(wholeMessage);
   }
 
   private List<String> filterLines(List<String> splittedLog) {
-    return splittedLog.stream().filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim())).collect(Collectors.toList());
+    return splittedLog.stream()
+        .filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim()))
+        .collect(Collectors.toList());
   }
 
   public void setExpectedLogMessage(String expectedLogMessage) {

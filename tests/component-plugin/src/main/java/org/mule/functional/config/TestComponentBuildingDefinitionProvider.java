@@ -179,15 +179,26 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
-                                             .withTypeDefinition(fromType(OnErrorAssertHandler.class)).withSetterParameterDefinition("checkers",fromChildCollectionConfiguration(LogChecker.class).build()).build());
+        .withTypeDefinition(fromType(OnErrorAssertHandler.class))
+        .withSetterParameterDefinition("checkers", fromChildCollectionConfiguration(LogChecker.class).build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class)).withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class))
+            .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
             .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("check-stacktrace").withTypeDefinition(fromType(StacktraceLogChecker.class)).withSetterParameterDefinition("expectedCalls", fromChildCollectionConfiguration(StacktraceLogChecker.MethodCall.class).build()).build());
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-stacktrace").withTypeDefinition(fromType(StacktraceLogChecker.class))
+            .withSetterParameterDefinition("expectedCalls",
+                                           fromChildCollectionConfiguration(StacktraceLogChecker.MethodCall.class).build())
+            .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("method-call").withTypeDefinition(fromType(StacktraceLogChecker.MethodCall.class)).withSetterParameterDefinition("packageName", fromSimpleParameter("package").build()).withSetterParameterDefinition("clazz",fromSimpleParameter("class").build())
-                                             .withSetterParameterDefinition("method",fromSimpleParameter("method").build()).withSetterParameterDefinition("lineNumber",fromSimpleParameter("lineNumber").build()).build());
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("method-call").withTypeDefinition(fromType(StacktraceLogChecker.MethodCall.class))
+            .withSetterParameterDefinition("packageName", fromSimpleParameter("package").build())
+            .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
+            .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
+            .withSetterParameterDefinition("lineNumber", fromSimpleParameter("lineNumber").build()).build());
 
     return componentBuildingDefinitions;
   }

@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.List;
 
-public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor{
+public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
 
 
   private List<LogChecker> checkers;
@@ -28,7 +28,7 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
   @Override
   public InternalEvent handleException(MessagingException exception, InternalEvent event) {
     String messageToLog = createMessageToLog(exception);
-    for( LogChecker checker : this.checkers) {
+    for (LogChecker checker : this.checkers) {
       checker.check(messageToLog);
     }
     exception.setHandled(true);

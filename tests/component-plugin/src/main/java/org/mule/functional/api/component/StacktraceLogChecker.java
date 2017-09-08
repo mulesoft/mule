@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class StacktraceLogChecker extends AbstractLogChecker{
+public class StacktraceLogChecker extends AbstractLogChecker {
 
   private List<MethodCall> expectedCalls = new ArrayList<>();
 
@@ -30,11 +30,11 @@ public class StacktraceLogChecker extends AbstractLogChecker{
     StringBuilder errors = new StringBuilder();
     List<String> stackTraceLines = getStacktraceLinesFromLogLines(splitLines(logMessage));
     Set<MethodCall> actualStackCalls = new HashSet<>();
-    for(String line : stackTraceLines) {
+    for (String line : stackTraceLines) {
       actualStackCalls.add(createMethodCallFromLine(line));
     }
-    for(MethodCall call: expectedCalls) {
-      if(!actualStackCalls.contains(call)){
+    for (MethodCall call : expectedCalls) {
+      if (!actualStackCalls.contains(call)) {
         errors.append(lineSeparator());
         errors.append(String.format("Expected method call: %s was not in stack trace", call.toString()));
         errors.append(lineSeparator());
@@ -42,7 +42,7 @@ public class StacktraceLogChecker extends AbstractLogChecker{
     }
 
     String errorMessage = errors.toString();
-    if(!StringUtils.isBlank(errorMessage)) {
+    if (!StringUtils.isBlank(errorMessage)) {
       fail(errors.toString());
     }
   }
@@ -50,13 +50,13 @@ public class StacktraceLogChecker extends AbstractLogChecker{
 
   private MethodCall createMethodCallFromLine(String line) {
     Matcher matcher = PARSING_REGEX_PATTERN.matcher(line);
-    if(matcher.matches()) {
-      return new MethodCall(matcher.group(1),matcher.group(2),matcher.group(3),Integer.parseInt(matcher.group(4)));
+    if (matcher.matches()) {
+      return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
     }
     return new MethodCall();
   }
 
-  public void setExpectedCalls(List<MethodCall> expectedCalls)  {
+  public void setExpectedCalls(List<MethodCall> expectedCalls) {
     this.expectedCalls = expectedCalls;
   }
 
@@ -71,7 +71,7 @@ public class StacktraceLogChecker extends AbstractLogChecker{
     private String method = EMPTY;
     Integer lineNumber = null;
 
-    private void setFields(String packageName,String clazz,String method) {
+    private void setFields(String packageName, String clazz, String method) {
       this.packageName = packageName;
       this.clazz = clazz;
       this.method = method;
@@ -79,12 +79,12 @@ public class StacktraceLogChecker extends AbstractLogChecker{
 
     public MethodCall() {}
 
-    public MethodCall(String packageName,String clazz,String method) {
-      setFields(packageName,clazz,method);
+    public MethodCall(String packageName, String clazz, String method) {
+      setFields(packageName, clazz, method);
     }
 
-    public MethodCall(String packageName,String clazz,String method,Integer lineNumber) {
-      setFields(packageName,clazz,method);
+    public MethodCall(String packageName, String clazz, String method, Integer lineNumber) {
+      setFields(packageName, clazz, method);
       this.lineNumber = lineNumber;
     }
 
@@ -126,7 +126,7 @@ public class StacktraceLogChecker extends AbstractLogChecker{
 
     @Override
     public String toString() {
-      return String.format("%s.%s.%s:%d",packageName,clazz,method,lineNumber);
+      return String.format("%s.%s.%s:%d", packageName, clazz, method, lineNumber);
     }
 
     @Override
@@ -136,18 +136,19 @@ public class StacktraceLogChecker extends AbstractLogChecker{
 
     @Override
     public boolean equals(Object obj) {
-      if(!(obj instanceof MethodCall)) {
+      if (!(obj instanceof MethodCall)) {
         return false;
       }
-      if(this == obj){
+      if (this == obj) {
         return true;
       }
-      if(this.lineNumber != null && ((MethodCall) obj).lineNumber != null) {
-        if(!this.lineNumber.equals(((MethodCall) obj).lineNumber)) {
+      if (this.lineNumber != null && ((MethodCall) obj).lineNumber != null) {
+        if (!this.lineNumber.equals(((MethodCall) obj).lineNumber)) {
           return false;
         }
       }
-      return packageName.equals(((MethodCall) obj).packageName) && clazz.equals(((MethodCall) obj).clazz) && method.equals(((MethodCall) obj).method);
+      return packageName.equals(((MethodCall) obj).packageName) && clazz.equals(((MethodCall) obj).clazz)
+          && method.equals(((MethodCall) obj).method);
     }
   }
 

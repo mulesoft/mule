@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractLogChecker implements LogChecker {
 
-  protected static final Pattern PARSING_REGEX_PATTERN = Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
+  protected static final Pattern PARSING_REGEX_PATTERN =
+      Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
 
   @Override
   public abstract void check(String logMessage);
@@ -28,9 +29,9 @@ public abstract class AbstractLogChecker implements LogChecker {
    */
   protected List<String> getMessageLinesFromLogLines(List<String> initialLogLines) {
     int index = initialLogLines.indexOf(EXCEPTION_MESSAGE_SECTION_DELIMITER.trim());
-    if(index > -1) {
-      return initialLogLines.subList(0,index);
-    }else {
+    if (index > -1) {
+      return initialLogLines.subList(0, index);
+    } else {
       return removeStacktraceLines(initialLogLines);
     }
   }
@@ -42,9 +43,9 @@ public abstract class AbstractLogChecker implements LogChecker {
    */
   protected List<String> getStacktraceLinesFromLogLines(List<String> initialLogLines) {
     int index = initialLogLines.indexOf(EXCEPTION_MESSAGE_SECTION_DELIMITER.trim());
-    if(index > -1) {
+    if (index > -1) {
       return initialLogLines.subList(index, initialLogLines.size());
-    }else {
+    } else {
       return getStacktraceLines(initialLogLines);
     }
   }
@@ -54,7 +55,7 @@ public abstract class AbstractLogChecker implements LogChecker {
   }
 
   private List<String> removeStacktraceLines(List<String> allLines) {
-    return allLines.stream().filter((line) -> ! PARSING_REGEX_PATTERN.matcher(line).matches()).collect(Collectors.toList());
+    return allLines.stream().filter((line) -> !PARSING_REGEX_PATTERN.matcher(line).matches()).collect(Collectors.toList());
   }
 
   protected List<String> splitLines(String wholeMessage) {
