@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://consumer.ws.module.mule.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="TestService" targetNamespace="http://consumer.ws.module.mule.org/">
+
+    <!--
+    This is another WSDL for the TestService, but imports the types from a separate WSDL "TestTypeDefinitions.wsdl".
+    This special scenario corresponds to the case where there are a lot of XSD files that import each other using relative paths,
+    for example:
+    
+    file 1 imports ../schema/1.xsd
+    xsd1 imports ../schema/2.xsd
+    xsd2 imports ../schema/3.xsd
+    
+    As a result of this, if the URI is not normalized, when trying to get a file, it will raise an exception due to the
+    length of the URI.
+    -->
+
+    <wsdl:import namespace="http://consumer.ws.module.mule.org/" location="imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../imported_schemas/../TestTypeDefinitionsWithMultipleLevels.wsdl"/>
+    <wsdl:types />
+    <wsdl:binding name="TestServiceSoapBinding" type="tns:TestService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="fail">
+            <soap:operation soapAction="fail" style="document"/>
+            <wsdl:input name="fail">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="failResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EchoException">
+                <soap:fault name="EchoException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="noParamsWithHeader">
+            <soap:operation soapAction="noParams" style="document"/>
+            <wsdl:input name="noParamsWithHeader">
+                <soap:header message="tns:noParamsWithHeader" part="header" use="literal">
+                </soap:header>
+                <soap:body parts="parameters" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="noParamsWithHeaderResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echoWithHeaders">
+            <soap:operation soapAction="echoWithHeaders" style="document"/>
+            <wsdl:input name="echoWithHeaders">
+                <soap:header message="tns:echoWithHeaders" part="headerIn" use="literal">
+                </soap:header>
+                <soap:header message="tns:echoWithHeaders" part="headerInOut" use="literal">
+                </soap:header>
+                <soap:body parts="parameters" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoWithHeadersResponse">
+                <soap:header message="tns:echoWithHeadersResponse" part="headerOut" use="literal">
+                </soap:header>
+                <soap:header message="tns:echoWithHeadersResponse" part="headerInOut" use="literal">
+                </soap:header>
+                <soap:body parts="result" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="noParams">
+            <soap:operation soapAction="noParams" style="document"/>
+            <wsdl:input name="noParams">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="noParamsResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echo">
+            <soap:operation soapAction="echo" style="document"/>
+            <wsdl:input name="echo">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="echoResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="TestService">
+        <wsdl:port binding="tns:TestServiceSoapBinding" name="TestPort">
+            <soap:address location="http://localhost:5804/services/Test"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
