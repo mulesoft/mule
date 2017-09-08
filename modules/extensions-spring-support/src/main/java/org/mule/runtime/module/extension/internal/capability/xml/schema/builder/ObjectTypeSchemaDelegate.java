@@ -18,13 +18,13 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ON
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUNDED;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getLayoutModel;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getParameterRole;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getBaseType;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getParameterRole;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getSubstitutionGroup;
-import static org.mule.runtime.extension.api.declaration.type.TypeUtils.getBaseType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
