@@ -1581,7 +1581,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   private static class OperationProcessorInApp extends AbstractAnnotatedObject
-      implements ParametersResolverProcessor, Processor {
+      implements ParametersResolverProcessor<OperationModel>, Processor {
 
     private final ExecutionContext executionContext = mock(ExecutionContext.class);
 
