@@ -15,6 +15,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -26,6 +27,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
+import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
@@ -69,8 +71,9 @@ import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser
 import org.mule.runtime.config.spring.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
@@ -146,7 +149,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
   private static final String TRANSFORMATION_BODY_REMOVAL = "META-INF/remove_body_content.xsl";
-  private static final String XMLNS_TNS = "xmlns:" + TNS_PREFIX;
+  private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
 
@@ -370,7 +373,7 @@ public final class XmlExtensionLoaderDelegate {
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(xmlDslModel);
-    declarer.withModelProperty(new XmlExtensionModelProperty());
+    declarer.withModelProperty(getXmlExtensionModelProperty(moduleModel, xmlDslModel));
     final Optional<ConfigurationDeclarer> configurationDeclarer = loadPropertiesFrom(declarer, moduleModel, extensions);
     if (configurationDeclarer.isPresent()) {
       loadOperationsFrom(configurationDeclarer.get(), moduleModel, directedGraph, xmlDslModel);
@@ -383,6 +386,24 @@ public final class XmlExtensionLoaderDelegate {
     if (!cycles.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet(cycles))));
     }
+  }
+
+  /**
+   * Calculates all the used namespaces of the given <module/> leaving behind the (possible) cyclic reference if there are
+   * {@link MacroExpansionModuleModel#TNS_PREFIX} references by removing the current namespace generation.
+   *
+   * @param moduleModel XML of the <module/>
+   * @param xmlDslModel the {@link XmlDslModel} for the current {@link ExtensionModel} generation
+   * @return a {@link XmlExtensionModelProperty} which contains all the namespaces dependencies. Among them could be dependencies
+   * that must be macro expanded and others which might not, but that job is left for the
+   * {@link MacroExpansionModulesModel#getDirectExpandableNamespaceDependencies(ComponentModel, Set)}
+   */
+  private XmlExtensionModelProperty getXmlExtensionModelProperty(ComponentModel moduleModel,
+                                                                 XmlDslModel xmlDslModel) {
+    final Set<String> namespaceDependencies = getUsedNamespaces(moduleModel).stream()
+        .filter(namespace -> !xmlDslModel.getNamespace().equals(namespace))
+        .collect(Collectors.toSet());
+    return new XmlExtensionModelProperty(namespaceDependencies);
   }
 
   private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {

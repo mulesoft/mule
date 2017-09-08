@@ -8,7 +8,10 @@ package org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+
+import java.util.Set;
 
 /**
  * Marker {@link ModelProperty} to indicate if the current {@link ExtensionModel} containing it should be expanded in
@@ -20,6 +23,20 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
  * @since 4.0
  */
 public class XmlExtensionModelProperty implements ModelProperty {
+
+  final private Set<String> namespacesDependencies;
+
+  public XmlExtensionModelProperty(Set<String> namespacesDependencies) {
+    this.namespacesDependencies = namespacesDependencies;
+  }
+
+  /**
+   * @return list of namespaces dependencies used in {@link MacroExpansionModulesModel} to determine the order in which the
+   * <module/>s must be macro expanded. Not null.
+   */
+  public Set<String> getNamespacesDependencies() {
+    return namespacesDependencies;
+  }
 
   @Override
   public String getName() {

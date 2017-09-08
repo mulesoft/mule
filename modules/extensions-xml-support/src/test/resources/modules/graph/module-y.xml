@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-y" minMuleVersion="4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:module-x="http://www.mulesoft.org/schema/mule/module-x"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-x http://www.mulesoft.org/schema/mule/module-x/current/mule-module-x.xsd">
+    <operation name="op1">
+        <body>
+            <module-x:op1/>
+            <mule:set-payload value="#['y-op1 ' ++ payload]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

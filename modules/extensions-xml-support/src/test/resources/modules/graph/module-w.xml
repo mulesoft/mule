@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-w" minMuleVersion="4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-w"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/module-w http://www.mulesoft.org/schema/mule/module-w/current/mule-module-w.xsd">
+    <operation name="op1">
+        <body>
+            <tns:internal-op/>
+            <mule:set-payload value="#['w-op1 ' ++ payload]"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="internal-op">
+        <body>
+            <mule:set-payload value="w-internal-op"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>
