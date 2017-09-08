@@ -24,7 +24,7 @@ public class MultipleModuleWithGlobalElementTestCase extends AbstractModuleWithH
   }
 
   @Test
-  public void testHttpDoLoginThroughNestedModules() throws Exception {
+  public void testHttpDoLoginThroughNestedModules() throws Exception { //TODO lautaro working with this test, enhance it pls.
     assertFlowForUsername("testHttpDoLoginThroughNestedModules", "nestedUser");
   }
 

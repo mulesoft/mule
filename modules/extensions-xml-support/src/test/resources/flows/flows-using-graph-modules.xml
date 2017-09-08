@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-c="http://www.mulesoft.org/schema/mule/module-c"
+      xmlns:module-x="http://www.mulesoft.org/schema/mule/module-x"
+      xmlns:module-y="http://www.mulesoft.org/schema/mule/module-y"
+      xmlns:module-z="http://www.mulesoft.org/schema/mule/module-z"
+      xmlns:module-b="http://www.mulesoft.org/schema/mule/module-b"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-c http://www.mulesoft.org/schema/mule/module-c/current/mule-module-c.xsd
+       http://www.mulesoft.org/schema/mule/module-x http://www.mulesoft.org/schema/mule/module-x/current/mule-module-x.xsd
+       http://www.mulesoft.org/schema/mule/module-y http://www.mulesoft.org/schema/mule/module-y/current/mule-module-y.xsd
+       http://www.mulesoft.org/schema/mule/module-z http://www.mulesoft.org/schema/mule/module-z/current/mule-module-z.xsd
+       http://www.mulesoft.org/schema/mule/module-b http://www.mulesoft.org/schema/mule/module-b/current/mule-module-b.xsd">
+
+    <flow name="testUsingModuleB_Op1">
+        <module-b:op1/>
+    </flow>
+
+    <flow name="testUsingModuleC_Op1">
+        <module-c:op1/>
+    </flow>
+
+    <flow name="testUsingModuleC_Op2">
+        <module-c:op2/>
+    </flow>
+
+    <flow name="testUsingModuleC_Op3">
+        <module-c:op3/>
+    </flow>
+
+    <flow name="testUsingModuleX_Op1">
+        <module-x:op1/>
+    </flow>
+
+    <flow name="testUsingModuleY_Op1">
+        <module-y:op1/>
+    </flow>
+
+    <flow name="testUsingModuleZ_Op1">
+        <module-z:op1/>
+    </flow>
+</mule>
