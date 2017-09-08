@@ -439,7 +439,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private static class ZombieArtifact {
 
-    private static final int MIN_TIME_DIFFERENCE = 1000;
     Map<File, Long> initialResourceFiles = new HashMap<>();
 
     private ZombieArtifact(File[] resourceFiles) {
@@ -455,7 +454,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     public boolean updatedZombieApp() {
       return initialResourceFiles.entrySet().stream()
-          .anyMatch((entry) -> abs(entry.getKey().lastModified() - entry.getValue()) > MIN_TIME_DIFFERENCE);
+          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
     }
 
     //Returns true only if all the files exist
