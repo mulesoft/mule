@@ -12,12 +12,15 @@ import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 
+import org.junit.Before;
+
 public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase
 {
 
-    public HttpRequestNtlmProxyTestCase()
+    @Before
+    public void setup()
     {
-        super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+        setupTestAuthorizer(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
     }
 
     @Override
