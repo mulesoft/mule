@@ -12,6 +12,9 @@ import org.junit.Rule;
 
 /**
  * Test that verifies a WSDL that involves an import that uses a very long URI with relative paths.
+ * This is also the scenario where a lot of XSD's imports each other using relative paths.
+ * The URI to verify keeps getting longer until an exception is raised because the length of the file
+ * is too long. 
  */
 public class ImportedWsdlTypesWithLongURIUsingRelativePathsTestCase extends ImportedWsdlTypesFunctionalTestCase
 {
