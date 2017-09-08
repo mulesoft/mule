@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -87,9 +86,8 @@ public final class ExtensionActivator implements Startable, Stoppable {
       return;
     }
 
-    ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(
-                                                                                new ModuleNamespace(capitalize(extensionModel
-                                                                                    .getXmlDslModel().getPrefix())));
+    ExpressionModule.Builder moduleBuilder = new DefaultExpressionModuleBuilder(new ModuleNamespace(extensionModel
+        .getXmlDslModel().getPrefix()));
 
     registerExpressionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
     try {
