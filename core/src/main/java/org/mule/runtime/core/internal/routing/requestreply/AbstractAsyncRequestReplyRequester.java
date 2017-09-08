@@ -42,7 +42,7 @@ import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase;
 
@@ -375,7 +375,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(correlationId);
     BaseEvent event = multipleEvent.getEvent();
     // TODO MULE-10302 remove this.
-    if (((ReallyInternalEvent) event).getMuleContext() == null) {
+    if (((InternalEvent) event).getMuleContext() == null) {
       try {
         DeserializationPostInitialisable.Implementation.init(event, muleContext);
       } catch (Exception e) {

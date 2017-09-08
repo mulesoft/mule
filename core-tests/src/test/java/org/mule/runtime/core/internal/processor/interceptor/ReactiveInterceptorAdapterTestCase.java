@@ -59,7 +59,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -159,7 +159,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor).after(eq(((Component) processor).getLocation()), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -189,7 +189,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
       inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(2));
     }
   }
@@ -217,7 +217,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -248,7 +248,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue(TEST_PAYLOAD)));
       inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -282,7 +282,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor).process(argThat(hasPayloadValue("")));
       inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -313,7 +313,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -347,7 +347,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -736,7 +736,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(processor, never()).process(any());
       inOrder.verify(interceptor).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -771,7 +771,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(2));
     }
   }
@@ -804,7 +804,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(2));
     }
   }
@@ -836,7 +836,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -868,7 +868,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -905,7 +905,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(2));
     }
   }
@@ -940,7 +940,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -978,7 +978,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1015,7 +1015,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1053,7 +1053,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1090,7 +1090,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
       inOrder.verify(interceptor1).after(any(), argThat(interceptionHasPayloadValue(TEST_PAYLOAD)), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1397,7 +1397,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1430,7 +1430,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1467,7 +1467,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1, never()).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }
@@ -1504,7 +1504,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       inOrder.verify(interceptor2, never()).after(any(), any(), eq(empty()));
       inOrder.verify(interceptor1).after(any(), any(), eq(empty()));
 
-      assertThat(((ReallyInternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
+      assertThat(((InternalEvent) result).getInternalParameters().entrySet(), hasSize(0));
       verifyParametersResolvedAndDisposed(times(1));
     }
   }

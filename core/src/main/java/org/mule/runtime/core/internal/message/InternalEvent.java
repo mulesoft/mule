@@ -12,7 +12,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
 
-public interface ReallyInternalEvent extends PrivilegedEvent {
+public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.

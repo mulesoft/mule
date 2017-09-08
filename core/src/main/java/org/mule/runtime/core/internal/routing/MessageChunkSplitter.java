@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
     List<BaseEvent> messageParts = new ArrayList<>();
     byte[] data;
     try {
-      data = ((ReallyInternalEvent) event).getMessageAsBytes(muleContext);
+      data = ((InternalEvent) event).getMessageAsBytes(muleContext);
     } catch (Exception e) {
       throw new RoutingException(CoreMessages.failedToReadPayload(), next, e);
     }

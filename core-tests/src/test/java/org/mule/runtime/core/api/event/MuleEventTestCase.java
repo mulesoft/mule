@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -241,7 +241,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertThat(from(((BaseEventContext) before.getContext()).getResponsePublisher()).block(), equalTo(result));
 
     // Cache entry is removed on deserialization
-    assertThat(((Pipeline) ((ReallyInternalEvent) before).getFlowConstruct()).getSerializationEventContextCache()
+    assertThat(((Pipeline) ((InternalEvent) before).getFlowConstruct()).getSerializationEventContextCache()
         .get(before.getContext().getId()), is(nullValue()));
 
   }

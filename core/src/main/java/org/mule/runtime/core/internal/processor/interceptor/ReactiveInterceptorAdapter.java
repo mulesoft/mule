@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import org.slf4j.Logger;
@@ -186,7 +186,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private Map<String, ProcessorParameterValue> getResolvedParams(final BaseEvent eventWithResolvedParams) {
-    return (Map<String, ProcessorParameterValue>) ((ReallyInternalEvent) eventWithResolvedParams).getInternalParameters()
+    return (Map<String, ProcessorParameterValue>) ((InternalEvent) eventWithResolvedParams).getInternalParameters()
         .get(INTERCEPTION_RESOLVED_PARAMS);
   }
 
@@ -215,11 +215,11 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private BaseEvent addResolvedParameters(BaseEvent event, Processor component, Map<String, String> dslParameters) {
-    boolean sameComponent = ((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
-        ? component.equals(((ReallyInternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT))
+    boolean sameComponent = ((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_COMPONENT)
+        ? component.equals(((InternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT))
         : false;
 
-    if (!sameComponent || !((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
+    if (!sameComponent || !((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_PARAMS)) {
       return resolveParameters(removeResolvedParameters(event), component, dslParameters);
     } else {
       return event;
@@ -227,8 +227,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
   }
 
   private BaseEvent removeResolvedParameters(BaseEvent event) {
-    if (((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
-      Processor processor = (Processor) ((ReallyInternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT);
+    if (((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      Processor processor = (Processor) ((InternalEvent) event).getInternalParameters().get(INTERCEPTION_COMPONENT);
 
       if (processor instanceof ParametersResolverProcessor) {
         if (LOGGER.isDebugEnabled()) {
@@ -237,7 +237,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         }
 
         ((ParametersResolverProcessor) processor)
-            .disposeResolvedParameters((ExecutionContext) ((ReallyInternalEvent) event).getInternalParameters()
+            .disposeResolvedParameters((ExecutionContext) ((InternalEvent) event).getInternalParameters()
                 .get(INTERCEPTION_RESOLVED_CONTEXT));
       }
     }

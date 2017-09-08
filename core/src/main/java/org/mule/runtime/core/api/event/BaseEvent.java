@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.io.Serializable;
@@ -92,7 +92,7 @@ public interface BaseEvent extends Serializable, Event {
    * @return new builder instance.
    */
   static Builder builder(BaseEvent event) {
-    return new DefaultEventBuilder((ReallyInternalEvent) event);
+    return new DefaultEventBuilder((InternalEvent) event);
   }
 
   /**
@@ -106,7 +106,7 @@ public interface BaseEvent extends Serializable, Event {
    * @return new builder instance.
    */
   static Builder builder(EventContext context, BaseEvent event) {
-    return new DefaultEventBuilder((BaseEventContext) context, (ReallyInternalEvent) event);
+    return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
   interface Builder {

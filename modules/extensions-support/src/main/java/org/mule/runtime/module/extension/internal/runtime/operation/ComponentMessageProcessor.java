@@ -43,7 +43,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -143,7 +143,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
-      if (((ReallyInternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      if (((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
         ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
@@ -185,7 +185,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(BaseEvent event) {
-    return (PrecalculatedExecutionContextAdapter) (((ReallyInternalEvent) event).getInternalParameters()
+    return (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
         .get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 

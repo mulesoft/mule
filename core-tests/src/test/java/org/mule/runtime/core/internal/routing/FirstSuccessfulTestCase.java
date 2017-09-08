@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -126,7 +126,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
       try {
         Message msg;
         Error error = null;
-        String payload = ((ReallyInternalEvent) event).getMessageAsString(muleContext);
+        String payload = ((InternalEvent) event).getMessageAsString(muleContext);
         if (payload.indexOf(rejectIfMatches) >= 0) {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {

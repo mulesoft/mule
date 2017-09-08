@@ -44,7 +44,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
 
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
     this.context = messageContext;
   }
 
-  public DefaultEventBuilder(ReallyInternalEvent event) {
+  public DefaultEventBuilder(InternalEvent event) {
     this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
@@ -106,7 +106,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
     this.internalParameters.putAll(event.getInternalParameters());
   }
 
-  public DefaultEventBuilder(BaseEventContext messageContext, ReallyInternalEvent event) {
+  public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
     this(event);
     this.context = messageContext;
     this.modified = true;
@@ -294,7 +294,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
    * Mule component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
    * components.
    */
-  public static class InternalEventImplementation implements ReallyInternalEvent, DeserializationPostInitialisable {
+  public static class InternalEventImplementation implements InternalEvent, DeserializationPostInitialisable {
 
     private static final long serialVersionUID = 1L;
 

@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.internal.message.ReallyInternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -267,7 +267,7 @@ public class DefaultFlowBuilder implements Builder {
         Optional<Error> errorOptional = result.getError();
         // TODO MULE-10013
         // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-        result = BaseEvent.builder(result).flow(((ReallyInternalEvent) original).getFlowConstruct())
+        result = BaseEvent.builder(result).flow(((InternalEvent) original).getFlowConstruct())
             .replyToHandler(((PrivilegedEvent) original).getReplyToHandler())
             .replyToDestination(((PrivilegedEvent) original).getReplyToDestination())
             .error(errorOptional.orElse(null)).build();
