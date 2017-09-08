@@ -153,6 +153,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -287,6 +298,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -411,6 +431,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -3153,6 +3182,17 @@
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                       "typeAlias": {
                         "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
                       }
                     },
                     "fields": [
@@ -3287,6 +3327,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       },
                       {
@@ -3411,6 +3460,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       }
                     ]
@@ -3840,6 +3898,17 @@
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                       "typeAlias": {
                         "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
                       }
                     },
                     "fields": [
@@ -3974,6 +4043,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       },
                       {
@@ -4098,6 +4176,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       }
                     ]
@@ -4527,6 +4614,17 @@
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                       "typeAlias": {
                         "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
                       }
                     },
                     "fields": [
@@ -4661,6 +4759,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       },
                       {
@@ -4785,6 +4892,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       }
                     ]
@@ -5421,6 +5537,17 @@
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                       "typeAlias": {
                         "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
                       }
                     },
                     "fields": [
@@ -5555,6 +5682,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       },
                       {
@@ -5679,6 +5815,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       }
                     ]
@@ -6108,6 +6253,17 @@
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                       "typeAlias": {
                         "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
                       }
                     },
                     "fields": [
@@ -6242,6 +6398,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       },
                       {
@@ -6366,6 +6531,15 @@
                               }
                             }
                           ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
                         }
                       }
                     ]
@@ -8990,6 +9164,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -9124,6 +9309,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -9248,6 +9442,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -9677,6 +9880,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -9811,6 +10025,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -9935,6 +10158,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -10364,6 +10596,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -10498,6 +10741,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -10622,6 +10874,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -11258,6 +11519,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -11392,6 +11664,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -11516,6 +11797,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -11945,6 +12235,17 @@
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
                   "typeAlias": {
                     "value": "Tls"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": true
+                  },
+                  "QName": {
+                    "value": {
+                      "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                      "localPart": "context",
+                      "prefix": "tls"
+                    }
                   }
                 },
                 "fields": [
@@ -12079,6 +12380,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   },
                   {
@@ -12203,6 +12513,15 @@
                           }
                         }
                       ]
+                    },
+                    "annotations": {
+                      "parameterDsl": {
+                        "allowInlineDefinition": true,
+                        "allowReferences": false
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
+                      }
                     }
                   }
                 ]
@@ -13605,6 +13924,17 @@
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
               "typeAlias": {
                 "value": "Tls"
+              },
+              "typeDsl": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true
+              },
+              "QName": {
+                "value": {
+                  "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                  "localPart": "context",
+                  "prefix": "tls"
+                }
               }
             },
             "fields": [
@@ -13739,6 +14069,15 @@
                       }
                     }
                   ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
                 }
               },
               {
@@ -13863,6 +14202,15 @@
                       }
                     }
                   ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
                 }
               }
             ]
@@ -14050,6 +14398,17 @@
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
               "typeAlias": {
                 "value": "Tls"
+              },
+              "typeDsl": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true
+              },
+              "QName": {
+                "value": {
+                  "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                  "localPart": "context",
+                  "prefix": "tls"
+                }
               }
             },
             "fields": [
@@ -14184,6 +14543,15 @@
                       }
                     }
                   ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
                 }
               },
               {
@@ -14308,6 +14676,15 @@
                       }
                     }
                   ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
                 }
               }
             ]
