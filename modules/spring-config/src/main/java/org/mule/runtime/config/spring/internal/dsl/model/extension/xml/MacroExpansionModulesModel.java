@@ -57,15 +57,17 @@ public class MacroExpansionModulesModel {
 
   /**
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
-   * the global elements.
+   * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
   public void expand() {
-    GraphIterator<String, DefaultEdge> graphIterator = namespaceGraphIterator();
-    while (graphIterator.hasNext()) {
-      final String namespace = graphIterator.next();
-      if (allExtensionsByNamespace.containsKey(namespace)) {
-        final ExtensionModel extensionModel = allExtensionsByNamespace.get(namespace);
-        new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
+    if (!allExtensionsByNamespace.isEmpty()) {
+      GraphIterator<String, DefaultEdge> graphIterator = namespaceGraphIterator();
+      while (graphIterator.hasNext()) {
+        final String namespace = graphIterator.next();
+        if (allExtensionsByNamespace.containsKey(namespace)) {
+          final ExtensionModel extensionModel = allExtensionsByNamespace.get(namespace);
+          new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
+        }
       }
     }
   }
