@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,7 +20,7 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import java.nio.charset.Charset;
 
 /**
- * Allows access to the privileged behavior of the {@link BaseEvent}.
+ * Allows access to the privileged behavior of the {@link Event} implementation.
  *
  * @since 4.0
  */
