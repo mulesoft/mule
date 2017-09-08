@@ -8,11 +8,13 @@ package org.mule.runtime.core.internal.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Test;
@@ -30,7 +32,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
         new ResponseMessageProcessorAdapter(createStringAppendTransformer("3"));
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("0123", process(builder.build(), eventBuilder().message(of("0")).build())
+    assertEquals("0123", ((PrivilegedEvent) process(builder.build(), eventBuilder().message(of("0")).build()))
         .getMessageAsString(muleContext));
   }
 
@@ -41,9 +43,9 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
         new ResponseMessageProcessorAdapter(new ReturnNullMP());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012", process(builder.build(), eventBuilder()
+    assertEquals("012", ((PrivilegedEvent) process(builder.build(), eventBuilder()
         .message(of("0"))
-        .build()).getMessageAsString(muleContext));
+        .build())).getMessageAsString(muleContext));
   }
 
   @Test
@@ -54,7 +56,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
             .chain(createStringAppendTransformer("a"), createStringAppendTransformer("b")).build());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012ab", process(builder.build(), eventBuilder().message(of("0")).build())
+    assertEquals("012ab", ((PrivilegedEvent) process(builder.build(), eventBuilder().message(of("0")).build()))
         .getMessageAsString(muleContext));
   }
 
@@ -66,7 +68,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
             .chain(createStringAppendTransformer("a"), createStringAppendTransformer("b"), new ReturnNullMP()).build());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012", process(builder.build(), eventBuilder().message(of("0")).build())
+    assertEquals("012", ((PrivilegedEvent) process(builder.build(), eventBuilder().message(of("0")).build()))
         .getMessageAsString(muleContext));
   }
 
@@ -79,7 +81,7 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractReactivePro
   private static class ReturnNullMP implements Processor {
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       return null;
     }
   }

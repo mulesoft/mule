@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionProperty
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import org.slf4j.Logger;

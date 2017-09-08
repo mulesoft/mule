@@ -8,8 +8,8 @@ package org.mule;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
@@ -17,13 +17,13 @@ import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,13 +79,13 @@ public class AbstractBenchmark {
     return builder(FLOW_NAME, muleContext).build();
   }
 
-  public InternalEvent createEvent(Flow flow) {
+  public BaseEvent createEvent(Flow flow) {
     return createEvent(flow, PAYLOAD);
   }
 
-  public InternalEvent createEvent(Flow flow, Object payload) {
+  public BaseEvent createEvent(Flow flow, Object payload) {
     try {
-      return InternalEvent.builder(create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
+      return BaseEvent.builder(create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -28,9 +28,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -40,6 +41,7 @@ import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -51,7 +53,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 /**
- * Processes {@link InternalEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
+ * Processes {@link BaseEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
  * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be executed in a
  * different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is present then an
  * exception is thrown.
@@ -117,12 +119,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
         .doOnNext(request -> just(request)
             .map(event -> asyncEvent(request))
@@ -136,8 +138,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                         .warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
                             + " . To handle this error include a <try> scope in the <async> scope.",
                               throwable))
-                    .subscribe(event -> asyncRequest.getContext().success(event),
-                               throwable -> asyncRequest.getContext().error(throwable))))
+                    .subscribe(event -> ((BaseEventContext) asyncRequest.getContext()).success(event),
+                               throwable -> ((BaseEventContext) asyncRequest.getContext()).error(throwable))))
             .subscribe(requestUnbounded()));
   }
 
@@ -152,20 +154,20 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
   }
 
-  private InternalEvent asyncEvent(InternalEvent event) {
+  private BaseEvent asyncEvent(BaseEvent event) {
     // Clone event, make it async and remove ReplyToHandler
-    return InternalEvent
-        .builder(child(event.getContext(), ofNullable(getLocation())), event)
+    return BaseEvent
+        .builder(child(((BaseEventContext) event.getContext()), ofNullable(getLocation())), event)
         .replyToHandler(null)
-        .session(new DefaultMuleSession(event.getSession())).build();
+        .session(new DefaultMuleSession(((PrivilegedEvent) event).getSession())).build();
   }
 
-  private Consumer<InternalEvent> fireAsyncScheduledNotification() {
+  private Consumer<BaseEvent> fireAsyncScheduledNotification() {
     return event -> muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(createInfo(event, null, this), getLocation(), PROCESS_ASYNC_SCHEDULED));
   }
 
-  private void fireAsyncCompleteNotification(InternalEvent event, MessagingException exception) {
+  private void fireAsyncCompleteNotification(BaseEvent event, MessagingException exception) {
     muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(createInfo(event, exception, this), getLocation(),
                                                        PROCESS_ASYNC_COMPLETE));

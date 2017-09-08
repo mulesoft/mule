@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.mvel.function;
 
-import static java.util.Optional.empty;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -14,28 +13,28 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Date;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 @SmallTest
 public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTestCase {
@@ -44,8 +43,8 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
   protected MVELExpressionLanguageContext context;
   protected WildcardExpressionLanguageFuntion wildcardFunction;
   protected MuleContext muleContext;
-  private InternalEvent event;
-  private InternalEvent.Builder eventBuilder;
+  private BaseEvent event;
+  private BaseEvent.Builder eventBuilder;
   private InternalMessage message;
 
   @Before
@@ -212,13 +211,11 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
   }
 
   @SuppressWarnings("unchecked")
-  protected void addMessageToContextWithPayload(String payload) throws TransformerException {
-    event = mock(InternalEvent.class);
-    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-    when(event.getError()).thenReturn(empty());
-    eventBuilder = InternalEvent.builder(event);
+  protected void addMessageToContextWithPayload(String payload) throws MuleException {
     message = mock(InternalMessage.class);
-    when(event.getMessage()).thenAnswer(invocation -> message);
+
+    event = getEventBuilder().message(message).build();
+    eventBuilder = BaseEvent.builder(event);
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(transformedMessage.getPayload()).thenReturn(new TypedValue<>(payload, STRING));
     DefaultTransformationService transformationService = mock(DefaultTransformationService.class);

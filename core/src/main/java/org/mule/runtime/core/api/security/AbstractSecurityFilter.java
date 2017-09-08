@@ -12,12 +12,12 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegist
 import static org.mule.runtime.core.api.util.StringUtils.splitAndTrim;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public abstract class AbstractSecurityFilter extends AbstractComponent implement
   }
 
   @Override
-  public abstract InternalEvent doFilter(InternalEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract SecurityContext doFilter(BaseEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
 }

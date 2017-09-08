@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.Collection;
@@ -33,7 +33,7 @@ import org.junit.Test;
 
 public class MessagePropertiesTestCase extends AbstractELTestCase {
 
-  private InternalEvent event;
+  private BaseEvent event;
 
   public MessagePropertiesTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -41,12 +41,12 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() throws Exception {
-    event = InternalEvent.builder(context).message(of("")).build();
+    event = BaseEvent.builder(context).message(of("")).build();
   }
 
   @Test
   public void inboundPropertyMap() throws Exception {
-    event = InternalEvent.builder(context)
+    event = BaseEvent.builder(context)
         .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertTrue(evaluate("message.inboundProperties", event) instanceof Map);
@@ -59,7 +59,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void inboundProperty() throws Exception {
-    event = InternalEvent.builder(context)
+    event = BaseEvent.builder(context)
         .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertEquals("bar", evaluate("message.inboundProperties['foo']", event));
@@ -67,7 +67,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void assignValueToInboundProperty() throws Exception {
-    event = InternalEvent.builder(context)
+    event = BaseEvent.builder(context)
         .message(InternalMessage.builder().value("").inboundProperties(singletonMap("foo", "bar")).build())
         .build();
     assertUnsupportedOperation("message.inboundProperties['foo']='bar'", event);
@@ -80,7 +80,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundPropertyMap() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "bar").build())
         .build();
     assertTrue(evaluate("message.outboundProperties", event) instanceof Map);
@@ -93,7 +93,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundProperty() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "bar").build())
         .build();
     assertEquals("bar", evaluate("message.outboundProperties['foo']", event));
@@ -101,9 +101,9 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void assignValueToOutboundProperty() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "bar_old").build()).build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("message.outboundProperties['foo']='bar'", event, eventBuilder);
 
     assertEquals("bar", ((InternalMessage) eventBuilder.build().getMessage()).getOutboundProperty("foo"));
@@ -111,7 +111,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void assignValueToNewOutboundProperty() throws Exception {
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("message.outboundProperties['foo']='bar'", event, eventBuilder);
     assertEquals("bar", ((InternalMessage) eventBuilder.build().getMessage()).getOutboundProperty("foo"));
   }
@@ -125,7 +125,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void inboundSize() throws Exception {
     Message message = event.getMessage();
     mock(DataHandler.class);
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(message).addInboundProperty("foo", "abc").addInboundProperty("bar", "xyz").build())
         .build();
     assertEquals(2, evaluate("message.inboundProperties.size()", event));
@@ -135,7 +135,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void inboundKeySet() throws Exception {
     Message message = event.getMessage();
     mock(DataHandler.class);
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(message).addInboundProperty("foo", "abc").addInboundProperty("bar", "xyz").build())
         .build();
     assertThat((Iterable<String>) evaluate("message.inboundProperties.keySet()", event), hasItems("foo", "bar"));
@@ -146,7 +146,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
     Message message = event.getMessage();
     mock(DataHandler.class);
     event =
-        InternalEvent.builder(event).message(InternalMessage.builder(message).addInboundProperty("foo", "abc").build()).build();
+        BaseEvent.builder(event).message(InternalMessage.builder(message).addInboundProperty("foo", "abc").build()).build();
     assertTrue((Boolean) evaluate("message.inboundProperties.containsKey('foo')", event));
     assertFalse((Boolean) evaluate("message.inboundProperties.containsKey('bar')", event));
   }
@@ -155,7 +155,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void inboundContainsValue() throws Exception {
     Message message = event.getMessage();
     event =
-        InternalEvent.builder(event).message(InternalMessage.builder(message).addInboundProperty("foo", "abc").build()).build();
+        BaseEvent.builder(event).message(InternalMessage.builder(message).addInboundProperty("foo", "abc").build()).build();
     assertTrue((Boolean) evaluate("message.inboundProperties.containsValue('abc')", event));
     assertFalse((Boolean) evaluate("message.inboundProperties.containsValue('xyz')", event));
   }
@@ -164,7 +164,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void inboundEntrySet() throws Exception {
     Message message = event.getMessage();
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(message).addInboundProperty("foo", "abc").addInboundProperty("bar", "xyz").build())
         .build();
     Set<Map.Entry<String, Object>> entrySet =
@@ -178,7 +178,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void inboundValues() throws Exception {
     Message message = event.getMessage();
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(message).addInboundProperty("foo", "abc").addInboundProperty("bar", "xyz").build())
         .build();
     Collection<DataHandler> values = (Collection<DataHandler>) evaluate("message.inboundProperties.values()", event);
@@ -191,7 +191,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void inboundIsEmpty() throws Exception {
     Message message = event.getMessage();
     assertTrue((Boolean) evaluate("message.inboundProperties.isEmpty()", event));
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(message).addInboundProperty("foo", "abc").addInboundProperty("bar", "xyz").build())
         .build();
     assertFalse((Boolean) evaluate("message.inboundProperties.isEmpty()", event));
@@ -209,23 +209,23 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundClear() throws Exception {
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("message.outboundProperties.clear()", event, eventBuilder);
     assertEquals(0, ((InternalMessage) eventBuilder.build().getMessage()).getOutboundPropertyNames().size());
   }
 
   @Test
   public void outboundSize() throws Exception {
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
     assertEquals(2, evaluate("message.outboundProperties.size()", event));
   }
 
   @Test
   public void outboundKeySet() throws Exception {
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
     assertThat(evaluate("message.outboundProperties.keySet().toArray()[0]", event), anyOf(equalTo("foo"), equalTo("bar")));
     assertThat(evaluate("message.outboundProperties.keySet().toArray()[1]", event), anyOf(equalTo("foo"), equalTo("bar")));
@@ -233,7 +233,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundContainsKey() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc").build())
         .build();
     assertTrue((Boolean) evaluate("message.outboundProperties.containsKey('foo')", event));
@@ -242,7 +242,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundContainsValue() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc").build())
         .build();
     assertTrue((Boolean) evaluate("message.outboundProperties.containsValue('abc')", event));
@@ -252,7 +252,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @SuppressWarnings("unchecked")
   @Test
   public void outboundEntrySet() throws Exception {
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
     Set<Map.Entry<String, Object>> entrySet =
         (Set<Entry<String, Object>>) evaluate("message.outboundProperties.entrySet()", event);
@@ -264,7 +264,7 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @SuppressWarnings("unchecked")
   @Test
   public void outboundValues() throws Exception {
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
     Collection<DataHandler> values = (Collection<DataHandler>) evaluate("message.outboundProperties.values()", event);
     assertEquals(2, values.size());
@@ -275,14 +275,14 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   @Test
   public void outboundIsEmpty() throws Exception {
     assertTrue((Boolean) evaluate("message.outboundProperties.isEmpty()", event));
-    event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
+    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
     assertFalse((Boolean) evaluate("message.outboundProperties.isEmpty()", event));
   }
 
   @Test
   public void outboundPutAll() throws Exception {
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("message.outboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", event, eventBuilder);
     assertEquals("abc", evaluate("message.outboundProperties['foo']", eventBuilder.build()));
     assertEquals("xyz", evaluate("message.outboundProperties['bar']", eventBuilder.build()));
@@ -290,10 +290,10 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundInboundRemove() throws Exception {
-    event = InternalEvent.builder(event)
+    event = BaseEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc").build())
         .build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     assertFalse((Boolean) evaluate("message.outboundProperties.isEmpty()", event));
     evaluate("message.outboundProperties.remove('foo')", event, eventBuilder);
     assertTrue((Boolean) evaluate("message.outboundProperties.isEmpty()", eventBuilder.build()));

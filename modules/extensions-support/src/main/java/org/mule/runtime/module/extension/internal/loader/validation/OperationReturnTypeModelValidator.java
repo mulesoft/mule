@@ -13,7 +13,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
@@ -27,13 +27,13 @@ import java.util.List;
 /**
  * Validates that all {@link OperationModel operations} specify a valid return type.
  * <p>
- * A return type is considered valid when it's not {@code null} and not a {@link InternalEvent}
+ * A return type is considered valid when it's not {@code null} and not a {@link BaseEvent}
  *
  * @since 4.0
  */
 public class OperationReturnTypeModelValidator implements ExtensionModelValidator {
 
-  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(InternalEvent.class, Message.class);
+  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(BaseEvent.class, Message.class);
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {

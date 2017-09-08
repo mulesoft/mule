@@ -12,23 +12,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.api.InternalEvent.builder;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.nio.charset.Charset;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.nio.charset.Charset;
 
 @SmallTest
 public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
@@ -42,19 +46,19 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Message muleMessage = of("test-data");
   private Flow flow;
-  private InternalEventContext messageContext;
-  private InternalEvent muleEvent;
+  private BaseEventContext messageContext;
+  private PrivilegedEvent muleEvent;
 
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     messageContext = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = builder(messageContext).message(muleMessage).flow(flow).build();
+    muleEvent = (PrivilegedEvent) builder(messageContext).message(muleMessage).flow(flow).build();
   }
 
   @Test
   public void setFlowVariableDefaultDataType() throws Exception {
-    muleEvent = InternalEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
+    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
     DataType dataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(dataType, like(String.class, MediaType.ANY, null));
@@ -64,7 +68,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setFlowVariableCustomDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    muleEvent = InternalEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
+    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
@@ -97,6 +101,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void dontSetMessage() throws Exception {
     expected.expect(NullPointerException.class);
-    muleEvent = builder(messageContext).build();
+    muleEvent = (PrivilegedEvent) builder(messageContext).build();
   }
 }

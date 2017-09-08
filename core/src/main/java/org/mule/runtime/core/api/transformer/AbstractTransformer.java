@@ -13,9 +13,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
@@ -74,10 +74,10 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        return InternalEvent.builder(event)
+        return BaseEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (MessageTransformerException e) {
         throw e;

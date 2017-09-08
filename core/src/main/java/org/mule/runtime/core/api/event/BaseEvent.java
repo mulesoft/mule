@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.api.event;
 
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -18,12 +18,11 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.runtime.core.internal.message.DefaultEventBuilder;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -37,18 +36,7 @@ import java.util.Optional;
  *
  * @see Message
  */
-public interface InternalEvent extends Serializable, Event {
-
-  class CurrentEventHolder {
-
-    private static final ThreadLocal<InternalEvent> currentEvent = new ThreadLocal<>();
-  }
-
-  /**
-   * @return the context applicable to all events created from the same root {@link InternalEvent} from a {@link MessageSource}.
-   */
-  @Override
-  InternalEventContext getContext();
+public interface BaseEvent extends Serializable, Event {
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
@@ -57,12 +45,6 @@ public interface InternalEvent extends Serializable, Event {
    * @return the context for this session or null if the request is not secure.
    */
   SecurityContext getSecurityContext();
-
-  /**
-   * Internal parameters used by the runtime to pass information around.
-   *
-   */
-  Map<String, ?> getInternalParameters();
 
   /**
    * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
@@ -80,118 +62,6 @@ public interface InternalEvent extends Serializable, Event {
   String getCorrelationId();
 
   /**
-   * Returns the contents of the message as a byte array.
-   *
-   * @param muleContext the Mule node.
-   * @return the contents of the message as a byte array
-   * @throws MuleException if the message cannot be converted into an array of bytes
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException;
-
-  /**
-   * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
-   * this event was received.
-   *
-   * @param outputType The requested output type.
-   * @param muleContext the Mule node.
-   * @return the message transformed into it's recognized or expected format.
-   * @throws MessageTransformerException if a failure occurs in the transformer
-   * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException;
-
-  /**
-   * Returns the message transformed into it's recognized or expected format and then into a String. The transformer used is the
-   * one configured on the endpoint through which this event was received. If necessary this will use the encoding set on the
-   * event.
-   *
-   * @param muleContext the Mule node.
-   * @return the message transformed into it's recognized or expected format as a Strings.
-   * @throws MessageTransformerException if a failure occurs in the transformer
-   * @see org.mule.runtime.core.api.transformer.Transformer
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  String transformMessageToString(MuleContext muleContext) throws MessageTransformerException;
-
-  /**
-   * Returns the message contents as a string If necessary this will use the encoding set on the event
-   *
-   * @param muleContext the Mule node.
-   * @return the message contents as a string
-   * @throws MuleException if the message cannot be converted into a string
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  String getMessageAsString(MuleContext muleContext) throws MuleException;
-
-  /**
-   * Returns the message contents as a string
-   *
-   * @param encoding the encoding to use when converting the message to string
-   * @param muleContext the Mule node.
-   * @return the message contents as a string
-   * @throws MuleException if the message cannot be converted into a string
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException;
-
-  /**
-   * Retrieves the service session for the current event
-   *
-   * @return the service session for the event
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  MuleSession getSession();
-
-  /**
-   * Retrieves the service for the current event
-   *
-   * @return the service for the event
-   * @deprecated TODO MULE-10013 remove this
-   */
-  @Deprecated
-  FlowConstruct getFlowConstruct();
-
-  /**
-   * Returns the muleContext for the Mule node that this event was received in
-   *
-   * @return the muleContext for the Mule node that this event was received in
-   * @deprecated TODO MULE-10013 remove this
-   */
-  @Deprecated
-  MuleContext getMuleContext();
-
-  /**
-   * Return the replyToHandler (if any) that will be used to perform async reply
-   *
-   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-   */
-  @Deprecated
-  ReplyToHandler getReplyToHandler();
-
-  /**
-   * Return the destination (if any) that will be passed to the reply-to handler.
-   *
-   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-   */
-  @Deprecated
-  Object getReplyToDestination();
-
-  /**
-   * Indicates if notifications should be fired when processing this message.
-   *
-   * @return true if notifications are enabled, false otherwise
-   */
-  boolean isNotificationsEnabled();
-
-  /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
    * <p>
@@ -205,50 +75,44 @@ public interface InternalEvent extends Serializable, Event {
   FlowCallStack getFlowCallStack();
 
   /**
-   * @return the correlation id to use for this event.
-   * @deprecated TODO MULE-10706 Mule 4: remove this
-   */
-  @Deprecated
-  String getLegacyCorrelationId();
-
-  /**
    * Create new {@link Builder}.
    *
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(InternalEventContext context) {
-    return new DefaultEventBuilder(context);
+  static Builder builder(EventContext context) {
+    return new DefaultEventBuilder((BaseEventContext) context);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link InternalEvent} instance. The existing {@link InternalEventContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is
+   * conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(InternalEvent event) {
-    return new DefaultEventBuilder(event);
+  static Builder builder(BaseEvent event) {
+    return new DefaultEventBuilder((InternalEvent) event);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link InternalEvent} instance and and {@link InternalEventContext}. A new
-   * {@link InternalEventContext} is used instead of the existing instance referenced by the existing {@link InternalEvent}. This builder should
-   * only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link InternalEvent} needs a new
-   * context.
+   * Create new {@link Builder} based on an existing {@link BaseEvent} instance and and {@link EventContext}. A new
+   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link BaseEvent}. This builder
+   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same
+   * {@link BaseEvent} needs a new context.
    *
    * @param event existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(InternalEventContext context, InternalEvent event) {
-    return new DefaultEventBuilder(context, event);
+  static Builder builder(EventContext context, BaseEvent event) {
+    return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
   interface Builder {
 
     /**
-     * Set the {@link Message} to construct {@link InternalEvent} with.
+     * Set the {@link Message} to construct {@link BaseEvent} with.
      *
      * @param message the message instance.
      * @return the builder instance
@@ -295,7 +159,7 @@ public interface InternalEvent extends Serializable, Event {
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
-     * feed to it in a new and isolated {@link InternalEvent}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link BaseEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param properties properties to be set.
@@ -309,7 +173,7 @@ public interface InternalEvent extends Serializable, Event {
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
-     * feed to it in a new and isolated {@link InternalEvent}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link BaseEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param parameters parameters to be set.
@@ -374,7 +238,7 @@ public interface InternalEvent extends Serializable, Event {
     Builder removeInternalParameter(String key);
 
     /**
-     * Set correlationId overriding the correlationId from {@link InternalEventContext#getCorrelationId()} that came from the source
+     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
      * system or that was configured in the connector source. This is only used to support transports and should not be used
      * otherwise.
      *
@@ -453,11 +317,11 @@ public interface InternalEvent extends Serializable, Event {
     Builder session(MuleSession session);
 
     /**
-     * Build a new {@link InternalEvent} based on the state configured in the {@link Builder}.
+     * Build a new {@link BaseEvent} based on the state configured in the {@link Builder}.
      *
-     * @return new {@link InternalEvent} instance.
+     * @return new {@link BaseEvent} instance.
      */
-    InternalEvent build();
+    BaseEvent build();
 
   }
 
@@ -470,30 +334,12 @@ public interface InternalEvent extends Serializable, Event {
    * @param <T> the variable type
    * @return the value of the variables if it exists otherwise {@code null}.
    */
-  static <T> T getVariableValueOrNull(String key, InternalEvent event) {
+  static <T> T getVariableValueOrNull(String key, BaseEvent event) {
     if (event.getVariables().containsKey(key)) {
       return (T) event.getVariables().get(key).getValue();
     } else {
       return null;
     }
-  }
-
-  /**
-   * Return the event associated with the currently executing thread.
-   *
-   * @return event for currently executing thread.
-   */
-  static InternalEvent getCurrentEvent() {
-    return CurrentEventHolder.currentEvent.get();
-  }
-
-  /**
-   * Set the event to be associated with the currently executing thread.
-   *
-   * @param event event for currently executing thread.
-   */
-  static void setCurrentEvent(InternalEvent event) {
-    CurrentEventHolder.currentEvent.set(event);
   }
 
 }

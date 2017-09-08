@@ -27,20 +27,23 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,7 +54,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
-  protected ArrayList<InternalEvent> processedEvents;
+  protected ArrayList<BaseEvent> processedEvents;
   protected Map<String, TypedValue<?>> variables;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
@@ -76,7 +79,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
       String payload = event.getMessage().getPayload().getValue().toString();
-      event = InternalEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build())
+      event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(payload + ":foo").build())
           .build();
       return event;
     });
@@ -139,7 +142,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    final InternalEvent testEvent = eventBuilder().message(of(iterable)).build();
+    final BaseEvent testEvent = eventBuilder().message(of(iterable)).build();
     process(simpleForeach, testEvent);
 
     assertSimpleProcessedMessages();
@@ -291,8 +294,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreachMp.process(eventBuilder().message(of(asList(1, 2, 3))).build());
 
     assertThat(processedEvents, hasSize(2));
-    assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
-    assertThat(processedEvents.get(1).getMessageAsString(muleContext), is("[3]:foo:zas"));
+    assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
+    assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
   }
 
   @Test
@@ -307,8 +310,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreachMp.process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));
-    assertThat(processedEvents.get(0).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
-    assertThat(processedEvents.get(1).getMessageAsString(muleContext), is("[3]:foo:zas"));
+    assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
+    assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
   }
 
   @Test
@@ -316,7 +319,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    InternalEvent in = eventBuilder().message(of(arrayList)).build();
+    BaseEvent in = eventBuilder().message(of(arrayList)).build();
     process(simpleForeach, in);
 
     assertSimpleProcessedMessages();

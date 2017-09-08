@@ -6,36 +6,34 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.mvel2.compiler.AbstractParser;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
 import org.mule.runtime.core.internal.el.mvel.MVELArtifactContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
+import org.mule.runtime.core.internal.message.InternalMessage;
+
+import org.junit.Test;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-
-import org.junit.Test;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
@@ -110,23 +108,23 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    InternalEvent event = InternalEvent.builder(context).message(of("foo")).build();
+    BaseEvent event = BaseEvent.builder(context).message(of("foo")).build();
 
     assertThat(evaluate("p", event), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    InternalEvent event = InternalEvent.builder(context).message(of("")).build();
+    BaseEvent event = BaseEvent.builder(context).message(of("")).build();
 
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("p='bar'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    InternalEvent event = InternalEvent.builder(context).message(of("")).build();
+    BaseEvent event = BaseEvent.builder(context).message(of("")).build();
     evaluate("p=m.uniqueId", event);
   }
 
@@ -142,13 +140,9 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
   }
 
   @Test
-  public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException {
-    InternalEvent event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
-    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-
-    when(event.getError()).thenReturn(empty());
+  public void testMuleMessageAvailableInFunction() throws MuleException {
     InternalMessage message = mock(InternalMessage.class);
-    when(event.getMessage()).thenReturn(message);
+    BaseEvent event = getEventBuilder().message(message).build();
 
     assertThat(evaluate("muleMessage()", event), is(message));
   }

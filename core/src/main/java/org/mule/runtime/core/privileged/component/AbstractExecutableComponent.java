@@ -8,8 +8,8 @@ package org.mule.runtime.core.privileged.component;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.InternalEvent.builder;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
@@ -17,9 +17,9 @@ import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.InputEvent;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.MessageProcessors;
@@ -44,8 +44,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<Event> execute(InputEvent inputEvent) {
-    InternalEvent.Builder builder = InternalEvent.builder(createEventContext());
-    InternalEvent event = builder.message(inputEvent.getMessage())
+    BaseEvent.Builder builder = BaseEvent.builder(createEventContext());
+    BaseEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
         .parameters(inputEvent.getParameters())
@@ -56,11 +56,11 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<Event> execute(Event event) {
-    InternalEvent internalEvent;
-    if (event instanceof InternalEvent) {
-      internalEvent = builder(createEventContext(), (InternalEvent) event).build();
+    BaseEvent internalEvent;
+    if (event instanceof BaseEvent) {
+      internalEvent = builder(createEventContext(), (BaseEvent) event).build();
     } else {
-      internalEvent = InternalEvent.builder(createEventContext())
+      internalEvent = BaseEvent.builder(createEventContext())
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
@@ -72,22 +72,22 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   }
 
   /**
-   * Template method for executing the {@link InternalEvent} created from the input.
+   * Template method for executing the {@link BaseEvent} created from the input.
    * 
    * @param event the event to process
    * @return a {@link CompletableFuture<Event>} for the result.
    */
-  private CompletableFuture<Event> executeEvent(InternalEvent event) {
+  private CompletableFuture<Event> executeEvent(BaseEvent event) {
     return from(MessageProcessors.process(event, getExecutableFunction()))
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
-          InternalEvent messagingExceptionEvent = messagingException.getEvent();
+          BaseEvent messagingExceptionEvent = messagingException.getEvent();
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
                                                  messagingExceptionEvent);
         }).cast(Event.class).toFuture();
   }
 
-  protected InternalEventContext createEventContext() {
+  protected BaseEventContext createEventContext() {
     return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), NullExceptionHandler.getInstance());
   }
 

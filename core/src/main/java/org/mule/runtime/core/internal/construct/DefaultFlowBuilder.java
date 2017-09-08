@@ -12,22 +12,23 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -38,19 +39,22 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
- * 
+ *
  * <p/>
  * Builder instance can be configured using the methods that follow the builder pattern until the flow is built. After that point,
  * builder methods will fail to update the builder state.
@@ -212,28 +216,29 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    public InternalEvent process(final InternalEvent event) throws MuleException {
+    public BaseEvent process(final BaseEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            InternalEvent request =
-                createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+            BaseEvent request =
+                createMuleEventForCurrentFlow(event, ((PrivilegedEvent) event).getReplyToDestination(),
+                                              ((PrivilegedEvent) event).getReplyToHandler());
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
             try {
               getSink().accept(request);
             } catch (RejectedExecutionException ree) {
               MessagingException me = new MessagingException(event, ree, this);
-              request.getContext().error(exceptionResolver.resolve(me, getMuleContext()));
+              ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
-            return Mono.from(request.getContext().getResponsePublisher())
+            return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
                 .map(r -> {
-                  InternalEvent result = createReturnEventForParentFlowConstruct(r, event);
+                  BaseEvent result = createReturnEventForParentFlowConstruct(r, event);
                   return result;
                 })
                 .onErrorMap(MessagingException.class, me -> {
@@ -243,8 +248,8 @@ public class DefaultFlowBuilder implements Builder {
           });
     }
 
-    private InternalEvent createMuleEventForCurrentFlow(InternalEvent event, Object replyToDestination,
-                                                        ReplyToHandler replyToHandler) {
+    private BaseEvent createMuleEventForCurrentFlow(BaseEvent event, Object replyToDestination,
+                                                    ReplyToHandler replyToHandler) {
       // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
       // referenced flows. If it is passed on they two replyTo responses are sent.
       replyToHandler = null;
@@ -252,26 +257,26 @@ public class DefaultFlowBuilder implements Builder {
       // TODO MULE-10013
       // Create new event for current flow with current flowConstruct, replyToHandler etc.
       event =
-          InternalEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
+          BaseEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
       resetRequestContextEvent(event);
       return event;
     }
 
-    private InternalEvent createReturnEventForParentFlowConstruct(InternalEvent result, InternalEvent original) {
+    private BaseEvent createReturnEventForParentFlowConstruct(BaseEvent result, BaseEvent original) {
       if (result != null) {
         Optional<Error> errorOptional = result.getError();
         // TODO MULE-10013
         // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-        result = InternalEvent.builder(result).flow(original.getFlowConstruct())
-            .replyToHandler(original.getReplyToHandler())
-            .replyToDestination(original.getReplyToDestination())
+        result = BaseEvent.builder(result).flow(((InternalEvent) original).getFlowConstruct())
+            .replyToHandler(((PrivilegedEvent) original).getReplyToHandler())
+            .replyToDestination(((PrivilegedEvent) original).getReplyToDestination())
             .error(errorOptional.orElse(null)).build();
       }
       resetRequestContextEvent(result);
       return result;
     }
 
-    private void resetRequestContextEvent(InternalEvent event) {
+    private void resetRequestContextEvent(BaseEvent event) {
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }
@@ -309,7 +314,7 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected InternalEventContext createEventContext() {
+    protected BaseEventContext createEventContext() {
       return create(this, getLocation());
     }
   }

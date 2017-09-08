@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface RouterResultsHandler {
 
-  InternalEvent aggregateResults(List<InternalEvent> results, InternalEvent previous);
+  BaseEvent aggregateResults(List<BaseEvent> results, BaseEvent previous);
 }

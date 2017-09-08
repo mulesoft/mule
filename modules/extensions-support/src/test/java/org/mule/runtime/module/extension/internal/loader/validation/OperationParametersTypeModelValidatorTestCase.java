@@ -17,7 +17,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -58,7 +58,7 @@ public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleT
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void eventType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(InternalEvent.class));
+    when(parameterModel.getType()).thenReturn(toMetadataType(BaseEvent.class));
     validate(extensionModel, validator);
   }
 

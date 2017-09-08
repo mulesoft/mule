@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
@@ -37,7 +37,7 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -75,7 +75,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     reactor.core.scheduler.Scheduler reactorTimeoutScheduler = Schedulers.fromExecutorService(timeoutScheduler);
     return (original, routingPairs) -> {
       final AtomicInteger count = new AtomicInteger();
-      final InternalEvent.Builder resultBuilder = builder(original);
+      final BaseEvent.Builder resultBuilder = builder(original);
       return from(routingPairs)
           .map(addSequence(count))
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeout, reactorTimeoutScheduler,
@@ -93,26 +93,26 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   }
 
   /**
-   * Template method to be implemented by implementations that defines how the list of result {@link InternalEvent}'s should be
-   * aggregated into a result {@link InternalEvent}
+   * Template method to be implemented by implementations that defines how the list of result {@link BaseEvent}'s should be
+   * aggregated into a result {@link BaseEvent}
    * 
    * @param original the original event
    * @param resultBuilder a result builder with the current state of result event builder including flow variable
    * @return the result event
    */
-  protected abstract Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
-                                                                                    InternalEvent.Builder resultBuilder);
+  protected abstract Function<List<BaseEvent>, BaseEvent> createResultEvent(BaseEvent original,
+                                                                            BaseEvent.Builder resultBuilder);
 
   private Function<RoutingPair, RoutingPair> addSequence(AtomicInteger count) {
     return pair -> of(builder(pair.getEvent()).groupCorrelation(Optional.of(GroupCorrelation.of(count.getAndIncrement())))
         .build(), pair.getRoute());
   }
 
-  private Function<RoutingPair, Publisher<? extends InternalEvent>> processRoutePair(ProcessingStrategy processingStrategy,
-                                                                                     int maxConcurrency,
-                                                                                     boolean delayErrors, long timeout,
-                                                                                     reactor.core.scheduler.Scheduler timeoutScheduler,
-                                                                                     ErrorType timeoutErrorType) {
+  private Function<RoutingPair, Publisher<? extends BaseEvent>> processRoutePair(ProcessingStrategy processingStrategy,
+                                                                                 int maxConcurrency,
+                                                                                 boolean delayErrors, long timeout,
+                                                                                 reactor.core.scheduler.Scheduler timeoutScheduler,
+                                                                                 ErrorType timeoutErrorType) {
 
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
@@ -125,8 +125,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     };
   }
 
-  private Mono<InternalEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
-                                        RoutingPair pair) {
+  private Mono<BaseEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
+                                    RoutingPair pair) {
     return defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
         : error(new TimeoutException(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
             + pair.getEvent().getGroupCorrelation().get().getSequence() + "'")))
@@ -142,7 +142,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     }
   }
 
-  private InternalEvent createTimeoutErrorEvent(ErrorType timeoutErrorType, RoutingPair pair) {
+  private BaseEvent createTimeoutErrorEvent(ErrorType timeoutErrorType, RoutingPair pair) {
     return builder(pair.getEvent()).message(Message.of(null))
         .error(ErrorBuilder.builder().errorType(timeoutErrorType)
             .exception(new TimeoutException()).description(TIMEOUT_EXCEPTION_DESCRIPTION)
@@ -152,11 +152,11 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
         .build();
   }
 
-  private CompositeRoutingException createCompositeRoutingException(List<InternalEvent> results) {
+  private CompositeRoutingException createCompositeRoutingException(List<BaseEvent> results) {
     Map<String, Message> successMap = new LinkedHashMap<>();
     Map<String, Error> errorMap = new LinkedHashMap<>();
 
-    for (InternalEvent event : results) {
+    for (BaseEvent event : results) {
       String key = Integer.toString(event.getGroupCorrelation().get().getSequence());
       if (event.getError().isPresent()) {
         errorMap.put(key, event.getError().get());
@@ -167,7 +167,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return new CompositeRoutingException(new RoutingResult(successMap, errorMap));
   }
 
-  private Consumer<List<InternalEvent>> mergeVariables(InternalEvent original, InternalEvent.Builder result) {
+  private Consumer<List<BaseEvent>> mergeVariables(BaseEvent original, BaseEvent.Builder result) {
     return list -> {
       Map<String, TypedValue> routeVars = new HashMap<>();
       list.forEach(event -> event.getVariables().forEach((key, value) -> {

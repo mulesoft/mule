@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util.message;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -34,12 +34,12 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   private final Collection<Object> delegate;
   protected final CursorProviderFactory cursorProviderFactory;
-  protected final InternalEvent event;
+  protected final BaseEvent event;
   protected final FunctionalReadWriteLock lock = readWriteLock();
 
   public ResultsToMessageCollection(Collection<Object> delegate,
                                     CursorProviderFactory cursorProviderFactory,
-                                    InternalEvent event) {
+                                    BaseEvent event) {
     this.delegate = delegate;
     this.cursorProviderFactory = cursorProviderFactory;
     this.event = event;
@@ -188,7 +188,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
     stream().forEach(action);
   }
 
-  protected Message toMessage(Object value, CursorProviderFactory cursorProviderFactory, InternalEvent event) {
+  protected Message toMessage(Object value, CursorProviderFactory cursorProviderFactory, BaseEvent event) {
     if (value instanceof Message) {
       return (Message) value;
     } else {

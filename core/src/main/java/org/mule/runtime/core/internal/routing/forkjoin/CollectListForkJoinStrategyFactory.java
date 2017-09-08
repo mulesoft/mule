@@ -12,7 +12,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.List;
 import java.util.function.Function;
@@ -23,15 +23,15 @@ import java.util.function.Function;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes before emitting a result event, with an optional timeout.
- * <li>Collects results into a result {@link InternalEvent} with a {@link List<org.mule.runtime.api.message.Message>} payload.
+ * <li>Collects results into a result {@link BaseEvent} with a {@link List<org.mule.runtime.api.message.Message>} payload.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
  * </ul>
  */
 public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
 
   @Override
-  protected Function<List<InternalEvent>, InternalEvent> createResultEvent(InternalEvent original,
-                                                                           InternalEvent.Builder resultBuilder) {
+  protected Function<List<BaseEvent>, BaseEvent> createResultEvent(BaseEvent original,
+                                                                   BaseEvent.Builder resultBuilder) {
     return list -> resultBuilder.message(of(list.stream().map(event -> event.getMessage()).collect(toList()))).build();
   }
 

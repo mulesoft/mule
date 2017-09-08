@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Objects.requireNonNull;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.Objects;
@@ -22,33 +22,33 @@ import java.util.Optional;
  */
 public class ValueResolvingContext {
 
-  private InternalEvent event;
+  private BaseEvent event;
   private final ConfigurationInstance config;
 
-  private ValueResolvingContext(InternalEvent event, ConfigurationInstance config) {
+  private ValueResolvingContext(BaseEvent event, ConfigurationInstance config) {
     this.event = event;
     this.config = config;
   }
 
-  public static ValueResolvingContext from(InternalEvent event) {
+  public static ValueResolvingContext from(BaseEvent event) {
     return new ValueResolvingContext(event, null);
   }
 
-  public static ValueResolvingContext from(InternalEvent event, Optional<ConfigurationInstance> config) {
+  public static ValueResolvingContext from(BaseEvent event, Optional<ConfigurationInstance> config) {
     return new ValueResolvingContext(event, config.orElse(null));
   }
 
   /**
-   * @return the {@link InternalEvent} of the current resolution context
+   * @return the {@link BaseEvent} of the current resolution context
    */
-  public InternalEvent getEvent() {
+  public BaseEvent getEvent() {
     return event;
   }
 
   /**
-   * @param event the {@link InternalEvent} of the current resolution context. Not null.
+   * @param event the {@link BaseEvent} of the current resolution context. Not null.
    */
-  public void changeEvent(InternalEvent event) {
+  public void changeEvent(BaseEvent event) {
     requireNonNull(event);
     this.event = event;
   }

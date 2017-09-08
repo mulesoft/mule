@@ -10,7 +10,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ObjectUtils;
 
@@ -31,9 +31,9 @@ public class TestMessageProcessor extends AbstractComponent implements Processor
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
-      return InternalEvent.builder(event)
+      return BaseEvent.builder(event)
           .message(Message.builder(event.getMessage()).value(event.getMessage().getPayload().getValue() + ":" + label)
               .build())
           .build();

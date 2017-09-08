@@ -12,9 +12,10 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.HELLO_WORLD;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -32,7 +33,7 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   private static final String FAKE_KEY = "not there";
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private InternalEvent event;
+  private BaseEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;

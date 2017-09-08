@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -21,7 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
  * placed in the mule registry.
  * <p>
  * The objects are parsed as a {@link ValueResolver}. If that resolver is not static, then a value is obtained using a default
- * {@link InternalEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
+ * {@link BaseEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
  *
  * @since 4.0
  */

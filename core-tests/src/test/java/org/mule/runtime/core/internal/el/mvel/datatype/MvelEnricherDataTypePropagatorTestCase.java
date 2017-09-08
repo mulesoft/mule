@@ -17,8 +17,8 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEvent.Builder;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.el.mvel.datatype.EnricherDataTypePropagator;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
@@ -47,7 +47,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-    final Builder builder = InternalEvent.builder(testEvent());
+    final Builder builder = BaseEvent.builder(testEvent());
     dataTypePropagator.propagate(typedValue, testEvent(), builder, compiledExpression);
 
     verify(propagator1).propagate(testEvent(), builder, typedValue, compiledExpression);
@@ -60,7 +60,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
     propagators.add(propagator1);
-    final Builder builder = InternalEvent.builder(testEvent());
+    final Builder builder = BaseEvent.builder(testEvent());
     when(propagator1.propagate(testEvent(), builder, typedValue, compiledExpression)).thenReturn(true);
     propagators.add(propagator2);
 

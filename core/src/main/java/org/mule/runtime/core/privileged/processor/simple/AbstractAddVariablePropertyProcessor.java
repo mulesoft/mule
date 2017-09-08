@@ -16,8 +16,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEvent.Builder;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 
@@ -43,13 +43,13 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     String key = identifierEvaluator.resolveValue(event);
     if (key == null) {
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      final Builder builder = InternalEvent.builder(event);
+      final Builder builder = BaseEvent.builder(event);
       TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
       event = builder.build();
       if (typedValue.getValue() == null) {
@@ -87,7 +87,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param value value of the property or variable to add
    * @param dataType data type of the property or variable to add
    */
-  protected abstract InternalEvent addProperty(InternalEvent event, String propertyName, T value, DataType dataType);
+  protected abstract BaseEvent addProperty(BaseEvent event, String propertyName, T value, DataType dataType);
 
   /**
    * Removes the property from a property or variables scope.
@@ -95,7 +95,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param event event to which property is to be removed
    * @param propertyName name of the property or variable to remove
    */
-  protected abstract InternalEvent removeProperty(InternalEvent event, String propertyName);
+  protected abstract BaseEvent removeProperty(BaseEvent event, String propertyName);
 
   public void setIdentifier(String identifier) {
     if (StringUtils.isBlank(identifier)) {

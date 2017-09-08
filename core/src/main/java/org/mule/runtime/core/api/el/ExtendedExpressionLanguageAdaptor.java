@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.el;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -28,8 +28,8 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * expression when executed. Variable provided in the map will only be available if there are no conflict with context variables
    * provided by the expression language implementation.
    *
-   * This version of {@code evaluate} allows {@link InternalEvent} or {@link InternalMessage} mutation performed within the expression to
-   * be maintained post-evaluation via the use of a result {@link InternalEvent.Builder} which should be created
+   * This version of {@code evaluate} allows {@link BaseEvent} or {@link InternalMessage} mutation performed within the expression to
+   * be maintained post-evaluation via the use of a result {@link BaseEvent.Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression the expression to be executed
@@ -42,7 +42,7 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                       ComponentLocation componentLocation,
                       BindingContext bindingContext)
       throws ExpressionRuntimeException;
@@ -50,8 +50,8 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
   /**
    * Enriches an event.
    *
-   * This version of {@code enrich} allows {@link InternalEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link InternalEvent.Builder} which should be created
+   * This version of {@code enrich} allows {@link BaseEvent} or {@link InternalMessage} mutation performed within the expression to be
+   * maintained post-evaluation via the use of a result {@link BaseEvent.Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
@@ -62,14 +62,14 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder, ComponentLocation componentLocation,
+  void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder, ComponentLocation componentLocation,
               Object object);
 
   /**
    * Enriches an event using a typed value.
    *
-   * This version of {@code enrich} allows {@link InternalEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link InternalEvent.Builder} which should be created
+   * This version of {@code enrich} allows {@link BaseEvent} or {@link InternalMessage} mutation performed within the expression to be
+   * maintained post-evaluation via the use of a result {@link BaseEvent.Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
@@ -80,7 +80,7 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder, ComponentLocation componentLocation,
+  void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder, ComponentLocation componentLocation,
               TypedValue value);
 
 }

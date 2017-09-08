@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
 import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
@@ -19,10 +19,10 @@ import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,7 +40,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   protected ExtendedExpressionLanguageAdaptor expressionLanguage;
   protected Flow flowConstruct;
-  protected InternalEventContext context;
+  protected BaseEventContext context;
 
   public AbstractELTestCase(String mvelOptimizer) {
     OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
@@ -70,12 +70,12 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   }
 
   @SuppressWarnings("deprecation")
-  protected Object evaluate(String expression, InternalEvent event) {
-    return evaluate(expression, event, event != null ? InternalEvent.builder(event) : null);
+  protected Object evaluate(String expression, BaseEvent event) {
+    return evaluate(expression, event, event != null ? BaseEvent.builder(event) : null);
   }
 
   @SuppressWarnings("deprecation")
-  protected Object evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder) {
+  protected Object evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder) {
     return expressionLanguage.evaluate(expression, event, eventBuilder, ((Component) flowConstruct).getLocation(),
                                        BindingContext.builder().build())
         .getValue();
@@ -104,7 +104,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  protected void assertUnsupportedOperation(String expression, InternalEvent event) {
+  protected void assertUnsupportedOperation(String expression, BaseEvent event) {
     try {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");
@@ -122,7 +122,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  protected void assertImmutableVariable(String expression, InternalEvent event) {
+  protected void assertImmutableVariable(String expression, BaseEvent event) {
     try {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");
@@ -140,7 +140,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  protected void assertFinalProperty(String expression, InternalEvent event) {
+  protected void assertFinalProperty(String expression, BaseEvent event) {
     try {
       evaluate(expression, event);
       fail("ExpressionRuntimeException expected");

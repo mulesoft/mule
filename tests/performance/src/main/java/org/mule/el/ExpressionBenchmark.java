@@ -8,31 +8,34 @@ package org.mule.el;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import org.mule.AbstractBenchmark;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.TearDown;
 
 @OutputTimeUnit(NANOSECONDS)
 public class ExpressionBenchmark extends AbstractBenchmark {
 
 
   private MuleContext muleContext;
-  private InternalEvent event;
-  private InternalEventContext context;
+  private BaseEvent event;
+  private EventContext context;
 
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
     context = create(createFlow(muleContext), CONNECTOR_LOCATION);
-    event = InternalEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
+    event = BaseEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
   }
 
   @TearDown

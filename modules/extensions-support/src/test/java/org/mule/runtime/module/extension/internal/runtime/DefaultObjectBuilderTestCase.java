@@ -13,8 +13,9 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -43,7 +44,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   private static final int AGE = 50;
 
   @Mock
-  private InternalEvent event;
+  private BaseEvent event;
 
   @Mock
   private ValueResolvingContext resolvingContext;

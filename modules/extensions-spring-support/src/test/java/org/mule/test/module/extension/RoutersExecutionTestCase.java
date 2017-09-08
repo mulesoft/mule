@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
@@ -40,7 +40,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void singleRouteRouter() throws Exception {
-    InternalEvent internalEvent = flowRunner("singleRouteRouter").withPayload("message").withAttributes("other").run();
+    BaseEvent internalEvent = flowRunner("singleRouteRouter").withPayload("message").withAttributes("other").run();
 
     assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
     assertThat(internalEvent.getVariables().get("newPayload").getValue(), is("message"));
@@ -49,7 +49,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void twoRoutesRouterWhen() throws Exception {
-    InternalEvent internalEvent = flowRunner("twoRoutesRouter")
+    BaseEvent internalEvent = flowRunner("twoRoutesRouter")
         .withVariable("executeWhen", true)
         .withVariable("executeOther", false).run();
 
@@ -59,7 +59,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void twoRoutesRouterOther() throws Exception {
-    InternalEvent internalEvent = flowRunner("twoRoutesRouter")
+    BaseEvent internalEvent = flowRunner("twoRoutesRouter")
         .withVariable("executeWhen", false)
         .withVariable("executeOther", true).run();
 
@@ -77,14 +77,14 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void munitSpy() throws Exception {
-    InternalEvent internalEvent = flowRunner("munitSpy").run();
+    BaseEvent internalEvent = flowRunner("munitSpy").run();
     assertThat(internalEvent.getVariables().get("before").getValue(), is("true"));
     assertThat(internalEvent.getVariables().get("after").getValue(), is("true"));
   }
 
   @Test
   public void munitSpyNoBefore() throws Exception {
-    InternalEvent internalEvent = flowRunner("munitSpyNoBefore").run();
+    BaseEvent internalEvent = flowRunner("munitSpyNoBefore").run();
     assertThat(internalEvent.getMessage().getPayload().getValue(), is("1"));
     assertThat(internalEvent.getVariables().get("before"), is(nullValue()));
     assertThat(internalEvent.getVariables().get("after").getValue(), is("true"));
@@ -92,7 +92,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void munitSpyNoAfter() throws Exception {
-    InternalEvent internalEvent = flowRunner("munitSpyNoAfter").run();
+    BaseEvent internalEvent = flowRunner("munitSpyNoAfter").run();
     assertThat(internalEvent.getMessage().getPayload().getValue(), is("2"));
     assertThat(internalEvent.getVariables().get("before").getValue(), is("true"));
     assertThat(internalEvent.getVariables().get("after"), is(nullValue()));
@@ -100,7 +100,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   public void munitSpyNoAttributes() throws Exception {
-    InternalEvent internalEvent = flowRunner("munitSpyNoAttributes").run();
+    BaseEvent internalEvent = flowRunner("munitSpyNoAttributes").run();
     assertThat(internalEvent.getMessage().getPayload().getValue(), is(nullValue()));
     assertThat(internalEvent.getVariables().get("before"), is(nullValue()));
     assertThat(internalEvent.getVariables().get("after"), is(nullValue()));

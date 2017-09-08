@@ -12,10 +12,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 
 import org.apache.log4j.Level;
@@ -54,14 +54,14 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return withCursoredEvent(event, cursored -> {
       log(cursored);
       return event;
     });
   }
 
-  protected void log(InternalEvent event) {
+  protected void log(BaseEvent event) {
     if (event == null) {
       logWithLevel(null);
     } else {

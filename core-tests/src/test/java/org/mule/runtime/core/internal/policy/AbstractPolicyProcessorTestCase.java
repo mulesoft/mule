@@ -13,18 +13,19 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 
@@ -50,7 +51,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   private Processor policyProcessor;
   private String executionId;
-  private InternalEvent initialEvent;
+  private BaseEvent initialEvent;
 
   @Before
   public void before() {
@@ -65,21 +66,21 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   @Test
   public void variablesAddedInNextProcessorNotPropagated() throws MuleException {
-    InternalEvent initialEventWithVars = InternalEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
-    InternalEvent modifiedVarsEvent = InternalEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
+    BaseEvent initialEventWithVars = BaseEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
+    BaseEvent modifiedVarsEvent = BaseEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedVarsEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEventWithVars).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    InternalEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
+    BaseEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getVariables().keySet(), initialEventWithVars.getVariables().keySet());
   }
 
   @Test
   public void variablesAddedBeforeNextProcessorNotPropagatedToIt() throws MuleException {
-    InternalEvent initialEventWithVars = InternalEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
-    InternalEvent modifiedVarsEvent = InternalEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
+    BaseEvent initialEventWithVars = BaseEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
+    BaseEvent modifiedVarsEvent = BaseEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(initialEventWithVars));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedVarsEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -87,25 +88,25 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEventWithVars).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((InternalEvent) from(eventCaptor.getValue()).block()).getVariables().keySet(),
+    assertEquals(((BaseEvent) from(eventCaptor.getValue()).block()).getVariables().keySet(),
                  initialEventWithVars.getVariables().keySet());
   }
 
   @Test
   public void messageModifiedByNextProcessorIsPropagated() throws MuleException {
-    InternalEvent modifiedMessageEvent = InternalEvent.builder(initialEvent).message(MESSAGE).build();
+    BaseEvent modifiedMessageEvent = BaseEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    InternalEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
+    BaseEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getMessage(), MESSAGE);
   }
 
   @Test
   public void messageModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
-    InternalEvent modifiedMessageEvent = InternalEvent.builder(initialEvent).message(MESSAGE).build();
+    BaseEvent modifiedMessageEvent = BaseEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -113,26 +114,26 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEvent).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((InternalEvent) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
+    assertEquals(((BaseEvent) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
   }
 
   @Test
   public void sessionModifiedByNextProcessorIsPropagated() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    InternalEvent modifiedSessionEvent = InternalEvent.builder(initialEvent).session(session).build();
+    BaseEvent modifiedSessionEvent = BaseEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    InternalEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
+    BaseEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
-    assertEquals(resultEvent.getSession(), session);
+    assertEquals(((PrivilegedEvent) resultEvent).getSession(), session);
   }
 
   @Test
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    InternalEvent modifiedSessionEvent = InternalEvent.builder(initialEvent).session(session).build();
+    BaseEvent modifiedSessionEvent = BaseEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedSessionEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -140,12 +141,12 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEvent).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((InternalEvent) from(eventCaptor.getValue()).block()).getSession(), session);
+    assertEquals(((PrivilegedEvent) from(eventCaptor.getValue()).block()).getSession(), session);
   }
 
-  private InternalEvent createTestEvent() {
+  private BaseEvent createTestEvent() {
     when(mockFlowConstruct.getUniqueIdString()).thenReturn(executionId);
-    return InternalEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
+    return BaseEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build())
         .build();
   }

@@ -10,23 +10,25 @@ import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Iterator;
-
 import org.junit.Test;
+
+import java.util.Iterator;
 
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase {
@@ -44,25 +46,27 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    InternalEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    BaseEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    InternalEvent event1 = InternalEvent.builder(context).message(message1).flow(flow).session(session).build();
-    InternalEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
-    InternalEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
+    BaseEvent event1 = BaseEvent.builder(context).message(message1).flow(flow).session(session).build();
+    BaseEvent event2 = BaseEvent.builder(context).message(message2).flow(flow).session(session).build();
+    BaseEvent event3 = BaseEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
 
-    InternalEvent result = router.process(event3);
+    BaseEvent result = router.process(event3);
     assertNotNull(result);
-    assertTrue(result.getMessageAsString(muleContext).contains("test event A"));
-    assertTrue(result.getMessageAsString(muleContext).contains("test event B"));
-    assertTrue(result.getMessageAsString(muleContext).contains("test event C"));
-    assertTrue(result.getMessageAsString(muleContext).matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
+    PrivilegedEvent privilegedResult = (PrivilegedEvent) result;
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event A"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event B"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event C"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext)
+        .matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
   }
 
   public static class TestEventAggregator extends AbstractAggregator {
@@ -89,12 +93,12 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
         }
 
         @Override
-        public EventGroup createEventGroup(InternalEvent event, Object groupId) {
+        public EventGroup createEventGroup(BaseEvent event, Object groupId) {
           return new EventGroup(groupId, muleContext, of(eventThreshold), storePrefix);
         }
 
         @Override
-        public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
+        public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
           if (events.size() != eventThreshold) {
             throw new IllegalStateException("eventThreshold not yet reached?");
           }
@@ -103,9 +107,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
           try {
             for (Iterator iterator = events.iterator(false); iterator.hasNext();) {
-              InternalEvent event = (InternalEvent) iterator.next();
+              BaseEvent event = (BaseEvent) iterator.next();
               try {
-                newPayload.append(event.getMessageAsString(muleContext)).append(" ");
+                newPayload.append(((PrivilegedEvent) event).getMessageAsString(muleContext)).append(" ");
               } catch (MuleException e) {
                 throw new AggregationException(events, next, e);
               }
@@ -114,7 +118,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
             throw new AggregationException(events, next, e);
           }
 
-          return InternalEvent.builder(events.getMessageCollectionEvent()).message(Message.of(newPayload.toString())).build();
+          return BaseEvent.builder(events.getMessageCollectionEvent()).message(Message.of(newPayload.toString())).build();
         }
       };
     }

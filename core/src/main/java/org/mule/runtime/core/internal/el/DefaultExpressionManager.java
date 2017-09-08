@@ -26,12 +26,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.TemplateParser;
@@ -102,7 +102,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event) {
+  public TypedValue evaluate(String expression, BaseEvent event) {
     return evaluate(expression, event, NULL_BINDING_CONTEXT);
   }
 
@@ -112,28 +112,28 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, BindingContext context) {
-    return evaluate(expression, event, InternalEvent.builder(event), null, context);
+  public TypedValue evaluate(String expression, BaseEvent event, BindingContext context) {
+    return evaluate(expression, event, BaseEvent.builder(event), null, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, ComponentLocation componentLocation) {
-    return evaluate(expression, event, InternalEvent.builder(event), componentLocation, NULL_BINDING_CONTEXT);
+  public TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation) {
+    return evaluate(expression, event, BaseEvent.builder(event), componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                              ComponentLocation componentLocation) {
     return evaluate(expression, event, eventBuilder, componentLocation, NULL_BINDING_CONTEXT);
   }
 
   @Override
-  public TypedValue evaluate(String expression, InternalEvent event, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation,
                              BindingContext context) {
-    return evaluate(expression, event, InternalEvent.builder(event), componentLocation, context);
+    return evaluate(expression, event, BaseEvent.builder(event), componentLocation, context);
   }
 
-  private TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  private TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                               ComponentLocation componentLocation,
                               BindingContext context) {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, event, eventBuilder, componentLocation, context),
@@ -151,12 +151,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, InternalEvent event) {
+  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, BaseEvent event) {
     return evaluate(expression, outputType, context, event, null, false);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, InternalEvent event,
+  public TypedValue evaluate(String expression, DataType outputType, BindingContext context, BaseEvent event,
                              ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException {
     return updateTypedValueForStreaming(expressionLanguage.evaluate(expression, outputType, event, componentLocation, context,
@@ -174,20 +174,20 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  public void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                      ComponentLocation componentLocation,
                      TypedValue value) {
     expressionLanguage.enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, InternalEvent event, ComponentLocation componentLocation)
+  public boolean evaluateBoolean(String expression, BaseEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     return evaluateBoolean(expression, event, componentLocation, false, false);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, InternalEvent event, ComponentLocation componentLocation,
+  public boolean evaluateBoolean(String expression, BaseEvent event, ComponentLocation componentLocation,
                                  boolean nullReturnsTrue,
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
@@ -219,9 +219,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public String parse(String expression, InternalEvent event, ComponentLocation componentLocation)
+  public String parse(String expression, BaseEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
-    Builder eventBuilder = InternalEvent.builder(event);
+    Builder eventBuilder = BaseEvent.builder(event);
     parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {
@@ -249,7 +249,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     }
   }
 
-  private String parse(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  private String parse(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                        ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     parseWarning.warn();
@@ -280,14 +280,14 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, ComponentLocation componentLocation,
+  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return expressionLanguage.split(expression, event, componentLocation, bindingContext);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, InternalEvent event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return expressionLanguage.split(expression, event, bindingContext);
   }

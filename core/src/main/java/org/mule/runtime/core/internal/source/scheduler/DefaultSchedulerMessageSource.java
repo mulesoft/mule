@@ -7,11 +7,11 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
-import static org.mule.runtime.core.api.InternalEvent.builder;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;

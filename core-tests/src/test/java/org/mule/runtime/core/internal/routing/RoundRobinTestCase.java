@@ -14,14 +14,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -109,8 +109,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     public void run() {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
-        InternalEvent event =
-            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
+        BaseEvent event =
+            BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
                 .session(session).build();
         try {
           target.process(event);
@@ -127,7 +127,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     private List<Object> payloads = new ArrayList<>();
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       payloads.add(event.getMessage().getPayload().getValue());
       count++;
       if (count % 3 == 0) {

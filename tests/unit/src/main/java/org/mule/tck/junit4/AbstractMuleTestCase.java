@@ -14,19 +14,20 @@ import static java.util.Optional.empty;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
@@ -230,7 +231,7 @@ public abstract class AbstractMuleTestCase {
   }
 
   @After
-  public final void clearRequestContext() {
+  public void clearRequestContext() {
     setCurrentEvent(null);
   }
 
@@ -261,16 +262,16 @@ public abstract class AbstractMuleTestCase {
     }
   }
 
-  private InternalEvent _testEvent;
-  private InternalEvent _nullPayloadEvent;
+  private BaseEvent _testEvent;
+  private BaseEvent _nullPayloadEvent;
 
   /**
-   * Creates and caches a test {@link InternalEvent} instance for the scope of the current test method.
+   * Creates and caches a test {@link BaseEvent} instance for the scope of the current test method.
    *
    * @return test event.
    * @throws MuleException
    */
-  protected InternalEvent testEvent() throws MuleException {
+  protected BaseEvent testEvent() throws MuleException {
     if (_testEvent == null) {
       _testEvent = newEvent();
     }
@@ -278,13 +279,13 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Create a new {@link InternalEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
+   * Create a new {@link BaseEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
    * test method.
-   * 
+   *
    * @return new test event.
    * @throws MuleException
    */
-  protected InternalEvent newEvent() throws MuleException {
+  protected BaseEvent newEvent() throws MuleException {
     return getEventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
@@ -294,11 +295,11 @@ public abstract class AbstractMuleTestCase {
    * @return a event builder to use to build a test event
    * @throws MuleException
    */
-  protected InternalEvent.Builder getEventBuilder() throws MuleException {
+  protected BaseEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
-  protected InternalEvent nullPayloadEvent() throws MuleException {
+  protected BaseEvent nullPayloadEvent() throws MuleException {
     if (_nullPayloadEvent == null) {
       _nullPayloadEvent = eventBuilder().message(of(null)).build();
     }
@@ -345,7 +346,7 @@ public abstract class AbstractMuleTestCase {
 
   /**
    * Utility method to add a mock component location.
-   * 
+   *
    * @param component object to add the location.
    */
   protected void addMockComponentLocation(Component component) {

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;

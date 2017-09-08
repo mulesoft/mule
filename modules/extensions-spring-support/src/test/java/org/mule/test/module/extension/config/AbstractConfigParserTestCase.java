@@ -9,7 +9,8 @@ package org.mule.test.module.extension.config;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -65,13 +66,13 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
     return lookupHeisenberg(key, getHeisenbergEvent());
   }
 
-  protected HeisenbergExtension lookupHeisenberg(String key, InternalEvent event) throws Exception {
+  protected HeisenbergExtension lookupHeisenberg(String key, BaseEvent event) throws Exception {
     return getConfigurationFromRegistry(key, event, muleContext);
   }
 
-  protected InternalEvent getHeisenbergEvent() throws Exception {
+  protected BaseEvent getHeisenbergEvent() throws Exception {
     WEAPON.setMicrogramsPerKilo(10L);
-    InternalEvent event = eventBuilder().message(of(""))
+    BaseEvent event = eventBuilder().message(of(""))
         .addVariable("lidia", LIDIA)
         .addVariable("myName", HeisenbergExtension.HEISENBERG)
         .addVariable("age", HeisenbergExtension.AGE)

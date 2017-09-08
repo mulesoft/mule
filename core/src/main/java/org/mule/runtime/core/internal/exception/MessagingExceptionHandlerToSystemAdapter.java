@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Objects.requireNonNull;
 
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
@@ -23,7 +23,7 @@ public class MessagingExceptionHandlerToSystemAdapter implements MessagingExcept
   }
 
   @Override
-  public InternalEvent handleException(MessagingException exception, InternalEvent event) {
+  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     muleContext.getExceptionListener().handleException(exception);
     return event;
   }

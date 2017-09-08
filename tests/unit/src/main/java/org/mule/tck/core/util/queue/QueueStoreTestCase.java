@@ -13,8 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.queue.QueueConfiguration.MAXIMUM_CAPACITY;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.util.queue.QueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -119,15 +120,15 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
   @Test
   public void offerSeveralRetrieveAllMuleEvents() throws Exception {
     QueueStore queue = createQueue();
-    ArrayList<InternalEvent> events = new ArrayList<>(NUMBER_OF_ITEMS);
+    ArrayList<BaseEvent> events = new ArrayList<>(NUMBER_OF_ITEMS);
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      InternalEvent testEvent = eventBuilder().message(of("some data")).build();
+      BaseEvent testEvent = eventBuilder().message(of("some data")).build();
       events.add(testEvent);
       queue.offer(testEvent, 0, NUMBER_OF_ITEMS);
 
     }
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      assertThat(((InternalEvent) queue.poll(NUMBER_OF_ITEMS)).getContext().getId().equals(events.get(i).getContext().getId()),
+      assertThat(((BaseEvent) queue.poll(NUMBER_OF_ITEMS)).getContext().getId().equals(events.get(i).getContext().getId()),
                  is(true));
     }
   }

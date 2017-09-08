@@ -7,20 +7,21 @@
 package org.mule.functional.testmodels.services;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestReceiver implements Processor, MuleContextAware {
 
@@ -31,11 +32,15 @@ public class TestReceiver implements Processor, MuleContextAware {
   protected AtomicInteger count = new AtomicInteger(0);
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     try {
       final Message message = event.getMessage();
-      return InternalEvent.builder(event)
-          .message(Message.builder(message).value(receive(event.getMessageAsString(muleContext))).build())
+
+      return BaseEvent.builder(event)
+          .message(Message.builder(message)
+              .value(receive(muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
+                  .getValue().toString()))
+              .build())
           .build();
     } catch (Exception e) {
       throw new DefaultMuleException(e);

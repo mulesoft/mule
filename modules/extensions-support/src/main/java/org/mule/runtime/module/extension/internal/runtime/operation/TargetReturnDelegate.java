@@ -11,8 +11,8 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
@@ -47,11 +47,11 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   }
 
   @Override
-  public InternalEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+  public BaseEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
     TypedValue result =
         operationContext.getMuleContext().getExpressionManager()
             .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
-    return InternalEvent.builder(operationContext.getEvent())
+    return BaseEvent.builder(operationContext.getEvent())
         .securityContext(operationContext.getSecurityContext())
         .addVariable(this.target, result.getValue(), result.getDataType())
         .build();

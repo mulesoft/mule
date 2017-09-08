@@ -65,9 +65,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleManifest;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.core.api.message.ErrorBuilder;
@@ -119,7 +119,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void attributesBinding() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     SomeAttributes attributes = new SomeAttributes();
     InternalMessage message = (InternalMessage) Message.builder().nullValue().attributesValue(attributes).build();
     when(event.getMessage()).thenReturn(message);
@@ -131,7 +131,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void splitByJson() throws Exception {
-    InternalEvent jsonMessage =
+    BaseEvent jsonMessage =
         eventBuilder().message(Message.builder().value("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
     Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", jsonMessage, BindingContext.builder().build());
     assertThat(payload.hasNext(), is(true));
@@ -145,7 +145,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void expectedOutputShouldBeUsed() throws Exception {
-    InternalEvent jsonMessage =
+    BaseEvent jsonMessage =
         eventBuilder().message(Message.builder().value("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
     TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
@@ -155,7 +155,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void errorBinding() throws Exception {
     Error error = mock(Error.class);
     Optional opt = Optional.of(error);
-    InternalEvent event = getEventWithError(opt);
+    BaseEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     TypedValue result = expressionLanguage.evaluate(ERROR, event, BindingContext.builder().build());
@@ -179,7 +179,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         .errorType(errorType)
         .build();
     Optional opt = Optional.of(error);
-    InternalEvent event = getEventWithError(opt);
+    BaseEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression =
@@ -203,7 +203,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
                                                        .errorType(errorType).build()));
 
     Optional opt = Optional.of(error);
-    InternalEvent event = getEventWithError(opt);
+    BaseEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression = "error.childErrors reduce ((child, acc = '') -> acc ++ child.cause.message)";
@@ -217,7 +217,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     when(error.getErrorMessage()).thenReturn(Message.of(new Integer[] {1, 3, 6}));
 
     Optional opt = Optional.of(error);
-    InternalEvent event = getEventWithError(opt);
+    BaseEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
     String expression = "error.errorMessage.payload reduce ($$ + $)";
@@ -229,7 +229,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void errorMessageContainsDataweaveExceptionCauseMessage() throws Exception {
     Error error = mock(Error.class);
     Optional opt = Optional.of(error);
-    InternalEvent event = getEventWithError(opt);
+    BaseEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
     String expressionThatThrowsException = "payload + 'foo'";
 
@@ -242,7 +242,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void payloadBinding() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
     TypedValue payload = new TypedValue<>("hey", STRING);
@@ -257,7 +257,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void dataTypeBinding() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(event.getMessage()).thenReturn(message);
     TypedValue payload = new TypedValue<>("hey", STRING);
@@ -272,7 +272,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void variablesBindings() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     String var1 = "var1";
     String var2 = "var2";
     when(event.getVariables().keySet()).thenReturn(Sets.newHashSet(var1, var2));
@@ -288,7 +288,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void variablesCannotOverrideEventBindings() throws MuleException {
-    InternalEvent event = spy(testEvent());
+    BaseEvent event = spy(testEvent());
     TypedValue<String> varValue = new TypedValue<>("", STRING);
     ImmutableMap<String, TypedValue<?>> variablesMap = ImmutableMap.<String, TypedValue<?>>builder()
         .put(PAYLOAD, varValue).put(ATTRIBUTES, varValue).put(ERROR, varValue).put(VARS, varValue).put(FLOW, varValue)
@@ -308,7 +308,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void propertiesBindings() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     String var1 = "var1";
     String var2 = "var2";
     TypedValue varValue = new TypedValue<>(null, OBJECT);
@@ -324,7 +324,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void parametersBindings() throws Exception {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     String var1 = "var1";
     String var2 = "var2";
     TypedValue varValue = new TypedValue<>(null, OBJECT);
@@ -340,7 +340,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void messageBinding() throws Exception {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     TypedValue result = expressionLanguage.evaluate(MESSAGE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Message.class)));
     assertEquals(((Message) result.getValue()).getPayload(), event.getMessage().getPayload());
@@ -348,7 +348,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void authenticationBinding() throws Exception {
-    InternalEvent event = spy(testEvent());
+    BaseEvent event = spy(testEvent());
     Authentication authentication =
         new DefaultMuleAuthentication(new DefaultMuleCredentials("username", "password".toCharArray()));
     when(event.getAuthentication()).thenReturn(of(authentication));
@@ -360,14 +360,14 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void authenticationBindingWhenNullSecurityContext() throws Exception {
-    InternalEvent event = spy(testEvent());
+    BaseEvent event = spy(testEvent());
     TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(nullValue()));
   }
 
   @Test
   public void accessRegistryBean() throws MuleException {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is("DataWeave"));
@@ -375,7 +375,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void accessRegistryAnnotatedBean() throws MuleException {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     muleContext.getRegistry().registerObject("myBean", new MyAnnotatedBean("DataWeave"));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", DataType.fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
@@ -384,7 +384,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void accessRegistryCglibAnnotatedBean() throws Exception {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
 
     MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
     annotatedMyBean.setName("DataWeave");
@@ -396,7 +396,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void accessServerFileSeparator() throws MuleException {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
     TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
@@ -404,7 +404,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void accessMuleVersion() throws MuleException {
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
     TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
@@ -412,7 +412,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void flowNameBinding() {
-    InternalEvent event = getEventWithError(empty());
+    BaseEvent event = getEventWithError(empty());
     String flowName = "myFlowName";
 
     TypedValue result =
@@ -428,7 +428,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     DefaultExpressionLanguageFactoryService languageFactory = mock(DefaultExpressionLanguageFactoryService.class);
     ExpressionLanguage expressionLanguage = spy(ExpressionLanguage.class);
     when(languageFactory.create()).thenReturn(expressionLanguage);
-    InternalEvent event = testEvent();
+    BaseEvent event = testEvent();
     new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
     verify(expressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
@@ -437,7 +437,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void entrySetFunction() throws Exception {
     final String key = "foo";
     final String value = "bar";
-    InternalEvent event = eventBuilder().message(Message.builder().value(singletonMap(key, value)).build()).build();
+    BaseEvent event = eventBuilder().message(Message.builder().value(singletonMap(key, value)).build()).build();
     TypedValue result =
         expressionLanguage.evaluate("dw::core::Objects::entrySet(payload)", event, BindingContext.builder().build());
     assertThat(result.getValue(), instanceOf(List.class));
@@ -448,8 +448,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(entry.get("value"), equalTo(value));
   }
 
-  private InternalEvent getEventWithError(Optional<Error> error) {
-    InternalEvent event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private BaseEvent getEventWithError(Optional<Error> error) {
+    BaseEvent event = mock(BaseEvent.class, RETURNS_DEEP_STUBS);
     doReturn(error).when(event).getError();
     when(event.getMessage().getPayload()).thenReturn(new TypedValue<>(null, OBJECT));
     when(event.getMessage().getAttributes()).thenReturn(new TypedValue<>(null, OBJECT));

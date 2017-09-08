@@ -7,19 +7,21 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.util.Arrays;
 import java.util.Comparator;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
 public class MessageChunkAggregator extends AbstractAggregator {
 
@@ -39,27 +41,27 @@ public class MessageChunkAggregator extends AbstractAggregator {
       /**
        * This method is invoked if the shouldAggregate method is called and returns true. Once this method returns an aggregated
        * message the event group is removed from the router
-       * 
+       *
        * @param events the event group for this request
        * @return an aggregated message
        * @throws AggregationException if the aggregation fails. in this scenario the whole event
        *         group is removed and passed to the exception handler for this componenet
        */
       @Override
-      public InternalEvent aggregateEvents(EventGroup events) throws AggregationException {
-        InternalEvent[] collectedEvents;
+      public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
+        BaseEvent[] collectedEvents;
         try {
           collectedEvents = events.toArray(false);
         } catch (ObjectStoreException e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         }
-        InternalEvent firstEvent = collectedEvents[0];
+        BaseEvent firstEvent = collectedEvents[0];
         Arrays.sort(collectedEvents, eventComparator);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
         try {
-          for (InternalEvent event : collectedEvents) {
-            baos.write(event.getMessageAsBytes(muleContext));
+          for (BaseEvent event : collectedEvents) {
+            baos.write(((PrivilegedEvent) event).getMessageAsBytes(muleContext));
           }
 
           final Message.Builder builder = Message.builder(firstEvent.getMessage());
@@ -72,7 +74,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
           }
 
           // Use last event, that hasn't been completed yet, for continued processing.
-          return InternalEvent.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
+          return BaseEvent.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
               .session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);

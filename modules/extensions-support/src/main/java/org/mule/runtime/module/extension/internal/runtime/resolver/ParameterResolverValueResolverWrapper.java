@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
 /**
@@ -29,7 +29,7 @@ public class ParameterResolverValueResolverWrapper<T> implements ValueResolver<P
   }
 
   /**
-   * Resolves the value of {@link this#resolver} using the given {@link InternalEvent} and wraps it into a
+   * Resolves the value of {@link this#resolver} using the given {@link BaseEvent} and wraps it into a
    * {@link StaticParameterResolver}
    *
    * @param context a {@link ValueResolvingContext} to resolve the {@link ValueResolver}

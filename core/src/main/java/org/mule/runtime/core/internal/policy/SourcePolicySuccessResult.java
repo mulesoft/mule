@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -15,14 +15,14 @@ import java.util.function.Supplier;
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
  *
- * It contains the {@link InternalEvent} result of the flow execution and the response parameters and error response parameters to be sent
+ * It contains the {@link BaseEvent} result of the flow execution and the response parameters and error response parameters to be sent
  * by the source.
  *
  * @since 4.0
  */
 public class SourcePolicySuccessResult {
 
-  private final InternalEvent result;
+  private final BaseEvent result;
   private final Supplier<Map<String, Object>> responseParameters;
   private final MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor;
 
@@ -31,9 +31,9 @@ public class SourcePolicySuccessResult {
    *
    * @param result the result of the flow execution.
    * @param responseParameters the response parameters to be sent by the source.
-   * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link InternalEvent}
+   * @param messageSourceResponseParametersProcessor a processor to create response parameters from an {@link BaseEvent}
    */
-  public SourcePolicySuccessResult(InternalEvent result, Supplier<Map<String, Object>> responseParameters,
+  public SourcePolicySuccessResult(BaseEvent result, Supplier<Map<String, Object>> responseParameters,
                                    MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     this.result = result;
     this.responseParameters = responseParameters;
@@ -43,7 +43,7 @@ public class SourcePolicySuccessResult {
   /**
    * @return the result of the flow execution.
    */
-  public InternalEvent getResult() {
+  public BaseEvent getResult() {
     return result;
   }
 
@@ -55,7 +55,7 @@ public class SourcePolicySuccessResult {
   }
 
   /**
-   * This method generates the set of error parameters from an {@link InternalEvent} to use on the error response function.
+   * This method generates the set of error parameters from an {@link BaseEvent} to use on the error response function.
    * 
    * Even though this class represents a successful execution it may be that when evaluating the response parameters there's a
    * failure which most likely can be an expression execution error. In such scenarios the error handler must be executed and an
@@ -63,7 +63,7 @@ public class SourcePolicySuccessResult {
    * 
    * @return the set of parameters to execute the function that sends the failure response.
    */
-  public Function<InternalEvent, Map<String, Object>> createErrorResponseParameters() {
+  public Function<BaseEvent, Map<String, Object>> createErrorResponseParameters() {
     return event -> messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction().apply(event);
   }
 }

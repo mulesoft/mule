@@ -6,17 +6,18 @@
  */
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-
-import java.util.HashMap;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
 
@@ -58,8 +59,9 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
     return bitten;
   }
 
-  public void myEventHandler(InternalEvent event, MuleContext muleContext) throws MuleException {
-    logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: " + event.getMessageAsString(null));
+  public void myEventHandler(BaseEvent event, MuleContext muleContext) throws MuleException {
+    logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: "
+        + ((PrivilegedEvent) event).getMessageAsString(null));
     bite();
   }
 

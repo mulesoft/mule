@@ -22,11 +22,11 @@ import static org.mule.runtime.core.api.context.notification.ConnectorMessageNot
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
@@ -109,7 +109,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verifyOnlySuccessfulWasCalled();
-    verify(mockRequestResponseTemplate).sendResponseToClient(any(InternalEvent.class));
+    verify(mockRequestResponseTemplate).sendResponseToClient(any(BaseEvent.class));
   }
 
   @Test
@@ -120,10 +120,10 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
         Mockito.inOrder(mockContext, mockRequestResponseTemplate, mockNotifier);
     inOrderVerify.verify(mockContext, atLeastOnce()).getTransactionConfig();
     inOrderVerify.verify(mockRequestResponseTemplate).getEvent();
-    inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(InternalEvent.class));
-    inOrderVerify.verify(mockRequestResponseTemplate).routeEvent(any(InternalEvent.class));
-    inOrderVerify.verify(mockRequestResponseTemplate).afterRouteEvent(any(InternalEvent.class));
-    inOrderVerify.verify(mockRequestResponseTemplate).afterSuccessfulProcessingFlow(any(InternalEvent.class));
+    inOrderVerify.verify(mockRequestResponseTemplate).beforeRouteEvent(any(BaseEvent.class));
+    inOrderVerify.verify(mockRequestResponseTemplate).routeEvent(any(BaseEvent.class));
+    inOrderVerify.verify(mockRequestResponseTemplate).afterRouteEvent(any(BaseEvent.class));
+    inOrderVerify.verify(mockRequestResponseTemplate).afterSuccessfulProcessingFlow(any(BaseEvent.class));
     inOrderVerify.verify(mockNotifier).phaseSuccessfully();
     verifyOnlySuccessfulWasCalled();
   }
@@ -131,7 +131,7 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Test
   public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockRequestResponseTemplate.afterRouteEvent(any(InternalEvent.class))).thenThrow(mockMessagingException);
+    when(mockRequestResponseTemplate.afterRouteEvent(any(BaseEvent.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
     verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
@@ -140,44 +140,44 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Test
   public void doNotSendResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    doThrow(mockResponseDispatchException).when(mockRequestResponseTemplate).sendResponseToClient(any(InternalEvent.class));
+    doThrow(mockResponseDispatchException).when(mockRequestResponseTemplate).sendResponseToClient(any(BaseEvent.class));
     when(mockMessagingException.handled()).thenReturn(true);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(mockRequestResponseTemplate).sendResponseToClient(any(InternalEvent.class));
+    verify(mockRequestResponseTemplate).sendResponseToClient(any(BaseEvent.class));
     verify(mockRequestResponseTemplate, never()).afterFailureProcessingFlow(mockMessagingException);
   }
 
   @Test
   public void doNotSendFailureResponseWhenFlowExecutionFailsSendingResponseAndExceptionIsNotHandled() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    doThrow(mockMessagingException).when(mockRequestResponseTemplate).sendResponseToClient(any(InternalEvent.class));
+    doThrow(mockMessagingException).when(mockRequestResponseTemplate).sendResponseToClient(any(BaseEvent.class));
     when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(mockRequestResponseTemplate).sendResponseToClient(any(InternalEvent.class));
+    verify(mockRequestResponseTemplate).sendResponseToClient(any(BaseEvent.class));
     verify(mockRequestResponseTemplate).afterFailureProcessingFlow(mockMessagingException);
   }
 
   @Test
   public void responseNotificationFired() throws MuleException {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockRequestResponseTemplate.afterRouteEvent(any(InternalEvent.class)))
-        .thenAnswer(invocation -> invocation.getArgumentAt(0, InternalEvent.class));
+    when(mockRequestResponseTemplate.afterRouteEvent(any(BaseEvent.class)))
+        .thenAnswer(invocation -> invocation.getArgumentAt(0, BaseEvent.class));
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(InternalEvent.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(BaseEvent.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(InternalEvent.class),
+    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(BaseEvent.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
   }
 
   @Test
   public void errorResponseNotificationFired() throws Exception {
     when(mockContext.supportsAsynchronousProcessing()).thenReturn(false);
-    when(mockRequestResponseTemplate.afterRouteEvent(any(InternalEvent.class))).thenThrow(mockMessagingException);
+    when(mockRequestResponseTemplate.afterRouteEvent(any(BaseEvent.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(false);
     phase.runPhase(mockRequestResponseTemplate, mockContext, mockNotifier);
-    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(InternalEvent.class),
+    verify(notificationHelper, never()).fireNotification(any(MessageSource.class), any(BaseEvent.class),
                                                          any(FlowConstruct.class), eq(MESSAGE_RESPONSE));
-    verify(notificationHelper).fireNotification(any(MessageSource.class), any(InternalEvent.class),
+    verify(notificationHelper).fireNotification(any(MessageSource.class), any(BaseEvent.class),
                                                 any(FlowConstruct.class), eq(MESSAGE_ERROR_RESPONSE));
   }
 

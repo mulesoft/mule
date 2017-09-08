@@ -16,9 +16,9 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 
@@ -37,26 +37,26 @@ public final class StreamingUtils {
    * <p>
    * Closing the opened cursor, handling exceptions and return values are all taken care of by this utility method.
    *
-   * @param event an {@link InternalEvent}
+   * @param event an {@link BaseEvent}
    * @param f the function to execute
-   * @return the output {@link InternalEvent}
+   * @return the output {@link BaseEvent}
    * @throws MuleException
    */
-  public static InternalEvent withCursoredEvent(InternalEvent event, CheckedFunction<InternalEvent, InternalEvent> f)
+  public static BaseEvent withCursoredEvent(BaseEvent event, CheckedFunction<BaseEvent, BaseEvent> f)
       throws MuleException {
     if (event.getMessage().getPayload() == null) {
       return event;
     }
     Reference<Throwable> exception = new Reference<>();
-    CheckedFunction<InternalEvent, InternalEvent> function = new CheckedFunction<InternalEvent, InternalEvent>() {
+    CheckedFunction<BaseEvent, BaseEvent> function = new CheckedFunction<BaseEvent, BaseEvent>() {
 
       @Override
-      public InternalEvent applyChecked(InternalEvent event) throws Throwable {
+      public BaseEvent applyChecked(BaseEvent event) throws Throwable {
         return f.apply(event);
       }
 
       @Override
-      public InternalEvent handleException(Throwable throwable) {
+      public BaseEvent handleException(Throwable throwable) {
         exception.set(unwrap(throwable));
         return null;
       }
@@ -72,7 +72,7 @@ public final class StreamingUtils {
         event = replacePayload(event, cursor);
       }
 
-      InternalEvent value = function.apply(event);
+      BaseEvent value = function.apply(event);
 
       if (value == null) {
         handlePossibleException(exception);
@@ -90,14 +90,14 @@ public final class StreamingUtils {
 
   /**
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
-   * {@link CursorProviderFactory#of(InternalEvent, Object)} is returned. Otherwise, the original {@code value} is.
+   * {@link CursorProviderFactory#of(BaseEvent, Object)} is returned. Otherwise, the original {@code value} is.
    *
    * @param value a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
    * @param event the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
    */
-  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, InternalEvent event) {
+  public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, BaseEvent event) {
     if (cursorProviderFactory != null && cursorProviderFactory.accepts(value)) {
       return cursorProviderFactory.of(event, value);
     } else {
@@ -124,8 +124,8 @@ public final class StreamingUtils {
     }
   }
 
-  private static InternalEvent replacePayload(InternalEvent event, Object newPayload) {
-    return InternalEvent.builder(event)
+  private static BaseEvent replacePayload(BaseEvent event, Object newPayload) {
+    return BaseEvent.builder(event)
         .message(Message.builder(event.getMessage())
             .value(newPayload)
             .build())
@@ -149,7 +149,7 @@ public final class StreamingUtils {
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
-  public static TypedValue updateTypedValueForStreaming(final TypedValue value, final InternalEvent event,
+  public static TypedValue updateTypedValueForStreaming(final TypedValue value, final BaseEvent event,
                                                         final StreamingManager streamingManager) {
     if (event == null) {
       return value;
@@ -165,19 +165,19 @@ public final class StreamingUtils {
   }
 
   /**
-   * Provides a function that updates the payload value of an {@link InternalEvent} by replacing it with a {@link CursorProvider}.
+   * Provides a function that updates the payload value of an {@link BaseEvent} by replacing it with a {@link CursorProvider}.
    *
    * @param streamingManager the streaming manager
-   * @return function that maps the an {@link InternalEvent}
+   * @return function that maps the an {@link BaseEvent}
    */
-  public static Function<InternalEvent, InternalEvent> updateEventForStreaming(final StreamingManager streamingManager) {
+  public static Function<BaseEvent, BaseEvent> updateEventForStreaming(final StreamingManager streamingManager) {
     return event -> {
       TypedValue payload = event.getMessage().getPayload();
       if (payload.getValue() instanceof CursorProvider) {
         Message message = Message.builder(event.getMessage())
             .payload(updateTypedValueForStreaming(payload, event, streamingManager))
             .build();
-        return InternalEvent.builder(event).message(message).build();
+        return BaseEvent.builder(event).message(message).build();
       }
       return event;
     };

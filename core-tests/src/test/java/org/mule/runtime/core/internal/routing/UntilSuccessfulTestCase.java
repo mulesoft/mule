@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -43,11 +43,11 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   public static class ConfigurableMessageProcessor implements Processor, InternalProcessor {
 
     private volatile int eventCount;
-    private volatile InternalEvent event;
+    private volatile BaseEvent event;
     private volatile int numberOfFailuresToSimulate;
 
     @Override
-    public InternalEvent process(final InternalEvent evt) throws MuleException {
+    public BaseEvent process(final BaseEvent evt) throws MuleException {
       eventCount++;
       if (numberOfFailuresToSimulate-- > 0) {
         throw new RuntimeException("simulated problem");
@@ -56,7 +56,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
       return evt;
     }
 
-    public InternalEvent getEventReceived() {
+    public BaseEvent getEventReceived() {
       return event;
     }
 
@@ -134,7 +134,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final InternalEvent testEvent =
+    final BaseEvent testEvent =
         eventBuilder().message(of(new ByteArrayInputStream("test_data".getBytes()))).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
@@ -147,7 +147,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final InternalEvent testEvent = eventBuilder().message(of("ERROR")).build();
+    final BaseEvent testEvent = eventBuilder().message(of("ERROR")).build();
     expected.expect(MessagingException.class);
     expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
     try {
@@ -164,7 +164,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final InternalEvent testEvent = eventBuilder().message(of("ERROR")).build();
+    final BaseEvent testEvent = eventBuilder().message(of("ERROR")).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
@@ -178,12 +178,12 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
   }
 
-  private void assertTargetEventReceived(InternalEvent request) throws MuleException {
+  private void assertTargetEventReceived(BaseEvent request) throws MuleException {
     assertThat(targetMessageProcessor.getEventReceived(), not(nullValue()));
     assertLogicallyEqualEvents(request, targetMessageProcessor.getEventReceived());
   }
 
-  private void assertLogicallyEqualEvents(final InternalEvent testEvent, InternalEvent eventReceived) throws MuleException {
+  private void assertLogicallyEqualEvents(final BaseEvent testEvent, BaseEvent eventReceived) throws MuleException {
     // events have been rewritten so are different but the correlation ID has been carried around
     assertEquals(testEvent.getCorrelationId(), eventReceived.getCorrelationId());
     // and their payload

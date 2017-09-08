@@ -28,7 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
@@ -44,8 +44,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -131,7 +131,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     invokeStrategyBlocking(strategy, testEvent(), asList(createRoutingPairWithSleep(of(1), 250), pair2),
                            throwable -> {
-                             verify(pair2Processor, times(1)).process(any(InternalEvent.class));
+                             verify(pair2Processor, times(1)).process(any(BaseEvent.class));
                              CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 1);
                              RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 1);
                              assertThat(routingResult.getFailures().get("0").getCause(),
@@ -154,7 +154,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
     invokeStrategyBlocking(strategy, testEvent(),
                            asList(createRoutingPairWithSleep(of(1), 250), pair2),
-                           throwable -> verify(pair2Processor, never()).process(any(InternalEvent.class)));
+                           throwable -> verify(pair2Processor, never()).process(any(BaseEvent.class)));
   }
 
   @Test
@@ -188,7 +188,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     expectedException.expect(instanceOf(CompositeRoutingException.class));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(failingPair1, failingPair2, failingPair3, okPair), throwable -> {
-      verify(processorSpy, times(1)).process(any(InternalEvent.class));
+      verify(processorSpy, times(1)).process(any(BaseEvent.class));
       CompositeRoutingException compositeRoutingException = assertCompositeRoutingException(throwable, 3);
       RoutingResult routingResult = assertRoutingResult(compositeRoutingException, 1, 3);
       assertThat(routingResult.getFailures().get("0").getCause(), is(exception1));
@@ -213,7 +213,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     expectedException.expectCause(is(exception));
 
     invokeStrategyBlocking(strategy, testEvent(), asList(failingPair, okPair),
-                           throwable -> verify(processorSpy, never()).process(any(InternalEvent.class)));
+                           throwable -> verify(processorSpy, never()).process(any(BaseEvent.class)));
   }
 
   @Test
@@ -224,7 +224,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     Processor processorSpy2 = createProcessorSpy(of(2));
     Processor processorSpy3 = createProcessorSpy(of(3));
 
-    InternalEvent orignial = testEvent();
+    BaseEvent orignial = testEvent();
     RuntimeException exception = new IllegalStateException();
     RoutingPair failingPair = of(orignial, createFailingRoutingPair(exception));
     RoutingPair okPair = of(orignial, createChain(processorSpy));
@@ -236,9 +236,9 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
 
     invokeStrategyBlocking(strategy, testEvent(), asList(failingPair, okPair, okPair2, okPair3), throwable -> {
-      verify(processorSpy, atMost(1)).process(any(InternalEvent.class));
-      verify(processorSpy2, atMost(1)).process(any(InternalEvent.class));
-      verify(processorSpy3, atMost(1)).process(any(InternalEvent.class));
+      verify(processorSpy, atMost(1)).process(any(BaseEvent.class));
+      verify(processorSpy2, atMost(1)).process(any(BaseEvent.class));
+      verify(processorSpy3, atMost(1)).process(any(BaseEvent.class));
     });
   }
 
@@ -259,7 +259,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     final String fooVar3Value1 = "foo3Value1";
     final Apple fooVar3Value2 = new Apple();
 
-    InternalEvent original = builder(newEvent())
+    BaseEvent original = builder(newEvent())
         .addVariable(beforeVarName, beforeVarValue)
         .addVariable(beforeVar2Name, beforeVar2Value)
         .build();
@@ -275,7 +275,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
         .addVariable(fooVar3Name, fooVar3Value2)
         .build()));
 
-    InternalEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2));
+    BaseEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2));
 
     assertThat(result.getVariables().keySet(), hasSize(5));
 
@@ -352,16 +352,16 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     return routingResult;
   }
 
-  protected InternalEvent invokeStrategyBlocking(ForkJoinStrategy strategy, InternalEvent original,
-                                                 List<RoutingPair> routingPairs)
+  protected BaseEvent invokeStrategyBlocking(ForkJoinStrategy strategy, BaseEvent original,
+                                             List<RoutingPair> routingPairs)
       throws Throwable {
     return invokeStrategyBlocking(strategy, original, routingPairs, throwable -> {
     });
   }
 
-  protected InternalEvent invokeStrategyBlocking(ForkJoinStrategy strategy, InternalEvent original,
-                                                 List<RoutingPair> routingPairs,
-                                                 CheckedConsumer<Throwable> verifyOnError)
+  protected BaseEvent invokeStrategyBlocking(ForkJoinStrategy strategy, BaseEvent original,
+                                             List<RoutingPair> routingPairs,
+                                             CheckedConsumer<Throwable> verifyOnError)
       throws Throwable {
     try {
       return from(strategy.forkJoin(original, fromIterable(routingPairs))).block();
@@ -383,8 +383,8 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     return spy(new InternalTestProcessor() {
 
       @Override
-      public InternalEvent process(InternalEvent event) throws MuleException {
-        return InternalEvent.builder(event).message(result).build();
+      public BaseEvent process(BaseEvent event) throws MuleException {
+        return BaseEvent.builder(event).message(result).build();
       }
     });
   }
@@ -404,7 +404,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
-      return InternalEvent.builder(event).message(result).build();
+      return BaseEvent.builder(event).message(result).build();
     }));
   }
 

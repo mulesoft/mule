@@ -17,10 +17,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -71,12 +71,12 @@ public class DefaultPolicyInstance extends AbstractComponent
     return new MessagingExceptionHandler() {
 
       @Override
-      public InternalEvent handleException(MessagingException exception, InternalEvent event) {
+      public BaseEvent handleException(MessagingException exception, BaseEvent event) {
         return null;
       }
 
       @Override
-      public Publisher<InternalEvent> apply(MessagingException exception) {
+      public Publisher<BaseEvent> apply(MessagingException exception) {
         return error(exception);
       }
     };

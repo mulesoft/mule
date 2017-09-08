@@ -22,25 +22,26 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
-
-import java.beans.ExceptionListener;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.beans.ExceptionListener;
 
 public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProcessorTestCase implements ExceptionListener {
 
@@ -81,14 +82,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void process() throws Exception {
-    InternalEvent request = testEvent();
+    BaseEvent request = testEvent();
 
-    InternalEvent result = process(messageProcessor, request);
+    BaseEvent result = process(messageProcessor, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
-    request.getContext().success(result);
+    ((BaseEventContext) request.getContext()).success(result);
 
-    assertCompletionNotDone(request.getContext());
+    assertCompletionNotDone((BaseEventContext) request.getContext());
 
     // Permit async processing now we have already asserted that response alone is not enough to complete event context.
     asyncEntryLatch.countDown();
@@ -96,14 +97,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
 
     // Block until async completes, not just target processor.
-    from(target.sensedEvent.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(((BaseEventContext) target.sensedEvent.getContext()).getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
     assertThat(target.sensedEvent, notNullValue());
 
     // Block to ensure async fully completes before testing state
-    from(request.getContext().getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
+    from(((BaseEventContext) request.getContext()).getCompletionPublisher()).block(ofMillis(BLOCK_TIMEOUT));
 
-    assertCompletionDone(target.sensedEvent.getContext());
-    assertCompletionDone(request.getContext());
+    assertCompletionDone((BaseEventContext) target.sensedEvent.getContext());
+    assertCompletionDone((BaseEventContext) request.getContext());
 
     assertTargetEvent(request);
     assertResponse(result);
@@ -115,8 +116,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      InternalEvent request = testEvent();
-      InternalEvent result = process(messageProcessor, request);
+      BaseEvent request = testEvent();
+      BaseEvent result = process(messageProcessor, request);
 
       // Wait until processor in async is executed to allow assertions on sensed event
       asyncEntryLatch.countDown();
@@ -149,7 +150,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     process();
   }
 
-  private void assertTargetEvent(InternalEvent request) {
+  private void assertTargetEvent(BaseEvent request) {
     // Assert that event is processed in async thread
     assertNotNull(target.sensedEvent);
     assertThat(request, not(sameInstance(target.sensedEvent)));
@@ -158,7 +159,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.thread, not(sameInstance(currentThread())));
   }
 
-  private void assertResponse(InternalEvent result) throws MuleException {
+  private void assertResponse(BaseEvent result) throws MuleException {
     // Assert that response is echoed by async and no exception is thrown in flow
     assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
@@ -173,21 +174,21 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     return mp;
   }
 
-  private void assertCompletionDone(InternalEventContext parent) {
+  private void assertCompletionDone(BaseEventContext parent) {
     assertThat(from(parent.getCompletionPublisher()).toFuture().isDone(), is(true));
   }
 
-  private void assertCompletionNotDone(InternalEventContext child1) {
+  private void assertCompletionNotDone(BaseEventContext child1) {
     assertThat(from(child1.getCompletionPublisher()).toFuture().isDone(), is(false));
   }
 
   class TestListener implements Processor {
 
-    InternalEvent sensedEvent;
+    BaseEvent sensedEvent;
     Thread thread;
 
     @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
+    public BaseEvent process(BaseEvent event) throws MuleException {
       try {
         asyncEntryLatch.await();
       } catch (InterruptedException e) {

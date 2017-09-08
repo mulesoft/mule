@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;
@@ -59,7 +59,7 @@ public class LifecycleSensingMessageProcessor extends AbstractComponent implemen
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return event;
   }
 }

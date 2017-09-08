@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -38,7 +38,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     runThread(testEvent(), true);
   }
 
-  protected void runThread(InternalEvent event, boolean doTest) throws InterruptedException {
+  protected void runThread(BaseEvent event, boolean doTest) throws InterruptedException {
     AtomicBoolean success = new AtomicBoolean(false);
     Thread thread = new Thread(new SetExceptionPayload(event, success));
     thread.start();
@@ -51,10 +51,10 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   private class SetExceptionPayload implements Runnable {
 
-    private InternalEvent event;
+    private BaseEvent event;
     private AtomicBoolean success;
 
-    public SetExceptionPayload(InternalEvent event, AtomicBoolean success) {
+    public SetExceptionPayload(BaseEvent event, AtomicBoolean success) {
       this.event = event;
       this.success = success;
     }
@@ -63,7 +63,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     public void run() {
       try {
         Exception exception = new Exception();
-        event = InternalEvent.builder(event)
+        event = BaseEvent.builder(event)
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .error(createErrorMock(exception)).build();
         setCurrentEvent(event);

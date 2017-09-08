@@ -10,12 +10,14 @@ package org.mule.runtime.core.internal.keygenerator;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -48,9 +50,9 @@ public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTest
 
   @Test
   public void failsToGenerateKeyWhenCannotReadPayload() throws Exception {
-    InternalEvent event = mock(InternalEvent.class);
+    BaseEvent event = spy(newEvent());
     final DefaultMuleException fail = new DefaultMuleException("Fail");
-    when(event.getMessageAsBytes(muleContext)).thenThrow(fail);
+    when(((PrivilegedEvent) event).getMessageAsBytes(muleContext)).thenThrow(fail);
     expectedException.expect(MuleRuntimeException.class);
     expectedException.expectCause(is(sameInstance(fail)));
     keyGenerator.generateKey(event);

@@ -31,9 +31,9 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.DuplicateMessageException;
@@ -118,11 +118,11 @@ public class IdempotentMessageValidator extends AbstractComponent
         .build());
   }
 
-  protected String getValueForEvent(InternalEvent event) throws MessagingException {
+  protected String getValueForEvent(BaseEvent event) throws MessagingException {
     return (String) muleContext.getExpressionManager().evaluate(valueExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
-  protected String getIdForEvent(InternalEvent event) throws MuleException {
+  protected String getIdForEvent(BaseEvent event) throws MuleException {
     return (String) muleContext.getExpressionManager().evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
@@ -142,7 +142,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     this.store = store;
   }
 
-  private boolean accept(InternalEvent event) {
+  private boolean accept(BaseEvent event) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
@@ -169,7 +169,7 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   @Override
-  public final InternalEvent process(InternalEvent event) throws MuleException {
+  public final BaseEvent process(BaseEvent event) throws MuleException {
     if (accept(event)) {
       return event;
     } else {
@@ -177,7 +177,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     }
   }
 
-  protected boolean isNewMessage(InternalEvent event) {
+  protected boolean isNewMessage(BaseEvent event) {
     try {
       String id = this.getIdForEvent(event);
       if (store == null) {

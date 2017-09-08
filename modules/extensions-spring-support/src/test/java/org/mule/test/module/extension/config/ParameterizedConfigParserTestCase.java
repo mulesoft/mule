@@ -21,7 +21,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -96,15 +97,15 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void sameInstanceForEquivalentEvent() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
+    BaseEvent event = getHeisenbergEvent();
     HeisenbergExtension heisenberg = lookupHeisenberg(testConfig, event);
     assertThat(heisenberg, is(sameInstance(lookupHeisenberg(testConfig, event))));
   }
 
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
-    InternalEvent anotherEvent = testEvent();
+    BaseEvent event = getHeisenbergEvent();
+    BaseEvent anotherEvent = testEvent();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));
@@ -112,8 +113,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
-    InternalEvent event = getHeisenbergEvent();
-    InternalEvent anotherEvent = InternalEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
+    BaseEvent event = getHeisenbergEvent();
+    BaseEvent anotherEvent = BaseEvent.builder(getHeisenbergEvent()).addVariable("age", 40).build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
     assertThat(config, is(not(sameInstance(anotherConfig))));

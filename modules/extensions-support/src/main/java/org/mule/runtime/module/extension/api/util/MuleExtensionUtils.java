@@ -11,8 +11,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
@@ -20,9 +20,9 @@ import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtension
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -78,9 +78,9 @@ public class MuleExtensionUtils {
   /**
    * Creates an empty event for extension initialization purposes
    *
-   * @return a new {@link InternalEvent}
+   * @return a new {@link BaseEvent}
    */
-  public static InternalEvent getInitialiserEvent() {
+  public static BaseEvent getInitialiserEvent() {
     return getInitialiserEvent(null);
   }
 
@@ -88,9 +88,9 @@ public class MuleExtensionUtils {
    * Creates an empty event for extension initialization pusposes
    *
    * @param muleContext context on which the event will be associated.
-   * @return a new {@link InternalEvent}
+   * @return a new {@link BaseEvent}
    */
-  public static InternalEvent getInitialiserEvent(MuleContext muleContext) {
+  public static BaseEvent getInitialiserEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
 
       @Override
@@ -152,7 +152,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
+    return BaseEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
         .flow(flowConstruct)
         .build();
   }

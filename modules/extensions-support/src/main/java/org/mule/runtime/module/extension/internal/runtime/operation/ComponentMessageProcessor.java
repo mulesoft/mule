@@ -28,13 +28,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ParametersResolverProcessor;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -60,13 +62,14 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -78,7 +81,7 @@ import reactor.core.publisher.Mono;
  * <p>
  * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link ComponentExecutorModelProperty}
  * through which a {@link ComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The
- * obtained {@link ComponentExecutor} serve all invocations of {@link #process(InternalEvent)} on {@code this} instance but will
+ * obtained {@link ComponentExecutor} serve all invocations of {@link #process(BaseEvent)} on {@code this} instance but will
  * not be shared with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events that {@code this}
  * instance receives will be propagated to the {@link #componentExecutor}.
  * <p>
@@ -130,17 +133,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
+  public BaseEvent process(BaseEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher).flatMap(checkedFunction(event -> withContextClassLoader(classLoader, () -> {
       Optional<ConfigurationInstance> configuration;
       OperationExecutionFunction operationExecutionFunction;
 
-      if (event.getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
+      if (((InternalEvent) event).getInternalParameters().containsKey(INTERCEPTION_RESOLVED_CONTEXT)) {
         // If the event already contains an execution context, use that one.
         ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
         configuration = operationContext.getConfiguration();
@@ -181,20 +184,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     })));
   }
 
-  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(InternalEvent event) {
-    return (PrecalculatedExecutionContextAdapter) (event.getInternalParameters().get(INTERCEPTION_RESOLVED_CONTEXT));
+  private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(BaseEvent event) {
+    return (PrecalculatedExecutionContextAdapter) (((InternalEvent) event).getInternalParameters()
+        .get(INTERCEPTION_RESOLVED_CONTEXT));
   }
 
-  protected Mono<InternalEvent> doProcess(InternalEvent event, ExecutionContextAdapter<T> operationContext) {
+  protected Mono<BaseEvent> doProcess(BaseEvent event, ExecutionContextAdapter<T> operationContext) {
     return executeOperation(operationContext)
         .map(value -> asReturnValue(operationContext, value))
         .switchIfEmpty(fromCallable(() -> asReturnValue(operationContext, null)))
         .onErrorMap(Exceptions::unwrap);
   }
 
-  private InternalEvent asReturnValue(ExecutionContextAdapter<T> operationContext, Object value) {
-    if (value instanceof InternalEvent) {
-      return (InternalEvent) value;
+  private BaseEvent asReturnValue(ExecutionContextAdapter<T> operationContext, Object value) {
+    if (value instanceof BaseEvent) {
+      return (BaseEvent) value;
     } else {
       return returnDelegate.asReturnValue(value, operationContext);
     }
@@ -206,7 +210,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,
                                                             Map<String, Object> resolvedParameters,
-                                                            InternalEvent event)
+                                                            BaseEvent event)
       throws MuleException {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
@@ -288,20 +292,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    *
    * @throws IllegalOperationException If the validation fails
    */
+  @Override
   protected abstract void validateOperationConfiguration(ConfigurationProvider configurationProvider);
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    final InternalEvent event = getInitialiserEvent(muleContext);
+    final BaseEvent event = getInitialiserEvent(muleContext);
     return new OperationParameterValueResolver(new LazyExecutionContext<>(resolverSet, componentModel, extensionModel,
                                                                           from(event)));
   }
 
 
+  @Override
   public abstract ProcessingType getProcessingType();
 
   @Override
-  public void resolveParameters(InternalEvent.Builder eventBuilder,
+  public void resolveParameters(BaseEvent.Builder eventBuilder,
                                 BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
       throws MuleException {
     if (componentExecutor instanceof OperationArgumentResolverFactory) {
@@ -345,12 +351,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     mediator.after(executionContext, null, interceptors);
   }
 
-  private ExecutionContextAdapter<T> createExecutionContext(InternalEvent event) throws MuleException {
+  private ExecutionContextAdapter<T> createExecutionContext(BaseEvent event) throws MuleException {
     Optional<ConfigurationInstance> configuration = getConfiguration(event);
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event);
   }
 
-  private Map<String, Object> getResolutionResult(InternalEvent event, Optional<ConfigurationInstance> configuration)
+  private Map<String, Object> getResolutionResult(BaseEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
     return resolverSet.resolve(from(event, configuration)).asMap();
   }

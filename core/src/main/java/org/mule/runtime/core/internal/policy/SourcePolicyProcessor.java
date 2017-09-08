@@ -7,13 +7,13 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEvent.builder;
+import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
@@ -25,18 +25,18 @@ import org.reactivestreams.Publisher;
 
 /**
  * This class is responsible for the processing of a policy applied to a {@link org.mule.runtime.core.api.source.MessageSource}.
- * 
+ *
  * In order for this class to be able to execute a policy it requires an {@link PolicyChain} with the content of the policy. Such
  * policy may have an {@link PolicyNextActionMessageProcessor} which will be the one used to execute the provided
  * {@link Processor} which may be another policy or the actual logic behind the
  * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
- * 
+ *
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link InternalEvent} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link InternalEvent}
- * from the policy to the next operation {@link InternalEvent} or from the next operation result to the {@link InternalEvent} that must continue
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link BaseEvent} modified by the policy behaviour can be
+ * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link BaseEvent}
+ * from the policy to the next operation {@link BaseEvent} or from the next operation result to the {@link BaseEvent} that must continue
  * the execution of the policy.
- * 
+ *
  * If a non-empty {@code sourcePolicyParametersTransformer} is passed to this class, then it will be used to convert the result of
  * the policy chain execution to the set of parameters that the success response function or the failure response function will be
  * used to execute.
@@ -50,7 +50,7 @@ public class SourcePolicyProcessor implements Processor {
 
   /**
    * Creates a new {@code DefaultSourcePolicy}.
-   * 
+   *
    * @param policy the policy to execute before and after the source.
    * @param policyStateHandler the state handler for the policy.
    * @param nextProcessor the next-operation processor implementation, it may be another policy or the flow execution.
@@ -71,12 +71,12 @@ public class SourcePolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public InternalEvent process(InternalEvent sourceEvent) throws MuleException {
+  public BaseEvent process(BaseEvent sourceEvent) throws MuleException {
     return processToApply(sourceEvent, this);
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
         .then(sourceEvent -> {
           String executionIdentifier = sourceEvent.getContext().getCorrelationId();
@@ -90,16 +90,16 @@ public class SourcePolicyProcessor implements Processor {
         });
   }
 
-  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, InternalEvent sourceEvent) {
+  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, BaseEvent sourceEvent) {
     return new Processor() {
 
       @Override
-      public InternalEvent process(InternalEvent event) throws MuleException {
+      public BaseEvent process(BaseEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+      public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
         return from(publisher)
             .then(event -> just(event)
                 .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),

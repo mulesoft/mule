@@ -11,10 +11,10 @@ import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnn
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -56,7 +56,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
 
   protected Processor next;
 
-  protected InternalEvent processNext(InternalEvent event) throws MuleException {
+  protected BaseEvent processNext(BaseEvent event) throws MuleException {
     if (next == null) {
       return event;
     } else if (event == null) {
@@ -81,7 +81,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
     return ObjectUtils.toString(this);
   }
 
-  protected boolean isEventValid(InternalEvent event) {
+  protected boolean isEventValid(BaseEvent event) {
     return event != null;
   }
 

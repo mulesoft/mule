@@ -15,7 +15,7 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
@@ -40,7 +40,7 @@ public class CompositeOperationPolicy extends
 
   private final Processor nextOperation;
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
-  private InternalEvent nextOperationResponse;
+  private BaseEvent nextOperationResponse;
 
   /**
    * Creates a new composite policy.
@@ -65,12 +65,12 @@ public class CompositeOperationPolicy extends
     this.nextOperation = new Processor() {
 
       @Override
-      public InternalEvent process(InternalEvent event) throws MuleException {
+      public BaseEvent process(BaseEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+      public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
         return from(publisher).flatMap(event -> {
           Map<String, Object> parametersMap = new HashMap<>();
           try {
@@ -96,7 +96,7 @@ public class CompositeOperationPolicy extends
    * @param event the event to execute the operation.
    */
   @Override
-  protected Publisher<InternalEvent> processNextOperation(InternalEvent event) {
+  protected Publisher<BaseEvent> processNextOperation(BaseEvent event) {
     return just(event).transform(nextOperation).doOnNext(response -> {
       this.nextOperationResponse = response;
     });
@@ -111,19 +111,19 @@ public class CompositeOperationPolicy extends
    * @param event the event to use to execute the policy chain.
    */
   @Override
-  protected Publisher<InternalEvent> processPolicy(Policy policy, Processor nextProcessor, InternalEvent event) {
+  protected Publisher<BaseEvent> processPolicy(Policy policy, Processor nextProcessor, BaseEvent event) {
     Processor defaultOperationPolicy =
         operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
     return just(event).transform(defaultOperationPolicy).map(policyResponse -> nextOperationResponse);
   }
 
   @Override
-  public Publisher<InternalEvent> process(InternalEvent operationEvent) {
+  public Publisher<BaseEvent> process(BaseEvent operationEvent) {
     try {
       Message message = getParametersTransformer().isPresent()
           ? getParametersTransformer().get().fromParametersToMessage(getParametersProcessor().getOperationParameters())
           : operationEvent.getMessage();
-      return processWithChildContext(InternalEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
+      return processWithChildContext(BaseEvent.builder(operationEvent).message(message).build(), getPolicyProcessor(),
                                      empty());
     } catch (Exception e) {
       return error(e);

@@ -26,9 +26,9 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.routing.Aggregator;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
@@ -148,8 +148,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
   @Override
-  public InternalEvent process(InternalEvent event) throws MuleException {
-    InternalEvent result = eventCorrelator.process(event);
+  public BaseEvent process(BaseEvent event) throws MuleException {
+    BaseEvent result = eventCorrelator.process(event);
     if (result == null) {
       return null;
     }
@@ -157,7 +157,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   }
 
   @Override
-  public Publisher<InternalEvent> apply(Publisher<InternalEvent> publisher) {
+  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
@@ -190,7 +190,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
-  public void setEventGroupsObjectStore(PartitionableObjectStore<InternalEvent> eventGroupsObjectStore) {
+  public void setEventGroupsObjectStore(PartitionableObjectStore<BaseEvent> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
         //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
         new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());

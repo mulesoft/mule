@@ -9,17 +9,19 @@ package org.mule.runtime.core.internal.el.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.message.Message.of;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
 
-import java.util.Map;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
+
 public class VariablesTestCase extends AbstractELTestCase {
 
-  private InternalEvent event;
+  private BaseEvent event;
 
   public VariablesTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -27,12 +29,12 @@ public class VariablesTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() throws Exception {
-    event = InternalEvent.builder(context).message(of("")).build();
+    event = BaseEvent.builder(context).message(of("")).build();
   }
 
   @Test
   public void flowVariablesMap() throws Exception {
-    event = InternalEvent.builder(event).addVariable("foo", "bar").build();
+    event = BaseEvent.builder(event).addVariable("foo", "bar").build();
     assertTrue(evaluate("flowVars", event) instanceof Map);
   }
 
@@ -44,7 +46,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void flowVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct)
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar").build();
     assertEquals(event.getVariables().get("foo").getValue(), evaluate("flowVars['foo']", event));
   }
@@ -52,9 +54,9 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToFlowVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct)
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar_old").build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("flowVars['foo']='bar'", event, eventBuilder);
     assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
@@ -62,8 +64,8 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToNewFlowVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("flowVars['foo']='bar'", event, eventBuilder);
     assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
@@ -71,8 +73,8 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void sessionVariablesMap() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
-    event.getSession().setProperty("foo", "bar");
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    ((PrivilegedEvent) event).getSession().setProperty("foo", "bar");
     assertTrue(evaluate("sessionVars", event) instanceof Map);
   }
 
@@ -84,7 +86,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void sessionVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertEquals(event.getSession().getProperty("foo"), evaluate("sessionVars['foo']", event));
   }
@@ -92,7 +94,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToSessionVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar_old");
     evaluate("sessionVars['foo']='bar'", event);
     assertEquals("bar", event.getSession().getProperty("foo"));
@@ -101,24 +103,24 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToNewSessionVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     evaluate("sessionVars['foo']='bar'", event);
-    assertEquals("bar", event.getSession().getProperty("foo"));
+    assertEquals("bar", ((PrivilegedEvent) event).getSession().getProperty("foo"));
   }
 
   @Test
   public void variableFromFlowScope() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct)
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar").build();
-    event.getSession().setProperty("foo", "NOTbar");
+    ((PrivilegedEvent) event).getSession().setProperty("foo", "NOTbar");
     assertEquals(event.getVariables().get("foo").getValue(), evaluate("foo", event));
   }
 
   @Test
   public void updateVariableFromFlowScope() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct)
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar").build();
     assertEquals("bar_new", evaluate("foo='bar_new'", event));
   }
@@ -126,7 +128,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void variableFromSessionScope() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertEquals(event.getSession().getProperty("foo"), evaluate("foo", event));
   }
@@ -134,17 +136,17 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void updateVariableFromSessionScope() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
-    event.getSession().setProperty("foo", "bar");
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    ((PrivilegedEvent) event).getSession().setProperty("foo", "bar");
     assertEquals("bar_new", evaluate("foo='bar_new'", event));
   }
 
   @Test
   public void assignValueToVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct)
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct)
         .addVariable("foo", "bar_old").build();
-    InternalEvent.Builder eventBuilder = InternalEvent.builder(event);
+    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
     evaluate("foo='bar'", event, eventBuilder);
     assertEquals("bar", eventBuilder.build().getVariables().get("foo").getValue());
   }
@@ -152,7 +154,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToLocalVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     evaluate("localVar='bar'", event);
   }
 
@@ -162,14 +164,14 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void reassignValueToLocalVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     evaluate("localVar='bar';localVar='bar2'", event);
   }
 
   @Test
   public void localVariable() throws Exception {
     Message message = of("");
-    InternalEvent event = InternalEvent.builder(context).message(message).flow(flowConstruct).build();
+    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
     assertEquals("bar", evaluate("localVar='bar';localVar", event));
   }
 }

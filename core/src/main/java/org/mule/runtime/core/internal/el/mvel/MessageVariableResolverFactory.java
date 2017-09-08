@@ -10,13 +10,14 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.privileged.el.context.EventVariablesMapContext;
 import org.mule.runtime.core.internal.el.context.MessageContext;
-import org.mule.runtime.core.privileged.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.el.context.EventVariablesMapContext;
+import org.mule.runtime.core.privileged.el.context.SessionVariableMapContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
 
@@ -33,13 +34,13 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
-  protected InternalEvent event;
-  protected InternalEvent.Builder eventBuilder;
+  protected BaseEvent event;
+  protected BaseEvent.Builder eventBuilder;
   protected MuleContext muleContext;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final InternalEvent event, final InternalEvent.Builder eventBuilder) {
+                                        final BaseEvent event, final BaseEvent.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
@@ -48,11 +49,11 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   /**
    * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without and performance overhead
    * incurred by using a builder.
-   * 
+   *
    * @param next
    */
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final InternalEvent event, final InternalEvent.Builder eventBuilder,
+                                        final BaseEvent event, final BaseEvent.Builder eventBuilder,
                                         final VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
@@ -99,7 +100,9 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
         }
       } else if (SESSION_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
-                                                                      new SessionVariableMapContext(event.getSession()), null);
+                                                                      new SessionVariableMapContext(((PrivilegedEvent) event)
+                                                                          .getSession()),
+                                                                      null);
       } else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)) {
         return new MuleImmutableVariableResolver<>(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
                                                    event.getMessage(), null);
@@ -108,7 +111,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     return super.getNextFactoryVariableResolver(name);
   }
 
-  private MessagingException wrapIfNecessary(InternalEvent event, Throwable exception) {
+  private MessagingException wrapIfNecessary(BaseEvent event, Throwable exception) {
     if (exception instanceof MessagingException) {
       return (MessagingException) exception;
     } else {

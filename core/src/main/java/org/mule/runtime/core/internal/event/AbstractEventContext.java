@@ -13,11 +13,12 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,20 +29,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Base class for implementations of {@link InternalEventContext}
+ * Base class for implementations of {@link BaseEventContext}
  *
  * @since 4.0
  */
-abstract class AbstractEventContext implements InternalEventContext {
+abstract class AbstractEventContext implements BaseEventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   protected static final MessagingExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private transient MonoProcessor<InternalEvent> beforeResponseProcessor;
-  private transient MonoProcessor<InternalEvent> responseProcessor;
+  private transient MonoProcessor<BaseEvent> beforeResponseProcessor;
+  private transient MonoProcessor<BaseEvent> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
-  private transient final List<InternalEventContext> childContexts = new LinkedList<>();
+  private transient final List<BaseEventContext> childContexts = new LinkedList<>();
   private transient Mono<Void> completionCallback = empty();
   private transient MessagingExceptionHandler exceptionHandler;
 
@@ -75,7 +76,7 @@ abstract class AbstractEventContext implements InternalEventContext {
         .doOnEach(s -> s.accept(completionProcessor)).subscribe();
   }
 
-  void addChildContext(InternalEventContext childContext) {
+  void addChildContext(BaseEventContext childContext) {
     synchronized (this) {
       childContexts.add(childContext);
       updateCompletionPublisher();
@@ -118,7 +119,7 @@ abstract class AbstractEventContext implements InternalEventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void success(InternalEvent event) {
+  public final void success(BaseEvent event) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.debug(this + " response was already completed, ignoring.");
@@ -167,12 +168,12 @@ abstract class AbstractEventContext implements InternalEventContext {
   }
 
   @Override
-  public Publisher<InternalEvent> getBeforeResponsePublisher() {
+  public Publisher<BaseEvent> getBeforeResponsePublisher() {
     return beforeResponseProcessor;
   }
 
   @Override
-  public Publisher<InternalEvent> getResponsePublisher() {
+  public Publisher<BaseEvent> getResponsePublisher() {
     return responseProcessor;
   }
 

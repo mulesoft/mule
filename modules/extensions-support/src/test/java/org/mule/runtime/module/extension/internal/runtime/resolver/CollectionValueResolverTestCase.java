@@ -16,9 +16,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -43,7 +43,7 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
   private List<ValueResolver> childResolvers;
   private List<Integer> expectedValues;
   private MuleContext muleContext;
-  private InternalEvent event;
+  private BaseEvent event;
 
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
@@ -57,7 +57,7 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     muleContext = mock(MuleContext.class);
-    event = mock(InternalEvent.class);
+    event = mock(BaseEvent.class);
     resolvingContext = mock(ValueResolvingContext.class);
 
     when(resolvingContext.getEvent()).thenReturn(event);

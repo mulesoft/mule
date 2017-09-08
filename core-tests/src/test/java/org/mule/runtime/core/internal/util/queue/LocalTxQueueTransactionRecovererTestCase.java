@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
@@ -69,7 +69,7 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
 
     queueTransactionRecoverer.recover();
-    InternalEvent muleEvent = (InternalEvent) inQueue.poll(TIMEOUT);
+    BaseEvent muleEvent = (BaseEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
     assertThat(testEvent().getContext().getId(), equalTo(muleEvent.getContext().getId()));
   }
@@ -77,7 +77,7 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
   @Test
   public void pollAndFailThenRecoverWithTwoElements() throws Exception {
     final String MESSAGE_CONTENT_2 = TEST_PAYLOAD + "2";
-    InternalEvent testEvent2 = eventBuilder().message(of(MESSAGE_CONTENT_2)).build();
+    BaseEvent testEvent2 = eventBuilder().message(of(MESSAGE_CONTENT_2)).build();
 
     inQueue.offer(testEvent(), 0, TIMEOUT);
     inQueue.offer(testEvent2, 0, TIMEOUT);
@@ -87,12 +87,12 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     queueTransactionRecoverer.recover();
-    InternalEvent muleEvent = (InternalEvent) inQueue.poll(TIMEOUT);
+    BaseEvent muleEvent = (BaseEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
     assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(MESSAGE_CONTENT_2)); // recovered element should be
                                                                                                   // last
 
-    muleEvent = (InternalEvent) inQueue.poll(TIMEOUT);
+    muleEvent = (BaseEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
     assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(TEST_PAYLOAD)); // recovered element
   }
@@ -104,10 +104,10 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     queueTransactionRecoverer.recover();
-    InternalEvent muleEvent = (InternalEvent) inQueue.poll(TIMEOUT);
+    BaseEvent muleEvent = (BaseEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
     assertThat(testEvent().getContext().getId(), equalTo(muleEvent.getContext().getId()));
-    muleEvent = (InternalEvent) inQueue.poll(TIMEOUT);
+    muleEvent = (BaseEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, nullValue());
   }
 

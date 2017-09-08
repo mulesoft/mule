@@ -6,8 +6,8 @@
  */
 package org.mule.functional.api.component;
 
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.BaseEvent;
 
 /**
  * The scope of the MuleEvent Callback is to be able to get a the message currently being processed by the
@@ -18,5 +18,5 @@ import org.mule.runtime.core.api.MuleContext;
  */
 public interface EventCallback {
 
-  void eventReceived(InternalEvent event, Object component, MuleContext muleContext) throws Exception;
+  void eventReceived(BaseEvent event, Object component, MuleContext muleContext) throws Exception;
 }

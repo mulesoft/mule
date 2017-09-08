@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.mule.runtime.core.api.InternalEvent.getCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
 import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 
 import java.io.ByteArrayOutputStream;

@@ -12,19 +12,19 @@ import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.datatype.ExpressionDataTypeResolver;
-import org.mule.runtime.core.internal.el.mvel.datatype.PropertyExpressionDataTypeResolver;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
-import org.junit.Test;
 
 public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase {
 
@@ -41,7 +41,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    InternalEvent testEvent =
+    BaseEvent testEvent =
         eventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", EXPRESSION_VALUE, expectedDataType)
             .build();
 
@@ -57,7 +57,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    testEvent().getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
+    ((PrivilegedEvent) testEvent()).getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
 
     assertThat(expressionDataTypeResolver.resolve(testEvent(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }

@@ -10,11 +10,11 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 
@@ -114,9 +115,9 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
                                            ? notification.getComponent().getLocation().getLocation()
                                            : null,
                                        notification.getProcessor());
-    InternalEventContext eventContext = notification.getEventContext();
+    EventContext eventContext = notification.getEventContext();
     if (eventContext != null) {
-      ((DefaultProcessorsTrace) eventContext.getProcessorsTrace())
+      ((DefaultProcessorsTrace) ((BaseEventContext) eventContext).getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
     if (notification.getFlowCallStack() != null) {

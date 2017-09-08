@@ -18,8 +18,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
@@ -38,8 +38,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEvent.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -57,6 +55,8 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
@@ -460,11 +460,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         }
       }
     }
-    return InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
+    return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 
   @Override
-  protected InternalEvent.Builder getEventBuilder() throws MuleException {
+  protected BaseEvent.Builder getEventBuilder() throws MuleException {
     return eventBuilder();
   }
 
@@ -601,7 +601,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 
-  protected InternalEvent process(Processor processor, InternalEvent event) throws Exception {
+  protected BaseEvent process(Processor processor, BaseEvent event) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     return processor.process(event);
   }

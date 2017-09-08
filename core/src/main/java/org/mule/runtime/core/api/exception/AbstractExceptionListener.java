@@ -15,12 +15,12 @@ import static org.mule.runtime.core.api.context.notification.SecurityNotificatio
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ExceptionNotification;
 import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.SecurityNotification;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
@@ -94,7 +94,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     logger.info("Initialising exception listener: " + toString());
   }
 
-  protected void fireNotification(Exception ex, InternalEvent event) {
+  protected void fireNotification(Exception ex, BaseEvent event) {
     if (enableNotifications) {
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
@@ -124,7 +124,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param event The MuleEvent currently being processed
    * @param t the fatal exception to log
    */
-  protected void logFatal(InternalEvent event, Throwable t) {
+  protected void logFatal(BaseEvent event, Throwable t) {
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
     }

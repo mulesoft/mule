@@ -10,11 +10,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.InternalEventContext.create;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.message.ErrorBuilder.builder;
@@ -25,13 +25,13 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -87,7 +87,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  private Either<Error, Message> createEitherResult(InternalEvent muleEvent) {
+  private Either<Error, Message> createEitherResult(BaseEvent muleEvent) {
     if (muleEvent == null) {
       // This should never return a null event. This happen because of mule 3.x behaviour with filters.
       // We will just return an error in this case.
@@ -166,7 +166,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
-      final InternalEvent event = connectorMessageProcessor.process(createMuleEvent(of(null)));
+      final BaseEvent event = connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());
       }
@@ -179,15 +179,15 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  protected InternalEvent createMuleEvent(Message message) throws MuleException {
+  protected BaseEvent createMuleEvent(Message message) throws MuleException {
     return baseEventBuilder(message).build();
   }
 
-  private InternalEvent.Builder baseEventBuilder(Message message) {
-    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
+  private BaseEvent.Builder baseEventBuilder(Message message) {
+    return BaseEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
   }
 
-  protected InternalEvent returnEvent(InternalEvent event) {
+  protected BaseEvent returnEvent(BaseEvent event) {
     if (event != null) {
       return event;
     } else {

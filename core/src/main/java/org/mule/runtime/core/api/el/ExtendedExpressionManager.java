@@ -9,8 +9,8 @@ package org.mule.runtime.core.api.el;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -27,8 +27,8 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    * <p>
-   * This version of {@code evaluate} allows {@link InternalEvent} or {@link InternalMessage} mutation performed within the expression to
-   * be maintained post-evaluation via the use of a result {@link InternalEvent.Builder} which should be created
+   * This version of {@code evaluate} allows {@link BaseEvent} or {@link InternalMessage} mutation performed within the expression to
+   * be maintained post-evaluation via the use of a result {@link BaseEvent.Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression the expression to be executed
@@ -39,15 +39,15 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  TypedValue evaluate(String expression, InternalEvent event, InternalEvent.Builder eventBuilder,
+  TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
                       ComponentLocation componentLocation)
       throws ExpressionRuntimeException;
 
   /**
    * Enriches an event using a typed value.
    * <p>
-   * This version of {@code enrich} allows {@link InternalEvent} or {@link InternalMessage} mutation performed within the expression to be
-   * maintained post-evaluation via the use of a result {@link InternalEvent.Builder} which should be created
+   * This version of {@code enrich} allows {@link BaseEvent} or {@link InternalMessage} mutation performed within the expression to be
+   * maintained post-evaluation via the use of a result {@link BaseEvent.Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression a single expression i.e. header://foo that defines how the message should be enriched
@@ -58,14 +58,14 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @deprecated Mutation via expressions is deprecated.
    */
   @Deprecated
-  void enrich(String expression, InternalEvent event, InternalEvent.Builder eventBuilder, ComponentLocation componentLocation,
+  void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder, ComponentLocation componentLocation,
               TypedValue value);
 
   /**
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
-   * evaluate a single expression they can use {@link #evaluate(String, InternalEvent, FlowConstruct, BindingContext)}.
+   * evaluate a single expression they can use {@link #evaluate(String, BaseEvent, FlowConstruct, BindingContext)}.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link InternalEvent} or
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link BaseEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
@@ -79,6 +79,6 @@ public interface ExtendedExpressionManager extends ExpressionManager {
    * @deprecated Parsing of expressions is deprecated. Use standard evaluation instead.
    */
   @Deprecated
-  String parse(String expression, InternalEvent event, ComponentLocation componentLocation) throws ExpressionRuntimeException;
+  String parse(String expression, BaseEvent event, ComponentLocation componentLocation) throws ExpressionRuntimeException;
 
 }

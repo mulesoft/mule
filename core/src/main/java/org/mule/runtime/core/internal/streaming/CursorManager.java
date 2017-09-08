@@ -8,15 +8,19 @@ package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.InternalEventContext;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,9 +29,6 @@ import com.google.common.cache.RemovalNotification;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Keeps track of active {@link Cursor cursors} and their {@link CursorProvider providers}
@@ -68,8 +69,8 @@ public class CursorManager {
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
-  public CursorProvider manage(CursorProvider provider, InternalEvent creatorEvent) {
-    final InternalEventContext ownerContext = getRoot(creatorEvent.getContext());
+  public CursorProvider manage(CursorProvider provider, BaseEvent creatorEvent) {
+    final BaseEventContext ownerContext = getRoot(((BaseEventContext) creatorEvent.getContext()));
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);
 
@@ -111,7 +112,7 @@ public class CursorManager {
     }
   }
 
-  private void terminated(InternalEventContext rootContext) {
+  private void terminated(BaseEventContext rootContext) {
     EventStreamingState state = registry.getIfPresent(rootContext.getId());
     if (state != null) {
       state.dispose();
@@ -125,11 +126,11 @@ public class CursorManager {
    * invocation will literally be no-ops. This is preferred to introducing contention here given multiple thread may be opening
    * cursors concurrently.
    */
-  private void registerEventContext(InternalEventContext eventContext) {
+  private void registerEventContext(BaseEventContext eventContext) {
     from(eventContext.getCompletionPublisher()).subscribe(null, null, () -> terminated(eventContext));
   }
 
-  private InternalEventContext getRoot(InternalEventContext eventContext) {
+  private BaseEventContext getRoot(BaseEventContext eventContext) {
     return eventContext.getParentContext()
         .map(this::getRoot)
         .orElse(eventContext);

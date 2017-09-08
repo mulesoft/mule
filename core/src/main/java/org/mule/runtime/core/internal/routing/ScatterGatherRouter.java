@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.routing.ForkJoinStrategy;
 import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
@@ -47,7 +47,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter {
   private List<MessageProcessorChain> routes = emptyList();
 
   @Override
-  protected Consumer<InternalEvent> onEvent() {
+  protected Consumer<BaseEvent> onEvent() {
     return event -> validateMessageIsNotConsumable(event.getMessage());
   }
 
@@ -60,7 +60,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter {
   }
 
   @Override
-  protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(InternalEvent event) {
+  protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(BaseEvent event) {
     return fromIterable(routes).map(route -> of(event, route));
   }
 

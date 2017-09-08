@@ -7,8 +7,8 @@
 
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.util.Preconditions;
 
 import java.util.Collections;
@@ -37,7 +37,7 @@ public final class AggregationContext {
         return false;
       }
 
-      InternalEvent event = (InternalEvent) object;
+      BaseEvent event = (BaseEvent) object;
       return event.getError().isPresent();
     }
   };
@@ -45,37 +45,37 @@ public final class AggregationContext {
   /**
    * the original event from wich the events to be aggregated were splitted from
    */
-  private final InternalEvent originalEvent;
+  private final BaseEvent originalEvent;
 
   /**
    * The events to be aggregated. These events need to be ordered so that each event's index corresponds to the index of each
    * route
    */
-  private final List<InternalEvent> events;
+  private final List<BaseEvent> events;
 
   /**
    * Creates a new instance
    * 
-   * @param originalEvent a {@link InternalEvent}. Can be <code>null</code>
-   * @param events a {@link List} of {@link InternalEvent}. Cannot be <code>null</code> but could be empty. In that case, is up to each
+   * @param originalEvent a {@link BaseEvent}. Can be <code>null</code>
+   * @param events a {@link List} of {@link BaseEvent}. Cannot be <code>null</code> but could be empty. In that case, is up to each
    *        consumer to decide wether to fail or not
    */
-  public AggregationContext(InternalEvent originalEvent, List<InternalEvent> events) {
+  public AggregationContext(BaseEvent originalEvent, List<BaseEvent> events) {
     Preconditions.checkArgument(events != null, "events cannot be null");
     this.originalEvent = originalEvent;
     this.events = Collections.unmodifiableList(events);
   }
 
   /**
-   * Returns all the {@link InternalEvent}s which messages have a not <code>null</code> {@link ExceptionPayload} and a not
+   * Returns all the {@link BaseEvent}s which messages have a not <code>null</code> {@link ExceptionPayload} and a not
    * <code>null</code> {@link ExceptionPayload#getException()}. Notice that this is a select operation. Each time this method is
    * invoked the result will be re-calculated
    * 
-   * @return a list of {@link InternalEvent}. It could be empty but it will never be <code>null</code>
+   * @return a list of {@link BaseEvent}. It could be empty but it will never be <code>null</code>
    */
   @SuppressWarnings("unchecked")
-  public List<InternalEvent> collectEventsWithExceptions() {
-    return (List<InternalEvent>) CollectionUtils.select(this.events, failedEventsPredicate);
+  public List<BaseEvent> collectEventsWithExceptions() {
+    return (List<BaseEvent>) CollectionUtils.select(this.events, failedEventsPredicate);
   }
 
   /**
@@ -87,7 +87,7 @@ public final class AggregationContext {
   public NavigableMap<String, Throwable> collectRouteExceptions() {
     NavigableMap<String, Throwable> routes = new TreeMap<>();
     for (int i = 0; i < this.events.size(); i++) {
-      InternalEvent event = this.events.get(i);
+      BaseEvent event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
         routes.put(Integer.toString(i), event.getError().get().getCause());
       }
@@ -97,22 +97,22 @@ public final class AggregationContext {
   }
 
   /**
-   * The exact opposite to {@link #collectEventsWithExceptions()} Returns all the {@link InternalEvent}s which messages have a
+   * The exact opposite to {@link #collectEventsWithExceptions()} Returns all the {@link BaseEvent}s which messages have a
    * <code>null</code> {@link ExceptionPayload} or a <code>null</code> {@link ExceptionPayload#getException()}. Notice that this
    * is a collect operation. Each time this method is invoked the result will be re-calculated
    * 
-   * @return a list of {@link InternalEvent}. It could be empty but it will never be <code>null</code>
+   * @return a list of {@link BaseEvent}. It could be empty but it will never be <code>null</code>
    */
   @SuppressWarnings("unchecked")
-  public List<InternalEvent> collectEventsWithoutExceptions() {
-    return (List<InternalEvent>) CollectionUtils.selectRejected(this.events, failedEventsPredicate);
+  public List<BaseEvent> collectEventsWithoutExceptions() {
+    return (List<BaseEvent>) CollectionUtils.selectRejected(this.events, failedEventsPredicate);
   }
 
-  public InternalEvent getOriginalEvent() {
+  public BaseEvent getOriginalEvent() {
     return this.originalEvent;
   }
 
-  public List<InternalEvent> getEvents() {
+  public List<BaseEvent> getEvents() {
     return this.events;
   }
 

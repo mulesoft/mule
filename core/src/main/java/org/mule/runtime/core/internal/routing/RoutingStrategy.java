@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
 /**
- * Defines an strategy to route a {@link InternalEvent} through a set of
+ * Defines an strategy to route a {@link BaseEvent} through a set of
  * {@link org.mule.runtime.core.api.processor.Processor}
  */
 public interface RoutingStrategy {
 
   /**
-   * Routes {@link InternalEvent} through a set of {@link Processor}
+   * Routes {@link BaseEvent} through a set of {@link Processor}
    *
    * @param event
    * @param messageProcessors
    * @return
    */
-  InternalEvent route(InternalEvent event, List<Processor> messageProcessors) throws MuleException;
+  BaseEvent route(BaseEvent event, List<Processor> messageProcessors) throws MuleException;
 }
