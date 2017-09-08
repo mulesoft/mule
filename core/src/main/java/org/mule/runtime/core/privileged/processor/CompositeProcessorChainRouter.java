@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
 
@@ -34,7 +35,6 @@ import java.util.function.BiFunction;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component to be used that supports a collection of {@link MessageProcessorChain} and executes them in sequentially waiting for
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CompositeProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CompositeProcessorChainRouter.class);
+  private static Logger LOGGER = getLogger(CompositeProcessorChainRouter.class);
 
   @Inject
   private MuleContext muleContext;
