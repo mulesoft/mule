@@ -8,9 +8,6 @@ package org.mule.module.http.functional.requester;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
-import static org.glassfish.grizzly.http.server.Constants.CLOSE;
-import static org.glassfish.grizzly.http.server.Constants.CONNECTION;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -18,15 +15,8 @@ import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.module.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 
 import org.mule.api.MuleEvent;
+import org.mule.module.http.api.requester.proxy.NtlmConnectHandler;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.proxy.ConnectHandler;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
@@ -37,69 +27,18 @@ import org.junit.Test;
  */
 public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
 {
-    private static final String TARGET_RESPONSE = "Response";
-
     @Override
     protected AbstractHandler createHandler(Server server)
     {
-        return new ConnectHandler()
+        try
         {
-
-            boolean authenticated = false;
-
-            @Override
-            public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-            {
-                if (request.isSecure())
-                {
-                    // if the request is secure, the response
-                    // from the https target is being handled
-                    simpleResponseFromTarget(response);
-                }
-                else
-                {
-                    super.handle(target, baseRequest, request, response);
-                }
-            }
-
-            @Override
-            protected void handleConnect(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         String serverAddress)
-            {
-                super.handleConnect(baseRequest, request, response, serverAddress);
-                if (!authenticated)
-                {
-                    try
-                    {
-                        response.getOutputStream().flush();
-                    }
-                    catch (IOException e)
-                    {
-                        // Do nothing
-                    }
-                }
-            }
-
-            @Override
-            protected boolean handleAuthentication(HttpServletRequest request, HttpServletResponse response, String address)
-            {
-                try
-                {
-                    authenticated = authorizeRequest(address, request, response, false);
-                    return authenticated;
-                }
-                catch (IOException e)
-                {
-                    return false;
-                }
-            }
-        };
-    }
-
-    public HttpsRequestNtlmProxyTestCase()
-    {
-        super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+            setupTestAuthorizer(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+            return new NtlmConnectHandler(getAuthorizer());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Error creating testAuthorizer");
+        }
     }
 
     @Override
@@ -113,16 +52,6 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase
     {
         MuleEvent event = runFlow(getFlowName());
         assertThat((int) event.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), is(SC_OK));
-        assertThat(event.getMessage().getPayloadAsString(), equalTo(TARGET_RESPONSE));
-    }
-
-    private void simpleResponseFromTarget(HttpServletResponse response) throws IOException
-    {
-        response.setHeader(CONNECTION, CLOSE);
-        response.getOutputStream().print(TARGET_RESPONSE);
-        response.setStatus(SC_OK);
-        response.getOutputStream().flush();
-        response.getOutputStream().close();
     }
 
     protected boolean enableHttps()

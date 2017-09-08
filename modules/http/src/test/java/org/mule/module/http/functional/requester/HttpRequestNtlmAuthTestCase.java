@@ -13,6 +13,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -29,9 +30,10 @@ public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase
     @Parameterized.Parameter(2)
     public String workstation;
 
-    public HttpRequestNtlmAuthTestCase()
+    @Before
+    public void setup()
     {
-        super(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
+        setupTestAuthorizer(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
     }
 
     @Parameterized.Parameters(name = "{0}")
