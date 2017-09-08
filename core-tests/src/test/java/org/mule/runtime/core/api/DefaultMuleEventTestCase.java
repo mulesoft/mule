@@ -47,18 +47,18 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   private Message muleMessage = of("test-data");
   private Flow flow;
   private BaseEventContext messageContext;
-  private BaseEvent muleEvent;
+  private PrivilegedEvent muleEvent;
 
   @Before
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     messageContext = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = builder(messageContext).message(muleMessage).flow(flow).build();
+    muleEvent = (PrivilegedEvent) builder(messageContext).message(muleMessage).flow(flow).build();
   }
 
   @Test
   public void setFlowVariableDefaultDataType() throws Exception {
-    muleEvent = BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
+    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
     DataType dataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(dataType, like(String.class, MediaType.ANY, null));
@@ -68,7 +68,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setFlowVariableCustomDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    muleEvent = BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
+    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
@@ -76,9 +76,9 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void setSessionVariableDefaultDataType() throws Exception {
-    ((PrivilegedEvent) muleEvent).getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
+    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
 
-    DataType dataType = ((PrivilegedEvent) muleEvent).getSession().getPropertyDataType(PROPERTY_NAME);
+    DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
     assertThat(dataType, like(String.class, MediaType.ANY, null));
   }
 
@@ -86,9 +86,9 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setSessionVariableCustomDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    ((PrivilegedEvent) muleEvent).getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
+    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
 
-    DataType actualDataType = ((PrivilegedEvent) muleEvent).getSession().getPropertyDataType(PROPERTY_NAME);
+    DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 
@@ -101,6 +101,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void dontSetMessage() throws Exception {
     expected.expect(NullPointerException.class);
-    muleEvent = builder(messageContext).build();
+    muleEvent = (PrivilegedEvent) builder(messageContext).build();
   }
 }

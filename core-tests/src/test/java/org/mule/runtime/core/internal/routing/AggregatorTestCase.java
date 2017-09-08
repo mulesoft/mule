@@ -61,10 +61,11 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
     BaseEvent result = router.process(event3);
     assertNotNull(result);
-    assertTrue(((PrivilegedEvent) result).getMessageAsString(muleContext).contains("test event A"));
-    assertTrue(((PrivilegedEvent) result).getMessageAsString(muleContext).contains("test event B"));
-    assertTrue(((PrivilegedEvent) result).getMessageAsString(muleContext).contains("test event C"));
-    assertTrue(((PrivilegedEvent) result).getMessageAsString(muleContext)
+    PrivilegedEvent privilegedResult = (PrivilegedEvent) result;
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event A"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event B"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext).contains("test event C"));
+    assertTrue(privilegedResult.getMessageAsString(muleContext)
         .matches("test event [A,B,C] test event [A,B,C] test event [A,B,C] "));
   }
 

@@ -150,7 +150,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .build();
     BaseEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);
 
-    assertSucessfulProcessing(response);
+    assertSucessfulProcessing((PrivilegedEvent) response);
   }
 
   @Test
@@ -159,11 +159,11 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     flow.start();
     BaseEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
 
-    assertSucessfulProcessing(response);
+    assertSucessfulProcessing((PrivilegedEvent) response);
   }
 
-  private void assertSucessfulProcessing(BaseEvent response) throws MuleException {
-    assertThat(((PrivilegedEvent) response).getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
+  private void assertSucessfulProcessing(PrivilegedEvent response) throws MuleException {
+    assertThat(response.getMessageAsString(muleContext), equalTo(TEST_PAYLOAD + "abcdef"));
     assertThat(response.getVariables().get("thread").getValue(), not(sameInstance(currentThread())));
 
     assertThat(((PrivilegedEvent) sensingMessageProcessor.event).getMessageAsString(muleContext),

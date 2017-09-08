@@ -37,7 +37,7 @@ public interface PrivilegedEvent extends BaseEvent {
   BaseEventContext getContext();
 
   /**
-   * @return the correlation id to use for this event.
+   * @return the correlation ID to use for this event.
    * @deprecated TODO MULE-10706 Mule 4: remove this
    */
   @Deprecated
@@ -112,7 +112,7 @@ public interface PrivilegedEvent extends BaseEvent {
   Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException;
 
   /**
-   * Returns the message contents as a string If necessary this will use the encoding set on the event
+   * Returns the message contents as a string if necessary. This will use the encoding set on the event
    *
    * @param muleContext the Mule node.
    * @return the message contents as a string

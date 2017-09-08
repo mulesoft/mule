@@ -207,29 +207,29 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.initEventsStore(objectStore);
     assertFalse(eg.iterator().hasNext());
 
-    BaseEvent event1 = eventBuilder().message(Message.of("foo1")).build();
-    BaseEvent event2 = eventBuilder().message(Message.of("foo2")).build();
-    BaseEvent event3 = eventBuilder().message(Message.of("foo3")).build();
+    PrivilegedEvent event1 = (PrivilegedEvent) eventBuilder().message(Message.of("foo1")).build();
+    PrivilegedEvent event2 = (PrivilegedEvent) eventBuilder().message(Message.of("foo2")).build();
+    PrivilegedEvent event3 = (PrivilegedEvent) eventBuilder().message(Message.of("foo3")).build();
 
-    ((PrivilegedEvent) event1).getSession().setProperty("key1", "value1");
-    ((PrivilegedEvent) event1).getSession().setProperty("key2", "value2");
-    ((PrivilegedEvent) event2).getSession().setProperty("KEY2", "value2NEW");
-    ((PrivilegedEvent) event2).getSession().setProperty("key3", "value3");
-    ((PrivilegedEvent) event3).getSession().setProperty("key4", "value4");
+    event1.getSession().setProperty("key1", "value1");
+    event1.getSession().setProperty("key2", "value2");
+    event2.getSession().setProperty("KEY2", "value2NEW");
+    event2.getSession().setProperty("key3", "value3");
+    event3.getSession().setProperty("key4", "value4");
 
     eg.addEvent(event1);
-    System.out.println(((PrivilegedEvent) event1).getSession());
+    System.out.println(event1.getSession());
     eg.addEvent(event2);
-    System.out.println(((PrivilegedEvent) event2).getSession());
+    System.out.println(event2.getSession());
     eg.addEvent(event3);
-    System.out.println(((PrivilegedEvent) event3).getSession());
+    System.out.println(event3.getSession());
 
-    BaseEvent result = eg.getMessageCollectionEvent();
-    assertEquals("value1", ((PrivilegedEvent) result).getSession().getProperty("key1"));
+    PrivilegedEvent result = (PrivilegedEvent) eg.getMessageCollectionEvent();
+    assertEquals("value1", result.getSession().getProperty("key1"));
     // Cannot assert this because the ordering of events aren't ordered. See MULE-5998
     // assertEquals("value2NEW", result.getSession().getProperty("key2"));
-    assertEquals("value3", ((PrivilegedEvent) result).getSession().getProperty("key3"));
-    assertEquals("value4", ((PrivilegedEvent) result).getSession().getProperty("key4"));
+    assertEquals("value3", result.getSession().getProperty("key3"));
+    assertEquals("value4", result.getSession().getProperty("key4"));
   }
 
   private static class MyEventGroup extends EventGroup {

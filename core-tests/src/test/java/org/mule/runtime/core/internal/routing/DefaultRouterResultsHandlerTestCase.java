@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -74,12 +75,14 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     Message message1 = Message.of("test event A");
     BaseEvent event1 = BaseEvent.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
-    ((PrivilegedEvent) event1).getSession().setProperty("key", "value");
+    PrivilegedEvent privilegedEvent1 = (PrivilegedEvent) event1;
+    privilegedEvent1.getSession().setProperty("key", "value");
 
     Message message2 = Message.of("test event B");
     BaseEvent event2 = BaseEvent.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
-    ((PrivilegedEvent) event2).getSession().setProperty("key", "valueNEW");
-    ((PrivilegedEvent) event2).getSession().setProperty("key1", "value1");
+    PrivilegedEvent privilegedEvent2 = (PrivilegedEvent) event2;
+    privilegedEvent2.getSession().setProperty("key", "valueNEW");
+    privilegedEvent2.getSession().setProperty("key1", "value1");
 
     BaseEvent result = resultsHandler.aggregateResults(Collections.<BaseEvent>singletonList(event2), event1);
     assertSame(event2, result);
@@ -89,8 +92,9 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertThat(result.getVariables().keySet(), not(hasItem("key1")));
     assertThat(result.getVariables().get("key2").getValue(), equalTo("value2"));
 
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key"), equalTo("valueNEW"));
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key1"), equalTo("value1"));
+    PrivilegedEvent privilegedResult = (PrivilegedEvent) result;
+    assertThat(privilegedResult.getSession().getProperty("key"), equalTo("valueNEW"));
+    assertThat(privilegedResult.getSession().getProperty("key1"), equalTo("value1"));
 
   }
 
@@ -102,16 +106,20 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     Message message3 = Message.of("test event C");
     BaseEvent event1 =
         BaseEvent.builder(context).message(message1).flow(flow).addVariable("key1", "value1", simpleDateType1).build();
-    MuleSession session = ((PrivilegedEvent) event1).getSession();
+    PrivilegedEvent privilegedEvent1 = (PrivilegedEvent) event1;
     BaseEvent event2 = BaseEvent.builder(context).message(message2).flow(flow).session(session)
         .addVariable("key2", "value2", simpleDateType1).build();
+    PrivilegedEvent privilegedEvent2 = (PrivilegedEvent) event2;
     BaseEvent event3 = BaseEvent.builder(context).message(message3).flow(flow).session(session)
         .addVariable("key3", "value3", simpleDateType1).build();
-    ((PrivilegedEvent) event1).getSession().setProperty("key", "value");
-    ((PrivilegedEvent) event2).getSession().setProperty("key1", "value1");
-    ((PrivilegedEvent) event2).getSession().setProperty("key2", "value2");
-    ((PrivilegedEvent) event3).getSession().setProperty("KEY2", "value2NEW");
-    ((PrivilegedEvent) event3).getSession().setProperty("key3", "value3");
+    PrivilegedEvent privilegedEvent3 = (PrivilegedEvent) event3;
+
+    MuleSession session = privilegedEvent1.getSession();
+    privilegedEvent1.getSession().setProperty("key", "value");
+    privilegedEvent2.getSession().setProperty("key1", "value1");
+    privilegedEvent2.getSession().setProperty("key2", "value2");
+    privilegedEvent3.getSession().setProperty("KEY2", "value2NEW");
+    privilegedEvent3.getSession().setProperty("key3", "value3");
 
     List<BaseEvent> events = new ArrayList<>();
     events.add(event2);
@@ -134,11 +142,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Root id
     assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
 
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key"), is("value"));
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key1"), is("value1"));
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key2"), is("value2NEW"));
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key3"), is("value3"));
-    assertThat(((PrivilegedEvent) result).getSession().getProperty("key4"), nullValue());
+    PrivilegedEvent privilegedResult = (PrivilegedEvent) result;
+    assertThat(privilegedResult.getSession().getProperty("key"), is("value"));
+    assertThat(privilegedResult.getSession().getProperty("key1"), is("value1"));
+    assertThat(privilegedResult.getSession().getProperty("key2"), is("value2NEW"));
+    assertThat(privilegedResult.getSession().getProperty("key3"), is("value3"));
+    assertThat(privilegedResult.getSession().getProperty("key4"), nullValue());
   }
 
   @Test

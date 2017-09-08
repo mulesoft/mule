@@ -12,6 +12,11 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
 
+/**
+ * Contains accessors to the fields of the event only accessible from within the Mule Runtime.
+ *
+ * @since 4.0
+ */
 public interface InternalEvent extends PrivilegedEvent {
 
   /**

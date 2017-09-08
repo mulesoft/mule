@@ -69,13 +69,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
-    BaseEvent deserialized = (BaseEvent) trans.transform(serialized);
+    PrivilegedEvent deserialized = (PrivilegedEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
 
     // Assert that deserialized event has session with same id
-    assertNotNull(((PrivilegedEvent) deserialized).getSession());
+    assertNotNull(deserialized.getSession());
   }
 
   private Transformer createSerializableToByteArrayTransformer() {
@@ -105,13 +105,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     createAndRegisterTransformersEndpointBuilderService();
 
     // Deserialize
-    BaseEvent deserialized = (BaseEvent) trans.transform(serialized);
+    PrivilegedEvent deserialized = (PrivilegedEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
 
     // Assert that deserialized event has session with same id
-    assertNotNull(((PrivilegedEvent) deserialized).getSession());
+    assertNotNull(deserialized.getSession());
   }
 
   private BaseEvent createEventToSerialize() throws Exception {

@@ -86,18 +86,18 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void sessionVariable() throws Exception {
     Message message = of("");
-    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
-    ((PrivilegedEvent) event).getSession().setProperty("foo", "bar");
-    assertEquals(((PrivilegedEvent) event).getSession().getProperty("foo"), evaluate("sessionVars['foo']", event));
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    event.getSession().setProperty("foo", "bar");
+    assertEquals(event.getSession().getProperty("foo"), evaluate("sessionVars['foo']", event));
   }
 
   @Test
   public void assignValueToSessionVariable() throws Exception {
     Message message = of("");
-    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
-    ((PrivilegedEvent) event).getSession().setProperty("foo", "bar_old");
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    event.getSession().setProperty("foo", "bar_old");
     evaluate("sessionVars['foo']='bar'", event);
-    assertEquals("bar", ((PrivilegedEvent) event).getSession().getProperty("foo"));
+    assertEquals("bar", event.getSession().getProperty("foo"));
   }
 
   @Test
@@ -128,9 +128,9 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void variableFromSessionScope() throws Exception {
     Message message = of("");
-    BaseEvent event = BaseEvent.builder(context).message(message).flow(flowConstruct).build();
-    ((PrivilegedEvent) event).getSession().setProperty("foo", "bar");
-    assertEquals(((PrivilegedEvent) event).getSession().getProperty("foo"), evaluate("foo", event));
+    PrivilegedEvent event = (PrivilegedEvent) BaseEvent.builder(context).message(message).flow(flowConstruct).build();
+    event.getSession().setProperty("foo", "bar");
+    assertEquals(event.getSession().getProperty("foo"), evaluate("foo", event));
   }
 
   @Test

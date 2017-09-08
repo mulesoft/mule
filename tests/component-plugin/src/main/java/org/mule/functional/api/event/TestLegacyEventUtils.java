@@ -6,11 +6,13 @@
  */
 package org.mule.functional.api.event;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.lang.reflect.Field;
 
@@ -19,9 +21,9 @@ import java.lang.reflect.Field;
  *
  * @since 4.0
  */
-public final class EventTestUtils {
+public final class TestLegacyEventUtils {
 
-  private EventTestUtils() {
+  private TestLegacyEventUtils() {
     // Nothing to do
   }
 
@@ -66,6 +68,26 @@ public final class EventTestUtils {
     } finally {
       exceptionHandlerField.setAccessible(false);
     }
+  }
 
+  public static Object getSessionProperty(BaseEvent event, String property) {
+    return ((PrivilegedEvent) event).getSession().getProperty(property);
+  }
+
+  public static DataType getSessionPropertyDataType(BaseEvent event, String property) {
+    return ((PrivilegedEvent) event).getSession().getPropertyDataType(property);
+  }
+
+  public static Object removeSessionProperty(BaseEvent event, String property) {
+    return ((PrivilegedEvent) event).getSession().removeProperty(property);
+  }
+
+  /**
+   * Return the event associated with the currently executing thread.
+   *
+   * @return event for currently executing thread.
+   */
+  public static BaseEvent getCurrentEvent() {
+    return PrivilegedEvent.getCurrentEvent();
   }
 }
