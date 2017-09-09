@@ -19,7 +19,9 @@ import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 
 import javax.xml.XMLConstants;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -38,7 +40,7 @@ import java.util.stream.Collectors;
 public class MacroExpansionModulesModel {
 
   private final ApplicationModel applicationModel;
-  private final Map<String, ExtensionModel> allExtensionsByNamespace;
+  private final List<ExtensionModel> sortedExtensions;
 
   /**
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
@@ -50,9 +52,7 @@ public class MacroExpansionModulesModel {
    */
   public MacroExpansionModulesModel(ApplicationModel applicationModel, Set<ExtensionModel> extensions) {
     this.applicationModel = applicationModel;
-    this.allExtensionsByNamespace = extensions.stream()
-        .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
+    this.sortedExtensions = calculateExtensionByTopologicalOrder(extensions);
   }
 
   /**
@@ -60,15 +60,8 @@ public class MacroExpansionModulesModel {
    * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
   public void expand() {
-    if (!allExtensionsByNamespace.isEmpty()) {
-      GraphIterator<String, DefaultEdge> graphIterator = namespaceGraphIterator();
-      while (graphIterator.hasNext()) {
-        final String namespace = graphIterator.next();
-        if (allExtensionsByNamespace.containsKey(namespace)) {
-          final ExtensionModel extensionModel = allExtensionsByNamespace.get(namespace);
-          new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
-        }
-      }
+    for (ExtensionModel sortedExtension : sortedExtensions) {
+      new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
     }
   }
 
@@ -80,18 +73,41 @@ public class MacroExpansionModulesModel {
    * those namespaces as starting point. For each <module/> namespace, it will go over it's dependencies using
    * {@link #fillDependencyGraph(DirectedGraph, String, Map)}.
    * <p/>
-   * Once finished, returns a {@link TopologicalOrderIterator} as the macro expansion relies entirely in the correct order.
+   * Once finished, generates a {@link TopologicalOrderIterator} as the macro expansion relies entirely in the correct order to
+   * plain it in a simple {@link List} to be later used in the {@link #expand()} method.
    *
-   * @return a topological iterator from a DAG created of all the used namespaces from the given {@link #applicationModel}.
+   * @param extensions complete set of {@link ExtensionModel}s used in the app that might or might not be macro expandable (it
+   *                   will filter them.
+   * @return a <bold>sorted</bold> collection of {@link ExtensionModel} to macro expand. This order must not be altered.
    */
-  private TopologicalOrderIterator<String, DefaultEdge> namespaceGraphIterator() {
-    Set<String> extensionsUsedInApp = new HashSet<>();
-    applicationModel.executeOnEveryMuleComponentTree(rootComponentModel -> extensionsUsedInApp
-        .addAll(getDirectExpandableNamespaceDependencies(rootComponentModel, allExtensionsByNamespace.keySet())));
+  private List<ExtensionModel> calculateExtensionByTopologicalOrder(Set<ExtensionModel> extensions) {
+    final List<ExtensionModel> result = new ArrayList<>();
+    final Map<String, ExtensionModel> allExtensionsByNamespace = extensions.stream()
+        .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
+        .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
 
-    DirectedGraph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
-    extensionsUsedInApp.stream().forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
-    return new TopologicalOrderIterator<>(namespaceDAG);
+    // we firt check there are at least one extension to macro expand
+    if (!allExtensionsByNamespace.isEmpty()) {
+      Set<String> extensionsUsedInApp = new HashSet<>();
+      applicationModel.executeOnEveryMuleComponentTree(rootComponentModel -> extensionsUsedInApp
+          .addAll(getDirectExpandableNamespaceDependencies(rootComponentModel, allExtensionsByNamespace.keySet())));
+      // then we assure there are at least one of those extensions being used by the app
+      if (!extensionsUsedInApp.isEmpty()) {
+        // generation of the DAG and then the topological iterator.
+        // it's important to be 100% sure the DAG is not empty, or the TopologicalOrderIterator will fail at start up.
+        DirectedGraph<String, DefaultEdge> namespaceDAG = new DirectedMultigraph<>(DefaultEdge.class);
+        extensionsUsedInApp.stream().forEach(namespace -> fillDependencyGraph(namespaceDAG, namespace, allExtensionsByNamespace));
+        GraphIterator<String, DefaultEdge> graphIterator = new TopologicalOrderIterator<>(namespaceDAG);
+        while (graphIterator.hasNext()) {
+          final String namespace = graphIterator.next();
+          if (allExtensionsByNamespace.containsKey(namespace)) {
+            result.add(allExtensionsByNamespace.get(namespace));
+
+          }
+        }
+      }
+    }
+    return result;
   }
 
   private void fillDependencyGraph(DirectedGraph<String, DefaultEdge> g, String sourceVertex,
