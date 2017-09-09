@@ -22,6 +22,9 @@ import java.util.Map;
  */
 public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
 
+  private static final String SYS_PROPERTY_PREFIX = "sys.";
+  private static final String MULE_PROPERTY_PREFIX = "mule.config.";
+
   private final Map<String, String> appProperties;
   private final String appName;
   private final String defaultEncoding;
@@ -51,17 +54,16 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
     return configuration;
   }
 
-  private static void initializeFromProperties(MuleConfiguration configuration, Map properties) {
-    for (Object entryObject : properties.entrySet()) {
-      Map.Entry entry = (Map.Entry) entryObject;
-      String key = (String) entry.getKey();
-      String value = (String) entry.getValue();
+  private static void initializeFromProperties(MuleConfiguration configuration, Map<String, String> properties) {
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
 
-      if (key.startsWith("sys.")) {
-        String systemProperty = key.substring(4);
+      if (key.startsWith(SYS_PROPERTY_PREFIX)) {
+        String systemProperty = key.substring(SYS_PROPERTY_PREFIX.length());
         System.setProperty(systemProperty, value);
-      } else if (key.startsWith("mule.config.")) {
-        String configProperty = key.substring(12);
+      } else if (key.startsWith(MULE_PROPERTY_PREFIX)) {
+        String configProperty = key.substring(MULE_PROPERTY_PREFIX.length());
         try {
           setProperty(configuration, configProperty, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
