@@ -7,7 +7,7 @@
 package org.mule.functional.api.component;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -26,7 +26,7 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
   }
 
   @Override
-  public InternalEvent handleException(MessagingException exception, InternalEvent event) {
+  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     String messageToLog = createMessageToLog(exception);
     for (LogChecker checker : this.checkers) {
       checker.check(messageToLog);
@@ -36,7 +36,7 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
   }
 
   @Override
-  public boolean accept(InternalEvent event) {
+  public boolean accept(BaseEvent event) {
     return true;
   }
 
