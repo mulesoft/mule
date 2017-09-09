@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import org.mule.runtime.config.builders.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -40,12 +42,32 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
   @Override
   protected DefaultMuleConfiguration createMuleConfiguration() {
     final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
-    PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, appProperties);
+    initializeFromProperties(configuration, appProperties);
     configuration.setId(appName);
     final String encoding = defaultEncoding;
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
     return configuration;
+  }
+
+  private static void initializeFromProperties(MuleConfiguration configuration, Map properties) {
+    for (Object entryObject : properties.entrySet()) {
+      Map.Entry entry = (Map.Entry) entryObject;
+      String key = (String) entry.getKey();
+      String value = (String) entry.getValue();
+
+      if (key.startsWith("sys.")) {
+        String systemProperty = key.substring(4);
+        System.setProperty(systemProperty, value);
+      } else if (key.startsWith("mule.config.")) {
+        String configProperty = key.substring(12);
+        try {
+          setProperty(configuration, configProperty, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          logger.error("Cannot set configuration property", e);
+        }
+      }
+    }
   }
 }

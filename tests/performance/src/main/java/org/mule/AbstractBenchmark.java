@@ -16,7 +16,6 @@ import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.config.builders.BasicRuntimeServicesConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
@@ -62,12 +61,7 @@ public class AbstractBenchmark {
     }
   }
 
-  public MuleContext createMuleContext() throws MuleException {
-    MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    return muleContextFactory.createMuleContext();
-  }
-
-  public MuleContext createMuleContextWithServices() throws MuleException {
+  protected MuleContext createMuleContextWithServices() throws MuleException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builderList = new ArrayList<>();
     builderList.add(new BasicRuntimeServicesConfigurationBuilder());
@@ -75,7 +69,7 @@ public class AbstractBenchmark {
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
   }
 
-  public Flow createFlow(MuleContext muleContext) {
+  protected Flow createFlow(MuleContext muleContext) {
     return builder(FLOW_NAME, muleContext).build();
   }
 

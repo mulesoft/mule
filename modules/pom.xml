@@ -19,7 +19,6 @@
     <modules>
         <module>all-modules</module>
         <module>artifact</module>
-        <module>builders</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
