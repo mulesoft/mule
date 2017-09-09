@@ -6,19 +6,24 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import org.mule.runtime.config.builders.PropertiesMuleConfigurationFactory;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
  * Takes Mule application descriptor into account when building the context.
  */
 public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
+
+  private static final String SYS_PROPERTY_PREFIX = "sys.";
+  private static final String MULE_PROPERTY_PREFIX = "mule.config.";
 
   private final Map<String, String> appProperties;
   private final String appName;
@@ -40,12 +45,31 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
   @Override
   protected DefaultMuleConfiguration createMuleConfiguration() {
     final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
-    PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, appProperties);
+    initializeFromProperties(configuration, appProperties);
     configuration.setId(appName);
     final String encoding = defaultEncoding;
     if (!isBlank(encoding)) {
       configuration.setDefaultEncoding(encoding);
     }
     return configuration;
+  }
+
+  private static void initializeFromProperties(MuleConfiguration configuration, Map<String, String> properties) {
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+
+      if (key.startsWith(SYS_PROPERTY_PREFIX)) {
+        String systemProperty = key.substring(SYS_PROPERTY_PREFIX.length());
+        System.setProperty(systemProperty, value);
+      } else if (key.startsWith(MULE_PROPERTY_PREFIX)) {
+        String configProperty = key.substring(MULE_PROPERTY_PREFIX.length());
+        try {
+          setProperty(configuration, configProperty, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          logger.error("Cannot set configuration property", e);
+        }
+      }
+    }
   }
 }

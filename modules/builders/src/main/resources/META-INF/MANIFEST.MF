@@ -1,2 +1,0 @@
-Bundle-SymbolicName: org.mule.runtime.module.builders
-Export-Package: org.mule.config.builders, org.mule.config.converters

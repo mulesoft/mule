@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.builders;
+package org.mule;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 
@@ -20,8 +20,6 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 /**
  * Provides the basic {@link Service}s infrastructure required by the Mule runtime to start in embedded mode.
- * <p>
- * TODO MULE-9655 Remove this when embedded mode supports registering services from the zip file
  *
  * @since 4.0
  */
