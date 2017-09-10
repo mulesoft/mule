@@ -153,7 +153,7 @@ public class MessageProcessors {
    * <p/>
    * The {@link InternalEvent} returned by this method <b>will</b> be completed with the same {@link InternalEvent} instance and
    * if an error occurs during processing the {@link InternalEventContext} will be completed with the error.
-   * 
+   *
    * @param event event to process
    * @param processor processor to use
    * @return future result
@@ -177,6 +177,11 @@ public class MessageProcessors {
   public static Publisher<InternalEvent> processWithChildContext(InternalEvent event, ReactiveProcessor processor,
                                                                  Optional<ComponentLocation> componentLocation) {
     return internalProcessWithChildContext(event, processor, child(event.getContext(), componentLocation), true);
+  }
+
+  public static Publisher<InternalEvent> processWithChildContext(InternalEvent event, ReactiveProcessor processor,
+                                                                 InternalEventContext childContext) {
+    return internalProcessWithChildContext(event, processor, childContext, true);
   }
 
   /**

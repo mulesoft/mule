@@ -7,32 +7,38 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.InternalEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Component to be used that supports a collection of {@link MessageProcessorChain} and executes them in order.
+ * Component to be used that supports a collection of {@link MessageProcessorChain} and executes them in sequentially waiting for
+ * each chain and all child context executions (such as async blocks) to complete.
  * <p/>
  * Meant to be used by runtime privileged extensions that need to construct top level chains of execution.
  * 
@@ -40,46 +46,55 @@ import org.slf4j.LoggerFactory;
  */
 public class CompositeProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CompositeProcessorChainRouter.class);
+  private static Logger LOGGER = getLogger(CompositeProcessorChainRouter.class);
 
   @Inject
   private MuleContext muleContext;
 
-  private String name;
   private List<MessageProcessorChain> processorChains = emptyList();
-  private MessageProcessorChain messageProcessorChain;
 
-  public void setProcessorChains(List processorChains) {
+  public void setProcessorChains(List<MessageProcessorChain> processorChains) {
     this.processorChains = processorChains;
   }
 
   @Override
   protected ReactiveProcessor getExecutableFunction() {
-    return publisher -> from(publisher).transform(messageProcessorChain);
+    return publisher -> from(publisher).flatMapMany(initial -> fromIterable(processorChains).reduce(initial, processChain()));
+  }
+
+  private BiFunction<InternalEvent, MessageProcessorChain, InternalEvent> processChain() {
+    return (event, processorChain) -> {
+      InternalEventContext childContext = child(event.getContext(), ofNullable(getLocation()));
+      return from(processWithChildContext(event, processorChain, childContext))
+          // Block until all child contexts are complete
+          .doOnNext(result -> from(childContext.getCompletionPublisher()).block())
+          .block();
+    };
   }
 
   @Override
   public void stop() throws MuleException {
-    stopIfNeeded(messageProcessorChain);
+    stopIfNeeded(processorChains);
   }
 
   @Override
   public void dispose() {
-    disposeIfNeeded(messageProcessorChain, LOGGER);
+    disposeIfNeeded(processorChains, LOGGER);
   }
 
   @Override
   public void start() throws MuleException {
-    startIfNeeded(messageProcessorChain);
+    startIfNeeded(processorChains);
+  }
+
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    super.setMuleContext(muleContext);
+    setMuleContextIfNeeded(processorChains, muleContext);
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
-    for (MessageProcessorChain processorChain : processorChains) {
-      chainBuilder.chain(processorChain);
-    }
-    messageProcessorChain = chainBuilder.build();
-    initialiseIfNeeded(messageProcessorChain, muleContext);
+    initialiseIfNeeded(processorChains, muleContext);
   }
 }
