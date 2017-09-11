@@ -9,6 +9,7 @@ package org.mule.functional.api.component;
 import static java.lang.System.lineSeparator;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class EqualsLogChecker extends AbstractLogChecker {
 
-  private String expectedLogMessage;
+  private String expectedLogMessage = EMPTY;
   private boolean shouldFilterLogMessage;
 
 
