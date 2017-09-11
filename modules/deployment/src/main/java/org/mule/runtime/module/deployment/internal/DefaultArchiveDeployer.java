@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
@@ -451,7 +450,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private static boolean allResourcesExist(File[] resourceFiles) {
-    return stream(resourceFiles).map((f) -> f.exists()).reduce(true, (result, tmp_status) -> result && tmp_status);
+    return stream(resourceFiles).allMatch(File::exists);
   }
 
   private static class ZombieArtifact {
@@ -466,13 +465,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     }
 
     public boolean isFor(URI uri) {
-      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().toURI().equals(uri))
-          .collect(Collectors.toList()).isEmpty());
+      return initialResourceFiles.entrySet().stream().anyMatch((entry) -> entry.getKey().toURI().equals(uri));
     }
 
     public boolean updatedZombieApp() {
-      return !(initialResourceFiles.entrySet().stream().filter((entry) -> entry.getKey().lastModified() != entry.getValue())
-          .collect(Collectors.toList()).isEmpty());
+      return initialResourceFiles.entrySet().stream()
+          .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
     }
 
     //Returns true only if all the files exist
