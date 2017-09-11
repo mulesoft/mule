@@ -161,11 +161,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                 // Otherwise create a new message
                                 partEventBuilder.message(Message.builder().payload(typedValue).build());
                               }
-                              return just(partEventBuilder.addVariable(counterVariableName,
-                                                                       count.incrementAndGet())
-                                  .build())
-                                      .transform(nestedChain)
-                                      .doOnNext(result -> currentEvent.set(BaseEvent.builder(result).build())).log("TWO");
+                              return just(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build())
+                                  .transform(nestedChain).doOnNext(result -> currentEvent.set(BaseEvent.builder(result).build()));
                             })
                             // This can potentially be improved but simplest way currently to determine if split results in empty
                             // iterator is to check atomic count
