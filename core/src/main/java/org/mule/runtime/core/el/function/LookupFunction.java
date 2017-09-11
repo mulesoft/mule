@@ -18,8 +18,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -32,10 +32,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -74,14 +75,14 @@ public class LookupFunction implements ExpressionFunction {
         Error incomingError = lookupValue(context, ERROR, null);
 
         Message message = Message.builder(incomingMessage).value(payload).build();
-        InternalEvent event = InternalEvent.builder(InternalEvent.getCurrentEvent().getContext())
+        BaseEvent event = BaseEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
             .variables(incomingVariables)
             .error(incomingError)
             .message(message)
             .build();
         MessagingExceptionHandler exceptionListener = ((Flow) component).getExceptionListener();
 
-        InternalEvent result = from(processWithChildContext(event, (Flow) component, empty(), exceptionListener)).block();
+        BaseEvent result = from(processWithChildContext(event, (Flow) component, empty(), exceptionListener)).block();
         return result.getMessage().getPayload();
       } catch (Exception e) {
         MessagingException me = (MessagingException) unwrap(e);
