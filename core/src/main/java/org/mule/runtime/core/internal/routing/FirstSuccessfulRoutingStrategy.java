@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
-import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -21,17 +19,15 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
