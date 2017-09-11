@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util.queue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.tck.core.util.queue.AbstractTransactionQueueManagerTestCase;

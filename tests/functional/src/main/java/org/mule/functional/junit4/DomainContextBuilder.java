@@ -9,11 +9,8 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -25,15 +22,7 @@ public class DomainContextBuilder {
 
   private String[] domainConfig = new String[0];
 
-  private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
-
-    @Override
-    protected DefaultMuleContext createDefaultMuleContext() {
-      DefaultMuleContext muleContext = super.createDefaultMuleContext();
-      muleContext.setArtifactType(DOMAIN);
-      return muleContext;
-    }
-  };
+  private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(DOMAIN);
 
   public DomainContextBuilder setDomainConfig(String... domainConfig) {
     this.domainConfig = domainConfig;

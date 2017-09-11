@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
  * ConfigurationBuilder's can be used to configure a single mule instance with each ConfigurationBuilder doing one of more of the
  * following:
  * <li>Creation of mule runtime artifacts (endpoint's, connector's, service's, transformer's) which are then registered with the
- * <code>Registy</code
+ * <code>Registry</code
  * <li> Creation and registration of SecurityManager / TransactionManager / TransactionManagerFactory / QueueManager
  * and ThreadingProfile's.  Unlike the runtime artifacts mule only uses a single instance of each of these and so if
  * multiple configuration builder create and register these artifacts only one will be used.
@@ -42,11 +42,4 @@ public interface ConfigurationBuilder {
    * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or initialised properly
    */
   void configure(MuleContext muleContext) throws ConfigurationException;
-
-  /**
-   * Indicate whether this ConfigurationBulder has been configured yet
-   *
-   * @return <code>true</code> if this ConfigurationBulder has been configured.
-   */
-  boolean isConfigured();
 }

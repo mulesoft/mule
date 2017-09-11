@@ -12,7 +12,6 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.crea
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
@@ -67,7 +66,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
         ExtensionManager extensionManager;
         if (muleContext.getExtensionManager() == null) {
           extensionManager = createDefaultExtensionManager();
-          ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+          muleContext.setExtensionManager(extensionManager);
           initialiseIfNeeded(extensionManager, muleContext);
         }
         extensionManager = muleContext.getExtensionManager();

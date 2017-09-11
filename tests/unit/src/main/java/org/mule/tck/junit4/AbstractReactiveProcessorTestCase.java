@@ -82,11 +82,6 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
           throw new ConfigurationException(e);
         }
       }
-
-      @Override
-      public boolean isConfigured() {
-        return true;
-      }
     });
   }
 

@@ -109,15 +109,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   @SuppressWarnings("unused")
   protected void addResources(List<ConfigResource> allResources) {}
 
-  public void unconfigure(MuleContext muleContext) {
-    registry.dispose();
-    if (muleContext != null) {
-      muleContext.removeRegistry(registry);
-    }
-    registry = null;
-    configured = false;
-  }
-
   private MuleArtifactContext createApplicationContext(MuleContext muleContext) throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
     OptionalObjectsController parentObjectController = null;

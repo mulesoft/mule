@@ -13,6 +13,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_LISTENER_REGISTRY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
@@ -34,6 +35,7 @@ import org.mule.runtime.core.api.context.notification.NotificationListenerRegist
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
@@ -63,7 +65,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
-    ctxBuilder = new DefaultMuleContextBuilder();
+    ctxBuilder = new DefaultMuleContextBuilder(APP);
     lifecycleManager = new SensingLifecycleManager();
     ctxBuilder.setLifecycleManager(lifecycleManager);
     ctx = ctxBuilder.buildMuleContext();

@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -21,13 +20,14 @@ import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
@@ -92,7 +92,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
     }
     ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
 
-    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+    muleContext.setExtensionManager(extensionManager);
 
     return extensionManager;
   }

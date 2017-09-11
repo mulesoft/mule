@@ -18,7 +18,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
-import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;

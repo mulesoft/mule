@@ -242,4 +242,25 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   public boolean isDisposed() {
     return disposed.get();
   }
+
+  /**
+   * @return a {@link ServerNotificationManager} with the default configuration for Mule notifications
+   */
+  public static ServerNotificationManager createDefaultNotificationManager() {
+    ServerNotificationManager manager = new ServerNotificationManager();
+    manager.addInterfaceToType(MuleContextNotificationListener.class, MuleContextNotification.class);
+    manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
+    manager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
+    manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
+    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
+    manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
+    manager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
+    manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
+    manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
+    manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
+    manager.addInterfaceToType(PipelineMessageNotificationListener.class, PipelineMessageNotification.class);
+    manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);
+    manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
+    return manager;
+  }
 }

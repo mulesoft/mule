@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.transaction.TransactionFactory;

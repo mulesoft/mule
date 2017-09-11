@@ -9,10 +9,9 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -30,16 +29,10 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder {
   private final String defaultEncoding;
 
   public ApplicationMuleContextBuilder(String appName, Map<String, String> appProperties, String defaultEncoding) {
+    super(APP);
     this.appProperties = appProperties;
     this.appName = appName;
     this.defaultEncoding = defaultEncoding;
-  }
-
-  @Override
-  protected DefaultMuleContext createDefaultMuleContext() {
-    DefaultMuleContext muleContext = super.createDefaultMuleContext();
-    muleContext.setArtifactType(APP);
-    return muleContext;
   }
 
   @Override

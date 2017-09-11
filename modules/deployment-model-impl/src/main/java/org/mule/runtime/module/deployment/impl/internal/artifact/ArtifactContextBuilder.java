@@ -383,12 +383,6 @@ public class ArtifactContextBuilder {
             }
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
-            isConfigured = true;
-          }
-
-          @Override
-          public boolean isConfigured() {
-            return isConfigured;
           }
 
           @Override

@@ -9,8 +9,8 @@ package org.mule.runtime.config.spring;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertSame;
-import static org.mule.runtime.core.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
-import static org.mule.runtime.core.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;

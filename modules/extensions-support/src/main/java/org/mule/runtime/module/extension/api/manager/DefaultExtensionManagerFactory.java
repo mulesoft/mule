@@ -10,7 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -29,7 +28,7 @@ public class DefaultExtensionManagerFactory implements ExtensionManagerFactory {
   @Override
   public ExtensionManager create(MuleContext muleContext) {
     ExtensionManager extensionManager = new DefaultExtensionManager();
-    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+    muleContext.setExtensionManager(extensionManager);
     try {
       initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {

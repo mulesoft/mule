@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultMuleContextFactory implements MuleContextFactory {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextFactory.class);
 
   private List<MuleContextListener> listeners = new LinkedList<>();
 
@@ -46,11 +47,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    */
   @Override
   public MuleContext createMuleContext() throws InitialisationException, ConfigurationException {
-    return createMuleContext(new DefaultsConfigurationBuilder(), createMuleContextBuilder());
-  }
-
-  protected DefaultMuleContextBuilder createMuleContextBuilder() {
-    return new DefaultMuleContextBuilder();
+    return createMuleContext(new DefaultsConfigurationBuilder(), MuleContextBuilder.builder(APP));
   }
 
   /**
@@ -59,7 +56,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   @Override
   public MuleContext createMuleContext(ConfigurationBuilder... configurationBuilders)
       throws InitialisationException, ConfigurationException {
-    return createMuleContext(asList(configurationBuilders), createMuleContextBuilder());
+    return createMuleContext(asList(configurationBuilders), MuleContextBuilder.builder(APP));
   }
 
   /**
@@ -131,7 +128,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    */
   public MuleContext createMuleContext(final String configResources, final Properties properties)
       throws InitialisationException, ConfigurationException {
-    return doCreateMuleContext(createMuleContextBuilder(), new ContextConfigurator() {
+    return doCreateMuleContext(MuleContextBuilder.builder(APP), new ContextConfigurator() {
 
       @Override
       public void configure(MuleContext muleContext) throws ConfigurationException {
@@ -185,7 +182,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
                                        MuleConfiguration configuration)
       throws InitialisationException, ConfigurationException {
     // Create MuleContext
-    DefaultMuleContextBuilder contextBuilder = createMuleContextBuilder();
+    MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     contextBuilder.setMuleConfiguration(configuration);
     return doCreateMuleContext(contextBuilder, new ContextConfigurator() {
 
@@ -206,7 +203,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
     });
   }
 
-  protected MuleContext doCreateMuleContext(MuleContextBuilder muleContextBuilder, ContextConfigurator configurator)
+  private MuleContext doCreateMuleContext(MuleContextBuilder muleContextBuilder, ContextConfigurator configurator)
       throws InitialisationException, ConfigurationException {
     MuleContext muleContext = buildMuleContext(muleContextBuilder);
 

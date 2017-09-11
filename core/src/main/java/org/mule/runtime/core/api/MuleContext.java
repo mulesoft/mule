@@ -13,7 +13,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -43,14 +42,10 @@ import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.transaction.TransactionManager;
-import javax.xml.namespace.QName;
 
 public interface MuleContext extends Lifecycle {
 
@@ -205,7 +200,7 @@ public interface MuleContext extends Lifecycle {
    * <p>
    * Use this method to run code that depends on this context's lifecycle state not changing while the command is running.
    *
-   * @param command the command to run with the lock for this conext's lifecycle taken.
+   * @param command the command to run with the lock for this context's lifecycle taken.
    */
   void withLifecycleLock(Runnable command);
 
@@ -214,8 +209,6 @@ public interface MuleContext extends Lifecycle {
   SystemExceptionHandler getExceptionListener();
 
   void setExceptionListener(SystemExceptionHandler exceptionListener);
-
-  void setObjectStore(String name, ObjectStore<Serializable> store) throws RegistrationException;
 
   void handleException(Exception e, RollbackSourceCallback rollbackMethod);
 
@@ -241,11 +234,6 @@ public interface MuleContext extends Lifecycle {
    * Generate a unique ID string; this will begin with the cluster node ID followed by a dash, e.g. "3-XXXYYY"
    */
   String getUniqueIdString();
-
-  /**
-   * Return all annotations seen in the configuration
-   */
-  Map<QName, Set<Object>> getConfigurationAnnotations();
 
   /**
    * @return default exception strategy. If no default error handler was configured it returns one with a catch all
@@ -375,5 +363,11 @@ public interface MuleContext extends Lifecycle {
    */
   ConfigurationComponentLocator getConfigurationComponentLocator();
 
+  /**
+   * Sets artifact wide instance of {@link ExtensionManager}
+   *
+   * @param extensionManager manages the extensions available on the artifact. Non null.
+   */
+  void setExtensionManager(ExtensionManager extensionManager);
 }
 
