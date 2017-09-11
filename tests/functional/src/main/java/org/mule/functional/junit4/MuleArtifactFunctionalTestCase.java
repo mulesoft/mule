@@ -7,6 +7,13 @@
 
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 /**
@@ -40,4 +47,24 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
     })
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
+  private BaseEvent _testEvent;
+
+  /**
+   * Creates and caches a test {@link BaseEvent} instance for the scope of the current test method.
+   *
+   * @return test event.
+   * @throws MuleException
+   */
+  @Override
+  protected BaseEvent testEvent() throws MuleException {
+    if (_testEvent == null) {
+      _testEvent = baseEvent();
+    }
+    return _testEvent;
+  }
+
+  private BaseEvent baseEvent() throws MuleException {
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
+    return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(Message.of(TEST_PAYLOAD)).build();
+  }
 }

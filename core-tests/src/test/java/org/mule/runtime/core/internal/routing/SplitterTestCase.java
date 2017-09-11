@@ -15,16 +15,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,8 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Test;
 
 public class SplitterTestCase extends AbstractMuleContextTestCase {
 
@@ -121,7 +123,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     Splitter splitter = new Splitter();
     splitter.setMuleContext(muleContext);
     splitter.initialise();
-    BaseEvent event = eventBuilder().message(toSplit).session(session).build();
+    BaseEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(toSplit).session(session).build();
     assertSame(event, splitter.process(event));
   }
 
@@ -161,7 +163,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     splitter.setListener(grabber);
     splitter.initialise();
 
-    final Builder eventBuilder = eventBuilder().message(toSplit).session(session);
+    final Builder eventBuilder = this.<PrivilegedEvent.Builder>getEventBuilder().message(toSplit).session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       eventBuilder.addVariable(entry.getKey(), entry.getValue());
     }

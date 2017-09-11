@@ -7,18 +7,18 @@
 package org.mule.runtime.core.internal.processor.simple;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 
 public class AddFlowVariableProcessor extends AbstractAddVariablePropertyProcessor<Object> {
 
   @Override
-  protected BaseEvent addProperty(BaseEvent event, String propertyName, Object value, DataType dataType) {
-    return BaseEvent.builder(event).addVariable(propertyName, value, dataType).build();
+  protected PrivilegedEvent addProperty(PrivilegedEvent event, String propertyName, Object value, DataType dataType) {
+    return PrivilegedEvent.builder(event).addVariable(propertyName, value, dataType).build();
   }
 
   @Override
-  protected BaseEvent removeProperty(BaseEvent event, String propertyName) {
-    return BaseEvent.builder(event).removeVariable(propertyName).build();
+  protected PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName) {
+    return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
   }
 }

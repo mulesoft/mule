@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.message.ErrorBuilder.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
@@ -34,6 +35,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.message.InternalMessage.Builder;
 
@@ -184,7 +186,7 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   private BaseEvent.Builder baseEventBuilder(Message message) {
-    return BaseEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
+    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
   }
 
   protected BaseEvent returnEvent(BaseEvent event) {

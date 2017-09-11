@@ -10,14 +10,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import java.math.BigDecimal;
-
 import org.junit.Test;
+
+import java.math.BigDecimal;
 
 public class StatefulOperationTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -58,7 +60,8 @@ public class StatefulOperationTestCase extends AbstractExtensionFunctionalTestCa
   }
 
   private void assertRemainingMoney(String configName, String name, long expectedAmount) throws Exception {
-    BaseEvent event = eventBuilder().message(of("")).addVariable("myName", name).build();
+    BaseEvent event = BaseEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(""))
+        .addVariable("myName", name).build();
 
     HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationFromRegistry(configName, event, muleContext);
     assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));

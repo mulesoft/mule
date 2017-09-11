@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.mockito.Mockito;
@@ -275,7 +276,7 @@ public class TestEventBuilder {
       eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
-    BaseEvent.Builder builder = BaseEvent.builder(eventContext)
+    BaseEvent.Builder builder = InternalEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {

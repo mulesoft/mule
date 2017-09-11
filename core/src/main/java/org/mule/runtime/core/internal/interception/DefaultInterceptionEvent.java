@@ -17,9 +17,9 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.interception.InternalInterceptionEvent;
 
@@ -36,10 +36,10 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   public static final String INTERCEPTION_RESOLVED_PARAMS = "core:interceptionResolvedParams";
   public static final String INTERCEPTION_RESOLVED_CONTEXT = "core:interceptionResolvedContext";
 
-  private BaseEvent interceptedInput;
-  private BaseEvent.Builder interceptedOutput;
+  private InternalEvent interceptedInput;
+  private InternalEvent.Builder interceptedOutput;
 
-  public DefaultInterceptionEvent(BaseEvent interceptedInput) {
+  public DefaultInterceptionEvent(InternalEvent interceptedInput) {
     reset(interceptedInput);
   }
 
@@ -81,7 +81,7 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
 
   @Override
   public MuleSession getSession() {
-    return ((PrivilegedEvent) interceptedInput).getSession();
+    return interceptedInput.getSession();
   }
 
   @Override
@@ -138,13 +138,13 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
    * Updates the state of this object if needed, overriding the {@code interceptedInput} with the result built from
    * {@code interceptedOutput} and resetting {@code interceptedOutput}.
    *
-   * @return {@link BaseEvent} with the result.
+   * @return {@link PrivilegedEvent} with the result.
    */
-  public BaseEvent resolve() {
-    final BaseEvent newEvent = interceptedOutput.build();
+  public InternalEvent resolve() {
+    final InternalEvent newEvent = interceptedOutput.build();
     if (interceptedInput != newEvent) {
       interceptedInput = newEvent;
-      interceptedOutput = BaseEvent.builder(interceptedInput).removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
+      interceptedOutput = InternalEvent.builder(interceptedInput).removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
     }
     return interceptedInput;
   }
@@ -152,12 +152,12 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   /**
    * @return the output of {@link #interceptedOutput#build()}.
    */
-  public BaseEvent getInterceptionResult() {
+  public InternalEvent getInterceptionResult() {
     return interceptedInput;
   }
 
-  public void reset(BaseEvent newEvent) {
+  public void reset(InternalEvent newEvent) {
     this.interceptedInput = newEvent;
-    this.interceptedOutput = BaseEvent.builder(newEvent);
+    this.interceptedOutput = InternalEvent.builder(newEvent);
   }
 }

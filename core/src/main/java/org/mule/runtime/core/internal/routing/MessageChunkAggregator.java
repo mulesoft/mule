@@ -49,7 +49,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
        */
       @Override
       public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
-        BaseEvent[] collectedEvents;
+        PrivilegedEvent[] collectedEvents;
         try {
           collectedEvents = events.toArray(false);
         } catch (ObjectStoreException e) {
@@ -60,8 +60,8 @@ public class MessageChunkAggregator extends AbstractAggregator {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
         try {
-          for (BaseEvent event : collectedEvents) {
-            baos.write(((PrivilegedEvent) event).getMessageAsBytes(muleContext));
+          for (PrivilegedEvent event : collectedEvents) {
+            baos.write(event.getMessageAsBytes(muleContext));
           }
 
           final Message.Builder builder = Message.builder(firstEvent.getMessage());
@@ -74,7 +74,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
           }
 
           // Use last event, that hasn't been completed yet, for continued processing.
-          return BaseEvent.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
+          return PrivilegedEvent.builder(collectedEvents[collectedEvents.length - 1]).message(builder.build())
               .session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);

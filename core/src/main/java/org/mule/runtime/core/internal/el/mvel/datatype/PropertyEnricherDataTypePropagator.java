@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.el.mvel.datatype;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
@@ -19,15 +18,15 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
   @Override
-  protected boolean doPropagate(BaseEvent event, BaseEvent.Builder builder, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(PrivilegedEvent event, PrivilegedEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (node instanceof AssignmentNode) {
       String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 
       if (event.getVariables().containsKey(assignmentVar)) {
         builder.addVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
         return true;
-      } else if (((PrivilegedEvent) event).getSession().getPropertyNamesAsSet().contains(assignmentVar)) {
-        ((PrivilegedEvent) event).getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());
+      } else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar)) {
+        event.getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());
         return true;
       }
     }

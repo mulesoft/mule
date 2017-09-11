@@ -7,17 +7,20 @@
 package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyEventConverter;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -29,10 +32,10 @@ import reactor.core.publisher.Mono;
  * {@link Processor}.
  * <p>
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link BaseEvent} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link BaseEvent}
- * from the policy to the next operation {@link BaseEvent} or from the next operation result to the {@link BaseEvent} that must continue
- * the execution of the policy.
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link BaseEvent} modified by the policy behaviour can
+ * be stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
+ * {@link BaseEvent} from the policy to the next operation {@link BaseEvent} or from the next operation result to the
+ * {@link BaseEvent} that must continue the execution of the policy.
  * <p>
  */
 public class OperationPolicyProcessor implements Processor {
@@ -65,27 +68,33 @@ public class OperationPolicyProcessor implements Processor {
 
   @Override
   public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
-    return from(publisher).then(operationEvent -> {
-      PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
-      Optional<BaseEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
-      BaseEvent variablesProviderEvent =
-          latestPolicyState.orElseGet(() -> BaseEvent.builder(operationEvent.getContext()).message(of(null)).build());
-      policyStateHandler.updateState(policyStateId, variablesProviderEvent);
-      BaseEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
-      Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
-      policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
-      return executePolicyChain(operationEvent, policyStateId, policyEvent);
-    });
+    return from(publisher)
+        .cast(PrivilegedEvent.class)
+        .then(operationEvent -> {
+          PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
+          Optional<BaseEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
+          PrivilegedEvent variablesProviderEvent =
+              (PrivilegedEvent) latestPolicyState
+                  .orElseGet(() -> PrivilegedEvent.builder(operationEvent.getContext()).message(of(null)).build());
+          policyStateHandler.updateState(policyStateId, variablesProviderEvent);
+          PrivilegedEvent policyEvent = policyEventConverter.createEvent(operationEvent, variablesProviderEvent);
+          Processor operationCall = buildOperationExecutionWithPolicyFunction(nextProcessor, operationEvent);
+          policyStateHandler.updateNextOperation(policyStateId.getExecutionIdentifier(), operationCall);
+          return executePolicyChain(operationEvent, policyStateId, policyEvent);
+        });
   }
 
-  private Mono<BaseEvent> executePolicyChain(BaseEvent operationEvent, PolicyStateId policyStateId,
-                                             BaseEvent policyEvent) {
-    return just(policyEvent).transform(policy.getPolicyChain())
+  private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
+                                                   PrivilegedEvent policyEvent) {
+    return just(policyEvent)
+        .cast(BaseEvent.class)
+        .transform(policy.getPolicyChain())
+        .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent));
   }
 
-  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, BaseEvent operationEvent) {
+  private Processor buildOperationExecutionWithPolicyFunction(Processor nextOperation, PrivilegedEvent operationEvent) {
     return new Processor() {
 
       @Override
@@ -95,13 +104,18 @@ public class OperationPolicyProcessor implements Processor {
 
       @Override
       public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
-        return from(publisher).then(policyExecuteNextEvent -> {
-          PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
-          policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
-          return just(policyExecuteNextEvent).map(event -> policyEventConverter.createEvent(event, operationEvent))
-              .transform(nextOperation)
-              .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));
-        });
+        return from(publisher)
+            .cast(PrivilegedEvent.class)
+            .then(policyExecuteNextEvent -> {
+              PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
+              policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
+              return just(policyExecuteNextEvent)
+                  .map(event -> policyEventConverter.createEvent(event, operationEvent))
+                  .cast(BaseEvent.class)
+                  .transform(nextOperation)
+                  .cast(PrivilegedEvent.class)
+                  .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));
+            });
       }
     };
   }

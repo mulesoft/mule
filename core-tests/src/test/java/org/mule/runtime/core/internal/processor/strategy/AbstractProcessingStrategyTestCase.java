@@ -60,6 +60,7 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -207,8 +208,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   @Override
-  protected BaseEvent.Builder getEventBuilder() throws MuleException {
-    return BaseEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
+  protected InternalEvent.Builder getEventBuilder() throws MuleException {
+    return InternalEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
   }
 
   protected abstract ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix);
@@ -509,7 +510,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       AtomicInteger processed = new AtomicInteger();
 
       for (int i = 0; i < STREAM_ITERATIONS; i++) {
-        cachedThreadPool.submit(() -> Flux.just(newEvent()).transform(triggerableMessageSource.getListener())
+        cachedThreadPool.submit(() -> Flux.just(newEvent())
+            .cast(BaseEvent.class).transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
             .doOnError(e -> rejected.getAndIncrement()).subscribe());
       }

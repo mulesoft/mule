@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
@@ -50,11 +51,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
@@ -64,6 +62,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 
 @RunWith(Parameterized.class)
@@ -126,7 +128,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = BaseEvent.builder(context).message(of("request")).flow(pipeline).build();
+    event = InternalEvent.builder(context).message(of("request")).flow(pipeline).build();
 
     process(pipeline, event);
 
@@ -141,7 +143,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = BaseEvent.builder(context).message(of("request")).flow(pipeline).build();
+    event = InternalEvent.builder(context).message(of("request")).flow(pipeline).build();
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));

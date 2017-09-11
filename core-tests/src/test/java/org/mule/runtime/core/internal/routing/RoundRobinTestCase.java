@@ -16,22 +16,24 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
-import org.reactivestreams.Publisher;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
@@ -110,7 +112,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
         BaseEvent event =
-            BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
+            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
                 .session(session).build();
         try {
           target.process(event);

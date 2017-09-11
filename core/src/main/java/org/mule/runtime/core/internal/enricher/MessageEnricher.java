@@ -8,14 +8,13 @@ package org.mule.runtime.core.internal.enricher;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -28,8 +27,8 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
@@ -70,11 +69,11 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
     return processToApply(event, this);
   }
 
-  protected BaseEvent enrich(BaseEvent currentEvent,
-                             BaseEvent enrichmentEvent,
-                             String sourceExpressionArg,
-                             String targetExpressionArg,
-                             ExtendedExpressionManager expressionManager) {
+  protected PrivilegedEvent enrich(PrivilegedEvent currentEvent,
+                                   PrivilegedEvent enrichmentEvent,
+                                   String sourceExpressionArg,
+                                   String targetExpressionArg,
+                                   ExtendedExpressionManager expressionManager) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
       sourceExpressionArg = "#[mel:payload:]";
     }
@@ -87,11 +86,11 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
-      BaseEvent.Builder eventBuilder = builder(currentEvent);
+      PrivilegedEvent.Builder eventBuilder = PrivilegedEvent.builder(currentEvent);
       expressionManager.enrich(targetExpressionArg, currentEvent, eventBuilder, getLocation(), typedValue);
       return eventBuilder.build();
     } else {
-      return builder(currentEvent).message(Message.builder(currentEvent.getMessage())
+      return PrivilegedEvent.builder(currentEvent).message(Message.builder(currentEvent.getMessage())
           .value(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
@@ -99,16 +98,18 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Sc
   @Override
   public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
+        .cast(PrivilegedEvent.class)
         // Use flatMap and child context in order to handle null response and do nothing rather than complete response as empty
         // if enrichment processor drops event due to a filter for example.
-        .flatMap(event -> from(processWithChildContext(builder(event)
-            .session(new DefaultMuleSession(((PrivilegedEvent) event).getSession()))
+        .flatMap(event -> from(processWithChildContext(PrivilegedEvent.builder(event)
+            .session(new DefaultMuleSession(event.getSession()))
             .build(), enrichmentProcessor, ofNullable(getLocation())))
+                .cast(PrivilegedEvent.class)
                 .map(checkedFunction(response -> enrich(response, event)))
                 .defaultIfEmpty(event));
   }
 
-  protected BaseEvent enrich(final BaseEvent event, BaseEvent eventToEnrich) throws MuleException {
+  protected PrivilegedEvent enrich(final PrivilegedEvent event, PrivilegedEvent eventToEnrich) throws MuleException {
     final ExtendedExpressionManager expressionManager = muleContext.getExpressionManager();
 
     if (event != null) {

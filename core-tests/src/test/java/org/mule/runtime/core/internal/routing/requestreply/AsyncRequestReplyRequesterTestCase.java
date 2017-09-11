@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -241,7 +241,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
       mp.process(event);
 
-      Map<String, BaseEvent> responseEvents = mp.getResponseEvents();
+      Map<String, PrivilegedEvent> responseEvents = mp.getResponseEvents();
       assertThat(responseEvents.entrySet(), empty());
     } finally {
       mp.stop();
@@ -292,7 +292,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       start();
     }
 
-    public Map<String, BaseEvent> getResponseEvents() {
+    public Map<String, PrivilegedEvent> getResponseEvents() {
       return responseEvents;
     }
   }

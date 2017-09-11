@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.el.context;
 
 import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
-import org.mule.runtime.core.api.event.MuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 
 import java.util.HashMap;
 import java.util.Map;

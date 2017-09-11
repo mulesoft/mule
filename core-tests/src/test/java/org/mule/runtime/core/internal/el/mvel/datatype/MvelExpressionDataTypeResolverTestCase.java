@@ -16,7 +16,7 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -34,7 +34,8 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
 
     dataTypeResolver = new MvelDataTypeResolver(EMPTY_LIST);
 
-    assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, testEvent(), compiledExpression), like(String.class, ANY, null));
+    assertThat(dataTypeResolver.resolve(EXPRESSION_VALUE, (PrivilegedEvent) testEvent(), compiledExpression),
+               like(String.class, ANY, null));
   }
 
   @Test
@@ -43,7 +44,7 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
 
     dataTypeResolver = new MvelDataTypeResolver();
 
-    assertThat(dataTypeResolver.resolve(null, testEvent(), compiledExpression), like(Object.class, ANY, null));
+    assertThat(dataTypeResolver.resolve(null, (PrivilegedEvent) testEvent(), compiledExpression), like(Object.class, ANY, null));
   }
 
   private CompiledExpression compileMelExpression() {

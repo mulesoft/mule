@@ -55,7 +55,7 @@ import java.util.Optional;
  * IDE/surfire-maven-plugin generates an equivalent {@link ClassLoader} hierarchy as standalone mode.
  * <p/>
  * The classification is based on the maven dependencies declared by the pom maven artifact that the test belongs to. In order to
- * classify the {@link java.net.URL}s from the classphat it will use a dependency tree that holds also duplicates relationship for
+ * classify the {@link java.net.URL}s from the classpath it will use a dependency tree that holds also duplicates relationship for
  * the dependency graph.
  * <p/>
  * The classification for {@link ClassLoader}s would be based on dependencies scope, provided will go to the container, compile to

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.session;
+package org.mule.runtime.core.privileged.event;
 
 import static java.util.Collections.synchronizedMap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyNotSerializableWasDropped;
@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionProperty
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import org.slf4j.Logger;

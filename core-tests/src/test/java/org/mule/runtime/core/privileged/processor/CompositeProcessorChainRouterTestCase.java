@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;

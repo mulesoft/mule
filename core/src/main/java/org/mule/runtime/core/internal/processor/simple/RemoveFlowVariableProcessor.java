@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 
 import java.util.Set;
@@ -16,13 +16,13 @@ public class RemoveFlowVariableProcessor extends AbstractRemoveVariablePropertyP
   private static final String FLOW_VAR_NAME = "flow variables";
 
   @Override
-  protected Set<String> getPropertyNames(BaseEvent event) {
+  protected Set<String> getPropertyNames(PrivilegedEvent event) {
     return event.getVariables().keySet();
   }
 
   @Override
-  protected BaseEvent removeProperty(BaseEvent event, String propertyName) {
-    return BaseEvent.builder(event).removeVariable(propertyName).build();
+  protected PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName) {
+    return PrivilegedEvent.builder(event).removeVariable(propertyName).build();
   }
 
   @Override

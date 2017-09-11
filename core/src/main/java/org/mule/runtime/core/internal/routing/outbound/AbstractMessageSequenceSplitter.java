@@ -9,7 +9,8 @@ package org.mule.runtime.core.internal.routing.outbound;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;

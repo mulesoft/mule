@@ -7,8 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -20,6 +19,7 @@ import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
 
@@ -78,19 +78,23 @@ public class SourcePolicyProcessor implements Processor {
   @Override
   public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
+        .cast(PrivilegedEvent.class)
         .then(sourceEvent -> {
           String executionIdentifier = sourceEvent.getContext().getCorrelationId();
           policyStateHandler.updateNextOperation(executionIdentifier,
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
           return just(sourceEvent)
               .map(event -> policyEventConverter.createEvent(sourceEvent,
-                                                             builder(sourceEvent.getContext()).message(of(null)).build()))
+                                                             PrivilegedEvent.builder(sourceEvent.getContext()).message(of(null))
+                                                                 .build()))
+              .cast(BaseEvent.class)
               .transform(policy.getPolicyChain())
+              .cast(PrivilegedEvent.class)
               .map(event -> policyEventConverter.createEvent(event, sourceEvent));
         });
   }
 
-  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, BaseEvent sourceEvent) {
+  private Processor buildSourceExecutionWithPolicyFunction(String executionIdentifier, PrivilegedEvent sourceEvent) {
     return new Processor() {
 
       @Override
@@ -101,11 +105,14 @@ public class SourcePolicyProcessor implements Processor {
       @Override
       public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
         return from(publisher)
+            .cast(PrivilegedEvent.class)
             .then(event -> just(event)
                 .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),
                                                                     request))
                 .map(request -> policyEventConverter.createEvent(request, sourceEvent))
+                .cast(BaseEvent.class)
                 .transform(nextProcessor)
+                .cast(PrivilegedEvent.class)
                 .map(result -> policyEventConverter.createEvent(result, event)));
       }
     };

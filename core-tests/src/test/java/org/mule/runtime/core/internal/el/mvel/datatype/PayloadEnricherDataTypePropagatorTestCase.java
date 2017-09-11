@@ -20,14 +20,13 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.datatype.PayloadEnricherDataTypePropagator;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.nio.charset.Charset;
-
 import org.junit.Test;
+
+import java.nio.charset.Charset;
 
 public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase {
 
@@ -52,8 +51,8 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    final Builder builder = BaseEvent.builder(testEvent());
-    dataTypePropagator.propagate(testEvent(), builder, new TypedValue<>(TEST_MESSAGE, expectedDataType),
+    final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(testEvent());
+    dataTypePropagator.propagate((PrivilegedEvent) testEvent(), builder, new TypedValue<>(TEST_MESSAGE, expectedDataType),
                                  compiledExpression);
     final BaseEvent event = builder.build();
 

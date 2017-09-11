@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.el.mvel.datatype;
 
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
@@ -18,11 +17,11 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 public class PropertyExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver {
 
   @Override
-  protected DataType getDataType(BaseEvent event, ASTNode node) {
+  protected DataType getDataType(PrivilegedEvent event, ASTNode node) {
     if (node.isIdentifier() && event.getVariables().containsKey(node.getName())) {
       return event.getVariables().get(node.getName()).getDataType();
-    } else if (node.isIdentifier() && ((PrivilegedEvent) event).getSession().getPropertyNamesAsSet().contains(node.getName())) {
-      return ((PrivilegedEvent) event).getSession().getPropertyDataType(node.getName());
+    } else if (node.isIdentifier() && event.getSession().getPropertyNamesAsSet().contains(node.getName())) {
+      return event.getSession().getPropertyDataType(node.getName());
     } else {
       return null;
     }

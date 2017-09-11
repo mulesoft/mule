@@ -10,9 +10,10 @@ import static com.google.common.cache.CacheBuilder.newBuilder;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;

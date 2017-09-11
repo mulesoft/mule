@@ -126,7 +126,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    BaseEvent testEvent = eventBuilder().message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
+    PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
+        .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
@@ -213,7 +214,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   public void eventContextSerializationEventContextGarbageCollected() throws Exception {
 
     Flow flow = getTestFlow(muleContext);
-    BaseEvent before = eventBuilder().message(of(null)).flow(flow).build();
+    BaseEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null)).flow(flow).build();
     String beforeId = before.getContext().getId();
 
     byte[] bytes = org.apache.commons.lang3.SerializationUtils.serialize(before);
@@ -227,7 +228,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void eventContextSerializationPublisherConserved() throws Exception {
     BaseEvent result = testEvent();
-    BaseEvent before = eventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
+    BaseEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
 
     BaseEvent after =
         (BaseEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),

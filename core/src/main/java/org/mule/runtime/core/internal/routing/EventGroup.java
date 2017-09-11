@@ -17,10 +17,10 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -44,7 +44,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    */
   private static final long serialVersionUID = 953739659615692697L;
 
-  public static final BaseEvent[] EMPTY_EVENTS_ARRAY = new BaseEvent[0];
+  public static final PrivilegedEvent[] EMPTY_EVENTS_ARRAY = new PrivilegedEvent[0];
 
   public static final String MULE_ARRIVAL_ORDER_PROPERTY = MuleProperties.PROPERTY_PREFIX + "ARRIVAL_ORDER";
 
@@ -178,7 +178,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    * @return an array of collected {@link BaseEvent}s.
    * @throws ObjectStoreException
    */
-  public BaseEvent[] toArray() throws ObjectStoreException {
+  public PrivilegedEvent[] toArray() throws ObjectStoreException {
     return toArray(true);
   }
 
@@ -188,15 +188,15 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    * @return an array of collected {@link BaseEvent}s.
    * @throws ObjectStoreException
    */
-  public BaseEvent[] toArray(boolean sortByArrival) throws ObjectStoreException {
+  public PrivilegedEvent[] toArray(boolean sortByArrival) throws ObjectStoreException {
     synchronized (this) {
       if (eventsObjectStore.allKeys(eventsPartitionKey).isEmpty()) {
         return EMPTY_EVENTS_ARRAY;
       }
       List<String> keys = eventsObjectStore.allKeys(eventsPartitionKey);
-      BaseEvent[] eventArray = new BaseEvent[keys.size()];
+      PrivilegedEvent[] eventArray = new PrivilegedEvent[keys.size()];
       for (int i = 0; i < keys.size(); i++) {
-        eventArray[i] = eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
+        eventArray[i] = (PrivilegedEvent) eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
       }
       if (sortByArrival) {
         Arrays.sort(eventArray, new ArrivalOrderEventComparator());
@@ -318,14 +318,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     try {
       if (size() > 0) {
 
-        BaseEvent[] muleEvents = toArray(true);
+        PrivilegedEvent[] muleEvents = toArray(true);
         BaseEvent lastEvent = muleEvents[muleEvents.length - 1];
 
         List<Message> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
         final Message.Builder builder = Message.builder().collectionValue(messageList, Message.class);
-        BaseEvent muleEvent =
-            BaseEvent.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
+        PrivilegedEvent muleEvent =
+            PrivilegedEvent.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
         return null;
@@ -336,8 +336,8 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
   }
 
-  protected MuleSession getMergedSession(BaseEvent[] events) throws ObjectStoreException {
-    MuleSession session = new DefaultMuleSession(((PrivilegedEvent) events[0]).getSession());
+  protected MuleSession getMergedSession(PrivilegedEvent[] events) throws ObjectStoreException {
+    MuleSession session = new DefaultMuleSession(events[0].getSession());
     for (int i = 1; i < events.length - 1; i++) {
       addAndOverrideSessionProperties(session, events[i]);
     }
@@ -345,9 +345,9 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     return session;
   }
 
-  private void addAndOverrideSessionProperties(MuleSession session, BaseEvent event) {
-    for (String name : ((PrivilegedEvent) event).getSession().getPropertyNamesAsSet()) {
-      session.setProperty(name, ((PrivilegedEvent) event).getSession().getProperty(name));
+  private void addAndOverrideSessionProperties(MuleSession session, PrivilegedEvent event) {
+    for (String name : event.getSession().getPropertyNamesAsSet()) {
+      session.setProperty(name, event.getSession().getProperty(name));
     }
   }
 

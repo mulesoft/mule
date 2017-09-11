@@ -26,11 +26,12 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.event.MuleSession;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.ResequenceMessagesCorrelatorCallback;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -70,11 +71,11 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Message message3 = Message.of("test event C");
 
     BaseEvent event1 =
-        BaseEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
     BaseEvent event2 =
-        BaseEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
     BaseEvent event3 =
-        BaseEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
@@ -112,11 +113,11 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Message message3 = Message.of("test event C");
 
     BaseEvent event1 =
-        BaseEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
     BaseEvent event2 =
-        BaseEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
     BaseEvent event3 =
-        BaseEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
+        InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     // set a resequencing comparator. We need to reset the router since it will
     // not process the same event group

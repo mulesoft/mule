@@ -22,8 +22,8 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;

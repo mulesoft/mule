@@ -15,7 +15,7 @@ import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
  * Base class for extracting data type from map variables
@@ -29,7 +29,7 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
   }
 
   @Override
-  protected DataType getDataType(BaseEvent event, ASTNode node) {
+  protected DataType getDataType(PrivilegedEvent event, ASTNode node) {
     final Accessor accessor = node.getAccessor();
 
     if (accessor instanceof VariableAccessor) {
@@ -55,6 +55,6 @@ public abstract class AbstractVariableExpressionDataTypeResolver extends Abstrac
     return null;
   }
 
-  protected abstract DataType getVariableDataType(BaseEvent event, String propertyName);
+  protected abstract DataType getVariableDataType(PrivilegedEvent event, String propertyName);
 
 }

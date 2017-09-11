@@ -17,14 +17,15 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Optional;
-
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -49,10 +50,10 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     BaseEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     BaseEvent event1 =
-        BaseEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
+        InternalEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
             .session(session).build();
-    BaseEvent event2 = BaseEvent.builder(context).message(message2).flow(flow).session(session).build();
-    BaseEvent event3 = BaseEvent.builder(context).message(message3).flow(flow).session(session).build();
+    BaseEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
+    BaseEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
+import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE;
+
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
@@ -34,13 +36,13 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
-  protected BaseEvent event;
-  protected BaseEvent.Builder eventBuilder;
+  protected PrivilegedEvent event;
+  protected PrivilegedEvent.Builder eventBuilder;
   protected MuleContext muleContext;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final BaseEvent event, final BaseEvent.Builder eventBuilder) {
+                                        final PrivilegedEvent event, final PrivilegedEvent.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
@@ -53,7 +55,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
    * @param next
    */
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final BaseEvent event, final BaseEvent.Builder eventBuilder,
+                                        final PrivilegedEvent event, final PrivilegedEvent.Builder eventBuilder,
                                         final VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
@@ -100,11 +102,11 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
         }
       } else if (SESSION_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
-                                                                      new SessionVariableMapContext(((PrivilegedEvent) event)
+                                                                      new SessionVariableMapContext(event
                                                                           .getSession()),
                                                                       null);
-      } else if (MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)) {
-        return new MuleImmutableVariableResolver<>(MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE,
+      } else if (MULE_MESSAGE_INTERNAL_VARIABLE.equals(name)) {
+        return new MuleImmutableVariableResolver<>(MULE_MESSAGE_INTERNAL_VARIABLE,
                                                    event.getMessage(), null);
       }
     }

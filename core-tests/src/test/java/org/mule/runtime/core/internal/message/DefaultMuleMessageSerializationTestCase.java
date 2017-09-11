@@ -9,19 +9,21 @@ package org.mule.runtime.core.internal.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.apache.commons.lang3.SerializationUtils;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-
-import org.apache.commons.lang3.SerializationUtils;
-import org.junit.Test;
 
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {
 
@@ -44,7 +46,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
     final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
-    setCurrentEvent(eventBuilder().message(message).build());
+    setCurrentEvent(this.<PrivilegedEvent.Builder>getEventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
@@ -55,7 +57,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final Message message = InternalMessage.builder().value(stream).addOutboundProperty("foo", "bar").build();
-    setCurrentEvent(eventBuilder().message(message).build());
+    setCurrentEvent(this.<PrivilegedEvent.Builder>getEventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());

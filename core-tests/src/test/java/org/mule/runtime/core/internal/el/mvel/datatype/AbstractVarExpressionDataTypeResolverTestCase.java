@@ -18,7 +18,6 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.internal.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -26,14 +25,14 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory;
 import org.mule.runtime.core.internal.el.mvel.StaticVariableResolverFactory;
 import org.mule.runtime.core.internal.el.mvel.VariableVariableResolverFactory;
-import org.mule.runtime.core.internal.el.mvel.datatype.ExpressionDataTypeResolver;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-
-import org.junit.Test;
 
 public abstract class AbstractVarExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase {
 
@@ -68,7 +67,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    BaseEvent event = setVariable(testEvent(), EXPRESSION_VALUE, expectedDataType);
+    PrivilegedEvent event = setVariable((PrivilegedEvent) testEvent(), EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
     final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(event, parserConfiguration);
@@ -81,7 +80,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     assertThat(expressionDataTypeResolver.resolve(event, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
-  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(BaseEvent testEvent,
+  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(PrivilegedEvent testEvent,
                                                                               ParserConfiguration parserConfiguration) {
     final MVELExpressionLanguageContext context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
     final StaticVariableResolverFactory staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
@@ -91,15 +90,15 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     final DelegateVariableResolverFactory innerDelegate =
         new DelegateVariableResolverFactory(globalContext,
                                             new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent,
-                                                                                BaseEvent.builder(testEvent)));
+                                                                                PrivilegedEvent.builder(testEvent)));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(parserConfiguration, muleContext,
                                                                                               testEvent,
-                                                                                              BaseEvent.builder(testEvent),
+                                                                                              PrivilegedEvent.builder(testEvent),
                                                                                               innerDelegate));
     context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP, delegate));
     return context;
   }
 
-  protected abstract BaseEvent setVariable(BaseEvent testEvent, Object propertyValue, DataType expectedDataType);
+  protected abstract PrivilegedEvent setVariable(PrivilegedEvent testEvent, Object propertyValue, DataType expectedDataType);
 }

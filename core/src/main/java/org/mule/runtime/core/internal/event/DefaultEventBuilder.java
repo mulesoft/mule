@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.event;
 
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
@@ -34,18 +35,17 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.event.MuleSession;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.util.CopyOnWriteCaseInsensitiveMap;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class DefaultEventBuilder implements BaseEvent.Builder {
+public class DefaultEventBuilder implements InternalEvent.Builder {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
@@ -77,7 +77,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   private Object replyToDestination;
   private MuleSession session = new DefaultMuleSession();
   private SecurityContext securityContext;
-  private BaseEvent originalEvent;
+  private InternalEvent originalEvent;
   private boolean modified;
   private boolean notificationsEnabled = true;
 
@@ -113,7 +113,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public BaseEvent.Builder message(Message message) {
+  public DefaultEventBuilder message(Message message) {
     requireNonNull(message);
     this.message = message;
     this.modified = true;
@@ -121,13 +121,13 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public BaseEvent.Builder variables(Map<String, ?> flowVariables) {
+  public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
     copyFromTo(flowVariables, this.flowVariables);
     return this;
   }
 
   @Override
-  public BaseEvent.Builder addVariable(String key, Object value) {
+  public DefaultEventBuilder addVariable(String key, Object value) {
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
@@ -135,32 +135,32 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public BaseEvent.Builder addVariable(String key, Object value, DataType dataType) {
+  public DefaultEventBuilder addVariable(String key, Object value, DataType dataType) {
     flowVariables.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder removeVariable(String key) {
+  public DefaultEventBuilder removeVariable(String key) {
     this.modified = flowVariables.remove(key) != null || modified;
     return this;
   }
 
   @Override
-  public Builder properties(Map<String, ?> properties) {
+  public DefaultEventBuilder properties(Map<String, ?> properties) {
     copyFromTo(properties, this.moduleProperties);
     return this;
   }
 
   @Override
-  public Builder parameters(Map<String, ?> parameters) {
+  public DefaultEventBuilder parameters(Map<String, ?> parameters) {
     copyFromTo(parameters, this.moduleParameters);
     return this;
   }
 
   @Override
-  public BaseEvent.Builder addParameter(String key, Object value) {
+  public DefaultEventBuilder addParameter(String key, Object value) {
     moduleParameters.put(key, new TypedValue<>(value, DataType.fromObject(value)));
     this.modified = true;
     return this;
@@ -168,14 +168,14 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public BaseEvent.Builder addParameter(String key, Object value, DataType dataType) {
+  public DefaultEventBuilder addParameter(String key, Object value, DataType dataType) {
     moduleParameters.put(key, new TypedValue<>(value, dataType));
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder internalParameters(Map<String, ?> internalParameters) {
+  public DefaultEventBuilder internalParameters(Map<String, ?> internalParameters) {
     this.internalParameters.clear();
     this.internalParameters.putAll(internalParameters);
     this.modified = true;
@@ -183,75 +183,75 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public BaseEvent.Builder addInternalParameter(String key, Object value) {
+  public DefaultEventBuilder addInternalParameter(String key, Object value) {
     internalParameters.put(key, value);
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder removeInternalParameter(String key) {
+  public DefaultEventBuilder removeInternalParameter(String key) {
     this.modified = internalParameters.remove(key) != null || modified;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder removeParameter(String key) {
+  public DefaultEventBuilder removeParameter(String key) {
     this.modified = moduleParameters.remove(key) != null || modified;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder correlationId(String correlationId) {
+  public DefaultEventBuilder correlationId(String correlationId) {
     legacyCorrelationId = correlationId;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder groupCorrelation(Optional<GroupCorrelation> correlation) {
+  public DefaultEventBuilder groupCorrelation(Optional<GroupCorrelation> correlation) {
     this.groupCorrelation = correlation;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder error(Error error) {
+  public DefaultEventBuilder error(Error error) {
     this.error = error;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder flow(FlowConstruct flow) {
+  public DefaultEventBuilder flow(FlowConstruct flow) {
     this.flow = flow;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder replyToHandler(ReplyToHandler replyToHandler) {
+  public DefaultEventBuilder replyToHandler(ReplyToHandler replyToHandler) {
     this.replyToHandler = replyToHandler;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder replyToDestination(Object replyToDestination) {
+  public DefaultEventBuilder replyToDestination(Object replyToDestination) {
     this.replyToDestination = replyToDestination;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder session(MuleSession session) {
+  public DefaultEventBuilder session(MuleSession session) {
     this.session = session;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent.Builder securityContext(SecurityContext securityContext) {
+  public DefaultEventBuilder securityContext(SecurityContext securityContext) {
     SecurityContext originalValue = this.securityContext;
     this.securityContext = securityContext;
     this.modified = originalValue != securityContext;
@@ -259,14 +259,14 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
   }
 
   @Override
-  public Builder disableNotifications() {
+  public DefaultEventBuilder disableNotifications() {
     this.notificationsEnabled = false;
     this.modified = true;
     return this;
   }
 
   @Override
-  public BaseEvent build() {
+  public InternalEvent build() {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
@@ -520,8 +520,7 @@ public class DefaultEventBuilder implements BaseEvent.Builder {
       for (Map.Entry<String, TypedValue<?>> entry : variables.entrySet()) {
         Object value = entry.getValue();
         if (value != null && !(value instanceof Serializable)) {
-          String message = String.format(
-                                         "Unable to serialize the flow variable %s, which is of type %s ", entry.getKey(), value);
+          String message = format("Unable to serialize the flow variable %s, which is of type %s ", entry.getKey(), value);
           logger.error(message);
           throw new IOException(message);
         }

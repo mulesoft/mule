@@ -15,10 +15,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
@@ -120,7 +120,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #2 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
+        .cast(PrivilegedEvent.class)
         .doOnNext(event -> setCurrentEvent(event))
+        .cast(BaseEvent.class)
         .transform(next));
 
     // #3 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
@@ -146,14 +148,20 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #4 Update ThreadLocal event after processor execution once back on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
-        .doOnNext(result -> setCurrentEvent(result)));
+        .cast(PrivilegedEvent.class)
+        .doOnNext(result -> setCurrentEvent(result))
+        .cast(BaseEvent.class));
 
     // #5 Fire MessageProcessor notifications before and after processor execution.
     interceptors.add((processor, next) -> stream -> from(stream)
+        .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
+        .cast(BaseEvent.class)
         .transform(next)
+        .cast(PrivilegedEvent.class)
         .doOnNext(postNotification(processor))
-        .doOnError(MessagingException.class, errorNotification(processor)));
+        .doOnError(MessagingException.class, errorNotification(processor))
+        .cast(BaseEvent.class));
 
     // #6 If the processor returns a CursorProvider, then have the StreamingManager manage it
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -195,18 +203,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<BaseEvent> preNotification(Processor processor) {
+  private Consumer<PrivilegedEvent> preNotification(Processor processor) {
     return event -> {
-      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
+      if (event.isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
   }
 
-  private Consumer<BaseEvent> postNotification(Processor processor) {
+  private Consumer<PrivilegedEvent> postNotification(Processor processor) {
     return event -> {
-      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
+      if (event.isNotificationsEnabled()) {
         fireNotification(muleContext.getNotificationManager(), event, processor, null,
                          MESSAGE_PROCESSOR_POST_INVOKE);
 

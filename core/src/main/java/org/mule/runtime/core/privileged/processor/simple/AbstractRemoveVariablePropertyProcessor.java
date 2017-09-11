@@ -14,12 +14,13 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
-
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMessageProcessor {
 
@@ -37,17 +38,17 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   public BaseEvent process(BaseEvent event) throws MuleException {
     if (wildcardAttributeEvaluator.hasWildcards()) {
       AtomicReference<BaseEvent> resultEvent = new AtomicReference<>(event);
-      wildcardAttributeEvaluator.processValues(getPropertyNames(event), matchedValue -> {
+      wildcardAttributeEvaluator.processValues(getPropertyNames((PrivilegedEvent) event), matchedValue -> {
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));
         }
-        resultEvent.set(removeProperty(event, matchedValue));
+        resultEvent.set(removeProperty((PrivilegedEvent) event, matchedValue));
       });
       return resultEvent.get();
     } else {
       String key = identifierEvaluator.resolveValue(event);
       if (key != null) {
-        return removeProperty(event, key);
+        return removeProperty((PrivilegedEvent) event, key);
       } else {
         logger.info("Key expression return null, no property will be removed");
         return event;
@@ -55,9 +56,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
     }
   }
 
-  protected abstract Set<String> getPropertyNames(BaseEvent event);
+  protected abstract Set<String> getPropertyNames(PrivilegedEvent event);
 
-  protected abstract BaseEvent removeProperty(BaseEvent event, String propertyName);
+  protected abstract PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName);
 
   @Override
   public Object clone() throws CloneNotSupportedException {

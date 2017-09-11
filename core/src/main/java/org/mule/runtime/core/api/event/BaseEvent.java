@@ -12,8 +12,6 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
@@ -213,43 +211,6 @@ public interface BaseEvent extends Serializable, Event {
     Builder removeParameter(String key);
 
     /**
-     * Set a map of parameters to be internal by the runtime to pass information within the context of an event
-     *
-     * @param internalParameters parameters to be set.
-     * @return the builder instance
-     */
-    Builder internalParameters(Map<String, ?> internalParameters);
-
-    /**
-     * Adds an internal parameter.
-     *
-     * @param key the parameter key
-     * @param value the parameter value
-     * @return the builder instance
-     */
-    Builder addInternalParameter(String key, Object value);
-
-    /**
-     * Remove a internal parameter.
-     *
-     * @param key the parameter key.
-     * @return the builder instance
-     */
-    Builder removeInternalParameter(String key);
-
-    /**
-     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
-     * system or that was configured in the connector source. This is only used to support transports and should not be used
-     * otherwise.
-     *
-     * @param correlationId to override existing correlationId
-     * @return the builder instance
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder correlationId(String correlationId);
-
-    /**
      * Sets the group correlation information to the produced event.
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event
@@ -266,55 +227,12 @@ public interface BaseEvent extends Serializable, Event {
     Builder error(Error error);
 
     /**
-     *
-     * @param replyToHandler
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Deprecated
-    Builder replyToHandler(ReplyToHandler replyToHandler);
-
-    /**
-     *
-     * @param replyToDestination
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Deprecated
-    Builder replyToDestination(Object replyToDestination);
-
-    /**
-     *
-     * @param flow
-     * @return the builder instance
-     * @deprecated TODO MULE-10013 remove this
-     */
-    @Deprecated
-    Builder flow(FlowConstruct flow);
-
-    /**
-     * Disables the firing of notifications when processing the produced event.
-     *
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder disableNotifications();
-
-    /**
      * The security context for this event. If not null outbound, inbound and/or method invocations will be authenticated using
      * this context.
      *
      * @param securityContext the context for this session or null if the request is not secure.
      */
     Builder securityContext(SecurityContext securityContext);
-
-    /**
-     * @param session
-     * @return the builder instance
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder session(MuleSession session);
 
     /**
      * Build a new {@link BaseEvent} based on the state configured in the {@link Builder}.

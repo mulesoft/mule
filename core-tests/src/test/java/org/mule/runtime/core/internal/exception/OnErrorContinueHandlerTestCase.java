@@ -24,6 +24,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -36,12 +37,11 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,6 +50,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -97,7 +100,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
         .thenReturn(flow.getProcessingStrategy());
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = BaseEvent.builder(context).message(muleMessage).flow(flow).build();
+    muleEvent = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
   }
 
   @Test
@@ -130,9 +133,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    BaseEvent lastEventCreated = BaseEvent.builder(context).message(muleMessage).flow(flow).build();
+    BaseEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(BaseEvent.builder(context).message(muleMessage)
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(muleMessage)
             .flow(flow)
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
@@ -155,9 +158,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
 
-    BaseEvent lastEventCreated = BaseEvent.builder(context).message(muleMessage).flow(flow).build();
+    BaseEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createFailingEventMessageProcessor(BaseEvent.builder(context).message(muleMessage)
+        .setMessageProcessors(asList(createFailingEventMessageProcessor(InternalEvent.builder(context).message(muleMessage)
             .flow(flow)
             .build()),
                                      createFailingEventMessageProcessor(lastEventCreated)));
