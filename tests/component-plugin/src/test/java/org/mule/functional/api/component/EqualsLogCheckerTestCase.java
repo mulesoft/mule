@@ -73,7 +73,7 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void delimiterDifferencesShouldFailWithoutFilter() throws Exception {
     String log = EXCEPTION_MESSAGE_DELIMITER + "first line\n" + EXCEPTION_MESSAGE_DELIMITER + "second line";
-    equalsLogChecker.setShouldFilterLogMessage(true);
+    equalsLogChecker.setShouldFilterLogMessage(false);
     equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
     expectedException.expect(AssertionError.class);
     equalsLogChecker.check(log);
