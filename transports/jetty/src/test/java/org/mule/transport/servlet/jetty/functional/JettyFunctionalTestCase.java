@@ -67,7 +67,7 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
 
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/normal/extrapath?param1=value1", getTestMuleMessage(TEST_MESSAGE), newOptions().method(POST.name()).build());
-        assertEquals(200, response.getInboundProperty("http.status"));
+        assertEquals(200, (int)response.getInboundProperty("http.status"));
         assertEquals(TEST_MESSAGE + " received", IOUtils.toString((InputStream) response.getPayload()));
     }
 
@@ -77,6 +77,6 @@ public class JettyFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
         MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/exception", getTestMuleMessage(TEST_MESSAGE), httpRequestOptions);
-        assertEquals(500, response.getInboundProperty("http.status"));
+        assertEquals(500, (int)response.getInboundProperty("http.status"));
     }
 }

@@ -42,6 +42,6 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
 
         assertNull(result.getExceptionPayload());
         assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals(list.size(), result.getSessionProperty("ErrorCount"));
+        assertEquals(list.size(), (int)result.getSessionProperty("ErrorCount"));
     }
 }

@@ -59,7 +59,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         final HttpRequestOptions httpRequestOptions = HttpRequestOptionsBuilder.newOptions().method(POST.name()).build();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_ACCEPT), httpRequestOptions);
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(200, (int)message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertEquals("accepted", message.getPayloadAsString());
     }
 
@@ -68,7 +68,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_REJECT));
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(200, (int)message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertFalse("accepted".equals(message.getPayloadAsString()));
     }
 
@@ -77,7 +77,7 @@ public class JsonSchemaValidationFilterTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         MuleMessage message = client.send("http://localhost:" + dynamicPort.getNumber(), getTestMuleMessage(JSON_BROKEN));
-        assertEquals(200, message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(200, (int)message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
         assertFalse("accepted".equals(message.getPayloadAsString()));
     }
 }

@@ -109,11 +109,11 @@ public class MuleServletTestCase extends AbstractMuleTestCase
         MuleHttpServletResponse response = new MuleHttpServletResponse(event);
 
         response.setStatus(404);
-        assertEquals(404, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(404, (int)message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         // nothing happens with message, the parameter is deprecated
         response.setStatus(200, "status message");
-        assertEquals(200, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(200, (int)message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
         response.setContentType("application/octet-stream");
         assertEquals("application/octet-stream",
@@ -129,7 +129,7 @@ public class MuleServletTestCase extends AbstractMuleTestCase
 
         response.sendRedirect("http://anotherplace");
         assertEquals("http://anotherplace", message.getOutboundProperty("Location"));
-        assertEquals(302, message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
+        assertEquals(302, (int)message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
     @Test

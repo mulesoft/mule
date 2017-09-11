@@ -49,7 +49,7 @@ public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
         MuleMessage message = factory.create(getValidTransportMessage(), encoding, muleContext);
         assertNotNull(message);
         assertPayload(message);
-        assertEquals(PORT, message.getInboundProperty(UdpConnector.PORT_PROPERTY));
+        assertEquals(PORT, (int)message.getInboundProperty(UdpConnector.PORT_PROPERTY));
         assertNotNull(message.getInboundProperty(UdpConnector.ADDRESS_PROPERTY));
     }
 

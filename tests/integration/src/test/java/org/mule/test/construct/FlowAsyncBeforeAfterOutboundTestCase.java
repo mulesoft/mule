@@ -6,7 +6,6 @@
  */
 package org.mule.test.construct;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -60,8 +59,8 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends FunctionalTestCase
         assertNotNull(msgAsync);
         assertNotNull(msgOut);
 
-        assertEquals(msgSync.getInboundProperty("request-response-thread"),
-            msgOut.getInboundProperty("request-response-thread"));
+        assertTrue(msgSync.getInboundProperty("request-response-thread").
+                equals(msgOut.getInboundProperty("request-response-thread")));
 
         assertTrue(!msgAsync.getInboundProperty("async-thread").
             equals(msgSync.getInboundProperty("request-response-thread")));

@@ -20,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateAware;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.store.ObjectStoreManager;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import javax.inject.Inject;
@@ -113,7 +114,7 @@ public class RegistrationAndInjectionTestCase extends FunctionalTestCase
 
     private void assertInjection(TestLifecycleObject object)
     {
-        assertThat(object.getObjectStoreManager(), is(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)));
+        assertThat(object.getObjectStoreManager(), is((ObjectStoreManager)muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)));
         assertThat(object.getMuleContext(), is(muleContext));
 
         // just to make sure that injection is to thank for this
