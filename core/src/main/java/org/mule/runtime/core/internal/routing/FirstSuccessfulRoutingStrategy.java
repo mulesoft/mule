@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.DefaultEventContext.child;
 import static org.mule.runtime.core.api.InternalEvent.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.connector.DispatchException;
@@ -83,8 +81,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
 
     for (Processor mp : messageProcessors) {
       try {
-        returnEvent = processor.processRoute(mp, builder(child(event.getContext(), empty()), event).build());
-
+        returnEvent = processToApplyWithChildContext(event, mp);
         if (returnEvent == null) {
           failed = false;
         } else if (returnEvent.getMessage() == null) {
