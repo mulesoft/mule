@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -152,14 +154,14 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return BaseEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
+    return InternalEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
         .flow(flowConstruct)
         .build();
   }
 
   /**
    * Creates a default {@link ExtensionManager}
-   * 
+   *
    * @return a non null {@link ExtensionManager}
    */
   public static ExtensionManager createDefaultExtensionManager() {

@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -20,11 +21,11 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import java.util.Collection;
 
 @RunnerDelegateTo(Parameterized.class)
 public class PetStoreTlsConfigTestCase extends AbstractExtensionFunctionalTestCase {

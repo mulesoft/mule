@@ -7,21 +7,21 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,9 +29,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -134,9 +136,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct).build())
+          .map(message -> InternalEvent.builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct)
+              .build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))
+          .cast(BaseEvent.class)
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

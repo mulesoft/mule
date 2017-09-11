@@ -17,17 +17,14 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.datatype.EnricherDataTypePropagator;
-import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
 
 public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase {
 
@@ -47,11 +44,11 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-    final Builder builder = BaseEvent.builder(testEvent());
-    dataTypePropagator.propagate(typedValue, testEvent(), builder, compiledExpression);
+    final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(testEvent());
+    dataTypePropagator.propagate(typedValue, (PrivilegedEvent) testEvent(), builder, compiledExpression);
 
-    verify(propagator1).propagate(testEvent(), builder, typedValue, compiledExpression);
-    verify(propagator2).propagate(testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator1).propagate((PrivilegedEvent) testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator2).propagate((PrivilegedEvent) testEvent(), builder, typedValue, compiledExpression);
   }
 
   @Test
@@ -60,16 +57,16 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
     propagators.add(propagator1);
-    final Builder builder = BaseEvent.builder(testEvent());
-    when(propagator1.propagate(testEvent(), builder, typedValue, compiledExpression)).thenReturn(true);
+    final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(testEvent());
+    when(propagator1.propagate((PrivilegedEvent) testEvent(), builder, typedValue, compiledExpression)).thenReturn(true);
     propagators.add(propagator2);
 
     MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-    dataTypePropagator.propagate(typedValue, testEvent(), builder, compiledExpression);
+    dataTypePropagator.propagate(typedValue, (PrivilegedEvent) testEvent(), builder, compiledExpression);
 
-    verify(propagator1).propagate(testEvent(), builder, typedValue, compiledExpression);
-    verify(propagator2, never()).propagate(testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator1).propagate((PrivilegedEvent) testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator2, never()).propagate((PrivilegedEvent) testEvent(), builder, typedValue, compiledExpression);
   }
 
   private CompiledExpression compileMelExpression() {

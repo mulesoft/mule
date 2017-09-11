@@ -14,17 +14,16 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.BaseEvent;
@@ -225,9 +224,7 @@ public class DefaultFlowBuilder implements Builder {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            BaseEvent request =
-                createMuleEventForCurrentFlow(event, ((PrivilegedEvent) event).getReplyToDestination(),
-                                              ((PrivilegedEvent) event).getReplyToHandler());
+            BaseEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
             try {
@@ -237,46 +234,48 @@ public class DefaultFlowBuilder implements Builder {
               ((BaseEventContext) request.getContext()).error(exceptionResolver.resolve(me, getMuleContext()));
             }
             return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
+                .cast(PrivilegedEvent.class)
                 .map(r -> {
-                  BaseEvent result = createReturnEventForParentFlowConstruct(r, event);
+                  BaseEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
                   return result;
                 })
                 .onErrorMap(MessagingException.class, me -> {
-                  me.setProcessedEvent(createReturnEventForParentFlowConstruct(me.getEvent(), event));
+                  me.setProcessedEvent(createReturnEventForParentFlowConstruct((PrivilegedEvent) me.getEvent(),
+                                                                               (InternalEvent) event));
                   return me;
                 });
           });
     }
 
-    private BaseEvent createMuleEventForCurrentFlow(BaseEvent event, Object replyToDestination,
-                                                    ReplyToHandler replyToHandler) {
-      // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
-      // referenced flows. If it is passed on they two replyTo responses are sent.
-      replyToHandler = null;
-
+    private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
       // TODO MULE-10013
       // Create new event for current flow with current flowConstruct, replyToHandler etc.
-      event =
-          BaseEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination).build();
+      event = InternalEvent.builder(event)
+          .flow(this)
+          // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
+          // referenced flows. If it is passed on they two replyTo responses are sent.
+          .replyToHandler(null)
+          .replyToDestination(event.getReplyToDestination()).build();
       resetRequestContextEvent(event);
       return event;
     }
 
-    private BaseEvent createReturnEventForParentFlowConstruct(BaseEvent result, BaseEvent original) {
+    private PrivilegedEvent createReturnEventForParentFlowConstruct(PrivilegedEvent result, InternalEvent original) {
       if (result != null) {
         Optional<Error> errorOptional = result.getError();
         // TODO MULE-10013
         // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-        result = BaseEvent.builder(result).flow(((InternalEvent) original).getFlowConstruct())
-            .replyToHandler(((PrivilegedEvent) original).getReplyToHandler())
-            .replyToDestination(((PrivilegedEvent) original).getReplyToDestination())
+        result = InternalEvent.builder(result)
+            .flow(original.getFlowConstruct())
+            .replyToHandler(original.getReplyToHandler())
+            .replyToDestination(original.getReplyToDestination())
             .error(errorOptional.orElse(null)).build();
       }
       resetRequestContextEvent(result);
       return result;
     }
 
-    private void resetRequestContextEvent(BaseEvent event) {
+    private void resetRequestContextEvent(PrivilegedEvent event) {
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }

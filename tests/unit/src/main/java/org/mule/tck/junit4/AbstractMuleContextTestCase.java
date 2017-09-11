@@ -31,6 +31,7 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -56,19 +57,25 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -83,12 +90,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -450,7 +451,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    *
    * @return a basic event builder with its context already set.
    */
-  protected static Builder eventBuilder() throws MuleException {
+  protected static BaseEvent.Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
     if (flowConstruct == null) {
       synchronized (muleContext) {
@@ -460,12 +461,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         }
       }
     }
-    return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
+    return InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
   }
 
   @Override
-  protected BaseEvent.Builder getEventBuilder() throws MuleException {
-    return eventBuilder();
+  protected <B extends BaseEvent.Builder> B getEventBuilder() throws MuleException {
+    return (B) eventBuilder();
   }
 
   protected boolean isStartContext() {

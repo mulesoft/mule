@@ -10,8 +10,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;

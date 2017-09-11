@@ -17,14 +17,14 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
-
-import java.nio.charset.Charset;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.Charset;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
@@ -49,7 +49,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      final Builder builder = BaseEvent.builder(event);
+      final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(event);
       TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
       event = builder.build();
       if (typedValue.getValue() == null) {
@@ -58,10 +58,11 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
                               "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
                               key, valueEvaluator.getRawValue()));
         }
-        return removeProperty(event, key);
+        return removeProperty((PrivilegedEvent) event, key);
       } else {
-        return addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getDataType().getType())
-            .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
+        return addProperty((PrivilegedEvent) event, key, typedValue
+            .getValue(), DataType.builder().type(typedValue.getDataType().getType())
+                .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
       }
     }
   }
@@ -87,7 +88,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param value value of the property or variable to add
    * @param dataType data type of the property or variable to add
    */
-  protected abstract BaseEvent addProperty(BaseEvent event, String propertyName, T value, DataType dataType);
+  protected abstract PrivilegedEvent addProperty(PrivilegedEvent event, String propertyName, T value, DataType dataType);
 
   /**
    * Removes the property from a property or variables scope.
@@ -95,7 +96,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param event event to which property is to be removed
    * @param propertyName name of the property or variable to remove
    */
-  protected abstract BaseEvent removeProperty(BaseEvent event, String propertyName);
+  protected abstract PrivilegedEvent removeProperty(PrivilegedEvent event, String propertyName);
 
   public void setIdentifier(String identifier) {
     if (StringUtils.isBlank(identifier)) {

@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.DefaultReplyToHandler;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.routing.requestreply.AbstractReplyToPropertyRequestReplyReplier;
 
@@ -26,9 +25,9 @@ public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToProp
   }
 
   @Override
-  protected boolean shouldProcessEvent(BaseEvent event) {
+  protected boolean shouldProcessEvent(PrivilegedEvent event) {
     return !messageExchangePattern.hasResponse()
-        && ((PrivilegedEvent) event).getReplyToHandler() instanceof DefaultReplyToHandler;
+        && event.getReplyToHandler() instanceof DefaultReplyToHandler;
   }
 
 }

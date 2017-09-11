@@ -22,16 +22,17 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.Test;
 
 public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestCase {
 
@@ -58,11 +59,11 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message message3 = Message.of("test event C");
 
     BaseEvent event1 =
-        BaseEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3)))
+        InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3)))
             .flow(flow)
             .build();
-    BaseEvent event2 = BaseEvent.builder(executionContext).message(message2).flow(flow).build();
-    BaseEvent event3 = BaseEvent.builder(executionContext).message(message3).flow(flow).build();
+    BaseEvent event2 = InternalEvent.builder(executionContext).message(message2).flow(flow).build();
+    BaseEvent event3 = InternalEvent.builder(executionContext).message(message3).flow(flow).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
@@ -102,7 +103,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message message1 = of("test event A");
 
     BaseEvent event1 =
-        BaseEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 1)))
+        InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 1)))
             .flow(flow)
             .build();
 
@@ -145,12 +146,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message messageCollection2 = Message.of(list2);
 
     BaseEvent event1 =
-        BaseEvent.builder(executionContext).message(messageCollection1)
+        InternalEvent.builder(executionContext).message(messageCollection1)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
             .flow(flow)
             .build();
     BaseEvent event2 =
-        BaseEvent.builder(executionContext).message(messageCollection2)
+        InternalEvent.builder(executionContext).message(messageCollection2)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
             .flow(flow)
             .build();

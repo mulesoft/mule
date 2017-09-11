@@ -14,12 +14,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.junit.Test;
 
@@ -63,13 +66,13 @@ public class ExceptionTestCase extends AbstractELTestCase {
     Message message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               BaseEvent.builder(context).message(message).flow(flowConstruct).build(),
+                               InternalEvent.builder(context).message(message).flow(flowConstruct).build(),
                                new IllegalAccessException());
     when(mockError.getCause()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }
 
-  private BaseEvent createEvent() throws Exception {
-    return BaseEvent.builder(context).message(of("")).flow(flowConstruct).error(mockError).build();
+  private PrivilegedEvent createEvent() throws Exception {
+    return PrivilegedEvent.builder(context).message(of("")).flow(flowConstruct).error(mockError).build();
   }
 }

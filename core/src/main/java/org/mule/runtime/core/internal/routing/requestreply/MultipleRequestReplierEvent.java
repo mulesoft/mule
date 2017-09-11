@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.internal.routing.requestreply;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.List;
 
 public class MultipleRequestReplierEvent implements Serializable {
 
-  private final List<BaseEvent> muleEvents = new ArrayList<>();
+  private final List<PrivilegedEvent> muleEvents = new ArrayList<>();
 
-  protected synchronized void addEvent(BaseEvent event) {
+  protected synchronized void addEvent(PrivilegedEvent event) {
     muleEvents.add(event);
   }
 
@@ -25,7 +25,7 @@ public class MultipleRequestReplierEvent implements Serializable {
     muleEvents.remove(0);
   }
 
-  protected synchronized BaseEvent getEvent() {
+  protected synchronized PrivilegedEvent getEvent() {
     return muleEvents.get(0);
   }
 }

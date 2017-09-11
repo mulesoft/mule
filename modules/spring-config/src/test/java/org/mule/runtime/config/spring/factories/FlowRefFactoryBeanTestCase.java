@@ -225,8 +225,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     initialiseIfNeeded(flowRefProcessor);
     startIfNeeded(flowRefProcessor);
 
-    assertSame(result.getMessage(), just(newEvent()).transform(flowRefProcessor).block().getMessage());
-    assertSame(result.getMessage(), just(newEvent()).transform(flowRefProcessor).block().getMessage());
+    assertSame(result.getMessage(), just(newEvent()).cast(BaseEvent.class).transform(flowRefProcessor).block().getMessage());
+    assertSame(result.getMessage(), just(newEvent()).cast(BaseEvent.class).transform(flowRefProcessor).block().getMessage());
 
     verify(applicationContext).getBean(anyString());
 

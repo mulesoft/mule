@@ -16,7 +16,6 @@ import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -50,9 +49,9 @@ public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTest
 
   @Test
   public void failsToGenerateKeyWhenCannotReadPayload() throws Exception {
-    BaseEvent event = spy(newEvent());
+    PrivilegedEvent event = spy(this.<PrivilegedEvent>newEvent());
     final DefaultMuleException fail = new DefaultMuleException("Fail");
-    when(((PrivilegedEvent) event).getMessageAsBytes(muleContext)).thenThrow(fail);
+    when(event.getMessageAsBytes(muleContext)).thenThrow(fail);
     expectedException.expect(MuleRuntimeException.class);
     expectedException.expectCause(is(sameInstance(fail)));
     keyGenerator.generateKey(event);

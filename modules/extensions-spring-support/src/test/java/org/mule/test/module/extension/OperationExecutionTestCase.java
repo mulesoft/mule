@@ -19,6 +19,8 @@ import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
+import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -512,7 +514,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils
-        .getConfigurationFromRegistry(name, eventBuilder().message(of(EMPTY_STRING)).build(), muleContext);
+    return ExtensionsTestUtils.getConfigurationFromRegistry(name, BaseEvent
+        .builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(EMPTY_STRING)).build(), muleContext);
   }
 }

@@ -8,15 +8,15 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.api.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -31,7 +31,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -40,7 +39,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
@@ -126,11 +125,13 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
     return from(publisher)
+        .cast(PrivilegedEvent.class)
         .doOnNext(request -> just(request)
             .map(event -> asyncEvent(request))
             .transform(innerPublisher -> from(innerPublisher)
                 .doOnNext(fireAsyncScheduledNotification())
                 .doOnNext(asyncRequest -> just(asyncRequest)
+                    .cast(BaseEvent.class)
                     .transform(scheduleAsync(delegate))
                     .doOnNext(event -> fireAsyncCompleteNotification(event, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), e))
@@ -138,9 +139,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                         .warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
                             + " . To handle this error include a <try> scope in the <async> scope.",
                               throwable))
-                    .subscribe(event -> ((BaseEventContext) asyncRequest.getContext()).success(event),
-                               throwable -> ((BaseEventContext) asyncRequest.getContext()).error(throwable))))
-            .subscribe(requestUnbounded()));
+                    .subscribe(event -> asyncRequest.getContext().success(event),
+                               throwable -> asyncRequest.getContext().error(throwable))))
+            .subscribe(requestUnbounded()))
+        .cast(BaseEvent.class);
   }
 
 
@@ -154,12 +156,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
   }
 
-  private BaseEvent asyncEvent(BaseEvent event) {
+  private PrivilegedEvent asyncEvent(PrivilegedEvent event) {
     // Clone event, make it async and remove ReplyToHandler
-    return BaseEvent
-        .builder(child(((BaseEventContext) event.getContext()), ofNullable(getLocation())), event)
+    return PrivilegedEvent
+        .builder(child((event.getContext()), ofNullable(getLocation())), event)
         .replyToHandler(null)
-        .session(new DefaultMuleSession(((PrivilegedEvent) event).getSession())).build();
+        .session(new DefaultMuleSession(event.getSession())).build();
   }
 
   private Consumer<BaseEvent> fireAsyncScheduledNotification() {

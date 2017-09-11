@@ -10,10 +10,10 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
@@ -54,11 +54,11 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
     return events.getMessageCollectionEvent();
   }
 
-  protected MuleSession getMergedSession(BaseEvent[] events) {
-    MuleSession session = new DefaultMuleSession(((PrivilegedEvent) events[0]).getSession());
+  protected MuleSession getMergedSession(PrivilegedEvent[] events) {
+    MuleSession session = new DefaultMuleSession(events[0].getSession());
     for (int i = 1; i < events.length; i++) {
-      for (String name : ((PrivilegedEvent) events[i]).getSession().getPropertyNamesAsSet()) {
-        session.setProperty(name, ((PrivilegedEvent) events[i]).getSession().getProperty(name));
+      for (String name : events[i].getSession().getPropertyNamesAsSet()) {
+        session.setProperty(name, events[i].getSession().getProperty(name));
       }
     }
     return session;

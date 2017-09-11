@@ -24,9 +24,10 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
   @Override
   public BaseEvent process(BaseEvent event) throws MuleException {
     BaseEvent resultEvent;
-    if (shouldProcessEvent(event)) {
-      Object replyTo = ((PrivilegedEvent) event).getReplyToDestination();
-      ReplyToHandler replyToHandler = ((PrivilegedEvent) event).getReplyToHandler();
+    PrivilegedEvent privilegedEvent = (PrivilegedEvent) event;
+    if (shouldProcessEvent(privilegedEvent)) {
+      Object replyTo = privilegedEvent.getReplyToDestination();
+      ReplyToHandler replyToHandler = privilegedEvent.getReplyToHandler();
 
       resultEvent = processNext(event);
 
@@ -41,7 +42,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
     return resultEvent;
   }
 
-  protected abstract boolean shouldProcessEvent(BaseEvent event);
+  protected abstract boolean shouldProcessEvent(PrivilegedEvent event);
 
   protected BaseEvent processReplyTo(BaseEvent event, BaseEvent result, ReplyToHandler replyToHandler, Object replyTo)
       throws MuleException {

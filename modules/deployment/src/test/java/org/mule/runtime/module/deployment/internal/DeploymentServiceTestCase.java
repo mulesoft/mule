@@ -89,6 +89,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -113,6 +114,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -154,6 +156,17 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestContainerModuleDiscoverer;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -171,17 +184,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -4104,7 +4106,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     Message muleMessage = of(TEST_MESSAGE);
 
-    mainFlow.process(BaseEvent.builder(create(mainFlow, TEST_CONNECTOR_LOCATION)).message(muleMessage)
+    mainFlow.process(InternalEvent.builder(create(mainFlow, TEST_CONNECTOR_LOCATION)).message(muleMessage)
         .flow(mainFlow)
         .build());
   }

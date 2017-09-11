@@ -6,12 +6,13 @@
  */
 package org.mule.tck.core.transformer;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -20,23 +21,12 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.junit.Test;
-
 public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase {
-
-  @Override
-  protected void doSetUp() throws Exception {
-    // setup a dummy context for transformers that are event aware
-    setCurrentEvent(testEvent());
-  }
-
-  @Override
-  protected void doTearDown() throws Exception {
-    setCurrentEvent(null);
-  }
 
   // Remove tabs and line breaks in the passed String; this makes comparison of XML
   // fragments easier
@@ -55,8 +45,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
 
     final boolean match = this.compareResults(expectedResult, result);
     if (!match) {
-      fail(String.format("Transformation result does not match expected result. Expected '%s', but got '%s'",
-                         expectedResult, result));
+      fail(format("Transformation result does not match expected result. Expected '%s', but got '%s'",
+                  expectedResult, result));
     }
   }
 
@@ -71,8 +61,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
       final boolean match = this.compareRoundtripResults(this.getTestData(), result);
 
       if (!match) {
-        fail(String.format("The result of the roundtrip transform does not match expected result. Expected '%s', but got '%s'",
-                           this.getTestData(), result));
+        fail(format("The result of the roundtrip transform does not match expected result. Expected '%s', but got '%s'",
+                    this.getTestData(), result));
       }
     }
   }

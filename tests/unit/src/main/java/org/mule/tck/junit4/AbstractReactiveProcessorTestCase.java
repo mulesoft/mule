@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;

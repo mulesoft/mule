@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 

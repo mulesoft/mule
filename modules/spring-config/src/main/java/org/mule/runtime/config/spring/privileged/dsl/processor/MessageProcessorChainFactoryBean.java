@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.privileged.dsl.processor;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 
 import org.mule.runtime.core.api.MuleContext;

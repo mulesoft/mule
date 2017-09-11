@@ -285,8 +285,8 @@ public abstract class AbstractMuleTestCase {
    * @return new test event.
    * @throws MuleException
    */
-  protected BaseEvent newEvent() throws MuleException {
-    return getEventBuilder().message(of(TEST_PAYLOAD)).build();
+  protected <E extends BaseEvent> E newEvent() throws MuleException {
+    return (E) getEventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
   /**
@@ -295,8 +295,8 @@ public abstract class AbstractMuleTestCase {
    * @return a event builder to use to build a test event
    * @throws MuleException
    */
-  protected BaseEvent.Builder getEventBuilder() throws MuleException {
-    return eventBuilder();
+  protected <B extends BaseEvent.Builder> B getEventBuilder() throws MuleException {
+    return (B) eventBuilder();
   }
 
   protected BaseEvent nullPayloadEvent() throws MuleException {

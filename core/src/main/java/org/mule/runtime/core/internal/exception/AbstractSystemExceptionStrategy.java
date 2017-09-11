@@ -14,7 +14,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -22,6 +21,7 @@ import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy if this is a
@@ -42,8 +42,8 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
 
     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
     if (getCurrentEvent() != null) {
-      BaseEvent currentEvent = getCurrentEvent();
-      currentEvent = BaseEvent.builder(currentEvent)
+      PrivilegedEvent currentEvent = getCurrentEvent();
+      currentEvent = PrivilegedEvent.builder(currentEvent)
           .message(InternalMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
       setCurrentEvent(currentEvent);
     }

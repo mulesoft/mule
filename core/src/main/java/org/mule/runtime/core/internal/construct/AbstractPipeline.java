@@ -15,10 +15,10 @@ import static org.mule.runtime.core.api.context.notification.PipelineMessageNoti
 import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;

@@ -13,9 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -25,7 +25,7 @@ public class DefaultInterceptionEventTestCase extends AbstractMuleTestCase {
 
   @Test
   public void addSession() throws MuleException {
-    final BaseEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
+    final InternalEvent event = this.<InternalEvent.Builder>getEventBuilder().message(of(TEST_PAYLOAD)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = mock(MuleSession.class);
@@ -36,8 +36,8 @@ public class DefaultInterceptionEventTestCase extends AbstractMuleTestCase {
 
   @Test
   public void changeSession() throws MuleException {
-    final BaseEvent event =
-        getEventBuilder().message(of(TEST_PAYLOAD)).session(mock(MuleSession.class)).build();
+    final InternalEvent event =
+        this.<InternalEvent.Builder>getEventBuilder().message(of(TEST_PAYLOAD)).session(mock(MuleSession.class)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = mock(MuleSession.class);
@@ -48,7 +48,7 @@ public class DefaultInterceptionEventTestCase extends AbstractMuleTestCase {
 
   @Test
   public void updateSession() throws MuleException {
-    final BaseEvent event = getEventBuilder().message(of(TEST_PAYLOAD)).build();
+    final InternalEvent event = this.<InternalEvent.Builder>getEventBuilder().message(of(TEST_PAYLOAD)).build();
     final DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(event);
 
     final MuleSession session = ((PrivilegedEvent) event).getSession();

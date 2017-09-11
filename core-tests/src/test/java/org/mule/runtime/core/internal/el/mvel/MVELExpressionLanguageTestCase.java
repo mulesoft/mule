@@ -56,6 +56,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -157,7 +158,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testEvaluateStringMuleEvent() throws Exception {
-    BaseEvent event = createEvent();
+    PrivilegedEvent event = createEvent();
 
     // Literals
     assertEquals("hi", evaluate("'hi'", event));
@@ -176,7 +177,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testEvaluateMapOfStringObject() throws Exception {
-    BaseEvent event = createEvent();
+    PrivilegedEvent event = createEvent();
 
     // Custom variables (via method param)
     assertEquals(1, evaluate("foo", singletonMap("foo", 1)));
@@ -185,7 +186,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testEvaluateStringMuleMessage() throws Exception {
-    BaseEvent event = createEvent();
+    PrivilegedEvent event = createEvent();
 
     // Event context
     assertEquals("foo", evaluate("message.payload", event));
@@ -193,7 +194,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testEvaluateAttributes() throws Exception {
-    BaseEvent event = createEventWithAttributes();
+    PrivilegedEvent event = createEventWithAttributes();
 
     // Event context
     assertEquals("number 1", evaluate("attributes.one", event));
@@ -212,14 +213,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void regexFunction() throws Exception {
-    final BaseEvent testEvent = eventBuilder().message(of("TESTfooTEST")).build();
+    final PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("TESTfooTEST")).build();
     assertEquals("foo", evaluate("regex('TEST(\\\\w+)TEST')", testEvent));
   }
 
   @Test
   public void appTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(singletonMap("app", "'other1'"));
-    BaseEvent event = eventBuilder().message(of("")).addVariable("app", "otherb").build();
+    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("app", "otherb").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
     mvel.initialise();
@@ -229,7 +230,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void messageTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(singletonMap("message", "'other1'"));
-    BaseEvent event = eventBuilder().message(of("")).addVariable("message", "other2").build();
+    PrivilegedEvent event =
+        this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("message", "other2").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("message", "other3"));
     mvel.initialise();
@@ -238,7 +240,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void extensionTakesPrecedenceOverAutoResolved() throws Exception {
-    BaseEvent event = eventBuilder().message(of("")).addVariable("foo", "other").build();
+    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("foo", "other").build();
     muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo", event));
@@ -436,12 +438,12 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     }
   }
 
-  protected Object evaluate(String expression, BaseEvent event) throws Exception {
+  protected Object evaluate(String expression, PrivilegedEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluateUntyped("#[mel:" + expression + "]", event, BaseEvent.builder(event),
+      return mvel.evaluateUntyped("#[mel:" + expression + "]", event, PrivilegedEvent.builder(event),
                                   ((Component) flowConstruct).getLocation(), null);
     } else {
-      return mvel.evaluateUntyped(expression, event, BaseEvent.builder(event),
+      return mvel.evaluateUntyped(expression, event, PrivilegedEvent.builder(event),
                                   ((Component) flowConstruct).getLocation(), null);
     }
   }
@@ -454,38 +456,38 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     }
   }
 
-  protected BaseEvent createEvent(DataType dataType) {
+  protected PrivilegedEvent createEvent(DataType dataType) {
     return createEvent("foo", STRING);
   }
 
-  protected BaseEvent createEventWithAttributes(DataType dataType) {
+  protected PrivilegedEvent createEventWithAttributes(DataType dataType) {
     HashMap<String, String> attributes = new HashMap<>();
     attributes.put("one", "number 1");
     attributes.put("two", "number 2");
     return createEvent("foo", STRING, attributes, OBJECT);
   }
 
-  protected BaseEvent createEvent(String payload, DataType dataType) {
+  protected PrivilegedEvent createEvent(String payload, DataType dataType) {
     return createEvent(payload, dataType, null, OBJECT);
   }
 
-  protected BaseEvent createEvent(String payload, DataType dataType, Object attributes, DataType attributesDataType) {
+  protected PrivilegedEvent createEvent(String payload, DataType dataType, Object attributes, DataType attributesDataType) {
     InternalMessage message = mock(InternalMessage.class);
     when(message.getPayload()).thenReturn(new TypedValue<>(payload, dataType));
     when(message.getAttributes()).thenReturn(new TypedValue<>(attributes, attributesDataType));
 
     try {
-      return getEventBuilder().message(message).build();
+      return this.<PrivilegedEvent.Builder>getEventBuilder().message(message).build();
     } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
   }
 
-  protected BaseEvent createEvent() {
+  protected PrivilegedEvent createEvent() {
     return createEvent(STRING);
   }
 
-  protected BaseEvent createEventWithAttributes() {
+  protected PrivilegedEvent createEventWithAttributes() {
     return createEventWithAttributes(STRING);
   }
 
@@ -517,12 +519,12 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
-    BaseEvent event = eventBuilder().message(of(new String[] {"1", "2"})).build();
-    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, BaseEvent.builder(event),
+    PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(new String[] {"1", "2"})).build();
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, PrivilegedEvent.builder(event),
                                            ((Component) flowConstruct).getLocation(), null));
-    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(singletonList("1")).build())
+    event = PrivilegedEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(singletonList("1")).build())
         .build();
-    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, BaseEvent.builder(event),
+    assertEquals("1", mvel.evaluateUntyped("payload[0]", event, PrivilegedEvent.builder(event),
                                            ((Component) flowConstruct).getLocation(), null));
   }
 

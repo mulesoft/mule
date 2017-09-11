@@ -25,10 +25,11 @@ public class PolicyEventConverter {
    * @param variablesProviderEvent provider of the variables part of the event
    * @return the created event
    */
-  public BaseEvent createEvent(BaseEvent event, BaseEvent variablesProviderEvent) {
-    BaseEvent.Builder eventBuilder =
-        BaseEvent.builder(variablesProviderEvent.getContext()).message(event.getMessage())
-            .session(((PrivilegedEvent) event).getSession());
+  public PrivilegedEvent createEvent(PrivilegedEvent event, PrivilegedEvent variablesProviderEvent) {
+    PrivilegedEvent.Builder eventBuilder =
+        PrivilegedEvent.builder(variablesProviderEvent.getContext())
+            .message(event.getMessage())
+            .session(event.getSession());
     eventBuilder.variables(variablesProviderEvent.getVariables());
     return eventBuilder.build();
   }

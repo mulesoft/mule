@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;

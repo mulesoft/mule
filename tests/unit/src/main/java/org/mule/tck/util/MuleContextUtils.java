@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -24,13 +25,13 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 /**
@@ -62,7 +63,7 @@ public class MuleContextUtils {
 
   /**
    * Creates and configures a mock {@link MuleContext} to return testing services implementations.
-   * 
+   *
    * @return the created {@code muleContext}.
    */
   public static MuleContext mockContextWithServices() {
@@ -86,12 +87,12 @@ public class MuleContextUtils {
 
   /**
    * Creates a basic event builder with its context already set.
-   * 
+   *
    * @return a basic event builder with its context already set.
    */
-  public static Builder eventBuilder() throws MuleException {
+  public static <B extends BaseEvent.Builder> B eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
-    return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
 }

@@ -12,14 +12,14 @@ import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   private FlowConstruct flowConstruct;
 
   @Override
-  protected boolean shouldProcessEvent(BaseEvent event) {
+  protected boolean shouldProcessEvent(PrivilegedEvent event) {
     MessageExchangePattern mep = REQUEST_RESPONSE;
     if (getFlowConstruct() instanceof Pipeline
         && ((Pipeline) getFlowConstruct()).getSource() instanceof LegacyImmutableEndpoint) {

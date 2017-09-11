@@ -15,11 +15,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,11 +30,11 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.Scope;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;

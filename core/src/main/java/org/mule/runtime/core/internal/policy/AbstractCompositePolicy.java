@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.process;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.process;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;

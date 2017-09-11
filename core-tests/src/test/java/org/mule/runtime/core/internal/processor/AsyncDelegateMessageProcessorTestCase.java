@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;

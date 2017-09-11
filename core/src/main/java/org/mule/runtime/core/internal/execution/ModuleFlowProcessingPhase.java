@@ -20,12 +20,12 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.message.ErrorBuilder.builder;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.api.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
@@ -33,6 +33,7 @@ import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -40,7 +41,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -56,21 +56,22 @@ import org.mule.runtime.core.api.execution.MessageProcessTemplate;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
@@ -261,12 +262,12 @@ public class ModuleFlowProcessingPhase
                                 Publisher<Void> responseCompletion, FlowConstruct flowConstruct)
       throws MuleException {
     Message message = template.getMessage();
-    BaseEvent templateEvent =
-        builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
-                       NullExceptionHandler.getInstance()))
-                           .message(message)
-                           .flow(flowConstruct)
-                           .build();
+    BaseEvent templateEvent = InternalEvent
+        .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
+                        NullExceptionHandler.getInstance()))
+        .message(message)
+        .flow(flowConstruct)
+        .build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {
       SourceResultAdapter adapter = (SourceResultAdapter) message.getPayload().getValue();

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -24,7 +25,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
@@ -120,7 +121,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void sessionModifiedByNextProcessorIsPropagated() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    BaseEvent modifiedSessionEvent = BaseEvent.builder(initialEvent).session(session).build();
+    BaseEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -133,7 +134,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    BaseEvent modifiedSessionEvent = BaseEvent.builder(initialEvent).session(session).build();
+    BaseEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedSessionEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));

@@ -12,7 +12,7 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.util.ASTIterator;
 import org.mule.mvel2.util.ASTLinkedList;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
  * Base class {@link EnricherDataTypePropagator}
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 public abstract class AbstractEnricherDataTypePropagator implements EnricherDataTypePropagator {
 
   @Override
-  public boolean propagate(BaseEvent event, BaseEvent.Builder builder, TypedValue typedValue,
+  public boolean propagate(PrivilegedEvent event, PrivilegedEvent.Builder builder, TypedValue typedValue,
                            CompiledExpression compiledExpression) {
     ASTIterator iterator = new ASTLinkedList(compiledExpression.getFirstNode());
 
@@ -33,5 +33,6 @@ public abstract class AbstractEnricherDataTypePropagator implements EnricherData
     return false;
   }
 
-  protected abstract boolean doPropagate(BaseEvent event, BaseEvent.Builder builder, TypedValue typedValue, ASTNode node);
+  protected abstract boolean doPropagate(PrivilegedEvent event, PrivilegedEvent.Builder builder, TypedValue typedValue,
+                                         ASTNode node);
 }

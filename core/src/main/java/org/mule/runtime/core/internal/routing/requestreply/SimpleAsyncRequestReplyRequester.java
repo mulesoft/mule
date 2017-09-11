@@ -115,13 +115,13 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     }
 
     @Override
-    protected boolean shouldProcessEvent(BaseEvent event) {
+    protected boolean shouldProcessEvent(PrivilegedEvent event) {
       // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
       MessageExchangePattern mep = REQUEST_RESPONSE;
       if (source instanceof LegacyImmutableEndpoint) {
         mep = ((LegacyImmutableEndpoint) source).getExchangePattern();
       }
-      return !mep.hasResponse() && ((PrivilegedEvent) event).getReplyToHandler() instanceof DefaultReplyToHandler;
+      return !mep.hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
     }
 
   }

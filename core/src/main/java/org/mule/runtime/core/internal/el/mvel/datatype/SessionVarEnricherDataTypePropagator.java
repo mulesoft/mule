@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -22,13 +21,13 @@ public class SessionVarEnricherDataTypePropagator extends AbstractVariableEnrich
   }
 
   @Override
-  protected void addVariable(BaseEvent event, BaseEvent.Builder builder, TypedValue typedValue, String propertyName) {
-    ((PrivilegedEvent) event).getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
+  protected void addVariable(PrivilegedEvent event, PrivilegedEvent.Builder builder, TypedValue typedValue, String propertyName) {
+    event.getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
   }
 
   @Override
-  protected boolean containsVariable(BaseEvent event, String propertyName) {
-    return ((PrivilegedEvent) event).getSession().getPropertyNamesAsSet().contains(propertyName);
+  protected boolean containsVariable(PrivilegedEvent event, String propertyName) {
+    return event.getSession().getPropertyNamesAsSet().contains(propertyName);
   }
 
 }

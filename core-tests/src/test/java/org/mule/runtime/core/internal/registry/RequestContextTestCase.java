@@ -15,12 +15,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 import org.slf4j.Logger;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RequestContextTestCase extends AbstractMuleTestCase {
 
@@ -40,7 +41,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   protected void runThread(BaseEvent event, boolean doTest) throws InterruptedException {
     AtomicBoolean success = new AtomicBoolean(false);
-    Thread thread = new Thread(new SetExceptionPayload(event, success));
+    Thread thread = new Thread(new SetExceptionPayload((PrivilegedEvent) event, success));
     thread.start();
     thread.join();
     if (doTest) {
@@ -51,10 +52,10 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   private class SetExceptionPayload implements Runnable {
 
-    private BaseEvent event;
+    private PrivilegedEvent event;
     private AtomicBoolean success;
 
-    public SetExceptionPayload(BaseEvent event, AtomicBoolean success) {
+    public SetExceptionPayload(PrivilegedEvent event, AtomicBoolean success) {
       this.event = event;
       this.success = success;
     }
@@ -63,7 +64,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     public void run() {
       try {
         Exception exception = new Exception();
-        event = BaseEvent.builder(event)
+        event = PrivilegedEvent.builder(event)
             .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
             .error(createErrorMock(exception)).build();
         setCurrentEvent(event);

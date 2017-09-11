@@ -6,11 +6,22 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Contains accessors to the fields of the event only accessible from within the Mule Runtime.
@@ -43,4 +54,154 @@ public interface InternalEvent extends PrivilegedEvent {
   @Deprecated
   FlowConstruct getFlowConstruct();
 
+  /**
+   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is conserved.
+   *
+   * @param event existing event to use as a template to create builder instance
+   * @return new builder instance.
+   */
+  static Builder builder(BaseEvent event) {
+    return new DefaultEventBuilder((InternalEvent) event);
+  }
+
+  /**
+   * Create new {@link Builder}.
+   *
+   * @param context the context to create event instance with.
+   * @return new builder instance.
+   */
+  static Builder builder(EventContext context) {
+    return new DefaultEventBuilder((BaseEventContext) context);
+  }
+
+  public interface Builder extends PrivilegedEvent.Builder {
+
+    /**
+     * Set a map of parameters to be internal by the runtime to pass information within the context of an event
+     *
+     * @param internalParameters parameters to be set.
+     * @return the builder instance
+     */
+    Builder internalParameters(Map<String, ?> internalParameters);
+
+    /**
+     * Adds an internal parameter.
+     *
+     * @param key the parameter key
+     * @param value the parameter value
+     * @return the builder instance
+     */
+    Builder addInternalParameter(String key, Object value);
+
+    /**
+     * Remove a internal parameter.
+     *
+     * @param key the parameter key.
+     * @return the builder instance
+     */
+    Builder removeInternalParameter(String key);
+
+    /**
+     * Build a new {@link InternalEvent} based on the state configured in the {@link Builder}.
+     *
+     * @return new {@link InternalEvent} instance.
+     */
+    @Override
+    InternalEvent build();
+
+    /**
+     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
+     * system or that was configured in the connector source. This is only used to support transports and should not be used
+     * otherwise.
+     *
+     * @param correlationId to override existing correlationId
+     * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Override
+    @Deprecated
+    Builder correlationId(String correlationId);
+
+    /**
+     *
+     * @param replyToHandler
+     * @return the builder instance
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
+     */
+    @Override
+    @Deprecated
+    Builder replyToHandler(ReplyToHandler replyToHandler);
+
+    /**
+     *
+     * @param replyToDestination
+     * @return the builder instance
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
+     */
+    @Override
+    @Deprecated
+    Builder replyToDestination(Object replyToDestination);
+
+    /**
+     * Disables the firing of notifications when processing the produced event.
+     *
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Override
+    @Deprecated
+    Builder disableNotifications();
+
+    /**
+     * @param session
+     * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Override
+    @Deprecated
+    Builder session(MuleSession session);
+
+    @Override
+    Builder message(Message message);
+
+    @Override
+    Builder variables(Map<String, ?> variables);
+
+    @Override
+    Builder addVariable(String key, Object value);
+
+    @Override
+    Builder addVariable(String key, Object value, DataType mediaType);
+
+    @Override
+    Builder removeVariable(String key);
+
+    @Override
+    Builder properties(Map<String, ?> properties);
+
+    @Override
+    Builder parameters(Map<String, ?> parameters);
+
+    @Override
+    Builder addParameter(String key, Object value);
+
+    @Override
+    Builder addParameter(String key, Object value, DataType dataType);
+
+    @Override
+    Builder removeParameter(String key);
+
+    @Override
+    Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
+
+    @Override
+    Builder error(org.mule.runtime.api.message.Error error);
+
+    @Override
+    Builder securityContext(SecurityContext securityContext);
+
+    @Override
+    @Deprecated
+    Builder flow(FlowConstruct flow);
+
+  }
 }

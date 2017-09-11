@@ -17,8 +17,6 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -42,9 +40,10 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    BaseEvent testEvent = eventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", "bar").build();
+    PrivilegedEvent testEvent =
+        this.<PrivilegedEvent.Builder>getEventBuilder().message(of(TEST_MESSAGE)).addVariable("foo", "bar").build();
 
-    final Builder builder = BaseEvent.builder(testEvent);
+    final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(testEvent);
     dataTypePropagator.propagate(testEvent, builder, new TypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
 
     assertThat(builder.build().getVariables().get("foo").getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
@@ -58,12 +57,14 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    ((PrivilegedEvent) testEvent()).getSession().setProperty("foo", "bar");
+    PrivilegedEvent event = (PrivilegedEvent) testEvent();
+    event.getSession().setProperty("foo", "bar");
 
-    final Builder builder = BaseEvent.builder(testEvent());
-    dataTypePropagator.propagate(testEvent(), builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final PrivilegedEvent.Builder builder = PrivilegedEvent.builder(testEvent());
+    dataTypePropagator.propagate((PrivilegedEvent) testEvent(), builder, new TypedValue(TEST_MESSAGE, expectedDataType),
+                                 compiledExpression);
 
-    assertThat(((PrivilegedEvent) builder.build()).getSession().getPropertyDataType("foo"),
+    assertThat(builder.build().getSession().getPropertyDataType("foo"),
                like(String.class, JSON, CUSTOM_ENCODING));
   }
 

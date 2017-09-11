@@ -12,16 +12,18 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorFromFailingP
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 
 import org.slf4j.Logger;
 
@@ -57,7 +59,9 @@ class ReactiveInterceptionAction implements InterceptionAction {
     }
 
     return just(interceptionEvent.resolve())
+        .cast(BaseEvent.class)
         .transform(next)
+        .cast(InternalEvent.class)
         .map(event -> {
           interceptionEvent.reset(event);
           return interceptionEvent;

@@ -7,17 +7,25 @@
 package org.mule.runtime.core.privileged.event;
 
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.event.MuleSession;
+import org.mule.runtime.core.api.message.GroupCorrelation;
+import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Allows access to the privileged behavior of the {@link Event} implementation.
@@ -28,7 +36,7 @@ public interface PrivilegedEvent extends BaseEvent {
 
   class CurrentEventHolder {
 
-    private static final ThreadLocal<BaseEvent> currentEvent = new ThreadLocal<>();
+    private static final ThreadLocal<PrivilegedEvent> currentEvent = new ThreadLocal<>();
   }
 
   /**
@@ -74,7 +82,7 @@ public interface PrivilegedEvent extends BaseEvent {
    *
    * @return event for currently executing thread.
    */
-  static BaseEvent getCurrentEvent() {
+  static PrivilegedEvent getCurrentEvent() {
     return CurrentEventHolder.currentEvent.get();
   }
 
@@ -83,7 +91,7 @@ public interface PrivilegedEvent extends BaseEvent {
    *
    * @param event event for currently executing thread.
    */
-  static void setCurrentEvent(BaseEvent event) {
+  static void setCurrentEvent(PrivilegedEvent event) {
     CurrentEventHolder.currentEvent.set(event);
   }
 
@@ -142,4 +150,142 @@ public interface PrivilegedEvent extends BaseEvent {
    */
   boolean isNotificationsEnabled();
 
+  /**
+   * Create new {@link Builder}.
+   *
+   * @param context the context to create event instance with.
+   * @return new builder instance.
+   */
+  static Builder builder(EventContext context) {
+    return new DefaultEventBuilder((BaseEventContext) context);
+  }
+
+  /**
+   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is conserved.
+   *
+   * @param event existing event to use as a template to create builder instance
+   * @return new builder instance.
+   */
+  static Builder builder(BaseEvent event) {
+    return new DefaultEventBuilder((InternalEvent) event);
+  }
+
+  /**
+   * Create new {@link Builder} based on an existing {@link BaseEvent} instance and and {@link EventContext}. A new
+   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link BaseEvent}. This builder
+   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link BaseEvent}
+   * needs a new context.
+   *
+   * @param event existing event to use as a template to create builder instance
+   * @param context the context to create event instance with.
+   * @return new builder instance.
+   */
+  static Builder builder(EventContext context, BaseEvent event) {
+    return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
+  }
+
+  public interface Builder extends BaseEvent.Builder {
+
+    /**
+     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
+     * system or that was configured in the connector source. This is only used to support transports and should not be used
+     * otherwise.
+     *
+     * @param correlationId to override existing correlationId
+     * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder correlationId(String correlationId);
+
+    /**
+     *
+     * @param replyToHandler
+     * @return the builder instance
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
+     */
+    @Deprecated
+    Builder replyToHandler(ReplyToHandler replyToHandler);
+
+    /**
+     *
+     * @param replyToDestination
+     * @return the builder instance
+     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
+     */
+    @Deprecated
+    Builder replyToDestination(Object replyToDestination);
+
+    /**
+     * Disables the firing of notifications when processing the produced event.
+     *
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder disableNotifications();
+
+    /**
+     * @param session
+     * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder session(MuleSession session);
+
+    /**
+     *
+     * @param flow
+     * @return the builder instance
+     * @deprecated TODO MULE-10013 remove this
+     */
+    @Deprecated
+    Builder flow(FlowConstruct flow);
+
+    /**
+     * Build a new {@link PrivilegedEvent} based on the state configured in the {@link Builder}.
+     *
+     * @return new {@link PrivilegedEvent} instance.
+     */
+    @Override
+    PrivilegedEvent build();
+
+    @Override
+    Builder message(Message message);
+
+    @Override
+    Builder variables(Map<String, ?> variables);
+
+    @Override
+    Builder addVariable(String key, Object value);
+
+    @Override
+    Builder addVariable(String key, Object value, DataType mediaType);
+
+    @Override
+    Builder removeVariable(String key);
+
+    @Override
+    Builder properties(Map<String, ?> properties);
+
+    @Override
+    Builder parameters(Map<String, ?> parameters);
+
+    @Override
+    Builder addParameter(String key, Object value);
+
+    @Override
+    Builder addParameter(String key, Object value, DataType dataType);
+
+    @Override
+    Builder removeParameter(String key);
+
+    @Override
+    Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);
+
+    @Override
+    Builder error(org.mule.runtime.api.message.Error error);
+
+    @Override
+    Builder securityContext(SecurityContext securityContext);
+  }
 }

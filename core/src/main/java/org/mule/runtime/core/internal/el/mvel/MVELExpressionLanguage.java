@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
+import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -15,10 +17,6 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 
-import static java.util.Collections.singletonMap;
-
-import static java.util.stream.Collectors.toMap;
-
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
@@ -26,12 +24,12 @@ import org.mule.mvel2.compiler.ExpressionCompiler;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -43,6 +41,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -130,7 +129,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
     return (T) evaluateInternal(expression, context);
   }
 
-  public <T> T evaluateUntyped(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
+  public <T> T evaluateUntyped(String expression, PrivilegedEvent event, PrivilegedEvent.Builder eventBuilder,
                                ComponentLocation componentLocation,
                                Map<String, Object> vars) {
     if (event == null) {
@@ -158,7 +157,8 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
                      Object object) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, event, eventBuilder, componentLocation, singletonMap(OBJECT_FOR_ENRICHMENT, object));
+    evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, componentLocation,
+                    singletonMap(OBJECT_FOR_ENRICHMENT, object));
   }
 
   @Override
@@ -167,13 +167,13 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
                      TypedValue typedValue) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    evaluateUntyped(expression, event, eventBuilder, componentLocation,
+    evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, componentLocation,
                     singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
     event = eventBuilder.build();
-    dataTypePropagator.propagate(typedValue, event, eventBuilder, compiledExpression);
+    dataTypePropagator.propagate(typedValue, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder, compiledExpression);
   }
 
   @Override
@@ -232,12 +232,13 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
                                                                                          id -> bindingContext.lookup(id).get()
                                                                                              .getValue()));
 
-    final Object value = evaluateUntyped(expression, event, eventBuilder, componentLocation, bindingMap);
+    final Object value = evaluateUntyped(expression, (PrivilegedEvent) event, (PrivilegedEvent.Builder) eventBuilder,
+                                         componentLocation, bindingMap);
     if (value instanceof TypedValue) {
       return (TypedValue) value;
     } else {
       final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
-      DataType dataType = event != null ? dataTypeResolver.resolve(value, event, compiledExpression) : OBJECT;
+      DataType dataType = event != null ? dataTypeResolver.resolve(value, (PrivilegedEvent) event, compiledExpression) : OBJECT;
 
       return new TypedValue(value, dataType);
     }
@@ -346,8 +347,8 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
     this.globalFunctionsFile = globalFunctionsFile;
   }
 
-  protected VariableResolverFactory createVariableVariableResolverFactory(BaseEvent event,
-                                                                          BaseEvent.Builder eventBuilder) {
+  protected VariableResolverFactory createVariableVariableResolverFactory(PrivilegedEvent event,
+                                                                          PrivilegedEvent.Builder eventBuilder) {
     if (autoResolveVariables) {
       return new VariableVariableResolverFactory(parserConfiguration, muleContext, event, eventBuilder);
     } else {

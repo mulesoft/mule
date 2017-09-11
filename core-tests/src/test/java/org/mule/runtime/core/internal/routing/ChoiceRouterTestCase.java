@@ -14,7 +14,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;

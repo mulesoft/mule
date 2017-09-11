@@ -9,11 +9,12 @@ package org.mule.runtime.core.privileged.routing;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +59,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     if (results == null) {
       return null;
     } else if (results.size() == 1) {
-      BaseEvent event = results.get(0);
+      PrivilegedEvent event = (PrivilegedEvent) results.get(0);
       if (event == null) {
         return event;
       } else if (event != null && event.getMessage() != null) {
@@ -84,16 +85,16 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     }
   }
 
-  private BaseEvent createMessageCollectionWithSingleMessage(BaseEvent event) {
+  private BaseEvent createMessageCollectionWithSingleMessage(PrivilegedEvent event) {
     final Message coll = Message.builder().collectionValue(singletonList(event.getMessage()), Message.class).build();
-    event = BaseEvent.builder(event).message(coll).build();
+    event = PrivilegedEvent.builder(event).message(coll).build();
     setCurrentEvent(event);
     return event;
   }
 
   private BaseEvent createMessageCollection(final List<BaseEvent> nonNullResults,
                                             final BaseEvent previous) {
-    final Builder resultBuilder = BaseEvent.builder(previous);
+    final PrivilegedEvent.Builder resultBuilder = PrivilegedEvent.builder(previous);
 
     List<Message> list = new ArrayList<>();
     for (BaseEvent event : nonNullResults) {
@@ -105,7 +106,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     }
     final Message coll = Message.builder().collectionValue(list, Message.class).build();
 
-    BaseEvent resultEvent = resultBuilder.message(coll).build();
+    PrivilegedEvent resultEvent = resultBuilder.message(coll).build();
     setCurrentEvent(resultEvent);
     return resultEvent;
   }

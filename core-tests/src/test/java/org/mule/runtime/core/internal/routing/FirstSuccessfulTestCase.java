@@ -24,13 +24,14 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.api.session.DefaultMuleSession;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -101,7 +102,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     Message msg = of(message);
     try {
-      BaseEvent event = mp.process(eventBuilder().message(msg).session(session).build());
+      BaseEvent event = mp.process(this.<PrivilegedEvent.Builder>getEventBuilder().message(msg).session(session).build());
       Message returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
