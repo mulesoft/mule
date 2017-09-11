@@ -26,7 +26,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
-import org.mule.runtime.api.el.FunctionExecutionException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -86,11 +86,11 @@ public class LookupFunction implements ExpressionFunction {
       } catch (Exception e) {
         MessagingException me = (MessagingException) unwrap(e);
         Error error = me.getEvent().getError().get();
-        throw new FunctionExecutionException(createStaticMessage(format("Flow '%s' has failed with error '%s' (%s)",
-                                                                        flowName,
-                                                                        error.getErrorType(),
-                                                                        error.getDescription())),
-                                             error.getCause());
+        throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has failed with error '%s' (%s)",
+                                                                  flowName,
+                                                                  error.getErrorType(),
+                                                                  error.getDescription())),
+                                       error.getCause());
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
