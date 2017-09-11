@@ -8,7 +8,6 @@
 package org.mule.runtime.core.api.exception;
 
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.abbreviate;
 import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCauseHierarchy;
 
@@ -22,13 +21,10 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.ErrorBuilder;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 
-import com.sun.xml.internal.rngom.parse.host.Base;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -39,9 +35,6 @@ public class MessagingException extends MuleException {
 
   public static final String PAYLOAD_INFO_KEY = "Payload";
   public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
-
-  private static final String INFO_ERROR_TYPE_KEY = "Error type";
-  private static final String DEFAULT_ERROR_TYPE = "(None)";
 
   /**
    * Serial version
@@ -162,8 +155,8 @@ public class MessagingException extends MuleException {
   }
 
   private void storeErrorTypeInfo() {
-    if(event != null) {
-      addInfo(INFO_ERROR_TYPE_KEY, getEvent().getError().map(e -> e.getErrorType().toString()).orElse(DEFAULT_ERROR_TYPE));
+    if (event != null) {
+      addInfo(INFO_ERROR_TYPE_KEY, getEvent().getError().map(e -> e.getErrorType().toString()).orElse(MISSING_DEFAULT_VALUE));
     }
   }
 
@@ -403,6 +396,7 @@ public class MessagingException extends MuleException {
 
   @Override
   public String toString() {
-    return super.toString() + "; ErrorType: " + getEvent().getError().map(e -> e.getErrorType().toString()).orElse(DEFAULT_ERROR_TYPE);
+    return super.toString() + "; ErrorType: "
+        + getEvent().getError().map(e -> e.getErrorType().toString()).orElse(MISSING_DEFAULT_VALUE);
   }
 }
