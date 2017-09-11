@@ -4,48 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.context;
+package org.mule.runtime.core.internal.context;
 
+import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
-import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
-import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.runtime.core.api.context.notification.ConnectionNotification;
-import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
-import org.mule.runtime.core.api.context.notification.CustomNotification;
-import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotificationListener;
-import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ManagementNotification;
-import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.RegistryNotification;
-import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
-import org.mule.runtime.core.api.context.notification.RoutingNotification;
-import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
-import org.mule.runtime.core.api.context.notification.SecurityNotification;
-import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.context.notification.TransactionNotification;
-import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -70,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleContextBuilder.class);
+  private final ArtifactType artifactType;
 
   protected MuleConfiguration config;
 
@@ -77,13 +54,20 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ServerNotificationManager notificationManager;
 
-  protected BootstrapServiceDiscoverer bootstrapDiscoverer;
-
   protected ClassLoader executionClassLoader;
 
   protected ObjectSerializer objectSerializer;
 
   private ErrorTypeRepository errorTypeRepository;
+
+  /**
+   * Creates a new builder
+   *
+   * @param artifactType type of the artifact that will own the context created with this builder
+   */
+  public DefaultMuleContextBuilder(ArtifactType artifactType) {
+    this.artifactType = artifactType;
+  }
 
   /**
    * {@inheritDoc}
@@ -95,6 +79,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setMuleConfiguration(injectMuleContextIfRequired(getMuleConfiguration(), muleContext));
     muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
+    muleContext.setArtifactType(artifactType);
 
     DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
     muleContext.setRegistryBroker(registryBroker);
@@ -106,7 +91,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setExceptionListener(createExceptionListener(muleContext));
     muleContext.setExecutionClassLoader(getExecutionClassLoader());
     muleContext
-        .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(getBootstrapPropertiesServiceDiscoverer(), muleContext));
+        .setBootstrapServiceDiscoverer(injectMuleContextIfRequired(createBootstrapDiscoverer(), muleContext));
 
     getObjectSerializer(muleContext);
 
@@ -134,7 +119,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setObjectSerializer(objectSerializer);
   }
 
-  protected SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext) {
+  private SystemExceptionHandler createExceptionListener(DefaultMuleContext muleContext) {
     SystemExceptionHandler systemExceptionHandler = muleContext.getRegistry().get("_exceptionListenerFactory");
     if (systemExceptionHandler == null) {
       systemExceptionHandler = new DefaultSystemExceptionStrategy();
@@ -190,7 +175,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     this.errorTypeRepository = errorTypeRepository;
   }
 
-  public <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {
+  private <T> T injectMuleContextIfRequired(T object, MuleContext muleContext) {
     if (object instanceof MuleContextAware) {
       ((MuleContextAware) object).setMuleContext(muleContext);
     }
@@ -224,19 +209,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     }
   }
 
-  public void setBootstrapPropertiesServiceDiscoverer(BootstrapServiceDiscoverer bootstrapDiscoverer) {
-    this.bootstrapDiscoverer = bootstrapDiscoverer;
-  }
-
-  public BootstrapServiceDiscoverer getBootstrapPropertiesServiceDiscoverer() {
-    if (bootstrapDiscoverer != null) {
-      return bootstrapDiscoverer;
-    } else {
-      return createBootstrapDiscoverer();
-    }
-  }
-
-  protected BootstrapServiceDiscoverer createBootstrapDiscoverer() {
+  private BootstrapServiceDiscoverer createBootstrapDiscoverer() {
     return new PropertiesBootstrapServiceDiscoverer(DefaultMuleContextBuilder.class.getClassLoader());
   }
 
@@ -250,24 +223,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   protected ServerNotificationManager createNotificationManager() {
     return createDefaultNotificationManager();
-  }
-
-  public static ServerNotificationManager createDefaultNotificationManager() {
-    ServerNotificationManager manager = new ServerNotificationManager();
-    manager.addInterfaceToType(MuleContextNotificationListener.class, MuleContextNotification.class);
-    manager.addInterfaceToType(RoutingNotificationListener.class, RoutingNotification.class);
-    manager.addInterfaceToType(SecurityNotificationListener.class, SecurityNotification.class);
-    manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
-    manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
-    manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
-    manager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
-    manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
-    manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
-    manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
-    manager.addInterfaceToType(PipelineMessageNotificationListener.class, PipelineMessageNotification.class);
-    manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);
-    manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
-    return manager;
   }
 
   @Override

@@ -12,11 +12,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.springframework.util.ReflectionUtils.findMethod;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
@@ -85,7 +84,7 @@ public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
     extensionManager = new DefaultExtensionManager();
     File generatedResourcesDirectory = getGenerationTargetDirectory();
 
-    ((DefaultMuleContext) muleContext).setExtensionManager(extensionManager);
+    muleContext.setExtensionManager(extensionManager);
     initialiseIfNeeded(extensionManager, muleContext);
 
     ExtensionsTestInfrastructureDiscoverer discoverer = new ExtensionsTestInfrastructureDiscoverer(extensionManager);

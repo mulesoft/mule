@@ -26,7 +26,6 @@ import java.util.List;
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder {
 
   protected final List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
-  protected boolean configured = false;
 
   /**
    * Adds a service configurator to be used on the context being built.
@@ -51,7 +50,6 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
     try {
       doConfigure(muleContext);
       applyLifecycle(muleContext.getLifecycleManager());
-      configured = true;
     } catch (Exception e) {
       throw new ConfigurationException(e);
     }
@@ -86,15 +84,5 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
    */
   protected void applyLifecycle(LifecycleManager lifecycleManager) throws Exception {
     // by default do nothing
-  }
-
-  /**
-   * Has this builder been configured already
-   * 
-   * @return true if the {@link #configure(org.mule.runtime.core.api.MuleContext)} method has been called
-   */
-  @Override
-  public boolean isConfigured() {
-    return configured;
   }
 }

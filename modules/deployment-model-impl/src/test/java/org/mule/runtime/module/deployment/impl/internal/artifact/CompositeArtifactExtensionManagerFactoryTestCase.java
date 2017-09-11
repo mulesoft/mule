@@ -14,13 +14,12 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
-import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
+import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -45,7 +44,7 @@ public class CompositeArtifactExtensionManagerFactoryTestCase extends AbstractMu
                                                                                                     extensionManagerFactory);
 
     ExtensionManager policyExtensionManager = mock(ExtensionManager.class);
-    MuleContext muleContext = mock(DefaultMuleContext.class);
+    MuleContext muleContext = mock(MuleContext.class);
     when(extensionManagerFactory.create(muleContext)).thenReturn(policyExtensionManager);
 
     ExtensionManager extensionManager = factory.create(muleContext);

@@ -16,7 +16,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;

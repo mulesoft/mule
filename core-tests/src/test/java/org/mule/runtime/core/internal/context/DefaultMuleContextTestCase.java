@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.context;
+package org.mule.runtime.core.internal.context;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -22,12 +22,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CON
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.SchedulerController;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -53,10 +55,6 @@ import org.slf4j.Logger;
 public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(DefaultMuleContextTestCase.class);
-
-  public static final String INITIAL_VALUE = "500";
-  public static final String VALUE_AFTER_REDEPLOY = "222";
-  public static final String TEST_PROTOCOL = "test2";
 
   private SystemExceptionHandler mockSystemExceptionHandler = mock(SystemExceptionHandler.class);
   private MessagingException mockMessagingException = mock(MessagingException.class);
@@ -86,7 +84,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     ServerNotificationManager mockNotificationManager = mock(ServerNotificationManager.class);
     doThrow(MuleRuntimeException.class).when(mockNotificationManager).initialise();
 
-    DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder();
+    DefaultMuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder(APP);
     muleContextBuilder.setLifecycleManager(new MuleContextLifecycleManager());
     muleContextBuilder.setNotificationManager(mockNotificationManager);
     DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContextBuilder.buildMuleContext();

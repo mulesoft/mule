@@ -62,11 +62,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       }
 
       @Override
-      public boolean isConfigured() {
-        return false;
-      }
-
-      @Override
       public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {
         // Nothing to do
       }

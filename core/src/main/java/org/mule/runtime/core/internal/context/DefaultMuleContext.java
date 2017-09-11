@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.runtime.core.internal.context;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -123,7 +123,6 @@ import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -208,8 +207,6 @@ public class DefaultMuleContext implements MuleContext {
   private SchedulerController schedulerController = new DefaultSchedulerController();
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
-
-  private Map<QName, Set<Object>> configurationAnnotations = new HashMap<>();
 
   private SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
       new SingleResourceTransactionFactoryManager();
@@ -809,12 +806,6 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public void setObjectStore(String name, ObjectStore<Serializable> store) throws RegistrationException {
-    checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
-    registryBroker.registerObject(name, store);
-  }
-
-  @Override
   public String getClusterId() {
     return clusterConfiguration.getClusterId();
   }
@@ -836,11 +827,6 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public String getUniqueIdString() {
     return clusterConfiguration.getClusterNodeId() + "-" + UUID.getUUID();
-  }
-
-  @Override
-  public Map<QName, Set<Object>> getConfigurationAnnotations() {
-    return configurationAnnotations;
   }
 
   @Override
@@ -971,6 +957,7 @@ public class DefaultMuleContext implements MuleContext {
     this.localMuleClient = muleClient;
   }
 
+  @Override
   public void setExtensionManager(ExtensionManager extensionManager) {
     this.extensionManager = extensionManager;
   }

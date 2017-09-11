@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.context;
+package org.mule.runtime.core.internal.context;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
@@ -53,7 +53,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testBuildMuleContextDefault() {
     // Build
-    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
+    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder(APP);
     MuleContext muleContext = builder.buildMuleContext();
 
     // Assert
@@ -82,7 +82,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void notificationManagerContainsTheCorrectInterfaces() {
-    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
+    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder(APP);
     builder.setMuleConfiguration(new MyMuleConfiguration());
     builder.setLifecycleManager(new MyLifeCycleManager());
     MuleContext muleContext = builder.buildMuleContext();
@@ -107,7 +107,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private MuleContext build() {
-    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder();
+    DefaultMuleContextBuilder builder = new DefaultMuleContextBuilder(APP);
     builder.setMuleConfiguration(new MyMuleConfiguration());
     builder.setLifecycleManager(new MyLifeCycleManager());
     builder.setNotificationManager(new MyServerNotificationManager());

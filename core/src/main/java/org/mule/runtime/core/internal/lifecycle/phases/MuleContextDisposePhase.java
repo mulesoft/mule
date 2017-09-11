@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -35,8 +36,8 @@ import javax.annotation.PreDestroy;
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects it must also
  * take care of disposing them. However, a user may want to initiate a dispose via the
- * {@link org.mule.runtime.core.DefaultMuleContext} so the dispose Lifecycle phase for the
- * {@link org.mule.runtime.core.DefaultMuleContext} needs to call dispose on the Registry.
+ * {@link DefaultMuleContext} so the dispose Lifecycle phase for the
+ * {@link DefaultMuleContext} needs to call dispose on the Registry.
  *
  * The MuleContextDisposePhase defines the lifecycle behaviour when the Mule context is disposed. The MuleContext is associated
  * with one or more registries that inherit the lifecycle of the MuleContext.

@@ -8,11 +8,8 @@ package org.mule.functional.junit4;
 
 import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -25,15 +22,7 @@ public class ApplicationContextBuilder {
   private MuleContext domainContext;
   private String[] applicationResources = new String[0];
 
-  private MuleContextBuilder muleContextBuilder = new DefaultMuleContextBuilder() {
-
-    @Override
-    protected DefaultMuleContext createDefaultMuleContext() {
-      DefaultMuleContext muleContext = super.createDefaultMuleContext();
-      muleContext.setArtifactType(APP);
-      return muleContext;
-    }
-  };
+  private MuleContextBuilder muleContextBuilder = MuleContextBuilder.builder(APP);
 
   public ApplicationContextBuilder setDomainContext(MuleContext domainContext) {
     this.domainContext = domainContext;

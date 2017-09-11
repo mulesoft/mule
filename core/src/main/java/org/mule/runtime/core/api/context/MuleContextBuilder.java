@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.context;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 /**
  * Builder that is used to build instances of {@link MuleContext}. Implementing classes are stateful and should provide public
@@ -46,4 +48,14 @@ public interface MuleContextBuilder {
    */
   void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository);
 
+
+  /**
+   * Creates a new {@link MuleContextBuilder} instance
+   *
+   * @param artifactType type of the artifact the owns the created context.
+   * @return a new builder instance
+   */
+  static MuleContextBuilder builder(ArtifactType artifactType) {
+    return new DefaultMuleContextBuilder(artifactType);
+  }
 }

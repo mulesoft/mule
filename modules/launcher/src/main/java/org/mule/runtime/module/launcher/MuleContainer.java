@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.config.StartupContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
@@ -336,7 +337,7 @@ public class MuleContainer {
 
   /**
    * This class is installed only for MuleContainer running as commandline app. A clean Mule shutdown can be achieved by disposing
-   * the {@link org.mule.runtime.core.DefaultMuleContext}.
+   * the {@link DefaultMuleContext}.
    */
   private class MuleShutdownHook extends Thread {
 

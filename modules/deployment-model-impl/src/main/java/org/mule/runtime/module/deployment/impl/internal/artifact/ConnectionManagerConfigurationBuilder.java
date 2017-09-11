@@ -31,7 +31,6 @@ import org.mule.runtime.deployment.model.api.DeployableArtifact;
 public class ConnectionManagerConfigurationBuilder implements ConfigurationBuilder {
 
   private final CheckedConsumer<MuleContext> muleContextConfigurer;
-  private boolean isConfigured = false;
 
   ConnectionManagerConfigurationBuilder(DeployableArtifact parentArtifact) {
     checkNotNull(parentArtifact, "'parentArtifact' can't be null");
@@ -47,14 +46,12 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
       } else {
         registerDefaultConnectionManager(muleContext);
       }
-      isConfigured = true;
     };
   }
 
   ConnectionManagerConfigurationBuilder() {
     muleContextConfigurer = muleContext -> {
       registerDefaultConnectionManager(muleContext);
-      isConfigured = true;
     };
   }
 
@@ -66,11 +63,6 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
       throw new ConfigurationException(createStaticMessage("An error occurred trying to register the Mule Connection Manager"),
                                        e);
     }
-  }
-
-  @Override
-  public boolean isConfigured() {
-    return isConfigured;
   }
 
   private void registerDefaultConnectionManager(MuleContext muleContext) throws RegistrationException {
