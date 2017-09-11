@@ -17,8 +17,8 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.metadata.message.MessageMetadataType;
-import org.mule.metadata.message.MessageMetadataTypeBuilder;
+import org.mule.metadata.message.api.MessageMetadataType;
+import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;

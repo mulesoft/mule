@@ -7,17 +7,18 @@
 package org.mule.runtime.extension.internal.loader.catalog.model.resolver;
 
 import static java.lang.String.format;
-import com.google.common.base.Preconditions;
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.impl.BaseMetadataType;
-import org.mule.metadata.json.JsonTypeLoader;
-import org.mule.metadata.xml.SchemaCollector;
-import org.mule.metadata.xml.XmlTypeLoader;
+import org.mule.metadata.json.api.JsonTypeLoader;
+import org.mule.metadata.xml.api.SchemaCollector;
+import org.mule.metadata.xml.api.XmlTypeLoader;
 import org.mule.runtime.core.api.util.IOUtils;
+
+import com.google.common.base.Preconditions;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
