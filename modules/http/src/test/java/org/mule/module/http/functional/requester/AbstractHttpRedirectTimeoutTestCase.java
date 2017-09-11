@@ -23,16 +23,17 @@ import org.junit.Rule;
 public class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTestCase
 {
 
-    private static long DELAY ;
-    @Rule
-    public SystemProperty timeoutProperty ;
-
     private String REDIRECT_URL = format("http://localhost:%s/%s", httpPort.getNumber(), "secondPath");
+
+    @Rule
+    public SystemProperty timeoutProperty;
+
+    private long delay;
 
     public AbstractHttpRedirectTimeoutTestCase(long timeout, long delay)
     {
         timeoutProperty = new SystemProperty("timeout", valueOf(timeout));
-        DELAY = delay;
+        this.delay = delay;
     }
 
     protected String getConfigFile()
@@ -52,7 +53,7 @@ public class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTest
         {
             try
             {
-                Thread.sleep(DELAY);
+                Thread.sleep(delay);
                 response.getOutputStream().print("OK");
             }
             catch (InterruptedException e)

@@ -6,16 +6,19 @@
  */
 package org.mule.module.http.functional.requester;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.isA;
 
 import java.util.concurrent.TimeoutException;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HttpRedirectExceededTimeoutTestCase extends AbstractHttpRedirectTimeoutTestCase
 {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static long TIMEOUT = 600;
 
@@ -27,16 +30,9 @@ public class HttpRedirectExceededTimeoutTestCase extends AbstractHttpRedirectTim
     @Test
     public void testRedirectTimeout() throws Exception
     {
-        try
-        {
-            runFlow("requestFlow");
-            fail("Timeout exception must be triggered");
-        }
-        catch(Exception timeoutException)
-        {
-            assertThat(timeoutException.getCause(), instanceOf(TimeoutException.class));
-        }
+        expectedException.expectCause(isA(TimeoutException.class));
+        expectedException.reportMissingExceptionWithMessage("Timeout exception must be triggered");
+        runFlow("requestFlow");
     }
-
 
 }
