@@ -38,7 +38,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
-import org.mule.metadata.message.MessageMetadataType;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;

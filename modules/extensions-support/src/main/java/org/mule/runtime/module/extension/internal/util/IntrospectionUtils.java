@@ -41,7 +41,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.metadata.message.MessageMetadataTypeBuilder;
+import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
