@@ -295,16 +295,7 @@ public class MessagingException extends MuleException {
     final Boolean matched = traverseCauseHierarchy(this, e -> e.getClass().getName().matches(regex));
     return matched != null && matched;
   }
-
-  //@Override
-  //protected void appendSummaryMessage(Map<String, String> summary) {
-  //  super.appendSummaryMessage(summary);
-  //  StringBuilder builder = new StringBuilder();
-  //  builder.append("Error Type            : ")
-  //      .append(getEvent().getError().map(e -> e.getErrorType().toString()).orElse(DEFAULT_ERROR_TYPE))
-  //      .append(lineSeparator());
-  //}
-
+  
   /**
    * Signals if the exception cause rollback of any current transaction if any or if the message source should rollback incoming
    * message
