@@ -6,8 +6,6 @@
  */
 package org.mule.processor;
 
-import static java.lang.Boolean.getBoolean;
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.NonBlockingSupported;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -24,10 +22,6 @@ import org.mule.config.i18n.CoreMessages;
  */
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor  implements NonBlockingSupported
 {
-
-    public static final String FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW = SYSTEM_PROPERTY_PREFIX + "filterOnUnacceptedStopsParentFlow";
-
-
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
      */
@@ -55,18 +49,10 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     protected abstract boolean accept(MuleEvent event);
 
     protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
-    {        
+    {
         if (unacceptedMessageProcessor != null)
         {
-            if (shouldFiltersStopParentFlow())
-            {
-                unacceptedMessageProcessor.process(event);
-                return null;
-            }
-            else
-            {
-                return unacceptedMessageProcessor.process(event);
-            }
+            return unacceptedMessageProcessor.process(event);
         }
         else if (throwOnUnaccepted)
         {
@@ -80,7 +66,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
 
     protected MuleException filterUnacceptedException(MuleEvent event)
     {
-        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event);        
+        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event);
     }
     
     public MessageProcessor getUnacceptedMessageProcessor()
@@ -105,10 +91,5 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
     {
         this.throwOnUnaccepted = throwOnUnaccepted;
-    }
-
-    private boolean shouldFiltersStopParentFlow()
-    {
-        return getBoolean(FILTER_ON_UNACCEPTED_STOPS_PARENT_FLOW);
     }
 }
