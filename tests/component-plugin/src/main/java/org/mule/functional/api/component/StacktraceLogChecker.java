@@ -9,7 +9,6 @@ package org.mule.functional.api.component;
 
 import static java.lang.System.lineSeparator;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,7 +41,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      fail(errors.toString());
+      throw new AssertionError(errorMessage);
     }
   }
 

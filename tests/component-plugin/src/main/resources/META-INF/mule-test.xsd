@@ -418,9 +418,9 @@
 
     <xsd:element name="check-equals" substitutionGroup="abstract-log-checker" type="checkEqualsType">
         <xsd:annotation>
-                <xsd:documentation>
-                    Evaluates the expected and actual logs line by line expecting them to be equal
-                </xsd:documentation>
+            <xsd:documentation>
+                Evaluates the expected and actual logs line by line expecting them to be equal
+            </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 

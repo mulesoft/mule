@@ -34,7 +34,7 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      fail(errors.toString());
+      throw new AssertionError(errorMessage);
     }
 
   }

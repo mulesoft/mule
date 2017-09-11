@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.List;
 
@@ -27,11 +28,20 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
 
   @Override
   public BaseEvent handleException(MessagingException exception, BaseEvent event) {
-    String messageToLog = createMessageToLog(exception);
-    for (LogChecker checker : this.checkers) {
-      checker.check(messageToLog);
-    }
     exception.setHandled(true);
+    String messageToLog = createMessageToLog(exception);
+    StringBuilder errors = new StringBuilder();
+    for (LogChecker checker : this.checkers) {
+      try {
+        checker.check(messageToLog);
+      }catch(Exception e) {
+        errors.append(e.getMessage());
+      }
+    }
+    String errorMessage = errors.toString();
+    if(!StringUtils.isBlank(errorMessage)) {
+      throw new AssertionError(errorMessage);
+    }
     return null;
   }
 
