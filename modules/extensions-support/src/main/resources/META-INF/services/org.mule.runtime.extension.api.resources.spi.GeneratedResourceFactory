@@ -1,3 +1,2 @@
-org.mule.runtime.module.extension.internal.resources.manifest.ExtensionManifestGenerator
 org.mule.runtime.module.extension.internal.resources.ExtensionModelResourceFactory
 org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator

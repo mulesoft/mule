@@ -14,7 +14,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel.ExternalLibraryModelBuilder;
@@ -102,7 +101,6 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
             .onVersion(version)
             .fromVendor(extension.vendor())
             .withCategory(extension.category())
-            .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
             .withModelProperty(new ImplementingTypeModelProperty(extensionType));
 
     parseExternalLibs(extensionElement, declarer);

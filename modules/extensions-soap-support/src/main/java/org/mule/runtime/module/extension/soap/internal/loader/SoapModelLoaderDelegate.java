@@ -86,7 +86,6 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
         .onVersion(version)
         .fromVendor(extension.vendor())
         .withCategory(extension.category())
-        .withMinMuleVersion(new MuleVersion(extension.minMuleVersion()))
         .withModelProperty(new SoapExtensionModelProperty())
         .withModelProperty(new ImplementingTypeModelProperty(extensionType));
   }
