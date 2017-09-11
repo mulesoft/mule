@@ -7,15 +7,14 @@
 
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
-import static org.mule.tools.api.packager.ContentGenerator.createClassLoaderModelFromJson;
-import org.apache.maven.model.Model;
+import static org.mule.tools.api.packager.sources.MuleContentGenerator.createClassLoaderModelFromJson;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -25,6 +24,8 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 
 import java.io.File;
 import java.util.Map;
+
+import org.apache.maven.model.Model;
 
 /**
  * Loads a {@link BundleDescriptor} using Maven to extract the relevant information from a Mule artifact's

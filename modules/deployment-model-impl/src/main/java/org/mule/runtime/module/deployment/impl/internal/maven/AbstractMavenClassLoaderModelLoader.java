@@ -17,15 +17,14 @@ import static org.mule.maven.client.api.model.BundleScope.PROVIDED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
-import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-import static org.mule.tools.api.packager.ContentGenerator.createClassLoaderModelFromJson;
-import org.apache.maven.model.Model;
+import static org.mule.tools.api.packager.sources.MuleContentGenerator.createClassLoaderModelFromJson;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -40,8 +39,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.tools.api.classloader.model.Artifact;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -53,6 +50,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
@@ -181,7 +182,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   }
 
   private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes) {
-    File containerRepository = null;
+    File containerRepository;
     if (isStandalone() && !getBoolean("mule.mode.embedded")) {
       containerRepository = new File(getMuleHomeFolder(), "repository");
       if (!containerRepository.exists()) {
