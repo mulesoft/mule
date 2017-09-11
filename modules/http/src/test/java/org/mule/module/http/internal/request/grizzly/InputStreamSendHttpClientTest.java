@@ -13,6 +13,18 @@ import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.api.MuleException;
+import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
+import org.mule.module.http.internal.domain.request.HttpRequest;
+import org.mule.module.http.internal.request.HttpClientConfiguration;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,14 +35,11 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.api.MuleException;
-import org.mule.module.http.internal.ParameterMap;
-import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
-import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.tck.junit4.rule.DynamicPort;
+import org.mockito.Matchers;
 
 public class InputStreamSendHttpClientTest
 {
@@ -58,6 +67,7 @@ public class InputStreamSendHttpClientTest
     public void before() throws Exception
     {
         createClient();
+        server.start();
     }
     @After
     public void after() throws Exception
@@ -71,14 +81,23 @@ public class InputStreamSendHttpClientTest
     {
         InputStream responseStream = null;
 
-        HttpRequest request = new DefaultHttpRequest(
-                PROTOCOL + "://" + HOST + ":" + dynamicPort.getNumber() + "/" + PATH, null, GET.asString(),
-                new ParameterMap(), new ParameterMap(), null);
+        HttpRequest request = createRequest(null, GET.name());
         responseStream = httpClient.sendAndReceiveInputStream(request, TIMEOUT, FOLLOW_REDIRECTS, null);
 
         String response = IOUtils.toString(responseStream, UTF_8.name());
 
         assertThat(EXPECTED_RESULT, equalTo(response));
+    }
+
+
+    @Test
+    public void testInputStreamIsClosed() throws Exception
+    {
+        InputStream requestInputStream = mock(InputStream.class);
+        when(requestInputStream.read(Matchers.<byte[]>any())).thenReturn(1).thenReturn(-1);
+        HttpRequest request = createRequest(new InputStreamHttpEntity(requestInputStream), POST.name());
+        httpClient.send(request, TIMEOUT, FOLLOW_REDIRECTS, null);
+        verify(requestInputStream).close();
     }
 
     private void createClient() throws MuleException
@@ -89,6 +108,13 @@ public class InputStreamSendHttpClientTest
                                                                                      .build();
         httpClient = new GrizzlyHttpClient(configuration);
         httpClient.start();
+    }
+
+    private DefaultHttpRequest createRequest(HttpEntity entity, String method)
+    {
+        return new DefaultHttpRequest(
+                PROTOCOL + "://" + HOST + ":" + dynamicPort.getNumber() + "/" + PATH, null, method,
+                new ParameterMap(), new ParameterMap(), entity);
     }
 
     /**
@@ -102,15 +128,7 @@ public class InputStreamSendHttpClientTest
 
         public MockServer(int serverPort)
         {
-            try
-            {
-                this.serverPort = serverPort;
-                start();
-            }
-            catch (Exception e)
-            {
-                fail("Could not construct mock server");
-            }
+            this.serverPort = serverPort;
         }
 
         public void start() throws IOException
