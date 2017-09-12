@@ -190,6 +190,7 @@
                 <xsd:sequence maxOccurs="unbounded" minOccurs="1">
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
                         <xsd:element ref="property"/>
+                        <xsd:element ref="connection"/>
                         <xsd:element ref="operation" />
                         <xsd:group ref="mule:muleRootElements">
                             <xsd:annotation>
@@ -295,4 +296,25 @@
             <xsd:enumeration value="AUTO"/>
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:element name="connection" type="connectionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A connection defines a set of properties that will be tight to the connection provider mechanism rather than the
+                configuration (default behaviour).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="connectionType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence maxOccurs="unbounded" minOccurs="1">
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:element ref="property"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

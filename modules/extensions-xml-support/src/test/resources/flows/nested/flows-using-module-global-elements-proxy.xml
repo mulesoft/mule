@@ -6,8 +6,13 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/module-global-element-proxy http://www.mulesoft.org/schema/mule/module-global-element-proxy/current/mule-module-global-element-proxy.xsd">
 
-    <module-global-element-proxy:config name="la-plata-config" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}"/>
-    <module-global-element-proxy:config name="gonnet-config" someUserConfig="userGonnet" somePassConfig="passGonnet" port="${httpPort}"/>
+    <module-global-element-proxy:config name="la-plata-config" port="${httpPort}">
+        <module-global-element-proxy:connection someUserConfig="userLP" somePassConfig="passLP"/>
+    </module-global-element-proxy:config>
+    
+    <module-global-element-proxy:config name="gonnet-config" port="${httpPort}">
+        <module-global-element-proxy:connection someUserConfig="userGonnet" somePassConfig="passGonnet"/>
+    </module-global-element-proxy:config>
 
     <flow name="testHttpDoLogin">
         <module-global-element-proxy:do-login config-ref="la-plata-config" someUser="userLP" somePass="passLP" />

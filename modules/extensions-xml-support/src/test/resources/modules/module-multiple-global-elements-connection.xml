@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-multiple-global-elements-connection"
+        minMuleVersion="4.0.0"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:file="http://www.mulesoft.org/schema/mule/file"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <property name="filenamePattern" type="string"/>
+    <connection>
+        <property name="workingDir" type="string"/>
+    </connection>
+
+    <file:config name="file">
+        <file:connection workingDir="#[properties.workingDir]"/>
+    </file:config>
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+
+    <operation name="list">
+        <parameters>
+            <parameter name="path" type="string"/>
+        </parameters>
+        <body>
+            <file:list directoryPath="#[parameters.path]" config-ref="file" matcher="globalMatcher"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

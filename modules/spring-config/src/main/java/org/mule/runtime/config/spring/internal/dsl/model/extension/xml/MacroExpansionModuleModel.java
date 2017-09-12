@@ -14,6 +14,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.PARAMETERS;
 import static org.mule.runtime.api.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
@@ -33,6 +34,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,18 +72,6 @@ public class MacroExpansionModuleModel {
    * Reserved prefix in a <module/> to define a reference an operation of the same module (no circular dependencies allowed)
    */
   public static final String TNS_PREFIX = "tns";
-
-  /**
-   * literal that represents the name of the connection element for any given module. If the module's name is github, then the
-   * value of this field will name the global element as <github:connection ../>. As an example, think of the following snippet:
-   *
-   * <code>
-   *    <github:config configParameter="someFood" ...>
-   *      <github:connection username="myUsername" .../>
-   *    </github:config>
-   * </code>
-   */
-  public static final String MODULE_CONNECTION_GLOBAL_ELEMENT_NAME = "connection";
 
   private final ApplicationModel applicationModel;
   private final ExtensionModel extensionModel;
@@ -357,8 +347,34 @@ public class MacroExpansionModuleModel {
       // as configParameter != null, a ConfigurationModel must exists
       final ConfigurationModel configurationModel = getConfigurationModel().get();
       valuesMap.putAll(extractParameters(configRefComponentModel, configurationModel.getAllParameterModels()));
+      valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
     });
     return valuesMap;
+  }
+
+  /**
+   * If the current {@link ExtensionModel} does have a {@link ConnectionProviderModel}, then it will check if the current XML does
+   * contain a child of it under the connection name (see {@link ModuleOperationMessageProcessorChainBuilder#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
+   *
+   * @param configRefComponentModel root element of the current XML config (global element of the parametrized operation)
+   * @param configurationModel configuration model of the current element
+   * @return a map of properties to be added in the macro expanded <operation/>
+   */
+  private Map<String, String> extractConnectionProperties(ComponentModel configRefComponentModel,
+                                                          ConfigurationModel configurationModel) {
+    Map<String, String> connectionValuesMap = new HashMap<>();
+    configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+        .ifPresent(
+                   connectionProviderModel -> configRefComponentModel.getInnerComponents().stream()
+                       .filter(componentModel -> MODULE_CONNECTION_GLOBAL_ELEMENT_NAME
+                           .equals(componentModel.getIdentifier().getName()))
+                       .findFirst()
+                       .ifPresent(connectionComponentModel -> connectionValuesMap
+                           .putAll(extractParameters(connectionComponentModel,
+                                                     connectionProviderModel
+                                                         .getAllParameterModels()))));
+
+    return connectionValuesMap;
   }
 
   /**

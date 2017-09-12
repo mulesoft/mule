@@ -9,9 +9,11 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
             http://www.mulesoft.org/schema/mule/module-global-element http://www.mulesoft.org/schema/mule/module-global-element/current/mule-module-global-element.xsd">
 
-    <property name="someUserConfig" type="string" defaultValue="some-username"/>
-    <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
+    <connection>
+        <property name="someUserConfig" type="string" defaultValue="some-username"/>
+        <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    </connection>
 
     <module-global-element:config name="proxy-config" someUserConfig="#[properties.someUserConfig]" somePassConfig="#[properties.somePassConfig]" port="#[properties.port]">
         <module-global-element:connection />
