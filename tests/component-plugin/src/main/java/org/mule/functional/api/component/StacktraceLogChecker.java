@@ -8,12 +8,9 @@ package org.mule.functional.api.component;
 
 
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +23,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   public void check(String logMessage) {
     StringBuilder errors = new StringBuilder();
     List<String> stackTraceLines = getStacktraceLinesFromLogLines(splitLines(logMessage));
-    Set<MethodCall> actualStackCalls = new HashSet<>();
+    List<MethodCall> actualStackCalls = new ArrayList<>();
     for (String line : stackTraceLines) {
       actualStackCalls.add(createMethodCallFromLine(line));
     }
@@ -67,9 +64,9 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
   public static class MethodCall {
 
-    private String packageName = EMPTY;
-    private String clazz = EMPTY;
-    private String method = EMPTY;
+    private String packageName = null;
+    private String clazz = null;
+    private String method = null;
     Integer lineNumber = null;
 
     private void setFields(String packageName, String clazz, String method) {
@@ -132,7 +129,11 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     @Override
     public int hashCode() {
-      return this.packageName.hashCode() + this.clazz.hashCode() + this.method.hashCode();
+      int methodHashCode = method != null ? method.hashCode() : 7;
+      int packageHashCode = packageName != null ? packageName.hashCode() : 7;
+      int classHashCode = clazz != null ? clazz.hashCode() : 7;
+      int lineHashCode = lineNumber != null ? lineNumber.hashCode() : 7;
+      return methodHashCode + packageHashCode + classHashCode + lineHashCode;
     }
 
     @Override
@@ -143,13 +144,19 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       if (this == obj) {
         return true;
       }
-      if (this.lineNumber != null && ((MethodCall) obj).lineNumber != null) {
-        if (!this.lineNumber.equals(((MethodCall) obj).lineNumber)) {
-          return false;
-        }
+      if (method != null && !method.equals(((MethodCall) obj).method)) {
+        return false;
       }
-      return packageName.equals(((MethodCall) obj).packageName) && clazz.equals(((MethodCall) obj).clazz)
-          && method.equals(((MethodCall) obj).method);
+      if (clazz != null && !clazz.equals(((MethodCall) obj).clazz)) {
+        return false;
+      }
+      if (packageName != null && !packageName.equals(((MethodCall) obj).packageName)) {
+        return false;
+      }
+      if (lineNumber != null && !lineNumber.equals(((MethodCall) obj).lineNumber)) {
+        return false;
+      }
+      return true;
     }
   }
 

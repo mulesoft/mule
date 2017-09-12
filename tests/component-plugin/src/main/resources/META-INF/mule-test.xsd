@@ -461,11 +461,10 @@
     </xsd:element>
 
     <xsd:complexType name="methodCallType">
-        <xsd:attribute name="package" type="xsd:string" use="required"/>
-        <xsd:attribute name="class" type="xsd:string" use="required"/>
-        <xsd:attribute name="method" type="xsd:string" use="required"/>
+        <xsd:attribute name="package" type="xsd:string" use="optional"/>
+        <xsd:attribute name="class" type="xsd:string" use="optional"/>
+        <xsd:attribute name="method" type="xsd:string" use="optional"/>
         <xsd:attribute name="lineNumber" type="xsd:int" use="optional"/>
     </xsd:complexType>
-
 
 </xsd:schema>

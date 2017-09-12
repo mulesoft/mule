@@ -64,6 +64,146 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void noPackageSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setMethod("method");
+    methodCall.setClazz("Class");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void noClassSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setMethod("method");
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void noMethodSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setClazz("Class");
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void onlyMethodSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setMethod("method");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void onlyClassSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setClazz("Class");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void onlyPackageSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void onlyLineSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void methodAndPackageSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setMethod("method");
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void methodAndClassSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setClazz("Class");
+    methodCall.setMethod("method");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void methodAndLineNumberSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setMethod("method");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void packageAndClassSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setClazz("Class");
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void packageAndLineNumberSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setPackageName("package");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void classAndLineNumberSpecifiedShouldMatch() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
+    methodCall.setLineNumber(25);
+    methodCall.setClazz("Class");
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void differentMethodRepresentsDifferentExpectedMethodCalls() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "otherMethod", 25);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    expectedException.expect(AssertionError.class);
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void differentClassRepresentsDifferentExpectedMethodCalls() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "OtherClass", "method", 25);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    expectedException.expect(AssertionError.class);
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
+  public void differentPackageRepresentsDifferentExpectedMethodCalls() throws Exception {
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("other.package", "Class", "method", 25);
+    stacktraceLogChecker.setExpectedCalls(asList(methodCall));
+    expectedException.expect(AssertionError.class);
+    stacktraceLogChecker.check("at package.Class.method(whatever:25)");
+  }
+
+  @Test
   public void differentLineNumbersRepresentDifferentExpectedMethodCalls() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method", 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
