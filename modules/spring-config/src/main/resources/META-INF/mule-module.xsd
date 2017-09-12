@@ -175,7 +175,6 @@
                 <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
                 <xsd:attribute name="order" type="xsd:int" use="optional"/>
                 <xsd:attribute name="tab" type="xsd:string" use="optional"/>
-                <xsd:attribute name="configurationMode" type="configurationType" default="CONFIGURATION"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -191,6 +190,7 @@
                 <xsd:sequence maxOccurs="unbounded" minOccurs="1">
                     <xsd:choice minOccurs="1" maxOccurs="unbounded">
                         <xsd:element ref="property"/>
+                        <xsd:element ref="connection"/>
                         <xsd:element ref="operation" />
                         <xsd:group ref="mule:muleRootElements">
                             <xsd:annotation>
@@ -297,17 +297,24 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:simpleType name="configurationType">
+    <xsd:element name="connection" type="connectionType">
         <xsd:annotation>
             <xsd:documentation>
-                Set of defined uses for a given property.
-                CONFIGURATION implies the property will be part of the "config" global element as an attribute.
-                CONNECTION implies the property will be part of a "connection", child of the global element, as an attribute.
+                A connection defines a set of properties that will be tight to the connection provider mechanism rather than the
+                configuration (default behaviour).
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="CONFIGURATION"/>
-            <xsd:enumeration value="CONNECTION"/>
-        </xsd:restriction>
-    </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="connectionType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:sequence maxOccurs="unbounded" minOccurs="1">
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:element ref="property"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

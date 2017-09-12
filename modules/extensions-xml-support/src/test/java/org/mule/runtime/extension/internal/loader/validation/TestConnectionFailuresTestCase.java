@@ -75,8 +75,14 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
 
   @Test
   public void repeatedPropertiesConfigurationConnection() {
-    setExpectedMessage("[CONFIGURATION] or [CONNECTION], repeated properties are: [someUserConfig, somePassConfig]");
+    setExpectedMessage("repeated properties are: [someUserConfig, somePassConfig]");
     getExtensionModelFrom("validation/testconnection/module-repeated-properties-configuration-connection.xml");
+  }
+
+  @Test
+  public void multipleConnectionProperties() {
+    setExpectedMessage("There cannot be more than 1 child [connection] element per [module], found [2]");
+    getExtensionModelFrom("validation/testconnection/module-multiple-connection.xml");
   }
 
   private ExtensionModel getFileExtension() {

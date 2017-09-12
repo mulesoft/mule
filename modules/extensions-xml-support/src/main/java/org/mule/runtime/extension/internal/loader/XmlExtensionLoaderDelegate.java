@@ -32,6 +32,7 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.jgrapht.DirectedGraph;
@@ -101,6 +102,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -154,9 +156,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
-  private static final String CONFIGURATION_MODE_ATTRIBUTE = "configurationMode";
-  private static final String CONFIGURATION_MODE_CONFIGURATION = "CONFIGURATION";
-  private static final String CONFIGURATION_MODE_CONNECTION = "CONNECTION";
 
   /**
    * ENUM used to discriminate which type of {@link ParameterDeclarer} has to be created (required or not).
@@ -179,6 +178,8 @@ public final class XmlExtensionLoaderDelegate {
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("operation").build();
   private static final ComponentIdentifier OPERATION_PROPERTY_IDENTIFIER =
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("property").build();
+  private static final ComponentIdentifier CONNECTION_PROPERTIES_IDENTIFIER =
+      ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("connection").build();
   private static final ComponentIdentifier OPERATION_PARAMETERS_IDENTIFIER =
       ComponentIdentifier.builder().namespace(MODULE_NAMESPACE_NAME).name("parameters").build();
   private static final ComponentIdentifier OPERATION_PARAMETER_IDENTIFIER =
@@ -360,7 +361,6 @@ public final class XmlExtensionLoaderDelegate {
     final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
 
-    //TODO MULE-13361: when the TNS prefix is added dynamically, the following assertion won't make much sense. Delete it.
     final String xmlnsTnsValue = moduleModel.getParameters().get(XMLNS_TNS);
     if (xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
@@ -422,33 +422,48 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private List<ComponentModel> extractGlobalElementsFrom(ComponentModel moduleModel) {
+    final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS = Sets
+        .newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
     return moduleModel.getInnerComponents().stream()
-        .filter(child -> !child.getIdentifier().equals(OPERATION_PROPERTY_IDENTIFIER)
-            && !child.getIdentifier().equals(OPERATION_IDENTIFIER))
+        .filter(child -> !NOT_GLOBAL_ELEMENT_IDENTIFIERS.contains(child.getIdentifier()))
         .collect(Collectors.toList());
   }
 
   private Optional<ConfigurationDeclarer> loadPropertiesFrom(ExtensionDeclarer declarer, ComponentModel moduleModel,
                                                              Set<ExtensionModel> extensions) {
     List<ComponentModel> globalElementsComponentModel = extractGlobalElementsFrom(moduleModel);
-    List<ComponentModel> allProperties = moduleModel.getInnerComponents().stream()
-        .filter(child -> child.getIdentifier().equals(OPERATION_PROPERTY_IDENTIFIER))
-        .collect(Collectors.toList());
+    List<ComponentModel> configurationProperties = extractProperties(moduleModel);
+    List<ComponentModel> connectionProperties = extractConnectionProperties(moduleModel);
+    validateProperties(configurationProperties, connectionProperties);
 
-    if (!allProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
+    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
-      final List<ComponentModel> configurationProperties = calculateConnectionProperties(allProperties,
-                                                                                         CONFIGURATION_MODE_CONFIGURATION);
       configurationProperties.stream().forEach(param -> extractProperty(configurationDeclarer, param));
 
-      final List<ComponentModel> connectionProperties = calculateConnectionProperties(allProperties,
-                                                                                      CONFIGURATION_MODE_CONNECTION);
-      validateProperties(configurationProperties, connectionProperties);
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel, extensions);
       return of(configurationDeclarer);
     }
     return empty();
+  }
+
+  private List<ComponentModel> extractProperties(ComponentModel moduleModel) {
+    return moduleModel.getInnerComponents().stream()
+        .filter(child -> child.getIdentifier().equals(OPERATION_PROPERTY_IDENTIFIER))
+        .collect(Collectors.toList());
+  }
+
+  private List<ComponentModel> extractConnectionProperties(ComponentModel moduleModel) {
+    final List<ComponentModel> connectionsComponentModel = moduleModel.getInnerComponents().stream()
+        .filter(child -> child.getIdentifier().equals(CONNECTION_PROPERTIES_IDENTIFIER))
+        .collect(Collectors.toList());
+    if (connectionsComponentModel.size() > 1) {
+      throw new MuleRuntimeException(createStaticMessage(format("There cannot be more than 1 child [%s] element per [%s], found [%d]",
+                                                                CONNECTION_PROPERTIES_IDENTIFIER.getName(),
+                                                                MODULE_IDENTIFIER.getName(),
+                                                                connectionsComponentModel.size())));
+    }
+    return connectionsComponentModel.isEmpty() ? Collections.EMPTY_LIST : extractProperties(connectionsComponentModel.get(0));
   }
 
   /**
@@ -464,23 +479,15 @@ public final class XmlExtensionLoaderDelegate {
         .filter(connectionPropertiesNames::contains)
         .collect(Collectors.toList());
     if (!intersectedProperties.isEmpty()) {
-      throw new MuleRuntimeException(createStaticMessage(format("There cannot be properties with the same name for [%s] or [%s], repeated properties are: [%s]",
-                                                                CONFIGURATION_MODE_CONFIGURATION,
-                                                                CONFIGURATION_MODE_CONNECTION,
+      throw new MuleRuntimeException(createStaticMessage(format("There cannot be properties with the same name even if they are within a <connection>, repeated properties are: [%s]",
                                                                 intersectedProperties.stream()
                                                                     .collect(Collectors.joining(", ")))));
     }
   }
 
-  private List<ComponentModel> calculateConnectionProperties(List<ComponentModel> allProperties, String configurationMode) {
-    return allProperties.stream()
-        .filter(componentModel -> configurationMode.equals(componentModel.getParameters().get(CONFIGURATION_MODE_ATTRIBUTE)))
-        .collect(Collectors.toList());
-  }
-
   /**
    * Adds a connection provider if (a) there's at least one global element that has test connection or (b) there's at least one
-   * <property/> that has been marked as {@link #CONFIGURATION_MODE_CONNECTION}.
+   * <property/> that has been placed within a <connection/> wrapper in the <module/> element.
    *
    * @param configurationDeclarer declarer to add the {@link ConnectionProviderDeclarer} if applies.
    * @param connectionProperties collection of <property/>s that should be added to the {@link ConnectionProviderDeclarer}.

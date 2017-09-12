@@ -9,8 +9,10 @@
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
-    <property name="workingDir" type="string" configurationMode="CONNECTION"/>
     <property name="filenamePattern" type="string"/>
+    <connection>
+        <property name="workingDir" type="string"/>
+    </connection>
 
     <file:config name="file">
         <file:connection workingDir="#[properties.workingDir]"/>
