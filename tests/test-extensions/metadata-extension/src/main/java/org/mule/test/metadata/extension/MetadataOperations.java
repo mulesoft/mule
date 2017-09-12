@@ -7,6 +7,7 @@
 package org.mule.test.metadata.extension;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -218,7 +219,7 @@ public class MetadataOperations {
       entityResolver = MetadataExtensionEntityResolver.class,
       nativeOutputResolver = NativeQueryOutputResolver.class)
   public List<Object> doQuery(@MetadataKeyId String query) {
-    return emptyList();
+    return singletonList(query);
   }
 
   @Query(translator = MetadataExtensionQueryTranslator.class,
