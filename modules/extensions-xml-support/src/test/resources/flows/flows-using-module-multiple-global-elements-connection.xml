@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-multiple-global-elements-connection="http://www.mulesoft.org/schema/mule/module-multiple-global-elements-connection"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-multiple-global-elements-connection http://www.mulesoft.org/schema/mule/module-multiple-global-elements-connection/current/mule-module-multiple-global-elements-connection.xsd">
+
+    <module-multiple-global-elements-connection:config name="configPatternA" filenamePattern="sub*A">
+        <module-multiple-global-elements-connection:connection workingDir="${workingDir}" />
+    </module-multiple-global-elements-connection:config>
+
+    <module-multiple-global-elements-connection:config name="configPatternB" filenamePattern="sub*B">
+        <module-multiple-global-elements-connection:connection workingDir="${workingDir}" />
+    </module-multiple-global-elements-connection:config>
+
+    <flow name="list-pattern-a">
+        <module-multiple-global-elements-connection:list config-ref="configPatternA" path="."/>
+    </flow>
+
+    <flow name="list-pattern-b">
+        <module-multiple-global-elements-connection:list config-ref="configPatternB" path="."/>
+    </flow>
+</mule>

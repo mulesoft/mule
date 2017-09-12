@@ -69,7 +69,10 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
         {"flows/flows-using-module-multiple-global-elements.xml", new String[] {"modules/module-multiple-global-elements.xml"}},
         // scenario with TNS and "internal" operations
         {"flows/flows-using-module-calling-operations-within-module-with-global-elements.xml",
-            new String[] {"modules/module-calling-operations-within-module-with-global-elements.xml"}}
+            new String[] {"modules/module-calling-operations-within-module-with-global-elements.xml"}},
+        // scenario with connection attributes (child element)
+        {"flows/flows-using-module-multiple-global-elements-connection.xml",
+            new String[] {"modules/module-multiple-global-elements-connection.xml"}}
     });
   }
 

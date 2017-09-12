@@ -17,32 +17,30 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.reactivestreams.Publisher;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -75,6 +73,18 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
    * this field will name the global element as <math:config ../>
    */
   public static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
+
+  /**
+   * literal that represents the name of the connection element for any given module. If the module's name is github, then the
+   * value of this field will name the global element as <github:connection ../>. As an example, think of the following snippet:
+   *
+   * <code>
+   *    <github:config configParameter="someFood" ...>
+   *      <github:connection username="myUsername" .../>
+   *    </github:config>
+   * </code>
+   */
+  public static final String MODULE_CONNECTION_GLOBAL_ELEMENT_NAME = "connection";
 
   private Map<String, String> properties;
   private Map<String, String> parameters;
@@ -121,16 +131,29 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                                   ExtensionModel extensionModel, OperationModel operationModel,
                                   ExpressionManager expressionManager) {
       super(name, empty(), head, processors, processorsForLifecycle);
-      final List<ParameterModel> propertiesModels =
-          extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-              ? extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get().getAllParameterModels()
-              : Collections.EMPTY_LIST;
+      final List<ParameterModel> propertiesModels = getAllProperties(extensionModel);
       this.properties = parseParameters(properties, propertiesModels);
       this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
       this.targetValue = parameters.remove(TARGET_VALUE_PARAMETER_NAME);
       this.parameters = parseParameters(parameters, operationModel.getAllParameterModels());
       this.returnsVoid = MetadataTypeUtils.isVoid(operationModel.getOutput().getType());
       this.expressionManager = expressionManager;
+    }
+
+    /**
+     * Plains the complete list of configurations and connections for the parameterized {@link ExtensionModel}
+     * @param extensionModel looks for all the the parameters of the configuration and connection.
+     * @return a list of {@link ParameterModel} that will not repeat their {@link ParameterModel#getName()}s.
+     */
+    private List<ParameterModel> getAllProperties(ExtensionModel extensionModel) {
+      List<ParameterModel> result = new ArrayList<>();
+      extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).ifPresent(configurationModel -> {
+        result.addAll(configurationModel.getAllParameterModels());
+        configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+            .ifPresent(
+                       connectionProviderModel -> result.addAll(connectionProviderModel.getAllParameterModels()));
+      });
+      return result;
     }
 
     /**

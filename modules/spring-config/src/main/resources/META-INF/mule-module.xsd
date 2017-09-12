@@ -175,6 +175,7 @@
                 <xsd:attribute name="displayName" type="xsd:string" use="optional"/>
                 <xsd:attribute name="order" type="xsd:int" use="optional"/>
                 <xsd:attribute name="tab" type="xsd:string" use="optional"/>
+                <xsd:attribute name="configurationMode" type="configurationType" default="CONFIGURATION"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -293,6 +294,20 @@
             <xsd:enumeration value="REQUIRED"/>
             <xsd:enumeration value="OPTIONAL"/>
             <xsd:enumeration value="AUTO"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="configurationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Set of defined uses for a given property.
+                CONFIGURATION implies the property will be part of the "config" global element as an attribute.
+                CONNECTION implies the property will be part of a "connection", child of the global element, as an attribute.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CONFIGURATION"/>
+            <xsd:enumeration value="CONNECTION"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

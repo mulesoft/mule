@@ -11,7 +11,10 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -31,11 +34,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests if the current module contains global elements poorly defined in which the current smart connector cannot determine to
@@ -75,6 +73,12 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
                           new HashSet<>(Arrays.asList(getHttpExtension(), getFileExtension())));
   }
 
+  @Test
+  public void repeatedPropertiesConfigurationConnection() {
+    setExpectedMessage("[CONFIGURATION] or [CONNECTION], repeated properties are: [someUserConfig, somePassConfig]");
+    getExtensionModelFrom("validation/testconnection/module-repeated-properties-configuration-connection.xml");
+  }
+
   private ExtensionModel getFileExtension() {
     return mockedExtension("file", "config", "connection");
   }
@@ -108,7 +112,6 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> extensions) {
-
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
     return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(extensions), parameters);
