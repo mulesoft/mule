@@ -21,10 +21,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-import javafx.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,10 +75,10 @@ public class LayoutModelTestCase extends AbstractJavaExtensionDeclarationTestCas
 
   private void assertParameterPlacement(Pair<ParameterGroupDeclaration, ParameterDeclaration> pair, String groupName,
                                         Integer order) {
-    ParameterGroupDeclaration group = pair.getKey();
+    ParameterGroupDeclaration group = pair.getFirst();
     assertThat(group.getName(), equalTo(groupName));
 
-    assertParameterPlacement(pair.getValue(), order);
+    assertParameterPlacement(pair.getSecond(), order);
   }
 
   private void assertParameterPlacement(ParameterDeclaration param, Integer order) {
