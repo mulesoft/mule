@@ -53,8 +53,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
 
     final ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
     final MulePluginModelBuilder builder = new MulePluginModelBuilder();
-    builder.setName(extensionModel.getName())
-        .setMinMuleVersion(extensionModel.getMinMuleVersion().toCompleteNumericVersion());
+    builder.setName(extensionModel.getName());
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())

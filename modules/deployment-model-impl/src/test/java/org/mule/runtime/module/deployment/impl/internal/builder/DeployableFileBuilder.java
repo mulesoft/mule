@@ -22,7 +22,7 @@ import org.mule.tck.ZipUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
-import org.mule.tools.api.packager.sources.MuleContentGenerator;
+import org.mule.tools.api.packager.ContentGenerator;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -132,7 +132,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
       }
     }
 
-    return MuleContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, repository.toFile());
+    return ContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, repository.toFile());
   }
 
   private File getClassLoaderModelFile() {
@@ -151,7 +151,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     if (!destinationFolder.exists()) {
       assertThat(destinationFolder.mkdirs(), is(true));
     }
-    return MuleContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, destinationFolder);
+    return ContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, destinationFolder);
   }
 
   private Artifact getArtifact(AbstractDependencyFileBuilder builder) {

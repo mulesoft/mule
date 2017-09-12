@@ -11,29 +11,20 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactExtensionManagerConfigurationBuilder.META_INF_FOLDER;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.deployment.impl.internal.policy.ArtifactExtensionManagerFactory;
-import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.slf4j.Logger;
 
 /**
  * Discover the {@link ExtensionModel} based on the {@link ExtensionModelLoader} type.
@@ -65,7 +56,8 @@ public class ExtensionModelDiscoverer {
                                                                   extensions, artifactClassloader,
                                                                   artifactName))
           .orElseThrow(() -> new MuleRuntimeException(
-                  createStaticMessage("Could not find the descriptor for artifact " + artifactName)));
+                                                      createStaticMessage("Could not find the descriptor for artifact "
+                                                          + artifactName)));
       if (extension != null) {
         descriptorsWithExtensions.add(new Pair<>(artifactPluginDescriptor, extension));
       }

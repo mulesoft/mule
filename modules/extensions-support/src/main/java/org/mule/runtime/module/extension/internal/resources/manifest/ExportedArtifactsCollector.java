@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.resources.manifest;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
@@ -66,7 +65,6 @@ final public class ExportedArtifactsCollector {
     // TODO: remove at Kraan's notice
     addMetaInfResource("");
 
-    addMetaInfResource(EXTENSION_MANIFEST_FILE_NAME);
     collectXmlSupportResources();
 
     return exportedResources.build();
@@ -94,7 +92,8 @@ final public class ExportedArtifactsCollector {
   }
 
   /**
-   * @return The {@link Set} of artifact IDs that the extension should grant access to the privileged API. Each artifact is defined using Maven's groupId:artifactId
+   * @return The {@link Set} of artifact IDs that the extension should grant access to the privileged API. Each artifact is
+   *         defined using Maven's groupId:artifactId
    */
   public Set<String> getPrivilegedArtifacts() {
     privilegedArtifacts.addAll(extensionModel.getPrivilegedArtifacts());
