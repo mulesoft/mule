@@ -13,12 +13,10 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.util.AttributeEvaluator;
-
-import java.util.function.BiConsumer;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.function.BiConsumer;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -29,12 +27,13 @@ import org.apache.commons.lang3.StringUtils;
  * @param <T>
  * @since 4.0
  */
-public class ExpressionValueResolver<T> implements ValueResolver<T> {
+public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<T> {
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
   final AttributeEvaluator evaluator;
   private boolean evaluatorInitialized = false;
+  private final String expression;
   private BiConsumer<AttributeEvaluator, ExtendedExpressionManager> evaluatorInitialiser =
       (evaluator, extendedExpressionManager) -> {
         synchronized (extendedExpressionManager) {
@@ -49,13 +48,13 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
 
   ExpressionValueResolver(String expression, DataType expectedDataType) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
-
+    this.expression = expression;
     this.evaluator = new AttributeEvaluator(expression, expectedDataType);
   }
 
   public ExpressionValueResolver(String expression) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
-
+    this.expression = expression;
     this.evaluator = new AttributeEvaluator(expression);
   }
 
@@ -87,5 +86,13 @@ public class ExpressionValueResolver<T> implements ValueResolver<T> {
   @Override
   public boolean isDynamic() {
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getExpression() {
+    return expression;
   }
 }

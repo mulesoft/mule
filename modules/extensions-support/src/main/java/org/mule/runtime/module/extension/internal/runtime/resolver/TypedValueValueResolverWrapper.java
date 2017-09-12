@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -47,7 +46,10 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   @Override
   public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
     Object resolve = resolver.resolve(context);
-    return new TypedValue<>((T) resolver.resolve(context), DataType.fromObject(resolve));
+    if (resolve instanceof ValueResolver) {
+      resolve = ((ValueResolver) resolve).resolve(context);
+    }
+    return TypedValue.of((T) resolve);
   }
 
   /**

@@ -19,18 +19,19 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExpressionBasedParameterResolverValueResolver<T> implements ValueResolver<ParameterResolver<T>> {
+public class ExpressionBasedParameterResolverValueResolver<T> implements ExpressionBasedValueResolver<ParameterResolver<T>> {
 
-  private final String exp;
+  private final String expression;
   private final MetadataType metadataType;
 
   @Inject
   private DefaultTransformationService transformationService;
+
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  public ExpressionBasedParameterResolverValueResolver(String exp, MetadataType metadataType) {
-    this.exp = exp;
+  public ExpressionBasedParameterResolverValueResolver(String expression, MetadataType metadataType) {
+    this.expression = expression;
     this.metadataType = metadataType;
   }
 
@@ -39,7 +40,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
    */
   @Override
   public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
-    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(exp, metadataType, context);
+    ExpressionBasedParameterResolver<T> resolver = new ExpressionBasedParameterResolver<>(expression, metadataType, context);
     resolver.setTransformationService(transformationService);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
     resolver.initialise();
@@ -62,4 +63,11 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements ValueRe
     this.extendedExpressionManager = extendedExpressionManager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getExpression() {
+    return expression;
+  }
 }

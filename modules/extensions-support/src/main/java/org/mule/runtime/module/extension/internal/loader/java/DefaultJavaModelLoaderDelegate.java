@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.Declarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.DeclaresExternalLibraries;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
@@ -30,23 +29,17 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.WrapperTypeParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionTypeFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
-
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -80,23 +73,20 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     this.extensionType = extensionType;
     this.version = version;
     this.typeLoader = getDefault().createTypeLoader(extensionType.getClassLoader());
+
     this.fieldParametersLoader = new ParameterModelsLoaderDelegate(getParameterFieldsContributors(), typeLoader);
     this.methodParametersLoader = new ParameterModelsLoaderDelegate(getParameterMethodsContributors(), typeLoader);
   }
 
   private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
     return ImmutableList
-        .of(new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, Literal.class, new LiteralModelProperty()));
+        .of(WrapperTypeParameterContributor.defaultContributor(typeLoader));
   }
 
   private ImmutableList<ParameterDeclarerContributor> getParameterFieldsContributors() {
     return ImmutableList
         .of(new InfrastructureFieldContributor(),
-            new ParameterTypeUnwrapperContributor(typeLoader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(typeLoader, Literal.class, new LiteralModelProperty()));
+            WrapperTypeParameterContributor.defaultContributor(typeLoader));
   }
 
   /**

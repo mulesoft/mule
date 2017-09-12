@@ -7,11 +7,14 @@
 
 package org.mule.test.parameter.resolver.extension.extension;
 
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
+
+import java.io.InputStream;
 
 public class ParameterResolverParameterOperations {
 
@@ -31,5 +34,9 @@ public class ParameterResolverParameterOperations {
   public ParameterResolver<String> stringOperation(@Optional(
       defaultValue = "this is a string") ParameterResolver<String> string) {
     return string;
+  }
+
+  public ParameterResolver<TypedValue<InputStream>> lazyValueOperation(@Optional ParameterResolver<TypedValue<InputStream>> lazyValue) {
+    return lazyValue;
   }
 }
