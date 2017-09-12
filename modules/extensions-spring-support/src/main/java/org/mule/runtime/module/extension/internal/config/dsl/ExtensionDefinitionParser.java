@@ -266,13 +266,15 @@ public abstract class ExtensionDefinitionParser {
           if (paramDsl.supportsChildDeclaration()) {
             parseFromTextExpression(parameter, paramDsl, () -> {
               Optional<QueryParameterModelProperty> query = parameter.getModelProperty(QueryParameterModelProperty.class);
-              if (query.isPresent()) {
-                return value -> new NativeQueryParameterValueResolver((String) value, query.get().getQueryTranslator());
-              } else {
-                return value -> resolverOf(parameter.getName(), stringType, value, parameter.getDefaultValue(),
-                                           parameter.getExpressionSupport(), parameter.isRequired(),
-                                           parameter.getModelProperties(), acceptsReferences(parameter));
-              }
+              return value -> {
+                ValueResolver<String> resolver = resolverOf(parameter.getName(), stringType, value, parameter.getDefaultValue(),
+                                                            parameter.getExpressionSupport(), parameter.isRequired(),
+                                                            parameter.getModelProperties(), acceptsReferences(parameter));
+
+                return query
+                    .map(p -> (ValueResolver<String>) new NativeQueryParameterValueResolver(resolver, p.getQueryTranslator()))
+                    .orElse(resolver);
+              };
             });
           } else {
             defaultVisit(stringType);
@@ -649,19 +651,21 @@ public abstract class ExtensionDefinitionParser {
     return Thread.currentThread().getContextClassLoader();
   }
 
-  private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                      ExpressionSupport expressionSupport, boolean required, Set<ModelProperty> modelProperties) {
+  private <T> ValueResolver<T> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+                                          ExpressionSupport expressionSupport, boolean required,
+                                          Set<ModelProperty> modelProperties) {
     return resolverOf(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, true);
   }
 
-  protected ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                        ExpressionSupport expressionSupport, boolean required, Set<ModelProperty> modelProperties,
-                                        boolean acceptsReferences) {
+  protected <T> ValueResolver<T> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
+                                            ExpressionSupport expressionSupport, boolean required,
+                                            Set<ModelProperty> modelProperties,
+                                            boolean acceptsReferences) {
     if (value instanceof ValueResolver) {
-      return (ValueResolver<?>) value;
+      return (ValueResolver<T>) value;
     }
 
-    ValueResolver resolver;
+    ValueResolver<T> resolver;
 
     final Class<Object> expectedClass = ExtensionMetadataTypeUtils.getType(expectedType).orElse(Object.class);
 

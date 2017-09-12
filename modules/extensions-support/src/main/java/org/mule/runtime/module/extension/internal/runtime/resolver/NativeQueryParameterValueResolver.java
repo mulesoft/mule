@@ -20,16 +20,15 @@ import org.mule.runtime.extension.api.dsql.QueryTranslator;
  *
  * @since 4.0
  */
-public final class NativeQueryParameterValueResolver implements ValueResolver<String> {
+public final class NativeQueryParameterValueResolver extends AbstractValueResolverWrapper<String> {
 
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
   private final static String ERROR = "Error creating QueryTranslator [%s], query translators must have a default constructor";
 
-  private final String query;
   private final Class<? extends QueryTranslator> translatorClass;
 
-  public NativeQueryParameterValueResolver(String query, Class<? extends QueryTranslator> translator) {
-    this.query = query;
+  public NativeQueryParameterValueResolver(ValueResolver<String> queryResolver, Class<? extends QueryTranslator> translator) {
+    super(queryResolver);
     this.translatorClass = translator;
   }
 
@@ -38,10 +37,12 @@ public final class NativeQueryParameterValueResolver implements ValueResolver<St
    */
   @Override
   public String resolve(ValueResolvingContext context) throws MuleException {
+    String query = super.resolve(context);
 
     if (!isDsqlQuery(query)) {
       return query;
     }
+
     DsqlQuery dsqlQuery = dsqlParser.parse(query);
     // creates new instances to avoid state related problems of the translator implementation.
     QueryTranslator queryTranslator = instantiateTranslator(translatorClass);
