@@ -229,4 +229,10 @@
         <metadata:dynamic-list-of-objects type="PERSON"/>
     </flow>
 
+    <flow name="queryWithExpression">
+        <metadata:do-query>
+            <metadata:query><![CDATA[#["dsql:SELECT id FROM Circle WHERE diameter < " ++ vars.diameter]]]></metadata:query>
+        </metadata:do-query>
+    </flow>
+
 </mule>
