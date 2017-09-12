@@ -10,8 +10,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
- * If thrown by the {@link org.mule.runtime.core.expression.DefaultExpressionManager} if an expression returns null and failIfNull
- * was set.
+ * Thrown by the {@link org.mule.runtime.core.api.el.ExpressionManager} when a failure occurs evaluating an expression.
  */
 public class ExpressionRuntimeException extends MuleRuntimeException {
 

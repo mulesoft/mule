@@ -7,11 +7,15 @@
 package org.mule.runtime.core.internal.el.mvel.function;
 
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.GlobalBindingContextProvider;
+import org.mule.runtime.core.el.function.LookupFunction;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,10 +31,22 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
   @Named(OBJECT_CONFIGURATION_PROPERTIES)
   private ConfigurationProperties configurationProperties;
 
+  @Inject
+  @Named(OBJECT_CONFIGURATION_COMPONENT_LOCATOR)
+  private ConfigurationComponentLocator componentLocator;
+
+
   @Override
   public BindingContext getBindingContext() {
+    BindingContext.Builder builder = BindingContext.builder();
+
     PropertyAccessFunction propertyFunction = new PropertyAccessFunction(configurationProperties);
-    return BindingContext.builder().addBinding("p", new TypedValue(propertyFunction, fromFunction(propertyFunction))).build();
+    builder.addBinding("p", new TypedValue(propertyFunction, fromFunction(propertyFunction)));
+
+    ExpressionFunction lookupFunction = new LookupFunction(componentLocator);
+    builder.addBinding("lookup", new TypedValue(lookupFunction, fromFunction(lookupFunction)));
+
+    return builder.build();
   }
 
 }
