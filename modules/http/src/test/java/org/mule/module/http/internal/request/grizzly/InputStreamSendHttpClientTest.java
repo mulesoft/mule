@@ -10,19 +10,19 @@ package org.mule.module.http.internal.request.grizzly;
 import static com.google.common.net.MediaType.APPLICATION_XML_UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.eclipse.jetty.http.HttpMethod.GET;
+import static org.eclipse.jetty.http.HttpMethod.POST;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.api.MuleException;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.domain.HttpEntity;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.DefaultHttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequest;
-import org.mule.module.http.internal.request.HttpClientConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -35,13 +35,12 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-public class InputStreamSendHttpClientTest
+public class InputStreamSendHttpClientTest extends AbstractMuleTestCase
 {
 
     @Rule
