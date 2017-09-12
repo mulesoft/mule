@@ -8,7 +8,6 @@ package org.mule.functional.api.component;
 
 
 import static java.lang.System.lineSeparator;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
@@ -47,8 +46,12 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
 
   private MethodCall createMethodCallFromLine(String line) {
-    Matcher matcher = PARSING_REGEX_PATTERN.matcher(line);
+    Matcher matcher = STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line);
     if (matcher.matches()) {
+      //If no line number found, probably due to native method
+      if (matcher.group(4).equals(StringUtils.EMPTY)) {
+        return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
+      }
       return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
     }
     return new MethodCall();

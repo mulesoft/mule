@@ -16,8 +16,15 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractLogChecker implements LogChecker {
 
-  protected static final Pattern PARSING_REGEX_PATTERN =
-      Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
+  //protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
+  //    Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
+  protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
+      Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
+  protected static final Pattern STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN =
+      Pattern.compile("(?:Caused by: )?(.*(Exception|Error)+):.*");
+  protected static final Pattern STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN = Pattern.compile(".*\\.\\.\\. [0-9]* more.*");
+
+
 
   @Override
   public abstract void check(String logMessage);
@@ -50,12 +57,18 @@ public abstract class AbstractLogChecker implements LogChecker {
     }
   }
 
+  private boolean isStacktrace(String line) {
+    return (STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line).matches()
+        || STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line).matches()
+        || STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN.matcher(line).matches());
+  }
+
   private List<String> getStacktraceLines(List<String> allLines) {
-    return allLines.stream().filter((line) -> PARSING_REGEX_PATTERN.matcher(line).matches()).collect(Collectors.toList());
+    return allLines.stream().filter((line) -> isStacktrace(line)).collect(Collectors.toList());
   }
 
   private List<String> removeStacktraceLines(List<String> allLines) {
-    return allLines.stream().filter((line) -> !PARSING_REGEX_PATTERN.matcher(line).matches()).collect(Collectors.toList());
+    return allLines.stream().filter((line) -> !isStacktrace(line)).collect(Collectors.toList());
   }
 
   protected List<String> splitLines(String wholeMessage) {

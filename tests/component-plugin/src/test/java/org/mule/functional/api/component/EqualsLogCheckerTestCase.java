@@ -10,6 +10,9 @@ import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DEL
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -77,6 +80,19 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
     equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
     expectedException.expect(AssertionError.class);
     equalsLogChecker.check(log);
+  }
+
+  @Test
+  public void filtersMessageFromStacktraceProperly() throws Exception {
+    String logMessage = "first line\nsecond line\n";
+    Exception ex1 = new Exception("exception in layer 1");
+    Exception ex2 = new Exception("exception in layer 2", ex1);
+    Exception ex3 = new Exception("exception in layer 3", ex2);
+    StringWriter s = new StringWriter();
+    PrintWriter p = new PrintWriter(s);
+    ex3.printStackTrace(p);
+    equalsLogChecker.setExpectedLogMessage(logMessage);
+    equalsLogChecker.check(logMessage + s.toString());
   }
 
 }

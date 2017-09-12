@@ -7,7 +7,6 @@
 package org.mule.functional.api.component;
 
 import static java.lang.System.lineSeparator;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
@@ -25,7 +24,7 @@ public class EqualsLogChecker extends AbstractLogChecker {
   @Override
   public void check(String logMessage) {
     StringBuilder errors = new StringBuilder();
-    List<String> expectedLines = getMessageLinesFromLogLines(splitLines(expectedLogMessage));
+    List<String> expectedLines = splitLines(expectedLogMessage);
     List<String> actualLines = getMessageLinesFromLogLines(splitLines(logMessage));
 
     checkLineCount(expectedLines, actualLines, errors);

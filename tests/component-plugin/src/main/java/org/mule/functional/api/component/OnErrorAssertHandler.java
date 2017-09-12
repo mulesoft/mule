@@ -34,12 +34,12 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
     for (LogChecker checker : this.checkers) {
       try {
         checker.check(messageToLog);
-      }catch(Exception e) {
+      } catch (Exception e) {
         errors.append(e.getMessage());
       }
     }
     String errorMessage = errors.toString();
-    if(!StringUtils.isBlank(errorMessage)) {
+    if (!StringUtils.isBlank(errorMessage)) {
       throw new AssertionError(errorMessage);
     }
     return null;

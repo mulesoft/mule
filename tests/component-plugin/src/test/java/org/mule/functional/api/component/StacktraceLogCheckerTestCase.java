@@ -10,6 +10,9 @@ import static java.util.Arrays.asList;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,6 +89,17 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
                                                  new StacktraceLogChecker.MethodCall("package", "Class0class", "method", 2)));
     stacktraceLogChecker
         .check("at package.Class0.method(whatever:0)\nat package.0Class.method(whatever:1)\nat package.Class0class.method(whatever:2)");
+  }
+
+  @Test
+  public void evaluatesRealStacktrace() throws Exception {
+    stacktraceLogChecker
+        .setExpectedCalls(asList(new StacktraceLogChecker.MethodCall("org.mule.functional.api.component",
+                                                                     "StacktraceLogCheckerTestCase", "evaluatesRealStacktrace")));
+    StringWriter s = new StringWriter();
+    PrintWriter p = new PrintWriter(s);
+    new Exception().printStackTrace(p);
+    stacktraceLogChecker.check(s.toString());
   }
 
 
