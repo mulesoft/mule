@@ -13,8 +13,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -43,6 +43,7 @@ import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionRegistry;
@@ -79,7 +80,6 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
@@ -469,24 +469,25 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         if (componentModel.getNameAttribute() != null) {
           createdComponentModels.add(componentModel.getNameAttribute());
         }
-        beanDefinitionFactory
-            .resolveComponentRecursively(componentModel.getParent() != null
-                ? (SpringComponentModel) componentModel.getParent()
-                : (SpringComponentModel) applicationModel
-                    .getRootComponentModel(), componentModel, beanFactory, (resolvedComponentModel, registry) -> {
-                      SpringComponentModel resolvedSpringComponentModel = (SpringComponentModel) resolvedComponentModel;
-                      if (resolvedComponentModel.isRoot()) {
-                        String nameAttribute = resolvedComponentModel.getNameAttribute();
-                        if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-                          nameAttribute = OBJECT_MULE_CONFIGURATION;
-                        } else if (nameAttribute == null) {
-                          // This may be a configuration that does not requires a name.
-                          nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition().getBeanClassName());
-                        }
-                        registry.registerBeanDefinition(nameAttribute, resolvedSpringComponentModel.getBeanDefinition());
-                        postProcessBeanDefinition(componentModel, registry, nameAttribute);
-                      }
-                    }, null);
+        beanDefinitionFactory.resolveComponentRecursively(componentModel.getParent() != null
+            ? (SpringComponentModel) componentModel.getParent()
+            : (SpringComponentModel) applicationModel
+                .getRootComponentModel(), componentModel, beanFactory, (resolvedComponentModel, registry) -> {
+                  SpringComponentModel resolvedSpringComponentModel = (SpringComponentModel) resolvedComponentModel;
+                  if (resolvedComponentModel.isRoot()) {
+                    String nameAttribute = resolvedComponentModel.getNameAttribute();
+                    if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
+                      nameAttribute = OBJECT_MULE_CONFIGURATION;
+                    } else if (nameAttribute == null) {
+                      // This may be a configuration that does not requires a name.
+                      nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition().getBeanClassName());
+                    }
+                    registry.registerBeanDefinition(nameAttribute, resolvedSpringComponentModel.getBeanDefinition());
+                    postProcessBeanDefinition(componentModel, registry, nameAttribute);
+                  }
+                }, null, componentLocator);
+
+        componentLocator.addComponentLocation(cm.getComponentLocation());
       }
     });
     registerObjectFromObjectProviders(beanFactory);

@@ -7,6 +7,7 @@
 package org.mule.tck.core.lifecycle;
 
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;

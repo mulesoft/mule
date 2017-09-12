@@ -9,9 +9,9 @@ package org.mule.runtime.config.spring.internal.dsl.spring;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
@@ -39,13 +39,14 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.api.dsl.processor.AbstractAttributeDefinitionVisitor;
+import org.mule.runtime.config.spring.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
@@ -58,6 +59,11 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.w3c.dom.Element;
+
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
@@ -68,11 +74,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.w3c.dom.Element;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -148,28 +149,30 @@ public class BeanDefinitionFactory {
    *        the bean definition.
    * @param componentModelPostProcessor a function to post process the bean definition.
    * @param oldParsingMechanism a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
+   * @param componentLocator where the locations of any {@link Component}'s locations must be registered
    * @return the {@code BeanDefinition} of the component model.
    */
   public BeanDefinition resolveComponentRecursively(SpringComponentModel parentComponentModel,
-                                                    SpringComponentModel componentModel,
-                                                    BeanDefinitionRegistry registry,
+                                                    SpringComponentModel componentModel, BeanDefinitionRegistry registry,
                                                     BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor,
-                                                    BiFunction<Element, BeanDefinition, Either<BeanDefinition, BeanReference>> oldParsingMechanism) {
+                                                    BiFunction<Element, BeanDefinition, Either<BeanDefinition, BeanReference>> oldParsingMechanism,
+                                                    SpringConfigurationComponentLocator componentLocator) {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
         if (innerComponent.isEnabled()) {
           resolveComponentRecursively(componentModel, (SpringComponentModel) innerComponent, registry,
-                                      componentModelPostProcessor, oldParsingMechanism);
+                                      componentModelPostProcessor, oldParsingMechanism, componentLocator);
         }
       }
     }
-    return resolveComponent(parentComponentModel, componentModel, registry, componentModelPostProcessor);
+    return resolveComponent(parentComponentModel, componentModel, registry, componentModelPostProcessor, componentLocator);
   }
 
   private BeanDefinition resolveComponent(ComponentModel parentComponentModel, SpringComponentModel componentModel,
                                           BeanDefinitionRegistry registry,
-                                          BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor) {
+                                          BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor,
+                                          SpringConfigurationComponentLocator componentLocator) {
     if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier()) || !componentModel.isEnabled()) {
       return null;
     }
@@ -207,6 +210,7 @@ public class BeanDefinitionFactory {
                 return new ErrorMapping(errorTypeMatcher, targetValue);
               }).collect(toList()), componentModel);
             }
+            componentLocator.addComponentLocation(componentModel.getComponentLocation());
           }
         });
 
