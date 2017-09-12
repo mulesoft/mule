@@ -35,7 +35,6 @@ public class EqualsLogChecker extends AbstractLogChecker {
     if (!StringUtils.isBlank(errorMessage)) {
       throw new AssertionError(errorMessage);
     }
-
   }
 
   private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {

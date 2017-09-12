@@ -467,4 +467,38 @@
         <xsd:attribute name="lineNumber" type="xsd:int" use="optional"/>
     </xsd:complexType>
 
+    <xsd:element name="check-summary" substitutionGroup="abstract-log-checker" type="checkSummaryType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Evaluates the log summary to be logged, checking that it contains the information expected.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="checkSummaryType">
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref="summary-info"/>
+        </xsd:sequence>
+        <xsd:attribute name="exclusiveContent" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Specifies if the content to check should be the only one present(true) or it allows another information(false)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="summary-info" type="summaryInfoType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element expected log summary information
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="summaryInfoType">
+        <xsd:attribute name="key" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
 </xsd:schema>

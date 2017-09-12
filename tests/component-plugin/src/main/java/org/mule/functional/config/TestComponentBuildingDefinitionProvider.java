@@ -30,6 +30,7 @@ import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
 import org.mule.functional.api.component.StacktraceLogChecker;
+import org.mule.functional.api.component.SummaryLogChecker;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
@@ -199,6 +200,19 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
             .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
             .withSetterParameterDefinition("lineNumber", fromSimpleParameter("lineNumber").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-summary").withTypeDefinition(fromType(SummaryLogChecker.class))
+            .withSetterParameterDefinition("expectedInfo",
+                                           fromChildCollectionConfiguration(SummaryLogChecker.SummaryInfo.class).build())
+            .withSetterParameterDefinition("exclusiveContent", fromSimpleParameter("exclusiveContent").build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("summary-info").withTypeDefinition(fromType(SummaryLogChecker.SummaryInfo.class))
+            .withSetterParameterDefinition("key", fromSimpleParameter("key").build())
+            .withSetterParameterDefinition("value", fromSimpleParameter("value").build()).build());
+
 
     return componentBuildingDefinitions;
   }
