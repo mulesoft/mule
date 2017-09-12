@@ -14,9 +14,10 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.getProcessin
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
+import static reactor.core.publisher.Mono.defer;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -48,7 +49,6 @@ import java.util.function.Function;
 
 import com.google.common.collect.Iterators;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 /**
@@ -67,7 +67,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
-  private static final Logger LOGGER = getLogger(Foreach.class);
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
 
@@ -166,6 +165,17 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                   .transform(nestedChain)
                                   .doOnNext(result -> currentEvent.set(InternalEvent.builder(result).build()));
                             })
+                            // This can potentially be improved but simplest way currently to determine if split results in empty
+                            // iterator is to check atomic count
+                            .switchIfEmpty(defer(() -> {
+                              if (count.get() == 0) {
+                                logger
+                                    .warn("Split expression returned no results. If this is not expected please check your expression");
+                                return just(request);
+                              } else {
+                                return empty();
+                              }
+                            }))
                             .takeLast(1)
                             .map(s -> InternalEvent.builder(currentEvent.get()).message(request.getMessage()).build());
   }
