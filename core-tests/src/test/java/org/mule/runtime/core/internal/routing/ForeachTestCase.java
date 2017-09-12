@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -46,6 +47,7 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -331,6 +333,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(), equalTo(DataType.builder().type(Integer.class).build()));
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
+  }
+
+  @Test
+  public void empty() throws Exception {
+    BaseEvent input = eventBuilder().message(of(emptyList())).build();
+    BaseEvent result = process(simpleForeach, input);
+
+    assertThat(result.getMessage(), equalTo(input.getMessage()));
+    assertThat(processedEvents, hasSize(0));
   }
 
   private void assertSimpleProcessedMessages() {
