@@ -107,6 +107,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   public void testHandleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn("Log");
 
     BaseEvent resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
     assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo(muleEvent.getMessage().getPayload().getValue()));
@@ -124,6 +125,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.initialise();
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn("Log");
     final BaseEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);
@@ -142,6 +144,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(onErrorContinueHandler, true, muleContext);
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn("Log");
     BaseEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);

@@ -410,7 +410,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     } finally {
       if (useMockInterceptor) {
         InOrder inOrder = inOrder(processor, interceptor);
-
         inOrder.verify(interceptor).before(any(), mapArgWithEntry("param", ""), any());
         inOrder.verify(interceptor).around(any(), mapArgWithEntry("param", ""), any(), any());
         inOrder.verify(processor, never()).process(any());

@@ -27,6 +27,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors specific to Message processing occur..
  */
@@ -165,7 +167,8 @@ public class MessagingException extends MuleException {
 
     if (message != null) {
       buf.append(message.getMessage());
-      if (message.getMessage().trim().charAt(message.getMessage().length() - 1) != '.') {
+      String trimmedMessage = message.getMessage().trim();
+      if (StringUtils.isNotBlank(trimmedMessage) && trimmedMessage.charAt(trimmedMessage.length() - 1) != '.') {
         buf.append(".");
       }
     }

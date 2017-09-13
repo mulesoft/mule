@@ -131,8 +131,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
       context = muleContextFactory.createMuleContext("log4j2-test.xml");
     } catch (ConfigurationException e) {
       assertEquals("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-          + "Check you have configuration module on your classpath and are using correct file extension. "
-          + "(org.mule.runtime.core.api.config.ConfigurationException)", e.getMessage());
+          + "Check you have configuration module on your classpath and are using correct file extension.", e.getMessage());
     }
     assertNull(context);
   }
@@ -148,8 +147,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
       context = muleContextFactory.createMuleContext("log4j2-test.xml", properties);
     } catch (ConfigurationException e) {
       assertEquals("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-          + "Check you have configuration module on your classpath and are using correct file extension. "
-          + "(org.mule.runtime.core.api.config.ConfigurationException)", e.getMessage());
+          + "Check you have configuration module on your classpath and are using correct file extension.", e.getMessage());
     }
 
     assertNull(context);
