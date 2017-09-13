@@ -6,6 +6,9 @@
  */
 package org.mule.functional.api.component;
 
+import static org.junit.Assert.fail;
+import static org.mule.tck.processor.FlowAssert.addAssertion;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -13,13 +16,22 @@ import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;
 
-public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
+public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor,FlowAssertion {
 
 
   private List<LogChecker> checkers;
+  private StringBuilder errors;
+
+  @Override
+  public void start() throws MuleException {
+    super.start();
+    errors = new StringBuilder();
+    addAssertion(getRootContainerName(), this);
+  }
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
@@ -30,19 +42,22 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
   public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     exception.setHandled(true);
     String messageToLog = createMessageToLog(exception);
-    StringBuilder errors = new StringBuilder();
     for (LogChecker checker : this.checkers) {
       try {
         checker.check(messageToLog);
-      } catch (Exception e) {
+      } catch (AssertionError e) {
         errors.append(e.getMessage());
       }
     }
+    return null;
+  }
+
+  @Override
+  public void verify() {
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      throw new AssertionError(errorMessage);
+      fail(errorMessage);
     }
-    return null;
   }
 
   @Override

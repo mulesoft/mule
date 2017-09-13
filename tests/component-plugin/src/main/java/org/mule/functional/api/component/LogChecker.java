@@ -15,6 +15,6 @@ public interface LogChecker {
    *
    * @throws Exception if the check fails
    */
-  public void check(String logMessage);
+  public void check(String logMessage) throws AssertionError;
 
 }

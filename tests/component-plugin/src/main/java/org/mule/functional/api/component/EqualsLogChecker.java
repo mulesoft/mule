@@ -33,13 +33,12 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      throw new AssertionError(errorMessage);
+      throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
   private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {
     if (expectedLog.size() != actualLog.size()) {
-      errorCatcher.append(lineSeparator());
       errorCatcher.append(String.format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",
                                         actualLog.size(), expectedLog.size()));
       errorCatcher.append(lineSeparator());
@@ -51,6 +50,7 @@ public class EqualsLogChecker extends AbstractLogChecker {
     for (i = 0; i < expectedLogLines.size(); i++) {
       if (i >= actualLogLines.size()) {
         errorCatcher.append(String.format("Missing expected line[%d]: %s\n", i, expectedLogLines.get(i)));
+        errorCatcher.append(lineSeparator());
       } else {
         if (!(expectedLogLines.get(i).trim().equals(actualLogLines.get(i).trim()))) {
           errorCatcher.append(String.format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n", i,

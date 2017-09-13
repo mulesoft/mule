@@ -1,5 +1,7 @@
 package org.mule.functional.api.component;
 
+import static java.lang.System.lineSeparator;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,20 +39,22 @@ public class SummaryLogChecker extends AbstractLogChecker {
 
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      throw new AssertionError(errorMessage);
+      throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
   private void evaluatePresentInfo(Map<String, String> actualInfo, StringBuilder errors) {
     for (SummaryInfo expectedInfoElement : expectedInfo) {
       if (!actualInfo.containsKey(expectedInfoElement.getKey())) {
-        errors.append(String.format("Missing summary line. Expected: \"%s\" with info: \"%s\"\n", expectedInfoElement.getKey(),
+        errors.append(String.format("Missing summary line. Expected: \"%s\" with info: \"%s\"", expectedInfoElement.getKey(),
                                     expectedInfoElement.getValue()));
+        errors.append(lineSeparator());
       } else {
         if (expectedInfoElement.getValue() != null
             && !actualInfo.get(expectedInfoElement.getKey()).equals(expectedInfoElement.getValue())) {
-          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"\n",
+          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"",
                                       expectedInfoElement.getValue(), actualInfo.get(expectedInfoElement.getKey())));
+          errors.append(lineSeparator());
         }
       }
     }
@@ -63,7 +67,8 @@ public class SummaryLogChecker extends AbstractLogChecker {
       Set<String> extraInfo = actualInfo.keySet();
       extraInfo.removeAll(expectedInfoKeySet);
       for (String key : extraInfo) {
-        errors.append(String.format("Unwanted information found. Key: \"%s\" Value: \"%s\\n", key, actualInfo.get(key)));
+        errors.append(String.format("Unwanted information found. Key: \"%s\" Value: \"%s\"", key, actualInfo.get(key)));
+        errors.append(lineSeparator());
       }
     }
   }

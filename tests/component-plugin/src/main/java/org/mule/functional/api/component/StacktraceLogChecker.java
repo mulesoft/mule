@@ -29,15 +29,14 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     }
     for (MethodCall call : expectedCalls) {
       if (!actualStackCalls.contains(call)) {
-        errors.append(lineSeparator());
-        errors.append(String.format("Expected method call: %s was not in stack trace", call.toString()));
+        errors.append(String.format("Expected method call not found in stacktrace: %s", call.toString()));
         errors.append(lineSeparator());
       }
     }
 
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
-      throw new AssertionError(errorMessage);
+      throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
@@ -124,7 +123,11 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     @Override
     public String toString() {
-      return String.format("%s.%s.%s:%d", packageName, clazz, method, lineNumber);
+      String packageNameString = packageName != null ? packageName : "(any)";
+      String classString = clazz != null ? clazz : "(any)";
+      String methodString = method != null ? method : "(any)";
+      String lineString = lineNumber != null ? Integer.toString(lineNumber) : "(any)";
+      return String.format("%s.%s.%s:%s", packageNameString, classString, methodString, lineString);
     }
 
     @Override
