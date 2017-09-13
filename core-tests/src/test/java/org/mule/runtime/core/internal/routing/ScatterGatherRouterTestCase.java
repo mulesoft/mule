@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS_FEATURE;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.event.Event;
@@ -54,7 +54,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Feature(ROUTERS_FEATURE)
+@Feature(ROUTERS)
 @Story(SCATTER_GATHER)
 public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 

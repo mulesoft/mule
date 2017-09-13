@@ -324,7 +324,7 @@ public interface AllureConstants {
 
   interface RoutersFeature {
 
-    String ROUTERS_FEATURE = "Routers";
+    String ROUTERS = "Routers";
 
     interface ForeachStory {
 
@@ -339,6 +339,16 @@ public interface AllureConstants {
     interface RoundRobinStory {
 
       String ROUND_ROBIN = "Round Robin";
+    }
+
+    interface FirstSuccessfulStory {
+
+      String FIRST_SUCCESSFUL = "First Successful";
+    }
+
+    interface UntilSuccessfulStory {
+
+      String UNTIL_SUCCESSFUL = "Until Successful";
     }
   }
 
