@@ -11,6 +11,8 @@ import org.mule.runtime.http.api.server.HttpServer;
 import java.net.InetSocketAddress;
 import java.security.cert.Certificate;
 
+import javax.net.ssl.SSLSession;
+
 /**
  * Representation of all client related data concerning an {@link HttpServer}.
  *
@@ -28,5 +30,10 @@ public interface ClientConnection {
    *         require client authentication or if the connection is not using TLS.
    */
   Certificate getClientCertificate();
+
+  /**
+   * @return the client SSL Session for propagation.
+   */
+  SSLSession getSslSession();
 
 }
