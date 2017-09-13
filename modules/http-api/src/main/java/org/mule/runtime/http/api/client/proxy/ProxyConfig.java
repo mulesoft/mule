@@ -41,6 +41,11 @@ public interface ProxyConfig {
   String getPassword();
 
   /**
+   * @return A list of comma separated hosts against which the proxy should not be used
+   */
+  String getNonProxyHosts();
+
+  /**
    * HTTP proxy configuration for making HTTP requests through an NTLM authenticated proxy.
    *
    * @since 4.0

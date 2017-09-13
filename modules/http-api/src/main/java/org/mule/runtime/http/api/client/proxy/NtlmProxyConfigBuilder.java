@@ -29,6 +29,6 @@ public final class NtlmProxyConfigBuilder extends BaseProxyConfigBuilder<ProxyCo
   public ProxyConfig.NtlmProxyConfig build() {
     checkArgument(username != null, "A username must be provided for an NTLM proxy.");
     checkArgument(password != null, "A password must be provided for an NTLM proxy.");
-    return new DefaultNtlmProxyConfig(host, port, username, password, ntlmDomain);
+    return new DefaultNtlmProxyConfig(host, port, username, password, ntlmDomain, nonProxyHosts);
   }
 }

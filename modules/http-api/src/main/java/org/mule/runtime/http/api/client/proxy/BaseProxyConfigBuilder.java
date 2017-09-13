@@ -21,6 +21,7 @@ public abstract class BaseProxyConfigBuilder<P extends ProxyConfig, B extends Ba
   protected int port = MAX_VALUE;
   protected String username = null;
   protected String password = null;
+  protected String nonProxyHosts = null;
 
   public B host(String host) {
     this.host = host;
@@ -39,6 +40,11 @@ public abstract class BaseProxyConfigBuilder<P extends ProxyConfig, B extends Ba
 
   public B password(String password) {
     this.password = password;
+    return (B) this;
+  }
+
+  public B nonProxyHosts(String nonProxyHosts) {
+    this.nonProxyHosts = nonProxyHosts;
     return (B) this;
   }
 
