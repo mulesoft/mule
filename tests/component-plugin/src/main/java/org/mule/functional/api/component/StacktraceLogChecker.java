@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class StacktraceLogChecker extends AbstractLogChecker {
 
-  private List<MethodCall> expectedCalls;
+  private List<MethodCall> expectedCalls = new ArrayList<>();
 
   @Override
   public void check(String logMessage) {
