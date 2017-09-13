@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -22,11 +23,12 @@ import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * A component location describes where the component is defined in the configuration of the artifact.
- * 
+ *
  * For instance:
  * <ul>
  * <li>COMPONENT_NAME - global component defined with name COMPONENT_NAME</li>
@@ -164,7 +166,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
   /**
    * Utility method that adds a processors part to the location. This is the part used for nested processors in configuration
    * components.
-   * 
+   *
    * @return a new instance with the processors location part appended.
    */
   public DefaultComponentLocation appendProcessorsPart() {
@@ -185,7 +187,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
   /**
    * A location part represent an specific location of a component within another component.
-   * 
+   *
    * @since 4.0
    */
   public static class DefaultLocationPart implements LocationPart, Serializable {
@@ -248,7 +250,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
       DefaultLocationPart that = (DefaultLocationPart) o;
 
-      if (!getPartPath().equals(that.getPartPath())) {
+      if (!Objects.equals(getPartPath(), that.getPartPath())) {
         return false;
       }
       if (getPartIdentifier() != null ? !getPartIdentifier().equals(that.getPartIdentifier())
@@ -263,7 +265,7 @@ public class DefaultComponentLocation implements ComponentLocation, Serializable
 
     @Override
     public int hashCode() {
-      int result = getPartPath().hashCode();
+      int result = getPartPath() != null ? getPartPath().hashCode() : 31;
       result = 31 * result + (getPartIdentifier() != null ? getPartIdentifier().hashCode() : 0);
       result = 31 * result + (getFileName() != null ? getFileName().hashCode() : 0);
       result = 31 * result + (getLineInFile() != null ? getLineInFile().hashCode() : 0);

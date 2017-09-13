@@ -180,6 +180,22 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="lifecycle-tracker" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Stores the lifecycle method calls received by this processor.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="lifecycle-tracker-check" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Specialization of 'lifecycle-tracker' that validates the phase transition being done on this component.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="non-blocking-processor" substitutionGroup="mule:abstract-message-processor">
         <xsd:complexType>
             <xsd:complexContent>

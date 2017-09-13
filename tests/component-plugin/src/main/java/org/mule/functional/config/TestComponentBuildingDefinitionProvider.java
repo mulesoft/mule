@@ -8,13 +8,13 @@ package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+
 import org.mule.functional.api.component.AssertionMessageProcessor;
 import org.mule.functional.api.component.DependencyInjectionObject;
 import org.mule.functional.api.component.EventCallback;
@@ -28,9 +28,10 @@ import org.mule.functional.api.component.SkeletonSource;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.tck.core.lifecycle.LifecycleTrackerCheckProcessor;
+import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +128,16 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("responseExpression", fromSimpleParameter("responseExpression").build())
         .withSetterParameterDefinition("responseCount", fromSimpleParameter("responseCount").build())
         .withSetterParameterDefinition("responseSameTask", fromSimpleParameter("responseSameTask").build())
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("lifecycle-tracker")
+        .withTypeDefinition(fromType(LifecycleTrackerProcessor.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("lifecycle-tracker-check")
+        .withTypeDefinition(fromType(LifecycleTrackerCheckProcessor.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition
