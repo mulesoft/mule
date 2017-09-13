@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
@@ -61,13 +62,13 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   private void validateLookupPolicies(Map<String, LookupStrategy> lookupStrategies) {
     for (String packageName : lookupStrategies.keySet()) {
       if (isSystemPackage(packageName) && !(lookupStrategies.get(packageName) instanceof ContainerOnlyLookupStrategy)) {
-        throw new IllegalArgumentException(invalidLookupPolicyOverrideError(packageName));
+        throw new IllegalArgumentException(invalidLookupPolicyOverrideError(packageName, lookupStrategies.get(packageName)));
       }
     }
   }
 
-  protected static String invalidLookupPolicyOverrideError(String packageName) {
-    return "Attempt to override lookup strategy for system package: " + packageName;
+  protected static String invalidLookupPolicyOverrideError(String packageName, LookupStrategy lookupStrategy) {
+    return "Attempt to override lookup strategy " + lookupStrategy.getClass().getSimpleName() + " for package: " + packageName;
   }
 
   private String normalizePackageName(String packageName) {
