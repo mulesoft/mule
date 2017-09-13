@@ -38,10 +38,10 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
     super(builder);
   }
 
-  void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax) {
+  void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax, boolean hasImplicitConfig) {
     String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
     registerSourceElement(sourceModel, typeName, dslSyntax);
-    registerSourceType(typeName, sourceModel, dslSyntax);
+    registerSourceType(typeName, sourceModel, dslSyntax, hasImplicitConfig);
   }
 
   private void registerSourceElement(SourceModel sourceModel, String typeName, DslElementSyntax dslSyntax) {
@@ -59,8 +59,8 @@ class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
         : getSubstitutionGroup(sourceModel.getStereotype());
   }
 
-  private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {
-    final ExtensionType sourceType = createExecutableType(name, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
+  private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax, boolean hasImplicitConfig) {
+    final ExtensionType sourceType = createExecutableType(name, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax, hasImplicitConfig);
     initialiseSequence(sourceType);
     ExplicitGroup sequence = sourceType.getSequence();
     builder.addInfrastructureParameters(sourceType, sourceModel, sequence);

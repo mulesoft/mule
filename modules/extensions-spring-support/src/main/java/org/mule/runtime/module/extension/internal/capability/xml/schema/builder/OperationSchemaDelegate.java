@@ -32,13 +32,12 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     super(builder);
   }
 
-  public void registerOperation(ComponentModel componentModel, DslElementSyntax dslSyntax) {
+  public void registerOperation(ComponentModel componentModel, DslElementSyntax dslSyntax, boolean hasImplicitConfig) {
     String typeName = capitalize(componentModel.getName()) + TYPE_SUFFIX;
     registerProcessorElement(componentModel, typeName, dslSyntax);
-    ExtensionType extensionType = registerOperationType(typeName, componentModel, dslSyntax);
+    ExtensionType extensionType = registerOperationType(typeName, componentModel, dslSyntax, hasImplicitConfig);
     registerNestedComponents(extensionType, componentModel.getNestedComponents());
   }
-
 
   void registerProcessorElement(ComponentModel componentModel, String typeName, DslElementSyntax dslSyntax) {
     Element element = new TopLevelElement();
@@ -49,8 +48,9 @@ class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
   }
 
-  ExtensionType registerOperationType(String name, ComponentModel operationModel, DslElementSyntax dslSyntax) {
-    ExtensionType componentType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax);
+  ExtensionType registerOperationType(String name, ComponentModel operationModel, DslElementSyntax dslSyntax,
+                                      boolean hasImplicitConfig) {
+    ExtensionType componentType = createExecutableType(name, MULE_ABSTRACT_OPERATOR_TYPE, dslSyntax, hasImplicitConfig);
     initialiseSequence(componentType);
     ExplicitGroup sequence = componentType.getSequence();
     builder.addInfrastructureParameters(componentType, operationModel, sequence);

@@ -70,7 +70,7 @@ abstract class ExecutableTypeSchemaDelegate {
     this.dsl = builder.getDslResolver();
   }
 
-  protected ExtensionType createExecutableType(String name, QName base, DslElementSyntax dslSyntax) {
+  protected ExtensionType createExecutableType(String name, QName base, DslElementSyntax dslSyntax, boolean hasImplicitConfig) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
 
@@ -82,7 +82,7 @@ abstract class ExecutableTypeSchemaDelegate {
 
     if (dslSyntax.requiresConfig()) {
       Attribute configAttr =
-          builder.createAttribute(CONFIG_ATTRIBUTE_NAME, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
+          builder.createAttribute(CONFIG_ATTRIBUTE_NAME, CONFIG_ATTRIBUTE_DESCRIPTION, hasImplicitConfig, SUBSTITUTABLE_NAME);
       complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
     }
 
