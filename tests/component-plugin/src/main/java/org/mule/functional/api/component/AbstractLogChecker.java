@@ -19,7 +19,7 @@ public abstract class AbstractLogChecker implements LogChecker {
   //protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
   //    Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
   protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
-      Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
+      Pattern.compile("^.*at ([^A-Z]*)\\.([0-9A-Z]+[^\\.]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
   protected static final Pattern STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN =
       Pattern.compile("\\s*(Caused by: )?([a-zA-Z0-9\\.]+(Exception|Error)+)(: .*|\\z)");
   protected static final Pattern STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN = Pattern.compile(".*\\.\\.\\. [0-9]* more.*");

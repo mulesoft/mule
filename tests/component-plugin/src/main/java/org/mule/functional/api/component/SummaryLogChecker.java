@@ -3,7 +3,6 @@ package org.mule.functional.api.component;
 import static java.lang.System.lineSeparator;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +51,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
       } else {
         if (expectedInfoElement.getValue() != null
             && !actualInfo.get(expectedInfoElement.getKey()).equals(expectedInfoElement.getValue())) {
-          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"",
+          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"",expectedInfoElement.getKey(),
                                       expectedInfoElement.getValue(), actualInfo.get(expectedInfoElement.getKey())));
           errors.append(lineSeparator());
         }
