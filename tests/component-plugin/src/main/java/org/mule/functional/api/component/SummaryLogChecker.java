@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
 import java.util.HashMap;
@@ -51,13 +52,13 @@ public class SummaryLogChecker extends AbstractLogChecker {
   private void evaluatePresentInfo(Map<String, String> actualInfo, StringBuilder errors) {
     for (SummaryInfo expectedInfoElement : expectedInfo) {
       if (!actualInfo.containsKey(expectedInfoElement.getKey())) {
-        errors.append(String.format("Missing summary line. Expected: \"%s\" with info: \"%s\"", expectedInfoElement.getKey(),
+        errors.append(format("Missing summary line. Expected: \"%s\" with info: \"%s\"", expectedInfoElement.getKey(),
                                     expectedInfoElement.getValue()));
         errors.append(lineSeparator());
       } else {
         if (expectedInfoElement.getValue() != null
             && !actualInfo.get(expectedInfoElement.getKey()).equals(expectedInfoElement.getValue())) {
-          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"", expectedInfoElement.getKey(),
+          errors.append(format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"", expectedInfoElement.getKey(),
                                       expectedInfoElement.getValue(), actualInfo.get(expectedInfoElement.getKey())));
           errors.append(lineSeparator());
         }
@@ -72,7 +73,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
       Set<String> extraInfo = actualInfo.keySet();
       extraInfo.removeAll(expectedInfoKeySet);
       for (String key : extraInfo) {
-        errors.append(String.format("Unwanted information found. Key: \"%s\" Value: \"%s\"", key, actualInfo.get(key)));
+        errors.append(format("Unwanted information found. Key: \"%s\" Value: \"%s\"", key, actualInfo.get(key)));
         errors.append(lineSeparator());
       }
     }

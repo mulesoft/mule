@@ -7,6 +7,7 @@
 package org.mule.functional.api.component;
 
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
@@ -41,7 +42,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   private void validateCalls(List<MethodCall> actualCalls, StringBuilder errors) {
     for (MethodCall call : expectedCalls) {
       if (!actualCalls.contains(call)) {
-        errors.append(String.format("Expected method call not found in stacktrace: %s", call.toString()));
+        errors.append(format("Expected method call not found in stacktrace: %s", call.toString()));
         errors.append(lineSeparator());
       }
     }
@@ -50,7 +51,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   private void validateCauses(List<ExceptionCause> actualCauses, StringBuilder errors) {
     for (ExceptionCause cause : expectedExceptionCauses) {
       if (!actualCauses.contains(cause)) {
-        errors.append(String.format("Expected exception cause not found in stacktrace: %s", cause.toString()));
+        errors.append(format("Expected exception cause not found in stacktrace: %s", cause.toString()));
         errors.append(lineSeparator());
       }
     }
@@ -162,7 +163,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       String classString = clazz != null ? clazz : "(any)";
       String methodString = method != null ? method : "(any)";
       String lineString = lineNumber != null ? Integer.toString(lineNumber) : "(any)";
-      return String.format("%s.%s.%s:%s", packageNameString, classString, methodString, lineString);
+      return format("%s.%s.%s:%s", packageNameString, classString, methodString, lineString);
     }
 
     @Override
