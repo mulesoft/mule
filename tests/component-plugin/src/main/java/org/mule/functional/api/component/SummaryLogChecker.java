@@ -57,7 +57,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
       } else {
         if (expectedInfoElement.getValue() != null
             && !actualInfo.get(expectedInfoElement.getKey()).equals(expectedInfoElement.getValue())) {
-          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"",expectedInfoElement.getKey(),
+          errors.append(String.format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"", expectedInfoElement.getKey(),
                                       expectedInfoElement.getValue(), actualInfo.get(expectedInfoElement.getKey())));
           errors.append(lineSeparator());
         }

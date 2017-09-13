@@ -165,7 +165,7 @@ public class MessagingException extends MuleException {
 
     if (message != null) {
       buf.append(message.getMessage());
-      if(message.getMessage().trim().charAt(message.getMessage().length()-1) != '.'){
+      if (message.getMessage().trim().charAt(message.getMessage().length() - 1) != '.') {
         buf.append(".");
       }
     }
