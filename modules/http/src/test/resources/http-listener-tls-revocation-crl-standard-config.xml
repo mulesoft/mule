@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="serverRevokedStandardTlsContext" >
+        <tls:trust-store path="tls/test/serverTruststore.jceks" password="password" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/test/server.jceks" keyPassword="123456" password="password" type="jceks" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" preferCrls="true" noFallback="true"/>
+    </tls:context>
+
+    <tls:context name="clientTlsContext" >
+        <tls:trust-store path="tls/test/serverTruststore.jceks" password="password" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/test/client.jceks" keyPassword="123456" password="password" type="jceks" algorithm="PKIX"/>
+    </tls:context>
+
+    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${portRevoked}" tlsContext-ref="serverRevokedStandardTlsContext" />
+    <http:listener-config name="crlServer" protocol="HTTP" host="localhost" port="8180" />
+    <http:request-config name="clientConfig" protocol="HTTPS" host="localhost" port="${portRevoked}" tlsContext-ref="clientTlsContext" />
+
+    <flow name="testFlowServer">
+        <http:listener config-ref="serverConfig" path="/serverRevoked" allowedMethods="GET"/>
+        <set-payload value="ok"/>
+    </flow>
+
+    <flow name="testFlowCrlServer">
+        <http:listener config-ref="crlServer" path="/crl" allowedMethods="GET"/>
+        <parse-template location="src/test/resources/tls/test/crl"/>
+    </flow>
+
+    <flow name="testFlowClientRevoked">
+        <http:request config-ref="clientConfig" port="${portRevoked}" path="/serverRevoked" method="GET" />
+    </flow>
+
+</mule>

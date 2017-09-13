@@ -48,7 +48,7 @@ public class MuleSslFilter extends SSLFilter
         }
         catch (SSLHandshakeException e)
         {
-            logger.error("SSL handshake error: " + e.getMessage());
+            handleSSLException(e);
             throw e;
         }
     }
@@ -61,6 +61,11 @@ public class MuleSslFilter extends SSLFilter
             return null;
         }
         return sslConnectionContext.getSslEngine().getSession();
+    }
+
+    protected void handleSSLException(SSLHandshakeException e)
+    {
+        logger.error("SSL handshake error: " + e.getMessage());
     }
 
 }
