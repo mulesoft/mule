@@ -8,6 +8,7 @@ package org.mule.functional.api.component;
 
 
 import static java.lang.System.lineSeparator;
+import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,11 +200,13 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
   public static class ExceptionCause {
 
-    private String exception;
+    private String exception = EMPTY;
 
     public ExceptionCause(String exception) {
       this.exception = exception;
     }
+
+    public ExceptionCause() {}
 
     public String getException() {
       return exception;
