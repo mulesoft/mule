@@ -644,7 +644,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -776,7 +776,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -900,7 +900,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -932,7 +932,7 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -960,7 +960,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -976,7 +976,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1002,7 +1002,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1025,7 +1025,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1048,7 +1048,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1071,7 +1071,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1103,7 +1103,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1128,7 +1128,7 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1156,7 +1156,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1182,7 +1182,7 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1218,7 +1218,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1243,7 +1243,7 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1274,7 +1274,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
@@ -1352,8 +1352,8 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1462,9 +1462,9 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
-              </xs:sequence>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -1474,8 +1474,8 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1494,8 +1494,8 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
@@ -1718,9 +1718,9 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug-killing"></xs:element>
-                  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
-                </xs:choice>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug-killing"></xs:element>
+            <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
+          </xs:choice>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="reason"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
@@ -2011,8 +2011,8 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:choice minOccurs="0" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
@@ -2073,8 +2073,8 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="1" maxOccurs="1">
           <xs:choice minOccurs="1" maxOccurs="unbounded">
-                  <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                </xs:choice>
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
         </xs:sequence>
         <xs:attribute type="xs:string" use="required" name="payload"></xs:attribute>
         <xs:attribute type="mule:expressionMap" use="required" name="attributes"></xs:attribute>
@@ -2361,24 +2361,24 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" name="with-attributes">
             <xs:complexType>
-                <xs:sequence>
+              <xs:sequence>
                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-attribute"></xs:element>
-                </xs:sequence>
+              </xs:sequence>
             </xs:complexType>
           </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="before-call-assertions">
-                      <xs:complexType>
+            <xs:complexType>
               <xs:complexContent>
                 <xs:extension base="mule:abstractExtensionType">
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
-                            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
-                          </xs:choice>
-                        </xs:sequence>
+                      <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+                    </xs:choice>
+                  </xs:sequence>
                 </xs:extension>
               </xs:complexContent>
-                      </xs:complexType>
-                    </xs:element>
+            </xs:complexType>
+          </xs:element>
           <xs:element minOccurs="0" maxOccurs="1" name="after-call-assertions">
             <xs:complexType>
               <xs:complexContent>
@@ -2426,8 +2426,8 @@
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
                       <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
-                          </xs:choice>
-                        </xs:sequence>
+                    </xs:choice>
+                  </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
                   <xs:attribute type="mule:expressionString" use="required" name="message"></xs:attribute>
                 </xs:extension>
@@ -2441,8 +2441,8 @@
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
                       <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug-killing"></xs:element>
-                          </xs:choice>
-                        </xs:sequence>
+                    </xs:choice>
+                  </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
                 </xs:extension>
               </xs:complexContent>
@@ -2464,8 +2464,8 @@
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
                       <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
-                          </xs:choice>
-                        </xs:sequence>
+                    </xs:choice>
+                  </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
                   <xs:attribute type="mule:expressionString" use="required" name="message"></xs:attribute>
                 </xs:extension>
@@ -2479,7 +2479,7 @@
                   <xs:sequence minOccurs="1">
                     <xs:choice minOccurs="1" maxOccurs="unbounded">
                       <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="drug-killing"></xs:element>
-                          </xs:choice>
+                    </xs:choice>
                   </xs:sequence>
                   <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
                 </xs:extension>
