@@ -354,6 +354,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     MuleException.verboseExceptions = true;
 
     BaseEvent testEvent = mock(BaseEvent.class);
+    when(testEvent.getError()).thenReturn(Optional.empty());
     final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
     Message muleMessage = of(payload);
     when(testEvent.getMessage()).thenReturn(muleMessage);
