@@ -11,13 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runners.Parameterized;
+
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -29,6 +23,14 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
@@ -62,18 +64,38 @@ public class ModuleWithMultipleGlobalElementsTestCase extends AbstractXmlExtensi
   @Parameterized.Parameter(1)
   public String[] paths;
 
+  @Parameterized.Parameter(2)
+  public boolean shouldValidate;
+
   @Parameterized.Parameters(name = "{index}: Running tests for {0} ")
   public static Collection<Object[]> data() {
-    return asList(new Object[][] {
-        // scenario without TNS
-        {"flows/flows-using-module-multiple-global-elements.xml", new String[] {"modules/module-multiple-global-elements.xml"}},
-        // scenario with TNS and "internal" operations
-        {"flows/flows-using-module-calling-operations-within-module-with-global-elements.xml",
-            new String[] {"modules/module-calling-operations-within-module-with-global-elements.xml"}},
-        // scenario with connection attributes (child element)
-        {"flows/flows-using-module-multiple-global-elements-connection.xml",
-            new String[] {"modules/module-multiple-global-elements-connection.xml"}}
-    });
+    return asList(scenarioWithoutTns(false),
+                  scenarioWithoutTns(true),
+                  scenarioWithTnsAndInternalOperations(false),
+                  scenarioWithTnsAndInternalOperations(true),
+                  // scenario with connection attributes (child element)
+                  scenarioWithConnectionAttributes(false),
+                  scenarioWithConnectionAttributes(true));
+  }
+
+  private static Object[] scenarioWithTnsAndInternalOperations(boolean shouldValidate) {
+    return new Object[] {"flows/flows-using-module-calling-operations-within-module-with-global-elements.xml",
+        new String[] {"modules/module-calling-operations-within-module-with-global-elements.xml"}, shouldValidate};
+  }
+
+  private static Object[] scenarioWithConnectionAttributes(boolean shouldValidate) {
+    return new Object[] {"flows/flows-using-module-multiple-global-elements-connection.xml",
+        new String[] {"modules/module-multiple-global-elements-connection.xml"}, shouldValidate};
+  }
+
+  private static Object[] scenarioWithoutTns(boolean shouldValidate) {
+    return new Object[] {"flows/flows-using-module-multiple-global-elements.xml",
+        new String[] {"modules/module-multiple-global-elements.xml"}, shouldValidate};
+  }
+
+  @Override
+  protected boolean shouldValidateXml() {
+    return shouldValidate;
   }
 
   @Override
