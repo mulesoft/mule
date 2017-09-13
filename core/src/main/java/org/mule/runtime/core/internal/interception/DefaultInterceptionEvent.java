@@ -70,6 +70,11 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   }
 
   @Override
+  public String getCorrelationId() {
+    return interceptedInput.getCorrelationId();
+  }
+
+  @Override
   public EventContext getContext() {
     return interceptedInput.getContext();
   }
