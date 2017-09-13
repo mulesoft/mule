@@ -77,7 +77,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * {@inheritDoc}
    */
   @Override
-  public List<ComponentLocation> findAll() {
+  public List<ComponentLocation> findAllLocations() {
     return unmodifiableList(new ArrayList<>(componentLocations));
   }
 }
