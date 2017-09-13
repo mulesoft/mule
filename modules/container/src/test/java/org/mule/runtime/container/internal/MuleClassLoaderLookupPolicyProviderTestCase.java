@@ -20,6 +20,7 @@ import static org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy.in
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -46,7 +47,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
   public void extendingCustomLookupStrategyForSystemPackage() throws Exception {
     final String overrideClassName = Object.class.getName();
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName));
+    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName, CHILD_FIRST));
 
     new MuleClassLoaderLookupPolicy(emptyMap(), singleton(SYSTEM_PACKAGE))
         .extend(singletonMap(overrideClassName, CHILD_FIRST));
@@ -131,7 +132,7 @@ public class MuleClassLoaderLookupPolicyProviderTestCase extends AbstractMuleTes
 
     final String overrideClassName = Object.class.getName();
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName));
+    expectedException.expectMessage(invalidLookupPolicyOverrideError(overrideClassName, PARENT_FIRST));
 
     lookupPolicy.extend(singletonMap(overrideClassName, PARENT_FIRST));
   }

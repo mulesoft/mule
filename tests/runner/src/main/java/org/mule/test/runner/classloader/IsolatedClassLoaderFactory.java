@@ -53,6 +53,8 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -66,8 +68,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -127,11 +127,18 @@ public class IsolatedClassLoaderFactory {
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),
                                             moduleRepository)) {
 
+      final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
+
+      for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
+        pluginUrlClassification.getExportedPackages().forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
+      }
+
       containerClassLoader =
           createContainerArtifactClassLoader(testContainerClassLoaderFactory, artifactsUrlClassification);
 
       childClassLoaderLookupPolicy =
           testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader());
+      final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
 
       serviceArtifactClassLoaders = createServiceClassLoaders(containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy,
                                                               artifactsUrlClassification);
@@ -171,30 +178,23 @@ public class IsolatedClassLoaderFactory {
           filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter, emptyList()));
         }
       }
+
+      ArtifactClassLoader appClassLoader =
+          createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification,
+                                               pluginsArtifactClassLoaders);
+
+      regionClassLoader.addClassLoader(appClassLoader,
+                                       new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(),
+                                                                            testJarInfo.getResources()));
+
+      for (int i = 0; i < filteredPluginsArtifactClassLoaders.size(); i++) {
+        final ArtifactClassLoaderFilter classLoaderFilter = pluginArtifactClassLoaderFilters.get(i);
+        regionClassLoader.addClassLoader(filteredPluginsArtifactClassLoaders.get(i), classLoaderFilter);
+      }
+
+      return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
+                                           appClassLoader);
     }
-
-    final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
-    for (int i = 0; i < filteredPluginsArtifactClassLoaders.size(); i++) {
-      final ArtifactClassLoaderFilter classLoaderFilter = pluginArtifactClassLoaderFilters.get(i);
-      classLoaderFilter.getExportedClassPackages()
-          .forEach(p -> pluginsLookupStrategies.put(p, PARENT_FIRST));
-    }
-    final ClassLoaderLookupPolicy appLookupPolicy = childClassLoaderLookupPolicy.extend(pluginsLookupStrategies);
-
-    ArtifactClassLoader appClassLoader =
-        createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactsUrlClassification,
-                                             pluginsArtifactClassLoaders);
-
-    regionClassLoader.addClassLoader(appClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(), testJarInfo.getResources()));
-
-    for (int i = 0; i < filteredPluginsArtifactClassLoaders.size(); i++) {
-      final ArtifactClassLoaderFilter classLoaderFilter = pluginArtifactClassLoaderFilters.get(i);
-      regionClassLoader.addClassLoader(filteredPluginsArtifactClassLoaders.get(i), classLoaderFilter);
-    }
-
-    return new ArtifactClassLoaderHolder(containerClassLoader, serviceArtifactClassLoaders, pluginsArtifactClassLoaders,
-                                         appClassLoader);
   }
 
   private ClassLoaderLookupPolicy extendLookupPolicyForPrivilegedAccess(ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
