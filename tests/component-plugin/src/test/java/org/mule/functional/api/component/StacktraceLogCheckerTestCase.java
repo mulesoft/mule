@@ -242,6 +242,13 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
     stacktraceLogChecker.check(s.toString());
   }
 
+  @Test
+  public void causeMatchSuccess() throws Exception {
+    stacktraceLogChecker.setExpectedExceptionCauses(asList(new StacktraceLogChecker.ExceptionCause("org.package.Exception")));
+    stacktraceLogChecker
+        .check("noise, more noise, not \n      important. \t\nStill not important\n Caused by: org.package.Exception\n more irrelevant stuff");
+  }
+
 
 
 }

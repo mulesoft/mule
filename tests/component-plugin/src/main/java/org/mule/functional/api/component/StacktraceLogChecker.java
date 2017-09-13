@@ -18,39 +18,65 @@ import org.apache.commons.lang3.StringUtils;
 public class StacktraceLogChecker extends AbstractLogChecker {
 
   private List<MethodCall> expectedCalls = new ArrayList<>();
+  private List<ExceptionCause> expectedExceptionCauses = new ArrayList<>();
 
   @Override
   public void check(String logMessage) {
     StringBuilder errors = new StringBuilder();
     List<String> stackTraceLines = getStacktraceLinesFromLogLines(splitLines(logMessage));
     List<MethodCall> actualStackCalls = new ArrayList<>();
+    List<ExceptionCause> actualExceptionCauses = new ArrayList<>();
     for (String line : stackTraceLines) {
-      actualStackCalls.add(createMethodCallFromLine(line));
+      saveLineAsMatchingPojo(line, actualStackCalls, actualExceptionCauses);
     }
-    for (MethodCall call : expectedCalls) {
-      if (!actualStackCalls.contains(call)) {
-        errors.append(String.format("Expected method call not found in stacktrace: %s", call.toString()));
-        errors.append(lineSeparator());
-      }
-    }
-
+    validateCalls(actualStackCalls, errors);
+    validateCauses(actualExceptionCauses, errors);
     String errorMessage = errors.toString();
     if (!StringUtils.isBlank(errorMessage)) {
       throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
-
-  private MethodCall createMethodCallFromLine(String line) {
-    Matcher matcher = STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line);
-    if (matcher.matches()) {
-      //If no line number found, probably due to native method
-      if (matcher.group(4).equals(StringUtils.EMPTY)) {
-        return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
+  private void validateCalls(List<MethodCall> actualCalls, StringBuilder errors) {
+    for (MethodCall call : expectedCalls) {
+      if (!actualCalls.contains(call)) {
+        errors.append(String.format("Expected method call not found in stacktrace: %s", call.toString()));
+        errors.append(lineSeparator());
       }
-      return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
     }
-    return new MethodCall();
+  }
+
+  private void validateCauses(List<ExceptionCause> actualCauses, StringBuilder errors) {
+    for (ExceptionCause cause : expectedExceptionCauses) {
+      if (!actualCauses.contains(cause)) {
+        errors.append(String.format("Expected exception cause not found in stacktrace: %s", cause.toString()));
+        errors.append(lineSeparator());
+      }
+    }
+  }
+
+  private void saveLineAsMatchingPojo(String line, List<MethodCall> actualCalls, List<ExceptionCause> actualCauses) {
+    Matcher stackTraceMatcher = STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line);
+    if (stackTraceMatcher.matches()) {
+      actualCalls.add(createMethodCallFromMatcher(stackTraceMatcher));
+    } else {
+      Matcher exceptionCauseMatcher = STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line);
+      if (exceptionCauseMatcher.matches()) {
+        actualCauses.add(createExceptionCauseFromMatcher(exceptionCauseMatcher));
+      }
+    }
+  }
+
+  private MethodCall createMethodCallFromMatcher(Matcher matcher) {
+    //If no line number found, probably due to native method
+    if (matcher.group(4).equals(StringUtils.EMPTY)) {
+      return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
+    }
+    return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
+  }
+
+  private ExceptionCause createExceptionCauseFromMatcher(Matcher matcher) {
+    return new ExceptionCause(matcher.group(2));
   }
 
   public void setExpectedCalls(List<MethodCall> expectedCalls) {
@@ -59,6 +85,14 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
   public List<MethodCall> getExpectedCalls() {
     return this.expectedCalls;
+  }
+
+  public List<ExceptionCause> getExpectedExceptionCauses() {
+    return expectedExceptionCauses;
+  }
+
+  public void setExpectedExceptionCauses(List<ExceptionCause> expectedExceptionCauses) {
+    this.expectedExceptionCauses = expectedExceptionCauses;
   }
 
   public static class MethodCall {
@@ -161,6 +195,46 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       }
       return true;
     }
+  }
+
+  public static class ExceptionCause {
+
+    private String exception;
+
+    public ExceptionCause(String exception) {
+      this.exception = exception;
+    }
+
+    public String getException() {
+      return exception;
+    }
+
+    public void setException(String exception) {
+      this.exception = exception;
+    }
+
+    @Override
+    public String toString() {
+      return this.exception;
+    }
+
+    @Override
+    public int hashCode() {
+      return exception.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof ExceptionCause)) {
+        return false;
+      }
+      if (this == obj) {
+        return true;
+      }
+      return exception.equals(((ExceptionCause) obj).exception);
+    }
+
+
   }
 
 }

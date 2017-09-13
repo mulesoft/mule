@@ -192,6 +192,8 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .add(baseDefinition.withIdentifier("check-stacktrace").withTypeDefinition(fromType(StacktraceLogChecker.class))
             .withSetterParameterDefinition("expectedCalls",
                                            fromChildCollectionConfiguration(StacktraceLogChecker.MethodCall.class).build())
+            .withSetterParameterDefinition("expectedExceptionCauses",
+                                           fromChildCollectionConfiguration(StacktraceLogChecker.ExceptionCause.class).build())
             .build());
 
     componentBuildingDefinitions
@@ -200,6 +202,10 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
             .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
             .withSetterParameterDefinition("lineNumber", fromSimpleParameter("lineNumber").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("cause").withTypeDefinition(fromType(StacktraceLogChecker.ExceptionCause.class))
+            .withSetterParameterDefinition("exception", fromSimpleParameter("exception").build()).build());
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier("check-summary").withTypeDefinition(fromType(SummaryLogChecker.class))

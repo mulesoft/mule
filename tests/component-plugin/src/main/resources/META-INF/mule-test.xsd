@@ -448,11 +448,13 @@
 
     <xsd:complexType name="checkStacktraceType">
         <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element ref="method-call"/>
+            <xsd:element ref="abstract-stacktrace-element"/>
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="method-call" type="methodCallType">
+    <xsd:element name="abstract-stacktrace-element" abstract="true"/>
+
+    <xsd:element name="method-call" type="methodCallType" substitutionGroup="abstract-stacktrace-element">
         <xsd:annotation>
             <xsd:documentation>
                 An element with information about stacktraces method calls
@@ -465,6 +467,18 @@
         <xsd:attribute name="class" type="xsd:string" use="optional"/>
         <xsd:attribute name="method" type="xsd:string" use="optional"/>
         <xsd:attribute name="lineNumber" type="xsd:int" use="optional"/>
+    </xsd:complexType>
+
+    <xsd:element name="cause" type="exceptionCauseType" substitutionGroup="abstract-stacktrace-element">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element with information about stacktraces exception causes
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="exceptionCauseType">
+        <xsd:attribute name="exception" type="xsd:string" use="required"/>
     </xsd:complexType>
 
     <xsd:element name="check-summary" substitutionGroup="abstract-log-checker" type="checkSummaryType">

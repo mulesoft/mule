@@ -20,7 +20,7 @@ import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;
 
-public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor,FlowAssertion {
+public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor, FlowAssertion {
 
 
   private List<LogChecker> checkers;
