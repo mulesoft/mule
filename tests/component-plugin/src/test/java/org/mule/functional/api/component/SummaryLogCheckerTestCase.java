@@ -59,14 +59,14 @@ public class SummaryLogCheckerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void successEvenWithStacktraceNoiseAndExclusiveContentAsTrue() throws Exception {
+  public void successWithStacktraceNoiseAndExclusiveContentAsTrue() throws Exception {
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
     new Exception().printStackTrace(printWriter);
     summaryLogChecker.setExclusiveContent(true);
     SummaryLogChecker.SummaryInfo summaryInfo = new SummaryLogChecker.SummaryInfo("key", "value");
     summaryLogChecker.setExpectedInfo(asList(summaryInfo));
-    summaryLogChecker.check("key: value\nkey2: value2\n" + stringWriter.toString());
+    summaryLogChecker.check("key: value\n" + stringWriter.toString());
   }
 
 
