@@ -36,6 +36,7 @@ import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BR
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -581,6 +582,17 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName("dynamicListOfObjects").addProcessorsPart().addIndexPart(0).build();
     MetadataType param = getResolvedTypeFromList();
     assertExpectedType(((ArrayType) param).getType(), personType);
+  }
+
+  @Test
+  public void operationReceivesListOfObjects() throws Exception {
+    location = Location.builder().globalName("objectListAsInput").addProcessorsPart().addIndexPart(0).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> operationMetadata =
+        metadataService.getOperationMetadata(location);
+    MetadataType objects = getParameter(operationMetadata.get().getModel(), "objects").getType();
+
+    assertThat(objects, is(instanceOf(ArrayType.class)));
+    assertThat(((ArrayType) objects).getType(), is(personType));
   }
 
   private MetadataType getResolvedTypeFromList() {

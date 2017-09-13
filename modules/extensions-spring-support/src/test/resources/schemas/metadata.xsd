@@ -1031,6 +1031,16 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ObjectListAsInputType" substitutionGroup="mule:abstract-operator" name="object-list-as-input"></xs:element>
+  <xs:complexType name="ObjectListAsInputType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="objects"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAttributesWithDeclaredSubtypesMetadataType" substitutionGroup="mule:abstract-operator" name="output-attributes-with-declared-subtypes-metadata"></xs:element>
   <xs:complexType name="OutputAttributesWithDeclaredSubtypesMetadataType">
     <xs:complexContent>
