@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -50,14 +49,6 @@ public interface BaseEvent extends Serializable, Event {
    * @return the correlation metadata of this message.
    */
   Optional<GroupCorrelation> getGroupCorrelation();
-
-  /**
-   * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
-   * event.
-   *
-   * @return the correlation id to use for this event.
-   */
-  String getCorrelationId();
 
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
