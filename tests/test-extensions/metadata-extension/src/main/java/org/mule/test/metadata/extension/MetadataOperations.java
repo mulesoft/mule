@@ -9,6 +9,7 @@ package org.mule.test.metadata.extension;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -237,6 +238,11 @@ public class MetadataOperations {
   @OutputResolver(output = TestOutputResolverWithoutKeyResolver.class, attributes = TestAttributesResolverWithKeyResolver.class)
   public PagingProvider<MetadataConnection, Result<Object, Object>> pagedOperationResultWithAttributesResolver(@MetadataKeyId String type) {
     return generateDummyPagingProvider();
+  }
+
+  public void objectListAsInput(@MetadataKeyId String type,
+                                @Optional @TypeResolver(TestInputResolverWithKeyResolver.class) List<Object> objects) {
+
   }
 
   public PagingProvider<MetadataConnection, Animal> pagedOperationMetadata(Animal animal) {
