@@ -235,4 +235,7 @@
         </metadata:do-query>
     </flow>
 
+    <flow name="objectListAsInput">
+        <metadata:object-list-as-input type="PERSON"/>
+    </flow>
 </mule>
