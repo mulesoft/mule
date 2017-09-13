@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.0.0-BETA.3</version>
+        <version>4.0.0-rc-SNAPSHOT</version>
     </parent>
     <artifactId>mule-ce-sources</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -17,6 +17,8 @@
 
     <properties>
         <outputFilename>mule-sources-${project.version}</outputFilename>
+
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>
