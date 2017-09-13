@@ -58,7 +58,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -96,8 +95,6 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
-import org.mule.runtime.core.internal.el.DefaultExpressionManager;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
@@ -107,6 +104,8 @@ import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
+import org.mule.runtime.core.internal.el.DefaultExpressionManager;
+import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -202,10 +201,7 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_LOCAL_STORE_PERSISTENT,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"))
       .put(OBJECT_STORE_MANAGER, getBeanDefinition(MuleObjectStoreManager.class))
-      .put(OBJECT_QUEUE_MANAGER,
-           getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER)
-               .getBeanDefinition())
-      .put(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
+      .put(OBJECT_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
       .put(OBJECT_SECURITY_MANAGER, getBeanDefinition(DefaultMuleSecurityManager.class))
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
@@ -316,29 +312,29 @@ class SpringMuleContextServiceConfigurator {
   }
 
   private void createQueueManagerBeanDefinitions() {
-    if (customServiceRegistry.getOverriddenService(OBJECT_QUEUE_MANAGER).isPresent()) {
-      registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinitionBuilder(ConstantFactoryBean.class)
-          .addConstructorArgReference(OBJECT_LOCAL_QUEUE_MANAGER).getBeanDefinition());
-    } else {
+    AtomicBoolean customManagerDefined = new AtomicBoolean(false);
+    customServiceRegistry.getOverriddenService(OBJECT_QUEUE_MANAGER).ifPresent(customService -> {
+      customManagerDefined.set(true);
+      registerBeanDefinition(OBJECT_QUEUE_MANAGER, getCustomServiceBeanDefinition(customService));
+    });
+
+    if (customManagerDefined.get()) {
       registerBeanDefinition(OBJECT_LOCAL_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class));
+    } else {
+      beanDefinitionRegistry.registerAlias(OBJECT_QUEUE_MANAGER, OBJECT_LOCAL_QUEUE_MANAGER);
     }
   }
 
   private void createLocalLockFactoryBeanDefinitions() {
     AtomicBoolean customLockFactoryWasDefined = new AtomicBoolean(false);
     customServiceRegistry.getOverriddenService(OBJECT_LOCK_FACTORY).ifPresent(customService -> {
-      customService.getServiceClass().ifPresent(serviceClass -> {
-        customLockFactoryWasDefined.set(true);
-        final BeanDefinition defaultBeanDefinition = defaultContextServices.get(OBJECT_LOCK_FACTORY);
-        beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_FACTORY,
-                                                      defaultBeanDefinition);
-      });
+      customLockFactoryWasDefined.set(true);
+      beanDefinitionRegistry.registerBeanDefinition(OBJECT_LOCK_FACTORY, getCustomServiceBeanDefinition(customService));
     });
 
     if (customLockFactoryWasDefined.get()) {
       beanDefinitionRegistry
-          .registerBeanDefinition(LOCAL_OBJECT_LOCK_FACTORY, getBeanDefinitionBuilder(MuleLockFactory.class)
-              .getBeanDefinition());
+          .registerBeanDefinition(LOCAL_OBJECT_LOCK_FACTORY, defaultContextServices.get(OBJECT_LOCK_FACTORY));
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_LOCK_FACTORY, LOCAL_OBJECT_LOCK_FACTORY);
     }
@@ -346,24 +342,17 @@ class SpringMuleContextServiceConfigurator {
 
   private void createLocalObjectStoreBeanDefinitions() {
     AtomicBoolean anyBaseStoreWasRedefined = new AtomicBoolean(false);
-    OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> {
-      customServiceRegistry.getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
-        customService.getServiceClass().ifPresent(serviceClass -> {
+    OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME.entrySet().forEach(objectStoreLocal -> customServiceRegistry
+        .getOverriddenService(objectStoreLocal.getKey()).ifPresent(customService -> {
           anyBaseStoreWasRedefined.set(true);
-          final BeanDefinition defaultBeanDefinition = defaultContextServices.get(objectStoreLocal.getKey());
-          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getValue(),
-                                                        defaultBeanDefinition);
-          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getKey(),
-                                                        defaultBeanDefinition);
-        });
-      });
-    });
+          beanDefinitionRegistry.registerBeanDefinition(objectStoreLocal.getKey(), getCustomServiceBeanDefinition(customService));
+        }));
 
     if (anyBaseStoreWasRedefined.get()) {
       beanDefinitionRegistry
           .registerBeanDefinition(LOCAL_OBJECT_STORE_MANAGER, getBeanDefinitionBuilder(MuleObjectStoreManager.class)
-              .addPropertyValue("basePersistentStoreKey", BASE_PERSISTENT_OBJECT_STORE_KEY)
-              .addPropertyValue("baseTransientStoreKey", BASE_IN_MEMORY_OBJECT_STORE_KEY)
+              .addPropertyValue("basePersistentStoreKey", OBJECT_LOCAL_STORE_PERSISTENT)
+              .addPropertyValue("baseTransientStoreKey", OBJECT_LOCAL_STORE_IN_MEMORY)
               .getBeanDefinition());
     } else {
       beanDefinitionRegistry.registerAlias(OBJECT_STORE_MANAGER, LOCAL_OBJECT_STORE_MANAGER);

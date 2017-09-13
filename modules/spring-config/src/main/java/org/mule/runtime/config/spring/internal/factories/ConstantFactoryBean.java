@@ -7,14 +7,17 @@
 package org.mule.runtime.config.spring.internal.factories;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.api.component.Component;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
   private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
 
   private final T value;
+  private MuleContext muleContext;
 
   public ConstantFactoryBean(T value) {
     checkArgument(value != null, "value cannot be null");
@@ -60,29 +64,27 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    if (value instanceof MuleContextAware) {
-      ((MuleContextAware) value).setMuleContext(context);
-    }
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    LifecycleUtils.initialiseIfNeeded(value);
+    initialiseIfNeeded(value, true, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
-    LifecycleUtils.startIfNeeded(value);
+    startIfNeeded(value);
   }
 
   @Override
   public void stop() throws MuleException {
-    LifecycleUtils.stopIfNeeded(value);
+    stopIfNeeded(value);
   }
 
   @Override
   public void dispose() {
-    LifecycleUtils.disposeIfNeeded(value, LOGGER);
+    disposeIfNeeded(value, LOGGER);
   }
 }
