@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -45,11 +47,7 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
    */
   @Override
   public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
-    Object resolve = resolver.resolve(context);
-    if (resolve instanceof ValueResolver) {
-      resolve = ((ValueResolver) resolve).resolve(context);
-    }
-    return TypedValue.of((T) resolve);
+    return TypedValue.of((T) resolveRecursively(resolver, context));
   }
 
   /**

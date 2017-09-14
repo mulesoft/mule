@@ -22,7 +22,7 @@ import org.junit.Test;
 import java.io.InputStream;
 import java.util.Optional;
 
-public class WrapperTypesTestCase extends AbstractParameterResolverTestCase {
+public class StackedTypesTestCase extends AbstractParameterResolverTestCase {
 
   @Override
   protected String[] getConfigFiles() {

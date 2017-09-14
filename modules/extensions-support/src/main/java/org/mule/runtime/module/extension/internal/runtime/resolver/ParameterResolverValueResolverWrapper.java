@@ -9,7 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
@@ -41,13 +44,9 @@ public class ParameterResolverValueResolverWrapper<T>
       @Override
       public T resolve() {
         try {
-          Object resolve = resolver.resolve(context);
-          if (resolve instanceof ValueResolver) {
-            resolve = ((ValueResolver) resolve).resolve(context);
-          }
-          return (T) resolve;
+          return resolveRecursively((ValueResolver<T>) resolver, context);
         } catch (MuleException e) {
-          throw new RuntimeException(e);
+          throw new MuleRuntimeException(e);
         }
       }
 

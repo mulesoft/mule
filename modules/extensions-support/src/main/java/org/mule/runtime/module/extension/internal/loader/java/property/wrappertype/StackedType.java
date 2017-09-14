@@ -16,7 +16,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class WrapperType {
+public class StackedType {
 
   private final Class type;
   private final ExpressionBasedResolverFactory expressionBasedResolverFactory;
@@ -33,7 +33,7 @@ public class WrapperType {
    * @param staticResolverFactory          A factory that creates instances of static {@link ValueResolver value resolvers}
    * @param delegateResolverFactory        A factory that create instances of {@link ValueResolver value resolver} wrappers
    */
-  private WrapperType(Class type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
+  private StackedType(Class type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
                       StaticResolverFactory staticResolverFactory, DelegateResolverFactory delegateResolverFactory) {
     this.type = type;
     this.expressionBasedResolverFactory = expressionBasedResolverFactory;
@@ -75,7 +75,7 @@ public class WrapperType {
   /**
    * Creates a new instance of {@link Builder Wrapper Type Builder}
    *
-   * @param type The type that the {@link WrapperType} will represent
+   * @param type The type that the {@link StackedType} will represent
    * @return The builder
    */
   public static <T> Builder<T> builder(Class<T> type) {
@@ -108,8 +108,8 @@ public class WrapperType {
       return this;
     }
 
-    public WrapperType build() {
-      return new WrapperType(type, expressionBasedResolverFactory, staticResolverFactory, delegateResolverFactory);
+    public StackedType build() {
+      return new StackedType(type, expressionBasedResolverFactory, staticResolverFactory, delegateResolverFactory);
     }
   }
 

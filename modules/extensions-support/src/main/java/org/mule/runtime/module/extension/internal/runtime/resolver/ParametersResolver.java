@@ -20,9 +20,8 @@ import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableLi
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypeUtils.getStaticWrapperValueResolver;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypeUtils.getWrapperModelProperty;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypeUtils.isWrapperType;
+import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStackedTypesModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStaticValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
@@ -31,6 +30,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -55,7 +55,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEn
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -66,6 +65,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Joiner;
 
 /**
  * Contains behavior to obtain a ResolverSet for a set of parameters values and a {@link ParameterizedModel}.
@@ -383,8 +384,8 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       resolver = getCollectionResolver((Collection) value);
     } else if (value instanceof Map) {
       resolver = getMapResolver((Map<Object, Object>) value);
-    } else if (isWrapperType(modelProperties)) {
-      resolver = getStaticWrapperValueResolver(value, getWrapperModelProperty(modelProperties).get());
+    } else if (getStackedTypesModelProperty(modelProperties).isPresent()) {
+      resolver = getStaticValueResolver(value, getStackedTypesModelProperty(modelProperties).get());
     } else {
       resolver = new StaticValueResolver<>(value);
     }

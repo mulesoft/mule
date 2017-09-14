@@ -10,17 +10,18 @@ import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypeUtils.getExpressionBasedWrapperValueResolver;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypeUtils.getWrapperModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.WrapperTypesModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -64,7 +65,7 @@ public class ResolverUtils {
     return getExpressionBasedValueResolver(expression,
                                            () -> isTypedValue(metadataType),
                                            () -> isParameterResolver(metadataType),
-                                           getWrapperModelProperty(operationModel.getModelProperties()),
+                                           getStackedTypesModelProperty(operationModel.getModelProperties()),
                                            metadataType,
                                            muleContext);
   }
@@ -82,15 +83,25 @@ public class ResolverUtils {
     return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();
   }
 
+  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
+      throws MuleException {
+    T resolve = valueResolver.resolve(resolvingContext);
+    if (resolve instanceof ValueResolver) {
+      resolve = resolveRecursively((ValueResolver<T>) resolve, resolvingContext);
+    }
+    return resolve;
+  }
+
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
                                                                   BooleanSupplier isParameterResolver,
-                                                                  Optional<WrapperTypesModelProperty> wrapperModelProperty,
+                                                                  Optional<StackedTypesModelProperty> stackedTypesModelProperty,
                                                                   MetadataType type,
                                                                   MuleContext muleContext) {
 
     try {
-      if (wrapperModelProperty.isPresent()) {
-        return getExpressionBasedWrapperValueResolver(expression, getType(type), wrapperModelProperty.get());
+      if (stackedTypesModelProperty.isPresent()) {
+        return StackedTypesModelProperty.getExpressionBasedValueResolver(expression, getType(type),
+                                                                         stackedTypesModelProperty.get());
         //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
