@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java.property.wrappertype;
+package org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes;
 
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -16,7 +16,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public class StackedType {
+public class StackableType {
 
   private final Class type;
   private final ExpressionBasedResolverFactory expressionBasedResolverFactory;
@@ -33,8 +33,8 @@ public class StackedType {
    * @param staticResolverFactory          A factory that creates instances of static {@link ValueResolver value resolvers}
    * @param delegateResolverFactory        A factory that create instances of {@link ValueResolver value resolver} wrappers
    */
-  private StackedType(Class type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
-                      StaticResolverFactory staticResolverFactory, DelegateResolverFactory delegateResolverFactory) {
+  private StackableType(Class type, ExpressionBasedResolverFactory expressionBasedResolverFactory,
+                        StaticResolverFactory staticResolverFactory, DelegateResolverFactory delegateResolverFactory) {
     this.type = type;
     this.expressionBasedResolverFactory = expressionBasedResolverFactory;
     this.staticResolverFactory = staticResolverFactory;
@@ -75,7 +75,7 @@ public class StackedType {
   /**
    * Creates a new instance of {@link Builder Wrapper Type Builder}
    *
-   * @param type The type that the {@link StackedType} will represent
+   * @param type The type that the {@link StackableType} will represent
    * @return The builder
    */
   public static <T> Builder<T> builder(Class<T> type) {
@@ -108,8 +108,8 @@ public class StackedType {
       return this;
     }
 
-    public StackedType build() {
-      return new StackedType(type, expressionBasedResolverFactory, staticResolverFactory, delegateResolverFactory);
+    public StackableType build() {
+      return new StackableType(type, expressionBasedResolverFactory, staticResolverFactory, delegateResolverFactory);
     }
   }
 

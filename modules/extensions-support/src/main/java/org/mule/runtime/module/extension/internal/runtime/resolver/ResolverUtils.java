@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStackedTypesModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 
@@ -21,7 +21,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -100,8 +100,8 @@ public class ResolverUtils {
 
     try {
       if (stackedTypesModelProperty.isPresent()) {
-        return StackedTypesModelProperty.getExpressionBasedValueResolver(expression, getType(type),
-                                                                         stackedTypesModelProperty.get());
+        return stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(expression,
+                                                                                                         getType(type));
         //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =

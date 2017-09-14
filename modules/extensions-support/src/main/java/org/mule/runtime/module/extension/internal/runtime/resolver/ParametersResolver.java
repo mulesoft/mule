@@ -20,8 +20,7 @@ import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableLi
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStackedTypesModelProperty;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStaticValueResolver;
+import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getDefaultValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getFieldDefaultValueValueResolver;
@@ -385,7 +384,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     } else if (value instanceof Map) {
       resolver = getMapResolver((Map<Object, Object>) value);
     } else if (getStackedTypesModelProperty(modelProperties).isPresent()) {
-      resolver = getStaticValueResolver(value, getStackedTypesModelProperty(modelProperties).get());
+      resolver = getStackedTypesModelProperty(modelProperties).get().getValueResolverFactory().getStaticValueResolver(value);
     } else {
       resolver = new StaticValueResolver<>(value);
     }

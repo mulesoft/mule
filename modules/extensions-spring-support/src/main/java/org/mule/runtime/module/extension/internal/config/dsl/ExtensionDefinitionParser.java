@@ -33,9 +33,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStaticValueResolver;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getStackedTypesModelProperty;
-import static org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty.getWrapperValueResolver;
+import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
@@ -101,7 +99,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.wrappertype.StackedTypesModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
@@ -708,9 +706,9 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
                                                         Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
     ValueResolver resolver;
-    Optional<StackedTypesModelProperty> wrapperModelProperty = getStackedTypesModelProperty(modelProperties);
-    if (wrapperModelProperty.isPresent()) {
-      resolver = StackedTypesModelProperty.getExpressionBasedValueResolver(value, expectedClass, wrapperModelProperty.get());
+    Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
+    if (stackedTypesModelProperty.isPresent()) {
+      resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass);
       //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
     } else if (isParameterResolver(expectedType)) {
       resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedType);
@@ -731,11 +729,11 @@ public abstract class ExtensionDefinitionParser {
                                                Set<ModelProperty> modelProperties, boolean acceptsReferences,
                                                Class<Object> expectedClass) {
 
-    Optional<StackedTypesModelProperty> optionalWrapperModelProperty = getStackedTypesModelProperty(modelProperties);
+    Optional<StackedTypesModelProperty> optionalStackedTypeModelProperty = getStackedTypesModelProperty(modelProperties);
 
-    if (optionalWrapperModelProperty.isPresent()) {
-      StackedTypesModelProperty property = optionalWrapperModelProperty.get();
-      Optional<ValueResolver> optionalResolver = StackedTypesModelProperty.getStaticValueResolver(value, property, Literal.class);
+    if (optionalStackedTypeModelProperty.isPresent()) {
+      StackedTypesModelProperty property = optionalStackedTypeModelProperty.get();
+      Optional<ValueResolver> optionalResolver = property.getValueResolverFactory().getStaticValueResolver(value, Literal.class);
       if (optionalResolver.isPresent()) {
         return optionalResolver.get();
       }
@@ -746,8 +744,8 @@ public abstract class ExtensionDefinitionParser {
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
         : new StaticValueResolver<>(defaultValue);
 
-    if (optionalWrapperModelProperty.isPresent()) {
-      resolver = getWrapperValueResolver(resolver, optionalWrapperModelProperty.get().getStackedTypes());
+    if (optionalStackedTypeModelProperty.isPresent()) {
+      resolver = optionalStackedTypeModelProperty.get().getValueResolverFactory().getWrapperValueResolver(resolver);
     } else if (isParameterResolver(expectedType)) {
       resolver = new ParameterResolverValueResolverWrapper(resolver);
     } else if (isTypedValue(expectedType)) {

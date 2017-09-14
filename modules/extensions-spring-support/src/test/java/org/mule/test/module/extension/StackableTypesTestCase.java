@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -17,12 +18,13 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.module.extension.parameter.resolver.AbstractParameterResolverTestCase;
 import org.mule.test.parameter.resolver.extension.extension.NestedWrapperTypesConfig;
-import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.Optional;
 
-public class StackedTypesTestCase extends AbstractParameterResolverTestCase {
+import org.junit.Test;
+
+public class StackableTypesTestCase extends AbstractParameterResolverTestCase {
 
   @Override
   protected String[] getConfigFiles() {
