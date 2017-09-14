@@ -27,7 +27,6 @@ import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -43,6 +42,12 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,13 +55,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(ERROR_HANDLING)
@@ -179,13 +177,15 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getDefaultErrorHandler(of("root"))).thenReturn(errorHandler);
     errorHandler.initialise();
 
-    assertThat(errorHandler.getExceptionListeners(), hasSize(2));
-    assertThat(errorHandler.getExceptionListeners().get(0), is(mockTestExceptionStrategy1));
-    MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(1);
+    assertThat(errorHandler.getExceptionListeners(), hasSize(3));
+    assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
+    assertThat(errorHandler.getExceptionListeners().get(1), is(mockTestExceptionStrategy1));
+    MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
     assertThat(injected, is(instanceOf(MessagingExceptionStrategyAcceptorDelegate.class)));
     MessagingExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
     assertThat(defaultHandler, is(instanceOf(ErrorHandler.class)));
-    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasSize(1));
+    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasSize(2));
+    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnCriticalErrorHandler.class)));
     assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
   }
 
