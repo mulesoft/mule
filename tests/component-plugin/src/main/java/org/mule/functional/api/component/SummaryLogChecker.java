@@ -8,6 +8,12 @@ package org.mule.functional.api.component;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class SummaryLogChecker extends AbstractLogChecker {
 
-  private static final Pattern SUMMARY_REGEX_PATTERN = Pattern.compile("([^:]*):(.*)");
+  private static final Pattern SUMMARY_REGEX_PATTERN = compile("([^:]*):(.*)");
 
   private List<SummaryInfo> expectedInfo;
   private boolean exclusiveContent;
@@ -44,23 +48,27 @@ public class SummaryLogChecker extends AbstractLogChecker {
     }
 
     String errorMessage = errors.toString();
-    if (!StringUtils.isBlank(errorMessage)) {
+    if (isNotBlank(errorMessage)) {
       throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
   private void evaluatePresentInfo(Map<String, String> actualInfo, StringBuilder errors) {
     for (SummaryInfo expectedInfoElement : expectedInfo) {
-      if (!actualInfo.containsKey(expectedInfoElement.getKey())) {
-        errors.append(format("Missing summary line. Expected: \"%s\" with info: \"%s\"", expectedInfoElement.getKey(),
-                                    expectedInfoElement.getValue()));
-        errors.append(lineSeparator());
-      } else {
-        if (expectedInfoElement.getValue() != null
-            && !actualInfo.get(expectedInfoElement.getKey()).equals(expectedInfoElement.getValue())) {
-          errors.append(format("\"%s\" has the wrong info.\nEXPECTED: \"%s\"\nGOT: \"%s\"", expectedInfoElement.getKey(),
-                                      expectedInfoElement.getValue(), actualInfo.get(expectedInfoElement.getKey())));
-          errors.append(lineSeparator());
+      if (assertAndSaveError(actualInfo,
+                             hasKey(expectedInfoElement.getKey()),
+                             format("Missing summary line. Expected: \"%s\" with info: \"%s\"%s", expectedInfoElement.getKey(),
+                                    expectedInfoElement.getValue(), lineSeparator()),
+                             errors)) {
+
+        if (expectedInfoElement.getValue() != null) {
+          assertAndSaveError(actualInfo.get(expectedInfoElement.getKey()),
+                             is(equalTo(expectedInfoElement.getValue())),
+                             format("\"%s\" has the wrong info.%sEXPECTED: \"%s\"%sGOT: \"%s\"%s", expectedInfoElement.getKey(),
+                                    lineSeparator(),
+                                    expectedInfoElement.getValue(), lineSeparator(), actualInfo.get(expectedInfoElement.getKey()),
+                                    lineSeparator()),
+                             errors);
         }
       }
     }
@@ -69,7 +77,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
   private void checkExclusive(Map<String, String> actualInfo, StringBuilder errors) {
     evaluatePresentInfo(actualInfo, errors);
     if (actualInfo.size() > expectedInfo.size()) {
-      Set<String> expectedInfoKeySet = expectedInfo.stream().map(SummaryInfo::getKey).collect(Collectors.toSet());
+      Set<String> expectedInfoKeySet = expectedInfo.stream().map(SummaryInfo::getKey).collect(toSet());
       Set<String> extraInfo = actualInfo.keySet();
       extraInfo.removeAll(expectedInfoKeySet);
       for (String key : extraInfo) {

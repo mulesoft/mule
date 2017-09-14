@@ -8,21 +8,23 @@ package org.mule.functional.api.component;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import org.hamcrest.Matcher;
 
 public abstract class AbstractLogChecker implements LogChecker {
 
-  //protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
-  //    Pattern.compile("^.*at ([^A-Z]*)\\.([a-zA-Z0-9]*)\\.([^\\(]*)[^:]*:([0-9]*).*");
   protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
-      Pattern.compile("^.*at ([^A-Z]*)\\.([0-9A-Z]+[^\\.]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
+      compile("^.*at ([^A-Z]*)\\.([0-9A-Z]+[^\\.]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
   protected static final Pattern STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN =
-      Pattern.compile("\\s*(Caused by: )?([a-zA-Z0-9\\.]+(Exception|Error)+)(: .*|\\z)");
-  protected static final Pattern STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN = Pattern.compile(".*\\.\\.\\. [0-9]* more.*");
+      compile("\\s*(Caused by: )?([a-zA-Z0-9\\.]+(Exception|Error)+)(: .*|\\z)");
+  protected static final Pattern STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN = compile(".*\\.\\.\\. [0-9]* more.*");
 
 
 
@@ -64,15 +66,26 @@ public abstract class AbstractLogChecker implements LogChecker {
   }
 
   private List<String> getStacktraceLines(List<String> allLines) {
-    return allLines.stream().filter((line) -> isStacktrace(line)).collect(Collectors.toList());
+    return allLines.stream().filter((line) -> isStacktrace(line)).collect(toList());
   }
 
   private List<String> removeStacktraceLines(List<String> allLines) {
-    return allLines.stream().filter((line) -> !isStacktrace(line)).collect(Collectors.toList());
+    return allLines.stream().filter((line) -> !isStacktrace(line)).collect(toList());
   }
 
   protected List<String> splitLines(String wholeMessage) {
     return asList(wholeMessage.split(lineSeparator()));
+  }
+
+  protected boolean assertAndSaveError(Object checkedValue, Matcher comparison, String failureMessage,
+                                       StringBuilder errorCatcher) {
+    try {
+      assertThat(checkedValue, comparison);
+    } catch (AssertionError e) {
+      errorCatcher.append(failureMessage);
+      return false;
+    }
+    return true;
   }
 
 }

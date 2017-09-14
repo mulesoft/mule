@@ -8,13 +8,16 @@ package org.mule.functional.api.component;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class EqualsLogChecker extends AbstractLogChecker {
 
@@ -33,35 +36,36 @@ public class EqualsLogChecker extends AbstractLogChecker {
     compareLines(expectedLines, actualLines, errors);
 
     String errorMessage = errors.toString();
-    if (!StringUtils.isBlank(errorMessage)) {
+    if (isNotBlank(errorMessage)) {
       throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
   private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {
-    if (expectedLog.size() != actualLog.size()) {
-      errorCatcher.append(format("Log lines differs from expected one. It has %d lines and it's expecting %d\n",
-                                        actualLog.size(), expectedLog.size()));
-      errorCatcher.append(lineSeparator());
-    }
+    assertAndSaveError(expectedLog.size(),
+                       is(equalTo(actualLog.size())),
+                       format("Log lines differs from expected one. It has %d lines and it's expecting %d%s", actualLog.size(),
+                              expectedLog.size(), lineSeparator()),
+                       errorCatcher);
   }
 
   private void compareLines(List<String> expectedLogLines, List<String> actualLogLines, StringBuilder errorCatcher) {
     int i;
     for (i = 0; i < expectedLogLines.size(); i++) {
       if (i >= actualLogLines.size()) {
-        errorCatcher.append(format("Missing expected line[%d]: %s\n", i, expectedLogLines.get(i)));
+        errorCatcher.append(format("Missing expected line[%d]: %s", i, expectedLogLines.get(i)));
         errorCatcher.append(lineSeparator());
       } else {
-        if (!(expectedLogLines.get(i).trim().equals(actualLogLines.get(i).trim()))) {
-          errorCatcher.append(format("Difference found in line %d: \nEXPECTED: %s\nFOUND: %s\n", i,
-                                            expectedLogLines.get(i).trim(), actualLogLines.get(i).trim()));
-          errorCatcher.append(lineSeparator());
-        }
+        assertAndSaveError(expectedLogLines.get(i),
+                           is(equalToIgnoringWhiteSpace(actualLogLines.get(i))),
+                           format("Difference found in line %d:%sEXPECTED: %s%sFOUND: %s%s", i, lineSeparator(),
+                                  expectedLogLines.get(i).trim(), lineSeparator(), actualLogLines.get(i).trim(), lineSeparator()),
+                           errorCatcher);
       }
     }
     if (actualLogLines.size() > expectedLogLines.size()) {
-      errorCatcher.append("Actual log has extra lines:\n");
+      errorCatcher.append("Actual log has extra lines:");
+      errorCatcher.append(lineSeparator());
       for (int j = i; j < actualLogLines.size(); j++) {
         errorCatcher.append(actualLogLines.get(j));
         errorCatcher.append(lineSeparator());
@@ -81,8 +85,8 @@ public class EqualsLogChecker extends AbstractLogChecker {
 
   private List<String> filterLines(List<String> splittedLog) {
     return splittedLog.stream()
-        .filter((line) -> StringUtils.isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim()))
-        .collect(Collectors.toList());
+        .filter((line) -> isNotBlank(line) && !line.trim().equals(EXCEPTION_MESSAGE_DELIMITER.trim()))
+        .collect(toList());
   }
 
   public void setExpectedLogMessage(String expectedLogMessage) {

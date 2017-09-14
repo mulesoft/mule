@@ -7,6 +7,7 @@
 package org.mule.functional.api.component;
 
 import static java.util.Arrays.asList;
+import static org.junit.rules.ExpectedException.none;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.PrintWriter;
@@ -21,7 +22,7 @@ public class SummaryLogCheckerTestCase extends AbstractMuleTestCase {
   private SummaryLogChecker summaryLogChecker = new SummaryLogChecker();
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   @Test
   public void successIfInfoFound() throws Exception {

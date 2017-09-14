@@ -24,7 +24,7 @@ import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
 import org.mule.functional.api.component.LogChecker;
-import org.mule.functional.api.component.OnErrorAssertHandler;
+import org.mule.functional.api.component.OnCheckLogHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
@@ -179,8 +179,15 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("failurePhase", fromSimpleParameter("failurePhase").build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-assert")
-        .withTypeDefinition(fromType(OnErrorAssertHandler.class))
+    addOnErrorCheckLogComponentBuildingDefinitions(componentBuildingDefinitions);
+
+    return componentBuildingDefinitions;
+  }
+
+  private void addOnErrorCheckLogComponentBuildingDefinitions(List<ComponentBuildingDefinition> componentBuildingDefinitions) {
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-check-log")
+        .withTypeDefinition(fromType(OnCheckLogHandler.class))
         .withSetterParameterDefinition("checkers", fromChildCollectionConfiguration(LogChecker.class).build()).build());
 
     componentBuildingDefinitions
@@ -220,6 +227,6 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build()).build());
 
 
-    return componentBuildingDefinitions;
   }
+
 }

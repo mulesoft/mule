@@ -9,15 +9,19 @@ package org.mule.functional.api.component;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class StacktraceLogChecker extends AbstractLogChecker {
+
+  private static final String ANY = "(any)";
+  private static final int MISSING_DATA_HASH_CODE = 7;
 
   private List<MethodCall> expectedCalls = new ArrayList<>();
   private List<ExceptionCause> expectedExceptionCauses = new ArrayList<>();
@@ -34,26 +38,26 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     validateCalls(actualStackCalls, errors);
     validateCauses(actualExceptionCauses, errors);
     String errorMessage = errors.toString();
-    if (!StringUtils.isBlank(errorMessage)) {
+    if (isNotBlank(errorMessage)) {
       throw new AssertionError(lineSeparator() + errorMessage);
     }
   }
 
   private void validateCalls(List<MethodCall> actualCalls, StringBuilder errors) {
     for (MethodCall call : expectedCalls) {
-      if (!actualCalls.contains(call)) {
-        errors.append(format("Expected method call not found in stacktrace: %s", call.toString()));
-        errors.append(lineSeparator());
-      }
+      assertAndSaveError(actualCalls,
+                         hasItem(call),
+                         format("Expected method call not found in stacktrace: %s%s", call.toString(), lineSeparator()),
+                         errors);
     }
   }
 
   private void validateCauses(List<ExceptionCause> actualCauses, StringBuilder errors) {
     for (ExceptionCause cause : expectedExceptionCauses) {
-      if (!actualCauses.contains(cause)) {
-        errors.append(format("Expected exception cause not found in stacktrace: %s", cause.toString()));
-        errors.append(lineSeparator());
-      }
+      assertAndSaveError(actualCauses,
+                         hasItem(cause),
+                         format("Expected exception cause not found in stacktrace: %s%s", cause.toString(), lineSeparator()),
+                         errors);
     }
   }
 
@@ -70,8 +74,8 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   }
 
   private MethodCall createMethodCallFromMatcher(Matcher matcher) {
-    //If no line number found, probably due to native method
-    if (matcher.group(4).equals(StringUtils.EMPTY)) {
+    //If no line number found,is probably due to native method
+    if (matcher.group(4).equals(EMPTY)) {
       return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
     }
     return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
@@ -159,19 +163,19 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     @Override
     public String toString() {
-      String packageNameString = packageName != null ? packageName : "(any)";
-      String classString = clazz != null ? clazz : "(any)";
-      String methodString = method != null ? method : "(any)";
-      String lineString = lineNumber != null ? Integer.toString(lineNumber) : "(any)";
+      String packageNameString = packageName != null ? packageName : ANY;
+      String classString = clazz != null ? clazz : ANY;
+      String methodString = method != null ? method : ANY;
+      String lineString = lineNumber != null ? Integer.toString(lineNumber) : ANY;
       return format("%s.%s.%s:%s", packageNameString, classString, methodString, lineString);
     }
 
     @Override
     public int hashCode() {
-      int methodHashCode = method != null ? method.hashCode() : 7;
-      int packageHashCode = packageName != null ? packageName.hashCode() : 7;
-      int classHashCode = clazz != null ? clazz.hashCode() : 7;
-      int lineHashCode = lineNumber != null ? lineNumber.hashCode() : 7;
+      int methodHashCode = method != null ? method.hashCode() : MISSING_DATA_HASH_CODE;
+      int packageHashCode = packageName != null ? packageName.hashCode() : MISSING_DATA_HASH_CODE;
+      int classHashCode = clazz != null ? clazz.hashCode() : MISSING_DATA_HASH_CODE;
+      int lineHashCode = lineNumber != null ? lineNumber.hashCode() : MISSING_DATA_HASH_CODE;
       return methodHashCode + packageHashCode + classHashCode + lineHashCode;
     }
 
@@ -183,16 +187,16 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       if (this == obj) {
         return true;
       }
-      if (method != null && !method.equals(((MethodCall) obj).method)) {
+      if (method != null && ((MethodCall) obj).method != null && !method.equals(((MethodCall) obj).method)) {
         return false;
       }
-      if (clazz != null && !clazz.equals(((MethodCall) obj).clazz)) {
+      if (clazz != null && ((MethodCall) obj).clazz != null && !clazz.equals(((MethodCall) obj).clazz)) {
         return false;
       }
-      if (packageName != null && !packageName.equals(((MethodCall) obj).packageName)) {
+      if (packageName != null && ((MethodCall) obj).packageName != null && !packageName.equals(((MethodCall) obj).packageName)) {
         return false;
       }
-      if (lineNumber != null && !lineNumber.equals(((MethodCall) obj).lineNumber)) {
+      if (lineNumber != null && ((MethodCall) obj).lineNumber != null && !lineNumber.equals(((MethodCall) obj).lineNumber)) {
         return false;
       }
       return true;

@@ -6,6 +6,9 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_DELIMITER;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -22,25 +25,33 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
   private EqualsLogChecker equalsLogChecker = new EqualsLogChecker();
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   @Test
   public void onlyEvaluatesMessage() throws Exception {
-    String log = "message\n" + EXCEPTION_MESSAGE_SECTION_DELIMITER + "stacktrace";
+    String log = format("message%s" +
+        "%s" +
+        "stacktrace", lineSeparator(), EXCEPTION_MESSAGE_SECTION_DELIMITER);
     equalsLogChecker.setExpectedLogMessage("message");
     equalsLogChecker.check(log);
   }
 
   @Test
   public void stacktraceShouldBeAvoidedEvenWithNoDelimiter() throws Exception {
-    String log = "first line\nsecond line\nat some.package.SomeClass.theMethod(theline:56)";
-    equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
+    String log = format("first line%s" +
+        "second line%s" +
+        "at some.package.SomeClass.theMethod(theline:56)", lineSeparator(), lineSeparator());
+    equalsLogChecker.setExpectedLogMessage(format("first line%s" +
+        "second line", lineSeparator()));
     equalsLogChecker.check(log);
   }
 
   @Test
   public void whitespaceDifferencesDontCauseFailureIfFilterSet() throws Exception {
-    String log = "  \t\n\nmessage\n\n\t  ";
+    String log = format("  \t%s" +
+        "%smessage%s" +
+        "%s" +
+        "\t  ", lineSeparator(), lineSeparator(), lineSeparator(), lineSeparator());
     equalsLogChecker.setShouldFilterLogMessage(true);
     equalsLogChecker.setExpectedLogMessage("message");
     equalsLogChecker.check(log);
@@ -48,7 +59,10 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void whitepaceDifferencesCauseFailureIfFilterNotSet() throws Exception {
-    String log = "  \t\n\nmessage\n\n\t  ";
+    String log = format("  \t%s" +
+        "%smessage%s" +
+        "%s" +
+        "\t  ", lineSeparator(), lineSeparator(), lineSeparator(), lineSeparator());
     equalsLogChecker.setShouldFilterLogMessage(false);
     equalsLogChecker.setExpectedLogMessage("message");
     expectedException.expect(AssertionError.class);
@@ -57,8 +71,12 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void whitespaceDifferencesBeforeAndAfterSucceedWithAndWithoutFilter() throws Exception {
-    String log = "first line\n   second line   \n\tthird line\t";
-    equalsLogChecker.setExpectedLogMessage("first line\nsecond line\nthird line");
+    String log = format("first line%s" +
+        "   second line   %s" +
+        "\tthird line\t", lineSeparator(), lineSeparator());
+    equalsLogChecker.setExpectedLogMessage(format("first line%s" +
+        "second line%s" +
+        "third line", lineSeparator(), lineSeparator()));
     equalsLogChecker.setShouldFilterLogMessage(false);
     equalsLogChecker.check(log);
     equalsLogChecker.setShouldFilterLogMessage(true);
@@ -67,24 +85,27 @@ public class EqualsLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void delimiterDifferencesShouldSucceedWithFilter() throws Exception {
-    String log = EXCEPTION_MESSAGE_DELIMITER + "first line\n" + EXCEPTION_MESSAGE_DELIMITER + "second line";
+    String log = EXCEPTION_MESSAGE_DELIMITER + "first line" + lineSeparator() + EXCEPTION_MESSAGE_DELIMITER + "second line";
     equalsLogChecker.setShouldFilterLogMessage(true);
-    equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
+    equalsLogChecker.setExpectedLogMessage(format("first line%s" +
+        "second line", lineSeparator()));
     equalsLogChecker.check(log);
   }
 
   @Test
   public void delimiterDifferencesShouldFailWithoutFilter() throws Exception {
-    String log = EXCEPTION_MESSAGE_DELIMITER + "first line\n" + EXCEPTION_MESSAGE_DELIMITER + "second line";
+    String log = EXCEPTION_MESSAGE_DELIMITER + "first line" + lineSeparator() + EXCEPTION_MESSAGE_DELIMITER + "second line";
     equalsLogChecker.setShouldFilterLogMessage(false);
-    equalsLogChecker.setExpectedLogMessage("first line\nsecond line");
+    equalsLogChecker.setExpectedLogMessage(format("first line%s" +
+        "second line", lineSeparator()));
     expectedException.expect(AssertionError.class);
     equalsLogChecker.check(log);
   }
 
   @Test
   public void filtersMessageFromStacktraceProperly() throws Exception {
-    String logMessage = "first line\nsecond line\n";
+    String logMessage = format("first line%s" +
+        "second line%s", lineSeparator(), lineSeparator());
     Exception ex1 = new Exception("exception in layer 1");
     Exception ex2 = new Exception("exception in layer 2", ex1);
     Exception ex3 = new Exception("exception in layer 3", ex2);

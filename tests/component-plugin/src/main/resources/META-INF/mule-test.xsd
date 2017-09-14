@@ -389,7 +389,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="on-error-assert" type="onErrorAssertType"
+    <xsd:element name="on-error-check-log" type="onErrorCheckLogType"
                  substitutionGroup="mule:abstract-on-error">
         <xsd:annotation>
             <xsd:documentation>
@@ -398,7 +398,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:complexType name="onErrorAssertType">
+    <xsd:complexType name="onErrorCheckLogType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractOnErrorType">
                 <xsd:sequence minOccurs="1" maxOccurs="unbounded">
@@ -411,7 +411,7 @@
     <xsd:element name="abstract-log-checker" abstract="true">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for log checker
+                A placeholder for log checkers
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -441,7 +441,7 @@
     <xsd:element name="check-stacktrace" substitutionGroup="abstract-log-checker" type="checkStacktraceType">
         <xsd:annotation>
             <xsd:documentation>
-                Evaluates the stacktrace to be logged, checking that it goes through defined method calls
+                Evaluates the stacktrace to be logged, checking that it goes through expected method calls
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

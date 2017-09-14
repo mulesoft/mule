@@ -6,6 +6,8 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -20,6 +22,9 @@ import org.junit.rules.ExpectedException;
 public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   private StacktraceLogChecker stacktraceLogChecker = new StacktraceLogChecker();
+  private static final String PACKAGE = "package";
+  private static final String CLASS = "Class";
+  private static final String METHOD = "method";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -34,15 +39,17 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void stacktraceShouldBeEvalatedEvenWithNoSectionDelimiter() throws Exception {
-    String log = "this could be\nthe message part and\tshould not be evaluated\nat package.Class.method(whatever:0)";
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method", 0);
+    String log = format("this could be%s" +
+        "the message part and\tshould not be evaluated%s" +
+        "at package.Class.method(whatever:0)", lineSeparator(), lineSeparator());
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, METHOD, 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check(log);
   }
 
   @Test
   public void callNotFoundShouldRaiseError() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method", 0);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, METHOD, 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     expectedException.expect(AssertionError.class);
     stacktraceLogChecker.check("this stacktrace does not contain expected call");
@@ -50,7 +57,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void callFoundShouldSucceed() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method", 0);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, METHOD, 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:0)");
   }
@@ -58,7 +65,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void noLineNumberSpecifiedShouldMatch() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method");
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, METHOD);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -67,8 +74,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void noPackageSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setMethod("method");
-    methodCall.setClazz("Class");
+    methodCall.setMethod(METHOD);
+    methodCall.setClazz(CLASS);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -77,8 +84,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void noClassSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setMethod("method");
-    methodCall.setPackageName("package");
+    methodCall.setMethod(METHOD);
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -87,8 +94,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void noMethodSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setClazz("Class");
-    methodCall.setPackageName("package");
+    methodCall.setClazz(CLASS);
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -96,7 +103,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void onlyMethodSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setMethod("method");
+    methodCall.setMethod(METHOD);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -104,7 +111,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void onlyClassSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setClazz("Class");
+    methodCall.setClazz(CLASS);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -112,7 +119,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void onlyPackageSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setPackageName("package");
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -128,8 +135,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void methodAndPackageSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setMethod("method");
-    methodCall.setPackageName("package");
+    methodCall.setMethod(METHOD);
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -137,8 +144,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void methodAndClassSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setClazz("Class");
-    methodCall.setMethod("method");
+    methodCall.setClazz(CLASS);
+    methodCall.setMethod(METHOD);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -147,7 +154,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void methodAndLineNumberSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setMethod("method");
+    methodCall.setMethod(METHOD);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -155,8 +162,8 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void packageAndClassSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
-    methodCall.setClazz("Class");
-    methodCall.setPackageName("package");
+    methodCall.setClazz(CLASS);
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -165,7 +172,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void packageAndLineNumberSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setPackageName("package");
+    methodCall.setPackageName(PACKAGE);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
@@ -174,14 +181,14 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void classAndLineNumberSpecifiedShouldMatch() throws Exception {
     StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall();
     methodCall.setLineNumber(25);
-    methodCall.setClazz("Class");
+    methodCall.setClazz(CLASS);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
   }
 
   @Test
   public void differentMethodRepresentsDifferentExpectedMethodCalls() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "otherMethod", 25);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, "otherMethod", 25);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     expectedException.expect(AssertionError.class);
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
@@ -189,7 +196,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void differentClassRepresentsDifferentExpectedMethodCalls() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "OtherClass", "method", 25);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, "OtherClass", METHOD, 25);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     expectedException.expect(AssertionError.class);
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
@@ -197,7 +204,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void differentPackageRepresentsDifferentExpectedMethodCalls() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("other.package", "Class", "method", 25);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("other.package", CLASS, METHOD, 25);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     expectedException.expect(AssertionError.class);
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
@@ -205,7 +212,7 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void differentLineNumbersRepresentDifferentExpectedMethodCalls() throws Exception {
-    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall("package", "Class", "method", 0);
+    StacktraceLogChecker.MethodCall methodCall = new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, METHOD, 0);
     stacktraceLogChecker.setExpectedCalls(asList(methodCall));
     expectedException.expect(AssertionError.class);
     stacktraceLogChecker.check("at package.Class.method(whatever:25)");
@@ -214,21 +221,25 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   @Test
   public void methodWithNumbersInNameIsFound() throws Exception {
     stacktraceLogChecker.setExpectedCalls(asList(
-                                                 new StacktraceLogChecker.MethodCall("package", "Class", "method0", 0),
-                                                 new StacktraceLogChecker.MethodCall("package", "Class", "0method", 1),
-                                                 new StacktraceLogChecker.MethodCall("package", "Class", "method0method", 2)));
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, "method0", 0),
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, "0method", 1),
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, CLASS, "method0method", 2)));
     stacktraceLogChecker
-        .check("at package.Class.method0(whatever:0)\nat package.Class.0method(whatever:1)\nat package.Class.method0method(whatever:2)");
+        .check(format("at package.Class.method0(whatever:0)%s" +
+            "at package.Class.0method(whatever:1)%s" +
+            "at package.Class.method0method(whatever:2)", lineSeparator(), lineSeparator()));
   }
 
   @Test
   public void classWithNumbersInNameIsFound() throws Exception {
     stacktraceLogChecker.setExpectedCalls(asList(
-                                                 new StacktraceLogChecker.MethodCall("package", "Class0", "method", 0),
-                                                 new StacktraceLogChecker.MethodCall("package", "0Class", "method", 1),
-                                                 new StacktraceLogChecker.MethodCall("package", "Class0class", "method", 2)));
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, "Class0", METHOD, 0),
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, "0Class", METHOD, 1),
+                                                 new StacktraceLogChecker.MethodCall(PACKAGE, "Class0class", METHOD, 2)));
     stacktraceLogChecker
-        .check("at package.Class0.method(whatever:0)\nat package.0Class.method(whatever:1)\nat package.Class0class.method(whatever:2)");
+        .check(format("at package.Class0.method(whatever:0)%s" +
+            "at package.0Class.method(whatever:1)%s" +
+            "at package.Class0class.method(whatever:2)", lineSeparator(), lineSeparator()));
   }
 
   @Test
@@ -246,7 +257,11 @@ public class StacktraceLogCheckerTestCase extends AbstractMuleTestCase {
   public void causeMatchSuccess() throws Exception {
     stacktraceLogChecker.setExpectedExceptionCauses(asList(new StacktraceLogChecker.ExceptionCause("org.package.Exception")));
     stacktraceLogChecker
-        .check("noise, more noise, not \n      important. \t\nStill not important\n Caused by: org.package.Exception\n more irrelevant stuff");
+        .check(format("noise, more noise, not %s" +
+            "      important. \t%s" +
+            "Still not important%s" +
+            " Caused by: org.package.Exception%s" +
+            " more irrelevant stuff", lineSeparator(), lineSeparator(), lineSeparator(), lineSeparator()));
   }
 
 

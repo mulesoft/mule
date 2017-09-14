@@ -8,11 +8,12 @@ package org.mule.runtime.core.api.context;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -130,8 +131,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     try {
       context = muleContextFactory.createMuleContext("log4j2-test.xml");
     } catch (ConfigurationException e) {
-      assertEquals("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-          + "Check you have configuration module on your classpath and are using correct file extension.", e.getMessage());
+      assertThat(e.getMessage(),
+                 equalTo("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
+                     + "Check you have configuration module on your classpath and are using correct file extension."));
     }
     assertNull(context);
   }
@@ -146,8 +148,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     try {
       context = muleContextFactory.createMuleContext("log4j2-test.xml", properties);
     } catch (ConfigurationException e) {
-      assertEquals("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-          + "Check you have configuration module on your classpath and are using correct file extension.", e.getMessage());
+      assertThat(e.getMessage(),
+                 equalTo("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
+                     + "Check you have configuration module on your classpath and are using correct file extension."));
     }
 
     assertNull(context);

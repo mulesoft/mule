@@ -9,9 +9,7 @@ package org.mule.functional.api.component;
 import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
@@ -20,7 +18,7 @@ import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;
 
-public class OnErrorAssertHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor, FlowAssertion {
+public class OnCheckLogHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor, FlowAssertion {
 
 
   private List<LogChecker> checkers;
@@ -31,11 +29,6 @@ public class OnErrorAssertHandler extends AbstractExceptionListener implements M
     super.start();
     errors = new StringBuilder();
     addAssertion(getRootContainerName(), this);
-  }
-
-  @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    super.doInitialise(muleContext);
   }
 
   @Override
