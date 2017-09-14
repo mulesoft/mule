@@ -60,7 +60,7 @@
     </heisenberg:config>
 
     <flow name="sayMyName">
-        <heisenberg:say-my-name/>
+        <heisenberg:say-my-name config-ref="heisenberg"/>
     </flow>
 
 </mule>
