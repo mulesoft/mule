@@ -36,7 +36,7 @@ public class DefaultRegistry implements Registry {
   }
 
   @Override
-  public <T> Optional<T> lookup(Class<T> objectType) {
+  public <T> Optional<T> lookupByType(Class<T> objectType) {
     try {
       return (Optional<T>) ofNullable(deAnnotator.apply(muleContext.getRegistry().lookupObject(objectType)));
     } catch (RegistrationException e) {
@@ -50,7 +50,7 @@ public class DefaultRegistry implements Registry {
   }
 
   @Override
-  public <T> Collection<T> lookupAll(Class<T> serviceType) {
+  public <T> Collection<T> lookupAllByType(Class<T> serviceType) {
     return (Collection<T>) muleContext.getRegistry().lookupObjects(serviceType).stream().map(deAnnotator).collect(toSet());
   }
 }
