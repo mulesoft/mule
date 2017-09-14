@@ -11,17 +11,20 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.matchingWith;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Objects;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
 
 public class StacktraceLogChecker extends AbstractLogChecker {
 
   private static final String ANY = "(any)";
-  private static final int MISSING_DATA_HASH_CODE = 7;
 
   private List<MethodCall> expectedCalls = new ArrayList<>();
   private List<ExceptionCause> expectedExceptionCauses = new ArrayList<>();
@@ -46,8 +49,8 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   private void validateCalls(List<MethodCall> actualCalls, StringBuilder errors) {
     for (MethodCall call : expectedCalls) {
       assertAndSaveError(actualCalls,
-                         hasItem(call),
-                         format("Expected method call not found in stacktrace: %s%s", call.toString(), lineSeparator()),
+                         hasItem(matchingWith(call)),
+                         "Expected method call not found in stacktrace:",
                          errors);
     }
   }
@@ -56,24 +59,24 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     for (ExceptionCause cause : expectedExceptionCauses) {
       assertAndSaveError(actualCauses,
                          hasItem(cause),
-                         format("Expected exception cause not found in stacktrace: %s%s", cause.toString(), lineSeparator()),
+                         "Expected exception cause not found in stacktrace:",
                          errors);
     }
   }
 
   private void saveLineAsMatchingPojo(String line, List<MethodCall> actualCalls, List<ExceptionCause> actualCauses) {
-    Matcher stackTraceMatcher = STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line);
+    java.util.regex.Matcher stackTraceMatcher = STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line);
     if (stackTraceMatcher.matches()) {
       actualCalls.add(createMethodCallFromMatcher(stackTraceMatcher));
     } else {
-      Matcher exceptionCauseMatcher = STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line);
+      java.util.regex.Matcher exceptionCauseMatcher = STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line);
       if (exceptionCauseMatcher.matches()) {
         actualCauses.add(createExceptionCauseFromMatcher(exceptionCauseMatcher));
       }
     }
   }
 
-  private MethodCall createMethodCallFromMatcher(Matcher matcher) {
+  private MethodCall createMethodCallFromMatcher(java.util.regex.Matcher matcher) {
     //If no line number found,is probably due to native method
     if (matcher.group(4).equals(EMPTY)) {
       return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3));
@@ -81,7 +84,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     return new MethodCall(matcher.group(1), matcher.group(2), matcher.group(3), Integer.parseInt(matcher.group(4)));
   }
 
-  private ExceptionCause createExceptionCauseFromMatcher(Matcher matcher) {
+  private ExceptionCause createExceptionCauseFromMatcher(java.util.regex.Matcher matcher) {
     return new ExceptionCause(matcher.group(2));
   }
 
@@ -112,6 +115,39 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       this.packageName = packageName;
       this.clazz = clazz;
       this.method = method;
+    }
+
+    public static org.hamcrest.Matcher<MethodCall> matchingWith(MethodCall thisCall) {
+      return new TypeSafeMatcher<MethodCall>() {
+
+        @Override
+        protected boolean matchesSafely(MethodCall otherCall) {
+          if (thisCall.method != null && otherCall.method != null && !thisCall.method.equals(otherCall.method)) {
+            return false;
+          }
+          if (thisCall.clazz != null && otherCall.clazz != null && !thisCall.clazz.equals(otherCall.clazz)) {
+            return false;
+          }
+          if (thisCall.packageName != null && otherCall.packageName != null
+              && !thisCall.packageName.equals(otherCall.packageName)) {
+            return false;
+          }
+          if (thisCall.lineNumber != null && otherCall.lineNumber != null && !thisCall.lineNumber.equals(otherCall.lineNumber)) {
+            return false;
+          }
+          return true;
+        }
+
+        @Override
+        protected void describeMismatchSafely(MethodCall otherCall, Description mismatchDescription) {
+          mismatchDescription.appendText(otherCall.toString());
+        }
+
+        @Override
+        public void describeTo(Description description) {
+          description.appendText(thisCall.toString());
+        }
+      };
     }
 
     public MethodCall() {}
@@ -172,34 +208,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     @Override
     public int hashCode() {
-      int methodHashCode = method != null ? method.hashCode() : MISSING_DATA_HASH_CODE;
-      int packageHashCode = packageName != null ? packageName.hashCode() : MISSING_DATA_HASH_CODE;
-      int classHashCode = clazz != null ? clazz.hashCode() : MISSING_DATA_HASH_CODE;
-      int lineHashCode = lineNumber != null ? lineNumber.hashCode() : MISSING_DATA_HASH_CODE;
-      return methodHashCode + packageHashCode + classHashCode + lineHashCode;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof MethodCall)) {
-        return false;
-      }
-      if (this == obj) {
-        return true;
-      }
-      if (method != null && ((MethodCall) obj).method != null && !method.equals(((MethodCall) obj).method)) {
-        return false;
-      }
-      if (clazz != null && ((MethodCall) obj).clazz != null && !clazz.equals(((MethodCall) obj).clazz)) {
-        return false;
-      }
-      if (packageName != null && ((MethodCall) obj).packageName != null && !packageName.equals(((MethodCall) obj).packageName)) {
-        return false;
-      }
-      if (lineNumber != null && ((MethodCall) obj).lineNumber != null && !lineNumber.equals(((MethodCall) obj).lineNumber)) {
-        return false;
-      }
-      return true;
+      return Objects.hashCode(method) + Objects.hashCode(packageName) + Objects.hashCode(clazz) + Objects.hashCode(lineNumber);
     }
   }
 

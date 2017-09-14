@@ -57,17 +57,13 @@ public class SummaryLogChecker extends AbstractLogChecker {
     for (SummaryInfo expectedInfoElement : expectedInfo) {
       if (assertAndSaveError(actualInfo,
                              hasKey(expectedInfoElement.getKey()),
-                             format("Missing summary line. Expected: \"%s\" with info: \"%s\"%s", expectedInfoElement.getKey(),
-                                    expectedInfoElement.getValue(), lineSeparator()),
+                             "Missing summary line:",
                              errors)) {
 
         if (expectedInfoElement.getValue() != null) {
           assertAndSaveError(actualInfo.get(expectedInfoElement.getKey()),
                              is(equalTo(expectedInfoElement.getValue())),
-                             format("\"%s\" has the wrong info.%sEXPECTED: \"%s\"%sGOT: \"%s\"%s", expectedInfoElement.getKey(),
-                                    lineSeparator(),
-                                    expectedInfoElement.getValue(), lineSeparator(), actualInfo.get(expectedInfoElement.getKey()),
-                                    lineSeparator()),
+                             format("\"%s\" has the wrong info:", expectedInfoElement.getKey()),
                              errors);
         }
       }
@@ -81,6 +77,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
       Set<String> extraInfo = actualInfo.keySet();
       extraInfo.removeAll(expectedInfoKeySet);
       for (String key : extraInfo) {
+        errors.append(lineSeparator());
         errors.append(format("Unwanted information found. Key: \"%s\" Value: \"%s\"", key, actualInfo.get(key)));
         errors.append(lineSeparator());
       }

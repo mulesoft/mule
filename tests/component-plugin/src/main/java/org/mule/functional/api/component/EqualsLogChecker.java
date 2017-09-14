@@ -44,8 +44,7 @@ public class EqualsLogChecker extends AbstractLogChecker {
   private void checkLineCount(List<String> expectedLog, List<String> actualLog, StringBuilder errorCatcher) {
     assertAndSaveError(expectedLog.size(),
                        is(equalTo(actualLog.size())),
-                       format("Log lines differs from expected one. It has %d lines and it's expecting %d%s", actualLog.size(),
-                              expectedLog.size(), lineSeparator()),
+                       "Log lines differs from expected ones:",
                        errorCatcher);
   }
 
@@ -53,24 +52,23 @@ public class EqualsLogChecker extends AbstractLogChecker {
     int i;
     for (i = 0; i < expectedLogLines.size(); i++) {
       if (i >= actualLogLines.size()) {
-        errorCatcher.append(format("Missing expected line[%d]: %s", i, expectedLogLines.get(i)));
-        errorCatcher.append(lineSeparator());
+        errorCatcher
+            .append(format("%sMissing expected line[%d]: %s%s", lineSeparator(), i, expectedLogLines.get(i), lineSeparator()));
       } else {
         assertAndSaveError(expectedLogLines.get(i),
                            is(equalToIgnoringWhiteSpace(actualLogLines.get(i))),
-                           format("Difference found in line %d:%sEXPECTED: %s%sFOUND: %s%s", i, lineSeparator(),
-                                  expectedLogLines.get(i).trim(), lineSeparator(), actualLogLines.get(i).trim(), lineSeparator()),
+                           format("Difference found in line %d:", i),
                            errorCatcher);
       }
     }
     if (actualLogLines.size() > expectedLogLines.size()) {
+      errorCatcher.append(lineSeparator());
       errorCatcher.append("Actual log has extra lines:");
       errorCatcher.append(lineSeparator());
       for (int j = i; j < actualLogLines.size(); j++) {
         errorCatcher.append(actualLogLines.get(j));
         errorCatcher.append(lineSeparator());
       }
-      errorCatcher.append(lineSeparator());
     }
   }
 

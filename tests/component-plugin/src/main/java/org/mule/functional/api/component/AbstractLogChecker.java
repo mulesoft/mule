@@ -77,12 +77,15 @@ public abstract class AbstractLogChecker implements LogChecker {
     return asList(wholeMessage.split(lineSeparator()));
   }
 
-  protected boolean assertAndSaveError(Object checkedValue, Matcher comparison, String failureMessage,
-                                       StringBuilder errorCatcher) {
+  protected <T> boolean assertAndSaveError(T checkedValue, Matcher<T> comparison, String failureMessage,
+                                           StringBuilder errorCatcher) {
     try {
       assertThat(checkedValue, comparison);
     } catch (AssertionError e) {
+      errorCatcher.append(lineSeparator());
       errorCatcher.append(failureMessage);
+      errorCatcher.append(e.getMessage());
+      errorCatcher.append(lineSeparator());
       return false;
     }
     return true;
