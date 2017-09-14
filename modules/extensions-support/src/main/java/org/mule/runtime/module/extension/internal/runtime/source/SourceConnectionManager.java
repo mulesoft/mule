@@ -80,11 +80,17 @@ public class SourceConnectionManager {
   /**
    * Tests that the given {@code connectionProvider} is capable of producing a valid connection
    *
-   * @param connectionProvider the provider to be tested
+   * @param connection the connection to validate
    * @return a {@link ConnectionValidationResult}
    */
-  ConnectionValidationResult testConnectivity(ConnectionProvider<?> connectionProvider) {
-    return connectionManager.testConnectivity(connectionProvider);
+  ConnectionValidationResult testConnectivity(Object connection) {
+    ConnectionHandler<Object> connectionHandler = connections.get(new Reference<>(connection));
+    if (connectionHandler == null) {
+      throw new IllegalArgumentException("Cannot validate a connection which was not generated through this "
+          + ConnectionProvider.class.getSimpleName());
+    }
+
+    return connectionManager.testConnectivity(connection, connectionHandler);
   }
 
   /**

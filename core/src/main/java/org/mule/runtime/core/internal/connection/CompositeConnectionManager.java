@@ -122,6 +122,14 @@ public class CompositeConnectionManager implements ConnectionManager, Lifecycle,
    * {@inheritDoc}
    */
   @Override
+  public <C> ConnectionValidationResult testConnectivity(C connection, ConnectionHandler<C> connectionHandler) {
+    return childConnectionManager.testConnectivity(connection, connectionHandler);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider) {
     return childConnectionManager.getRetryTemplateFor(connectionProvider);
   }

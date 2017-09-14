@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -17,6 +18,11 @@ import org.mule.runtime.api.connection.ConnectionHandler;
  * @since 4.0
  */
 public interface ConnectionHandlerAdapter<T> extends ConnectionHandler<T>, Closeable {
+
+  /**
+   * @return The {@link ConnectionProvider} which produced the connection
+   */
+  ConnectionProvider<T> getConnectionProvider();
 
   /**
    * Indicates that all resources allocated by the wrapped connection must be closed and released. This is different from

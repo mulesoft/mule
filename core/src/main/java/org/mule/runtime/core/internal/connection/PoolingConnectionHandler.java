@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.MuleException;
 
@@ -28,6 +29,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   private C connection;
   private final ObjectPool<C> pool;
   private final PoolingListener poolingListener;
+  private final ConnectionProvider connectionProvider;
 
   /**
    * Creates a new instance
@@ -35,10 +37,12 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    * @param connection the connection to be wrapped
    * @param pool       the pool from which the {@code connection} was obtained and to which it has to be returned
    */
-  PoolingConnectionHandler(C connection, ObjectPool<C> pool, PoolingListener poolingListener) {
+  PoolingConnectionHandler(C connection, ObjectPool<C> pool, PoolingListener poolingListener,
+                           ConnectionProvider connectionProvider) {
     this.connection = connection;
     this.pool = pool;
     this.poolingListener = poolingListener;
+    this.connectionProvider = connectionProvider;
   }
 
   /**
@@ -78,6 +82,9 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void invalidate() {
     try {
@@ -87,6 +94,14 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     } finally {
       connection = null;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionProvider getConnectionProvider() {
+    return connectionProvider;
   }
 
   /**

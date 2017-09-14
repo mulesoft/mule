@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.connection.ConnectionHandlerAdapter;
@@ -29,6 +30,7 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
   private static final Logger LOGGER = getLogger(TransactionalConnectionHandler.class);
 
   private final ExtensionTransactionalResource<T> resource;
+  private final ConnectionHandlerAdapter<T> connectionHandler;
 
   /**
    * Creates a new instance
@@ -38,6 +40,9 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
   public TransactionalConnectionHandler(ExtensionTransactionalResource<T> resource) {
     checkArgument(resource != null, "resource cannot be null");
     this.resource = resource;
+    ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
+    checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
+    this.connectionHandler = (ConnectionHandlerAdapter<T>) connectionHandler;
   }
 
   /**
@@ -64,7 +69,7 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
         LOGGER.warn(format("Failed to rollback transaction while invalidating connection %s. %s", e, e.getMessage()), e);
       }
     } finally {
-      getConnectionHandler().invalidate();
+      connectionHandler.invalidate();
     }
   }
 
@@ -79,8 +84,16 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
     try {
       forceRollback();
     } finally {
-      getConnectionHandler().close();
+      connectionHandler.close();
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionProvider<T> getConnectionProvider() {
+    return connectionHandler.getConnectionProvider();
   }
 
   private void forceRollback() throws TransactionException {
@@ -91,11 +104,5 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
         throw new TransactionException(e);
       }
     }
-  }
-
-  private ConnectionHandlerAdapter<T> getConnectionHandler() {
-    ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
-    checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
-    return (ConnectionHandlerAdapter<T>) connectionHandler;
   }
 }

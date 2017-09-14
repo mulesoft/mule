@@ -60,6 +60,11 @@ public class PassThroughConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void getConnectionProvider() {
+    assertThat(managedConnection.getConnectionProvider(), is(sameInstance(connectionProvider)));
+  }
+
+  @Test
   public void close() throws Exception {
     doTwiceDisconnectOnce(() -> {
       try {

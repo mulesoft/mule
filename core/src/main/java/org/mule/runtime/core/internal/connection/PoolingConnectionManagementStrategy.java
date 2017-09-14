@@ -59,7 +59,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   @Override
   public ConnectionHandler<C> getConnectionHandler() throws ConnectionException {
     try {
-      return new PoolingConnectionHandler<>(borrowConnection(), pool, poolingListener);
+      return new PoolingConnectionHandler<>(borrowConnection(), pool, poolingListener, connectionProvider);
     } catch (ConnectionException e) {
       throw e;
     } catch (NoSuchElementException e) {

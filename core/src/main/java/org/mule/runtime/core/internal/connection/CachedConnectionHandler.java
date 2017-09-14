@@ -100,6 +100,14 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
     lazyConnect();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionProvider<C> getConnectionProvider() {
+    return connectionProvider;
+  }
+
   private void disconnectAndCleanConnection() {
     connection.ifComputed(c -> {
       try {

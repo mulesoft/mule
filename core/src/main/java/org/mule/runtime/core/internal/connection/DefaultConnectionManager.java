@@ -122,8 +122,21 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
    */
   @Override
   public <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider) {
-    return doTestConnectivity(() -> testConnectivity(connectionProvider, managementStrategyFactory.getStrategy(connectionProvider)
-        .getConnectionHandler()));
+    return doTestConnectivity(() -> doTestConnectivity(connectionProvider,
+                                                       managementStrategyFactory.getStrategy(connectionProvider)
+                                                           .getConnectionHandler()));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <C> ConnectionValidationResult testConnectivity(C connection, ConnectionHandler<C> connectionHandler) {
+    if (!(connectionHandler instanceof ConnectionHandlerAdapter)) {
+      throw new IllegalArgumentException("ConnectionHandler was not produced through this manager");
+    }
+
+    return ((ConnectionHandlerAdapter) connectionHandler).getConnectionProvider().validate(connection);
   }
 
   /**
@@ -154,7 +167,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
         return failure(e.getMessage(), e.getErrorType().orElse(null), e);
       }
 
-      return testConnectivity(connectionProvider, connectionHandler);
+      return doTestConnectivity(connectionProvider, connectionHandler);
     });
 
   }
@@ -167,8 +180,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     }
   }
 
-  private <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider,
-                                                          ConnectionHandler<C> connectionHandler)
+  private <C> ConnectionValidationResult doTestConnectivity(ConnectionProvider<C> connectionProvider,
+                                                            ConnectionHandler<C> connectionHandler)
       throws Exception {
     try {
       return connectionProvider.validate(connectionHandler.getConnection());
