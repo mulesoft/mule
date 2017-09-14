@@ -11,15 +11,16 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.core.api.MuleContext;
+import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.spring.internal.factories.ConstantFactoryBean;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -58,16 +59,17 @@ public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void setMuleContext() {
+  public void initialise() throws Exception {
     MuleContext muleContext = mock(MuleContext.class);
-    factoryBean.setMuleContext(muleContext);
-    verify((MuleContextAware) value).setMuleContext(muleContext);
-  }
+    Injector injector = mock(Injector.class);
+    when(muleContext.getInjector()).thenReturn(injector);
 
-  @Test
-  public void initialise() throws InitialisationException {
+    factoryBean.setMuleContext(muleContext);
     factoryBean.initialise();
+
     verify((Initialisable) value).initialise();
+    verify((MuleContextAware) value).setMuleContext(muleContext);
+    verify(injector).inject(value);
   }
 
   @Test
