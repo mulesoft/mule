@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.isNullType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_TYPE_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
@@ -133,7 +134,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       throws MetadataResolvingException {
 
     MetadataType inputType = parameter.getType();
-    if (!isCollection(inputType)) {
+    if (!isCollection(inputType) || isNullType(resolvedType)) {
       return resolvedType;
     }
     return metadataContext.getTypeBuilder().arrayType()

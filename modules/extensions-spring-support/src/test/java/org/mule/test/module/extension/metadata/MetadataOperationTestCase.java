@@ -40,6 +40,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -593,6 +594,16 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
     assertThat(objects, is(instanceOf(ArrayType.class)));
     assertThat(((ArrayType) objects).getType(), is(personType));
+  }
+
+  @Test
+  public void operationReceivesNullTypeOfList() throws Exception {
+    location = Location.builder().globalName("nullListAsInput").addProcessorsPart().addIndexPart(0).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> operationMetadata =
+        metadataService.getOperationMetadata(location);
+    MetadataType objects = getParameter(operationMetadata.get().getModel(), "objects").getType();
+
+    assertThat(objects, is(instanceOf(NullType.class)));
   }
 
   private MetadataType getResolvedTypeFromList() {
