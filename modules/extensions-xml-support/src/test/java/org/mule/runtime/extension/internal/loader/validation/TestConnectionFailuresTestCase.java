@@ -102,7 +102,6 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
     extensionDeclarer.named(name)
         .onVersion("4.0.0")
         .fromVendor("MuleSoft testcase")
-        .withMinMuleVersion(new MuleVersion("4.0.0"))
         .withCategory(Category.COMMUNITY)
         .withConfig(config)
         .withConnectionProvider(connectionProvider)

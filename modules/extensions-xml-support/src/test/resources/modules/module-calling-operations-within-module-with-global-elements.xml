@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-calling-operations-within-module-with-global-elements"
-        minMuleVersion="4.1.0"
 
         xmlns:tns="http://www.mulesoft.org/schema/mule/module-calling-operations-within-module-with-global-elements"
 

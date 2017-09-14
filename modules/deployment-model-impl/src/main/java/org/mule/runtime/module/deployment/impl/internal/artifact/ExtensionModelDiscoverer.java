@@ -55,9 +55,7 @@ public class ExtensionModelDiscoverer {
           .map(describer -> discoverExtensionThroughJsonDescriber(loaderRepository, describer,
                                                                   extensions, artifactClassloader,
                                                                   artifactName))
-          .orElseThrow(() -> new MuleRuntimeException(
-                                                      createStaticMessage("Could not find the descriptor for artifact "
-                                                          + artifactName)));
+          .orElse(null);
       if (extension != null) {
         descriptorsWithExtensions.add(new Pair<>(artifactPluginDescriptor, extension));
       }

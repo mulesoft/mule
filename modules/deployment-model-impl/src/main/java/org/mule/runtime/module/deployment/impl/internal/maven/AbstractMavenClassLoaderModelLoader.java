@@ -24,7 +24,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-import static org.mule.tools.api.packager.ContentGenerator.createClassLoaderModelFromJson;
+import static org.mule.tools.api.packager.sources.MuleContentGenerator.createClassLoaderModelFromJson;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;

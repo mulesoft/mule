@@ -222,13 +222,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="minMuleVersion" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Min Mule version that the extension requires to work correctly.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <!-- DSL XML attributes -->
                 <xsd:attribute name="namespace" use="optional">
                     <xsd:annotation>

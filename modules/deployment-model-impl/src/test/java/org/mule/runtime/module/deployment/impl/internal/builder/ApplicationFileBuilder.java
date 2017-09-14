@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
@@ -161,7 +162,10 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     applicationDescriptor.deleteOnExit();
     MuleApplicationModel.MuleApplicationModelBuilder muleApplicationModelBuilder =
         new MuleApplicationModel.MuleApplicationModelBuilder();
-    muleApplicationModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    muleApplicationModelBuilder
+        .setName(getArtifactId())
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE);
     domain.ifPresent(muleApplicationModelBuilder::setDomain);
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {

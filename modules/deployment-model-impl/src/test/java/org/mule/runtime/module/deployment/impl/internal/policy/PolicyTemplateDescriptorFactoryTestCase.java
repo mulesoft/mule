@@ -22,6 +22,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
@@ -41,6 +42,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.Properties
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -131,7 +133,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void readsRuntimeLibs() throws Exception {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
+        .setName(POLICY_NAME)
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID));
     mulePolicyModelBuilder
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
@@ -153,7 +158,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void assignsBundleDescriptor() throws Exception {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
+        .setName(POLICY_NAME)
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
@@ -176,7 +184,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void readsPlugin() throws Exception {
-    MulePolicyModelBuilder policyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder policyModelBuilder = new MulePolicyModelBuilder()
+        .setName(POLICY_NAME)
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
 
@@ -215,7 +226,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void detectsInvalidClassLoaderModelLoaderId() throws Exception {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
+        .setName(POLICY_NAME)
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(INVALID_LOADER_ID, emptyMap()));
 
@@ -233,7 +247,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   @Test
   public void detectsInvalidBundleDescriptorLoaderId() throws Exception {
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder().setName(POLICY_NAME).setMinMuleVersion("4.0.0")
+    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
+        .setName(POLICY_NAME)
+        .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createPolicyBundleDescriptorLoader(INVALID_LOADER_ID))
         .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, emptyMap()));
 

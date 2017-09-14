@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module name="module-w" minMuleVersion="4.0.0"
+<module name="module-w"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"

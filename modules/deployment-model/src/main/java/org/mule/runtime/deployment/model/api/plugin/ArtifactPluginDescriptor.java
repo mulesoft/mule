@@ -25,6 +25,7 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    * Target path as URL for any files used at deployment time or when generating the {@link ExtensionModel}
    */
   public static final String MULE_ARTIFACT_PATH_INSIDE_JAR = META_INF + "/" + MULE_ARTIFACT;
+  public static final String MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR = META_INF + "/auto-generated-" + MULE_ARTIFACT_JSON_DESCRIPTOR;;
   public static final String MULE_PLUGIN_POM = "pom.xml";
 
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();

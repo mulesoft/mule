@@ -13,6 +13,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
@@ -29,6 +30,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -84,8 +86,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    * Adds a describer into the plugin describer file.
    *
    * @param mulePluginModel the describer to store under
-   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR}
-   *        file
+   *        {@link ArtifactPluginDescriptor#MULE_ARTIFACT_FOLDER}/{@link ArtifactDescriptor#MULE_ARTIFACT_JSON_DESCRIPTOR} file
    * @return the same builder instance
    */
   public ArtifactPluginFileBuilder describedBy(MulePluginModel mulePluginModel) {
@@ -118,7 +119,8 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
 
       final MulePluginModel.MulePluginModelBuilder builder = new MulePluginModel.MulePluginModelBuilder();
       builder.setName(getArtifactId())
-          .setMinMuleVersion("4.0.0");
+          .setMinMuleVersion("4.0.0")
+          .setRequiredProduct(MULE);
       MuleArtifactLoaderDescriptorBuilder classLoaderModelDescriptorBuilder =
           new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
       if (properties.containsKey(EXPORTED_CLASS_PACKAGES_PROPERTY)) {

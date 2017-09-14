@@ -142,7 +142,6 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final String CATEGORY = "category";
   private static final String VENDOR = "vendor";
-  private static final String MIN_MULE_VERSION = "minMuleVersion";
   private static final String DOC_DESCRIPTION = "doc:description";
   private static final String PASSWORD = "password";
   private static final String ORDER_ATTRIBUTE = "order";
@@ -363,7 +362,6 @@ public final class XmlExtensionLoaderDelegate {
     String version = "4.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getParameters().get(CATEGORY);
     final String vendor = moduleModel.getParameters().get(VENDOR);
-    final String minMuleVersion = moduleModel.getParameters().get(MIN_MULE_VERSION);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
 
     final String xmlnsTnsValue = moduleModel.getParameters().get(XMLNS_TNS);
@@ -379,7 +377,6 @@ public final class XmlExtensionLoaderDelegate {
     declarer.named(name)
         .describedAs(getDescription(moduleModel))
         .fromVendor(vendor)
-        .withMinMuleVersion(new MuleVersion(minMuleVersion))
         .onVersion(version)
         .withCategory(Category.valueOf(category.toUpperCase()))
         .withXmlDsl(xmlDslModel);

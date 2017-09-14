@@ -1,4 +1,6 @@
 {
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
   "extensionModelLoaderDescriptor": {
     "id": "crafted",
     "attributes": {
