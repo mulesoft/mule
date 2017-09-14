@@ -10,29 +10,24 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
@@ -46,23 +41,20 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
 
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default exception strategy must accept any event.";
-  private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
 
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    addDefaultExceptionStrategyIfRequired();
+    addCriticalErrorHandler();
+    addDefaultErrorHandlerIfRequired();
     validateConfiguredExceptionStrategies();
   }
 
   @Override
   public BaseEvent handleException(MessagingException exception, BaseEvent event) {
     event = addExceptionPayload(exception, event);
-    if (isCriticalException(exception)) {
-      return event;
-    }
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
         return exceptionListener.handleException(exception, event);
@@ -73,18 +65,14 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   public Publisher<BaseEvent> apply(MessagingException exception) {
-    if (isCriticalException(exception)) {
-      return error(exception);
-    } else {
-      BaseEvent event = addExceptionPayload(exception, exception.getEvent());
-      exception.setProcessedEvent(event);
-      for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-        if (exceptionListener.accept(event)) {
-          return exceptionListener.apply(exception);
-        }
+    BaseEvent event = addExceptionPayload(exception, exception.getEvent());
+    exception.setProcessedEvent(event);
+    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+      if (exceptionListener.accept(event)) {
+        return exceptionListener.apply(exception);
       }
-      return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));
     }
+    return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));
   }
 
   @Override
@@ -108,12 +96,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         .build();
   }
 
-  private boolean isCriticalException(MessagingException exception) {
-    Optional<Error> error = exception.getEvent().getError();
-    return error.isPresent() && criticalMatcher.match(error.get().getErrorType());
+  private void addCriticalErrorHandler() {
+    exceptionListeners.add(0, new OnCriticalErrorHandler());
   }
 
-  private void addDefaultExceptionStrategyIfRequired() throws InitialisationException {
+  private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
     if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
       String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
       MessagingExceptionHandler defaultErrorHandler;
