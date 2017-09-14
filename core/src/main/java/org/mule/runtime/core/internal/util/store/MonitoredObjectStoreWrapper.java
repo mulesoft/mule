@@ -18,11 +18,11 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.UUID;
 
 import java.io.Serializable;

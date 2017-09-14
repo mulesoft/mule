@@ -10,17 +10,17 @@ import static org.mule.runtime.core.api.context.notification.ConnectorMessageNot
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.execution.RequestResponseFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.api.execution.ResponseDispatchException;
 import org.mule.runtime.core.api.execution.TransactionalExecutionTemplate;
-import org.mule.runtime.core.api.scheduler.SchedulerBusyException;
+import org.mule.runtime.api.scheduler.SchedulerBusyException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 

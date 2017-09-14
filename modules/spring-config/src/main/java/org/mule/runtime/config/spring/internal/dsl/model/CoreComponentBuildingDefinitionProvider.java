@@ -102,13 +102,13 @@ import org.mule.runtime.core.api.context.notification.AbstractServerNotification
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.processor.AnnotatedProcessor;
-import org.mule.runtime.core.api.processor.LoggerMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;

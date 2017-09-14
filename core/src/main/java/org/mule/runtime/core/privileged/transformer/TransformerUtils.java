@@ -7,9 +7,10 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -69,9 +70,9 @@ public class TransformerUtils {
    * @param names - a list of transformers separated by commands
    * @param muleContext the current muleContext. This is used to look up transformers in the registry
    * @return a list (possibly empty) of transformers or
-   * @throws org.mule.runtime.core.api.DefaultMuleException if any of the transformers cannot be found
+   * @throws MuleException if any of the transformers cannot be found
    */
-  public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws DefaultMuleException {
+  public static List<Transformer> getTransformers(String names, MuleContext muleContext) throws MuleException {
     if (null != names) {
       List<Transformer> transformers = new LinkedList<>();
       StringTokenizer st = new StringTokenizer(names, COMMA);

@@ -12,14 +12,13 @@ import java.util.List;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 
 import org.reactivestreams.Publisher;
 
 /**
  * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as
- * {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor}.
+ * {@link MessagingExceptionHandlerAcceptor}.
  */
 public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler>
     implements MessagingExceptionHandlerAcceptor {

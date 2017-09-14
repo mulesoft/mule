@@ -32,7 +32,7 @@ import static org.mule.runtime.api.exception.MuleException.refreshVerboseExcepti
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToBuildMessage;
 
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -135,7 +135,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
       fail("Expected exception");
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
-                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
+                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.apache.commons.collections.CollectionUtils.forAllDo\\(CollectionUtils.java:[0-9]+\\)",
@@ -160,7 +160,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
       fail("Expected exception");
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
-                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
+                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  org.apache.commons.collections.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
@@ -187,7 +187,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
       });
     } catch (Exception e) {
       assertThat(getExceptionStack(e),
-                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.core.api.DefaultMuleException\\)",
+                 StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()

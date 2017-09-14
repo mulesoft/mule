@@ -9,14 +9,12 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.Acceptor;
+import org.mule.runtime.core.internal.event.Acceptor;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.routing.MessageSequence;
-import org.mule.runtime.core.api.processor.Router;
-import org.mule.runtime.core.api.util.collection.SplittingStrategy;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
+import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of

@@ -18,16 +18,16 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactor
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.execution.EndPhaseTemplate;
-import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.execution.ValidationPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;

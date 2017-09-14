@@ -29,7 +29,6 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.routing.Aggregator;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;

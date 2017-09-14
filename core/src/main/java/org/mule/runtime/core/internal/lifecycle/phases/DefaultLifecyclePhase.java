@@ -13,9 +13,9 @@ import static org.reflections.ReflectionUtils.withName;
 
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
-import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +35,12 @@ import java.util.Set;
  * Lifecycle phases have a fixed configuration in which case a specialisation of this class should be created that initialises its
  * configuration internally.
  * <p>
- * Note that this class and {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult} both make assumptions about the
+ * Note that this class and {@link LifecycleTransitionResult} both make assumptions about the
  * interfaces used - the return values and exceptions. These are, currently, that the return value is either void or
- * {@link org.mule.runtime.core.api.lifecycle.LifecycleTransitionResult} and either 0 or 1 exceptions can be thrown which are
+ * {@link LifecycleTransitionResult} and either 0 or 1 exceptions can be thrown which are
  * either {@link InstantiationException} or {@link LifecycleException}.
  *
- * @see org.mule.runtime.core.api.lifecycle.LifecyclePhase
+ * @see LifecyclePhase
  */
 public class DefaultLifecyclePhase implements LifecyclePhase {
 

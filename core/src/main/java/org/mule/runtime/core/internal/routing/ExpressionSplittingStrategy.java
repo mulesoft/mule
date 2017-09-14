@@ -7,11 +7,9 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 
 import java.util.Collections;
 import java.util.Iterator;

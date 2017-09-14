@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.routing.ForkJoinStrategy;
-import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;

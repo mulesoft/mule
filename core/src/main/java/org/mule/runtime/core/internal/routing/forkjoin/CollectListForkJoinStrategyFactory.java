@@ -13,12 +13,13 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 
 import java.util.List;
 import java.util.function.Function;
 
 /**
- * {@link org.mule.runtime.core.api.routing.ForkJoinStrategy} that:
+ * {@link ForkJoinStrategy} that:
  * <ul>
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.

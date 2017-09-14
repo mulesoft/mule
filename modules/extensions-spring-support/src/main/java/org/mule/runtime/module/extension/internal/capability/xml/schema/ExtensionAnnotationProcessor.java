@@ -12,7 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Parameter;

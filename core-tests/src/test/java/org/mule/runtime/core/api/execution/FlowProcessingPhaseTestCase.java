@@ -33,6 +33,8 @@ import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
 import org.mule.runtime.core.internal.execution.MessageProcessPhase;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
 import org.mule.runtime.core.internal.execution.ValidationPhase;
+import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.RequestResponseFlowProcessingPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

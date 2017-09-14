@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.execution.EndPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import java.util.List;
 

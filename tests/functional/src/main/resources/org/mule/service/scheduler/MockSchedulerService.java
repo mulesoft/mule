@@ -7,16 +7,13 @@
 package org.mule.service.scheduler;
 
 import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerView;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
-import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerPoolsConfigFactory;
+import org.mule.runtime.api.scheduler.SchedulerService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MockSchedulerService implements SchedulerService {

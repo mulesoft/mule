@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.context.notification;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -26,14 +25,14 @@ import org.mule.runtime.core.api.context.notification.MessageProcessorNotificati
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
+import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.LoggerContext;
 
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContext;
 
 /**
  * Manager for handling message processing troubleshooting data.

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.time;
 
 import static java.lang.System.currentTimeMillis;
 
-import org.mule.runtime.core.api.time.TimeSupplier;
+import org.mule.runtime.api.time.TimeSupplier;
 
 import java.util.function.Supplier;
 

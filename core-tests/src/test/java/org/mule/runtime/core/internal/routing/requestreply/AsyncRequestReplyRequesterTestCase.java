@@ -35,7 +35,7 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.store.SimpleMemoryObjectStore;
+import org.mule.runtime.api.store.SimpleMemoryObjectStore;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorTestCase;

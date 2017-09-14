@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.time.Time;
+import org.mule.runtime.core.internal.time.Time;
 
 import java.util.Optional;
 

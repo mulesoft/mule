@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util.store;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.store.SimpleMemoryObjectStore;
+import org.mule.runtime.api.store.SimpleMemoryObjectStore;
 import org.mule.tck.core.util.store.TemplateObjectStoreContractTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 

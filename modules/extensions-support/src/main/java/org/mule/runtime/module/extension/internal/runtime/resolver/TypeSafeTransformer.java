@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -33,12 +32,11 @@ public class TypeSafeTransformer {
    * @param expectedDataType the expected type's {@link DataType}
    * @param event the event to perform the transformation
    * @return the transformed value
-   * @throws MessagingException If could not be able to find a proper transformer do obtain the desired type
    * @throws MessageTransformerException If a problem occurs transforming the value
    * @throws TransformerException If a problem occurs transforming the value
    */
   public <T> T transform(Object value, DataType valueDataType, DataType expectedDataType)
-      throws MessagingException, MessageTransformerException, TransformerException {
+      throws MessageTransformerException, TransformerException {
 
     // TODO review that event is not need but there was logic to use MessageTransform
     return (T) transformationService.internalTransform(value, valueDataType, expectedDataType);

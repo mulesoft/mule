@@ -11,7 +11,7 @@ import static java.lang.Integer.MAX_VALUE;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 
 /**
  * Abstract {@link AsyncProcessingStrategyFactory} implementation that supports the configuration of maximum concurrency.

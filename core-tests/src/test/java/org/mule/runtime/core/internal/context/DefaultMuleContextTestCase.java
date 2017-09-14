@@ -31,7 +31,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.connector.SchedulerController;
+import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;

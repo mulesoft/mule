@@ -11,9 +11,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.execution.EndPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;

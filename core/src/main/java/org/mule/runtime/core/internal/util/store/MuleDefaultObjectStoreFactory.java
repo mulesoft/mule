@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.core.api.store.PartitionedInMemoryObjectStore;
-import org.mule.runtime.core.api.store.PartitionedPersistentObjectStore;
+import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 
 import java.io.Serializable;
 

@@ -15,7 +15,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.NAME
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 

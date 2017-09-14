@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import org.mule.runtime.core.api.routing.MessageSequence;
-
 /**
  * An abstract implementation of a {@link MessageSequence}, that does not support {@link #remove()}
  * 

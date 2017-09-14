@@ -42,16 +42,16 @@ import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.message.ErrorBuilder;
-import org.mule.runtime.core.api.processor.InternalProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -127,7 +127,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * <p>
    * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and allows a chain of
    * {@link Processor}s to be configured using the
-   * {@link #configureMessageProcessors(org.mule.runtime.core.api.processor.MessageProcessorChainBuilder)} method but if you wish
+   * {@link #configureMessageProcessors(MessageProcessorChainBuilder)} method but if you wish
    * to use another {@link MessageProcessorBuilder} or just a single {@link Processor} then this method can be overridden and
    * return a single {@link Processor} instead.
    */

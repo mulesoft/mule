@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.core.api.DefaultMuleException;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ import java.util.List;
  */
 public interface MuleCoreExtensionDiscoverer {
 
-  List<MuleCoreExtension> discover() throws DefaultMuleException;
+  List<MuleCoreExtension> discover() throws MuleException;
 }

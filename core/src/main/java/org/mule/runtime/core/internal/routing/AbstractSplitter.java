@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.routing.MessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
 

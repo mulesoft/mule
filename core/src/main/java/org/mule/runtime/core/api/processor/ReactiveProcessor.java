@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerService;
 
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;

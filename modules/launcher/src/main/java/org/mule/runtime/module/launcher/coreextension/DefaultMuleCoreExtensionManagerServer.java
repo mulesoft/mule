@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
-import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +95,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     }
   }
 
-  private void initializeCoreExtensions() throws InitialisationException, DefaultMuleException {
+  private void initializeCoreExtensions() throws MuleException {
     logger.info("Initializing core extensions");
 
     for (MuleCoreExtension extension : orderedCoreExtensions) {

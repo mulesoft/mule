@@ -7,7 +7,7 @@
 package org.mule.test.runner.infrastructure;
 
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.AbstractResourcesGenerator;

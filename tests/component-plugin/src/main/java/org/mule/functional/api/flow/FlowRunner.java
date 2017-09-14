@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -88,7 +89,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    *
    * @param scheduler the scheduler to use to run the {@link Flow}.
    * @return this {@link FlowRunner}
-   * @see {@link org.mule.runtime.core.api.scheduler.SchedulerService}
+   * @see {@link SchedulerService}
    */
   public FlowRunner withScheduler(Scheduler scheduler) {
     this.scheduler = scheduler;

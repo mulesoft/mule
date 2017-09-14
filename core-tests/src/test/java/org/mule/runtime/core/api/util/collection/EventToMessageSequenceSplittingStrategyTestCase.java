@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.internal.routing.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy;
-import org.mule.runtime.core.api.routing.MessageSequence;
+import org.mule.runtime.core.internal.routing.MessageSequence;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

@@ -32,9 +32,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
-import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
-import org.mule.runtime.core.api.routing.SelectiveRouter;
+import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
 import org.reactivestreams.Publisher;
 

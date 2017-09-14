@@ -10,14 +10,12 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
-import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.fromIterable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.routing.ForkJoinStrategy;
-import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 
 import java.util.List;

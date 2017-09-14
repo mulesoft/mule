@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.api.dsl.processor.xml;
 
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.api.dsl.xml.StaticXmlNamespaceInfo;

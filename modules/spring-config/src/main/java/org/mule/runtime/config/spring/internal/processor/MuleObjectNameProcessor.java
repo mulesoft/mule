@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.internal.processor;
 
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transport.LegacyConnector;
+import org.mule.runtime.core.privileged.transport.LegacyConnector;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

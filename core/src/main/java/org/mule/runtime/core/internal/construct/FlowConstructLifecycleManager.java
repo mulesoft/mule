@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowConstructNotification;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.api.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
 
 import org.slf4j.Logger;
 

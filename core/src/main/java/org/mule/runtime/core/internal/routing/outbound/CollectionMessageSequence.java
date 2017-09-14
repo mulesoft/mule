@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing.outbound;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.core.internal.routing.AbstractMessageSequence;
-import org.mule.runtime.core.api.routing.MessageSequence;
+import org.mule.runtime.core.internal.routing.MessageSequence;
 
 import java.util.Collection;
 import java.util.Iterator;

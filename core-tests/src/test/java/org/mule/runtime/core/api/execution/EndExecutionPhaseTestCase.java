@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.internal.execution.EndProcessPhase;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
+import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

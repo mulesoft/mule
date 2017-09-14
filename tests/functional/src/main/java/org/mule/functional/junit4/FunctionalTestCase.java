@@ -9,14 +9,12 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -170,9 +168,5 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @After
   public final void clearFlowAssertions() throws Exception {
     FlowAssert.reset();
-  }
-
-  protected MessageProcessorChain getSubFlow(String subflowName) {
-    return (MessageProcessorChain) muleContext.getRegistry().lookupObject(subflowName);
   }
 }

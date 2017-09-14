@@ -10,7 +10,7 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static java.time.Duration.ofMillis;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
-import static org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.Exceptions.propagate;
@@ -39,23 +39,22 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.routing.ForkJoinStrategy;
-import org.mule.runtime.core.api.routing.ForkJoinStrategy.RoutingPair;
-import org.mule.runtime.core.api.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.api.routing.CompositeRoutingException;
 import org.mule.runtime.core.api.routing.RoutingResult;
 
 import org.reactivestreams.Publisher;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Abstract {@link org.mule.runtime.core.api.routing.ForkJoinStrategy} that provides the base behavior for strategies that will
+ * Abstract {@link ForkJoinStrategy} that provides the base behavior for strategies that will
  * perform parallel invocation of {@link RoutingPair}'s that wish to use the following common behaviour:
  * <ul>
  * <li>Emit a single result event once all routes complete.

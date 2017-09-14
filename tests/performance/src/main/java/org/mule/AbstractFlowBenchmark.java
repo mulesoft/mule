@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorStreamProcessingStrategyFactory;
 import org.mule.tck.TriggerableMessageSource;
@@ -84,7 +84,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   protected TriggerableMessageSource source;
 
   @Param({
-      "org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory",
+      "org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory",
       "org.mule.runtime.core.internal.processor.strategy.DirectStreamPerThreadProcessingStrategyFactory",
       "org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory",
       "org.mule.runtime.core.internal.processor.strategy.ReactorStreamProcessingStrategyFactory",

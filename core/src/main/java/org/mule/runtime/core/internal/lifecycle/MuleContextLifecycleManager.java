@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.api.lifecycle.AbstractLifecycleManager;
+import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
 /**
  * This is a specialized class that extends {@link RegistryLifecycleManager} and will invoke lifecycle on the registry instance

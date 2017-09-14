@@ -23,7 +23,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
+import org.mule.runtime.core.internal.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 
 import java.io.Serializable;

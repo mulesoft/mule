@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
-import org.mule.runtime.core.api.lifecycle.LifecycleInterceptor;
-import org.mule.runtime.core.api.lifecycle.LifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 
 import java.util.Map;
 import java.util.Optional;

@@ -9,7 +9,7 @@ package org.mule.functional.services;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.util.CompilerUtils;
