@@ -32,7 +32,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.WrapperTypeParameterContributor;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionElement;
@@ -80,13 +80,13 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
 
   private List<ParameterDeclarerContributor> getParameterMethodsContributors() {
     return ImmutableList
-        .of(WrapperTypeParameterContributor.defaultContributor(typeLoader));
+        .of(StackableTypesParameterContributor.defaultContributor(typeLoader));
   }
 
   private ImmutableList<ParameterDeclarerContributor> getParameterFieldsContributors() {
     return ImmutableList
         .of(new InfrastructureFieldContributor(),
-            WrapperTypeParameterContributor.defaultContributor(typeLoader));
+            StackableTypesParameterContributor.defaultContributor(typeLoader));
   }
 
   /**
