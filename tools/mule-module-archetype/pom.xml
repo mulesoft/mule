@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>3.9.0-SNAPSHOT</version>
+        <version>3.9.0-JDK8-TARGET-7-SNAPSHOT</version>
     </parent>
     <packaging>maven-plugin</packaging>
     <name>Mule Module Archetype</name>
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-module-archetype</artifactId>
-    <version>3.9.0-SNAPSHOT</version>
+    <version>3.9.0-JDK8-TARGET-7-SNAPSHOT</version>
     <description>An architype for creating a Mule Module. It provides options for adding certain mule features and configuring the
     module for Muleforge.
     </description>

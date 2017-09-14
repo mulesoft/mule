@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.9.0-SNAPSHOT</version>
+        <version>3.9.0-JDK8-TARGET-7-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-json</artifactId>
     <packaging>jar</packaging>

@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.9.0-SNAPSHOT</version>
+        <version>3.9.0-JDK8-TARGET-7-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-guice</artifactId>
     <name>Guice Module</name>
     <packaging>jar</packaging>
-    <version>3.9.0-SNAPSHOT</version>
+    <version>3.9.0-JDK8-TARGET-7-SNAPSHOT</version>
     <description>Allows users to configure Mule to use Guice for DI/object creation.
     </description>
 
