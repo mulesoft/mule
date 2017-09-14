@@ -39,6 +39,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
@@ -290,12 +291,16 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerOperation(ComponentModel operationModel) {
-    operationSchemaDelegate.registerOperation(operationModel, dslResolver.resolve(operationModel));
+    operationSchemaDelegate.registerOperation(operationModel,
+                                              dslResolver.resolve(operationModel),
+                                              componentHasAnImplicitConfiguration(extensionModel, operationModel));
     return this;
   }
 
   public SchemaBuilder registerMessageSource(SourceModel sourceModel) {
-    sourceSchemaDelegate.registerMessageSource(sourceModel, dslResolver.resolve(sourceModel));
+    sourceSchemaDelegate.registerMessageSource(sourceModel,
+                                               dslResolver.resolve(sourceModel),
+                                               componentHasAnImplicitConfiguration(extensionModel, sourceModel));
     return this;
   }
 
