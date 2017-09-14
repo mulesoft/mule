@@ -105,7 +105,7 @@ class MuleExtensionModelDeclarer {
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(CORE_PREFIX)
             .setNamespace(CORE_NAMESPACE)
-            .setSchemaVersion("4.0.0-SNAPSHOT")
+            .setSchemaVersion("4.0.0-rc-SNAPSHOT")
             .setXsdFileName("mule.xsd")
             .setSchemaLocation("http://www.mulesoft.org/schema/mule/core/current/mule.xsd")
             .build());

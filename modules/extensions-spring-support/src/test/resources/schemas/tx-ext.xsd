@@ -71,7 +71,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TransactionalSourceWithTXParametersType" substitutionGroup="mule:abstract-message-source" name="transactional-source-with-t-x-parameters"></xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/tx" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TransactionalSourceWithTXParametersType" substitutionGroup="mule:abstract-message-source" name="transactional-source-with-tx-parameters"></xs:element>
   <xs:complexType name="TransactionalSourceWithTXParametersType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
