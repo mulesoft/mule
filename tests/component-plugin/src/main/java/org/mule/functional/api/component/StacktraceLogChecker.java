@@ -11,7 +11,7 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.matchingWith;
+import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.compatibleWith;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
   private void validateCalls(List<MethodCall> actualCalls, StringBuilder errors) {
     for (MethodCall call : expectedCalls) {
       assertAndSaveError(actualCalls,
-                         hasItem(matchingWith(call)),
+                         hasItem(compatibleWith(call)),
                          "Expected method call not found in stacktrace:",
                          errors);
     }
@@ -117,7 +117,22 @@ public class StacktraceLogChecker extends AbstractLogChecker {
       this.method = method;
     }
 
-    public static org.hamcrest.Matcher<MethodCall> matchingWith(MethodCall thisCall) {
+    /**
+     * {@link org.hamcrest.Matcher} to compare two Method calls.
+     * Two method calls will be compatible if all their defined fields are equal. If a field is not defined(null),
+     * if will be ignored in the comparison.
+     *
+     * For example:
+     *
+     * MethodCall(null,null,null,null) will be compatible with every other MethodCall.
+     *
+     * MethodCall(aPackage,aClass,aMethod,null) will be compatible with MethodCall(aPackage,aClass,aMethod,128)
+     * but won't be compatible with MethodCall(otherPackage,aClass,aMethod,null).
+     *
+     * @param thisCall
+     * @return a {@link org.hamcrest.Matcher} for checking compatible method calls.
+     */
+    public static org.hamcrest.Matcher<MethodCall> compatibleWith(MethodCall thisCall) {
       return new TypeSafeMatcher<MethodCall>() {
 
         @Override
@@ -208,7 +223,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
 
     @Override
     public int hashCode() {
-      return Objects.hashCode(method) + Objects.hashCode(packageName) + Objects.hashCode(clazz) + Objects.hashCode(lineNumber);
+      return Objects.hash(method, packageName, clazz, lineNumber);
     }
   }
 
