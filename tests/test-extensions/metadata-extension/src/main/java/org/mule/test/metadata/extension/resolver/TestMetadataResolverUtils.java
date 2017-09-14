@@ -55,6 +55,10 @@ public class TestMetadataResolverUtils {
         objectBuilder.addField().key(NAME).value().stringType();
         objectBuilder.addField().key(AGE).value().numberType();
         break;
+      case MetadataConnection.NULL:
+        return BaseTypeBuilder.create(JAVA).nullType().build();
+      case MetadataConnection.VOID:
+        return BaseTypeBuilder.create(JAVA).voidType().build();
       default:
         throw new MetadataResolvingException("Unknown key " + key, INVALID_METADATA_KEY);
     }

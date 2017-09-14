@@ -238,4 +238,12 @@
     <flow name="objectListAsInput">
         <metadata:object-list-as-input type="PERSON"/>
     </flow>
+
+    <flow name="nullListAsInput">
+        <metadata:object-list-as-input type="NULL"/>
+    </flow>
+
+    <flow name="voidListAsOutput">
+        <metadata:object-list-as-input type="VOID"/>
+    </flow>
 </mule>
