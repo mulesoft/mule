@@ -120,5 +120,10 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
     stubConnectionProvider();
     getConnection();
   }
+
+  @Test
+  public void getConnectionProvider() {
+    assertThat(managedConnection.getConnectionProvider(), is(sameInstance(connectionProvider)));
+  }
 }
 

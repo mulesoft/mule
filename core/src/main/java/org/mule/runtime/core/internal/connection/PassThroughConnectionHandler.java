@@ -67,6 +67,14 @@ final class PassThroughConnectionHandler<C> implements ConnectionHandlerAdapter<
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionProvider<C> getConnectionProvider() {
+    return connectionProvider;
+  }
+
   @Override
   public void invalidate() {
     release();

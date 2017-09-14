@@ -38,6 +38,6 @@ public class SourceConnectionProvider implements ConnectionProvider<Object> {
 
   @Override
   public ConnectionValidationResult validate(Object connection) {
-    return connectionManager.testConnectivity(this);
+    return connectionManager.testConnectivity(connection);
   }
 }

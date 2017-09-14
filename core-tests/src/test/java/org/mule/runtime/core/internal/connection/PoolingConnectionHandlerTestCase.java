@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -40,11 +41,14 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Mock
   private PoolingListener<Object> poolingListener;
 
+  @Mock
+  private ConnectionProvider connectionProvider;
+
   private PoolingConnectionHandler<Object> managedConnection;
 
   @Before
   public void before() {
-    managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener);
+    managedConnection = new PoolingConnectionHandler<>(connection, pool, poolingListener, connectionProvider);
   }
 
   @Test
@@ -80,5 +84,10 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   public void close() throws Exception {
     managedConnection.close();
     verify(pool, never()).returnObject(anyObject());
+  }
+
+  @Test
+  public void getConnectionProvider() {
+    assertThat(managedConnection.getConnectionProvider(), is(sameInstance(connectionProvider)));
   }
 }

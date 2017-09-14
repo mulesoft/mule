@@ -93,6 +93,20 @@ public interface ConnectionManager {
   <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider);
 
   /**
+   * Validates the given {@code connection}
+   * <p>
+   * The {@code connection} has to have been obtained through the given {@code connectionHandler}, and the handler
+   * has to have been obtained through {@code this} instance
+   *
+   * @param connection the connection to validate
+   *                   @param connectionHandler the connection's handler
+   * @param <C>                the generic type of the validated connection
+   * @return a {@link  ConnectionValidationResult}
+   * @throws IllegalArgumentException if any of the preconditions are not met
+   */
+  <C> ConnectionValidationResult testConnectivity(C connection, ConnectionHandler<C> connectionHandler);
+
+  /**
    * Tests connectivity for the given {@code configurationInstance}.
    * <p>
    * The {@code connectionProvider} is expected to be fully initialised and functional. It is not
