@@ -240,9 +240,10 @@ public class MetadataOperations {
     return generateDummyPagingProvider();
   }
 
-  public void objectListAsInput(@MetadataKeyId String type,
-                                @Optional @TypeResolver(TestInputResolverWithKeyResolver.class) List<Object> objects) {
-
+  @OutputResolver(output = TestOutputResolverWithKeyResolver.class)
+  public List<Object> objectListAsInput(@MetadataKeyId String type,
+                                        @Optional @TypeResolver(TestInputResolverWithKeyResolver.class) List<Object> objects) {
+    return null;
   }
 
   public PagingProvider<MetadataConnection, Animal> pagedOperationMetadata(Animal animal) {

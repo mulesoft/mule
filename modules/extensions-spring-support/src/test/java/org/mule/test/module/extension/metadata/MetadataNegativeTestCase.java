@@ -27,6 +27,8 @@ import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataK
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -208,5 +210,13 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
     final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = getComponentDynamicMetadata(metadataKey);
     assertMetadataFailure(result.getFailures().get(0), "Missing levels: [city]", INVALID_METADATA_KEY, "", COMPONENT);
+  }
+
+  @Test
+  public void operationCantResolverVoidAsOutputTypeFromList() throws Exception {
+    location = Location.builder().globalName("voidListAsOutput").addProcessorsPart().addIndexPart(0).build();
+    MetadataResult<ComponentMetadataDescriptor<OperationModel>> operationMetadata =
+        metadataService.getOperationMetadata(location);
+    assertThat(operationMetadata.isSuccess(), is(false));
   }
 }
