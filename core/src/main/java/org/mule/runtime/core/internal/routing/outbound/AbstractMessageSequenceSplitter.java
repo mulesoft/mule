@@ -14,7 +14,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.internal.event.Acceptor;
+import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEvent.Builder;
