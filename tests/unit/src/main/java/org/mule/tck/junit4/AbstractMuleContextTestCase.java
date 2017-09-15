@@ -459,7 +459,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         }
       }
     }
-    
+
     return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
