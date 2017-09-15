@@ -35,10 +35,9 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void logsException() {
     MessagingException messagingException = mock(MessagingException.class);
-
+    when(messagingException.getDetailedMessage()).thenReturn("Log");
     handler.apply(messagingException);
     handler.handleException(messagingException, mock(BaseEvent.class));
-
     verify(handler, times(2)).logException(any(MessagingException.class));
   }
 
