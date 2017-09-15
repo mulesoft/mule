@@ -67,4 +67,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
     return unmodifiableMap(customServices);
   }
 
+  public Map<String, CustomService> getDefaultServices() {
+    return unmodifiableMap(muleContextDefaultServices);
+  }
 }

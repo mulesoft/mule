@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.context.notification;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import javax.inject.Inject;

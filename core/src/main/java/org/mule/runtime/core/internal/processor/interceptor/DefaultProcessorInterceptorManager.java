@@ -18,15 +18,14 @@ import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-//TODO MULE-11521 Define if this will remain here
-public class DefaultProcessorInterceptorManager implements ProcessorInterceptorProvider, Initialisable {
+public class DefaultProcessorInterceptorManager implements ProcessorInterceptorManager, Initialisable {
 
   @Inject
   private MuleContext context;

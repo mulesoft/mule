@@ -8,9 +8,9 @@ package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.ClusterNodeNotification;
+import org.mule.runtime.api.notification.ClusterNodeNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -27,10 +28,10 @@ public class DeploymentMuleContextListenerFactoryTestCase extends AbstractMuleTe
   @Test
   public void createsContextListener() throws Exception {
     MuleContextListener contextListener = factory.create(APP_NAME);
-
     MuleContext context = mock(MuleContext.class);
+
     contextListener.onConfiguration(context);
 
-    verify(deploymentListener).onMuleContextConfigured(APP_NAME, context);
+    verify(deploymentListener).onArtifactConfigured(APP_NAME);
   }
 }

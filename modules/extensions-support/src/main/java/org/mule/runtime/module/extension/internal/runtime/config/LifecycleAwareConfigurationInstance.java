@@ -28,7 +28,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.internal.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;

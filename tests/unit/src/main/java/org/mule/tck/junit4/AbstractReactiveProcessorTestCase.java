@@ -19,7 +19,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -76,7 +75,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
       @Override
       public void configure(MuleContext muleContext) throws ConfigurationException {
         try {
-          muleContext.getRegistry().registerObject(MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR,
+          muleContext.getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY,
                                                    configurationComponentLocator);
         } catch (RegistrationException e) {
           throw new ConfigurationException(e);

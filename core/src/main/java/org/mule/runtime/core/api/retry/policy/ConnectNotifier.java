@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
-import static org.mule.runtime.core.api.context.notification.ConnectionNotification.CONNECTION_CONNECTED;
-import static org.mule.runtime.core.api.context.notification.ConnectionNotification.CONNECTION_FAILED;
+import static org.mule.runtime.api.notification.ConnectionNotification.CONNECTION_CONNECTED;
+import static org.mule.runtime.api.notification.ConnectionNotification.CONNECTION_FAILED;
 
-import org.mule.runtime.core.api.context.notification.ConnectionNotification;
+import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.internal.config.ExceptionHelper;

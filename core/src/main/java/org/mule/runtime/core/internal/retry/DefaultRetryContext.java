@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.retry;
 import static java.util.Collections.unmodifiableMap;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.retry.RetryContext;
 
 import java.util.HashMap;

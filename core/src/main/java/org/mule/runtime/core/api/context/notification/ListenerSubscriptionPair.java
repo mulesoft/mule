@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 
 import java.util.Objects;
 import java.util.function.Predicate;

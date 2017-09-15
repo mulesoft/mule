@@ -153,12 +153,10 @@ public class MuleProperties {
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
   public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";
   public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
-  public static final String OBJECT_CONFIGURATION_COMPONENT_LOCATOR = "_muleConfigurationComponentLocator";
   public static final String OBJECT_CONFIGURATION_PROPERTIES = "_muleConfigurationAttributesResolver";
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
   public static final String OBJECT_POLICY_MANAGER_STATE_HANDLER = "_mulePolicyStateHandler";
-  public static final String OBJECT_PROCESSOR_INTERCEPTOR_MANAGER = "_muleProcessorInterceptorManager";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_REGISTRY = "_muleRegistry";
   public static final String OBJECT_CURSOR_MANAGER = "_muleStreamingManager";
@@ -171,6 +169,8 @@ public class MuleProperties {
   public static final String OBJECT_NOTIFICATION_DISPATCHER = "_muleNotificationDispatcher";
   public static final String OBJECT_NOTIFICATION_LISTENER_REGISTRY = "_muleNotificationListenerRegistry";
   public static final String OBJECT_TRANSACTION_FACTORY_LOCATOR = "_muleTransactionFactoryLocator";
+  public static final String OBJECT_STATISTICS = "_muleStatistics";
+
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

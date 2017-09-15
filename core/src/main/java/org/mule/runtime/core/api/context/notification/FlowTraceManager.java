@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
+
 /**
  * Provides callbacks for notifying when a flow call from another flow is started or completed.
  * 

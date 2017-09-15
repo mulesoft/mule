@@ -96,6 +96,8 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -109,7 +111,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -3730,13 +3731,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class), any(CustomizationService.class));
+        verify(listener, times(1)).onArtifactCreated(eq(appName), any(CustomizationService.class));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName)
+        return String.format("Did not received notification '%s' for app '%s'", "onArtifactCreated", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });
@@ -3748,13 +3749,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
+        verify(listener, times(1)).onArtifactInitialised(eq(appName), any(Registry.class));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName)
+        return String.format("Did not received notification '%s' for app '%s'", "onArtifactInitialised", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });
@@ -3766,13 +3767,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextConfigured(eq(appName), any(MuleContext.class));
+        verify(listener, times(1)).onArtifactConfigured(eq(appName));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName)
+        return String.format("Did not received notification '%s' for app '%s'", "onArtifactConfigured", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });

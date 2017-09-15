@@ -73,7 +73,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
      * Ignored objects - -Component is ignored because the FlowConstruct will manage the components lifecycle -MessageSource
      * disposal is managed by the connector it is associated with -RouterCollection is ignored because the FlowConstruct will
      * manage the lifecycle -Router is ignored since its lifecycle is managed by the associated router collection -Transformer is
-     * ignored since the Dispose lifecycle is managed by the base {@link AbstractTransformer} by receiving a CONTEXT_DISPOSING
+     * ignored since the Dispose lifecycle is managed by the base {@link AbstractTransformer} by receiving a ARTIFACT_DISPOSING
      * event and calling dispose on the transformer. This is necessary since transformers are prototype objects and not managed by
      * DI containers such as Spring after the creation of the object
      */

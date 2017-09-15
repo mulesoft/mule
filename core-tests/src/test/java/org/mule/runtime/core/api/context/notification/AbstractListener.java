@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.runtime.api.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.NotificationListener;
+
 public abstract class AbstractListener<T extends AbstractServerNotification> implements NotificationListener<T> {
 
   private T notification = null;

@@ -36,8 +36,8 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.config.ConfigurationInstanceNotification;
-import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

@@ -11,6 +11,35 @@ import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.AsyncMessageNotification;
+import org.mule.runtime.api.notification.AsyncMessageNotificationListener;
+import org.mule.runtime.api.notification.ClusterNodeNotification;
+import org.mule.runtime.api.notification.ClusterNodeNotificationListener;
+import org.mule.runtime.api.notification.ConnectionNotification;
+import org.mule.runtime.api.notification.ConnectionNotificationListener;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.api.notification.CustomNotification;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.api.notification.ErrorHandlerNotificationListener;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.FlowConstructNotification;
+import org.mule.runtime.api.notification.FlowConstructNotificationListener;
+import org.mule.runtime.api.notification.ManagementNotification;
+import org.mule.runtime.api.notification.ManagementNotificationListener;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.api.notification.RoutingNotification;
+import org.mule.runtime.api.notification.RoutingNotificationListener;
+import org.mule.runtime.api.notification.SecurityNotification;
+import org.mule.runtime.api.notification.SecurityNotificationListener;
+import org.mule.runtime.api.notification.TransactionNotification;
+import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -254,13 +283,16 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
     manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
     manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
-    manager.addInterfaceToType(RegistryNotificationListener.class, RegistryNotification.class);
     manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
     manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
     manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
     manager.addInterfaceToType(PipelineMessageNotificationListener.class, PipelineMessageNotification.class);
     manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);
     manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
+    manager.addInterfaceToType(ConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
+    manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
+    manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
+
     return manager;
   }
 }

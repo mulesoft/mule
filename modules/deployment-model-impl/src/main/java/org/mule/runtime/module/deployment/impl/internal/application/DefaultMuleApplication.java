@@ -22,20 +22,22 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.Notification.Action;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.IntegerAction;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.context.notification.Notification.Action;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
@@ -271,6 +273,11 @@ public class DefaultMuleApplication implements Application {
   @Override
   public MuleContext getMuleContext() {
     return artifactContext != null ? artifactContext.getMuleContext() : null;
+  }
+
+  @Override
+  public Registry getRegistry() {
+    return artifactContext != null ? artifactContext.getRegistry() : null;
   }
 
   @Override

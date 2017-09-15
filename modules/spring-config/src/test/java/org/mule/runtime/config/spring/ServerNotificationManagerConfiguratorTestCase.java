@@ -20,8 +20,8 @@ import org.mule.runtime.config.spring.internal.NotificationConfig.DisabledNotifi
 import org.mule.runtime.config.spring.internal.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
-import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.api.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.api.util.Pair;

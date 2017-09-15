@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
@@ -98,7 +97,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
     ConfigurationComponentLocator configurationComponentLocator = Mockito.mock(ConfigurationComponentLocator.class);
     Mockito.when(configurationComponentLocator.find(Matchers.any(Location.class))).thenReturn(of(flow));
-    muleContext.getRegistry().registerObject(OBJECT_CONFIGURATION_COMPONENT_LOCATOR, configurationComponentLocator);
+    muleContext.getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY, configurationComponentLocator);
 
     TestEventResequencer router = new TestEventResequencer(3);
     Map<QName, Object> fakeComponentLocationAnnotations =

@@ -6,7 +6,7 @@
  */
 package org.mule.functional.listener;
 
-import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.api.notification.Notification;
 
 /**
  * Callback represents an operation to be executed upon notification receive by a test listener such as

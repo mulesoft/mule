@@ -7,10 +7,12 @@
 package org.mule.runtime.core.api.context.notification;
 
 import static com.google.common.cache.CacheBuilder.newBuilder;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;

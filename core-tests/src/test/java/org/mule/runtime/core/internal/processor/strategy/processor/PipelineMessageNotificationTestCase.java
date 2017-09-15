@@ -19,9 +19,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -31,28 +31,31 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.notification.EnrichedServerNotification;
+import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
-import org.mule.runtime.core.api.context.notification.EnrichedServerNotification;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
@@ -62,10 +65,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 
 
 @RunWith(Parameterized.class)
@@ -231,13 +230,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       if (!(argument instanceof PipelineMessageNotification || argument instanceof ErrorHandlerNotification)) {
         return false;
       }
+
       EnrichedServerNotification notification = (EnrichedServerNotification) argument;
-      MessagingException exception = null;
-      if (notification instanceof PipelineMessageNotification) {
-        exception = ((PipelineMessageNotification) notification).getException();
-      } else if (notification instanceof AsyncMessageNotification) {
-        exception = ((AsyncMessageNotification) notification).getException();
-      }
+      Exception exception = notification.getException();
 
       if (exceptionExpected) {
         return expectedAction == notification.getAction().getActionId() && exception != null && notification.getEvent() != null

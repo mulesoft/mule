@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 
 import java.util.Map;
 

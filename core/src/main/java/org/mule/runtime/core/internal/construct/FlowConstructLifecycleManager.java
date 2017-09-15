@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
-import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED;
-import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_STARTED;
-import static org.mule.runtime.core.api.context.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STARTED;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -18,8 +18,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.FlowConstructNotification;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.FlowConstructNotification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
 
@@ -89,6 +89,6 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
   }
 
   protected void fireNotification(int action) {
-    notificationFirer.dispatch(new FlowConstructNotification(getLifecycleObject(), action));
+    notificationFirer.dispatch(new FlowConstructNotification(getLifecycleObject().getName(), action));
   }
 }

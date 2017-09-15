@@ -14,7 +14,6 @@ import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
@@ -22,7 +21,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSOR_INTERCEPTOR_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -47,6 +45,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -60,6 +59,10 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.CustomNotification;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
@@ -74,11 +77,8 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
-import org.mule.runtime.core.api.context.notification.CustomNotification;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
@@ -90,7 +90,7 @@ import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
@@ -243,7 +243,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
-  private ProcessorInterceptorProvider processorInterceptorManager;
+  private ProcessorInterceptorManager processorInterceptorManager;
 
   // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
   // are run outside we need to set it up here.
@@ -517,7 +517,7 @@ public class DefaultMuleContext implements MuleContext {
 
   /**
    * Fires a server notification to all registered
-   * {@link org.mule.runtime.core.api.context.notification.CustomNotificationListener} notificationManager.
+   * {@link CustomNotificationListener} notificationManager.
    *
    * @param notification the notification to fire. This must be of type {@link CustomNotification} otherwise an exception will be
    *        thrown.
@@ -1033,7 +1033,7 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public ConfigurationComponentLocator getConfigurationComponentLocator() {
-    return getRegistry().lookupObject(OBJECT_CONFIGURATION_COMPONENT_LOCATOR);
+    return getRegistry().lookupObject(ConfigurationComponentLocator.REGISTRY_KEY);
   }
 
   @Override
@@ -1066,13 +1066,13 @@ public class DefaultMuleContext implements MuleContext {
    * {@inheritDoc}
    */
   @Override
-  public ProcessorInterceptorProvider getProcessorInterceptorManager() {
+  public ProcessorInterceptorManager getProcessorInterceptorManager() {
     return processorInterceptorManager;
   }
 
-  public void setProcessorInterceptorManager(ProcessorInterceptorProvider processorInterceptorManager) {
+  public void setProcessorInterceptorManager(ProcessorInterceptorManager processorInterceptorManager) {
     try {
-      getRegistry().registerObject(OBJECT_PROCESSOR_INTERCEPTOR_MANAGER, processorInterceptorManager);
+      getRegistry().registerObject(ProcessorInterceptorManager.REGISTRY_KEY, processorInterceptorManager);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

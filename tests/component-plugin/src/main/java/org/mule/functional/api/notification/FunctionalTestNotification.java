@@ -9,7 +9,7 @@ package org.mule.functional.api.notification;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.CustomNotification;
+import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 

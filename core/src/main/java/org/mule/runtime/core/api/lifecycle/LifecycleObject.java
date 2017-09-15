@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 public class LifecycleObject {

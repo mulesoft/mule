@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.source.scheduler;
 
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -27,7 +27,7 @@ import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;

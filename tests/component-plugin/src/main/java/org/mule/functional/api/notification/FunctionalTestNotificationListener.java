@@ -9,9 +9,9 @@ package org.mule.functional.api.notification;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.event.BaseEvent;
 
 /**

@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
@@ -349,7 +349,7 @@ public interface MuleContext extends Lifecycle {
   ErrorTypeRepository getErrorTypeRepository();
 
   // TODO MULE-11521 Define if this will remain here
-  ProcessorInterceptorProvider getProcessorInterceptorManager();
+  ProcessorInterceptorManager getProcessorInterceptorManager();
 
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}

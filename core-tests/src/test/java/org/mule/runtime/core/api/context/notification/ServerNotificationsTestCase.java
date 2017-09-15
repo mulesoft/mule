@@ -13,6 +13,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
 
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.EventObject;
@@ -112,11 +117,11 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     }
   }
 
-  public static interface DummyNotificationListener extends CustomNotificationListener {
+  public interface DummyNotificationListener extends CustomNotificationListener {
     // no methods
   }
 
-  public class DummyNotification extends CustomNotification {
+  public class DummyNotification extends org.mule.runtime.api.notification.CustomNotification {
 
     /**
      * Serial version
