@@ -8,19 +8,19 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tls:context name="serverStandardTlsContext" >
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check-standard enable="true" preferCrls="true" noFallback="true"/>
-    </tls:context>
-
-    <tls:context name="clientTlsContext" >
+    <tls:context name="serverTlsContext" >
         <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
         <tls:key-store path="tls/crl/entity-certified.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
-    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="serverStandardTlsContext" />
+    <tls:context name="clientTlsContext" >
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" noFallback="true" preferCrls="true"/>
+    </tls:context>
+
     <http:listener-config name="crlServer" protocol="HTTP" host="localhost" port="8093" />
+    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="serverTlsContext" />
     <http:request-config name="clientConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContext" />
 
     <flow name="testFlowServer">

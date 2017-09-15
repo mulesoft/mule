@@ -8,28 +8,28 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tls:context name="serverRevokedCrlFileTlsContext">
-        <tls:trust-store path="tls/test/serverTruststore.jceks" password="password" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/test/server.jceks" keyPassword="123456" password="password" type="jceks" algorithm="PKIX"/>
-        <tls:revocation-check-crl-file path="tls/test/crl"/>
+    <tls:context name="serverCrlFileTlsContext">
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-crl-file path="${crlPath}"/>
     </tls:context>
 
     <tls:context name="clientTlsContext" >
-        <tls:trust-store path="tls/test/serverTruststore.jceks" password="password" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/test/client.jceks" keyPassword="123456" password="password" type="jceks" algorithm="PKIX"/>
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/entity-certified.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
-    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${portRevoked}" tlsContext-ref="serverRevokedCrlFileTlsContext" />
+    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="serverCrlFileTlsContext" />
 
-    <http:request-config name="clientConfig" protocol="HTTPS" host="localhost" port="${portRevoked}" tlsContext-ref="clientTlsContext" />
+    <http:request-config name="clientConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContext" />
 
     <flow name="testFlowServer">
-        <http:listener config-ref="serverConfig" path="/serverRevoked" allowedMethods="GET"/>
-        <set-payload value="Ok"/>
+        <http:listener config-ref="serverConfig" path="/test" allowedMethods="GET"/>
+        <set-payload value="OK"/>
     </flow>
 
-    <flow name="testFlowClientRevoked">
-        <http:request config-ref="clientConfig"  path="/serverRevoked" method="GET" />
+    <flow name="testFlowRevoked">
+        <http:request config-ref="clientConfig"  path="/test" method="GET" />
     </flow>
 
 </mule>
