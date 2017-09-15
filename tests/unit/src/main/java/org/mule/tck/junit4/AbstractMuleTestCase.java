@@ -63,7 +63,7 @@ public abstract class AbstractMuleTestCase {
 
   public static final String TESTING_MODE_PROPERTY_NAME = "mule.testingMode";
 
-  public static final int DEFAULT_TEST_TIMEOUT_SECS = 10;
+  public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
   public static final String TEST_TIMEOUT_SYSTEM_PROPERTY = "mule.test.timeoutSecs";
 
