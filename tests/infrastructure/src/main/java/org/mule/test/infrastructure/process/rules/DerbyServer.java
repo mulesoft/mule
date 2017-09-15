@@ -11,12 +11,14 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.derby.drda.NetworkServerControl;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
@@ -109,10 +111,12 @@ public class DerbyServer extends ExternalResource implements Closeable {
   public void stop() {
     try {
       server.shutdown();
+      await().until(() -> !isRunning());
+      FileUtils.deleteQuietly(new File(DERBY_HOME));
       logger.info("Stopped Derby Database server.");
     } catch (Exception e) {
       logger.error("Failed to stop Database server.");
-      throw new RuntimeException("Failed to stop Database server.");
+      throw new RuntimeException("Failed to stop Database server: " + e.getMessage());
     }
   }
 
