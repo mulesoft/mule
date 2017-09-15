@@ -15,6 +15,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -56,9 +57,9 @@ public class PluginResourcesResolver {
 
     try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
       logger.debug("Loading plugin '{}' descriptor", pluginUrlClassification.getName());
-      URL pluginJsonUrl = classLoader.findResource(META_INF + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
+      URL pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
       if (pluginJsonUrl == null) {
-        pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
+        pluginJsonUrl = classLoader.getResource(MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR);
         if (pluginJsonUrl == null) {
           throw new IllegalStateException(MULE_ARTIFACT_JSON_DESCRIPTOR + " couldn't be found for plugin: " +
               pluginUrlClassification.getName());

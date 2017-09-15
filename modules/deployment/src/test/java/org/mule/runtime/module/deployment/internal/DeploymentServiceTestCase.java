@@ -340,17 +340,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
 
-  private final ArtifactPluginFileBuilder simpleExtensionPlugin =
-      new ArtifactPluginFileBuilder("simpleExtensionPlugin")
-          .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
-          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
-                          "/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+  private final ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
-  private final ArtifactPluginFileBuilder privilegedExtensionPlugin =
-      new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_ARTIFACT_ID)
-          .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
-          .configuredWith(EXPORTED_RESOURCE_PROPERTY,
-                          "/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+  private final ArtifactPluginFileBuilder privilegedExtensionPlugin = createPrivilegedExtensionPlugin();
+
 
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
@@ -516,7 +509,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
-    extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
+    extensionModelLoaderManager = muleArtifactResourcesRegistry.getExtensionModelLoaderManager();
     artifactClassLoaderManager = muleArtifactResourcesRegistry.getArtifactClassLoaderManager();
 
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
@@ -3315,7 +3308,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void failsToApplyBrokenApplicationPolicy() throws Exception {
     PolicyFileBuilder brokenPolicyFileBuilder =
         new PolicyFileBuilder(BAR_POLICY_NAME).describedBy(new MulePolicyModelBuilder()
-            .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME)
+            .setMinMuleVersion(MIN_MULE_VERSION).setName(BAR_POLICY_NAME).setRequiredProduct(MULE)
             .withBundleDescriptorLoader(createBundleDescriptorLoader(BAR_POLICY_NAME, MULE_POLICY_CLASSIFIER,
                                                                      PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
             .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
@@ -4266,6 +4259,41 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createSingleExtensionPlugin() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("simpleExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("simpleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES,
+                     asList("/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas"))
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.hello.SimpleExtension")
+        .addProperty("version", "1.0");
+    return new ArtifactPluginFileBuilder("simpleExtensionPlugin")
+        .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
+        .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private ArtifactPluginFileBuilder createPrivilegedExtensionPlugin() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName(PRIVILEGED_EXTENSION_ARTIFACT_ID).setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(PRIVILEGED_EXTENSION_ARTIFACT_ID, MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES,
+                     asList("/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas"))
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.hello.PrivilegedExtension")
+        .addProperty("version", "1.0");
+    return new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_ARTIFACT_ID)
+        .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
+        .describedBy(mulePluginModelBuilder.build());
   }
 
   private PolicyFileBuilder createPolicyIncludingPluginFileBuilder() {

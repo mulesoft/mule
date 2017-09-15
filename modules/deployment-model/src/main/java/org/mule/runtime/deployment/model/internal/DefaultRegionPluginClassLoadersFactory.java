@@ -177,14 +177,14 @@ public class DefaultRegionPluginClassLoadersFactory implements RegionPluginClass
     return lookupStrategy;
   }
 
-  private boolean isDependencyPlugin(Set<BundleDependency> pluginDependencies,
+  private boolean isDependencyPlugin(Set<BundleDependency> dependencies,
                                      ArtifactPluginDescriptor dependencyPluginDescriptor) {
-    for (BundleDependency pluginDependency : pluginDependencies) {
+    for (BundleDependency pluginDependency : dependencies) {
       if (pluginDependency.getDescriptor().getArtifactId()
           .equals(dependencyPluginDescriptor.getBundleDescriptor().getArtifactId())
           && pluginDependency.getDescriptor().getGroupId()
               .equals(dependencyPluginDescriptor.getBundleDescriptor().getGroupId())
-          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().get())) {
+          && MULE_PLUGIN_CLASSIFIER.equals(pluginDependency.getDescriptor().getClassifier().orElse(null))) {
         return true;
       }
     }
