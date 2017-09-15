@@ -85,7 +85,7 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
 
     schemaBuilder.registerEnums();
 
-    // Make sure the xml libs use the container classloader internally
+    // Make sure the XML libs use the container classloader internally
     return withContextClassLoader(DefaultExtensionSchemaGenerator.class.getClassLoader(),
                                   () -> renderSchema(schemaBuilder.build()));
   }
