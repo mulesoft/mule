@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
-import org.mule.runtime.core.internal.event.Acceptor;
+import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
 /**

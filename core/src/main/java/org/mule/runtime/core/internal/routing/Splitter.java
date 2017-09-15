@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.event.Acceptor;
+import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.privileged.processor.Router;
