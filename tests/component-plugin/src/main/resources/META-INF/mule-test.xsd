@@ -388,4 +388,131 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="on-error-check-log" type="onErrorCheckLogType"
+                 substitutionGroup="mule:abstract-on-error">
+        <xsd:annotation>
+            <xsd:documentation>
+                Error handler used to assert exceptions. It will check the exception and validate it and it's fields to an expected one.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="onErrorCheckLogType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractOnErrorType">
+                <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xsd:element ref="abstract-log-checker"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-log-checker" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for log checkers
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="check-equals" substitutionGroup="abstract-log-checker" type="checkEqualsType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Evaluates the expected and actual logs line by line expecting them to be equal
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="checkEqualsType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="filterLog" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Configures whether or not to filter the logs to compare before comparison, removing delimiter lines and special characters
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:element name="check-stacktrace" substitutionGroup="abstract-log-checker" type="checkStacktraceType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Evaluates the stacktrace to be logged, checking that it goes through expected method calls
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="checkStacktraceType">
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref="abstract-stacktrace-element"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-stacktrace-element" abstract="true"/>
+
+    <xsd:element name="method-call" type="methodCallType" substitutionGroup="abstract-stacktrace-element">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element with information about stacktraces method calls
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="methodCallType">
+        <xsd:attribute name="package" type="xsd:string" use="optional"/>
+        <xsd:attribute name="class" type="xsd:string" use="optional"/>
+        <xsd:attribute name="method" type="xsd:string" use="optional"/>
+        <xsd:attribute name="lineNumber" type="xsd:int" use="optional"/>
+    </xsd:complexType>
+
+    <xsd:element name="cause" type="exceptionCauseType" substitutionGroup="abstract-stacktrace-element">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element with information about stacktraces exception causes
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="exceptionCauseType">
+        <xsd:attribute name="exception" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="check-summary" substitutionGroup="abstract-log-checker" type="checkSummaryType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Evaluates the log summary to be logged, checking that it contains the information expected.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="checkSummaryType">
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element ref="summary-info"/>
+        </xsd:sequence>
+        <xsd:attribute name="exclusiveContent" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Specifies if the content to check should be the only one present(true) or it allows another information(false)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="summary-info" type="summaryInfoType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An element expected log summary information
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="summaryInfoType">
+        <xsd:attribute name="key" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+
 </xsd:schema>

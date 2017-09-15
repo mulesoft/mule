@@ -16,6 +16,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
@@ -29,6 +30,7 @@ import org.junit.Test;
 public class ExceptionTestCase extends AbstractELTestCase {
 
   private Error mockError = mock(Error.class);
+  private ErrorType mockErrorType = mock(ErrorType.class);
 
   public ExceptionTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -44,6 +46,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
     BaseEvent event = createEvent();
     RuntimeException rte = new RuntimeException();
     when(mockError.getCause()).thenReturn(rte);
+    when(mockError.getErrorType()).thenReturn(mockErrorType);
     event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     Object exception = evaluate("exception", event);
 
@@ -57,6 +60,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
     event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     RuntimeException runtimeException = new RuntimeException();
     when(mockError.getCause()).thenReturn(runtimeException);
+    when(mockError.getErrorType()).thenReturn(mockErrorType);
     assertImmutableVariable("exception='other'", event);
   }
 

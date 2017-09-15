@@ -7,6 +7,7 @@
 package org.mule.functional.config;
 
 import static org.mule.functional.config.TestXmlNamespaceInfoProvider.TEST_NAMESPACE;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
@@ -16,15 +17,20 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfiguratio
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
+import org.mule.functional.api.component.EqualsLogChecker;
 import org.mule.functional.api.component.DependencyInjectionObject;
 import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
+import org.mule.functional.api.component.LogChecker;
+import org.mule.functional.api.component.OnCheckLogHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
 import org.mule.functional.api.component.SkeletonSource;
+import org.mule.functional.api.component.StacktraceLogChecker;
+import org.mule.functional.api.component.SummaryLogChecker;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
@@ -173,6 +179,54 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("failurePhase", fromSimpleParameter("failurePhase").build())
         .build());
 
+    addOnErrorCheckLogComponentBuildingDefinitions(componentBuildingDefinitions);
+
     return componentBuildingDefinitions;
   }
+
+  private void addOnErrorCheckLogComponentBuildingDefinitions(List<ComponentBuildingDefinition> componentBuildingDefinitions) {
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-check-log")
+        .withTypeDefinition(fromType(OnCheckLogHandler.class))
+        .withSetterParameterDefinition("checkers", fromChildCollectionConfiguration(LogChecker.class).build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-equals").withTypeDefinition(fromType(EqualsLogChecker.class))
+            .withSetterParameterDefinition("expectedLogMessage", fromTextContent().build())
+            .withSetterParameterDefinition("shouldFilterLogMessage", fromSimpleParameter("filterLog").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-stacktrace").withTypeDefinition(fromType(StacktraceLogChecker.class))
+            .withSetterParameterDefinition("expectedCalls",
+                                           fromChildCollectionConfiguration(StacktraceLogChecker.MethodCall.class).build())
+            .withSetterParameterDefinition("expectedExceptionCauses",
+                                           fromChildCollectionConfiguration(StacktraceLogChecker.ExceptionCause.class).build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("method-call").withTypeDefinition(fromType(StacktraceLogChecker.MethodCall.class))
+            .withSetterParameterDefinition("packageName", fromSimpleParameter("package").build())
+            .withSetterParameterDefinition("clazz", fromSimpleParameter("class").build())
+            .withSetterParameterDefinition("method", fromSimpleParameter("method").build())
+            .withSetterParameterDefinition("lineNumber", fromSimpleParameter("lineNumber").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("cause").withTypeDefinition(fromType(StacktraceLogChecker.ExceptionCause.class))
+            .withSetterParameterDefinition("exception", fromSimpleParameter("exception").build()).build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("check-summary").withTypeDefinition(fromType(SummaryLogChecker.class))
+            .withSetterParameterDefinition("expectedInfo",
+                                           fromChildCollectionConfiguration(SummaryLogChecker.SummaryInfo.class).build())
+            .withSetterParameterDefinition("exclusiveContent", fromSimpleParameter("exclusiveContent").build())
+            .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("summary-info").withTypeDefinition(fromType(SummaryLogChecker.SummaryInfo.class))
+            .withSetterParameterDefinition("key", fromSimpleParameter("key").build())
+            .withSetterParameterDefinition("value", fromSimpleParameter("value").build()).build());
+
+
+  }
+
 }

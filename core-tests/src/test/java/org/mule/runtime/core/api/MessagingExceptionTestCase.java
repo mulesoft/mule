@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
@@ -354,6 +355,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     MuleException.verboseExceptions = true;
 
     BaseEvent testEvent = mock(BaseEvent.class);
+    when(testEvent.getError()).thenReturn(empty());
     final ByteArrayInputStream payload = new ByteArrayInputStream(new byte[] {});
     Message muleMessage = of(payload);
     when(testEvent.getMessage()).thenReturn(muleMessage);

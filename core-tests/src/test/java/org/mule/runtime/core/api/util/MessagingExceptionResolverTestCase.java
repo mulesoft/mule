@@ -111,7 +111,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(new Exception(), event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, UNKNOWN);
-    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE, null);
+    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
 
   @Test
@@ -119,7 +119,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(ERROR, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, CRITICAL);
-    assertExceptionMessage(resolved.getMessage(), ERROR.getMessage(), ERROR.getClass());
+    assertExceptionMessage(resolved.getMessage(), ERROR.getMessage());
   }
 
   @Test
@@ -128,7 +128,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(t, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, CRITICAL);
-    assertExceptionMessage(resolved.getMessage(), "expected", ERROR.getClass());
+    assertExceptionMessage(resolved.getMessage(), "expected");
   }
 
   @Test
@@ -138,7 +138,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(new Exception(), event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, TRANSFORMER);
-    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE, null);
+    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
 
   @Test
@@ -149,7 +149,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(cause, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, FATAL);
-    assertExceptionMessage(resolved.getMessage(), FATAL_EXCEPTION.getMessage(), FATAL_EXCEPTION.getClass());
+    assertExceptionMessage(resolved.getMessage(), FATAL_EXCEPTION.getMessage());
   }
 
   @Test
@@ -160,7 +160,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(cause, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, FATAL);
-    assertExceptionMessage(resolved.getMessage(), EXPECTED_MESSAGE, FATAL_EXCEPTION.getClass());
+    assertExceptionMessage(resolved.getMessage(), EXPECTED_MESSAGE);
   }
 
   @Test
@@ -172,7 +172,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException me = newMessagingException(cause, event, processor);
     MessagingException resolved = resolver.resolve(me, context);
     assertExceptionErrorType(resolved, withParent);
-    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE, null);
+    assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
 
   @Test
@@ -190,11 +190,11 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, context);
     assertExceptionErrorType(resolved, expected);
-    assertExceptionMessage(resolved.getMessage(), "CONNECTION PROBLEM", CONNECTION_EXCEPTION.getClass());
+    assertExceptionMessage(resolved.getMessage(), "CONNECTION PROBLEM");
   }
 
-  private void assertExceptionMessage(String result, String expected, Class<?> type) {
-    String expectedMessage = type != null ? String.format("%s (%s).", expected, type.getName()) : expected;
+  private void assertExceptionMessage(String result, String expected) {
+    String expectedMessage = String.format("%s.", expected);
     assertThat(result, containsString(expectedMessage));
   }
 

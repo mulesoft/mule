@@ -108,10 +108,18 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return ex.getCause() instanceof TypedException ? ex.getCause().getCause() : ex.getCause();
   }
 
-  protected void doLogException(Throwable t) {
+  protected String createMessageToLog(Throwable t) {
     MuleException muleException = ExceptionHelper.getRootMuleException(t);
     if (muleException != null) {
-      logger.error(muleException.getDetailedMessage());
+      return muleException.getDetailedMessage();
+    }
+    return null;
+  }
+
+  protected void doLogException(Throwable t) {
+    String logMessage = createMessageToLog(t);
+    if (logMessage != null) {
+      logger.error(logMessage);
     } else {
       logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
     }

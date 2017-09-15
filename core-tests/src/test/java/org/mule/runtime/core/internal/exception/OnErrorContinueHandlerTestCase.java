@@ -60,6 +60,7 @@ import io.qameta.allure.Story;
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
   protected MuleContext muleContext = mockContextWithServices();
+  private static final String DEFAULT_LOG_MESSAGE = "LOG";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -107,6 +108,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   public void testHandleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
 
     BaseEvent resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
     assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo(muleEvent.getMessage().getPayload().getValue()));
@@ -124,6 +126,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.initialise();
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     final BaseEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);
@@ -142,6 +145,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(onErrorContinueHandler, true, muleContext);
     when(mockException.handled()).thenReturn(true);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     BaseEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);
