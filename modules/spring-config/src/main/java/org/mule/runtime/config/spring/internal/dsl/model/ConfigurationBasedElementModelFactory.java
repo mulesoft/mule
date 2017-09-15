@@ -28,7 +28,6 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -268,11 +267,6 @@ class ConfigurationBasedElementModelFactory {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        if (isContent(model)) {
-          defaultVisit(arrayType);
-          return;
-        }
-
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         if (identifier.isPresent()) {
           ComponentConfiguration fieldComponent = geteNestedComponents(configuration).get(identifier.get());
@@ -310,11 +304,6 @@ class ConfigurationBasedElementModelFactory {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (isContent(model)) {
-          defaultVisit(objectType);
-          return;
-        }
-
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         if (identifier.isPresent()) {
           if (isMap(objectType)) {

@@ -27,7 +27,6 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -477,14 +476,11 @@ public abstract class ExtensionDefinitionParser {
       return;
     }
 
-    final boolean isContent = isContent(objectField);
     fieldType.accept(new MetadataTypeVisitor() {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        if (!parseAsContent(isContent, metadataType)) {
-          parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
-        }
+        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
       }
 
       @Override
@@ -507,20 +503,14 @@ public abstract class ExtensionDefinitionParser {
       @Override
       public void visitObject(ObjectType objectType) {
         if (objectType.isOpen()) {
-          if (!parseAsContent(isContent, objectType)) {
-            parseMapParameters(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                               emptySet());
-          }
+          parseMapParameters(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                             emptySet());
           return;
         }
 
         if (isFlattenedParameterGroup(objectField)) {
           dslResolver.resolve(objectType)
               .ifPresent(objectDsl -> objectType.getFields().forEach(field -> parseField(objectType, objectDsl, field)));
-          return;
-        }
-
-        if (parseAsContent(isContent, objectType)) {
           return;
         }
 
@@ -537,22 +527,8 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        if (!parseAsContent(isContent, arrayType)) {
-          parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
-                                   emptySet());
-        }
-      }
-
-      private boolean parseAsContent(boolean isContent, MetadataType type) {
-        if (isContent) {
-          parseFromTextExpression(fieldName, fieldDsl.get(), () -> value -> resolverOf(fieldName, type, value, defaultValue,
-                                                                                       expressionSupport, false, emptySet(),
-                                                                                       false));
-
-          return true;
-        }
-
-        return false;
+        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                                 emptySet());
       }
     });
   }
