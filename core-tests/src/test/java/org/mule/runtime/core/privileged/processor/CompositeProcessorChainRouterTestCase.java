@@ -38,6 +38,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+// TODO MULE-13550 Improve CompositeProcessorChainRouter unit tests to cover scenario that was previously causing deadlock with flow-ref
 public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTestCase {
 
   private CompositeProcessorChainRouter chainRouter;
