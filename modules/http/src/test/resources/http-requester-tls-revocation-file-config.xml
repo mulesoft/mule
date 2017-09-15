@@ -10,7 +10,7 @@
 
     <tls:context name="serverTlsContext" >
         <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/entity-certified.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/entity1" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
     <tls:context name="clientTlsContext" >

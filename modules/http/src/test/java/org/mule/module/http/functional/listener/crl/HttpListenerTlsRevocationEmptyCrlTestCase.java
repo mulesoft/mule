@@ -13,13 +13,12 @@ public class HttpListenerTlsRevocationEmptyCrlTestCase extends AbstractHttpListe
 
     public HttpListenerTlsRevocationEmptyCrlTestCase(String configFile)
     {
-        super(configFile, EMPTY_CRL_FILE_PATH);
+        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_1_SUB_PATH);
     }
 
     @Test
     public void testNotRevokedClient() throws Exception
     {
-        revocationException = null;
         verifyNotRevokedEntity();
     }
 

@@ -37,12 +37,11 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
 public abstract class AbstractHttpListenerTlsRevocationTestCase extends AbstractHttpTlsRevocationTestCase
 {
-
     Throwable revocationException ;
 
-    AbstractHttpListenerTlsRevocationTestCase(String configFile, String crlPath)
+    AbstractHttpListenerTlsRevocationTestCase(String configFile, String crlPath, String entityCertified)
     {
-        super(configFile, crlPath);
+        super(configFile, crlPath, entityCertified);
     }
 
     @Parameterized.Parameters

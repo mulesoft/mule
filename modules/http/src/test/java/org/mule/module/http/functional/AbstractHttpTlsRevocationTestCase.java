@@ -29,9 +29,15 @@ public abstract class AbstractHttpTlsRevocationTestCase extends FunctionalTestCa
 
     protected static final String EMPTY_CRL_FILE_PATH = "src/test/resources/tls/crl/emptyCrl";
 
-    protected static final String REVOKED_CRL_FILE_PATH = "src/test/resources/tls/crl/crl";
+    protected static final String REVOKED_CRL_FILE_PATH = "src/test/resources/tls/crl/validCrl";
 
     protected static final String OUTDATED_CRL_FILE_PATH = "src/test/resources/tls/crl/outdatedCrl";
+
+    protected static String ENTITY_CERTIFIED_1_SUB_PATH = "entity1";
+
+    protected static String ENTITY_CERTIFIED_2_SUB_PATH = "entity2";
+
+    protected static String ENTITY_CERTIFIED_3_SUB_PATH = "entity3";
 
     @Rule
     public DynamicPort portRevoked = new DynamicPort("port");
@@ -39,13 +45,17 @@ public abstract class AbstractHttpTlsRevocationTestCase extends FunctionalTestCa
     @Rule
     public SystemProperty crlSystemProperty ;
 
+    @Rule
+    public SystemProperty entityCertifiedSubPathSystemProperty ;
+
     public String configFile;
 
 
-    public AbstractHttpTlsRevocationTestCase(String configFile, String crlPath)
+    public AbstractHttpTlsRevocationTestCase(String configFile, String crlPath, String entityCertified)
     {
         this.configFile = configFile;
         crlSystemProperty = new SystemProperty("crlPath", crlPath);
+        entityCertifiedSubPathSystemProperty = new SystemProperty("entityCertifiedSubPath", entityCertified);
     }
 
 

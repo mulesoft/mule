@@ -14,7 +14,7 @@ public class HttpRequesterTlsRevocationEmptyCrlTestCase extends AbstractHttpRequ
 
     public HttpRequesterTlsRevocationEmptyCrlTestCase(String configFile)
     {
-        super(configFile, EMPTY_CRL_FILE_PATH);
+        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_1_SUB_PATH);
     }
 
     @Test

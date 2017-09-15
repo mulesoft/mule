@@ -16,7 +16,7 @@
 
     <tls:context name="clientTlsContext" >
         <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/entity-certified.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/entity1" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
     <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="serverCrlFileTlsContext" />

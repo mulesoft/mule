@@ -16,7 +16,7 @@ public class HttpRequesterTlsRevocationOutdatedCrlTestCase extends AbstractHttpR
 
     public HttpRequesterTlsRevocationOutdatedCrlTestCase(String configFile)
     {
-        super(configFile, OUTDATED_CRL_FILE_PATH);
+        super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_2_SUB_PATH);
     }
 
     @Test

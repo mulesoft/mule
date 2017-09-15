@@ -15,7 +15,7 @@ public class HttpRequesterTlsRevocationTestCase extends AbstractHttpRequesterTls
 
     public HttpRequesterTlsRevocationTestCase(String configFile)
     {
-        super(configFile, REVOKED_CRL_FILE_PATH);
+        super(configFile, REVOKED_CRL_FILE_PATH, ENTITY_CERTIFIED_3_SUB_PATH);
     }
 
     @Test

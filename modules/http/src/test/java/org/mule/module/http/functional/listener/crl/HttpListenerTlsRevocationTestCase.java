@@ -15,7 +15,7 @@ public class HttpListenerTlsRevocationTestCase extends AbstractHttpListenerTlsRe
 
     public HttpListenerTlsRevocationTestCase(String configFile)
     {
-        super(configFile, REVOKED_CRL_FILE_PATH);
+        super(configFile, REVOKED_CRL_FILE_PATH, ENTITY_CERTIFIED_3_SUB_PATH);
     }
 
     @Test

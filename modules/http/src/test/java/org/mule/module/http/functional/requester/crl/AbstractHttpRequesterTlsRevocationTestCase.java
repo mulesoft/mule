@@ -36,9 +36,9 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 public abstract class AbstractHttpRequesterTlsRevocationTestCase extends AbstractHttpTlsRevocationTestCase
 {
 
-    AbstractHttpRequesterTlsRevocationTestCase(String configFile, String crlPath)
+    AbstractHttpRequesterTlsRevocationTestCase(String configFile, String crlPath, String entityCertified)
     {
-        super(configFile, crlPath);
+        super(configFile, crlPath, entityCertified);
     }
 
     @Parameterized.Parameters
