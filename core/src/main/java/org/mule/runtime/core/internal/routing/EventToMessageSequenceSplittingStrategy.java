@@ -13,13 +13,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.routing.MessageSequence;
 import org.mule.runtime.core.api.util.Copiable;
-import org.mule.runtime.core.api.util.collection.ImmutableEntry;
-import org.mule.runtime.core.api.util.collection.SplittingStrategy;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.NodeListMessageSequence;
+import org.mule.runtime.internal.util.collection.ImmutableEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;

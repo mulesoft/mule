@@ -11,7 +11,7 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;

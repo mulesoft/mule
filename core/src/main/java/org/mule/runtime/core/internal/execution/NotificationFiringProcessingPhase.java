@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificati
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import java.util.concurrent.ConcurrentHashMap;
 

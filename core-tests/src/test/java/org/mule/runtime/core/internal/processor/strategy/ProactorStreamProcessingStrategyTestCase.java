@@ -35,7 +35,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;

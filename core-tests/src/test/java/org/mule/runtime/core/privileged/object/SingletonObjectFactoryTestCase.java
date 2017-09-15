@@ -8,6 +8,8 @@ package org.mule.runtime.core.privileged.object;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import org.mule.runtime.core.api.object.AbstractObjectFactory;
+import org.mule.runtime.core.api.object.AbstractObjectFactoryTestCase;
 
 public class SingletonObjectFactoryTestCase extends AbstractObjectFactoryTestCase {
 

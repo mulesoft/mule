@@ -11,7 +11,8 @@ import static org.apache.commons.lang3.StringUtils.indexOf;
 import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.nio.charset.Charset;
@@ -74,7 +75,7 @@ public class SystemUtils {
 
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
 
-  private static CommandLine parseCommandLine(String args[], String opts[][]) throws DefaultMuleException {
+  private static CommandLine parseCommandLine(String args[], String opts[][]) throws MuleException {
     Options options = new Options();
     for (String[] opt : opts) {
       options.addOption(opt[0], opt[1].equals("true") ? true : false, opt[2]);
@@ -99,7 +100,7 @@ public class SystemUtils {
    * on the command line. Options that don't have an argument will have the String "true".
    */
   // TODO MULE-1947 Command-line arguments should be handled exclusively by the bootloader
-  public static Map<String, Object> getCommandLineOptions(String args[], String opts[][]) throws DefaultMuleException {
+  public static Map<String, Object> getCommandLineOptions(String args[], String opts[][]) throws MuleException {
     CommandLine line = parseCommandLine(args, opts);
     Map<String, Object> ret = new HashMap<String, Object>();
     Option[] options = line.getOptions();

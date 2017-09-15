@@ -10,7 +10,7 @@ import static reactor.core.Exceptions.isBubbling;
 import static reactor.core.Exceptions.propagate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.util.func.CheckedBiConsumer;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import org.mule.runtime.core.api.time.Time;
+import org.mule.runtime.core.internal.time.Time;
 
 import java.util.Optional;
 

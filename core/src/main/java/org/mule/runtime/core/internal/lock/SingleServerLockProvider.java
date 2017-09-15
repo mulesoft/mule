@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.lock;
 
-import org.mule.runtime.core.api.lock.LockProvider;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

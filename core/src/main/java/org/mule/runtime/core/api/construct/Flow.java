@@ -93,6 +93,15 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
     Builder processingStrategyFactory(ProcessingStrategyFactory processingStrategyFactory);
 
     /**
+     * Configures a {@link org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory} as the processing
+     * strategy on the flow.
+     *
+     * @return same builder instance.
+     */
+    // TODO(pablo.kraan): MULE-13545 - added as a workaround to avoid exposing DirectProcessingStrategyFactory on the API
+    Builder withDirectProcessingStrategyFactory();
+
+    /**
      * Usually a flow is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped").
      * 
      * @param initialState The initial state of the flow. Non null.

@@ -12,7 +12,6 @@ import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentE
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 

@@ -10,7 +10,7 @@ package org.mule.runtime.core.api.processor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
+import static org.mule.runtime.core.internal.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 
 import java.util.List;
 

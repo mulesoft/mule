@@ -11,7 +11,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.client.AbstractPriorizableConnectorMessageProcessorProvider;
+import org.mule.runtime.core.privileged.client.AbstractPriorizableConnectorMessageProcessorProvider;
 
 /**
  * Provider for operations of the Test Connector.

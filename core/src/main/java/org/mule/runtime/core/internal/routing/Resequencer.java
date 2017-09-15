@@ -11,7 +11,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.processor.Router;
+import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.ResequenceMessagesCorrelatorCallback;

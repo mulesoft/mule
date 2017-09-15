@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
 import org.mule.runtime.core.internal.execution.ValidationPhase;
+import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

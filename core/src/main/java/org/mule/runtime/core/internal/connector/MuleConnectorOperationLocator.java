@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.client.AbstractPriorizableConnectorMessageProcessorProvider;
+import org.mule.runtime.core.privileged.client.AbstractPriorizableConnectorMessageProcessorProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;

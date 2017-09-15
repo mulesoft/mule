@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.connector;
 
-import org.mule.runtime.core.api.connector.SchedulerController;
-
 /**
  * By default, scheduler is always enabled.
  */

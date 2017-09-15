@@ -11,15 +11,14 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
-import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -210,7 +209,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
                                                                                                Class<CoreExtensionType> coreExtensionType,
                                                                                                Consumer<ServiceType> setServiceFunction,
                                                                                                BiConsumer<List<CoreExtensionType>, ServiceType> verificationFunction)
-      throws DefaultMuleException, InitialisationException {
+      throws MuleException {
     List<MuleCoreExtension> extensions = new LinkedList<>();
     CoreExtensionType extension = mock(coreExtensionType);
     extensions.add(extension);

@@ -15,6 +15,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.core.internal.processor.AbstractProcessor;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 
@@ -72,9 +73,9 @@ public class ObjectTypeVisitorTestCase {
     ObjectTypeVisitor visitor = new ObjectTypeVisitor(componentModel);
     // Check that ReferenceProcessor inherits from AbstractProcessor
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
-        .checkingThatIsClassOrInheritsFrom(org.mule.runtime.core.api.processor.AbstractProcessor.class);
+        .checkingThatIsClassOrInheritsFrom(AbstractProcessor.class);
     typeDefinition.visit(visitor);
-    assertTrue(org.mule.runtime.core.api.processor.AbstractProcessor.class.isAssignableFrom(visitor.getType()));
+    assertTrue(AbstractProcessor.class.isAssignableFrom(visitor.getType()));
   }
 
   @Test

@@ -13,16 +13,13 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -58,7 +55,7 @@ public final class MuleTestUtils {
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
-    final Flow flow = builder(APPLE_FLOW, context).processingStrategyFactory(new DirectProcessingStrategyFactory()).build();
+    final Flow flow = builder(APPLE_FLOW, context).withDirectProcessingStrategyFactory().build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(APPLE_FLOW)));
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);
@@ -159,11 +156,11 @@ public final class MuleTestUtils {
    * @return the list of configured exception listeners
    * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
    */
-  public static List<MessagingExceptionHandlerAcceptor> getExceptionListeners(MessagingExceptionHandler exceptionHandler) {
+  public static List<MessagingExceptionHandler> getExceptionListeners(MessagingExceptionHandler exceptionHandler) {
     try {
       Method getExceptionListenersMethod = exceptionHandler.getClass().getMethod("getExceptionListeners");
       Object exceptionListeners = getExceptionListenersMethod.invoke(exceptionHandler);
-      return (List<MessagingExceptionHandlerAcceptor>) exceptionListeners;
+      return (List<MessagingExceptionHandler>) exceptionListeners;
     } catch (Exception e) {
       throw new IllegalStateException("Cannot obtain exception listener for flow");
     }

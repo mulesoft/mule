@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util.queue;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.queue.Queue;
 
 import java.io.Serializable;

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.lock;
 
-import org.mule.runtime.core.api.lock.LockProvider;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

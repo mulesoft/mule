@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import org.mule.runtime.core.api.execution.FlowProcessingPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.api.execution.MessageProcessContext;
-import org.mule.runtime.core.api.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.execution.ValidationPhaseTemplate;
+import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
+import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
 
 /**
  * This phase validates the incoming message.

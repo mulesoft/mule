@@ -17,9 +17,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerView;
-import org.mule.runtime.core.api.scheduler.SchedulerConfig;
-import org.mule.runtime.core.api.scheduler.SchedulerPoolsConfigFactory;
-import org.mule.runtime.core.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerPoolsConfigFactory;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 
 import java.util.ArrayList;

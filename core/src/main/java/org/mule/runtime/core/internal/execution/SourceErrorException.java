@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.message.ErrorBuilder;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 
 import java.util.Optional;
 

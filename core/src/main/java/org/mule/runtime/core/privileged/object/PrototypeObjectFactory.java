@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.object;
 
+import org.mule.runtime.core.api.object.AbstractObjectFactory;
+
 import java.util.Map;
 
 /**

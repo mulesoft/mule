@@ -151,8 +151,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
     return soapAttachmentMap;
   }
 
-  private InputStream toInputStream(TypedValue typedValue)
-      throws MessageTransformerException, MessagingException, TransformerException {
+  private InputStream toInputStream(TypedValue typedValue) throws MessageTransformerException, TransformerException {
 
     Object value = typedValue.getValue();
     if (value instanceof InputStream) {

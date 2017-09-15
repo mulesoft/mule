@@ -19,7 +19,6 @@ import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.cre
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -32,23 +31,23 @@ import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.reactivestreams.Publisher;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -157,6 +156,10 @@ public class DefaultFlowBuilder implements Builder {
     return this;
   }
 
+  @Override
+  public Builder withDirectProcessingStrategyFactory() {
+    return processingStrategyFactory(new DirectProcessingStrategyFactory());
+  }
 
   @Override
   public Builder initialState(String initialState) {

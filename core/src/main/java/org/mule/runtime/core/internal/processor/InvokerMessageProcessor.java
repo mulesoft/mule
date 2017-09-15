@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
-import static org.mule.runtime.core.api.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
+import static org.mule.runtime.core.internal.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.slf4j.LoggerFactory.getLogger;
 

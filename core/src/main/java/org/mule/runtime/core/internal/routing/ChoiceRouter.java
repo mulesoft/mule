@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
+import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 
 import java.util.Optional;
 

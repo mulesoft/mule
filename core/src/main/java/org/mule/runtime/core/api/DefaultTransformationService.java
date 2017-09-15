@@ -21,7 +21,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
@@ -68,13 +67,12 @@ public class DefaultTransformationService implements TransformationService {
    * @param expectedDataType the expected type's {@link DataType}
    * @param event the event to perform the transformation
    * @return the transformed value
-   * @throws MessagingException If could not be able to find a proper transformer do obtain the desired type
    * @throws MessageTransformerException If a problem occurs transforming the value
    * @throws TransformerException If a problem occurs transforming the value
    */
   @Deprecated
   public Object internalTransform(Object value, DataType valueDataType, DataType expectedDataType)
-      throws MessagingException, MessageTransformerException, TransformerException {
+      throws MessageTransformerException, TransformerException {
     Transformer transformer;
     if (value != null) {
       try {

@@ -9,7 +9,7 @@ package org.mule;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.versionNotSet;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Threads;

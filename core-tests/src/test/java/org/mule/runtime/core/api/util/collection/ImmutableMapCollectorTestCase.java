@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.util.collection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.util.collection.ImmutableMapCollector;
+import org.mule.runtime.internal.util.collection.ImmutableMapCollector;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;

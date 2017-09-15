@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.parseRepeatableAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import org.mule.metadata.api.ClassTypeLoader;

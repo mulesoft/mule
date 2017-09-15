@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type;
 
-import static org.mule.runtime.core.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
