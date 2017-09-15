@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;

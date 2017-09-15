@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.ArrayList;
 import java.util.List;

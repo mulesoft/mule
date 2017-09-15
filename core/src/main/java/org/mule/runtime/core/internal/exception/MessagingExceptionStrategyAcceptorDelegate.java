@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import org.reactivestreams.Publisher;
 
