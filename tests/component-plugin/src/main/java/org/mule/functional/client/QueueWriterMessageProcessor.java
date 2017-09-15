@@ -7,9 +7,9 @@
 
 package org.mule.functional.client;
 
-import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -21,16 +21,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Writes {@link CoreEvent} to a test connector's queue.
  */
 public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, Initialisable {
-
-  @Inject
-  @Named(DEFAULT_CONFIG_ID)
-  private TestConnectorConfig connectorConfig;
 
   @Inject
   private ExtendedExpressionManager expressionManager;
@@ -39,6 +34,7 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
   private AttributeEvaluator attributeEvaluator;
   private String content;
   private Class contentJavaType;
+  private TestConnectorQueueHandler queueHandler;
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -58,7 +54,7 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
           .build();
     }
 
-    connectorConfig.write(name, copy);
+    queueHandler.write(name, copy);
 
     return event;
   }
@@ -90,5 +86,6 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
       }
     }
     attributeEvaluator.initialize(expressionManager);
+    queueHandler = new TestConnectorQueueHandler(registry);
   }
 }

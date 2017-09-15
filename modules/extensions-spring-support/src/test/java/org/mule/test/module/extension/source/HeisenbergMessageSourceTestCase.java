@@ -32,6 +32,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
@@ -59,7 +60,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public static final int TIMEOUT_MILLIS = 50000;
   public static final int POLL_DELAY_MILLIS = 100;
 
-  private static final String OUT = "test://out";
+  private static final String OUT = "out";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -141,7 +142,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
+    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(muleContext);
+    assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
   @Test
@@ -154,7 +156,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_BODY));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    assertThat(muleContext.getClient().request(OUT, RECEIVE_TIMEOUT).getRight().get(), hasPayload(equalTo("Expected.")));
+    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(muleContext);
+    assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
   @Test

@@ -7,10 +7,10 @@
 
 package org.mule.functional.client;
 
-import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -24,6 +24,7 @@ public class QueueReaderMessageProcessor implements Processor {
   private final Registry registry;
   private final String queueName;
   private final Long timeout;
+  private final TestConnectorQueueHandler queueHandler;
 
   /**
    * Creates a queue reader
@@ -40,18 +41,17 @@ public class QueueReaderMessageProcessor implements Processor {
     }
 
     this.registry = registry;
+    this.queueHandler = new TestConnectorQueueHandler(registry);
     this.queueName = queueName;
     this.timeout = timeout;
   }
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    TestConnectorConfig connectorConfig = registry.<TestConnectorConfig>lookupByName(DEFAULT_CONFIG_ID).get();
-
     if (timeout == null) {
-      return connectorConfig.take(queueName);
+      return queueHandler.read(queueName);
     } else {
-      return connectorConfig.poll(queueName, timeout);
+      return queueHandler.read(queueName, timeout);
     }
   }
 }
