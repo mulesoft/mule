@@ -7,7 +7,6 @@
 package org.mule.module.http.functional.requester.crl;
 
 import static org.junit.Assert.fail;
-import org.mule.module.http.functional.listener.crl.AbstractHttpListenerTlsRevocationTestCase;
 
 import org.junit.Test;
 

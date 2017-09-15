@@ -8,29 +8,12 @@
 package org.mule.module.http.functional.requester.crl;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 import org.mule.module.http.functional.AbstractHttpTlsRevocationTestCase;
-import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
-import org.mule.module.http.internal.listener.grizzly.MuleSslFilter;
 
-import java.io.IOException;
 import java.util.Collection;
 
-import javax.net.ssl.SSLHandshakeException;
-
-import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractHttpRequesterTlsRevocationTestCase extends AbstractHttpTlsRevocationTestCase
