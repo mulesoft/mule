@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
 import static org.springframework.util.ReflectionUtils.setField;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -90,11 +92,7 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
   }
 
   protected Object resolve(ValueResolver resolver, ValueResolvingContext context) throws MuleException {
-    Object value = resolver.resolve(context);
-
-    if (value instanceof ValueResolver) {
-      value = resolve((ValueResolver) value, context);
-    }
+    Object value = resolveRecursively(resolver, context);
 
     if (value instanceof CursorStreamProvider) {
       value = ((CursorStreamProvider) value).openCursor();

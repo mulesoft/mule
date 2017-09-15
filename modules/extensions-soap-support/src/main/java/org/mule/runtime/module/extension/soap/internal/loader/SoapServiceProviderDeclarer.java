@@ -10,31 +10,23 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_GROUP;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.ParameterModelsLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureFieldContributor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
-import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterTypeUnwrapperContributor;
+import org.mule.runtime.module.extension.internal.loader.java.contributor.StackableTypesParameterContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ParameterResolverTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.TypedValueTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.soap.internal.loader.type.runtime.SoapServiceProviderWrapper;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
-
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
@@ -52,7 +44,7 @@ public class SoapServiceProviderDeclarer {
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   SoapServiceProviderDeclarer(ClassTypeLoader loader) {
-    parametersLoader = new ParameterModelsLoaderDelegate(getContributors(loader), loader);
+    parametersLoader = new ParameterModelsLoaderDelegate(getContributors(), loader);
   }
 
   /**
@@ -84,11 +76,8 @@ public class SoapServiceProviderDeclarer {
     }
   }
 
-  private List<ParameterDeclarerContributor> getContributors(ClassTypeLoader loader) {
+  private List<ParameterDeclarerContributor> getContributors() {
     return ImmutableList
-        .of(new InfrastructureFieldContributor(),
-            new ParameterTypeUnwrapperContributor(loader, TypedValue.class, new TypedValueTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(loader, ParameterResolver.class, new ParameterResolverTypeModelProperty()),
-            new ParameterTypeUnwrapperContributor(loader, Literal.class, new LiteralModelProperty()));
+        .of(new InfrastructureFieldContributor(), StackableTypesParameterContributor.defaultContributor(typeLoader));
   }
 }

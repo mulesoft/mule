@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:parameter-resolver="http://www.mulesoft.org/schema/mule/parameter-resolver"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/parameter-resolver http://www.mulesoft.org/schema/mule/parameter-resolver/current/mule-parameter-resolver.xsd">
+
+
+    <parameter-resolver:door name="dynamicDoor" address="Address" victim="#[payload]" />
+
+    <parameter-resolver:nested-types-config name="config-with-dynamic-parameter-resolvers" lazyParameter="#[output application/json --- {key : 'a nice looking json'}]"
+    nestedParameter="#[output application/json --- {key : 'pretty nested'}]" resolverOfLiteral="#['this doesn't make sense']" doorResolver="dynamicDoor"/>
+
+    <parameter-resolver:nested-types-config name="config-with-static-parameter-resolvers" lazyString="a nice looking string" resolverOfLiteral="this doesn't make sense">
+        <parameter-resolver:door-resolver victim="Victim's Name" address="Address"/>
+    </parameter-resolver:nested-types-config>
+
+    <flow name="configurationWithDynamicParameterResolvers">
+        <set-payload value="Victim's Name"/>
+        <parameter-resolver:config-operation config-ref="config-with-dynamic-parameter-resolvers"/>
+    </flow>
+
+    <flow name="configurationWithStaticParameterResolvers">
+        <parameter-resolver:config-operation config-ref="config-with-static-parameter-resolvers"/>
+    </flow>
+
+    <flow name="parameterResolverOfTypedValueOnOperation">
+        <parameter-resolver:lazy-value-operation lazyValue="#[output application/json --- {key : 'a nice looking json'}]"/>
+    </flow>
+
+</mule>

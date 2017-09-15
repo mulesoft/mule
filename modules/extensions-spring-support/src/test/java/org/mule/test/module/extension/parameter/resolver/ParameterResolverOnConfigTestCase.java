@@ -14,9 +14,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
-import org.mule.test.parameter.resolver.extension.extension.ParameterResolverExtension;
+import org.mule.test.parameter.resolver.extension.extension.ParameterResolverConfig;
 import org.mule.test.parameter.resolver.extension.extension.SomeSource;
-
 import org.junit.Test;
 
 public class ParameterResolverOnConfigTestCase extends AbstractParameterResolverTestCase {
@@ -33,7 +32,7 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
 
   @Test
   public void configurationWithDynamicParameterResolvers() throws Exception {
-    ParameterResolverExtension config = getPayload("configurationWithDynamicParameterResolvers");
+    ParameterResolverConfig config = getPayload("configurationWithDynamicParameterResolvers");
 
     ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
     ParameterResolver<String> stringResolver = config.getStringResolver();
@@ -45,7 +44,7 @@ public class ParameterResolverOnConfigTestCase extends AbstractParameterResolver
 
   @Test
   public void configurationWithStaticParameterResolvers() throws Exception {
-    ParameterResolverExtension config = getPayload("configurationWithStaticParameterResolvers");
+    ParameterResolverConfig config = getPayload("configurationWithStaticParameterResolvers");
 
     ParameterResolver<KnockeableDoor> doorResolver = config.getDoorResolver();
     ParameterResolver<String> stringResolver = config.getStringResolver();

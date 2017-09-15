@@ -7,53 +7,12 @@
 
 package org.mule.test.parameter.resolver.extension.extension;
 
+import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
-@Operations(ParameterResolverParameterOperations.class)
+@Configurations({ParameterResolverConfig.class, NestedWrapperTypesConfig.class})
 @Extension(name = "ParameterResolver")
-@Sources(SomeSource.class)
 public class ParameterResolverExtension {
 
-  @Parameter
-  @Optional
-  private ParameterResolver<String> stringResolver;
 
-  @Parameter
-  @Optional
-  private ParameterResolver<KnockeableDoor> doorResolver;
-
-  @Parameter
-  @Optional
-  private Literal<KnockeableDoor> literalDoor;
-
-  public ParameterResolver<String> getStringResolver() {
-    return stringResolver;
-  }
-
-  public void setStringResolver(ParameterResolver<String> stringResolver) {
-    this.stringResolver = stringResolver;
-  }
-
-  public ParameterResolver<KnockeableDoor> getDoorResolver() {
-    return doorResolver;
-  }
-
-  public void setDoorResolver(ParameterResolver<KnockeableDoor> doorResolver) {
-    this.doorResolver = doorResolver;
-  }
-
-  public Literal<KnockeableDoor> getLiteralDoor() {
-    return literalDoor;
-  }
-
-  public void setLiteralDoor(Literal<KnockeableDoor> literalDoor) {
-    this.literalDoor = literalDoor;
-  }
 }

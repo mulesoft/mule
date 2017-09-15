@@ -33,9 +33,15 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -73,6 +79,7 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.RouteComponentParser;
@@ -92,6 +99,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionTypedValueValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
@@ -104,9 +112,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpre
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
-import com.google.common.collect.ImmutableList;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -128,6 +133,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
@@ -700,11 +706,15 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getExpressionBasedValueResolver(MetadataType expectedType, String value,
                                                         Set<ModelProperty> modelProperties, Class<Object> expectedClass) {
     ValueResolver resolver;
-    if (isParameterResolver(modelProperties, expectedType)) {
+    Optional<StackedTypesModelProperty> stackedTypesModelProperty = getStackedTypesModelProperty(modelProperties);
+    if (stackedTypesModelProperty.isPresent()) {
+      resolver = stackedTypesModelProperty.get().getValueResolverFactory().getExpressionBasedValueResolver(value, expectedClass);
+      //TODO MULE-13518: Add support for stacked value resolvers for @Parameter inside pojos // The following "IFs" should be removed once implemented
+    } else if (isParameterResolver(expectedType)) {
       resolver = new ExpressionBasedParameterResolverValueResolver<>(value, expectedType);
-    } else if (isTypedValue(modelProperties, expectedType)) {
+    } else if (isTypedValue(expectedType)) {
       resolver = new ExpressionTypedValueValueResolver<>(value, expectedClass);
-    } else if (isLiteral(modelProperties, expectedType)) {
+    } else if (isLiteral(expectedType) || isTargetParameter(modelProperties)) {
       resolver = new StaticLiteralValueResolver<>(value, expectedClass);
     } else {
       resolver = new TypeSafeExpressionValueResolver(value, expectedType);
@@ -718,8 +728,15 @@ public abstract class ExtensionDefinitionParser {
   private ValueResolver getStaticValueResolver(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
                                                Set<ModelProperty> modelProperties, boolean acceptsReferences,
                                                Class<Object> expectedClass) {
-    if (isLiteral(modelProperties, expectedType)) {
-      return new StaticLiteralValueResolver<>(value != null ? value.toString() : null, expectedClass);
+
+    Optional<StackedTypesModelProperty> optionalStackedTypeModelProperty = getStackedTypesModelProperty(modelProperties);
+
+    if (optionalStackedTypeModelProperty.isPresent()) {
+      StackedTypesModelProperty property = optionalStackedTypeModelProperty.get();
+      Optional<ValueResolver> optionalResolver = property.getValueResolverFactory().getStaticValueResolver(value, Literal.class);
+      if (optionalResolver.isPresent()) {
+        return optionalResolver.get();
+      }
     }
 
     ValueResolver resolver;
@@ -727,9 +744,11 @@ public abstract class ExtensionDefinitionParser {
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
         : new StaticValueResolver<>(defaultValue);
 
-    if (isParameterResolver(modelProperties, expectedType)) {
+    if (optionalStackedTypeModelProperty.isPresent()) {
+      resolver = optionalStackedTypeModelProperty.get().getValueResolverFactory().getWrapperValueResolver(resolver);
+    } else if (isParameterResolver(expectedType)) {
       resolver = new ParameterResolverValueResolverWrapper(resolver);
-    } else if (isTypedValue(modelProperties, expectedType)) {
+    } else if (isTypedValue(expectedType)) {
       resolver = new TypedValueValueResolverWrapper(resolver);
     }
 
@@ -995,18 +1014,6 @@ public abstract class ExtensionDefinitionParser {
     } catch (Exception e) {
       throw new MuleRuntimeException(new ConfigurationException(e));
     }
-  }
-
-  private boolean isParameterResolver(Set<ModelProperty> modelProperties, MetadataType expectedType) {
-    return IntrospectionUtils.isParameterResolver(modelProperties) || IntrospectionUtils.isParameterResolver(expectedType);
-  }
-
-  private boolean isTypedValue(Set<ModelProperty> modelProperties, MetadataType expectedType) {
-    return IntrospectionUtils.isTypedValue(modelProperties) || IntrospectionUtils.isTypedValue(expectedType);
-  }
-
-  private boolean isLiteral(Set<ModelProperty> modelProperties, MetadataType expectedType) {
-    return IntrospectionUtils.isLiteral(modelProperties) || IntrospectionUtils.isLiteral(expectedType);
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

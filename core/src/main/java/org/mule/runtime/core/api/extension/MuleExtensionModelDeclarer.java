@@ -75,7 +75,7 @@ import org.mule.runtime.core.api.source.polling.CronScheduler;
 import org.mule.runtime.core.api.source.polling.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.runtime.extension.internal.property.LiteralModelProperty;
+import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -378,7 +378,7 @@ class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-        .withModelProperty(new LiteralModelProperty());
+        .withModelProperty(new TargetModelProperty());
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
