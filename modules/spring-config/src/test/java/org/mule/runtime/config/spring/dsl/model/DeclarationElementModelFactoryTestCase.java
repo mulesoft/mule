@@ -24,7 +24,6 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
@@ -328,10 +327,7 @@ public class DeclarationElementModelFactoryTestCase {
     assertThat(element.getModel(), is(complexType));
     assertThat(element.getContainedElements().size(), is(2));
     assertThat(element.findElement(BEHAVIOUR_NAME).isPresent(), is(true));
-    assertThat(element.findElement(builder()
-        .name("my-camel-case-name")
-        .namespace("mockns")
-        .build()).get().getConfiguration().get()
+    assertThat(element.findElement("myCamelCaseName").get()
         .getValue().get(), is("#[{field: value}]"));
     assertThat(element.getConfiguration().get().getParameters().get(BEHAVIOUR_NAME), is("additional"));
   }

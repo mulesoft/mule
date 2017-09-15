@@ -311,9 +311,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -366,9 +363,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -421,9 +415,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "false",
             "expressionSupport": {
               "value": "SUPPORTED"

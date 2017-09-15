@@ -16,7 +16,10 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -25,6 +28,9 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A {@link ParameterGroupParser} which returns the values of the parameters in the group
@@ -35,6 +41,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 public class TypedInlineParameterGroupParser extends ParameterGroupParser {
 
   private final ObjectType metadataType;
+  private final Map<String, ParameterRole> parametersRole;
 
   public TypedInlineParameterGroupParser(Builder definition,
                                          ParameterGroupModel group,
@@ -48,6 +55,7 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
     checkArgument(isObjectType(type), format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",
                                              type.getClass().getName()));
     metadataType = (ObjectType) type;
+    parametersRole = group.getParameterModels().stream().collect(Collectors.toMap(NamedObject::getName, ParameterModel::getRole));
   }
 
 
@@ -60,7 +68,7 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build());
 
-    parseFields(metadataType, groupDsl);
+    parseFields(metadataType, groupDsl, parametersRole);
 
     return finalBuilder;
   }
