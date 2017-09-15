@@ -12,13 +12,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;
 
-public class OnCheckLogHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor, FlowAssertion {
+public class OnCheckLogHandler extends AbstractExceptionListener implements MessagingExceptionHandler, FlowAssertion {
 
 
   private List<LogChecker> checkers;
