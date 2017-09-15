@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -25,15 +27,15 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 
 /**
  * Default {@link ExtensionSchemaGenerator} implementation.
@@ -47,6 +49,7 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
   /**
    * {@inheritDoc}
    */
+  @Override
   public String generate(ExtensionModel extensionModel, DslResolvingContext dslContext) {
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
     validate(extensionModel, xmlDslModel);
@@ -82,7 +85,9 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
 
     schemaBuilder.registerEnums();
 
-    return renderSchema(schemaBuilder.build());
+    // Make sure the xml libs use the container classloader internally
+    return withContextClassLoader(DefaultExtensionSchemaGenerator.class.getClassLoader(),
+                                  () -> renderSchema(schemaBuilder.build()));
   }
 
   private void validate(ExtensionModel extensionModel, XmlDslModel xmlDslModel) {
