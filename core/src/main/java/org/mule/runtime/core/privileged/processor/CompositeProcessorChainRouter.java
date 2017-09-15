@@ -41,7 +41,7 @@ import org.slf4j.Logger;
  * each chain and all child context executions (such as async blocks) to complete.
  * <p/>
  * Meant to be used by runtime privileged extensions that need to construct top level chains of execution.
- * 
+ *
  * @since 4.0
  */
 public class CompositeProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
@@ -65,10 +65,10 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
   private BiFunction<BaseEvent, MessageProcessorChain, BaseEvent> processChain() {
     return (event, processorChain) -> {
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
-      return from(processWithChildContext(event, processorChain, childContext))
-          // Block until all child contexts are complete
-          .doOnNext(result -> from(childContext.getCompletionPublisher()).block())
-          .block();
+      BaseEvent result = from(processWithChildContext(event, processorChain, childContext)).block();
+      // Block until all child contexts are complete
+      from(childContext.getCompletionPublisher()).block();
+      return result;
     };
   }
 
