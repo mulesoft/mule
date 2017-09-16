@@ -19,6 +19,7 @@ import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
 
+import org.hamcrest.Matchers;
 import org.mule.api.MuleContext;
 import org.mule.api.client.SimpleOptionsBuilder;
 import org.mule.api.processor.MessageProcessor;
@@ -31,6 +32,7 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
+import org.mockito.Mockito;
 
 @SmallTest
 public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase
@@ -86,10 +88,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
     @Test
     public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithTlsContext() throws Exception
     {
-        // When specifying a tlsContextFactory instead of a requestConfig, the requester builder creates a new config with an
-        // auto generated unique name. Before doing this, it looks for the generated name in the registry to check that is hasn't
-        // been used yet. We need the following line so that the auto generated name is used.
-        when(mockMuleContext.getRegistry().get(anyString())).thenReturn(null);
+        when(mockMuleContext.getRegistry().get(Mockito.argThat(Matchers.startsWith("auto-generated-request-config_" + mockTlsContextFactory.toString())))).thenReturn(mockRequestConfig);
 
         HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
                 .disableStatusCodeValidation().method(POST.name()).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
