@@ -18,6 +18,7 @@ import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
+import org.mule.transport.ssl.DefaultTlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.util.ObjectNameHelper;
 
@@ -126,12 +127,24 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         }
         if (tlsContextFactory != null)
         {
-            DefaultHttpRequesterConfig requesterConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext)
-                    .setProtocol(HTTPS)
-                    .setTlsContext(tlsContextFactory)
-                    .build();
-            muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
-            httpRequester.setConfig(requesterConfig);
+            String httpRequesterWithTlsContextKey = "auto-generated-request-config_" + (tlsContextFactory instanceof DefaultTlsContextFactory ? ((DefaultTlsContextFactory)tlsContextFactory).getName() : tlsContextFactory.toString());
+			DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(httpRequesterWithTlsContextKey);
+            if (requestConfig == null)
+            {
+                synchronized (REGISTRY_LOCK)
+                {
+                    requestConfig = muleContext.getRegistry().get(httpRequesterWithTlsContextKey);
+                    if (requestConfig == null)
+                    {
+                        requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext)
+                                .setProtocol(HTTPS)
+                                .setTlsContext(tlsContextFactory)
+                                .build();
+                        muleContext.getRegistry().registerObject(httpRequesterWithTlsContextKey, requestConfig);
+                    }
+                }
+            }
+            httpRequester.setConfig(requestConfig);
         }
         else if (httpRequester.getConfig() == null)
         {
