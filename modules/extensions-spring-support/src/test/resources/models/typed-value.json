@@ -3591,8 +3591,7 @@
             "name": "victim"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3608,8 +3607,7 @@
             "name": "address"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3625,8 +3623,7 @@
             "name": "encodedPasssword"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3740,8 +3737,7 @@
             "name": "user"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3796,8 +3792,7 @@
             "name": "stringTypedValue"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3841,8 +3836,7 @@
                   "name": "victim"
                 },
                 "model": {
-                  "type": "String",
-                  "annotations": {}
+                  "type": "String"
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -3858,8 +3852,7 @@
                   "name": "address"
                 },
                 "model": {
-                  "type": "String",
-                  "annotations": {}
+                  "type": "String"
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -3875,8 +3868,7 @@
                   "name": "encodedPasssword"
                 },
                 "model": {
-                  "type": "String",
-                  "annotations": {}
+                  "type": "String"
                 },
                 "annotations": {
                   "parameterPurpose": {
@@ -3926,8 +3918,7 @@
             "name": "description"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {
@@ -3944,8 +3935,7 @@
             "name": "brandName"
           },
           "model": {
-            "type": "String",
-            "annotations": {}
+            "type": "String"
           },
           "annotations": {
             "parameterPurpose": {

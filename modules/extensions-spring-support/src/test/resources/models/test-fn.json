@@ -695,8 +695,7 @@
                       "name": "user"
                     },
                     "model": {
-                      "type": "String",
-                      "annotations": {}
+                      "type": "String"
                     },
                     "annotations": {
                       "parameterPurpose": {
