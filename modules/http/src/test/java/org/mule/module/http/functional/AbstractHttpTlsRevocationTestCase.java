@@ -27,17 +27,29 @@ public abstract class AbstractHttpTlsRevocationTestCase extends FunctionalTestCa
 
     private static final String UNDETERMINED_REVOCATION_ERROR_MESSAGE = "Could not determine revocation status";
 
+    /**
+     * Each CRL has a distant nextUpdate date for avoiding their expiration, except the outdatedCrl that was created for testing undetermined revocation scenarios.
+     */
     protected static final String EMPTY_CRL_FILE_PATH = "src/test/resources/tls/crl/emptyCrl";
 
     protected static final String REVOKED_CRL_FILE_PATH = "src/test/resources/tls/crl/validCrl";
 
     protected static final String OUTDATED_CRL_FILE_PATH = "src/test/resources/tls/crl/outdatedCrl";
 
-    protected static String ENTITY_CERTIFIED_1_SUB_PATH = "entity1";
+    /**
+     * For avoiding flaky tests, it is necessary to use consistently the certified entities.
+     * Each certified entity (i.e. each certificate ) has a hardcoded crl distribution with the format: http://localhost:8093/crl/{numberOfTheEntity}.
+     * Java SSL Support caches the CRLs, so it only hits the crl server once per URI.
+     * Therefore, in test cases, we should always use:
+     *      {@value ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH } for no revocation scenarios where tls/crl/emptyCrl list should be returned,
+     *      {@value ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH } for undetermined revocation scenarios where tls/crl/outdatedCrl list should be returned and
+     *      {@value ENTITY_CERTIFIED_REVOCATION_SUB_PATH } for revocation scenarios where tls/crl/validCrl list should be returned.
+     */
+    protected static String ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH = "entity1";
 
-    protected static String ENTITY_CERTIFIED_2_SUB_PATH = "entity2";
+    protected static String ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH = "entity2";
 
-    protected static String ENTITY_CERTIFIED_3_SUB_PATH = "entity3";
+    protected static String ENTITY_CERTIFIED_REVOCATION_SUB_PATH = "entity3";
 
     @Rule
     public DynamicPort portRevoked = new DynamicPort("port");

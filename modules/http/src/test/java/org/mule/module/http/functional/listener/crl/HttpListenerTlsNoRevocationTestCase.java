@@ -8,12 +8,12 @@ package org.mule.module.http.functional.listener.crl;
 
 import org.junit.Test;
 
-public class HttpListenerTlsRevocationEmptyCrlTestCase extends AbstractHttpListenerTlsRevocationTestCase
+public class HttpListenerTlsNoRevocationTestCase extends AbstractHttpListenerTlsRevocationTestCase
 {
 
-    public HttpListenerTlsRevocationEmptyCrlTestCase(String configFile)
+    public HttpListenerTlsNoRevocationTestCase(String configFile)
     {
-        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_1_SUB_PATH);
+        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH);
     }
 
     @Test

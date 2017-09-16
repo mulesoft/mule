@@ -15,7 +15,7 @@ public class HttpListenerTlsRevocationOutdatedCrlTestCase extends AbstractHttpLi
 
     public HttpListenerTlsRevocationOutdatedCrlTestCase(String configFile)
     {
-        super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_2_SUB_PATH);
+        super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH);
     }
 
     @Test

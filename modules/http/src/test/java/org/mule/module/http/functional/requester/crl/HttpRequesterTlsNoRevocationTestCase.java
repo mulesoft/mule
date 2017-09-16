@@ -9,12 +9,12 @@ package org.mule.module.http.functional.requester.crl;
 
 import org.junit.Test;
 
-public class HttpRequesterTlsRevocationEmptyCrlTestCase extends AbstractHttpRequesterTlsRevocationTestCase
+public class HttpRequesterTlsNoRevocationTestCase extends AbstractHttpRequesterTlsRevocationTestCase
 {
 
-    public HttpRequesterTlsRevocationEmptyCrlTestCase(String configFile)
+    public HttpRequesterTlsNoRevocationTestCase(String configFile)
     {
-        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_1_SUB_PATH);
+        super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH);
     }
 
     @Test
