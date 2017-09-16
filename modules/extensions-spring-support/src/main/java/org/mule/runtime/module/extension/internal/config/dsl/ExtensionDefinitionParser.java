@@ -739,6 +739,10 @@ public abstract class ExtensionDefinitionParser {
       }
     }
 
+    if (isLiteral(expectedType)) {
+      return new StaticLiteralValueResolver<>(value != null ? value.toString() : null, expectedClass);
+    }
+
     ValueResolver resolver;
     resolver = value != null
         ? getValueResolverFromMetadataType(parameterName, expectedType, value, defaultValue, acceptsReferences, expectedClass)
