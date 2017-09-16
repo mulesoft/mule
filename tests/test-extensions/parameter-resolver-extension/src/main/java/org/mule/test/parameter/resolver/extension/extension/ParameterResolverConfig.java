@@ -47,7 +47,6 @@ public class ParameterResolverConfig extends ParameterResolverExtension {
   @Optional
   private ParameterResolver<Literal<String>> resolverOfLiteral;
 
-
   public ParameterResolver<String> getStringResolver() {
     return stringResolver;
   }

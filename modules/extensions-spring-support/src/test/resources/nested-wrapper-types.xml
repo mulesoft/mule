@@ -28,4 +28,15 @@
         <parameter-resolver:lazy-value-operation lazyValue="#[output application/json --- {key : 'a nice looking json'}]"/>
     </flow>
 
+    <flow name="staticStackableTypes">
+        <parameter-resolver:pojo-with-stackable-types>
+            <parameter-resolver:stackable-types literalString="some static string" parameterResolverString="some static string" typedValueString="some static string"/>
+        </parameter-resolver:pojo-with-stackable-types>
+    </flow>
+    <flow name="dynamicStackableTypes">
+        <parameter-resolver:pojo-with-stackable-types>
+            <parameter-resolver:stackable-types literalString="#['some static string']" parameterResolverString="#['some static string']" typedValueString="#['some static string']"/>
+        </parameter-resolver:pojo-with-stackable-types>
+    </flow>
+
 </mule>

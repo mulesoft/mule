@@ -7,8 +7,10 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.theInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 
 import org.mule.runtime.api.metadata.TypedValue;
@@ -18,6 +20,7 @@ import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.module.extension.parameter.resolver.AbstractParameterResolverTestCase;
 import org.mule.test.parameter.resolver.extension.extension.NestedWrapperTypesConfig;
+import org.mule.test.parameter.resolver.extension.extension.PojoWithStackableTypes;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -102,5 +105,35 @@ public class StackableTypesTestCase extends AbstractParameterResolverTestCase {
     assertThat(expression, is(not(empty())));
     assertThat(expression.get(), is("#[output application/json --- {key : 'a nice looking json'}]"));
     assertThat(stringValue, is("{\n  \"key\": \"a nice looking json\"\n}"));
+  }
+
+  @Test
+  public void staticStackableTypesUsingMetadataTypes() throws Exception {
+    PojoWithStackableTypes pojoWithStackableTypes =
+        (PojoWithStackableTypes) flowRunner("staticStackableTypes").run().getMessage().getPayload().getValue();
+
+    assertThat(pojoWithStackableTypes.getLiteralString().getLiteralValue().get(), is("some static string"));
+    assertThat(pojoWithStackableTypes.getLiteralString().getType(), is(theInstance(String.class)));
+
+    assertThat(pojoWithStackableTypes.getParameterResolverString().resolve(), is("some static string"));
+    assertThat(pojoWithStackableTypes.getParameterResolverString().getExpression(), is(empty()));
+
+    assertThat(pojoWithStackableTypes.getTypedValueString().getValue(), is("some static string"));
+    assertThat(pojoWithStackableTypes.getTypedValueString().getDataType(), is(STRING));
+  }
+
+  @Test
+  public void dynamicStackableTypesUsingMetadataTypes() throws Exception {
+    PojoWithStackableTypes pojoWithStackableTypes =
+        (PojoWithStackableTypes) flowRunner("dynamicStackableTypes").run().getMessage().getPayload().getValue();
+
+    assertThat(pojoWithStackableTypes.getLiteralString().getLiteralValue().get(), is("#['some static string']"));
+    assertThat(pojoWithStackableTypes.getLiteralString().getType(), is(theInstance(String.class)));
+
+    assertThat(pojoWithStackableTypes.getParameterResolverString().resolve(), is("some static string"));
+    assertThat(pojoWithStackableTypes.getParameterResolverString().getExpression().get(), is("#['some static string']"));
+
+    assertThat(pojoWithStackableTypes.getTypedValueString().getValue(), is("some static string"));
+    assertThat(pojoWithStackableTypes.getTypedValueString().getDataType(), is(STRING));
   }
 }

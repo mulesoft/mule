@@ -39,4 +39,9 @@ public class ParameterResolverParameterOperations {
   public ParameterResolver<TypedValue<InputStream>> lazyValueOperation(@Optional ParameterResolver<TypedValue<InputStream>> lazyValue) {
     return lazyValue;
   }
+
+  public PojoWithStackableTypes pojoWithStackableTypes(@Optional PojoWithStackableTypes stackableTypes) {
+    return stackableTypes;
+  }
+
 }
