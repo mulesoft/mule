@@ -7,10 +7,11 @@
 package org.mule.module.http.internal.request.client;
 
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.MessageExchangePattern.ONE_WAY;
@@ -19,7 +20,6 @@ import static org.mule.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
 
-import org.hamcrest.Matchers;
 import org.mule.api.MuleContext;
 import org.mule.api.client.SimpleOptionsBuilder;
 import org.mule.api.processor.MessageProcessor;
@@ -32,7 +32,6 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.Mockito;
 
 @SmallTest
 public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleTestCase
@@ -88,7 +87,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
     @Test
     public void sameConfigReturnsSameInstanceUsingCompleteHttpOptionsWithTlsContext() throws Exception
     {
-        when(mockMuleContext.getRegistry().get(Mockito.argThat(Matchers.startsWith("auto-generated-request-config_" + mockTlsContextFactory.toString())))).thenReturn(mockRequestConfig);
+        when(mockMuleContext.getRegistry().get(argThat(startsWith("auto-generated-request-config_" + mockTlsContextFactory.toString())))).thenReturn(mockRequestConfig);
 
         HttpRequestOptions options = newOptions().requestStreamingMode(ALWAYS).disableFollowsRedirect().disableParseResponse()
                 .disableStatusCodeValidation().method(POST.name()).tlsContextFactory(mockTlsContextFactory).responseTimeout(1000).build();
