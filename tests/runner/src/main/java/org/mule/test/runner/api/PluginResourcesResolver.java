@@ -55,7 +55,7 @@ public class PluginResourcesResolver {
     final Set<String> privilegedExportedPackages = newHashSet();
     final Set<String> privilegedArtifacts = newHashSet();
 
-    try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
+     try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
       logger.debug("Loading plugin '{}' descriptor", pluginUrlClassification.getName());
       URL pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
       if (pluginJsonUrl == null) {
