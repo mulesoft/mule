@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-using-streaming"
+        minMuleVersion="4.0.0"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:tns="http://www.mulesoft.org/schema/mule/module-using-streaming"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/module-using-streaming http://www.mulesoft.org/schema/mule/module-using-streaming/current/mule-module-using-streaming.xsd">
+
+    <property name="someUserConfig" type="string" defaultValue="some-username"/>
+    <property name="somePassConfig" type="string" defaultValue="some-password"/>
+    <property name="port" type="string"/>
+    <property name="protocolConfig" type="string" defaultValue="HTTP"/>
+
+    <http:request-config name="simple-config" basePath="/basic-auth/">
+        <http:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
+            <http:authentication>
+                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <operation name="do-login-and-plain-entire-stream-response">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <http:uri-params>
+                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                </http:uri-params>
+            </http:request>
+            <mule:object-to-string-transformer />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-and-leave-entire-stream-response">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <http:uri-params>
+                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                </http:uri-params>
+            </http:request>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-and-plain-body-stream-response">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <http:uri-params>
+                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                </http:uri-params>
+            </http:request>
+            <mule:set-payload value="#[payload.response]" />
+            <mule:object-to-string-transformer />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-and-leave-stream-body-response">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
+                <http:uri-params>
+                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                </http:uri-params>
+            </http:request>
+            <mule:set-payload value="#[payload.response]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-and-plain-entire-stream-response-with-tns">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <tns:do-login-and-plain-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-and-plain-entire-stream-response-nesting-scopes">
+        <parameters>
+            <parameter name="someUser" type="string" defaultValue="usernameX"/>
+            <parameter name="somePass" type="string" defaultValue="passwordX"/>
+            <parameter name="amount" type="number" defaultValue="3"/>
+        </parameters>
+        <body>
+            <mule:scatter-gather>
+                <mule:route>
+                    <mule:choice>
+                        <mule:when expression="#[true]">
+                            <mule:try>
+                                <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                            </mule:try>
+                        </mule:when>
+                    </mule:choice>
+                    <mule:object-to-string-transformer />
+                </mule:route>
+                <mule:route>
+                    <mule:set-variable variableName="collected" value="" />
+                    <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+                        <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                        <mule:set-variable variableName="collected" value="#[output application/java --- 'index ' ++ vars.counter ++ ':[' ++  payload.response ++ '] ' ++ vars.collected]" />
+                    </mule:foreach>
+                    <mule:set-payload value="#[vars.collected]"/>
+                </mule:route>
+                <mule:route>
+                    <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                </mule:route>
+            </mule:scatter-gather>
+
+            <!-- map assembly to check the response on the test -->
+            <mule:set-payload value="#[{'route 0' : payload['0'].payload.response , 'route 1' : payload['1'].payload , 'route 2' : payload['2'].payload.response}]" />
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

@@ -9,14 +9,15 @@ package org.mule.runtime.core.internal.processor.chain;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -31,9 +32,10 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
@@ -109,7 +111,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     return new ModuleOperationProcessorChain("wrapping-operation-module-chain", head, processors, processorForLifecycle,
                                              properties, parameters,
                                              extensionModel, operationModel,
-                                             expressionManager);
+                                             expressionManager,
+                                             processingStrategy);
   }
 
   /**
@@ -129,8 +132,9 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                                   List<Processor> processorsForLifecycle,
                                   Map<String, String> properties, Map<String, String> parameters,
                                   ExtensionModel extensionModel, OperationModel operationModel,
-                                  ExpressionManager expressionManager) {
-      super(name, empty(), head, processors, processorsForLifecycle);
+                                  ExpressionManager expressionManager,
+                                  ProcessingStrategy processingStrategy) {
+      super(name, ofNullable(processingStrategy), head, processors, processorsForLifecycle);
       final List<ParameterModel> propertiesModels = getAllProperties(extensionModel);
       this.properties = parseParameters(properties, propertiesModels);
       this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();
@@ -185,10 +189,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     @Override
     public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
       return from(publisher)
-          .concatMap(request -> just(request)
-              .map(this::createEventWithParameters)
-              .transform(super::apply)
-              .map(eventResult -> processResult(request, eventResult)));
+          .concatMap(request -> from(processWithChildContext(createEventWithParameters(request),
+                                                             p -> from(p).transform(super::apply),
+                                                             ofNullable(getLocation())))
+                                                                 .map(eventResult -> processResult(request, eventResult)));
     }
 
     private BaseEvent processResult(BaseEvent originalEvent, BaseEvent chainEvent) {

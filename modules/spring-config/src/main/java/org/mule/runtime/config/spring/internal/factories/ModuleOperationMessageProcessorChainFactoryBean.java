@@ -7,13 +7,17 @@
 package org.mule.runtime.config.spring.internal.factories;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -30,25 +34,49 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   private ExtensionManager extensionManager;
 
   @Override
-  protected MessageProcessorChainBuilder getBuilderInstance() {
-    final Optional<ExtensionModel> extensionModel = extensionManager.getExtensions().stream()
-        .filter(em -> em.getXmlDslModel().getPrefix().equals(moduleName))
-        .findFirst();
-    if (!extensionModel.isPresent()) {
-      throw new IllegalArgumentException(format("Could not find any extension under the name of [%s]", moduleName));
+  public MessageProcessorChain doGetObject() throws Exception {
+    MessageProcessorChainBuilder builder = getBuilderInstance();
+    for (Object processor : processors) {
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
+      } else {
+        throw new IllegalArgumentException(format("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured. Found a %s",
+                                                  processor.getClass().getName()));
+      }
     }
+    final MessageProcessorChain messageProcessorChain =
+        newLazyProcessorChainBuilder((ModuleOperationMessageProcessorChainBuilder) builder,
+                                     muleContext,
+                                     () -> getProcessingStrategy(muleContext, getRootContainerName()).orElse(null));
+    messageProcessorChain.setAnnotations(getAnnotations());
+    messageProcessorChain.setMuleContext(muleContext);
+    return messageProcessorChain;
+  }
 
+  @Override
+  protected MessageProcessorChainBuilder getBuilderInstance() {
+    final ExtensionModel extensionModel = getExtensionModelOrFail();
+    return new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel,
+                                                           getOperationModelOrFail(extensionModel),
+                                                           muleContext.getExpressionManager());
+  }
+
+  private ExtensionModel getExtensionModelOrFail() {
+    return extensionManager.getExtensions().stream()
+        .filter(em -> em.getXmlDslModel().getPrefix().equals(moduleName))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(format("Could not find any extension under the name of [%s]",
+                                                               moduleName)));
+  }
+
+  private OperationModel getOperationModelOrFail(ExtensionModel extensionModel) {
     OperationSeeker operationSeeker = new OperationSeeker();
-    operationSeeker.walk(extensionModel.get());
+    operationSeeker.walk(extensionModel);
     if (!operationSeeker.operationModel.isPresent()) {
       throw new IllegalArgumentException(format("Could not find any operation under the name of [%s] for the extension [%s]",
                                                 moduleOperation, moduleName));
     }
-    MessageProcessorChainBuilder builder =
-        new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel.get(),
-                                                        operationSeeker.operationModel.get(),
-                                                        muleContext.getExpressionManager());
-    return builder;
+    return operationSeeker.operationModel.get();
   }
 
   public void setProperties(Map<String, String> properties) {

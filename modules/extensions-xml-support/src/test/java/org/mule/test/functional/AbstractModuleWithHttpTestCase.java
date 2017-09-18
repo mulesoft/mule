@@ -32,6 +32,9 @@ public abstract class AbstractModuleWithHttpTestCase extends AbstractXmlExtensio
   static final String MODULE_GLOBAL_ELEMENT_XML = "modules/module-global-element.xml";
   static final String MODULE_GLOBAL_ELEMENT_PROXY_XML = "modules/nested/module-global-element-proxy.xml";
   static final String MODULE_GLOBAL_ELEMENT_ANOTHER_PROXY_XML = "modules/nested/module-global-element-another-proxy.xml";
+  static final String USER_AND_PASS_VALIDATED_RESPONSE = "\"User and pass validated\"";
+  static final String SUCCESS_RESPONSE = "{ \"response\":" + USER_AND_PASS_VALIDATED_RESPONSE + " }";
+  private static final String FAILURE_RESPONSE = "{ \"response\":\"User and pass wrong\" }";
 
   private Server server;
 
@@ -79,14 +82,14 @@ public abstract class AbstractModuleWithHttpTestCase extends AbstractXmlExtensio
           .replace(':', '/');
       if (target.endsWith(userAndPass)) {
         scUnauthorized = SC_OK;
-        message = "User and pass validated";
+        message = SUCCESS_RESPONSE;
       } else {
         scUnauthorized = SC_UNAUTHORIZED;
-        message = "User and pass wrong";
+        message = FAILURE_RESPONSE;
       }
       response.setStatus(scUnauthorized);
       response.getWriter().print(message);
-      response.setContentType("text/html");
+      response.setContentType("application/json");
       baseRequest.setHandled(true);
     }
   }
