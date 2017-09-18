@@ -155,29 +155,13 @@
                             <xsd:element ref="key-store" minOccurs="1" maxOccurs="1" />
                         </xsd:sequence>
                     </xsd:choice>
-                    <xsd:choice minOccurs="0" maxOccurs="1">
-                        <xsd:element name="revocation-check-standard" type="rcStandardType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Enable Java certificate revocation checking.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="revocation-check-crl-file" type="rcCrlFileType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Enable revocation checking from a local CRL (Certificate Revocation List) file.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element name="revocation-check-custom-ocsp" type="rcCustomOcspType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    Enable revocation checking against a custom OCSP provider.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:choice>
+                    <xsd:element name="revocation-check" type="rcWrapperElement" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Enable certificate revocation checking.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string">
                     <xsd:annotation>
@@ -288,6 +272,32 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="rcWrapperElement">
+        <xsd:choice minOccurs="0" maxOccurs="1">
+            <xsd:element name="standard-revocation-check" type="rcStandardType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Standard Java certificate revocation checking.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="crl-file" type="rcCrlFileType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Revocation checking from a local CRL (Certificate Revocation List) file.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="custom-ocsp-responder" type="rcCustomOcspType">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Revocation checking against a custom OCSP provider.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="rcStandardType">

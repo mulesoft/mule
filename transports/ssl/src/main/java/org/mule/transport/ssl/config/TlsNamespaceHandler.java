@@ -7,11 +7,16 @@
 package org.mule.transport.ssl.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ssl.TlsConnector;
+import org.mule.api.security.revocation.CrlFile;
+import org.mule.api.security.revocation.CustomOcspResponder;
+import org.mule.api.security.revocation.RevocationCheck;
+import org.mule.api.security.revocation.StandardRevocationCheck;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.
@@ -29,9 +34,10 @@ public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
         registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
         registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
-        registerBeanDefinitionParser("revocation-check-standard", new RevocationCheckStandardDefinitionParser());
-        registerBeanDefinitionParser("revocation-check-crl-file", new RevocationCheckCrlFileDefinitionParser());
-        registerBeanDefinitionParser("revocation-check-custom-ocsp", new RevocationCheckCustomOcspDefinitionParser());
+        registerBeanDefinitionParser("revocation-check", new ChildDefinitionParser("revocationCheck", RevocationCheck.class));
+        registerBeanDefinitionParser("standard-revocation-check", new ChildDefinitionParser("standardRevocationCheck", StandardRevocationCheck.class));
+        registerBeanDefinitionParser("custom-ocsp-responder", new ChildDefinitionParser("customOcspResponder", CustomOcspResponder.class));
+        registerBeanDefinitionParser("crl-file", new ChildDefinitionParser("crlFile", CrlFile.class));
     }
 
 }

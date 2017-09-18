@@ -13,6 +13,10 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
+import org.mule.api.security.revocation.CrlFile;
+import org.mule.api.security.revocation.CustomOcspResponder;
+import org.mule.api.security.revocation.RevocationCheck;
+import org.mule.api.security.revocation.StandardRevocationCheck;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
@@ -180,19 +184,8 @@ public final class TlsConfiguration
     private TlsProperties tlsProperties = new TlsProperties();
     private boolean disableSystemPropertiesMapping = true;
 
-    // standard certificate revocation checking
-    private Boolean rcStandardEnable = false;
-    private Boolean rcStandardOnlyEndEntities = false;
-    private Boolean rcStandardPreferCrls = false;
-    private Boolean rcStandardNoFallback = false;
-    private Boolean rcStandardSoftFail = false;
-
-    // CRL file revocation checking
-    private String rcCrlFilePath;
-
-    // custom OCSP revocation checking
-    private String rcCustomOcspUrl;
-    private String rcCustomOcspCertAlias;
+    // certificate revocation checking
+    private RevocationCheck revocationCheck = null;
 
     /**
      * Support for TLS connections with a given initial value for the key store
@@ -347,22 +340,22 @@ public final class TlsConfiguration
             {
                 trustManagerFactory = TrustManagerFactory.getInstance(trustManagerAlgorithm);
 
-                Boolean revocationEnabled = getRcStandardEnable() || getRcCrlFilePath() != null || getRcCustomOcspUrl() != null;
+                Boolean revocationEnabled = getRevocationCheck() != null;
                 ManagerFactoryParameters tmfParams = null;
 
                 // Revocation checking is only supported for PKIX algorithm
                 if (revocationEnabled && "PKIX".equalsIgnoreCase(getTrustManagerAlgorithm()))
                 {
-                    if (getRcStandardEnable()) {
+                    if (getRevocationCheck().getStandardRevocationCheck() != null) {
                         tmfParams = configForStandardRevocation(trustStore);
 
                     }
-                    else if (getRcCrlFilePath() != null)
+                    else if (getRevocationCheck().getCrlFile() != null)
                     {
                         tmfParams = configForCrlFileRevocation(trustStore);
 
                     }
-                    else if (getRcCustomOcspUrl() != null)
+                    else if (getRevocationCheck().getCustomOcspResponder() != null)
                     {
                         tmfParams = configForCustomOcspRevocation(trustStore);
                     }
@@ -416,23 +409,24 @@ public final class TlsConfiguration
     private ManagerFactoryParameters configForStandardRevocation(KeyStore trustStore)
             throws NoSuchAlgorithmException, KeyStoreException, InvalidAlgorithmParameterException
     {
+        StandardRevocationCheck config = getRevocationCheck().getStandardRevocationCheck();
         CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
         PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
 
         Set<Option> options = new HashSet<>();
-        if (getRcStandardOnlyEndEntities())
+        if (config.getOnlyEndEntities())
         {
             options.add(Option.ONLY_END_ENTITY);
         }
-        if (getRcStandardPreferCrls())
+        if (config.getPreferCrls())
         {
             options.add(Option.PREFER_CRLS);
         }
-        if (getRcStandardNoFallback())
+        if (config.getNoFallback())
         {
             options.add(Option.NO_FALLBACK);
         }
-        if (getRcStandardSoftFail())
+        if (config.getSoftFail())
         {
             options.add(Option.SOFT_FAIL);
         }
@@ -446,6 +440,8 @@ public final class TlsConfiguration
 
     private ManagerFactoryParameters configForCrlFileRevocation(KeyStore trustStore) throws Exception
     {
+        CrlFile config = getRevocationCheck().getCrlFile();
+
         // When creating build parameters we must manually trust each certificate (which is automatic otherwise)
         Enumeration<String> aliases = trustStore.aliases();
         HashSet<TrustAnchor> trustAnchors = new HashSet<>();
@@ -463,7 +459,7 @@ public final class TlsConfiguration
         // Make sure revocation checking is enabled (com.sun.net.ssl.checkRevocation)
         pbParams.setRevocationEnabled(true);
 
-        Collection<? extends CRL> crls = loadCRL(getRcCrlFilePath());
+        Collection<? extends CRL> crls = loadCRL(config.getPath());
         if (crls != null && !crls.isEmpty())
         {
             pbParams.addCertStore(CertStore.getInstance("Collection", new CollectionCertStoreParameters(crls)));
@@ -475,23 +471,24 @@ public final class TlsConfiguration
     private ManagerFactoryParameters configForCustomOcspRevocation(KeyStore trustStore)
             throws NoSuchAlgorithmException, KeyStoreException, InvalidAlgorithmParameterException, URISyntaxException
     {
+        CustomOcspResponder config = getRevocationCheck().getCustomOcspResponder();
         CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
         PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
         rc.setOptions(EnumSet.of(Option.NO_FALLBACK));
 
-        if (getRcCustomOcspUrl() != null)
+        if (config.getUrl() != null)
         {
-            rc.setOcspResponder(new URI(getRcCustomOcspUrl()));
+            rc.setOcspResponder(new URI(config.getUrl()));
         }
-        if (getRcCustomOcspCertAlias() != null)
+        if (config.getCertAlias() != null)
         {
-            if (trustStore.isCertificateEntry(getRcCustomOcspCertAlias()))
+            if (trustStore.isCertificateEntry(config.getCertAlias()))
             {
-                rc.setOcspResponderCert((X509Certificate) trustStore.getCertificate(getRcCustomOcspCertAlias()));
+                rc.setOcspResponderCert((X509Certificate) trustStore.getCertificate(config.getCertAlias()));
             }
             else
             {
-                throw new IllegalStateException("Key with alias \"" + getRcCustomOcspCertAlias() + "\" was not found");
+                throw new IllegalStateException("Key with alias \"" + config.getCertAlias() + "\" was not found");
             }
         }
 
@@ -832,84 +829,14 @@ public final class TlsConfiguration
         this.keyAlias = keyAlias;
     }
 
-    public Boolean getRcStandardEnable()
+    public RevocationCheck getRevocationCheck()
     {
-        return rcStandardEnable;
+        return revocationCheck;
     }
 
-    public void setRcStandardEnable(Boolean rcStandardEnable)
+    public void setRevocationCheck(RevocationCheck revocationCheck)
     {
-        this.rcStandardEnable = rcStandardEnable;
-    }
-
-    public Boolean getRcStandardOnlyEndEntities()
-    {
-        return rcStandardOnlyEndEntities;
-    }
-
-    public void setRcStandardOnlyEndEntities(Boolean rcStandardOnlyEndEntities)
-    {
-        this.rcStandardOnlyEndEntities = rcStandardOnlyEndEntities;
-    }
-
-    public Boolean getRcStandardPreferCrls()
-    {
-        return rcStandardPreferCrls;
-    }
-
-    public void setRcStandardPreferCrls(Boolean rcStandardPreferCrls)
-    {
-        this.rcStandardPreferCrls = rcStandardPreferCrls;
-    }
-
-    public Boolean getRcStandardNoFallback()
-    {
-        return rcStandardNoFallback;
-    }
-
-    public void setRcStandardNoFallback(Boolean rcStandardNoFallback)
-    {
-        this.rcStandardNoFallback = rcStandardNoFallback;
-    }
-
-    public Boolean getRcStandardSoftFail()
-    {
-        return rcStandardSoftFail;
-    }
-
-    public void setRcStandardSoftFail(Boolean rcStandardSoftFail)
-    {
-        this.rcStandardSoftFail = rcStandardSoftFail;
-    }
-
-    public String getRcCrlFilePath()
-    {
-        return rcCrlFilePath;
-    }
-
-    public void setRcCrlFilePath(String rcCrlFilePath)
-    {
-        this.rcCrlFilePath = rcCrlFilePath;
-    }
-
-    public String getRcCustomOcspUrl()
-    {
-        return rcCustomOcspUrl;
-    }
-
-    public void setRcCustomOcspUrl(String rcCustomOcspUrl)
-    {
-        this.rcCustomOcspUrl = rcCustomOcspUrl;
-    }
-
-    public String getRcCustomOcspCertAlias()
-    {
-        return rcCustomOcspCertAlias;
-    }
-
-    public void setRcCustomOcspCertAlias(String rcCustomOcspCertAlias)
-    {
-        this.rcCustomOcspCertAlias = rcCustomOcspCertAlias;
+        this.revocationCheck = revocationCheck;
     }
 
     @Override
@@ -1002,35 +929,7 @@ public final class TlsConfiguration
         {
             return false;
         }
-        if (rcStandardEnable != null ? !rcStandardEnable.equals(that.rcStandardEnable) : that.rcStandardEnable != null)
-        {
-            return false;
-        }
-        if (rcStandardOnlyEndEntities != null ? !rcStandardOnlyEndEntities.equals(that.rcStandardOnlyEndEntities) : that.rcStandardOnlyEndEntities != null)
-        {
-            return false;
-        }
-        if (rcStandardPreferCrls != null ? !rcStandardPreferCrls.equals(that.rcStandardPreferCrls) : that.rcStandardPreferCrls != null)
-        {
-            return false;
-        }
-        if (rcStandardNoFallback != null ? !rcStandardNoFallback.equals(that.rcStandardNoFallback) : that.rcStandardNoFallback != null)
-        {
-            return false;
-        }
-        if (rcStandardSoftFail != null ? !rcStandardSoftFail.equals(that.rcStandardSoftFail) : that.rcStandardSoftFail != null)
-        {
-            return false;
-        }
-        if (rcCrlFilePath != null ? !rcCrlFilePath.equals(that.rcCrlFilePath) : that.rcCrlFilePath != null)
-        {
-            return false;
-        }
-        if (rcCustomOcspUrl != null ? !rcCustomOcspUrl.equals(that.rcCustomOcspUrl) : that.rcCustomOcspUrl != null)
-        {
-            return false;
-        }
-        if (rcCustomOcspCertAlias != null ? !rcCustomOcspCertAlias.equals(that.rcCustomOcspCertAlias) : that.rcCustomOcspCertAlias != null)
+        if (revocationCheck != null ? !revocationCheck.equals(that.revocationCheck) : that.revocationCheck!= null)
         {
             return false;
         }
@@ -1065,14 +964,7 @@ public final class TlsConfiguration
         result = hashcodePrimeNumber * result + (requireClientAuthentication ? 1 : 0);
         result = hashcodePrimeNumber * result + (tlsProperties != null ? tlsProperties.hashCode() : 0);
 
-        result = hashcodePrimeNumber * result + (rcStandardEnable != null ? rcStandardEnable.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcStandardOnlyEndEntities != null ? rcStandardOnlyEndEntities.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcStandardPreferCrls != null ? rcStandardPreferCrls.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcStandardNoFallback != null ? rcStandardNoFallback.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcStandardSoftFail != null ? rcStandardSoftFail.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcCrlFilePath != null ? rcCrlFilePath.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcCustomOcspUrl != null ? rcCustomOcspUrl.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (rcCustomOcspCertAlias != null ? rcCustomOcspCertAlias.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (revocationCheck!= null ? revocationCheck.hashCode() : 0);
 
         return result;
     }

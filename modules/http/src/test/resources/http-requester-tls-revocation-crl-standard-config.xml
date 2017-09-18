@@ -16,7 +16,9 @@
     <tls:context name="clientTlsContext" >
         <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
         <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check-standard enable="true" preferCrls="true"/>
+        <tls:revocation-check>
+            <tls:standard-revocation-check preferCrls="true"/>
+        </tls:revocation-check>
     </tls:context>
 
     <http:listener-config name="crlServer" protocol="HTTP" host="localhost" port="8093" />
