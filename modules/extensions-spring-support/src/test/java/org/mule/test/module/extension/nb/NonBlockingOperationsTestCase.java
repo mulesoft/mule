@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.nb;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -15,9 +16,11 @@ import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
 import org.mule.test.marvel.model.Villain;
@@ -74,8 +77,10 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
   @Test
   public void voidNonBlockingOperation() throws Exception {
     IronMan ironMan = getIronMan("ironMan");
-    flowRunner("computeFlightPlan").run();
-    assertThat(ironMan.getFlightPlan(), is(FLIGHT_PLAN));
+    final String payload = "take me to the avengers tower";
+    Event event = flowRunner("computeFlightPlan").withPayload(payload).run();
+    assertThat(event.getMessage().getPayload().getValue().toString(), equalTo(payload));
+    new PollingProber().probe(1000, 1000, () -> FLIGHT_PLAN.equals(ironMan.getFlightPlan()));
   }
 
   private IronMan getIronMan(String name) throws Exception {
