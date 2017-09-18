@@ -394,6 +394,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     BaseEvent testEvent = mock(BaseEvent.class);
     Message muleMessage = spy(of(""));
     when(testEvent.getMessage()).thenReturn(muleMessage);
+    when(testEvent.getError()).thenReturn(empty());
     MessagingException e = new MessagingException(createStaticMessage(message), testEvent);
 
     assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), nullValue());
