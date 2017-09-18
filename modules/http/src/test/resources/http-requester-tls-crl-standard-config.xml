@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="serverTlsContext" >
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/${entityCertifiedSubPath}" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+    </tls:context>
+
+    <tls:context name="clientTlsContextPreferCrl">
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" preferCrls="true"/>
+    </tls:context>
+
+    <tls:context name="clientTlsContextPreferCrlNoFallback">
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" preferCrls="true" noFallback="true"/>
+    </tls:context>
+
+    <tls:context name="clientTlsContextNotPreferCrl">
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" preferCrls="false" />
+    </tls:context>
+
+    <tls:context name="clientTlsContextNotPreferCrlNoFallback">
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:revocation-check-standard enable="true" preferCrls="false" noFallback="true"/>
+    </tls:context>
+
+    <http:listener-config name="crlServer" protocol="HTTP" host="localhost" port="8093" />
+    <http:listener-config name="serverConfig" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="serverTlsContext" />
+    <http:request-config name="clientConfigPreferCrl" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContextPreferCrl" />
+    <http:request-config name="clientConfigPreferCrlNoFallback" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContextPreferCrlNoFallback" />
+    <http:request-config name="clientConfigNotPreferCrl" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContextNotPreferCrl" />
+    <http:request-config name="clientConfigNotPreferCrlNoFallback" protocol="HTTPS" host="localhost" port="${port}" tlsContext-ref="clientTlsContextNotPreferCrlNoFallback" />
+
+    <flow name="testFlowServer">
+        <http:listener config-ref="serverConfig" path="/test" allowedMethods="GET"/>
+        <set-payload value="OK"/>
+    </flow>
+
+    <flow name="testFlowCrlServer">
+        <http:listener config-ref="crlServer" path="/crl/${entityCertifiedSubPath}" allowedMethods="GET"/>
+        <parse-template location="${crlPath}"/>
+    </flow>
+
+    <flow name="testFlowPreferCrl">
+        <http:request config-ref="clientConfigPreferCrl" port="${port}" path="/test" method="GET" />
+    </flow>
+
+    <flow name="testFlowPreferCrlNoFallback">
+        <http:request config-ref="clientConfigPreferCrlNoFallback" port="${port}" path="/test" method="GET" />
+    </flow>
+
+    <flow name="testFlowNotPreferCrl">
+        <http:request config-ref="clientConfigNotPreferCrl" port="${port}" path="/test" method="GET" />
+    </flow>
+
+    <flow name="testFlowNotPreferCrlNoFallback">
+        <http:request config-ref="clientConfigNotPreferCrlNoFallback" port="${port}" path="/test" method="GET" />
+    </flow>
+
+</mule>

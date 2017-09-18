@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.runners.Parameterized.Parameters;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 import org.mule.module.http.functional.AbstractHttpTlsRevocationTestCase;
 import org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager;
@@ -44,7 +45,7 @@ public abstract class AbstractHttpListenerTlsRevocationTestCase extends Abstract
         super(configFile, crlPath, entityCertified);
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object> data()
     {
         return asList(new Object[] {

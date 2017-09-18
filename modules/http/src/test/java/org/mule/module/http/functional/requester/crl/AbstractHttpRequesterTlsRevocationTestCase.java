@@ -8,6 +8,7 @@
 package org.mule.module.http.functional.requester.crl;
 
 import static java.util.Arrays.asList;
+import static org.junit.runners.Parameterized.Parameters;
 import org.mule.module.http.functional.AbstractHttpTlsRevocationTestCase;
 
 import java.util.Collection;
@@ -24,7 +25,7 @@ public abstract class AbstractHttpRequesterTlsRevocationTestCase extends Abstrac
         super(configFile, crlPath, entityCertified);
     }
 
-    @Parameterized.Parameters
+    @Parameters
     public static Collection<Object> data()
     {
         return asList(new Object[] {
