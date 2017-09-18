@@ -8,6 +8,8 @@ package org.mule.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.api.util.CredentialsMaskUtil.BARE_URL_PATTERN;
+import static org.mule.api.util.CredentialsMaskUtil.maskUrlPassword;
 import org.mule.api.Injector;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -448,7 +450,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 {
                     if (logger.isWarnEnabled())
                     {
-                        logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", key));
+                        logger.warn(String.format("Spring registry already contains an object named '%s'. The previous object will be overwritten.", maskUrlPassword(key, BARE_URL_PATTERN)));
                     }
                     SpringRegistry.this.unregisterObject(key);
                 }
@@ -461,7 +463,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
                 }
                 catch (Exception e)
                 {
-                    throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
+                    throw new RegistrationException(createStaticMessage("Could not register object for key " + maskUrlPassword(key, BARE_URL_PATTERN)), e);
                 }
             }
         }
