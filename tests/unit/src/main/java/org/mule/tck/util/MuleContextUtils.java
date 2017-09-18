@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
@@ -20,6 +21,8 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
@@ -29,6 +32,8 @@ import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -51,9 +56,11 @@ public class MuleContextUtils {
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      final MuleRegistry registry = muleContext.getRegistry();
+      MuleRegistry registry = mock(MuleRegistry.class);
+      when(muleContext.getRegistry()).thenReturn(registry);
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
       doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
+      doReturn(mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS)).when(registry).lookupObject(OBJECT_STORE_MANAGER);
     } catch (RegistrationException e) {
       throw new RuntimeException(e);
     }
@@ -83,6 +90,23 @@ public class MuleContextUtils {
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  public static void mockRegistry(MuleContext context) {
+    doReturn(spy(context.getRegistry())).when(context).getRegistry();
+  }
+
+  public static void registerIntoMockContext(MuleContext context, String key, Object value) {
+    when(context.getRegistry().lookupObject(key)).thenReturn(value);
+  }
+
+  public static <T> void registerIntoMockContext(MuleContext context, Class<T> clazz, T value) throws RegistrationException {
+    when(context.getRegistry().lookupObject(clazz)).thenReturn(value);
+  }
+
+  public static <T> Transformer lookupTransformer(MuleContext context, DataType source, DataType result)
+      throws TransformerException {
+    return context.getRegistry().lookupTransformer(source, result);
   }
 
   /**
