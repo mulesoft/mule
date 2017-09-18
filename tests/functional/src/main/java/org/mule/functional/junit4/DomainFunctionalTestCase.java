@@ -6,11 +6,14 @@
  */
 package org.mule.functional.junit4;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -61,6 +64,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
       @Override
       protected void addBuilders(List<ConfigurationBuilder> builders) {
         super.addBuilders(builders);
+        builders.add(new SimpleConfigurationBuilder(getDomainStartUpRegistryObjects()));
         if (getBuilder() != null) {
           builders.add(getBuilder());
         }
@@ -73,6 +77,10 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
       MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
       muleContexts.put(applicationConfig.applicationName, muleContext);
     }
+  }
+
+  protected Map<String, Object> getDomainStartUpRegistryObjects() {
+    return emptyMap();
   }
 
   @After

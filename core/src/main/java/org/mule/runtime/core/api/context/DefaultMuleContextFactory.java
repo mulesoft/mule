@@ -16,18 +16,18 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +126,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    * {@link ConfigurationBuilder} that should be used. Properties if provided are used to replace "property placeholder" value in
    * configuration files.
    */
-  public MuleContext createMuleContext(final String configResources, final Properties properties)
+  public MuleContext createMuleContext(final String configResources, final Map<String, Object> properties)
       throws InitialisationException, ConfigurationException {
     return doCreateMuleContext(MuleContextBuilder.builder(APP), new ContextConfigurator() {
 
@@ -150,7 +150,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    * Creates a new MuleContext using the given configurationBuilder. Properties if provided are used to replace "property
    * placeholder" value in configuration files.
    */
-  public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder, Properties properties)
+  public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder, Map<String, Object> properties)
       throws InitialisationException, ConfigurationException {
     return createMuleContext(configurationBuilder, properties, new DefaultMuleConfiguration());
   }
@@ -159,7 +159,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    * Creates a new MuleContext using the given configurationBuilder. Properties if provided are used to replace "property
    * placeholder" value in configuration files.
    */
-  public MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders, Properties properties)
+  public MuleContext createMuleContext(List<ConfigurationBuilder> configurationBuilders, Map<String, Object> properties)
       throws InitialisationException, ConfigurationException {
     return createMuleContext(configurationBuilders, properties, new DefaultMuleConfiguration());
   }
@@ -168,7 +168,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if provided are used to replace
    * "property placeholder" value in configuration files.
    */
-  public MuleContext createMuleContext(final ConfigurationBuilder configurationBuilder, final Properties properties,
+  public MuleContext createMuleContext(final ConfigurationBuilder configurationBuilder, final Map<String, Object> properties,
                                        MuleConfiguration configuration)
       throws InitialisationException, ConfigurationException {
     return createMuleContext(Collections.singletonList(configurationBuilder), properties, configuration);
@@ -178,7 +178,8 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
    * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if provided are used to replace
    * "property placeholder" value in configuration files.
    */
-  public MuleContext createMuleContext(final List<ConfigurationBuilder> configurationBuilders, final Properties properties,
+  public MuleContext createMuleContext(final List<ConfigurationBuilder> configurationBuilders,
+                                       final Map<String, Object> properties,
                                        MuleConfiguration configuration)
       throws InitialisationException, ConfigurationException {
     // Create MuleContext

@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -41,6 +42,7 @@ import org.mule.tck.testmodels.fruit.Banana;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.After;
@@ -146,7 +148,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
     context = null;
     try {
-      context = muleContextFactory.createMuleContext("log4j2-test.xml", properties);
+      context = muleContextFactory.createMuleContext("log4j2-test.xml", (Map) properties);
     } catch (ConfigurationException e) {
       assertThat(e.getMessage(),
                  equalTo("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
@@ -163,7 +165,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     properties.put("testKey4", "testValue4");
 
     context = muleContextFactory.createMuleContext(asList(testServicesConfigurationBuilder, new TestConfigurationBuilder()),
-                                                   properties);
+                                                   (Map) properties);
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);

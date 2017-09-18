@@ -19,15 +19,16 @@ import java.util.Map;
  */
 public class SimpleConfigurationBuilder extends AbstractConfigurationBuilder {
 
-  protected Map objects;
+  protected Map<String, ?> objects;
 
-  public SimpleConfigurationBuilder(Map objects) {
+  public SimpleConfigurationBuilder(Map<String, ?> objects) {
     this.objects = objects;
   }
 
+  @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     if (objects != null && objects.size() > 0) {
-      muleContext.getRegistry().registerObjects(objects);
+      muleContext.getRegistry().registerObjects((Map<String, Object>) objects);
     }
   }
 }

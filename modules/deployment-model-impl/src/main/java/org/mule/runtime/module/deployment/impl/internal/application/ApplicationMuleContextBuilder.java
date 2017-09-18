@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
