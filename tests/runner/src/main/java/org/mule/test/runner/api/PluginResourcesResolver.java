@@ -55,11 +55,11 @@ public class PluginResourcesResolver {
     final Set<String> privilegedExportedPackages = newHashSet();
     final Set<String> privilegedArtifacts = newHashSet();
 
-     try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
+    try (URLClassLoader classLoader = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null)) {
       logger.debug("Loading plugin '{}' descriptor", pluginUrlClassification.getName());
-      URL pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
+      URL pluginJsonUrl = classLoader.getResource(MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR);
       if (pluginJsonUrl == null) {
-        pluginJsonUrl = classLoader.getResource(MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR);
+        pluginJsonUrl = classLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR);
         if (pluginJsonUrl == null) {
           throw new IllegalStateException(MULE_ARTIFACT_JSON_DESCRIPTOR + " couldn't be found for plugin: " +
               pluginUrlClassification.getName());

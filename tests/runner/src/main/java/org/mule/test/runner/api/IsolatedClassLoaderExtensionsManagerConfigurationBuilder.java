@@ -10,6 +10,7 @@ package org.mule.test.runner.api;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
@@ -31,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.mule.runtime.core.api.config.ConfigurationBuilder} that creates an
- * {@link org.mule.runtime.core.api.extension.ExtensionManager}. It reads the extension manifest file using the extension class loader
- * that loads the extension annotated class and register the extension to the manager.
+ * {@link org.mule.runtime.core.api.extension.ExtensionManager}. It reads the extension manifest file using the extension class
+ * loader that loads the extension annotated class and register the extension to the manager.
  *
  * @since 4.0
  */
@@ -105,9 +107,9 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
             (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
         withContextClassLoader(classLoader, (CheckedRunnable) () -> {
           Method findResource = classLoader.getClass().getMethod("findResource", String.class);
-          URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_PLUGIN));
+          URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
           if (json == null) {
-            json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
+            json = ((URL) findResource.invoke(classLoader, MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR));
           }
           if (json != null) {
             LOGGER.debug("Discovered extension '{}'", artifactName);

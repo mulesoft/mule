@@ -144,6 +144,11 @@ public class MuleManifest {
       }
       if (!candidates.isEmpty()) {
         // if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
+        for (String candidateKey : candidates.keySet()) {
+          if (candidateKey.contains("mule-core-ee")) {
+            return candidates.get(candidateKey);
+          }
+        }
         return candidates.get(candidates.lastKey());
       }
       return null;

@@ -1,7 +1,7 @@
 {
   "name": "Database",
   "minMuleVersion": "4.0.0",
-  "requiredProduct": "MULE_EE",
+  "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {

@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.mule.runtime.api.deployment.meta.Product.getProductByCoreLibraryName;
+import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -114,7 +114,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     Product requiredProduct = descriptor.getRequiredProduct();
     checkState(requiredProduct != null,
                format("The artifact %s does not specifies a requiredProduct", descriptor.getName()));
-    Product runtimeProduct = getProductByCoreLibraryName(getProductName());
+    Product runtimeProduct = getProductByName(getProductName());
     if (!runtimeProduct.supports(requiredProduct)) {
       throw new MuleRuntimeException(createStaticMessage("The artifact %s requires a different runtime. The artifact required runtime is %s and the runtime is %s",
                                                          descriptor.getName(), descriptor.getRequiredProduct().name(),
