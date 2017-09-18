@@ -13,10 +13,6 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.api.security.revocation.CrlFile;
-import org.mule.api.security.revocation.CustomOcspResponder;
-import org.mule.api.security.revocation.RevocationCheck;
-import org.mule.api.security.revocation.StandardRevocationCheck;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
@@ -27,32 +23,13 @@ import org.mule.util.StringUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CRL;
-import java.security.cert.CertPathBuilder;
-import java.security.cert.CertStore;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXRevocationChecker;
-import java.security.cert.PKIXRevocationChecker.Option;
-import java.security.cert.TrustAnchor;
-import java.security.cert.X509CertSelector;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -346,20 +323,7 @@ public final class TlsConfiguration
                 // Revocation checking is only supported for PKIX algorithm
                 if (revocationEnabled && "PKIX".equalsIgnoreCase(getTrustManagerAlgorithm()))
                 {
-                    if (getRevocationCheck().getStandardRevocationCheck() != null) {
-                        tmfParams = configForStandardRevocation(trustStore);
-
-                    }
-                    else if (getRevocationCheck().getCrlFile() != null)
-                    {
-                        tmfParams = configForCrlFileRevocation(trustStore);
-
-                    }
-                    else if (getRevocationCheck().getCustomOcspResponder() != null)
-                    {
-                        tmfParams = configForCustomOcspRevocation(trustStore);
-                    }
-
+                    tmfParams = getRevocationCheck().configFor(trustStore);
                     trustManagerFactory.init(tmfParams);
                 }
                 else
@@ -405,123 +369,6 @@ public final class TlsConfiguration
 
         return trustStore;
     }
-
-    private ManagerFactoryParameters configForStandardRevocation(KeyStore trustStore)
-            throws NoSuchAlgorithmException, KeyStoreException, InvalidAlgorithmParameterException
-    {
-        StandardRevocationCheck config = getRevocationCheck().getStandardRevocationCheck();
-        CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
-        PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
-
-        Set<Option> options = new HashSet<>();
-        if (config.getOnlyEndEntities())
-        {
-            options.add(Option.ONLY_END_ENTITY);
-        }
-        if (config.getPreferCrls())
-        {
-            options.add(Option.PREFER_CRLS);
-        }
-        if (config.getNoFallback())
-        {
-            options.add(Option.NO_FALLBACK);
-        }
-        if (config.getSoftFail())
-        {
-            options.add(Option.SOFT_FAIL);
-        }
-        rc.setOptions(options);
-
-        PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
-        pkixParams.addCertPathChecker(rc);
-
-        return new CertPathTrustManagerParameters(pkixParams);
-    }
-
-    private ManagerFactoryParameters configForCrlFileRevocation(KeyStore trustStore) throws Exception
-    {
-        CrlFile config = getRevocationCheck().getCrlFile();
-
-        // When creating build parameters we must manually trust each certificate (which is automatic otherwise)
-        Enumeration<String> aliases = trustStore.aliases();
-        HashSet<TrustAnchor> trustAnchors = new HashSet<>();
-        while (aliases.hasMoreElements())
-        {
-            String alias = aliases.nextElement();
-            if (trustStore.isCertificateEntry(alias))
-            {
-                trustAnchors.add(new TrustAnchor((X509Certificate) trustStore.getCertificate(alias), null));
-            }
-        }
-
-        PKIXBuilderParameters pbParams = new PKIXBuilderParameters(trustAnchors, new X509CertSelector());
-
-        // Make sure revocation checking is enabled (com.sun.net.ssl.checkRevocation)
-        pbParams.setRevocationEnabled(true);
-
-        Collection<? extends CRL> crls = loadCRL(config.getPath());
-        if (crls != null && !crls.isEmpty())
-        {
-            pbParams.addCertStore(CertStore.getInstance("Collection", new CollectionCertStoreParameters(crls)));
-        }
-
-        return new CertPathTrustManagerParameters(pbParams);
-    }
-
-    private ManagerFactoryParameters configForCustomOcspRevocation(KeyStore trustStore)
-            throws NoSuchAlgorithmException, KeyStoreException, InvalidAlgorithmParameterException, URISyntaxException
-    {
-        CustomOcspResponder config = getRevocationCheck().getCustomOcspResponder();
-        CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
-        PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
-        rc.setOptions(EnumSet.of(Option.NO_FALLBACK));
-
-        if (config.getUrl() != null)
-        {
-            rc.setOcspResponder(new URI(config.getUrl()));
-        }
-        if (config.getCertAlias() != null)
-        {
-            if (trustStore.isCertificateEntry(config.getCertAlias()))
-            {
-                rc.setOcspResponderCert((X509Certificate) trustStore.getCertificate(config.getCertAlias()));
-            }
-            else
-            {
-                throw new IllegalStateException("Key with alias \"" + config.getCertAlias() + "\" was not found");
-            }
-        }
-
-        PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
-        pkixParams.addCertPathChecker(rc);
-
-        return new CertPathTrustManagerParameters(pkixParams);
-    }
-
-    public Collection<? extends CRL> loadCRL(String crlPath) throws Exception
-    {
-        Collection<? extends CRL> crlList = null;
-
-        if (crlPath != null)
-        {
-            InputStream in = null;
-            try
-            {
-                in = IOUtils.getResourceAsStream(crlPath, getClass());
-                crlList = CertificateFactory.getInstance("X.509").generateCRLs(in);
-            }
-            finally
-            {
-                if (in != null)
-                {
-                    in.close();
-                }
-            }
-        }
-
-        return crlList;
-    }
-
 
     private static void assertNotNull(Object value, String message)
     {

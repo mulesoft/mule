@@ -15,7 +15,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
 import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
-import org.mule.api.security.revocation.RevocationCheck;
+import org.mule.transport.ssl.revocation.RevocationCheckWrapper;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -287,14 +287,9 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
         this.enabledProtocols = StringUtils.splitAndTrim(enabledProtocols, ",");
     }
 
-    public RevocationCheck getRevocationCheck()
+    public void setRevocationCheckWrapper(RevocationCheckWrapper revocationCheckWrapper)
     {
-        return tlsConfiguration.getRevocationCheck();
-    }
-
-    public void setRevocationCheck(RevocationCheck revocationCheck)
-    {
-        tlsConfiguration.setRevocationCheck(revocationCheck);
+        tlsConfiguration.setRevocationCheck(revocationCheckWrapper.getConfig());
     }
 
     @Override

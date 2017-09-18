@@ -275,7 +275,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="rcWrapperElement">
-        <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:choice minOccurs="1" maxOccurs="1">
             <xsd:element name="standard-revocation-check" type="rcStandardType">
                 <xsd:annotation>
                     <xsd:documentation>

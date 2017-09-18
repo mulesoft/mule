@@ -4,9 +4,33 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.api.security.revocation;
+package org.mule.transport.ssl.revocation;
 
-public class StandardRevocationCheck
+import org.mule.api.security.tls.RevocationCheck;
+
+import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.PKIXRevocationChecker;
+import java.security.cert.X509CertSelector;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.net.ssl.CertPathTrustManagerParameters;
+import javax.net.ssl.ManagerFactoryParameters;
+
+/**
+ * Uses the standard JVM certificate revocation checks, which depend on the certificate having the
+ * corresponding extension points (additional tags for CRLDP or OCSP), and the availability
+ * of revocation servers.
+ *
+ * @since 3.9
+ */
+public class StandardRevocationCheck implements RevocationCheck
 {
     private Boolean onlyEndEntities = false;
     private Boolean preferCrls = false;
@@ -51,6 +75,44 @@ public class StandardRevocationCheck
     public void setSoftFail(Boolean softFail)
     {
         this.softFail = softFail;
+    }
+
+    @Override
+    public ManagerFactoryParameters configFor(KeyStore trustStore)
+    {
+        try
+        {
+            CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
+            PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
+
+            Set<PKIXRevocationChecker.Option> options = new HashSet<>();
+            if (this.getOnlyEndEntities())
+            {
+                options.add(PKIXRevocationChecker.Option.ONLY_END_ENTITY);
+            }
+            if (this.getPreferCrls())
+            {
+                options.add(PKIXRevocationChecker.Option.PREFER_CRLS);
+            }
+            if (this.getNoFallback())
+            {
+                options.add(PKIXRevocationChecker.Option.NO_FALLBACK);
+            }
+            if (this.getSoftFail())
+            {
+                options.add(PKIXRevocationChecker.Option.SOFT_FAIL);
+            }
+            rc.setOptions(options);
+
+            PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
+            pkixParams.addCertPathChecker(rc);
+
+            return new CertPathTrustManagerParameters(pkixParams);
+        }
+        catch (GeneralSecurityException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
