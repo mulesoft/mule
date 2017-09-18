@@ -9,6 +9,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleManager;
 
 import org.apache.commons.logging.Log;
@@ -36,13 +37,17 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
      * initialised properly
      */
     @Override
-    public void configure(MuleContext muleContext) throws ConfigurationException
+    public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
     {
         try
         {
             doConfigure(muleContext);
             applyLifecycle(muleContext.getLifecycleManager());
             configured = true;
+        }
+        catch (InitialisationException e)
+        {
+            throw e;
         }
         catch (Exception e)
         {

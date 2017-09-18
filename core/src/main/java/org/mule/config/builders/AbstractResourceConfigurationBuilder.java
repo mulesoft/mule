@@ -9,6 +9,7 @@ package org.mule.config.builders;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.ConfigResource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
@@ -59,7 +60,7 @@ public abstract class AbstractResourceConfigurationBuilder extends AbstractConfi
      * resources n configuration afterwards.
      */
     @Override
-    public void configure(MuleContext muleContext) throws ConfigurationException
+    public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
     {
         if (configResources == null)
         {

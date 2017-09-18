@@ -6,17 +6,23 @@
  */
 package org.mule.lifecycle;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.api.MuleException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.HasLifecycleInterceptor;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleInterceptor;
 import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.Registry;
 import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -84,7 +90,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
         for (Object target : targetObjects)
         {
-            if (duplicates.contains(target))
+            if (duplicates.contains(target) || target == null)
             {
                 continue;
             }
@@ -94,20 +100,40 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
                 LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
             }
 
-            if (interceptor.beforeLifecycle(phase, target))
+            try
             {
-                phase.applyLifecycle(target);
-                duplicates.add(target);
-                interceptor.afterLifecycle(phase, target);
-            }
-            else
-            {
-                if (LOGGER.isDebugEnabled())
+                if (interceptor.beforePhaseExecution(phase, target))
                 {
-                    LOGGER.debug(String.format("Skipping the application of the '%s' lifecycle phase over a certain object " +
-                                               "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                                               phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                                               interceptor.getClass().getName(), target));
+                    phase.applyLifecycle(target);
+                    duplicates.add(target);
+                    Optional<Exception> optException = empty();
+                    interceptor.afterPhaseExecution(phase, target, optException);
+                }
+                else
+                {
+                    if (LOGGER.isDebugEnabled())
+                    {
+                        LOGGER.debug(String.format("Skipping the application of the '%s' lifecycle phase over a certain object " +
+                                                   "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                                phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                                interceptor.getClass().getName(), target));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                interceptor.afterPhaseExecution(phase, target, of(e));
+                if (phase.equals(Disposable.PHASE_NAME) || phase.equals(Stoppable.PHASE_NAME))
+                {
+                    LOGGER.info(String.format("Failure executing phase %s over object %s, error message is: %s", phase, target), e.getMessage());
+                    if (LOGGER.isDebugEnabled())
+                    {
+                        LOGGER.debug(e.getMessage(), e);
+                    }
+                }
+                else
+                {
+                    throw e;
                 }
             }
         }
