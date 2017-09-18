@@ -26,6 +26,7 @@ import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistryBroker;
+import org.mule.transport.ConnectException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,8 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     protected Map<String, LifecyclePhase> phases = new HashMap<>();
     protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
     protected MuleContext muleContext;
-    private final LifecycleInterceptor initDisposeLifecycleInterceptor = new InitDisposeLifecycleInterceptor();
+    private final LifecycleInterceptor initDisposeLifecycleInterceptor = new PhaseErrorLifecycleInterceptor(Initialisable.PHASE_NAME, Disposable.PHASE_NAME, Initialisable.class);
+    private final LifecycleInterceptor startstopLifecycleInterceptor = new PhaseErrorLifecycleInterceptor(Startable.PHASE_NAME, Stoppable.PHASE_NAME, Startable.class);
 
     public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
     {
@@ -109,7 +111,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             {
                 ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(initDisposeLifecycleInterceptor);
             }
+
+            if (Startable.PHASE_NAME.equals(phaseName) || Stoppable.PHASE_NAME.equals(phaseName))
+            {
+                ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(startstopLifecycleInterceptor);
+            }
         }
+        
 
         phaseNames.add(phaseName);
         callbacks.put(phaseName, callback);
@@ -119,7 +127,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     public void fireLifecycle(String destinationPhase) throws LifecycleException
     {
         checkPhase(destinationPhase);
-        if (isDirectTransition(destinationPhase))
+        if (isDirectTransition(destinationPhase) || isLastPhaseExecutionFailed())
         {
 
             // transition to phase without going through other phases first
@@ -147,28 +155,12 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         }
     }
 
-    protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException
-    {
-        try
-        {
-            setExecutingPhase(phase);
-            callback.onTransition(phase, object);
-            setCurrentPhase(phase);
-        }
-        catch (LifecycleException e)
-        {
-            throw e;
-        }
-        catch (MuleException e)
-        {
-            throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(phase, object), e);
-        }
-        finally
-        {
-            setExecutingPhase(null);
-        }
-    }
 
+    protected void doOnConnectException(ConnectException ce) throws LifecycleException
+    {
+        throw new LifecycleException(ce, this);
+    }
+          
 
     //-------------------------------------------------------------------------------------------//
     //-                     LIFECYCLE HELPER METHODS
