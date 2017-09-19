@@ -16,15 +16,15 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.security.CredentialsAccessor;
-import org.mule.runtime.core.api.security.CredentialsNotSetException;
+import org.mule.runtime.core.internal.security.CredentialsAccessor;
+import org.mule.runtime.core.internal.security.CredentialsNotSetException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
-import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.core.internal.security.MuleHeaderCredentialsAccessor;
 
 /**

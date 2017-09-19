@@ -10,20 +10,20 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MA
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSecurityManagerNotSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.util.StringUtils.splitAndTrim;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 /**
  * <code>AbstractSecurityFilter</code> provides basic initialisation for all security filters, namely configuring the

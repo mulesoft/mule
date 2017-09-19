@@ -16,15 +16,15 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Optional;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Optional;
 
 @Feature(ERROR_HANDLING)
 @Story(ERROR_TYPES)

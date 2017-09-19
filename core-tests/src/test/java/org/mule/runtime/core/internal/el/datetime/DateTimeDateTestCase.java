@@ -17,7 +17,6 @@ import static java.util.Calendar.YEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.internal.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -40,7 +39,7 @@ public class DateTimeDateTestCase extends AbstractMuleTestCase {
 
   private Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-  private org.mule.runtime.core.api.el.datetime.Date now = new DateTime(currentCalendar).withTimeZone("UTC").getDate();
+  private org.mule.runtime.core.internal.el.datetime.Date now = new DateTime(currentCalendar).withTimeZone("UTC").getDate();
 
   @Test
   public void isBefore() {

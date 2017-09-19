@@ -11,7 +11,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.routing.CompositeRoutingException;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 
 
 public interface ForkJoinStrategyFactory {

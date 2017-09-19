@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.util;
 
 import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY;
-import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
+import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 
 public final class SecurityUtils {
 

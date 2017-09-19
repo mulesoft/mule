@@ -15,5 +15,5 @@ package org.mule.runtime.core.api.el;
  */
 public interface VariableAssignmentCallback<T> {
 
-  public void assignValue(String name, T value, T newValue);
+  void assignValue(String name, T value, T newValue);
 }

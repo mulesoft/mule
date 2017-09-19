@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;

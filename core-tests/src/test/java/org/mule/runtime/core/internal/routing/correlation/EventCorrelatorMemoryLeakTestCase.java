@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

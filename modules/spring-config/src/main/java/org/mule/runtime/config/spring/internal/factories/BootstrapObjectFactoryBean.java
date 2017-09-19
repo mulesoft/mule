@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.factories;
 
-import org.mule.runtime.core.api.config.bootstrap.BootstrapObjectFactory;
+import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 

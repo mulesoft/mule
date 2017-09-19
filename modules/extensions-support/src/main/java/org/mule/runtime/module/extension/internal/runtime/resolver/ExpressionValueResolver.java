@@ -12,7 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.inject.Inject;

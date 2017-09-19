@@ -6,7 +6,7 @@
  */
 package org.mule.test.infrastructure.process;
 
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 
 import java.util.concurrent.TimeUnit;

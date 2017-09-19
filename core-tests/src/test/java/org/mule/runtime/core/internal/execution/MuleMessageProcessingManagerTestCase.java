@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
 import org.mule.tck.size.SmallTest;

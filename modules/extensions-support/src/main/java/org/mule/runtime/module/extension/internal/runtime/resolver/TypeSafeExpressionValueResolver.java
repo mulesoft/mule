@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import javax.inject.Inject;
 

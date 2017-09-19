@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.security;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 

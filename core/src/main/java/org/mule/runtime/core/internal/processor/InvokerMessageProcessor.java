@@ -33,8 +33,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.util.TemplateParser;
-import org.mule.runtime.core.api.util.TemplateParser.PatternInfo;
+import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.core.privileged.util.TemplateParser.PatternInfo;
 import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 
 import java.lang.reflect.Method;

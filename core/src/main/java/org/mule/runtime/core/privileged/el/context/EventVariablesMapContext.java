@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.el.context;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.event.BaseEvent.getVariableValueOrNull;
 
-import org.mule.runtime.core.api.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.BaseEvent;
 
 import java.util.HashMap;

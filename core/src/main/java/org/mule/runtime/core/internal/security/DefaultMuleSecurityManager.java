@@ -17,10 +17,10 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.api.security.UnauthorisedException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

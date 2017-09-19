@@ -46,8 +46,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
-import org.mule.runtime.core.api.routing.CompositeRoutingException;
-import org.mule.runtime.core.api.routing.RoutingResult;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;

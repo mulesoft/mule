@@ -19,7 +19,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 

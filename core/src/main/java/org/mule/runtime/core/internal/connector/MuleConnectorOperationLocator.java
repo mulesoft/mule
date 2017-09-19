@@ -12,21 +12,21 @@ import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;
-import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
-import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.client.AbstractPriorizableConnectorMessageProcessorProvider;
+import org.mule.runtime.core.privileged.connector.ConnectorOperationLocator;
+import org.mule.runtime.core.privileged.connector.ConnectorOperationProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * Default {@link org.mule.runtime.core.api.connector.ConnectorOperationLocator} that will search in the mule registry for
- * registered {@link org.mule.runtime.core.api.connector.ConnectorOperationLocator} to later provider operations through the use
+ * Default {@link ConnectorOperationLocator} that will search in the mule registry for
+ * registered {@link ConnectorOperationLocator} to later provider operations through the use
  * of URLs.
  */
 public class MuleConnectorOperationLocator implements ConnectorOperationLocator, MuleContextAware, Initialisable {

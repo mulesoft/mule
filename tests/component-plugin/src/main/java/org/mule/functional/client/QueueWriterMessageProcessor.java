@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 /**
  * Writes {@link BaseEvent} to a test connector's queue.

@@ -34,14 +34,14 @@ import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
-import org.mule.runtime.core.api.exception.MuleFatalException;
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.routing.CompositeRoutingException;
+import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.internal.routing.DuplicateMessageException;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.internal.routing.ValidationException;
-import org.mule.runtime.core.api.security.NotPermittedException;
+import org.mule.runtime.api.security.NotPermittedException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 

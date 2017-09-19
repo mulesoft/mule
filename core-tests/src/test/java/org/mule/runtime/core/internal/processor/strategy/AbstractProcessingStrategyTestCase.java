@@ -58,7 +58,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.TriggerableMessageSource;

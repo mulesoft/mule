@@ -7,7 +7,7 @@
 package org.mule.test.heisenberg.extension.exception;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.exception.MuleFatalException;
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 
 public class HeisenbergConnectionExceptionEnricher extends ExceptionHandler {

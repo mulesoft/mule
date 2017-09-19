@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

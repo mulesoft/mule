@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.execution;
 
-import org.mule.runtime.core.api.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.EndProcessPhase;
 import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
 import org.mule.runtime.core.internal.execution.ValidationPhase;

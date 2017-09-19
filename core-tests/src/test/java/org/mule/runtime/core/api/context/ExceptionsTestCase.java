@@ -13,7 +13,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

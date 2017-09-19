@@ -24,16 +24,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.allure.AllureConstants;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -42,6 +39,8 @@ import java.util.concurrent.Future;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Test;
 
 @Feature(REGISTRY)
 public class ApplicationWithDomainRegistryTestCase extends AbstractMuleTestCase {

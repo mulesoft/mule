@@ -13,7 +13,7 @@ package org.mule.runtime.core.api.exception;
  */
 public interface RollbackSourceCallback {
 
-  public void rollback();
+  void rollback();
 }
 
 

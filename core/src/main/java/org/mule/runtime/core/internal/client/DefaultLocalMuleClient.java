@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.client.OperationOptions;
-import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
+import org.mule.runtime.core.privileged.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.functional.Either;

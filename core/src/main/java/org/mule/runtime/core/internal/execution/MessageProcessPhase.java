@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 /**

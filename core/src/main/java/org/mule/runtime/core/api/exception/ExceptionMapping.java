@@ -21,7 +21,7 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
   private ErrorType errorType;
 
   /**
-   * Creates a new {@link ExceptionMapper} instance.
+   * Creates a new {@link ExceptionMapping} instance.
    * 
    * @param exceptionType exception type to related to the error type.
    * @param errorType error type associated with the exception type.

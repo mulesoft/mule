@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.message.GroupCorrelation.of;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.util.ArrayList;

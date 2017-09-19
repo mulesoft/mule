@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.config.factory;
 
-import org.mule.runtime.core.api.config.PropertyFactory;
+import org.mule.runtime.core.internal.config.PropertyFactory;
 import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.util.Map;

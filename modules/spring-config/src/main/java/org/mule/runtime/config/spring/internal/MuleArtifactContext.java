@@ -72,7 +72,7 @@ import org.mule.runtime.config.spring.internal.processor.PostRegistrationActions
 import org.mule.runtime.config.spring.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
-import org.mule.runtime.core.api.config.RuntimeConfigurationException;
+import org.mule.runtime.config.spring.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;

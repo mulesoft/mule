@@ -39,7 +39,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.privileged.util.monitor.Expirable;

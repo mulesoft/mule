@@ -19,7 +19,7 @@ import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import io.qameta.allure.Attachment;
-import org.mule.runtime.core.api.util.MapUtils;
+import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;

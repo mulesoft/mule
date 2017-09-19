@@ -14,7 +14,7 @@ import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocati
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.core.api.config.RuntimeConfigurationException;
+import org.mule.runtime.config.spring.internal.dsl.model.config.RuntimeConfigurationException;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

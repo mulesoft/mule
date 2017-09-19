@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.util.TemplateParser;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;

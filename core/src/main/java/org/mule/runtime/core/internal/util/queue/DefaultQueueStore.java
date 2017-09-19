@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.util.queue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
-import org.mule.runtime.core.api.util.queue.QueueStoreDelegate;
 
 import java.io.Serializable;
 

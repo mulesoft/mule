@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
