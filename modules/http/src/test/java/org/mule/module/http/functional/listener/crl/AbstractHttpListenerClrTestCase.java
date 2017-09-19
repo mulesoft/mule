@@ -36,11 +36,11 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 @PowerMockRunnerDelegate(Parameterized.class)
 @PrepareForTest(GrizzlyServerManager.class)
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
-public abstract class AbstractHttpListenerTlsRevocationTestCase extends AbstractHttpTlsRevocationTestCase
+public abstract class AbstractHttpListenerClrTestCase extends AbstractHttpTlsRevocationTestCase
 {
     Throwable revocationException ;
 
-    AbstractHttpListenerTlsRevocationTestCase(String configFile, String crlPath, String entityCertified)
+    AbstractHttpListenerClrTestCase(String configFile, String crlPath, String entityCertified)
     {
         super(configFile, crlPath, entityCertified);
     }

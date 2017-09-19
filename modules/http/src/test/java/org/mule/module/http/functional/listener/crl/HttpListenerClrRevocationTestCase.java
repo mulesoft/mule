@@ -10,22 +10,22 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class HttpListenerTlsRevocationOutdatedCrlTestCase extends AbstractHttpListenerTlsRevocationTestCase
+public class HttpListenerClrRevocationTestCase extends AbstractHttpListenerClrTestCase
 {
 
-    public HttpListenerTlsRevocationOutdatedCrlTestCase(String configFile)
+    public HttpListenerClrRevocationTestCase(String configFile)
     {
-        super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH);
+        super(configFile, REVOKED_CRL_FILE_PATH, ENTITY_CERTIFIED_REVOCATION_SUB_PATH);
     }
 
     @Test
-    public void testClientCertifiedAndOutdatedCrl() throws Exception
+    public void testClientCertifiedAndRevoked() throws Exception
     {
         revocationException = null;
         try
         {
             runRevocationTestFlow();
-            fail("CertPathValidatorException should have been thrown");
+            fail("Remotely Closed exception has been thrown");
         }
         catch (Exception e)
         {
@@ -33,7 +33,7 @@ public class HttpListenerTlsRevocationOutdatedCrlTestCase extends AbstractHttpLi
         }
         finally
         {
-            verifyUndeterminedRevocationException(revocationException);
+            verifyRevocationException(revocationException);
         }
     }
 

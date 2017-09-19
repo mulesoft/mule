@@ -51,8 +51,22 @@ public abstract class AbstractHttpTlsRevocationTestCase extends FunctionalTestCa
 
     protected static String ENTITY_CERTIFIED_REVOCATION_SUB_PATH = "entity3";
 
+    /**
+     *  This certified entity was generated to test revocation with OCSP mechanism.
+     */
+    protected static String ENTITY_CERTIFIED_REVOCATION_OCSP_SUB_PATH = "entity4";
+
+
+    protected static String RUN_OCSP_SERVER_COMMAND = "openssl ocsp " +
+                                             "-index src/test/resources/tls/ocsp/%s " +
+                                             "-CA src/test/resources/tls/ocsp/server.crt " +
+                                             "-rkey src/test/resources/tls/ocsp/server_key.pem " +
+                                             "-port 1111 " +
+                                             "-rsigner src/test/resources/tls/ocsp/server.crt";
+
+    protected static String REVOKED_OCSP_LIST = "revoked-ocsp.txt";
     @Rule
-    public DynamicPort portRevoked = new DynamicPort("port");
+    public DynamicPort port = new DynamicPort("port");
 
     @Rule
     public SystemProperty crlSystemProperty ;
@@ -67,6 +81,12 @@ public abstract class AbstractHttpTlsRevocationTestCase extends FunctionalTestCa
     {
         this.configFile = configFile;
         crlSystemProperty = new SystemProperty("crlPath", crlPath);
+        entityCertifiedSubPathSystemProperty = new SystemProperty("entityCertifiedSubPath", entityCertified);
+    }
+
+    public AbstractHttpTlsRevocationTestCase(String configFile, String entityCertified)
+    {
+        this.configFile = configFile;
         entityCertifiedSubPathSystemProperty = new SystemProperty("entityCertifiedSubPath", entityCertified);
     }
 

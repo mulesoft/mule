@@ -9,10 +9,10 @@ package org.mule.module.http.functional.requester.crl;
 
 import org.junit.Test;
 
-public class HttpRequesterTlsNoRevocationTestCase extends AbstractHttpRequesterTlsRevocationTestCase
+public class HttpRequesterClrNoRevocationTestCase extends AbstractHttpRequesterClrTestCase
 {
 
-    public HttpRequesterTlsNoRevocationTestCase(String configFile)
+    public HttpRequesterClrNoRevocationTestCase(String configFile)
     {
         super(configFile, EMPTY_CRL_FILE_PATH, ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH);
     }

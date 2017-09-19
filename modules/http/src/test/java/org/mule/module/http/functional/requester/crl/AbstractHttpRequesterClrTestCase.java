@@ -17,10 +17,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public abstract class AbstractHttpRequesterTlsRevocationTestCase extends AbstractHttpTlsRevocationTestCase
+public abstract class AbstractHttpRequesterClrTestCase extends AbstractHttpTlsRevocationTestCase
 {
 
-    AbstractHttpRequesterTlsRevocationTestCase(String configFile, String crlPath, String entityCertified)
+    protected AbstractHttpRequesterClrTestCase(String configFile, String crlPath, String entityCertified)
     {
         super(configFile, crlPath, entityCertified);
     }
