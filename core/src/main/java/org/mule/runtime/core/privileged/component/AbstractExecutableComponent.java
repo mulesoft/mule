@@ -21,6 +21,7 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.InputEvent;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -60,7 +61,9 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   @Override
   public final CompletableFuture<Event> execute(Event event) {
     BaseEvent internalEvent;
-    BaseEventContext child = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
+    BaseEventContext child =
+        child((BaseEventContext) event.getContext(), ofNullable(getLocation()),
+              this instanceof Pipeline ? ((Pipeline) this).getExceptionListener() : NullExceptionHandler.getInstance());
     if (event instanceof BaseEvent) {
       internalEvent = builder(child, (BaseEvent) event).build();
     } else {

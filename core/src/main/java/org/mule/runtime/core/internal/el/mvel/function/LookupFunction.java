@@ -22,10 +22,13 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.ComponentExecutionException;
+import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -41,6 +44,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -80,18 +84,17 @@ public class LookupFunction implements ExpressionFunction {
             .error(incomingError)
             .message(message)
             .build();
-        MessagingExceptionHandler exceptionListener = ((Flow) component).getExceptionListener();
-
-        BaseEvent result = from(processWithChildContext(event, (Flow) component, empty(), exceptionListener)).block();
-        return result.getMessage().getPayload();
-      } catch (Exception e) {
-        MessagingException me = (MessagingException) unwrap(e);
-        Error error = me.getEvent().getError().get();
+        return ((ExecutableComponent) component).execute(event).get().getMessage().getPayload();
+      } catch (ExecutionException e) {
+        ComponentExecutionException componentExecutionException = (ComponentExecutionException) e.getCause();
+        Error error = componentExecutionException.getEvent().getError().get();
         throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has failed with error '%s' (%s)",
                                                                   flowName,
                                                                   error.getErrorType(),
                                                                   error.getDescription())),
                                        error.getCause());
+      } catch (InterruptedException e) {
+        throw new MuleRuntimeException(e);
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
