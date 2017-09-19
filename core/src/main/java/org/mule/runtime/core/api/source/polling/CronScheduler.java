@@ -35,8 +35,11 @@ public class CronScheduler extends PeriodicScheduler {
   @Parameter
   private String expression;
 
+  /**
+   * The ID of the time zone in which the expression will be based.
+   * Refer to {@code java.util.TimeZone} for the format and possible values of the timeZone ID.
+   */
   @Parameter
-  @Optional
   private String timeZone;
 
   @Override

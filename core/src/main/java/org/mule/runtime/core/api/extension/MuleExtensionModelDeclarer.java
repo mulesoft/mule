@@ -11,6 +11,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
@@ -46,7 +47,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
@@ -68,6 +69,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.SchedulingStrategy;
@@ -117,6 +119,7 @@ class MuleExtensionModelDeclarer {
     declareTry(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
     declareConfiguration(extensionDeclarer, typeLoader);
+    declareConfigurationProperties(extensionDeclarer, typeLoader);
 
     // operations
     declareAsync(extensionDeclarer, typeLoader);
@@ -520,7 +523,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
-        .withStereotype(CONFIG)
+        .withStereotype(APP_CONFIG)
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
@@ -574,6 +577,26 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default");
+  }
+
+  private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
+        .allowingTopLevelDefinition()
+        .withStereotype(APP_CONFIG)
+        .describedAs("References a file with configuration properties. Each property has a key and a value. \n"
+            + "The key can be referenced from the mule configuration files using the following semantics: \n"
+            + "${key_name}. This allows to externalize configuration and change it based\n"
+            + "on the environment the application is being deployed to.");
+
+    configuration.onDefaultParameterGroup()
+        .withRequiredParameter("file")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, new String[] {"properties"})).build())
+        .describedAs(" The location of the file with the configuration properties to use. "
+            + "It may be a location in the classpath or an absolute location. The file location\n"
+            + " value may also contains references to properties that will only be resolved based on "
+            + "system properties or properties set at deployment time.");
   }
 
 }
