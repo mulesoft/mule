@@ -72,7 +72,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Rule
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
-                                                                "/Users/pablo.lagreca/.m2/repository2");
+                                                                discoverProvider(ApplicationDescriptorFactoryTestCase.class
+                                                                    .getClassLoader()).getLocalRepositorySuppliers()
+                                                                        .environmentMavenRepositorySupplier().get()
+                                                                        .getAbsolutePath());
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
