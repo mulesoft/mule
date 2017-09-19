@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.lock;
 
 
+import static java.util.Collections.unmodifiableMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -177,6 +178,11 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
     @Override
     public List<String> allKeys() throws ObjectStoreException {
       return new ArrayList<>(store.keySet());
+    }
+
+    @Override
+    public Map<String, Integer> retrieveAll() throws ObjectStoreException {
+      return unmodifiableMap(store);
     }
   }
 

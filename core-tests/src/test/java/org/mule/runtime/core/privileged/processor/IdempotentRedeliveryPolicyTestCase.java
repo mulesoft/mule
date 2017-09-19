@@ -7,11 +7,11 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
@@ -242,6 +242,14 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     public List<String> allKeys() throws ObjectStoreException {
       return new ArrayList<>(store.keySet());
     }
+
+    @Override
+    public Map<String, AtomicInteger> retrieveAll() throws ObjectStoreException {
+      return store.entrySet().stream().collect(
+                                               toMap(entry -> entry.getKey(),
+                                                     entry -> (AtomicInteger) serializer.getExternalProtocol()
+                                                         .deserialize((byte[]) entry.getValue())));
+    }
   }
 
   public static class InMemoryObjectStore extends TemplateObjectStore<AtomicInteger> {
@@ -291,6 +299,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     @Override
     public List<String> allKeys() throws ObjectStoreException {
       return new ArrayList<>(store.keySet());
+    }
+
+    @Override
+    public Map<String, AtomicInteger> retrieveAll() throws ObjectStoreException {
+      return unmodifiableMap(store);
     }
   }
 }

@@ -13,6 +13,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -106,6 +107,11 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleContextTestCase {
 
     @Override
     public List<String> allKeys() throws ObjectStoreException {
+      return null;
+    }
+
+    @Override
+    public Map<String, String> retrieveAll() throws ObjectStoreException {
       return null;
     }
   }

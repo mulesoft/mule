@@ -117,6 +117,11 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   @Override
+  public Map<String, T> retrieveAll(String partitionName) throws ObjectStoreException {
+    return getPartitionObjectStore(partitionName).retrieveAll();
+  }
+
+  @Override
   public void clear(String partitionName) throws ObjectStoreException {
     getPartitionObjectStore(partitionName).clear();
   }

@@ -8,6 +8,7 @@ package org.mule.tck.core.util.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -125,6 +126,11 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
   @Override
   public List<String> allKeys() throws ObjectStoreException {
     return store.keySet().stream().map(String::valueOf).collect(toList());
+  }
+
+  @Override
+  public Map<String, T> retrieveAll() throws ObjectStoreException {
+    return store.values().stream().collect(toMap(StoredObject::getId, StoredObject::getItem));
   }
 
   private int expireAndCount() {
