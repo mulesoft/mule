@@ -29,10 +29,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.app.declaration.ParameterValue;
-import org.mule.runtime.api.app.declaration.ParameterValueVisitor;
-import org.mule.runtime.api.app.declaration.fluent.ParameterObjectValue;
-import org.mule.runtime.api.app.declaration.fluent.ParameterSimpleValue;
+import org.mule.runtime.app.declaration.api.ParameterValue;
+import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
+import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;

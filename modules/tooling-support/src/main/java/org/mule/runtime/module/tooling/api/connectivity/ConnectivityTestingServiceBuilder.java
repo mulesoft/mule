@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.tooling.api.connectivity;
 
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 
 /**

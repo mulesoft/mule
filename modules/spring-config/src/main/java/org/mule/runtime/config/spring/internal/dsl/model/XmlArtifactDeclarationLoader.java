@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.model;
 
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.internal.dsl.declaration.DefaultXmlArtifactDeclarationLoader;
