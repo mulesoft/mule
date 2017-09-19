@@ -21,7 +21,6 @@ public class HttpRequesterOcspNoRevocationTestCase extends AbstractHttpOscpRevoc
     @Test
     public void testNoRevokedEntity() throws Exception
     {
-        serverLatch.await();
         verifyNotRevokedEntity();
     }
 

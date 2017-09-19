@@ -1,9 +1,7 @@
 package org.mule.module.http.functional.requester.ocsp;
 
 import static java.lang.String.format;
-import static org.junit.Assert.fail;
 import org.mule.module.http.functional.AbstractHttpTlsRevocationTestCase;
-import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 
@@ -32,8 +30,6 @@ public abstract class AbstractHttpOscpRevocationTestCase extends AbstractHttpTls
 
     private Process process ;
 
-    final Latch serverLatch = new Latch();
-
     private final String ocspList ;
 
 
@@ -47,22 +43,7 @@ public abstract class AbstractHttpOscpRevocationTestCase extends AbstractHttpTls
     @Before
     public void setUp() throws Exception
     {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    process = Runtime.getRuntime().exec(format(RUN_OCSP_SERVER_COMMAND, ocspList));
-                    serverLatch.countDown();
-                }
-                catch (IOException e)
-                {
-                    fail("There was an error trying to start the ocsp server.");
-                }
-            }
-        }).start();
+        process = Runtime.getRuntime().exec(format(RUN_OCSP_SERVER_COMMAND, ocspList));
     }
 
     @After

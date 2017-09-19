@@ -23,7 +23,6 @@ public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOscpRevocat
     @Test
     public void testServerCertifiedAndRevoked() throws Exception
     {
-        serverLatch.await();
         try
         {
             runRevocationTestFlow();
