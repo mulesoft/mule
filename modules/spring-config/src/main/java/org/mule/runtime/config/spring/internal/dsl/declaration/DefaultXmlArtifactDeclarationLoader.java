@@ -22,6 +22,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONN
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.internal.dsl.processor.xml.XmlCustomAttributeHandler.IS_CDATA;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -36,6 +37,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
@@ -96,7 +98,6 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -107,6 +108,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.w3c.dom.Document;
 
 /**
  * Default implementation of a {@link XmlArtifactDeclarationLoader}
@@ -679,6 +682,17 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
               copyExplicitAttributes(config.getConfigAttributes(), redelivery);
               declarer.withParameterGroup(newParameterGroup()
                   .withParameter(REDELIVERY_POLICY_PARAMETER_NAME, redelivery.build())
+                  .getDeclaration());
+            });
+        return;
+
+      case EXPIRATION_POLICY_PARAMETER_NAME:
+        findAnyMatchingChildById(declaredConfigs, EXPIRATION_POLICY_ELEMENT_IDENTIFIER)
+            .ifPresent(config -> {
+              ParameterObjectValue.Builder expiration = newObjectValue();
+              copyExplicitAttributes(config.getConfigAttributes(), expiration);
+              declarer.withParameterGroup(newParameterGroup()
+                  .withParameter(EXPIRATION_POLICY_PARAMETER_NAME, expiration.build())
                   .getDeclaration());
             });
         return;

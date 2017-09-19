@@ -11,13 +11,14 @@ import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
-
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -26,11 +27,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,11 +38,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext.
  * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
+
+  protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -118,8 +120,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    */
   private boolean disableTimeouts = false;
 
-  protected static transient Logger logger = LoggerFactory.getLogger(DefaultMuleConfiguration.class);
-
   private MuleContext muleContext;
   private boolean containerMode;
 
@@ -155,7 +155,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   /**
    * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all
-   * {@link org.mule.runtime.core.api.construct.Flow}s which doesn't specify otherwise
+   * {@link Flow flows} which doesn't specify otherwise
    *
    * @since 3.7.0
    */
@@ -168,6 +168,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 3.9.0
    */
   private int maxQueueTransactionFilesSizeInMegabytes = 500;
+
+  private DynamicConfigExpiration dynamicConfigExpiration =
+      DynamicConfigExpiration.getDefault();
 
   public DefaultMuleConfiguration() {
     this(false);
@@ -579,6 +582,18 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   public void setDefaultProcessingStrategyFactory(ProcessingStrategyFactory defaultProcessingStrategy) {
     this.defaultProcessingStrategyFactory = defaultProcessingStrategy;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DynamicConfigExpiration getDynamicConfigExpiration() {
+    return dynamicConfigExpiration;
+  }
+
+  public void setDynamicConfigExpiration(DynamicConfigExpiration dynamicConfigExpiration) {
+    this.dynamicConfigExpiration = dynamicConfigExpiration;
   }
 
   public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer) {

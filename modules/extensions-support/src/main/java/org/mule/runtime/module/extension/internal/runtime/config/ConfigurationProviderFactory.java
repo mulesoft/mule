@@ -10,8 +10,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -31,7 +31,7 @@ public interface ConfigurationProviderFactory {
    * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
    * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
-   * @param dynamicConfigPolicy        a {@link DynamicConfigPolicy} in case the configuration is dynamic
+   * @param expirationPolicy        An {@link ExpirationPolicy} in case the configuration is dynamic
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */
@@ -40,7 +40,7 @@ public interface ConfigurationProviderFactory {
                                                            ConfigurationModel configurationModel,
                                                            ResolverSet resolverSet,
                                                            ConnectionProviderValueResolver connectionProviderResolver,
-                                                           DynamicConfigPolicy dynamicConfigPolicy,
+                                                           ExpirationPolicy expirationPolicy,
                                                            MuleContext muleContext)
       throws Exception;
 

@@ -20,10 +20,10 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
-import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
 /**
@@ -57,7 +57,7 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
             .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-            .withSetterParameterDefinition("dynamicConfigPolicy", fromChildConfiguration(DynamicConfigPolicy.class).build());
+            .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build());
 
     parseParameters(configurationModel);
     finalBuilder = parseConnectionProvider(finalBuilder);

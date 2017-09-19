@@ -8,23 +8,22 @@ package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -40,8 +39,6 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
   private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-
-  protected transient Logger logger = LoggerFactory.getLogger(MuleConfigurationConfigurator.class);
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -126,6 +123,10 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     config.setMaxQueueTransactionFilesSize(queueTransactionFilesSizeInMegabytes);
   }
 
+  public void setDynamicConfigExpiration(DynamicConfigExpiration dynamicConfigExpiration) {
+    config.setDynamicConfigExpiration(dynamicConfigExpiration);
+  }
+
   public void setExtensions(List<ConfigurationExtension> extensions) {
     config.addExtensions(extensions);
   }
@@ -141,6 +142,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
+      defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
       validateDefaultErrorHandler();
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 

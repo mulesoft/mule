@@ -25,33 +25,23 @@ public final class SchemaConstants {
   public static final String MULE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
   public static final String EE_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd";
 
-  public static final String MULE_EXTENSION_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "extension");
-  public static final String MULE_EXTENSION_PREFIX = "extension";
-  public static final String MULE_EXTENSION_SCHEMA_LOCATION =
-      "http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd";
-
   public static final String MULE_TLS_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "tls");
   public static final String MULE_TLS_SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd";
-  public static final String OPERATION_SUBSTITUTION_GROUP_SUFFIX = "-OperationGroup";
-  public static final String GROUP_SUFFIX = "-group";
-
 
   public static final QName MULE_ABSTRACT_MESSAGE_SOURCE_TYPE =
       new QName(CORE_NAMESPACE, "abstractMessageSourceType", CORE_PREFIX);
-  public static final QName MULE_ABSTRACT_EXTENSION =
-      new QName(CORE_NAMESPACE, "abstract-extension", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_SHARED_EXTENSION =
       new QName(CORE_NAMESPACE, "abstract-shared-extension", CORE_PREFIX);
   public static final QName MULE_PROPERTY_PLACEHOLDER_TYPE =
       new QName(CORE_NAMESPACE, "propertyPlaceholderType", CORE_PREFIX);
-  public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT =
-      new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProvider", MULE_EXTENSION_PREFIX);
-  public static final QName MULE_EXTENSION_CONNECTION_PROVIDER_TYPE =
-      new QName(MULE_EXTENSION_NAMESPACE, "abstractConnectionProviderType", MULE_EXTENSION_PREFIX);
-  public static final QName MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT =
-      new QName(MULE_EXTENSION_NAMESPACE, "dynamic-config-policy", MULE_EXTENSION_PREFIX);
-  public static final QName MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE =
-      new QName(MULE_EXTENSION_NAMESPACE, "operationTransactionalActionType", MULE_EXTENSION_PREFIX);
+  public static final QName MULE_CONNECTION_PROVIDER_ELEMENT =
+      new QName(CORE_NAMESPACE, "abstractConnectionProvider", CORE_PREFIX);
+  public static final QName MULE_CONNECTION_PROVIDER_TYPE =
+      new QName(CORE_NAMESPACE, "abstractConnectionProviderType", CORE_PREFIX);
+  public static final QName MULE_EXPIRATION_POLICY_ELEMENT =
+      new QName(CORE_NAMESPACE, "expiration-policy", CORE_PREFIX);
+  public static final QName MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE =
+      new QName(CORE_NAMESPACE, "operationTransactionalActionType", CORE_PREFIX);
   public static final QName MULE_TRANSACTION_TYPE =
       new QName(CORE_NAMESPACE, "transactionType", CORE_PREFIX);
   public static final QName MULE_ABSTRACT_EXTENSION_TYPE =
@@ -89,7 +79,6 @@ public final class SchemaConstants {
   public static final QName EXPRESSION_LIST = new QName(CORE_NAMESPACE, "expressionList", CORE_PREFIX);
   public static final QName EXPRESSION_MAP = new QName(CORE_NAMESPACE, "expressionMap", CORE_PREFIX);
   public static final QName EXPRESSION_DATE_TIME = new QName(CORE_NAMESPACE, "expressionDateTime", CORE_PREFIX);
-  public static final QName TARGET_OUTPUT_ENUM = new QName(CORE_NAMESPACE, "targetValueEnumType", CORE_PREFIX);
 
   // ATTRIBUTES
   public static final String USE_REQUIRED = "required";

@@ -935,6 +935,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
+                    <xsd:element ref="dynamic-config-expiration" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Configuration about how should the runtime handle the expiration of dynamic configurations
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="expression-language" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -3390,6 +3397,106 @@
     </xsd:complexType>
 
     <!--==============================================================-->
+    <!--  Extensions                                                  -->
+    <!--==============================================================-->
+
+    <xsd:element name="dynamic-config-expiration" type="dynamicConfigExpirationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configuration about how should the runtime handle the expiration of dynamic configurations
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="dynamicConfigExpirationType">
+        <xsd:sequence>
+            <xsd:element ref="expiration-policy" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+        <xsd:attribute name="frequency" type="substitutableLong" use="optional" default="5">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A scalar time value for how often should the platform check for expirable dynamic configs
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="timeUnit" type="timeUnitType" use="optional" default="MINUTES">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A time unit that qualifies the frequency attribute
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="abstractConnectionProvider" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                Connection Providers are responsible for configuring, creating and managing
+                connections
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractConnectionProviderType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Abstract type for ConnectionProvider elements.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="expiration-policy" type="expirationPolicyType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures the minimum amount of time that a dynamic configuration instance can remain idle
+                before the runtime considers it eligible for expiration. This does not mean that the platform
+                will expire the instance at the exact moment that it becomes eligible. The runtime will actually
+                purge the instances when it sees it fit.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:complexType name="expirationPolicyType">
+        <xsd:attribute name="maxIdleTime" type="substitutableLong" use="optional" default="5">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed
+                    to be idle before it's considered eligible for expiration
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="timeUnit" type="timeUnitType" use="optional" default="MINUTES">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A time unit that qualifies the maxIdleTime attribute
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:simpleType name="operationTransactionalActionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                The type of joining action that operations can take
+                regarding transactions. Possible values are:
+                ALWAYS_JOIN - Always expects a transaction to be in progress when a message is received. If there is no
+                transaction, an exception is thrown.
+                JOIN_IF_POSSIBLE - Join the current transaction if one is available. Otherwise, no transaction is
+                created.
+                NOT_SUPPORTED - Execute outside any existent transaction.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="ALWAYS_JOIN"/>
+            <xsd:enumeration value="JOIN_IF_POSSIBLE"/>
+            <xsd:enumeration value="NOT_SUPPORTED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <!--==============================================================-->
     <!--  Pooling                                                     -->
     <!--==============================================================-->
 
@@ -3801,6 +3908,8 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="NANOSECONDS"/>
+            <xsd:enumeration value="MICROSECONDS"/>
             <xsd:enumeration value="MILLISECONDS"/>
             <xsd:enumeration value="SECONDS"/>
             <xsd:enumeration value="MINUTES"/>

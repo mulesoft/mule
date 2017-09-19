@@ -4,7 +4,6 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>
@@ -13,34 +12,35 @@
             <xs:documentation>Default configuration</xs:documentation>
           </xs:annotation>
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="connection">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="extension:abstractConnectionProviderType">
+        <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
           </xs:sequence>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" default="false" name="useXa"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="useXa"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="non-pooling-connection">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="non-pooling-connection">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="extension:abstractConnectionProviderType">
+        <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
           </xs:sequence>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" default="false" name="useXa"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="useXa"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -109,7 +109,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -139,7 +139,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="action">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="action">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -170,7 +170,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -200,7 +200,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -221,7 +221,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -241,7 +241,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -261,7 +261,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
@@ -281,7 +281,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns:extension="http://www.mulesoft.org/schema/mule/extension" type="extension:operationTransactionalActionType" use="optional" name="transactionalAction">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>

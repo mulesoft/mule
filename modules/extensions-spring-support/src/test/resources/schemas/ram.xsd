@@ -4,7 +4,6 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
   <xs:complexType name="org.mule.runtime.extension.api.soap.MessageDispatcherProvider">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
@@ -63,20 +62,21 @@
             <xs:documentation>Default configuration</xs:documentation>
           </xs:annotation>
           <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="rick-and-morty-connection">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="rick-and-morty-connection">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="extension:abstractConnectionProviderType">
+        <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="transport">
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
@@ -86,9 +86,9 @@
               </xs:complexType>
             </xs:element>
           </xs:sequence>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="wsdlUrl"></xs:attribute>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="service"></xs:attribute>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="port"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="wsdlUrl"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="service"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="port"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="transport"></xs:attribute>
         </xs:extension>
       </xs:complexContent>

@@ -67,7 +67,7 @@ public class ParameterAllowedStereotypesDeclarionEnricherTestCase extends Abstra
   @Test
   public void configurationWithConfigReferenceParameter() {
     List<ParameterModel> params = configuration.getAllParameterModels();
-    assertThat(params, hasSize(2));
+    assertThat(params, hasSize(3));
     ParameterModel param = params.get(0);
     List<StereotypeModel> allowedStereotypes = param.getAllowedStereotypes();
     assertThat(allowedStereotypes, hasSize(1));

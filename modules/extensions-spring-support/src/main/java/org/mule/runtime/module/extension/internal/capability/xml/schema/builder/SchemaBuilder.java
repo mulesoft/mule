@@ -20,9 +20,7 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.EE_SCH
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
@@ -152,8 +150,7 @@ public final class SchemaBuilder {
     builder.withDslSyntaxResolver(extensionModel, dslContext)
         .importXmlNamespace()
         .importSpringFrameworkNamespace()
-        .importMuleNamespace()
-        .importMuleExtensionNamespace();
+        .importMuleNamespace();
 
     builder.initialiseDelegates();
 
@@ -244,21 +241,6 @@ public final class SchemaBuilder {
     muleSchemaImport.setNamespace(EE_NAMESPACE);
     muleSchemaImport.setSchemaLocation(EE_SCHEMA_LOCATION);
     return muleSchemaImport;
-  }
-
-  private SchemaBuilder importMuleEENamespace() {
-    Import muleSchemaImport = createMuleEEImport();
-    schema.getIncludeOrImportOrRedefine().add(muleSchemaImport);
-    return this;
-  }
-
-  private SchemaBuilder importMuleExtensionNamespace() {
-    Import muleExtensionImport = new Import();
-    muleExtensionImport.setNamespace(MULE_EXTENSION_NAMESPACE);
-    muleExtensionImport.setSchemaLocation(MULE_EXTENSION_SCHEMA_LOCATION);
-    schema.getIncludeOrImportOrRedefine().add(muleExtensionImport);
-
-    return this;
   }
 
   private void importIfNotImported(Import newImport) {
@@ -410,7 +392,7 @@ public final class SchemaBuilder {
 
         String typeName = getTypeId(enumType);
         if (OperationTransactionalAction.class.getName().equals(typeName)) {
-          attribute.setType(MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE);
+          attribute.setType(MULE_OPERATION_TRANSACTIONAL_ACTION_TYPE);
         } else if (TransactionType.class.getName().equals(typeName)) {
           attribute.setType(MULE_TRANSACTION_TYPE);
           attribute.setDefault(LOCAL.name());

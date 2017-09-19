@@ -50,6 +50,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STR
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_INCREMENT_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_MAX_BUFFER_SIZE;
+import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_FREQUENCY;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_BYTE_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
@@ -60,7 +61,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_ID
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tx.TransactionType;
@@ -81,6 +81,8 @@ import org.mule.runtime.config.spring.internal.dsl.processor.factory.MessageEnri
 import org.mule.runtime.config.spring.internal.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.ChoiceRouterObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.DefaultFlowFactoryBean;
+import org.mule.runtime.config.spring.internal.factories.DynamicConfigExpirationObjectFactory;
+import org.mule.runtime.config.spring.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.spring.internal.factories.FlowRefFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.runtime.config.spring.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
@@ -96,19 +98,16 @@ import org.mule.runtime.config.spring.privileged.dsl.processor.AddVariableProper
 import org.mule.runtime.config.spring.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
+import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.Notification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
-import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
 import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -135,6 +134,7 @@ import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.internal.processor.InvokerMessageProcessor;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
@@ -145,6 +145,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
+import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.IdempotentMessageValidator;
 import org.mule.runtime.core.internal.routing.MessageChunkAggregator;
 import org.mule.runtime.core.internal.routing.MessageChunkSplitter;
@@ -179,7 +180,9 @@ import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.privileged.expression.ExpressionConfig;
+import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
@@ -191,6 +194,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.ArrayList;
@@ -198,6 +202,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -541,12 +546,41 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromSimpleParameter("flowEndingWithOneWayEndpointReturnsNull").build())
         .withSetterParameterDefinition("enricherPropagatesSessionVariableChanges",
                                        fromSimpleParameter("enricherPropagatesSessionVariableChanges").build())
-        .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .withSetterParameterDefinition("defaultObjectSerializer",
                                        fromSimpleReferenceParameter("defaultObjectSerializer-ref").build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
+        .withSetterParameterDefinition("dynamicConfigExpiration",
+                                       fromChildConfiguration(DynamicConfigExpiration.class).build())
         .withSetterParameterDefinition("expressionLanguage", fromChildConfiguration(MVELExpressionLanguage.class).build())
+        .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .build());
+
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")
+        .withTypeDefinition(fromType(DynamicConfigExpiration.class))
+        .withObjectFactoryType(DynamicConfigExpirationObjectFactory.class)
+        .withConstructorParameterDefinition(fromSimpleParameter("frequency")
+            .withDefaultValue(DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getTime())
+            .build())
+        .withConstructorParameterDefinition(
+                                            fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value))
+                                                .withDefaultValue(DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getUnit())
+                                                .build())
+        .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+        .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
+            .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
+            .withSetterParameterDefinition("maxIdleTime",
+                                           fromSimpleParameter("maxIdleTime")
+                                               .withDefaultValue(DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getTime())
+                                               .build())
+            .withSetterParameterDefinition("timeUnit",
+                                           fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value))
+                                               .withDefaultValue(DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getUnit())
+                                               .build())
+            .build());
+
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("notifications")
         .withTypeDefinition(fromType(ServerNotificationManagerConfigurator.class))

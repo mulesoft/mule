@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.api.config;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after startup.
@@ -121,5 +121,10 @@ public interface MuleConfiguration {
    * @since 3.7.0
    */
   ProcessingStrategyFactory getDefaultProcessingStrategyFactory();
+
+  /**
+   * @return The default {@link DynamicConfigExpiration} that will be used in any dynamic config which doesn't specify its own
+   */
+  DynamicConfigExpiration getDynamicConfigExpiration();
 
 }
