@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher;
 
-import static java.util.Optional.empty;
+import static com.google.common.base.Optional.absent;
 import static org.apache.commons.lang.StringUtils.removeEndIgnoreCase;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.util.SplashScreen.miniSplash;
@@ -26,9 +26,9 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
+import com.google.common.base.Optional;
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.logging.Log;
@@ -329,7 +329,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void deployArtifact(T artifact) throws DeploymentException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         deployArtifact(artifact, properties);
     }
 
@@ -433,7 +433,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public void redeploy(T artifact) throws DeploymentException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         redeploy(artifact, properties);
     }
 
@@ -562,7 +562,7 @@ public class DefaultArchiveDeployer<T extends Artifact> implements ArchiveDeploy
     @Override
     public T deployPackagedArtifact(String zip) throws DeploymentException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         return deployPackagedArtifact(zip, properties);
     }
 }

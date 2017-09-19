@@ -12,7 +12,7 @@ import org.mule.module.launcher.artifact.ArtifactFactory;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
-import java.util.Optional;
+import com.google.common.base.Optional;
 import java.util.Properties;
 
 /**

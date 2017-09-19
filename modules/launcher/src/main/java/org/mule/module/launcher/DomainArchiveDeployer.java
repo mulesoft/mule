@@ -6,7 +6,8 @@
  */
 package org.mule.module.launcher;
 
-import static java.util.Optional.empty;
+import static com.google.common.base.Optional.absent;
+
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.domain.Domain;
@@ -19,9 +20,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
+import com.google.common.base.Optional;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
@@ -126,7 +127,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public void redeploy(Domain artifact) throws DeploymentException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         redeploy(artifact, properties);
     }
 
@@ -236,7 +237,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     @Override
     public Domain deployPackagedArtifact(String zip) throws DeploymentException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         return deployPackagedArtifact(zip, properties);
     }
 }

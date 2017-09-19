@@ -6,7 +6,8 @@
  */
 package org.mule.module.launcher.descriptor;
 
-import static java.util.Optional.empty; 
+import static com.google.common.base.Optional.absent;
+
 import org.mule.module.launcher.plugin.PluginDescriptor;
 
 import java.io.File;
@@ -14,9 +15,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+
+import com.google.common.base.Optional;
 
 
 public class ApplicationDescriptor extends ArtifactDescriptor
@@ -38,7 +40,7 @@ public class ApplicationDescriptor extends ArtifactDescriptor
     private String[] absoluteResourcePaths;
     private File[] configResourcesFile;
     private Map<String, String> appProperties = new HashMap<String, String>();
-    private Optional<Properties> deploymentProperties = empty();
+    private Optional<Properties> deploymentProperties = absent();
     
     private File logConfigFile;
 

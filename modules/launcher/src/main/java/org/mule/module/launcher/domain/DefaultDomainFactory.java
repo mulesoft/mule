@@ -6,7 +6,7 @@
  */
 package org.mule.module.launcher.domain;
 
-import static java.util.Optional.empty;
+import static com.google.common.base.Optional.absent;
 import static org.mule.module.launcher.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.module.launcher.MuleFoldersUtil.getDomainFolder;
 import static org.mule.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
@@ -23,8 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
+
+import com.google.common.base.Optional;
 
 public class DefaultDomainFactory implements DomainFactory
 {
@@ -123,7 +124,7 @@ public class DefaultDomainFactory implements DomainFactory
     @Override
     public Domain createArtifact(String artifactName) throws IOException
     {
-        Optional<Properties> properties = empty();
+        Optional<Properties> properties = absent();
         return createArtifact(artifactName, properties);
     }
 }
