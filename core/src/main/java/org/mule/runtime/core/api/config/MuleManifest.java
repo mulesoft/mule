@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 /**
  * This is a static class that provides access to the Mule core manifest file.
  */
-// TODO EE-572
 public class MuleManifest {
 
   /**
@@ -150,8 +149,7 @@ public class MuleManifest {
     }
 
     URL getManifestTestJarURL() throws IOException {
-      String pathSeparator = System.getProperty("file.separator");
-      String testManifestPath = "core-tests" + pathSeparator + "target" + pathSeparator + "test-classes";
+      String testManifestPath = "core-tests/target/test-classes";
       Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
       while (e.hasMoreElements()) {
         URL url = e.nextElement();

@@ -45,7 +45,7 @@ public class ExceptionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testFullStackTraceWithoutMessage() throws Exception {
     final String mainMessage = "main message 112312 [][] ''' ... sdfsd blah";
-    final String causeMessage = "cause message 2342998n  fwefoskjdcas  sdcasdhfsadjgsadkgasd \t\nsdfsllki";
+    final String causeMessage = "cause message 2342998n  fwefoskjdcas  sdcasdhfsadjgsadkgasd \t" + lineSeparator() + "sdfsllki";
 
     Exception e = new RuntimeException(mainMessage, new RuntimeException(causeMessage));
     String withoutMessage = getFullStackTraceWithoutMessages(e);
