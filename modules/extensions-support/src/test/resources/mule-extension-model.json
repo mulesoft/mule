@@ -1174,6 +1174,15 @@
               },
               "allowedStereotypeModels": [],
               "name": "file",
+              "displayModel": {
+                "pathModel": {
+                  "type": "FILE",
+                  "fileExtensions": [
+                    "properties"
+                  ],
+                  "acceptsUrls": false
+                }
+              },
               "description": " The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. The file location\n value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.",
               "modelProperties": {}
             }
