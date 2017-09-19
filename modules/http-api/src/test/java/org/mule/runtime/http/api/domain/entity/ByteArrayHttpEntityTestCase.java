@@ -14,9 +14,9 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
 import java.io.IOException;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 import sun.misc.IOUtils;
 
 @Feature(HTTP_SERVICE)
@@ -50,6 +50,11 @@ public class ByteArrayHttpEntityTestCase {
   @Test
   public void hasNoParts() throws IOException {
     assertThat(entity.getParts(), is(empty()));
+  }
+
+  @Test
+  public void providesSize() {
+    assertThat(entity.getLength().get(), is((long) content.length));
   }
 
 }

@@ -120,7 +120,7 @@ public final class HttpEncoderDecoderUtils {
    * @param requestPath request path
    * @return a map with the uri params present in the request path with the values decoded.
    */
-  public static MultiMap<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
+  public static Map<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
     MultiMap<String, String> uriParams = new MultiMap<>();
     if (pathWithUriParams.contains("{")) {
       final String[] requestPathParts = requestPath.split("/");

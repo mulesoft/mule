@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -69,6 +70,13 @@ public class InputStreamHttpEntityTestCase {
   @Test
   public void hasNoParts() throws IOException {
     assertThat(entity.getParts(), is(empty()));
+  }
+
+  @Test
+  public void hasNoSizeUnlessSpecified() {
+    assertThat(entity.getLength().isPresent(), is(false));
+    HttpEntity specifiedEntity = new InputStreamHttpEntity(new ByteArrayInputStream("TEST".getBytes()), 4L);
+    assertThat(specifiedEntity.getLength().get(), is(4L));
   }
 
 }

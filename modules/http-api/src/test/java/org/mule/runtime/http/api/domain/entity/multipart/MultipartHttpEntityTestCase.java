@@ -59,4 +59,9 @@ public class MultipartHttpEntityTestCase {
     assertThat(parts, contains(part1, part2));
   }
 
+  @Test
+  public void hasNoSize() {
+    assertThat(entity.getLength().isPresent(), is(false));
+  }
+
 }

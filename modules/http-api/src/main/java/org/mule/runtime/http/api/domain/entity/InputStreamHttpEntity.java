@@ -7,12 +7,14 @@
 package org.mule.runtime.http.api.domain.entity;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Optional;
 
 import sun.misc.IOUtils;
 
@@ -23,7 +25,7 @@ import sun.misc.IOUtils;
  */
 public class InputStreamHttpEntity implements HttpEntity {
 
-  private Integer contentLength;
+  private Long contentLength;
   private InputStream inputStream;
 
   public InputStreamHttpEntity(InputStream inputStream) {
@@ -31,17 +33,9 @@ public class InputStreamHttpEntity implements HttpEntity {
     this.inputStream = inputStream;
   }
 
-  public InputStreamHttpEntity(Integer contentLength, InputStream inputStream) {
+  public InputStreamHttpEntity(InputStream inputStream, Long contentLength) {
     this(inputStream);
     this.contentLength = contentLength;
-  }
-
-  public int getContentLength() {
-    return this.contentLength;
-  }
-
-  public boolean hasContentLength() {
-    return this.contentLength != null;
   }
 
   @Override
@@ -67,6 +61,11 @@ public class InputStreamHttpEntity implements HttpEntity {
   @Override
   public Collection<HttpPart> getParts() {
     return emptyList();
+  }
+
+  @Override
+  public Optional<Long> getLength() {
+    return ofNullable(contentLength);
   }
 
 }
