@@ -72,10 +72,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Rule
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
-                                                                discoverProvider(ApplicationDescriptorFactoryTestCase.class
-                                                                    .getClassLoader()).getLocalRepositorySuppliers()
-                                                                        .environmentMavenRepositorySupplier().get()
-                                                                        .getAbsolutePath());
+                                                                "/Users/pablo.lagreca/.m2/repository2");
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
@@ -261,7 +258,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("mule-sockets-connector") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.9.0-SNAPSHOT");
       }
     };
   }
@@ -294,7 +291,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.9.0-SNAPSHOT");
       }
     };
   }
