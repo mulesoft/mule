@@ -117,6 +117,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
     public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
+    public static final String INVALID_CRL_ALGORITHM = "TLS Context: certificate revocation checking is not available when algorithm is different from %s (currently %s)";
     public static final String DEFAULT_SSL_TYPE = "TLSv1";
     public static final String JSSE_NAMESPACE = "javax.net";
 
@@ -317,8 +318,7 @@ public final class TlsConfiguration
             // Revocation checking is only supported for PKIX algorithm
             if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm))
             {
-                String errorText = format("TLS Context: certificate revocation checking is not available when algorithm is different from %s (currently %s)",
-                                          REVOCATION_KEYSTORE_ALGORITHM, getTrustManagerAlgorithm());
+                String errorText = formatInvalidCrlAlgorithm(getTrustManagerAlgorithm());
                 throw new CreateException(CoreMessages.createStaticMessage(errorText), this);
             }
 
@@ -343,6 +343,11 @@ public final class TlsConfiguration
                         CoreMessages.failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
             }
         }
+    }
+
+    public static String formatInvalidCrlAlgorithm (String givenAlgorithm)
+    {
+        return format(INVALID_CRL_ALGORITHM, REVOCATION_KEYSTORE_ALGORITHM, givenAlgorithm);
     }
 
     private KeyStore createTrustStore() throws CreateException
