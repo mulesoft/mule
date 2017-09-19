@@ -28,8 +28,6 @@ import static org.mule.api.security.tls.TlsConfiguration.formatInvalidCrlAlgorit
 
 public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase
 {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private MuleContext context;
 
