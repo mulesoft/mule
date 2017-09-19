@@ -15,7 +15,7 @@
 
     <tls:context name="clientTlsContext" >
         <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
         <tls:revocation-check>
             <tls:standard-revocation-check preferCrls="false" noFallback="true"/>
         </tls:revocation-check>
