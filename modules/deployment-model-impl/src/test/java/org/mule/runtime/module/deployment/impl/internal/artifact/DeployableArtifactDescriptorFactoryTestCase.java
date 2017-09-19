@@ -261,7 +261,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals("mule-sockets-connector") &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.9.0-SNAPSHOT");
       }
     };
   }
@@ -294,7 +294,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
             bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getVersion().equals("0.9.0-SNAPSHOT");
       }
     };
   }
