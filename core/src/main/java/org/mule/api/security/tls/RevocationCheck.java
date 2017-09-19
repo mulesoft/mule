@@ -11,7 +11,20 @@ import java.security.KeyStore;
 
 import javax.net.ssl.ManagerFactoryParameters;
 
+/**
+ * Interface for certificate revocation checkers that prepare a trust manager factory configuration.
+ *
+ * @since 3.9
+ */
 public interface RevocationCheck
 {
+
+    /**
+     * Configures trust store factory parameters for certificate revocation checking according to
+     * the method implementation.
+     *
+     * @param trustStore the trust store configured for the TLS context
+     * @return the configured trust manager factory parameters
+     */
     ManagerFactoryParameters configFor(KeyStore trustStore);
 }

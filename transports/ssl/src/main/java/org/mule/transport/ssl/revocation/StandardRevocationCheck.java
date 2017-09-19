@@ -9,10 +9,7 @@ package org.mule.transport.ssl.revocation;
 import org.mule.api.security.tls.RevocationCheck;
 
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -37,19 +34,9 @@ public class StandardRevocationCheck implements RevocationCheck
     private Boolean noFallback = false;
     private Boolean softFail = false;
 
-    public Boolean getOnlyEndEntities()
-    {
-        return onlyEndEntities;
-    }
-
     public void setOnlyEndEntities(Boolean onlyEndEntities)
     {
         this.onlyEndEntities = onlyEndEntities;
-    }
-
-    public Boolean getPreferCrls()
-    {
-        return preferCrls;
     }
 
     public void setPreferCrls(Boolean preferCrls)
@@ -57,19 +44,9 @@ public class StandardRevocationCheck implements RevocationCheck
         this.preferCrls = preferCrls;
     }
 
-    public Boolean getNoFallback()
-    {
-        return noFallback;
-    }
-
     public void setNoFallback(Boolean noFallback)
     {
         this.noFallback = noFallback;
-    }
-
-    public Boolean getSoftFail()
-    {
-        return softFail;
     }
 
     public void setSoftFail(Boolean softFail)
@@ -86,19 +63,19 @@ public class StandardRevocationCheck implements RevocationCheck
             PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
 
             Set<PKIXRevocationChecker.Option> options = new HashSet<>();
-            if (this.getOnlyEndEntities())
+            if (onlyEndEntities)
             {
                 options.add(PKIXRevocationChecker.Option.ONLY_END_ENTITY);
             }
-            if (this.getPreferCrls())
+            if (preferCrls)
             {
                 options.add(PKIXRevocationChecker.Option.PREFER_CRLS);
             }
-            if (this.getNoFallback())
+            if (noFallback)
             {
                 options.add(PKIXRevocationChecker.Option.NO_FALLBACK);
             }
-            if (this.getSoftFail())
+            if (softFail)
             {
                 options.add(PKIXRevocationChecker.Option.SOFT_FAIL);
             }

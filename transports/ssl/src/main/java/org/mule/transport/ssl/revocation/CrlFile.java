@@ -43,11 +43,6 @@ public class CrlFile implements RevocationCheck
 {
     private String path;
 
-    public String getPath()
-    {
-        return path;
-    }
-
     public void setPath(String path)
     {
         this.path = path;
@@ -75,7 +70,7 @@ public class CrlFile implements RevocationCheck
             // Make sure revocation checking is enabled (com.sun.net.ssl.checkRevocation)
             pbParams.setRevocationEnabled(true);
 
-            Collection<? extends CRL> crls = loadCRL(this.getPath());
+            Collection<? extends CRL> crls = loadCRL(path);
             if (crls != null && !crls.isEmpty())
             {
                 pbParams.addCertStore(CertStore.getInstance("Collection", new CollectionCertStoreParameters(crls)));

@@ -11,10 +11,7 @@ import org.mule.api.security.tls.RevocationCheck;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
@@ -28,7 +25,7 @@ import javax.net.ssl.ManagerFactoryParameters;
 /**
  * Uses a custom OCSP responder for certificate revocation checks, with a specific trusted certificate for
  * revocating other keys. This ignores extension points (additional tags for CRLDP or OCSP) present in the
- * ertificate, if any.
+ * certificate, if any.
  *
  * @since 3.9
  */
@@ -37,19 +34,9 @@ public class CustomOcspResponder implements RevocationCheck
     private String url;
     private String certAlias;
 
-    public String getUrl()
-    {
-        return url;
-    }
-
     public void setUrl(String url)
     {
         this.url = url;
-    }
-
-    public String getCertAlias()
-    {
-        return certAlias;
     }
 
     public void setCertAlias(String certAlias)
@@ -66,19 +53,19 @@ public class CustomOcspResponder implements RevocationCheck
             PKIXRevocationChecker rc = (PKIXRevocationChecker) cpb.getRevocationChecker();
             rc.setOptions(EnumSet.of(PKIXRevocationChecker.Option.NO_FALLBACK));
 
-            if (this.getUrl() != null)
+            if (url != null)
             {
-                rc.setOcspResponder(new URI(this.getUrl()));
+                rc.setOcspResponder(new URI(url));
             }
-            if (this.getCertAlias() != null)
+            if (certAlias != null)
             {
-                if (trustStore.isCertificateEntry(this.getCertAlias()))
+                if (trustStore.isCertificateEntry(certAlias))
                 {
-                    rc.setOcspResponderCert((X509Certificate) trustStore.getCertificate(this.getCertAlias()));
+                    rc.setOcspResponderCert((X509Certificate) trustStore.getCertificate(certAlias));
                 }
                 else
                 {
-                    throw new IllegalStateException("Key with alias \"" + this.getCertAlias() + "\" was not found");
+                    throw new IllegalStateException("Key with alias \"" + certAlias + "\" was not found");
                 }
             }
 

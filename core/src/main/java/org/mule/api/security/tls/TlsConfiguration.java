@@ -116,6 +116,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
+    public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
     public static final String DEFAULT_SSL_TYPE = "TLSv1";
     public static final String JSSE_NAMESPACE = "javax.net";
 
@@ -311,28 +312,28 @@ public final class TlsConfiguration
     {
         if (null != trustStoreName)
         {
-            KeyStore trustStore = createTrustStore();
+            Boolean revocationEnabled = getRevocationCheck() != null;
+
+            // Revocation checking is only supported for PKIX algorithm
+            if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm))
+            {
+                String errorText = format("TLS Context: certificate revocation checking is not available when algorithm is different from %s (currently %s)",
+                                          REVOCATION_KEYSTORE_ALGORITHM, getTrustManagerAlgorithm());
+                throw new CreateException(CoreMessages.createStaticMessage(errorText), this);
+            }
 
             try
             {
+                KeyStore trustStore = createTrustStore();
                 trustManagerFactory = TrustManagerFactory.getInstance(trustManagerAlgorithm);
 
-                Boolean revocationEnabled = getRevocationCheck() != null;
-                ManagerFactoryParameters tmfParams = null;
-
-                // Revocation checking is only supported for PKIX algorithm
-                if (revocationEnabled && "PKIX".equalsIgnoreCase(getTrustManagerAlgorithm()))
+                if (revocationEnabled)
                 {
-                    tmfParams = getRevocationCheck().configFor(trustStore);
+                    ManagerFactoryParameters tmfParams = getRevocationCheck().configFor(trustStore);
                     trustManagerFactory.init(tmfParams);
                 }
                 else
                 {
-                    if (revocationEnabled && !"PKIX".equalsIgnoreCase(getTrustManagerAlgorithm()))
-                    {
-                        logger.warn(format("TLS Context: certificate revocation checking is not available when algorithm is different from PKIX (currently %s)", getTrustManagerAlgorithm()));
-                    }
-
                     trustManagerFactory.init(trustStore);
                 }
             }
