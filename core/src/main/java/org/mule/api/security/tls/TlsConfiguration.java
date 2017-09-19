@@ -782,7 +782,7 @@ public final class TlsConfiguration
         {
             return false;
         }
-        if (revocationCheck != null ? !revocationCheck.equals(that.revocationCheck) : that.revocationCheck!= null)
+        if (revocationCheck != null ? !revocationCheck.equals(that.revocationCheck) : that.revocationCheck != null)
         {
             return false;
         }
@@ -817,7 +817,7 @@ public final class TlsConfiguration
         result = hashcodePrimeNumber * result + (requireClientAuthentication ? 1 : 0);
         result = hashcodePrimeNumber * result + (tlsProperties != null ? tlsProperties.hashCode() : 0);
 
-        result = hashcodePrimeNumber * result + (revocationCheck!= null ? revocationCheck.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (revocationCheck != null ? revocationCheck.hashCode() : 0);
 
         return result;
     }

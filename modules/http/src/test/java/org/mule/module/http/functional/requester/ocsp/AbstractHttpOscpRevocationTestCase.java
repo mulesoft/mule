@@ -18,7 +18,6 @@ import org.junit.Before;
 public abstract class AbstractHttpOscpRevocationTestCase extends AbstractHttpTlsRevocationTestCase
 {
 
-
     private static String RUN_OCSP_SERVER_COMMAND = "openssl ocsp " +
                                                     "-index src/test/resources/tls/ocsp/%s " +
                                                     "-CA src/test/resources/tls/ocsp/server.crt " +
@@ -39,13 +38,11 @@ public abstract class AbstractHttpOscpRevocationTestCase extends AbstractHttpTls
 
     private final String ocspList ;
 
-
     AbstractHttpOscpRevocationTestCase(String entityCertified, String ocspList)
     {
         super("http-requester-ocsp-revocation-config.xml", entityCertified);
         this.ocspList = ocspList;
     }
-
 
     @Before
     public void setUp() throws Exception

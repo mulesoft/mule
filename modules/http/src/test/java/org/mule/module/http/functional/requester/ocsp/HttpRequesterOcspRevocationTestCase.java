@@ -19,7 +19,6 @@ public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOscpRevocat
         super(ENTITY_CERTIFIED_REVOCATION_OCSP_SUB_PATH, REVOKED_OCSP_LIST);
     }
 
-
     @Test
     public void testServerCertifiedAndRevoked() throws Exception
     {
@@ -33,7 +32,5 @@ public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOscpRevocat
             verifyRevocationException(e);
         }
     }
-
-
 
 }

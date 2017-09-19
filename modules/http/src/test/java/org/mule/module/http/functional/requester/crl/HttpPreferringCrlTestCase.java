@@ -42,7 +42,6 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
         }
     }
 
-
     @Test
     public void testPreferCrlNoFallback() throws Exception
     {
