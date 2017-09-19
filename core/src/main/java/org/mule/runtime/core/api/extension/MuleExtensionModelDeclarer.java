@@ -117,6 +117,7 @@ class MuleExtensionModelDeclarer {
     declareTry(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
     declareConfiguration(extensionDeclarer, typeLoader);
+    declareConfigurationProperties(extensionDeclarer, typeLoader);
 
     // operations
     declareAsync(extensionDeclarer, typeLoader);
@@ -574,6 +575,27 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default");
+  }
+
+  private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
+        .allowingTopLevelDefinition()
+        .withStereotype(CONFIG)
+        .describedAs("References a file with configuration properties. Each property has a key and a value. \n"
+            + "The key can be referenced from the mule configuration files using the following semantics: \n"
+            + "${key_name}. This allows to externalize configuration and change it based\n"
+            + "on the environment the application is being deployed to.");
+
+    addReconnectionStrategyParameter(configuration.getDeclaration());
+
+    configuration.onDefaultParameterGroup()
+        .withRequiredParameter("file")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs(" The location of the file with the configuration properties to use. "
+            + "It may be a location in the classpath or an absolute location. The file location\n"
+            + " value may also contains references to properties that will only be resolved based on "
+            + "system properties or properties set at deployment time.");
   }
 
 }
