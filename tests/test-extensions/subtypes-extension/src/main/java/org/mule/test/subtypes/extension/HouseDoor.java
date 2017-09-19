@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class HouseDoor implements Door {
 
   @Parameter
-  private boolean isLocked;
+  private boolean locked;
 
   @Parameter
   @Optional(defaultValue = "pivotal")
@@ -24,11 +24,11 @@ public class HouseDoor implements Door {
   public void open() {}
 
   public boolean isLocked() {
-    return isLocked;
+    return locked;
   }
 
   public void setLocked(boolean locked) {
-    isLocked = locked;
+    this.locked = locked;
   }
 
   @Override

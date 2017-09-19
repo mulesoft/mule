@@ -3476,7 +3476,7 @@
       "fields": [
         {
           "key": {
-            "name": "isLocked"
+            "name": "locked"
           },
           "model": {
             "type": "Boolean",

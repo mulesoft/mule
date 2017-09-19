@@ -15,11 +15,11 @@
                 <subtypes:triangle-alias height="2" area="1"/>
             </subtypes:abstract-shape>
             <subtypes:door-interface>
-                <subtypes:house-door isLocked="true"/>
+                <subtypes:house-door locked="true"/>
             </subtypes:door-interface>
             <subtypes:doors>
                 <subtypes:car-door color="red"/>
-                <subtypes:house-door isLocked="true"/>
+                <subtypes:house-door locked="true"/>
             </subtypes:doors>
         </subtypes:connection>
         <subtypes:abstract-shape>
@@ -118,7 +118,7 @@
                 <subtypes:parent-shape area="2"/>
             </subtypes:base-shape>
             <subtypes:door>
-                <subtypes:house-door isLocked="false"/>
+                <subtypes:house-door locked="false"/>
             </subtypes:door>
             <subtypes:final-pojo someString="asChild"/>
             <subtypes:cook-book>
@@ -135,7 +135,7 @@
     </flow>
 
     <subtypes:car-door name="global-car-door" color="white"/>
-    <subtypes:house-door name="global-house-door" isLocked="true"/>
+    <subtypes:house-door name="global-house-door" locked="true"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
     <subtypes:revolver name="remington" bullets="6"/>
 
@@ -149,7 +149,7 @@
     <flow name="sourceWithParameterMapping" initialState="stopped">
         <subtypes:subtypes-source>
             <subtypes:door-param>
-                <subtypes:house-door isLocked="false"/>
+                <subtypes:house-door locked="false"/>
             </subtypes:door-param>
         </subtypes:subtypes-source>
         <set-payload value="100"/>
@@ -162,7 +162,7 @@
     <flow name="pojoIsUsedInMapAndAlone">
         <subtypes:process-door>
             <subtypes:door>
-                <subtypes:house-door isLocked="false"/>
+                <subtypes:house-door locked="false"/>
             </subtypes:door>
             <subtypes:door-registries>
                 <subtypes:door-registry key="leftDoor">

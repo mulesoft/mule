@@ -67,7 +67,7 @@
   <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
     <xs:complexContent>
       <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Door">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" default="false" name="isLocked"></xs:attribute>
+        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" default="false" name="locked"></xs:attribute>
         <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="pivotal" name="handle"></xs:attribute>
       </xs:extension>
     </xs:complexContent>

@@ -671,7 +671,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="mule:expressionString" use="required" name="importer"></xs:attribute>
-        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="isStolen"></xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="stolen"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
