@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.io.FileUtils.moveFileToDirectory;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
@@ -39,6 +38,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -233,13 +234,13 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   }
 
   private void moveToCorruptedFilesFolder(File file) throws IOException {
-    String workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
-        .toPath().normalize().toString();
-
-    String diffFolder = file.getAbsolutePath().split(workingDirectory)[1];
+    Path workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
+        .toPath().normalize();
+    Path absoluteFilePath = file.toPath();
+    Path relativePath = workingDirectory.relativize(absoluteFilePath);
     File corruptedFile = new File(muleContext.getConfiguration().getWorkingDirectory()
-        + File.separator + CORRUPTED_FOLDER + diffFolder);
-    moveFileToDirectory(file, corruptedFile.getParentFile(), true);
+        + File.separator + CORRUPTED_FOLDER + File.separator + relativePath.toString());
+    Files.move(file.toPath(), corruptedFile.getParentFile().toPath());
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {
@@ -318,12 +319,9 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
         this.partitionName = readPartitionFileName(partitionDirectory);
         return partitionDescriptorFile;
       }
-      FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(), false);
-      try {
+      try (FileWriter fileWriter = new FileWriter(partitionDescriptorFile.getAbsolutePath(), false)) {
         fileWriter.write(partitionName);
         fileWriter.flush();
-      } finally {
-        fileWriter.close();
       }
       return partitionDescriptorFile;
     } catch (Exception e) {
@@ -332,8 +330,10 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   }
 
   protected void serialize(File outputFile, StoreValue<T> storeValue) throws ObjectStoreException {
-    try (ObjectOutputStream objectOutputStream =
-        new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)))) {
+    try (
+        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(bufferedOutputStream)) {
       serializer.getInternalProtocol().serialize(storeValue, objectOutputStream);
       objectOutputStream.flush();
     } catch (Exception se) {
@@ -343,7 +343,10 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
 
   @SuppressWarnings("unchecked")
   protected StoreValue<T> deserialize(File file) throws ObjectStoreException {
-    try (ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+    try (
+        FileInputStream fileInputStream = new FileInputStream(file);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+        ObjectInputStream objectInputStream = new ObjectInputStream(bufferedInputStream)) {
       StoreValue<T> storedValue = serializer.getInternalProtocol().deserialize(objectInputStream);
       if (storedValue.getValue() instanceof DeserializationPostInitialisable) {
         DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
