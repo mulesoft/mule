@@ -586,8 +586,6 @@ class MuleExtensionModelDeclarer {
             + "${key_name}. This allows to externalize configuration and change it based\n"
             + "on the environment the application is being deployed to.");
 
-    addReconnectionStrategyParameter(configuration.getDeclaration());
-
     configuration.onDefaultParameterGroup()
         .withRequiredParameter("file")
         .ofType(typeLoader.load(String.class))
