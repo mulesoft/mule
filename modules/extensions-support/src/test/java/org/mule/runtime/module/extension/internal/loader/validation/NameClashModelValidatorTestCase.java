@@ -38,6 +38,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
@@ -194,7 +195,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void configParameterWithRepeatedName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(TOP_LEVEL_OPERATION_PARAM_NAME, Banana.class);
-    when(configurationModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam, offending));
+    mockParameters(configurationModel, simpleConfigParam, topLevelConfigParam, offending);
     validate();
   }
 
@@ -284,7 +285,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void configWithRepeatedParameterName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
-    when(configurationModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam, topLevelConfigParam, offending));
+    mockParameters(configurationModel, simpleConfigParam, topLevelConfigParam, offending);
     validate();
   }
 
@@ -292,7 +293,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void operationWithRepeatedParameterName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
-    when(operationModel.getAllParameterModels()).thenReturn(asList(simpleOperationParam, topLevelOperationParam, offending));
+    mockParameters(operationModel, simpleConfigParam, topLevelConfigParam, offending);
     validate();
   }
 
@@ -309,8 +310,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void connectionProviderWithRepeatedParameterName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
-    when(connectionProviderModel.getAllParameterModels())
-        .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
+    mockParameters(connectionProviderModel, simpleConfigParam, topLevelConfigParam, offending);
     validate();
   }
 
@@ -328,7 +328,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
-    when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(simpleConnectionProviderParam, offending));
+    mockParameters(sourceCallbackModel, simpleConnectionProviderParam, offending);
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     validate();
   }
@@ -338,11 +338,12 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
-    when(sourceCallbackModel.getAllParameterModels()).thenReturn(asList(simpleConfigParam));
+    mockParameters(sourceCallbackModel, simpleConfigParam);
 
     ParameterGroupModel group = mock(ParameterGroupModel.class);
     when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(group.isShowInDsl()).thenReturn(false);
     when(group.getParameterModels()).thenReturn(asList(offending));
 
     SourceModel sourceModel = new ImmutableSourceModel(SOURCE_NAME, "", false, asList(group), emptyList(), null, null,
@@ -487,6 +488,34 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(operationModel.getAllParameterModels()).thenReturn(asList(firtParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
     validate();
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void invalidModelDueToRepeatedParameterWithGroupThatDoesntShowInDsl() {
+    mockParameterGroups(operationModel, false);
+    validate();
+  }
+
+  @Test
+  public void repeatedParameterWithGroupThatShowsInDsl() {
+    mockParameterGroups(operationModel, true);
+    validate();
+  }
+
+  private void mockParameterGroups(ParameterizedModel model, boolean showInDsl) {
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    ParameterModel parameterModel = getParameter(SIMPLE_PARAM_NAME, Object.class);
+
+    when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(group.getParameterModels()).thenReturn(asList(parameterModel));
+
+    ParameterGroupModel anotherGroup = mock(ParameterGroupModel.class);
+    when(anotherGroup.getName()).thenReturn("My Group");
+    when(anotherGroup.isShowInDsl()).thenReturn(showInDsl);
+    when(anotherGroup.getParameterModels()).thenReturn(asList(parameterModel));
+
+    when(model.getParameterGroupModels()).thenReturn(asList(group, anotherGroup));
   }
 
   private void validate() {
