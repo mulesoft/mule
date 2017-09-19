@@ -63,14 +63,14 @@
       "supportsStreaming": false,
       "nestedComponents": [
         {
-          "isRequired": false,
+          "isRequired": true,
           "allowedStereotypes": [
             {
               "type": "PROCESSOR",
               "namespace": "MULE"
             }
           ],
-          "name": "main",
+          "name": "processors",
           "description": "",
           "modelProperties": {},
           "kind": "chain"
@@ -99,7 +99,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "name",
               "description": "Name that will be used to name the async scheduler",
               "modelProperties": {}
@@ -165,7 +165,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "name",
               "description": "The name of the flow to call",
               "modelProperties": {}
@@ -200,7 +200,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "target",
               "displayModel": {
                 "displayName": "Target Variable"
@@ -230,7 +230,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "targetValue",
               "displayModel": {
                 "displayName": "Target Value"
@@ -277,14 +277,14 @@
       "supportsStreaming": false,
       "nestedComponents": [
         {
-          "isRequired": false,
+          "isRequired": true,
           "allowedStereotypes": [
             {
               "type": "PROCESSOR",
               "namespace": "MULE"
             }
           ],
-          "name": "main",
+          "name": "processors",
           "description": "",
           "modelProperties": {},
           "kind": "chain"
@@ -348,7 +348,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "collection",
               "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
               "modelProperties": {}
@@ -383,7 +383,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "batchSize",
               "description": "An expression to that returns a java collection, object array, map or DOM nodes.",
               "modelProperties": {}
@@ -404,7 +404,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "rootMessageVariableName",
               "description": "Property name where the parent message is stored.",
               "modelProperties": {}
@@ -425,7 +425,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "counterVariableName",
               "description": "Property name used to store the number of message being iterated.",
               "modelProperties": {}
@@ -505,7 +505,7 @@
                 "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "idExpression",
               "description": "Defines one or more expressions to use when extracting the ID from the message. If this property is not set, \u0027#[id]\u0027 will be used by default.",
               "modelProperties": {}
@@ -526,7 +526,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "valueExpression",
               "description": "Defines one or more expressions to use when extracting the value from the message.",
               "modelProperties": {}
@@ -546,7 +546,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "storePrefix",
               "description": "Defines the prefix of the object store names. This will only be used for the internally built object store.",
               "modelProperties": {}
@@ -584,11 +584,10 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [
+              "allowedStereotypeModels": [
                 {
-                  "namespace": "os",
-                  "name": "object-store",
-                  "type": "OBJECT_STORE"
+                  "type": "OBJECT_STORE",
+                  "namespace": "OS"
                 }
               ],
               "name": "objectStore",
@@ -656,7 +655,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "message",
               "description": "Message that will be logged. Embedded expressions can be used to extract value from the current message. If no message is specified then the current message is used.",
               "modelProperties": {}
@@ -689,7 +688,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "level",
               "description": "The logging level to be used. Default is DEBUG.",
               "modelProperties": {}
@@ -709,7 +708,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "category",
               "description": "The log category to be used",
               "modelProperties": {}
@@ -731,140 +730,25 @@
   "functions": [],
   "constructs": [
     {
-      "allowsTopLevelDefinition": true,
-      "nestedComponents": [
-        {
-          "isRequired": false,
-          "allowedStereotypes": [
-            {
-              "type": "SOURCE",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "source",
-          "description": "",
-          "modelProperties": {},
-          "kind": "component"
-        },
-        {
-          "isRequired": true,
-          "allowedStereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "main",
-          "description": "",
-          "modelProperties": {},
-          "kind": "chain"
-        },
-        {
-          "isRequired": false,
-          "allowedStereotypes": [
-            {
-              "type": "ERROR-HANDLER",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "errorHandler",
-          "description": "",
-          "modelProperties": {},
-          "kind": "component"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "FLOW",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "started",
-                      "stopped"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "defaultValue": "started",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "initialState",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "maxConcurrency",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "flow",
-      "description": "",
-      "modelProperties": {},
-      "kind": "construct"
-    },
-    {
       "allowsTopLevelDefinition": false,
       "nestedComponents": [
         {
           "minOccurs": 1,
-          "childComponents": [],
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "parameterGroupModels": [
             {
               "parameters": [
@@ -886,7 +770,7 @@
                     "allowsReferences": true,
                     "allowTopLevelDefinition": false
                   },
-                  "elementReferences": [],
+                  "allowedStereotypeModels": [],
                   "name": "expression",
                   "description": "The expression to evaluate.",
                   "modelProperties": {}
@@ -907,7 +791,21 @@
         {
           "minOccurs": 0,
           "maxOccurs": 1,
-          "childComponents": [],
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
           "parameterGroupModels": [],
           "name": "otherwise",
           "description": "",
@@ -928,617 +826,10 @@
     },
     {
       "allowsTopLevelDefinition": true,
-      "nestedComponents": [
-        {
-          "minOccurs": 0,
-          "childComponents": [
-            {
-              "isRequired": false,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "main",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
-          "parameterGroupModels": [
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "name",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "when",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "ANY",
-                          "REDELIVERY_EXHAUSTED",
-                          "TRANSFORMATION",
-                          "EXPRESSION",
-                          "SECURITY",
-                          "CLIENT_SECURITY",
-                          "SERVER_SECURITY",
-                          "ROUTING",
-                          "CONNECTIVITY",
-                          "RETRY_EXHAUSTED",
-                          "TIMEOUT"
-                        ]
-                      }
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "type",
-                  "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "defaultValue": true,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "logException",
-                  "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": true,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "enableNotifications",
-                  "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
-                  "modelProperties": {}
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "showInDsl": false,
-              "name": "General",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "name": "onErrorContinue",
-          "description": "Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.",
-          "modelProperties": {},
-          "kind": "route"
-        },
-        {
-          "minOccurs": 0,
-          "childComponents": [
-            {
-              "isRequired": false,
-              "allowedStereotypes": [
-                {
-                  "type": "PROCESSOR",
-                  "namespace": "MULE"
-                }
-              ],
-              "name": "main",
-              "description": "",
-              "modelProperties": {},
-              "kind": "chain"
-            }
-          ],
-          "parameterGroupModels": [
-            {
-              "parameters": [
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "name",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "when",
-                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "ANY",
-                          "REDELIVERY_EXHAUSTED",
-                          "TRANSFORMATION",
-                          "EXPRESSION",
-                          "SECURITY",
-                          "CLIENT_SECURITY",
-                          "SERVER_SECURITY",
-                          "ROUTING",
-                          "CONNECTIVITY",
-                          "RETRY_EXHAUSTED",
-                          "TIMEOUT"
-                        ]
-                      }
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "type",
-                  "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "defaultValue": true,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "logException",
-                  "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "Boolean",
-                    "annotations": {
-                      "typeId": "boolean"
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": true,
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "elementReferences": [],
-                  "name": "enableNotifications",
-                  "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
-                  "modelProperties": {}
-                }
-              ],
-              "exclusiveParametersModels": [],
-              "showInDsl": false,
-              "name": "General",
-              "description": "",
-              "modelProperties": {}
-            }
-          ],
-          "name": "onErrorPropagate",
-          "description": "Error handler used to propagate errors. It will rollback any transaction and not consume messages.",
-          "modelProperties": {},
-          "kind": "route"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "ERROR-HANDLER",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [],
-      "name": "errorHandler",
-      "description": "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there\u0027s no match, then a default error handler will be executed.",
-      "modelProperties": {},
-      "kind": "construct"
-    },
-    {
-      "allowsTopLevelDefinition": false,
-      "nestedComponents": [
-        {
-          "isRequired": false,
-          "allowedStereotypes": [
-            {
-              "type": "PROCESSOR",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "main",
-          "description": "",
-          "modelProperties": {},
-          "kind": "chain"
-        },
-        {
-          "isRequired": false,
-          "allowedStereotypes": [
-            {
-              "type": "ERROR-HANDLER",
-              "namespace": "MULE"
-            }
-          ],
-          "name": "errorHandler",
-          "description": "",
-          "modelProperties": {},
-          "kind": "component"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "INDIFFERENT",
-                      "ALWAYS_BEGIN",
-                      "BEGIN_OR_JOIN"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "INDIFFERENT",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Transactions"
-              },
-              "elementReferences": [],
-              "name": "transactionalAction",
-              "description": "The action to take regarding transactions. By default nothing will be done.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String",
-                "annotations": {
-                  "enum": {
-                    "type": "[Ljava.lang.String;",
-                    "values": [
-                      "LOCAL",
-                      "XA"
-                    ]
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": "LOCAL",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "transactionType",
-              "description": "Transaction type supported. Availability will depend on the runtime version, though LOCAL is always available.",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "try",
-      "description": "Processes the nested list of message processors, within a transaction and with it\u0027s own error handler if required.",
-      "modelProperties": {},
-      "kind": "construct"
-    },
-    {
-      "allowsTopLevelDefinition": false,
-      "nestedComponents": [
-        {
-          "minOccurs": 2,
-          "childComponents": [],
-          "parameterGroupModels": [],
-          "name": "route",
-          "description": "",
-          "modelProperties": {},
-          "kind": "route"
-        }
-      ],
-      "errors": [],
-      "stereotype": {
-        "type": "PROCESSOR",
-        "namespace": "MULE"
-      },
-      "parameterGroupModels": [
-        {
-          "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Long",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": 9223372036854775807,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "timeout",
-              "description": "Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": []
-                  }
-                }
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": 2147483647,
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "maxConcurrency",
-              "description": "This value determines the maximum level of parallelism that will be used by this router. .",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "elementReferences": [],
-              "name": "target",
-              "description": "The name of a variable on which the operation\u0027s output will be placed",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "REQUIRED",
-              "defaultValue": "#[payload]",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "tabName": "Advanced"
-              },
-              "elementReferences": [],
-              "name": "targetValue",
-              "displayModel": {
-                "displayName": "Target Value"
-              },
-              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
-              "modelProperties": {}
-            }
-          ],
-          "exclusiveParametersModels": [],
-          "showInDsl": false,
-          "name": "General",
-          "description": "",
-          "modelProperties": {}
-        }
-      ],
-      "name": "scatterGather",
-      "description": "Sends the same message to multiple message processors in parallel.",
-      "modelProperties": {},
-      "kind": "construct"
-    },
-    {
-      "allowsTopLevelDefinition": true,
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "MODULE_CONFIG",
+        "type": "APP_CONFIG",
         "namespace": "MULE"
       },
       "parameterGroupModels": [
@@ -1560,7 +851,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "defaultResponseTimeout",
               "description": "The default period (ms) to wait for a synchronous response.",
               "modelProperties": {}
@@ -1581,7 +872,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "defaultTransactionTimeout",
               "description": "The default timeout (ms) for transactions. This can also be configured on transactions, in which case the transaction configuration is used instead of this default.",
               "modelProperties": {}
@@ -1601,7 +892,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "defaultErrorHandler-ref",
               "description": "The default error handler for every flow. This must be a reference to a global error handler.",
               "modelProperties": {}
@@ -1637,7 +928,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "shutdownTimeout",
               "description": "The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.",
               "modelProperties": {}
@@ -1673,7 +964,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "maxQueueTransactionFilesSize",
               "description": "The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues. Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If both type of transactions are used then the approximated maximum space used will be twice the configured value.",
               "modelProperties": {}
@@ -1693,7 +984,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "defaultObjectSerializer-ref",
               "description": "An optional reference to an ObjectSerializer to be used as the application\u0027s default",
               "modelProperties": {}
@@ -1826,7 +1117,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -1852,6 +1143,809 @@
       ],
       "name": "configuration",
       "description": "Specifies defaults and general settings for the Mule instance.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": true,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "APP_CONFIG",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "file",
+              "displayModel": {
+                "pathModel": {
+                  "type": "FILE",
+                  "fileExtensions": [
+                    "properties"
+                  ],
+                  "acceptsUrls": false
+                }
+              },
+              "description": " The location of the file with the configuration properties to use. It may be a location in the classpath or an absolute location. The file location\n value may also contains references to properties that will only be resolved based on system properties or properties set at deployment time.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "configurationProperties",
+      "description": "References a file with configuration properties. Each property has a key and a value. \nThe key can be referenced from the mule configuration files using the following semantics: \n${key_name}. This allows to externalize configuration and change it based\non the environment the application is being deployed to.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": true,
+      "nestedComponents": [
+        {
+          "minOccurs": 0,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "name",
+                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "when",
+                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED",
+                          "TIMEOUT"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "type",
+                  "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "logException",
+                  "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "enableNotifications",
+                  "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "onErrorContinue",
+          "description": "Error handler used to handle exceptions. It will commit any transaction as if the message was consumed successfully.",
+          "modelProperties": {},
+          "kind": "route"
+        },
+        {
+          "minOccurs": 0,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "name",
+                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "when",
+                  "description": "The expression that will be evaluated to determine if this exception strategy should be executed. This should always be a boolean expression.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String",
+                    "annotations": {
+                      "enum": {
+                        "type": "[Ljava.lang.String;",
+                        "values": [
+                          "ANY",
+                          "REDELIVERY_EXHAUSTED",
+                          "TRANSFORMATION",
+                          "EXPRESSION",
+                          "SECURITY",
+                          "CLIENT_SECURITY",
+                          "SERVER_SECURITY",
+                          "ROUTING",
+                          "CONNECTIVITY",
+                          "RETRY_EXHAUSTED",
+                          "TIMEOUT"
+                        ]
+                      }
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "type",
+                  "description": "The full name of the error type to match against or a comma separated list of full names, to match against any of them.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "logException",
+                  "description": "Determines whether the handled exception will be logged to its standard logger in the ERROR level before being handled. Default is true.",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "defaultValue": true,
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "enableNotifications",
+                  "description": "Determines whether ExceptionNotifications will be fired from this strategy when an exception occurs. Default is true.",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "onErrorPropagate",
+          "description": "Error handler used to propagate errors. It will rollback any transaction and not consume messages.",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "ERROR_HANDLER",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [],
+      "name": "errorHandler",
+      "description": "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there\u0027s no match, then a default error handler will be executed.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": true,
+      "nestedComponents": [
+        {
+          "isRequired": false,
+          "allowedStereotypes": [
+            {
+              "type": "SOURCE",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "source",
+          "description": "",
+          "modelProperties": {},
+          "kind": "component"
+        },
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        },
+        {
+          "isRequired": false,
+          "allowedStereotypes": [
+            {
+              "type": "ERROR_HANDLER",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "errorHandler",
+          "description": "",
+          "modelProperties": {},
+          "kind": "component"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "FLOW",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "started",
+                      "stopped"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "started",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "initialState",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": []
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "maxConcurrency",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "flow",
+      "description": "",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 2,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [],
+          "name": "route",
+          "description": "",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Long",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": []
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": 9223372036854775807,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "timeout",
+              "description": "Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "Number",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.Integer",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "java.lang.Number",
+                    "genericTypes": []
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": 2147483647,
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "maxConcurrency",
+              "description": "This value determines the maximum level of parallelism that will be used by this router. .",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "scatterGather",
+      "description": "Sends the same message to multiple message processors in parallel.",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "processors",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        },
+        {
+          "isRequired": false,
+          "allowedStereotypes": [
+            {
+              "type": "ERROR_HANDLER",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "errorHandler",
+          "description": "",
+          "modelProperties": {},
+          "kind": "component"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "INDIFFERENT",
+                      "ALWAYS_BEGIN",
+                      "BEGIN_OR_JOIN"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "INDIFFERENT",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Transactions"
+              },
+              "allowedStereotypeModels": [],
+              "name": "transactionalAction",
+              "description": "The action to take regarding transactions. By default nothing will be done.",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String",
+                "annotations": {
+                  "enum": {
+                    "type": "[Ljava.lang.String;",
+                    "values": [
+                      "LOCAL",
+                      "XA"
+                    ]
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "defaultValue": "LOCAL",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "allowedStereotypeModels": [],
+              "name": "transactionType",
+              "description": "Transaction type supported. Availability will depend on the runtime version, though LOCAL is always available.",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "try",
+      "description": "Processes the nested list of message processors, within a transaction and with it\u0027s own error handler if required.",
       "modelProperties": {},
       "kind": "construct"
     }
@@ -1941,7 +2035,7 @@
                 "allowsReferences": true,
                 "allowTopLevelDefinition": false
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "schedulingStrategy",
               "description": "",
               "modelProperties": {}
@@ -2074,7 +2168,7 @@
                 "query": false,
                 "tabName": "Advanced"
               },
-              "elementReferences": [],
+              "allowedStereotypeModels": [],
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
@@ -2406,7 +2500,8 @@
         },
         {
           "key": {
-            "name": "timeZone"
+            "name": "timeZone",
+            "required": "true"
           },
           "model": {
             "type": "String"
@@ -2445,6 +2540,38 @@
       "fields": [
         {
           "key": {
+            "name": "timeUnit"
+          },
+          "model": {
+            "type": "String",
+            "annotations": {
+              "typeId": "java.util.concurrent.TimeUnit",
+              "enum": {
+                "type": "[Ljava.lang.String;",
+                "values": [
+                  "NANOSECONDS",
+                  "MICROSECONDS",
+                  "MILLISECONDS",
+                  "SECONDS",
+                  "MINUTES",
+                  "HOURS",
+                  "DAYS"
+                ]
+              }
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "MILLISECONDS",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
             "name": "frequency"
           },
           "model": {
@@ -2465,7 +2592,13 @@
             }
           },
           "annotations": {
-            "visibility": "WRITE_ONLY"
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "1000",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
           }
         },
         {
@@ -2490,33 +2623,13 @@
             }
           },
           "annotations": {
-            "visibility": "WRITE_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "timeUnit"
-          },
-          "model": {
-            "type": "String",
-            "annotations": {
-              "typeId": "java.util.concurrent.TimeUnit",
-              "enum": {
-                "type": "[Ljava.lang.String;",
-                "values": [
-                  "NANOSECONDS",
-                  "MICROSECONDS",
-                  "MILLISECONDS",
-                  "SECONDS",
-                  "MINUTES",
-                  "HOURS",
-                  "DAYS"
-                ]
-              }
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "default": "0",
+            "expressionSupport": {
+              "value": "SUPPORTED"
             }
-          },
-          "annotations": {
-            "visibility": "WRITE_ONLY"
           }
         }
       ]
