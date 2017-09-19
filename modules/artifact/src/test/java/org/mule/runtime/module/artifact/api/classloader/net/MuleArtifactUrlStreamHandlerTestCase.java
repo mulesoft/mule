@@ -15,6 +15,7 @@ import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactU
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler.PROTOCOL;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler.register;
 import static org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -94,7 +95,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testReadRootLibJarElement() throws IOException {
-    String file = "lib/test-jar-with-resources.jar";
+    String file = "lib" + File.separator + "test-jar-with-resources.jar";
 
     URL url = getURL(file);
     InputStream actualInputStream = url.openStream();
@@ -107,9 +108,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testReadElementWithinJar() throws IOException {
-    String file = "lib/test-jar-with-resources.jar"
-        + SEPARATOR
-        + "test-resource-2.txt";
+    String file = "lib" + File.separator + "test-jar-with-resources.jar" + SEPARATOR + "test-resource-2.txt";
 
     URL url = getURL(file);
     InputStream actualInputStream = url.openStream();
@@ -130,7 +129,7 @@ public class MuleArtifactUrlStreamHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testClassloaderWithMulePluginUrls() throws IOException {
-    URL jarURL = getURL("lib/test-jar-with-resources.jar" + SEPARATOR);
+    URL jarURL = getURL("lib" + File.separator + "test-jar-with-resources.jar" + SEPARATOR);
 
     URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {jarURL});
 
