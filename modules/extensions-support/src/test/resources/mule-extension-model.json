@@ -829,7 +829,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "MODULE_CONFIG",
+        "type": "APP_CONFIG",
         "namespace": "MULE"
       },
       "parameterGroupModels": [
@@ -1151,7 +1151,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "MODULE_CONFIG",
+        "type": "APP_CONFIG",
         "namespace": "MULE"
       },
       "parameterGroupModels": [

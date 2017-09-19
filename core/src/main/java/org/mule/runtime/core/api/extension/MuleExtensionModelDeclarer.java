@@ -47,7 +47,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
@@ -523,7 +523,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfiguration(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
-        .withStereotype(CONFIG)
+        .withStereotype(APP_CONFIG)
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
@@ -582,7 +582,7 @@ class MuleExtensionModelDeclarer {
   private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
         .allowingTopLevelDefinition()
-        .withStereotype(CONFIG)
+        .withStereotype(APP_CONFIG)
         .describedAs("References a file with configuration properties. Each property has a key and a value. \n"
             + "The key can be referenced from the mule configuration files using the following semantics: \n"
             + "${key_name}. This allows to externalize configuration and change it based\n"
