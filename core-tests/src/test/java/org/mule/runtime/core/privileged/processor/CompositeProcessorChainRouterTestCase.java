@@ -17,6 +17,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ProcessorChainRouterStory.PROCESSOR_CHAIN_ROUTER;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,11 +36,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 // TODO MULE-13550 Improve CompositeProcessorChainRouter unit tests to cover scenario that was previously causing deadlock with flow-ref
+@Feature(ROUTERS)
+@Story(PROCESSOR_CHAIN_ROUTER)
 public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTestCase {
 
   private CompositeProcessorChainRouter chainRouter;
@@ -62,6 +69,7 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Description("Ensure that with simple chains both chains are executed consecutively with the result of the first chain being used for the second chain.")
   public void simpleChain() throws Exception {
     Message chain1Out = of(1);
     Message chain2Out = of(2);
@@ -87,6 +95,7 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Description("Ensure that when a child context is created as part of the execution of one of the composite chains then the chain does not complete and the next chains is not executed until the child context completes.")
   public void childContextChain() throws Exception {
     Latch latch = new Latch();
     AtomicReference<BaseEventContext> childEventContext = new AtomicReference<>();
@@ -116,6 +125,7 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Description("Ensure that when an async scope is used as part of the execution of one of the composite chains then the chain does not complete and the next chains is not executed until the child context completes.")
   public void asyncDelegateChain() throws Exception {
     Latch latch = new Latch();
     Latch asyncLatch = new Latch();
