@@ -313,8 +313,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   }
 
   /**
-   * Template method to add artifact specific configuration to the
-   * {@link ClassLoaderModel.ClassLoaderModelBuilder}
+   * Template method to add artifact specific configuration to the {@link ClassLoaderModel.ClassLoaderModelBuilder}
    *
    * @param artifactFile the artifact file from which the classloader model is generated.
    * @param classLoaderModelBuilder the builder used to generate {@link ClassLoaderModel} of the artifact.

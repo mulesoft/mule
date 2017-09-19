@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-using-errormapping"
-        minMuleVersion="4.0.0"
-
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"

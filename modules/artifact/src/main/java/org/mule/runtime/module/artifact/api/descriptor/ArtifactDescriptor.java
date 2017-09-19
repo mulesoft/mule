@@ -10,6 +10,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.meta.MuleVersion;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class ArtifactDescriptor {
   private ClassLoaderModel classLoaderModel = ClassLoaderModel.NULL_CLASSLOADER_MODEL;
   private BundleDescriptor bundleDescriptor;
   private MuleVersion minMuleVersion;
+  private Product requiredProduct;
 
   /**
    * Creates a new descriptor for a named artifact
@@ -81,6 +83,17 @@ public class ArtifactDescriptor {
 
   public BundleDescriptor getBundleDescriptor() {
     return bundleDescriptor;
+  }
+
+  public Product getRequiredProduct() {
+    return requiredProduct;
+  }
+
+  /**
+   * @param requiredProduct the required product by this artifact.
+   */
+  public void setRequiredProduct(Product requiredProduct) {
+    this.requiredProduct = requiredProduct;
   }
 
   public void setBundleDescriptor(BundleDescriptor bundleDescriptor) {

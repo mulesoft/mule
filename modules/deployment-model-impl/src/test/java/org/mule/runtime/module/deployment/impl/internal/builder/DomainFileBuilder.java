@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
@@ -22,6 +23,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -123,7 +125,7 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
     domainDescriptor.deleteOnExit();
     MuleDomainModel.MuleDomainModelBuilder muleDomainModelBuilder =
         new MuleDomainModel.MuleDomainModelBuilder();
-    muleDomainModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    muleDomainModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0").setRequiredProduct(MULE);
     redeploymentEnabled.ifPresent(muleDomainModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");

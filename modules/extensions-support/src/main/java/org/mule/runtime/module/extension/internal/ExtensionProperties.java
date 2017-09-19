@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
@@ -36,8 +35,8 @@ public class ExtensionProperties {
   public static final String SOURCE_COMPLETION_CALLBACK_PARAM = PROPERTY_PREFIX + "SOURCE_COMPLETION_CALLBACK_PARAM";
 
   /**
-   * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking
-   * component will use to notify completion or failure
+   * The key of an execution context variable which holds the {@link CompletionCallback} that a non blocking component will use to
+   * notify completion or failure
    */
   public static final String COMPLETION_CALLBACK_CONTEXT_PARAM = PROPERTY_PREFIX + "COMPLETION_CALLBACK_CONTEXT_PARAM";
 
@@ -57,11 +56,6 @@ public class ExtensionProperties {
    * The final name of the file is formed like this: {extension-namespace}-extension-descriptions.xml.
    */
   public static final String EXTENSION_DESCRIPTIONS_FILE_NAME_MASK = "%s-extension-descriptions.xml";
-
-  /**
-   * The name of a file which contains each plugin's {@link ExtensionManifest}
-   */
-  public static final String EXTENSION_MANIFEST_FILE_NAME = "extension-manifest.xml";
 
   /**
    * The name of a file which contains a json representation of the extension's model

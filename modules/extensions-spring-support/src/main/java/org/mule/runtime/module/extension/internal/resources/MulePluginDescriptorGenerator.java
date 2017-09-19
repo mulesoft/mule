@@ -40,6 +40,8 @@ import java.util.Optional;
 // TODO: MULE-12295. This was moved here just to make it work with soap extensions.
 public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
 
+  private static final String AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR = "auto-generated-" + MULE_ARTIFACT_JSON_DESCRIPTOR;
+
   /**
    * {@inheritDoc}
    */
@@ -53,8 +55,8 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
 
     final ExportedArtifactsCollector exportCollector = new ExportedArtifactsCollector(extensionModel);
     final MulePluginModelBuilder builder = new MulePluginModelBuilder();
-    builder.setName(extensionModel.getName())
-        .setMinMuleVersion(extensionModel.getMinMuleVersion().toCompleteNumericVersion());
+    // Set only for testing purposes, the value will be reset by the plugin packager.
+    builder.setName(extensionModel.getName());
     builder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_PACKAGES, exportCollector.getExportedPackages())
@@ -70,7 +72,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
 
     builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
-    return of(new GeneratedResource(MULE_ARTIFACT_JSON_DESCRIPTOR, descriptorJson.getBytes()));
+    return of(new GeneratedResource(AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
   }
 
   private String getLoaderId(ExtensionModel extensionModel) {

@@ -333,7 +333,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     setLoader(loaderFor(HeisenbergExtension.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
-    assertThat(declaration.getMinMuleVersion(), is(new MuleVersion("4.1")));
   }
 
   @Test
@@ -349,7 +348,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     setLoader(loaderFor(PetStoreConnector.class));
     ExtensionDeclarer declarer = declareExtension();
     final ExtensionDeclaration declaration = declarer.getDeclaration();
-    assertThat(declaration.getMinMuleVersion(), is(new MuleVersion("4.0")));
   }
 
   @Test

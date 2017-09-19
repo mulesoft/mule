@@ -9,12 +9,19 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductName;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -79,6 +86,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     }
     descriptor.setBundleDescriptor(getBundleDescriptor(artifactLocation, artifactModel));
     descriptor.setMinMuleVersion(new MuleVersion(artifactModel.getMinMuleVersion()));
+    descriptor.setRequiredProduct(artifactModel.getRequiredProduct());
 
     ClassLoaderModel classLoaderModel =
         getClassLoaderModel(artifactLocation, artifactModel.getClassLoaderModelLoaderDescriptor());
@@ -86,7 +94,32 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
     doDescriptorConfig(artifactModel, descriptor, artifactLocation);
 
+    validate(descriptor);
     return descriptor;
+  }
+
+  private void validate(T descriptor) {
+    MuleVersion minMuleVersion = descriptor.getMinMuleVersion();
+    checkState(minMuleVersion != null,
+               format("The artifact %s does not specifies a minMuleVersion", descriptor.getName()));
+    MuleVersion runtimeVersion = new MuleVersion(getProductVersion());
+    runtimeVersion = new MuleVersion(runtimeVersion.toCompleteNumericVersion().replace("-" + runtimeVersion.getSuffix(), ""));
+    if (runtimeVersion.priorTo(minMuleVersion)) {
+      throw new MuleRuntimeException(
+                                     createStaticMessage("Artifact %s requires a newest runtime version. Artifact required version is %s and Mule Runtime version is %s",
+                                                         descriptor.getName(),
+                                                         descriptor.getMinMuleVersion().toCompleteNumericVersion(),
+                                                         runtimeVersion.toCompleteNumericVersion()));
+    }
+    Product requiredProduct = descriptor.getRequiredProduct();
+    checkState(requiredProduct != null,
+               format("The artifact %s does not specifies a requiredProduct", descriptor.getName()));
+    Product runtimeProduct = getProductByName(getProductName());
+    if (!runtimeProduct.supports(requiredProduct)) {
+      throw new MuleRuntimeException(createStaticMessage("The artifact %s requires a different runtime. The artifact required runtime is %s and the runtime is %s",
+                                                         descriptor.getName(), descriptor.getRequiredProduct().name(),
+                                                         runtimeProduct.name()));
+    }
   }
 
   /**

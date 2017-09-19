@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-simple"
-        minMuleVersion="4.1.0"
         prefix="simple-prefix"
         namespace="http://www.mulesoft.org/schema/a/different/path/mule/module-simple"
         xmlns="http://www.mulesoft.org/schema/mule/module"

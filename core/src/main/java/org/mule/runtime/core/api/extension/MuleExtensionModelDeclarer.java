@@ -103,7 +103,6 @@ class MuleExtensionModelDeclarer {
         .onVersion(MuleExtensionModelProvider.MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
-        .withMinMuleVersion(new MuleVersion(MuleExtensionModelProvider.MULE_VERSION))
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(CORE_PREFIX)
             .setNamespace(CORE_NAMESPACE)

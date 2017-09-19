@@ -9,12 +9,15 @@ package org.mule.runtime.module.service.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.deployment.meta.Product.MULE_EE;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel.MuleServiceModelBuilder;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
@@ -98,7 +101,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
     File serviceDescriptor = new File(getTempFolder(), getArtifactId() + "service.json");
     serviceDescriptor.deleteOnExit();
     MuleServiceModelBuilder serviceModelBuilder = new MuleServiceModelBuilder();
-    serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0");
+    serviceModelBuilder.setName(getArtifactId()).setMinMuleVersion("4.0.0").setRequiredProduct(MULE);
     serviceModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
     serviceModelBuilder.withServiceProviderClassName(serviceProviderClassName);

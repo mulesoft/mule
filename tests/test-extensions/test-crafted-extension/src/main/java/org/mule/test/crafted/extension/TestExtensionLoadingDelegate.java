@@ -22,7 +22,6 @@ public class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
     extensionDeclarer.named(EXTENSION_NAME)
         .describedAs("Crafted Extension")
         .onVersion("1.0.0")
-        .withMinMuleVersion(new MuleVersion("4.0"))
         .withCategory(COMMUNITY)
         .fromVendor("Mulesoft");
   }

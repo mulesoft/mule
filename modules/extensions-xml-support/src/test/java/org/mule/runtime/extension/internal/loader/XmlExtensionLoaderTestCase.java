@@ -76,7 +76,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   /**
    * @param validateXml whether the XML must be valid while loading the extension model or not. Useful to determine if the default
-   *                    values are properly feed when reading the document.
+   *        values are properly feed when reading the document.
    */
   public XmlExtensionLoaderTestCase(boolean validateXml) {
     this.validateXml = validateXml;
@@ -88,7 +88,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-simple"));
-    assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(11));
@@ -120,7 +119,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-properties"));
-    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
@@ -155,7 +153,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-global-element"));
-    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
     assertThat(configurationModel.getName(), is(CONFIG_NAME));
@@ -193,7 +190,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-json-custom-types"));
-    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(3));
@@ -227,7 +223,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-xsd-custom-types"));
-    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(2));
@@ -273,7 +268,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-documentation"));
-    assertThat(extensionModel.getMinMuleVersion(), is(DEFAULT_MIN_MULE_VERSION));
     assertThat(extensionModel.getDescription(), is("Documentation for the connector"));
     assertThat(extensionModel.getConfigurationModels().size(), is(1));
     ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
@@ -387,7 +381,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
       ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
       assertThat(extensionModel.getName(), is("module-wrong-body-content"));
-      assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
       assertThat(extensionModel.getOperationModels().size(), is(0));
       assertThat(extensionModel.getConfigurationModels().size(), is(1));
 
@@ -424,7 +417,6 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
 
     assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
-    assertThat(extensionModel.getMinMuleVersion(), is(new MuleVersion("4.1.0")));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
     assertThat(extensionModel.getOperationModels().size(), is(18));
@@ -432,7 +424,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   /**
    * If {@link #validateXml} is true, the XML of the smart connector must be validated when reading it. False otherwise. Useful to
-   *  simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
+   * simulate the {@link ExtensionModel} generation of a connector that has malformed message processors in the <body/> element.
    *
    * @param modulePath relative path to the XML connector.
    * @return an {@link ExtensionModel}

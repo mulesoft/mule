@@ -46,7 +46,6 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -80,7 +79,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getVersion(), is(getProductVersion()));
     assertThat(coreExtensionModel.getVendor(), is(getVendorName()));
     assertThat(coreExtensionModel.getCategory(), is(COMMUNITY));
-    assertThat(coreExtensionModel.getMinMuleVersion(), is(new MuleVersion(MULE_VERSION)));
   }
 
   @Test

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
@@ -32,6 +33,7 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -116,6 +118,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     MulePluginModel mulePluginModel = builder
         .setName(pluginName)
         .setMinMuleVersion("4.0.0")
+        .setRequiredProduct(MULE)
         .build();
 
     ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder(PLUGIN_NAME)

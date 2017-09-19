@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module name="module-using-java"
-        minMuleVersion="4.0.0"
         namespace="http://www.mulesoft.org/schema/mule/module-using-java"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:test="http://www.mulesoft.org/schema/mule/test"
