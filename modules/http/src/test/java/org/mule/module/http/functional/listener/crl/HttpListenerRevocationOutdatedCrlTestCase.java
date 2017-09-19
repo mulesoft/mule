@@ -10,10 +10,10 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class HttpListenerClrRevocationOutdatedCrlTestCase extends AbstractHttpListenerClrTestCase
+public class HttpListenerRevocationOutdatedCrlTestCase extends AbstractHttpListenerClrTestCase
 {
 
-    public HttpListenerClrRevocationOutdatedCrlTestCase(String configFile)
+    public HttpListenerRevocationOutdatedCrlTestCase(String configFile)
     {
         super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH);
     }
