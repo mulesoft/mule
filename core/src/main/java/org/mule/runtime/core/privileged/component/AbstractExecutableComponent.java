@@ -7,10 +7,13 @@
 package org.mule.runtime.core.privileged.component;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
@@ -57,8 +60,9 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   @Override
   public final CompletableFuture<Event> execute(Event event) {
     BaseEvent internalEvent;
+    BaseEventContext child = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
     if (event instanceof BaseEvent) {
-      internalEvent = builder(createEventContext(), (BaseEvent) event).build();
+      internalEvent = builder(child, (BaseEvent) event).build();
     } else {
       internalEvent = BaseEvent.builder(createEventContext())
           .message(event.getMessage())
@@ -68,7 +72,15 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           .properties(event.getProperties())
           .build();
     }
-    return executeEvent(internalEvent);
+    return from(MessageProcessors.process(internalEvent, getExecutableFunction()))
+        .onErrorMap(throwable -> {
+          MessagingException messagingException = (MessagingException) throwable;
+          BaseEvent messagingExceptionEvent = messagingException.getEvent();
+          return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(), messagingExceptionEvent);
+        })
+        .map(r -> builder(event.getContext(), r).build())
+        .cast(Event.class)
+        .toFuture();
   }
 
   /**
@@ -93,7 +105,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   /**
    * Template method that allows to return a function to execute for this component. It may not be redefine by implementation of
-   * this class if they are already instances of {@link Function<Publisher<InternalEvent>, Publisher<InternalEvent>>}
+   * this class if they are already instances of {@link Function<Publisher<BaseEvent>, Publisher<InternalEvent>>}
    * 
    * @return an executable function. It must not be null.
    */
