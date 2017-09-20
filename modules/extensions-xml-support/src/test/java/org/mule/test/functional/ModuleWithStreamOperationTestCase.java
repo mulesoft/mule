@@ -9,6 +9,10 @@ package org.mule.test.functional;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mule.test.allure.AllureConstants.XmlSdk.Streaming.STREAMING;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
@@ -22,6 +26,8 @@ import java.util.Map;
  * The idea is ensure all the streams created within a Smart Connector operation are accessible from within a <flow/>, or another
  * Smart Connector.
  */
+@Feature(XML_SDK)
+@Story(STREAMING)
 public class ModuleWithStreamOperationTestCase extends AbstractModuleWithHttpTestCase {
 
   @Override
