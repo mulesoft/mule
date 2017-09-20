@@ -6,7 +6,9 @@
  */
 package org.mule.api.security.tls;
 
+import static java.lang.String.format;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
@@ -30,6 +32,7 @@ import java.util.Enumeration;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -113,6 +116,8 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_KEYMANAGER_ALGORITHM = KeyManagerFactory.getDefaultAlgorithm();
+    public static final String REVOCATION_KEYSTORE_ALGORITHM = "PKIX";
+    public static final String INVALID_CRL_ALGORITHM = "TLS Context: certificate revocation checking is not available when algorithm is different from %s (currently %s)";
     public static final String DEFAULT_SSL_TYPE = "TLSv1";
     public static final String JSSE_NAMESPACE = "javax.net";
 
@@ -157,6 +162,9 @@ public final class TlsConfiguration
 
     private TlsProperties tlsProperties = new TlsProperties();
     private boolean disableSystemPropertiesMapping = true;
+
+    // certificate revocation checking
+    private RevocationCheck revocationCheck = null;
 
     /**
      * Support for TLS connections with a given initial value for the key store
@@ -209,7 +217,7 @@ public final class TlsConfiguration
             new TlsPropertiesMapper(namespace).writeToProperties(System.getProperties(), this);
         }
 
-        tlsProperties.load(String.format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
+        tlsProperties.load(format(PROPERTIES_FILE_PATTERN, SecurityUtils.getSecurityModel()));
     }
 
     private void validate(boolean anon) throws CreateException
@@ -305,30 +313,29 @@ public final class TlsConfiguration
     {
         if (null != trustStoreName)
         {
-            trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
+            Boolean revocationEnabled = revocationCheck != null;
 
-            KeyStore trustStore;
-            try
+            // Revocation checking is only supported for PKIX algorithm
+            if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm))
             {
-                trustStore = KeyStore.getInstance(trustStoreType);
-                InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
-                if (null == is)
-                {
-                    throw new FileNotFoundException(
-                            "Failed to load truststore from classpath or local file: " + trustStoreName);
-                }
-                trustStore.load(is, trustStorePassword.toCharArray());
-            }
-            catch (Exception e)
-            {
-                throw new CreateException(
-                        CoreMessages.failedToLoad("TrustStore: " + trustStoreName), e, this);
+                String errorText = formatInvalidCrlAlgorithm(getTrustManagerAlgorithm());
+                throw new CreateException(CoreMessages.createStaticMessage(errorText), this);
             }
 
             try
             {
+                KeyStore trustStore = createTrustStore();
                 trustManagerFactory = TrustManagerFactory.getInstance(trustManagerAlgorithm);
-                trustManagerFactory.init(trustStore);
+
+                if (revocationEnabled)
+                {
+                    ManagerFactoryParameters tmfParams = revocationCheck.configFor(trustStore);
+                    trustManagerFactory.init(tmfParams);
+                }
+                else
+                {
+                    trustManagerFactory.init(trustStore);
+                }
             }
             catch (Exception e)
             {
@@ -338,6 +345,36 @@ public final class TlsConfiguration
         }
     }
 
+    public static String formatInvalidCrlAlgorithm (String givenAlgorithm)
+    {
+        return format(INVALID_CRL_ALGORITHM, REVOCATION_KEYSTORE_ALGORITHM, givenAlgorithm);
+    }
+
+    private KeyStore createTrustStore() throws CreateException
+    {
+        trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
+
+        KeyStore trustStore;
+
+        try
+        {
+            trustStore = KeyStore.getInstance(trustStoreType);
+            InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
+            if (null == is)
+            {
+                throw new FileNotFoundException(
+                        "Failed to load truststore from classpath or local file: " + trustStoreName);
+            }
+            trustStore.load(is, trustStorePassword.toCharArray());
+        }
+        catch (Exception e)
+        {
+            throw new CreateException(
+                    CoreMessages.failedToLoad("TrustStore: " + trustStoreName), e, this);
+        }
+
+        return trustStore;
+    }
 
     private static void assertNotNull(Object value, String message)
     {
@@ -411,7 +448,7 @@ public final class TlsConfiguration
 
         if (enabledProtocols != null && !ArrayUtils.contains(enabledProtocols, sslType))
         {
-            throw new IllegalArgumentException(String.format("Protocol %s is not allowed in current configuration", sslType));
+            throw new IllegalArgumentException(format("Protocol %s is not allowed in current configuration", sslType));
         }
 
         this.sslType = sslType;
@@ -645,6 +682,11 @@ public final class TlsConfiguration
         this.keyAlias = keyAlias;
     }
 
+    public void setRevocationCheck(RevocationCheck revocationCheck)
+    {
+        this.revocationCheck = revocationCheck;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -735,6 +777,10 @@ public final class TlsConfiguration
         {
             return false;
         }
+        if (revocationCheck != null ? !revocationCheck.equals(that.revocationCheck) : that.revocationCheck != null)
+        {
+            return false;
+        }
 
         return true;
     }
@@ -747,23 +793,27 @@ public final class TlsConfiguration
         result = hashcodePrimeNumber * result + (keyStoreName != null ? keyStoreName.hashCode() : 0);
         result = hashcodePrimeNumber * result + (keyAlias != null ? keyAlias.hashCode() : 0);
         result = hashcodePrimeNumber * result + (keyPassword != null ? keyPassword.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (keyStorePassword != null ? keyStorePassword.hashCode() : 0);
-        result = hashcodePrimeNumber * result + (keystoreType != null ? keystoreType.hashCode() : 0);
         result = hashcodePrimeNumber * result + (keyManagerAlgorithm != null ? keyManagerAlgorithm.hashCode() : 0);
         result = hashcodePrimeNumber * result + (keyManagerFactory != null ? keyManagerFactory.hashCode() : 0);
+
+        result = hashcodePrimeNumber * result + (keyStorePassword != null ? keyStorePassword.hashCode() : 0);
+        result = hashcodePrimeNumber * result + (keystoreType != null ? keystoreType.hashCode() : 0);
         result = hashcodePrimeNumber * result + (clientKeyStoreName != null ? clientKeyStoreName.hashCode() : 0);
         result = hashcodePrimeNumber * result + (clientKeyStorePassword != null ? clientKeyStorePassword.hashCode() : 0);
         result = hashcodePrimeNumber * result + (clientKeyStoreType != null ? clientKeyStoreType.hashCode() : 0);
+
         result = hashcodePrimeNumber * result + (trustStoreName != null ? trustStoreName.hashCode() : 0);
         result = hashcodePrimeNumber * result + (trustStorePassword != null ? trustStorePassword.hashCode() : 0);
         result = hashcodePrimeNumber * result + (trustStoreType != null ? trustStoreType.hashCode() : 0);
         result = hashcodePrimeNumber * result + (trustManagerAlgorithm != null ? trustManagerAlgorithm.hashCode() : 0);
         result = hashcodePrimeNumber * result + (trustManagerFactory != null ? trustManagerFactory.hashCode() : 0);
         result = hashcodePrimeNumber * result + (explicitTrustStoreOnly ? 1 : 0);
+
         result = hashcodePrimeNumber * result + (requireClientAuthentication ? 1 : 0);
         result = hashcodePrimeNumber * result + (tlsProperties != null ? tlsProperties.hashCode() : 0);
+
+        result = hashcodePrimeNumber * result + (revocationCheck != null ? revocationCheck.hashCode() : 0);
+
         return result;
     }
 }
-
-

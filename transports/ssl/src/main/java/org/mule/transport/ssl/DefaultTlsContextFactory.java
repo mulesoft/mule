@@ -15,6 +15,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.ssl.api.TlsContextKeyStoreConfiguration;
 import org.mule.transport.ssl.api.TlsContextTrustStoreConfiguration;
+import org.mule.transport.ssl.revocation.RevocationCheckWrapper;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -235,7 +236,6 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
         this.trustStoreInsecure = insecure;
     }
 
-
     @Override
     public SSLContext createSslContext() throws KeyManagementException, NoSuchAlgorithmException, CreateException
     {
@@ -285,6 +285,11 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
     public void setEnabledProtocols(String enabledProtocols)
     {
         this.enabledProtocols = StringUtils.splitAndTrim(enabledProtocols, ",");
+    }
+
+    public void setRevocationCheckWrapper(RevocationCheckWrapper revocationCheckWrapper)
+    {
+        tlsConfiguration.setRevocationCheck(revocationCheckWrapper.getConfig());
     }
 
     @Override

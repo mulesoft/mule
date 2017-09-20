@@ -7,11 +7,16 @@
 package org.mule.transport.ssl.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ClientKeyStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.ProtocolHandlerDefinitionParser;
 import org.mule.config.spring.parsers.specific.tls.TrustStoreDefinitionParser;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.ssl.TlsConnector;
+import org.mule.transport.ssl.revocation.CrlFile;
+import org.mule.transport.ssl.revocation.CustomOcspResponder;
+import org.mule.transport.ssl.revocation.RevocationCheckWrapper;
+import org.mule.transport.ssl.revocation.StandardRevocationCheck;
 
 /**
  * Reigsters a Bean Definition Parser for handling <code><tls:connector></code> elements.
@@ -29,6 +34,10 @@ public class TlsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("protocol-handler", new ProtocolHandlerDefinitionParser());
         registerBeanDefinitionParser("context", new TlsContextDefinitionParser());
         registerBeanDefinitionParser("trust-store", new TrustStoreTlsContextDefinitionParser());
+        registerBeanDefinitionParser("revocation-check", new ChildDefinitionParser("revocationCheckWrapper", RevocationCheckWrapper.class));
+        registerBeanDefinitionParser("standard-revocation-check", new ChildDefinitionParser("config", StandardRevocationCheck.class));
+        registerBeanDefinitionParser("custom-ocsp-responder", new ChildDefinitionParser("config", CustomOcspResponder.class));
+        registerBeanDefinitionParser("crl-file", new ChildDefinitionParser("config", CrlFile.class));
     }
 
 }
