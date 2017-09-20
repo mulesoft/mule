@@ -14,12 +14,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.core.internal.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getConnectionProviderModel;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,7 +45,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -195,7 +196,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     ConnectionProvider<?> connectionProvider = configuration.getConnectionProvider()
         .orElseThrow(() -> new ValueResolvingException("Unable to obtain the Connection Provider Instance", UNKNOWN));
 
-    ConnectionProvider unwrap = unwrap(connectionProvider);
+    ConnectionProvider unwrap = unwrapProviderWrapper(connectionProvider);
     ConnectionProviderModel connectionProviderModel =
         getConnectionProviderModel(unwrap.getClass(), getAllConnectionProviders(getExtensionModel(), getConfigurationModel()))
             .orElseThrow(() -> new ValueResolvingException("Internal error. Unable to obtain the Connection Provider Model",
@@ -214,10 +215,5 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
 
   private ParameterValueResolver getParameterValueResolver(Object object, ParameterizedModel configurationModel) {
     return new ObjectBasedParameterValueResolver(object, configurationModel);
-  }
-
-  private <C> ConnectionProvider<C> unwrap(ConnectionProvider<C> connectionProvider) {
-    return connectionProvider instanceof ConnectionProviderWrapper
-        ? unwrap(((ConnectionProviderWrapper<C>) connectionProvider).getDelegate()) : connectionProvider;
   }
 }

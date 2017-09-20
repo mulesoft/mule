@@ -12,23 +12,24 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
+
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -39,7 +40,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public abstract class ConnectionProviderWrapper<C>
-    implements ConnectionProvider<C>, HasPoolingProfile, HasReconnectionConfig, Lifecycle {
+    implements ConnectionProvider<C>, HasPoolingProfile, HasReconnectionConfig, HasDelegate<C>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ConnectionProviderWrapper.class);
 
@@ -84,6 +85,7 @@ public abstract class ConnectionProviderWrapper<C>
     delegate.disconnect(connection);
   }
 
+  @Override
   public ConnectionProvider<C> getDelegate() {
     return delegate;
   }
