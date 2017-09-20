@@ -45,11 +45,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Base class for {@link QueryMetadataProvider} implementations
  */
 public abstract class AbstractQueryMetadataProvider implements QueryMetadataProvider
 {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractQueryMetadataProvider.class);
 
     protected final Query query;
     protected final DbConfigResolver dbConfigResolver;
@@ -328,17 +332,34 @@ public abstract class AbstractQueryMetadataProvider implements QueryMetadataProv
                 return new DefaultResult<MetaData>(null, Result.Status.FAILURE, e.getMessage(), FailureType.CONNECTION_FAILURE, e);
             }
 
-            PreparedStatement preparedStatement;
+            PreparedStatement preparedStatement = null;
             try
             {
                 preparedStatement = connection.prepareStatement(query.getQueryTemplate().getSqlText());
+                return metadataResolver.resolveMetaData(preparedStatement, query);
             }
             catch (SQLException e)
             {
                 return new DefaultResult<MetaData>(null, Result.Status.FAILURE, e.getMessage(), FailureType.INVALID_CONFIGURATION, e);
             }
+            finally
+            {
+              if (preparedStatement != null)
+              {
+                  try
+                  {
+                      preparedStatement.close();
+                  }
+                  catch (SQLException e)
+                  {
+                      if (logger.isWarnEnabled())
+                      {
+                          logger.warn("Could not close statement", e);
+                      }
+                  }
+              }
+            }
 
-            return metadataResolver.resolveMetaData(preparedStatement, query);
         }
         finally
         {
