@@ -18,7 +18,8 @@ import org.mule.tck.processor.FlowAssertion;
 
 import java.util.List;
 
-public class OnErrorCheckLogHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor, FlowAssertion {
+public class OnErrorCheckLogHandler extends AbstractExceptionListener
+    implements MessagingExceptionHandlerAcceptor, FlowAssertion {
 
 
   private List<LogChecker> checkers;
