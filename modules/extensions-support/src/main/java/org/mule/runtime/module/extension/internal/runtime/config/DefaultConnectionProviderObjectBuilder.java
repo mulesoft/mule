@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.System.arraycopy;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -105,13 +104,8 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   private ConnectionProvider<C> applyExtensionClassLoaderProxy(ConnectionProvider provider) {
     Enhancer enhancer = new Enhancer();
     ClassLoader classLoader = getClassLoader(extensionModel);
-    Class<?>[] allInterfaces = getAllInterfaces(provider);
-    int length = allInterfaces.length;
-    Class[] classes = new Class[length + 1];
-    arraycopy(allInterfaces, 0, classes, 0, length);
-    classes[length] = HasDelegate.class;
 
-    enhancer.setInterfaces(classes);
+    enhancer.setInterfaces(getInterfaces(provider));
     enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
       Reference<Object> resultReference = new Reference<>();
       Reference<Throwable> errorReference = new Reference<>();
@@ -138,5 +132,28 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     });
 
     return (ConnectionProvider<C>) enhancer.create();
+  }
+
+  private Class[] getInterfaces(ConnectionProvider provider) {
+    Class<?>[] originalInterfaces = getAllInterfaces(provider);
+    int length = originalInterfaces.length;
+    Class[] newInterfaces = new Class[length + 1];
+
+    boolean alreadyExists = false;
+
+    for (int i = 0; i < length; i++) {
+      Class<?> anInterface = originalInterfaces[i];
+      if (anInterface.equals(HasDelegate.class)) {
+        alreadyExists = true;
+      }
+      newInterfaces[i] = anInterface;
+    }
+
+    if (!alreadyExists) {
+      newInterfaces[length] = HasDelegate.class;
+      return newInterfaces;
+    } else {
+      return originalInterfaces;
+    }
   }
 }
