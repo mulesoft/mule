@@ -7,16 +7,15 @@
 package org.mule.runtime.core.privileged.component;
 
 import static java.lang.reflect.Modifier.isFinal;
-import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
-
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.asList;
-
 import static java.util.Collections.synchronizedMap;
 import static java.util.Collections.unmodifiableSet;
+import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 
@@ -125,7 +124,7 @@ public class AnnotatedObjectInvocationHandler {
         Field[] targetFields = currentClass.getDeclaredFields();
 
         for (Field field : targetFields) {
-          if (!fieldsByName.containsKey(field.getName())) {
+          if (!isStatic(field.getModifiers()) && !fieldsByName.containsKey(field.getName())) {
             fieldsByName.put(field.getName(), field);
           }
         }

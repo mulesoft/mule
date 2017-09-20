@@ -8,7 +8,6 @@ package org.mule.functional.api.component;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -22,6 +21,8 @@ import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -33,14 +34,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -458,24 +456,12 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
   /**
    * @return the first {@code test:processor} from a flow with the provided name.
    */
-  public static FunctionalTestProcessor getFromFlow(MuleContext muleContext, String flowName) throws Exception {
-    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
-
-    if (flowConstruct != null) {
-      if (flowConstruct instanceof Pipeline) {
-        Pipeline flow = (Pipeline) flowConstruct;
-        // Retrieve the first component
-        for (Processor processor : flow.getProcessors()) {
-          if (processor instanceof FunctionalTestProcessor) {
-            return (FunctionalTestProcessor) processor;
-          }
-        }
-      }
-
-      throw new RegistrationException(createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
-    } else {
-      throw new RegistrationException(createStaticMessage("Flow " + flowName + " not found in Registry"));
-    }
+  public static FunctionalTestProcessor getFromFlow(ConfigurationComponentLocator locator, String flowName) throws Exception {
+    return locator.find(ComponentIdentifier.builder().namespace("test").name("processor").build())
+        .stream()
+        .filter(c -> flowName.equals(c.getRootContainerName()))
+        .map(c -> (FunctionalTestProcessor) c)
+        .findAny().get();
   }
 
   public void setProcessorClass(String processorClass) {
