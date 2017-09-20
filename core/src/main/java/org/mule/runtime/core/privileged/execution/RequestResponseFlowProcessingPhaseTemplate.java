@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.execution;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.execution.ResponseDispatchException;
+import org.mule.runtime.core.privileged.exception.ResponseDispatchException;
 
 /**
  * Extension of {@link FlowProcessingPhaseTemplate} for those {@link org.mule.runtime.core.api.source.MessageSource} that requires

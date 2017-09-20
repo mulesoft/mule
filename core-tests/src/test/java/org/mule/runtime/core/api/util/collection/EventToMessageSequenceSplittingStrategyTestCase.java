@@ -18,7 +18,7 @@ import static org.mule.runtime.api.metadata.DataType.fromObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.util.Copiable;
+import org.mule.runtime.core.internal.util.Copiable;
 import org.mule.runtime.core.internal.routing.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy;
 import org.mule.runtime.core.internal.routing.MessageSequence;

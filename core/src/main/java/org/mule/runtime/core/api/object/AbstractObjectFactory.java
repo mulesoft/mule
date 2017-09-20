@@ -12,7 +12,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
-import org.mule.runtime.core.api.util.BeanUtils;
+import org.mule.runtime.core.privileged.util.BeanUtils;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.util.ArrayList;

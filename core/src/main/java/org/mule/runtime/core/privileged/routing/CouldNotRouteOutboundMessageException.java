@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.routing;
 
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.routing.RoutingException;
 
 /**
  * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route the current outbound event.

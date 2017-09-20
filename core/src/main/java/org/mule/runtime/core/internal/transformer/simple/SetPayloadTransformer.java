@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.runtime.core.api.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 

@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY
 
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 import java.io.Serializable;
 

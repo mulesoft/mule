@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.context.notification.RoutingNotification
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -27,21 +28,19 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.RoutingNotification;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase;
+import org.mule.runtime.core.privileged.routing.ResponseTimeoutException;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -222,7 +221,6 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         resultAvailable = asyncReplyLatch.await(timeout, MILLISECONDS);
       }
       if (!resultAvailable) {
-        postLatchAwait(asyncReplyCorrelationId);
         asyncReplyLatch.await(1000, MILLISECONDS);
         resultAvailable = asyncReplyLatch.getCount() == 0;
       }
@@ -259,10 +257,6 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         return null;
       }
     }
-  }
-
-  private void postLatchAwait(String asyncReplyCorrelationId) throws MessagingException {
-    // Template method
   }
 
   private void addProcessed(Object id) {

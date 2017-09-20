@@ -13,10 +13,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-
+import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
+import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
@@ -53,7 +53,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
 
   private static File getTlsPropertiesFile() {
     String path = ClassUtils.getClassPathRoot(DefaultTlsContextFactoryTestCase.class).getPath();
-    return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
+    return new File(path, String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
   }
 
   public static String getFileEnabledProtocols() {

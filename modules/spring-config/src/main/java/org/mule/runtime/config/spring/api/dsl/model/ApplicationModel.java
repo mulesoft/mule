@@ -63,7 +63,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.config.SystemProperties
 import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.RuntimeConfigurationException;
+import org.mule.runtime.config.spring.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;

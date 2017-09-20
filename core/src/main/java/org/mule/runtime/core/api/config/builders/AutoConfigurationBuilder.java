@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Configures Mule from a configuration resource or comma seperated list of configuration resources by auto-detecting the
+ * Configures Mule from a configuration resource or comma separated list of configuration resources by auto-detecting the
  * ConfigurationBuilder to use for each resource. This is resolved by either checking the classpath for config modules e.g.
- * spring-config or by using the file extention or a combination.
+ * spring-config or by using the file extension or a combination.
  */
 public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuilder
     implements ParentMuleContextAwareConfigurationBuilder {

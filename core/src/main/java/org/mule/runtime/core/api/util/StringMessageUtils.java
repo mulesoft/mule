@@ -11,6 +11,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToConvert
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.ArrayUtils;
+import org.mule.runtime.core.privileged.util.CollectionUtils;
+import org.mule.runtime.core.privileged.util.MapUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;

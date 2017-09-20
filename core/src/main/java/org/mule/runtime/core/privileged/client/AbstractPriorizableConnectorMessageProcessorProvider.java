@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.privileged.client;
 
-import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
+import org.mule.runtime.core.privileged.connector.ConnectorOperationProvider;
 
 /**
  * Allows to define the order in which {@link ConnectorOperationProvider}s will be evaluated for use.

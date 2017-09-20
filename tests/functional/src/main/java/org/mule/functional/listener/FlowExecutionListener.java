@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.context.notification.NotificationListenerRegist
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;

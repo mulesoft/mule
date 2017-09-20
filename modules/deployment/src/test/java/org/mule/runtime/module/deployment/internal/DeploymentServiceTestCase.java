@@ -114,7 +114,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.deployment.model.api.application.Application;

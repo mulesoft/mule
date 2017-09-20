@@ -10,7 +10,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 
 public class SensingNullReplyToHandler implements ReplyToHandler {
 

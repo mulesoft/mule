@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.el.mvel;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.el.ExpressionExecutor;
+import org.mule.runtime.core.internal.el.ExpressionExecutor;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.mvel2.MVEL;
 import org.mule.mvel2.ParserConfiguration;

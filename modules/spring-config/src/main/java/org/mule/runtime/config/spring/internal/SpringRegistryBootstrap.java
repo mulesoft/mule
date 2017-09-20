@@ -18,7 +18,7 @@ import org.mule.runtime.config.spring.internal.factories.BootstrapObjectFactoryB
 import org.mule.runtime.config.spring.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.config.bootstrap.BootstrapObjectFactory;
+import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.transformer.Transformer;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.core.api.registry.TransformerResolver.RegistryAction.ADDED;
-import static org.mule.runtime.core.api.util.BeanUtils.getName;
+import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;

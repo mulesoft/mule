@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;

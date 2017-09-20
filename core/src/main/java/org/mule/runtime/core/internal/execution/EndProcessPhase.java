@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
-import org.mule.runtime.core.api.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 
 /**
  * This phase notifies to the {@link MessageProcessTemplate} that the message processing has ended.

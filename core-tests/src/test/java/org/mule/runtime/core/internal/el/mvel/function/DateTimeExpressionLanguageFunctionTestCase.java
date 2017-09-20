@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionExecutor;
+import org.mule.runtime.core.internal.el.ExpressionExecutor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.el.datetime.DateTime;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionExecutor;

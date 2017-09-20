@@ -12,7 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.util.StreamCloser;
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
 import org.mule.tck.size.SmallTest;
 

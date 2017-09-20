@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing.correlation;
 
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
 

@@ -15,9 +15,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.core.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -55,7 +54,7 @@ public class PetstoreSecurityContextTestCase extends AbstractExtensionFunctional
   @Before
   public void setup() throws Exception {
     when(provider.getName()).thenReturn(MOCK_PROVIDER);
-    when(provider.authenticate(any(DefaultMuleAuthentication.class))).thenReturn(authenticationResult);
+    when(provider.authenticate(any(Authentication.class))).thenReturn(authenticationResult);
     when(provider.createSecurityContext(authenticationResult)).thenReturn(securityContext);
     when(provider.supports(any())).thenReturn(true);
 

@@ -29,8 +29,6 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.CompositeErrorTypeRepository;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 
 /**

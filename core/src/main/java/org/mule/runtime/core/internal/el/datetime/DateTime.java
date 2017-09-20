@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.datetime;
 
-import org.mule.runtime.core.api.el.datetime.Date;
-import org.mule.runtime.core.api.el.datetime.Time;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
