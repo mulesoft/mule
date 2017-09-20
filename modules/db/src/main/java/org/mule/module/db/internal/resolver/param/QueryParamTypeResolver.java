@@ -22,11 +22,15 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Resolves parameter types for standard queries
  */
 public class QueryParamTypeResolver implements ParamTypeResolver
 {
+    private static final Logger logger = LoggerFactory.getLogger(QueryParamTypeResolver.class);
 
     private final DbTypeManager dbTypeManager;
 
@@ -40,34 +44,53 @@ public class QueryParamTypeResolver implements ParamTypeResolver
     {
         Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
 
-        PreparedStatement statement = connection.prepareStatement(queryTemplate.getSqlText());
+        PreparedStatement statement = null;
+        try {
 
-        ParameterMetaData parameterMetaData = statement.getParameterMetaData();
+            statement = connection.prepareStatement(queryTemplate.getSqlText());
 
-        for (QueryParam queryParam : queryTemplate.getParams())
-        {
-            int parameterTypeId = parameterMetaData.getParameterType(queryParam.getIndex());
-            String parameterTypeName = parameterMetaData.getParameterTypeName(queryParam.getIndex());
-            DbType dbType;
-            if (parameterTypeName == null)
+            ParameterMetaData parameterMetaData = statement.getParameterMetaData();
+
+            for (QueryParam queryParam : queryTemplate.getParams())
             {
-                // Use unknown data type
-                dbType = UnknownDbType.getInstance();
+                int parameterTypeId = parameterMetaData.getParameterType(queryParam.getIndex());
+                String parameterTypeName = parameterMetaData.getParameterTypeName(queryParam.getIndex());
+                DbType dbType;
+                if (parameterTypeName == null)
+                {
+                    // Use unknown data type
+                    dbType = UnknownDbType.getInstance();
+                }
+                else
+                {
+                    try
+                    {
+                        dbType = dbTypeManager.lookup(connection, parameterTypeId, parameterTypeName);
+                    } catch (UnknownDbTypeException e) {
+                        // Type was not found in the type manager, but the DB knows about it
+                        dbType = new ResolvedDbType(parameterTypeId, parameterTypeName);
+                    }
+                }
+
+                paramTypes.put(queryParam.getIndex(), dbType);
             }
-            else
+        }
+        finally
+        {
+            if (statement != null)
             {
                 try
                 {
-                    dbType = dbTypeManager.lookup(connection, parameterTypeId, parameterTypeName);
+                    statement.close();
                 }
-                catch (UnknownDbTypeException e)
+                catch (SQLException e)
                 {
-                    // Type was not found in the type manager, but the DB knows about it
-                    dbType = new ResolvedDbType(parameterTypeId, parameterTypeName);
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn("Could not close statement", e);
+                    }
                 }
             }
-
-            paramTypes.put(queryParam.getIndex(), dbType);
         }
 
         return paramTypes;

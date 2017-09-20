@@ -10,6 +10,7 @@ package org.mule.module.db.internal.resolver.param;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.module.db.internal.domain.connection.DbConnection;
 import org.mule.module.db.internal.domain.param.DefaultInputQueryParam;
@@ -38,7 +39,8 @@ import org.junit.Test;
 public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
 {
 
-    public static final String SQL_TEXT = "select * from test where id = ?";
+    private static final String SQL_TEXT = "select * from test where id = ?";
+    private PreparedStatement preparedStatement;
 
     @Test
     public void resolvesQueryParameterKnownType() throws Exception
@@ -55,6 +57,7 @@ public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
 
         assertThat(parameterTypes.size(), equalTo(1));
         assertThat(parameterTypes.get(1), equalTo(JdbcTypes.INTEGER_DB_TYPE));
+        verify(preparedStatement).close();
     }
 
     @Test
@@ -73,13 +76,14 @@ public class QueryParamTypeResolverTestCase extends AbstractMuleTestCase
         assertThat(parameterTypes.size(), equalTo(1));
         assertThat(parameterTypes.get(1).getId(), equalTo(JdbcTypes.INTEGER_DB_TYPE.getId()));
         assertThat(parameterTypes.get(1).getName(), equalTo(JdbcTypes.INTEGER_DB_TYPE.getName()));
+        verify(preparedStatement).close();
     }
 
     private DbConnection createDbConnection() throws SQLException
     {
         ParameterMetaData parameterMetaData = new ParameterMetaDataBuilder().withParameter(1, JdbcTypes.INTEGER_DB_TYPE).build();
 
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        preparedStatement = mock(PreparedStatement.class);
         when(preparedStatement.getParameterMetaData()).thenReturn(parameterMetaData);
 
         return new DbConnectionBuilder().preparing(SQL_TEXT, preparedStatement).build();
