@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.connection.util;
+package org.mule.runtime.core.api.connection.util;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;

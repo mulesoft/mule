@@ -60,6 +60,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   public final Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = doBuild(result);
 
+    muleContext.getInjector().inject(provider);
     provider = applyExtensionClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);

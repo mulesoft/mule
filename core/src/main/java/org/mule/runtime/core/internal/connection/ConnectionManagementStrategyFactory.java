@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.core.internal.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
+import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
