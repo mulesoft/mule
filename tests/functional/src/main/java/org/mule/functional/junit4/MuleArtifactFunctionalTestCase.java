@@ -10,11 +10,15 @@ package org.mule.functional.junit4;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+
+import javax.inject.Inject;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -47,6 +51,12 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
     })
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
+  @Inject
+  protected Registry registry;
+
+  @Inject
+  protected ConfigurationComponentLocator locator;
+
   private BaseEvent _testEvent;
 
   /**
@@ -67,4 +77,10 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(Message.of(TEST_PAYLOAD)).build();
   }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
 }

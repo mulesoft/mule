@@ -9,7 +9,8 @@
         "org.mule.functional.api.event",
         "org.mule.functional.api.exception",
         "org.mule.functional.api.flow",
-        "org.mule.functional.api.notification"
+        "org.mule.functional.api.notification",
+        "org.mule.functional.api.registry"
       ],
       "exportedResources": [
         "META-INF/spring.schemas",

@@ -22,7 +22,11 @@ import java.util.Collection;
  * @deprecated inject {@link Registry} where possible instead of using this utility.
  */
 @Deprecated
-public class LegacyRegistryUtils {
+public final class LegacyRegistryUtils {
+
+  private LegacyRegistryUtils() {
+    // Nothing to do
+  }
 
   /**
    * Look up a single object by name.
