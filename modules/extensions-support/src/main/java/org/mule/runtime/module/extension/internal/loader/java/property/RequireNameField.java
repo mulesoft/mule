@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
-import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 
 import java.lang.reflect.Field;
 
@@ -19,46 +18,22 @@ import java.lang.reflect.Field;
  * @see RefName
  * @since 4.0
  */
-public final class RequireNameField implements ModelProperty {
-
-  /**
-   * The {@link Field} on which the name should be injected
-   */
-  private final Field configNameField;
+public final class RequireNameField extends InjectedFieldModelProperty {
 
   /**
    * Creates a new instance
    *
-   * @param configNameField on which the name should be injected
+   * @param field on which the value should be injected
    */
-  public RequireNameField(Field configNameField) {
-    this.configNameField = configNameField;
-  }
-
-  /**
-   * @return on which the name should be injected
-   */
-  public Field getConfigNameField() {
-    return configNameField;
+  public RequireNameField(Field field) {
+    super(field);
   }
 
   /**
    * {@inheritDoc}
-   *
-   * @return {@code requireNameField}
    */
   @Override
   public String getName() {
     return "requireNameField";
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @return {@code false}
-   */
-  @Override
-  public boolean isPublic() {
-    return false;
   }
 }

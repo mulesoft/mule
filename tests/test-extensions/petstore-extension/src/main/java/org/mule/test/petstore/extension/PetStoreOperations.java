@@ -7,14 +7,13 @@
 package org.mule.test.petstore.extension;
 
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -27,11 +26,13 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
-import javax.inject.Inject;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
 
 public class PetStoreOperations {
 
@@ -104,6 +105,10 @@ public class PetStoreOperations {
 
   public PetCage getCage(@Config PetStoreConnector config) {
     return config.getCage();
+  }
+
+  public PetStoreConnector getConfig(@Config PetStoreConnector config) {
+    return config;
   }
 
   public void setSecureCage(@Optional @NullSafe List<String> providers, String user, String pass,

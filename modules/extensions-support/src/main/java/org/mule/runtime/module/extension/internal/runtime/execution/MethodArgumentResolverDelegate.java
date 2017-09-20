@@ -21,6 +21,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
@@ -40,6 +41,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CompletionCal
 import org.mule.runtime.module.extension.internal.runtime.resolver.ComponentLocationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.DefaultEncodingArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ErrorArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.FlowListenerArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.LiteralArgumentResolver;
@@ -72,6 +74,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
   private static final ArgumentResolver<MediaType> MEDIA_TYPE_ARGUMENT_RESOLVER = new MediaTypeArgumentResolver();
+  private static final ArgumentResolver<String> DEFAULT_ENCODING_ARGUMENT_RESOLVER = new DefaultEncodingArgumentResolver();
   private static final ArgumentResolver<SourceCallbackContext> SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER =
       new SourceCallbackContextArgumentResolver();
   private static final ArgumentResolver<Error> ERROR_ARGUMENT_RESOLVER = new ErrorArgumentResolver();
@@ -132,6 +135,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
       } else if (annotations.containsKey(Connection.class)) {
         argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
+      } else if (annotations.containsKey(DefaultEncoding.class)) {
+        argumentResolver = DEFAULT_ENCODING_ARGUMENT_RESOLVER;
       } else if (Error.class.isAssignableFrom(parameterType)) {
         argumentResolver = ERROR_ARGUMENT_RESOLVER;
       } else if (SourceCallbackContext.class.equals(parameterType)) {

@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -51,6 +52,9 @@ public class PetStoreConnector {
   @ParameterGroup(name = "Cashier")
   private ExclusiveCashier cashier;
 
+  @DefaultEncoding
+  String encoding;
+
   public List<String> getPets() {
     return pets;
   }
@@ -65,5 +69,21 @@ public class PetStoreConnector {
 
   public ExclusiveCashier getCashier() {
     return cashier;
+  }
+
+  public String getEncoding() {
+    return encoding;
+  }
+
+  public static int getTimesStarted() {
+    return timesStarted;
+  }
+
+  public TlsContextFactory getTls() {
+    return tls;
+  }
+
+  public List<PetCage> getCages() {
+    return cages;
   }
 }

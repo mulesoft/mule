@@ -21,7 +21,6 @@ public class PhoneNumber {
   @Parameter
   private String home;
 
-  @Parameter
   @DefaultEncoding
   private String countryEncoding;
 

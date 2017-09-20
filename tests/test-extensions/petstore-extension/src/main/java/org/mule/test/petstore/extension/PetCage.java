@@ -7,7 +7,6 @@
 package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -28,10 +27,6 @@ public class PetCage {
   @Optional
   TlsContextFactory tls;
 
-  @Parameter
-  @DefaultEncoding
-  String encoding;
-
   public Map<String, Integer> getBirds() {
     return birds;
   }
@@ -44,7 +39,4 @@ public class PetCage {
     return tls;
   }
 
-  public String getEncoding() {
-    return encoding;
-  }
 }

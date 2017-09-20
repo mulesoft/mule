@@ -11,14 +11,14 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -49,6 +49,7 @@ public final class ConfigurationInstanceFactory<T> {
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final boolean requiresConnection;
+  private final MuleContext muleContext;
 
   /**
    * Creates a new instance which provides instances derived from the given {@code configurationModel} and {@code resolverSet}
@@ -61,6 +62,7 @@ public final class ConfigurationInstanceFactory<T> {
   public ConfigurationInstanceFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                       ResolverSet resolverSet, MuleContext muleContext) {
     this.configurationModel = configurationModel;
+    this.muleContext = muleContext;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
     requiresConnection = !getConnectedComponents(extensionModel, configurationModel).isEmpty();
     implicitConnectionProviderFactory =
@@ -178,14 +180,14 @@ public final class ConfigurationInstanceFactory<T> {
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, ResolverSetResult resolverSetResult)
       throws MuleException {
     Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(resolverSetResult);
-    injectRefName(configurationModel, config.getFirst(), name);
+    injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
 
     return config;
   }
 
   private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
     Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(from(event));
-    injectRefName(configurationModel, config.getFirst(), name);
+    injectFields(configurationModel, config.getFirst(), name, muleContext.getConfiguration().getDefaultEncoding());
 
     return config;
   }

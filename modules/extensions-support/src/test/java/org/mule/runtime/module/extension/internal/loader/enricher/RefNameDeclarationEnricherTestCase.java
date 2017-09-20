@@ -19,14 +19,13 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.extension.api.annotation.param.RefName;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
+import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -97,24 +96,12 @@ public class RefNameDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
     RequireNameField property = captor.getValue();
     assertThat(property, is(notNullValue()));
-    assertThat(property.getConfigNameField(), equalTo(injectionField));
+    assertThat(property.getField(), equalTo(injectionField));
   }
 
   @Test
   public void configWithoutImplementingProperty() throws Exception {
     mockImplementingProperty(configurationDeclaration, null);
-    enricher.enrich(extensionLoadingContext);
-  }
-
-  @Test(expected = IllegalConfigurationModelDefinitionException.class)
-  public void manyAnnotatedFields() {
-    mockImplementingProperty(configurationDeclaration, TestMultipleNameAwareConfig.class);
-    enricher.enrich(extensionLoadingContext);
-  }
-
-  @Test(expected = IllegalConfigurationModelDefinitionException.class)
-  public void annotatedFieldOfWrongType() {
-    mockImplementingProperty(configurationDeclaration, TestIllegalNameAwareConfig.class);
     enricher.enrich(extensionLoadingContext);
   }
 

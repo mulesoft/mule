@@ -6,13 +6,21 @@
  */
 package org.mule.test.module.extension.connector;
 
-import static java.nio.charset.Charset.availableCharsets;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.test.module.extension.connector.PetStoreSourceRetryPolicyProviderTestCase.POLL_DELAY_MILLIS;
+import static org.mule.test.module.extension.connector.PetStoreSourceRetryPolicyProviderTestCase.TIMEOUT_MILLIS;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.petstore.extension.PetCage;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +28,7 @@ import org.junit.Test;
 public class PetStoreDefaultEncodingTestCase extends AbstractExtensionFunctionalTestCase {
 
   private String defaultEncoding;
-  private String customEncoding;
+  private static Reference<Message> messageHolder = new Reference<>();
 
   @Override
   protected String getConfigFile() {
@@ -31,17 +39,12 @@ public class PetStoreDefaultEncodingTestCase extends AbstractExtensionFunctional
   public void setUp() {
     defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
     assertThat(defaultEncoding, is(notNullValue()));
-
-    customEncoding =
-        availableCharsets().keySet().stream().filter(encoding -> !encoding.equals(defaultEncoding)).findFirst().orElse(null);
-    assertThat(customEncoding, is(notNullValue()));
-    assertThat(customEncoding, is(not(defaultEncoding)));
   }
 
   @Test
   public void configEncoding() throws Exception {
-    PetCage cage = (PetCage) flowRunner("fieldEncoding").run().getMessage().getPayload().getValue();
-    assertDefaultEncoding(cage.getEncoding());
+    PetStoreConnector config = (PetStoreConnector) flowRunner("configEncoding").run().getMessage().getPayload().getValue();
+    assertDefaultEncoding(config.getEncoding());
   }
 
   @Test
@@ -50,15 +53,19 @@ public class PetStoreDefaultEncodingTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  public void inlinePojoEncoding() throws Exception {
+    assertDefaultEncoding((String) flowRunner("inlinePojoEncoding").run().getMessage().getPayload().getValue());
+  }
+
+  @Test
   public void argumentEncoding() throws Exception {
     assertDefaultEncoding((String) flowRunner("argumentEncoding").run().getMessage().getPayload().getValue());
   }
 
   @Test
-  public void overrideEncoding() throws Exception {
-    String flowResult = (String) flowRunner("overridedArgumentEncoding").withVariable("customEncoding", customEncoding).run()
-        .getMessage().getPayload().getValue();
-    assertThat(flowResult, is(customEncoding));
+  public void sourceEncoding() throws Exception {
+    startFlow("sourceEncoding");
+    assertDefaultEncoding((String) listen().getPayload().getValue());
   }
 
   private void assertDefaultEncoding(String encoding) {
@@ -66,4 +73,23 @@ public class PetStoreDefaultEncodingTestCase extends AbstractExtensionFunctional
     assertThat(encoding, is(defaultEncoding));
   }
 
+  public static class TestProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      messageHolder.set(event.getMessage());
+      return event;
+    }
+  }
+
+  private Message listen() {
+    PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+    prober.check(new JUnitLambdaProbe(() -> messageHolder.get() != null));
+
+    return messageHolder.get();
+  }
+
+  private void startFlow(String flowName) throws Exception {
+    ((Flow) getFlowConstruct(flowName)).start();
+  }
 }

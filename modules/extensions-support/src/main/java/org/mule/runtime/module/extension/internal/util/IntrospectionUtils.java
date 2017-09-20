@@ -69,11 +69,14 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.ParameterResolverTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
+import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -83,11 +86,14 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
+
 import com.google.common.collect.ImmutableList;
-import org.springframework.core.ResolvableType;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -113,6 +119,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import org.springframework.core.ResolvableType;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -987,5 +995,96 @@ public final class IntrospectionUtils {
       }
     }
     return empty();
+  }
+
+  private static void injectFieldFromModelProperty(Object target, String value,
+                                                   Optional<? extends InjectedFieldModelProperty> modelProperty,
+                                                   Class<? extends Annotation> annotationClass) {
+    if (value == null) {
+      return;
+    }
+
+    modelProperty.ifPresent(property -> {
+      final Field field = property.getField();
+
+      if (!field.getDeclaringClass().isInstance(target)) {
+        throw new IllegalConfigurationModelDefinitionException(
+                format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                        field.toString(),
+                        annotationClass.getSimpleName(),
+                        target.getClass().getName()));
+      }
+      new FieldSetter<>(field).set(target, value);
+    });
+  }
+
+  private static void injectField(Object target, String value, Class<? extends Annotation> annotationClass) {
+    if (value == null) {
+      return;
+    }
+
+    final Class<?> type = target.getClass();
+    List<Field> fields = getAnnotatedFields(type, annotationClass);
+    if (fields.isEmpty()) {
+      return;
+    } else if (fields.size() > 1) {
+      throw new IllegalModelDefinitionException(format(
+              "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+              type.getName(), fields.size(), annotationClass));
+    }
+
+    new FieldSetter<>(fields.get(0)).set(target, value);
+  }
+
+  /**
+   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the same for the
+   * {@code encoding} and the field annotated with {@link DefaultEncoding} if the {@code model} contains the {@link DeclaringMemberModelProperty}
+   *
+   * @param model      enriched with {@link InjectedFieldModelProperty}
+   * @param target     object in which the fields are going to be set
+   * @param configName to be injected into the {@link String} field annotated with {@link RefName}
+   * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   */
+  public static void injectFields(EnrichableModel model, Object target, String configName, String encoding) {
+    injectFieldFromModelProperty(target, configName, model.getModelProperty(RequireNameField.class), RefName.class);
+    injectDefaultEncoding(model, target, encoding);
+  }
+
+  /**
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model} contains the {@link DeclaringMemberModelProperty} property
+   * and the value is not {@code null}.
+   *
+   * @param model    enriched with {@link DefaultEncodingModelProperty}
+   * @param target   object in which the fields are going to be set
+   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   */
+  public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
+    injectFieldFromModelProperty(target, encoding, model.getModelProperty(DefaultEncodingModelProperty.class),
+            DefaultEncoding.class);
+  }
+
+  /**
+   * Sets the {@code configName} into the field of the {@code target} annotated {@link RefName} (if it's present) and does the same for the
+   * {@code encoding} and the field annotated with {@link DefaultEncoding}.
+   *
+   * @param target     object in which the fields are going to be set
+   * @param configName to be injected into the {@link String} field annotated with {@link RefName}
+   * @param encoding   to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   */
+  public static void injectFields(Object target, String configName, String encoding) {
+    injectDefaultEncoding(target, encoding);
+    injectField(target, configName, RefName.class);
+  }
+
+  /**
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} (if present)
+   *
+   * @param target   object in which the fields are going to be set
+   * @param encoding to be injected into the {@link String} field annotated with {@link DefaultEncoding}
+   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   */
+  public static void injectDefaultEncoding(Object target, String encoding) {
+    injectField(target, encoding, DefaultEncoding.class);
   }
 }
