@@ -87,7 +87,6 @@ import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
-import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -124,6 +123,7 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -214,7 +214,7 @@ class SpringMuleContextServiceConfigurator {
       .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
       .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
-      .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(DefaultTransformationService.class))
+      .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(ExtendedTransformationService.class))
       .put(OBJECT_SCHEDULER_POOLS_CONFIG, getConstantObjectBeanDefinition(SchedulerContainerPoolsConfig.getInstance()))
       .put(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))

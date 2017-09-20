@@ -37,7 +37,6 @@ import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.event.BaseEventContext;
@@ -45,6 +44,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
@@ -52,8 +54,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.hamcrest.Description;
@@ -96,7 +96,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
     mockErrorTypeLocator();
-    when(muleContext.getTransformationService()).thenReturn(new DefaultTransformationService(muleContext));
+    when(muleContext.getTransformationService()).thenReturn(new ExtendedTransformationService(muleContext));
   }
 
   private void mockErrorTypeLocator() {

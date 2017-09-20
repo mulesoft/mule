@@ -16,7 +16,8 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
 
   @Inject
-  private DefaultTransformationService transformationService;
+  private TransformationService transformationService;
 
   /**
    * logger used by this class
@@ -140,7 +141,8 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
         if (resultMessage != null) {
           try {
             logger.trace("Response payload: \n"
-                + truncate(transformationService.getPayloadForLogging(resultMessage), 100, false));
+                + truncate(((ExtendedTransformationService) transformationService).getPayloadForLogging(resultMessage), 100,
+                           false));
           } catch (Exception e) {
             logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
           }

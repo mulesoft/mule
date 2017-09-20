@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.io.InputStream;
@@ -78,9 +79,9 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     if (event != null && event.getMessage() != null) {
       try {
         return CoreEvent.builder(event)
-            .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
-      } catch (MessageTransformerException e) {
-        throw e;
+            .message(((ExtendedTransformationService) muleContext.getTransformationService())
+                .applyTransformers(event.getMessage(), event, this))
+            .build();
       } catch (Exception e) {
         throw new MessageTransformerException(this, e, event.getMessage());
       }

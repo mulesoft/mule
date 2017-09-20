@@ -31,6 +31,7 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
@@ -249,7 +250,8 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
       eventBuilder
-          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
+          .message(((ExtendedTransformationService) muleContext.getTransformationService())
+              .applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
       eventBuilder.message(of(null));
     }

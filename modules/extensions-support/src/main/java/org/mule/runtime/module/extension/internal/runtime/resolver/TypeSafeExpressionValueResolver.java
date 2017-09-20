@@ -13,7 +13,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
@@ -40,7 +40,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   private TypeSafeValueResolverWrapper<T> delegate;
 
   @Inject
-  private DefaultTransformationService transformationService;
+  private TransformationService transformationService;
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
@@ -74,7 +74,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
     delegate.initialise();
   }
 
-  public void setTransformationService(DefaultTransformationService transformationService) {
+  public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

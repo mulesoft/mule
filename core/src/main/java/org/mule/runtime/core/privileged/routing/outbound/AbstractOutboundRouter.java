@@ -21,6 +21,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -29,7 +31,6 @@ import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
@@ -117,7 +118,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
         if (resultMessage != null) {
           try {
             logger.trace("Response payload: \n"
-                + truncate(muleContext.getTransformationService().getPayloadForLogging(resultMessage), 100, false));
+                + truncate(((ExtendedTransformationService) muleContext.getTransformationService())
+                    .getPayloadForLogging(resultMessage), 100, false));
           } catch (Exception e) {
             logger.trace("Response payload: \n(unable to retrieve payload: " + e.getMessage());
           }

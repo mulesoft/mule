@@ -69,8 +69,8 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -119,7 +119,7 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.slf4j.Logger;
@@ -229,7 +229,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   private volatile Collection<ExceptionContextProvider> exceptionContextProviders;
   private Object exceptionContextProvidersLock = new Object();
 
-  private DefaultTransformationService transformationService;
+  private TransformationService transformationService;
 
   private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
 
@@ -266,7 +266,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   }
 
   public DefaultMuleContext() {
-    transformationService = new DefaultTransformationService(this);
+    transformationService = new ExtendedTransformationService(this);
   }
 
   @Override
@@ -998,7 +998,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   }
 
   @Override
-  public DefaultTransformationService getTransformationService() {
+  public TransformationService getTransformationService() {
     if (transformationService == null) {
       transformationService = getRegistry().get(OBJECT_TRANSFORMATION_SERVICE);
     }
@@ -1006,7 +1006,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   }
 
   @Override
-  public void setTransformationService(DefaultTransformationService transformationService) {
+  public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

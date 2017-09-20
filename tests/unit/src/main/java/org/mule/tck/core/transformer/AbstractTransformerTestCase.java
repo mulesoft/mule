@@ -18,6 +18,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
@@ -85,7 +86,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
       Transformer trans = this.getTransformer();
       Transformer trans2 = this.getRoundTripTransformer();
       Message message = of(getTestData());
-      message = muleContext.getTransformationService().applyTransformers(message, null, asList(trans, trans2));
+      message = ((ExtendedTransformationService) muleContext.getTransformationService()).applyTransformers(message, null,
+                                                                                                           asList(trans, trans2));
       Object result = message.getPayload().getValue();
       this.compareRoundtripResults(this.getTestData(), result);
     }

@@ -22,7 +22,6 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
@@ -30,6 +29,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.runtime.core.internal.transformer.builder.MockTransformerBuilder;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -59,12 +59,12 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
-  private DefaultTransformationService transformationService;
+  private ExtendedTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
     when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
-    this.transformationService = new DefaultTransformationService(muleContext);
+    this.transformationService = new ExtendedTransformationService(muleContext);
   }
 
   private static final DataType dataTypeB = DataType.fromType(B.class);
