@@ -85,7 +85,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     {
         try
         {
-            return endpoint.request(timeout);
+            return requestMessage(endpoint, timeout);
         }
         catch (Exception e)
         {
@@ -199,12 +199,24 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
         try
         {
-            return endpoint.request(timeout);
+            return requestMessage(endpoint, timeout);
         }
         catch (Exception e)
         {
             throw new ReceiveException(endpoint, timeout, e);
         }
+    }
+
+    private MuleMessage requestMessage(InboundEndpoint endpoint, long timeout) throws Exception
+    {
+        MuleMessage result = endpoint.request(timeout);
+
+        if (result != null)
+        {
+            return new DefaultMuleMessage(result.getPayload(), result, endpoint.getMuleContext());
+        }
+
+        return null;
     }
 
     public MuleMessage process(String uri,
