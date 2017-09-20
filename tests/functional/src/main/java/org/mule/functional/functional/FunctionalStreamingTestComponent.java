@@ -9,10 +9,13 @@ package org.mule.functional.functional;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+
 import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -22,12 +25,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A service that can be used by streaming functional tests. This service accepts an EventCallback that can be used to assert the
@@ -179,8 +182,9 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
   /**
    * @return the first {@link FunctionalStreamingTestComponent} instance from a flow with the provided name.
    */
-  public static FunctionalStreamingTestComponent getFromFlow(MuleContext muleContext, String flowName) throws Exception {
-    final FlowConstruct flowConstruct = muleContext.getRegistry().lookupObject(flowName);
+  public static FunctionalStreamingTestComponent getFromFlow(ConfigurationComponentLocator locator, String flowName)
+      throws Exception {
+    final FlowConstruct flowConstruct = (FlowConstruct) locator.find(Location.builder().globalName(flowName).build()).get();
 
     if (flowConstruct != null) {
       if (flowConstruct instanceof Pipeline) {

@@ -18,14 +18,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
-
-import com.google.common.io.PatternFilenameFilter;
-
-import java.io.File;
-import java.util.Optional;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -34,7 +31,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ExtensionPluginMetadataGeneratorTestCase {
+import com.google.common.io.PatternFilenameFilter;
+
+import java.io.File;
+import java.util.Optional;
+
+public class ExtensionPluginMetadataGeneratorTestCase extends AbstractMuleTestCase {
 
   private static final String META_INF = "META-INF";
 

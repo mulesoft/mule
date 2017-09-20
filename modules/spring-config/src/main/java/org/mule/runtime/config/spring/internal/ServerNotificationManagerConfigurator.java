@@ -12,16 +12,20 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.spring.internal.NotificationConfig.EVENT_MAP;
 import static org.mule.runtime.config.spring.internal.NotificationConfig.INTERFACE_MAP;
 
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.api.util.Pair;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,13 +40,12 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-
 public class ServerNotificationManagerConfigurator extends AbstractComponent implements Initialisable {
 
   @Inject
   private MuleContext muleContext;
+  @Inject
+  private Registry registry;
   @Inject
   private ApplicationContext applicationContext;
 
@@ -55,6 +58,10 @@ public class ServerNotificationManagerConfigurator extends AbstractComponent imp
 
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
   }
 
   @Override
@@ -86,7 +93,7 @@ public class ServerNotificationManagerConfigurator extends AbstractComponent imp
       throws InitialisationException {
     Map<String, NotificationsProvider> providersMap = new HashMap<>();
 
-    for (NotificationsProvider provider : muleContext.getRegistry().lookupObjects(NotificationsProvider.class)) {
+    for (NotificationsProvider provider : registry.lookupAllByType(NotificationsProvider.class)) {
       for (Entry<String, Pair<Class<? extends Notification>, Class<? extends NotificationListener>>> entry : provider
           .getEventListenerMapping().entrySet()) {
 

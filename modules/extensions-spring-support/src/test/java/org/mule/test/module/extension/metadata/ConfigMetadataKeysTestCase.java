@@ -9,6 +9,7 @@ package org.mule.test.module.extension.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
+
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -19,21 +20,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 
 public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestCase {
 
+  @Inject
   private MetadataService metadataManager;
 
   @Override
   protected String getConfigFile() {
     return "vegan-config.xml";
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
   }
 
   @Test

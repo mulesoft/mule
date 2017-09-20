@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -41,6 +41,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final M operationModel;
   protected final PolicyManager policyManager;
   protected final MuleContext muleContext;
+  protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
   protected final ExtensionsOAuthManager oauthManager;
 
@@ -54,7 +55,8 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
                                           PolicyManager policyManager,
-                                          MuleContext muleContext) {
+                                          MuleContext muleContext,
+                                          Registry registry) {
 
     checkArgument(extensionModel != null, "ExtensionModel cannot be null");
     checkArgument(operationModel != null, "OperationModel cannot be null");
@@ -65,8 +67,9 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.operationModel = operationModel;
     this.policyManager = policyManager;
     this.muleContext = muleContext;
-    this.extensionConnectionSupplier = lookup(ExtensionConnectionSupplier.class);
-    this.oauthManager = lookup(ExtensionsOAuthManager.class);
+    this.registry = registry;
+    this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
+    this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
   }
 
   public P build() {
@@ -95,14 +98,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
         ParametersResolver.fromValues(parameters, muleContext).getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);
-  }
-
-  private <T> T lookup(Class<T> type) {
-    try {
-      return muleContext.getRegistry().lookupObject(type);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(createStaticMessage(type.getName() + " Not Found"), e);
-    }
   }
 
   public ComponentMessageProcessorBuilder<M, P> setConfigurationProvider(ConfigurationProvider configurationProvider) {

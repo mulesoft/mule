@@ -9,9 +9,11 @@ package org.mule.runtime.module.launcher.logging;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 
 import org.mule.functional.listener.FlowExecutionListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
@@ -23,13 +25,13 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Issue;
 
@@ -64,7 +66,8 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
     MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
 
     final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<>();
-    FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
+    FlowExecutionListener flowExecutionListener =
+        new FlowExecutionListener(lookupObject(applicationContext, NotificationListenerRegistry.class));
     flowExecutionListener.addListener(source -> executionClassLoader.set(Thread.currentThread().getContextClassLoader()));
     HttpRequest request =
         HttpRequest.builder().uri(format(requestUrl, dynamicPort.getNumber())).method(GET)

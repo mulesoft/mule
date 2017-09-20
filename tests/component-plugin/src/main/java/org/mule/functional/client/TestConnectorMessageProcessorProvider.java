@@ -25,7 +25,7 @@ public class TestConnectorMessageProcessorProvider extends AbstractPriorizableCo
     final String queueName = cacheKey.getUrl().substring(TEST_URL_PREFIX.length());
     final OperationOptions operationOptions = cacheKey.getOperationOptions();
 
-    return new QueueReaderMessageProcessor(muleContext, queueName, operationOptions.getResponseTimeout());
+    return new QueueReaderMessageProcessor(registry, queueName, operationOptions.getResponseTimeout());
   }
 
   @Override

@@ -20,6 +20,8 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,28 +35,28 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExtensionManager}. This implementation uses standard Java SPI as a discovery mechanism.
  * <p/>
  * Although it allows registering {@link ConfigurationProvider} instances through the
  * {@link #registerConfigurationProvider(ConfigurationProvider)} method (and that's still the correct way of registering them),
- * this implementation automatically acknowledges any {@link ConfigurationProvider} already present on the {@link MuleRegistry}
+ * this implementation automatically acknowledges any {@link ConfigurationProvider} already present on the {@link Registry}
  *
  * @since 3.7.0
  */
@@ -74,7 +76,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   @Override
   public void initialise() throws InitialisationException {
-    extensionRegistry = new ExtensionRegistry(muleContext.getRegistry());
+    extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
     extensionErrorsRegistrant =
         new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(), muleContext.getErrorTypeLocator());
     extensionActivator = new ExtensionActivator(extensionErrorsRegistrant, muleContext);
@@ -132,7 +134,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    */
   @Override
   public void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
-    extensionRegistry.registerConfigurationProvider(configurationProvider);
+    extensionRegistry.registerConfigurationProvider(configurationProvider, muleContext);
   }
 
   /**

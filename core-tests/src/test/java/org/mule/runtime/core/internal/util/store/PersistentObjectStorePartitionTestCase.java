@@ -14,14 +14,14 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.FileUtils.openDirectory;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.io.File;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +31,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.File;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase {
@@ -38,8 +40,7 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
   @Rule
   public TemporaryFolder objectStoreFolder = new TemporaryFolder();
 
-  @Mock
-  private MuleContext muleContext;
+  private MuleContext muleContext = mockMuleContext();
 
   @Mock
   private MuleConfiguration muleConfiguration;

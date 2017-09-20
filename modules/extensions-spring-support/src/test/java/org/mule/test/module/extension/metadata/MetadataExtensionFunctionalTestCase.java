@@ -52,14 +52,16 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import org.junit.Before;
-import org.junit.runners.Parameterized;
-
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiConsumer;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.runners.Parameterized;
 
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
@@ -128,10 +130,12 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
+  @Inject
+  protected MetadataService metadataService;
+
   protected MetadataType personType;
   protected Location location;
   protected BaseEvent event;
-  protected MetadataService metadataService;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
   protected MetadataComponentDescriptorProvider<T> provider;
@@ -153,7 +157,6 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   @Before
   public void setup() throws Exception {
     event = BaseEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of("")).build();
-    metadataService = muleContext.getRegistry().lookupObject(MetadataService.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 

@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -24,7 +26,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -40,15 +44,15 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
@@ -180,7 +184,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   public void notifiesMuleContextEvents() throws InitialisationException, ConfigurationException {
     MuleContextListener listener = mock(MuleContextListener.class);
     ConfigurationBuilder configurationBuilder = mock(ConfigurationBuilder.class);
-    context = mock(MuleContext.class);
+    context = mockMuleContext();
     MuleContextBuilder contextBuilder = mock(MuleContextBuilder.class);
     when(contextBuilder.buildMuleContext()).thenReturn(context);
 
@@ -192,7 +196,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     inOrder.verify(listener, times(1)).onCreation(context);
     inOrder.verify(listener, times(1)).onConfiguration(context);
     // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-    inOrder.verify(listener, times(1)).onInitialization(context);
+    inOrder.verify(listener, times(1)).onInitialization(eq(context), any(Registry.class));
   }
 
   private void assertDefaults(MuleContext context) {

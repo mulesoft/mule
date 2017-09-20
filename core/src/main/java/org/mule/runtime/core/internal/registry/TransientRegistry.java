@@ -8,32 +8,33 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.api.registry.InjectProcessor;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.ObjectProcessor;
 import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
+import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.core.privileged.transport.LegacyConnector;
+
+import org.apache.commons.collections.functors.InstanceofPredicate;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.functors.InstanceofPredicate;
-
 /**
  * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
- * 
+ *
  * @deprecated as of 3.7.0. Use {@link SimpleRegistry instead}.
  */
 @Deprecated
@@ -55,6 +56,7 @@ public class TransientRegistry extends AbstractRegistry {
   private void putDefaultEntriesIntoRegistry() {
     Map<String, Object> processors = new HashMap<>();
     processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
+    processors.put("_registryProcessor", new RegistryProcessor(muleContext));
     processors.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
     processors.put("_muleLifecycleManager", getLifecycleManager());
     registryMap.putAll(processors);

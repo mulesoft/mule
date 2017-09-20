@@ -8,15 +8,16 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
@@ -38,6 +39,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     this.delegate = artifact;
   }
 
+  @Override
   public void dispose() {
     executeWithinArtifactClassLoader(delegate::dispose);
   }
@@ -47,8 +49,13 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     return delegate.getArtifactClassLoader();
   }
 
+  @Override
   public MuleContext getMuleContext() {
     return delegate.getMuleContext();
+  }
+
+  public Registry getRegistry() {
+    return delegate.getRegistry();
   }
 
   @Override
@@ -76,6 +83,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     return delegate.getArtifactPlugins();
   }
 
+  @Override
   public void init() {
     executeWithinArtifactClassLoader(delegate::init);
   }
@@ -85,6 +93,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     getDelegate().lazyInit();
   }
 
+  @Override
   public void install() throws InstallException {
     executeWithinArtifactClassLoader(delegate::install);
   }
@@ -114,10 +123,12 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     delegate.setMuleContextListener(muleContextListener);
   }
 
+  @Override
   public void start() throws DeploymentStartException {
     executeWithinArtifactClassLoader(delegate::start);
   }
 
+  @Override
   public void stop() {
     executeWithinArtifactClassLoader(delegate::stop);
   }

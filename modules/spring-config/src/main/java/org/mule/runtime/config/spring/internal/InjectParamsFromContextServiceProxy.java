@@ -15,6 +15,7 @@ import static java.util.Arrays.deepEquals;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
@@ -34,7 +35,7 @@ import javax.inject.Named;
 
 /**
  * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
- * 
+ *
  * @since 4.0
  */
 public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandler<Service> {
@@ -44,7 +45,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
   public static final String NO_OBJECT_FOUND_FOR_PARAM =
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
-  private final MuleContext context;
+  private final Registry registry;
 
   /**
    * Creates a new proxy for the provided service instance.
@@ -52,10 +53,10 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
    * @param service service instance to wrap. Non null.
    * @param context the {@link MuleContext} to use for resolving injectable parameters. Non null.
    */
-  public InjectParamsFromContextServiceProxy(Service service, MuleContext context) {
+  public InjectParamsFromContextServiceProxy(Service service, Registry registry) {
     super(service);
-    checkArgument(context != null, "context cannot be null");
-    this.context = context;
+    checkArgument(registry != null, "context cannot be null");
+    this.registry = registry;
   }
 
   @Override
@@ -71,15 +72,13 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
         final Parameter parameter = injectable.getParameters()[i];
         Object arg;
         if (parameter.isAnnotationPresent(Named.class)) {
-          arg = context.getRegistry().lookupObject(parameter.getAnnotation(Named.class).value());
+          arg = registry.lookupByName(parameter.getAnnotation(Named.class).value())
+              .orElseThrow(() -> new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
+                                                                                parameter.getName(), injectable.getName(),
+                                                                                getProxiedObject().getName())));
         } else {
-          final Collection<?> lookupObjects = context.getRegistry().lookupObjects(parameter.getType());
+          final Collection<?> lookupObjects = registry.lookupAllByType(parameter.getType());
           arg = new PreferredObjectSelector().select(lookupObjects.iterator());
-        }
-        if (arg == null) {
-          throw new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
-                                                               parameter.getName(), injectable.getName(),
-                                                               getProxiedObject().getName()));
         }
         augmentedArgs.add(arg);
       }
@@ -121,7 +120,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
     // Check that the remaining parameters are injectable
     for (int j = i; j < serviceImplParams.length; ++j) {
       if (!serviceImplParams[j].isAnnotationPresent(Named.class)
-          && context.getRegistry().lookupObjects(serviceImplParams[j].getType()).isEmpty()) {
+          && registry.lookupAllByType(serviceImplParams[j].getType()).isEmpty()) {
         return false;
       }
     }
@@ -133,13 +132,13 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
    * Creates a proxy for the provided service instance.
    *
    * @param service service to wrap. Non null.
-   * @param context the {@link MuleContext} to use for resolving injectable parameters. Non null.
+   * @param registry the {@link Registry} to use for resolving injectable parameters. Non null.
    * @return a new proxy instance.
    */
-  public static Service createInjectProviderParamsServiceProxy(Service service, MuleContext context) {
+  public static Service createInjectProviderParamsServiceProxy(Service service, Registry registry) {
     checkArgument(service != null, "service cannot be null");
-    checkArgument(context != null, "context cannot be null");
-    InvocationHandler handler = new InjectParamsFromContextServiceProxy(service, context);
+    checkArgument(registry != null, "registry cannot be null");
+    InvocationHandler handler = new InjectParamsFromContextServiceProxy(service, registry);
 
     return (Service) newProxyInstance(service.getClass().getClassLoader(), findImplementedInterfaces(service.getClass()),
                                       handler);

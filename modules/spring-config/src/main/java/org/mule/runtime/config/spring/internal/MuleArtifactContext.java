@@ -27,12 +27,14 @@ import static org.mule.runtime.config.spring.internal.parsers.generic.AutoIdUtil
 import static org.mule.runtime.config.spring.internal.util.ComponentBuildingDefinitionUtils.registerComponentBuildingDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -57,6 +59,7 @@ import org.mule.runtime.config.spring.internal.dsl.model.ClassLoaderResourceProv
 import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.spring.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.internal.editors.MulePropertyEditorRegistrar;
@@ -69,7 +72,6 @@ import org.mule.runtime.config.spring.internal.processor.PostRegistrationActions
 import org.mule.runtime.config.spring.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
-import org.mule.runtime.config.spring.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -636,6 +638,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       ManagedMap managedMap = (ManagedMap) value;
       managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
     }
+  }
+
+  public Registry getRegistry() {
+    return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
   }
 
 }

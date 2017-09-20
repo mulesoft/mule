@@ -19,15 +19,14 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractInterceptableContractTestCase<T extends AbstractInterceptable> extends AbstractMuleContextTestCase {
@@ -41,8 +40,10 @@ public abstract class AbstractInterceptableContractTestCase<T extends AbstractIn
   protected Injector injector;
   protected T interceptable;
 
-  @Before
-  public void before() throws Exception {
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+
     interceptable = createInterceptable();
     muleContext.getInjector().inject(interceptable);
 

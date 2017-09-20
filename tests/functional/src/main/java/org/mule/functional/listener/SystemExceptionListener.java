@@ -13,22 +13,21 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.util.concurrent.Latch;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Listener for exceptions managed by the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler}.
@@ -42,15 +41,11 @@ public class SystemExceptionListener {
   private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
   private AtomicInteger numberOfInvocations = new AtomicInteger();
 
-  public SystemExceptionListener(MuleContext muleContext) {
-    try {
-      final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
-      muleContext.setExceptionListener(new CountingSystemExceptionHandler(exceptionListener));
-      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
-          .registerListener((ExceptionNotificationListener) notification -> exceptionNotifications.add(notification));
-    } catch (RegistrationException e) {
-      throw new RuntimeException(e);
-    }
+  public SystemExceptionListener(MuleContext muleContext, NotificationListenerRegistry notificationListenerRegistry) {
+    final SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
+    muleContext.setExceptionListener(new CountingSystemExceptionHandler(exceptionListener));
+    notificationListenerRegistry
+        .registerListener((ExceptionNotificationListener) notification -> exceptionNotifications.add(notification));
   }
 
   public SystemExceptionListener waitUntilAllNotificationsAreReceived() {

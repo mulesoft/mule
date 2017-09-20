@@ -8,19 +8,21 @@ package org.mule.el.mvel;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-
-import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
+
+import java.util.Random;
 
 public class MVELBenchmark extends AbstractBenchmark {
 
@@ -43,14 +45,14 @@ public class MVELBenchmark extends AbstractBenchmark {
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
-    ((MVELExpressionLanguage) muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
+    ((MVELExpressionLanguage) lookupObject(muleContext, OBJECT_EXPRESSION_LANGUAGE)).setAutoResolveVariables(false);
     flow = createFlow(muleContext);
     event = createEvent(flow);
   }
 
   @TearDown
   public void teardown() throws MuleException {
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(lookupObject(muleContext, SchedulerService.class));
     muleContext.dispose();
   }
 

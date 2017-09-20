@@ -126,6 +126,10 @@ import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -135,10 +139,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 
 /**
@@ -304,7 +304,7 @@ class SpringMuleContextServiceConfigurator {
     } else if (customServiceImpl.isPresent()) {
       if (customServiceImpl.get() instanceof Service) {
         beanDefinition = getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) customServiceImpl.get(),
-                                                                                                muleContext));
+                                                                                                registry));
       } else {
         beanDefinition = getConstantObjectBeanDefinition(customServiceImpl.get());
       }

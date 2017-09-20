@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -31,6 +32,8 @@ import org.mule.tck.probe.PollingProber;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 
 /**
@@ -42,6 +45,9 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   private static final int PROBER_TIMEOUT = 1000;
   private static final int PROBER_INTERVAL = 100;
 
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
   private DefaultMuleApplication application;
   private File appLocation = new File("fakeLocation");
 
@@ -50,10 +56,13 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
     MuleApplicationClassLoader parentArtifactClassLoader = mock(MuleApplicationClassLoader.class);
     ArtifactContext mockArtifactContext = mock(ArtifactContext.class);
     when(mockArtifactContext.getMuleContext()).thenReturn(muleContext);
+    when(mockArtifactContext.getRegistry()).thenReturn(new DefaultRegistry(muleContext));
     application = new DefaultMuleApplication(null, parentArtifactClassLoader, emptyList(),
                                              null, mock(ServiceRepository.class), mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null);
     application.setArtifactContext(mockArtifactContext);
+
+    muleContext.getInjector().inject(this);
   }
 
   @Test
@@ -65,8 +74,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   public void initialised() throws RegistrationException {
     // the context was initialised before we gave it to the application, so we need
     // to fire the notification again since the listener wasn't there
-    muleContext.getRegistry().lookupObject(NotificationDispatcher.class)
-        .dispatch(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));
+    notificationDispatcher.dispatch(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));
     assertStatus(ApplicationStatus.INITIALISED);
   }
 

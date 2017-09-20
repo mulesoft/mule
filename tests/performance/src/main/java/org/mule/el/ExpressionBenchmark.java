@@ -10,13 +10,14 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.api.scheduler.SchedulerService;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -40,7 +41,7 @@ public class ExpressionBenchmark extends AbstractBenchmark {
 
   @TearDown
   public void teardown() throws MuleException {
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(lookupObject(muleContext, SchedulerService.class));
     muleContext.dispose();
   }
 

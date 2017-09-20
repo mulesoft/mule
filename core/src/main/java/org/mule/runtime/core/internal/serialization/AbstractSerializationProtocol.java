@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.serialization;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,12 +21,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.inject.Inject;
+
 /**
- * Base class for implementations of {@link SerializationProtocol} This class implements all the base behavioral
- * contract allowing its extensions to only care about the actual serialization/deserialization part.
+ * Base class for implementations of {@link SerializationProtocol} This class implements all the base behavioral contract allowing
+ * its extensions to only care about the actual serialization/deserialization part.
  */
 public abstract class AbstractSerializationProtocol implements SerializationProtocol, MuleContextAware {
 
+  @Inject
   protected MuleContext muleContext;
 
   /**
@@ -125,8 +130,8 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
       try {
         DeserializationPostInitialisable.Implementation.init(object, muleContext);
       } catch (Exception e) {
-        throw new SerializationException(String.format("Could not initialize instance of %s after deserialization",
-                                                       object.getClass().getName()),
+        throw new SerializationException(format("Could not initialize instance of %s after deserialization",
+                                                object.getClass().getName()),
                                          e);
       }
     }

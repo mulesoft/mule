@@ -6,16 +6,17 @@
  */
 package org.mule.test.module.extension.config;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import org.junit.Test;
+
+import java.util.Collection;
 
 public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -28,8 +29,8 @@ public class ImplicitConfigsAreCreatedOnceTestCase extends AbstractExtensionFunc
   public void tooManyConfigsTestCase() throws Exception {
     Integer value = (Integer) flowRunner("implicitConfig").run().getMessage().getPayload().getValue();
     assertThat(value, is(5));
-    Collection<ConfigurationProvider> configs = muleContext.getRegistry().lookupObjects(ConfigurationProvider.class);
+    Collection<ConfigurationProvider> configs = registry.lookupAllByType(ConfigurationProvider.class);
     assertThat(configs, hasSize(5));
-    assertThat(configs.stream().filter(c -> c.getName().endsWith("implicit")).collect(Collectors.toList()), hasSize(2));
+    assertThat(configs.stream().filter(c -> c.getName().endsWith("implicit")).collect(toList()), hasSize(2));
   }
 }

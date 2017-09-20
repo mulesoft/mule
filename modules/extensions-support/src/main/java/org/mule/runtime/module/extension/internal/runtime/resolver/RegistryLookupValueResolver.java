@@ -10,13 +10,13 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.StringUtils;
+
+import javax.inject.Inject;
 
 /**
  * Implementation of {@link ValueResolver} which accesses the mule registry and returns the value associated with {@link #key}.
@@ -30,8 +30,7 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
 
   private final String key;
 
-  @Inject
-  private MuleContext muleContext;
+  private Registry registry;
 
   /**
    * Construct a new instance and set the {@link #key} that will be used to access the registry
@@ -53,12 +52,9 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
    */
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
-    T value = muleContext.getRegistry().get(key);
-    if (value == null) {
-      throw new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry", key)));
-    }
-
-    return value;
+    return registry.<T>lookupByName(key)
+        .orElseThrow(() -> new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry",
+                                                                                 key))));
   }
 
   /**
@@ -69,7 +65,8 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
     return false;
   }
 
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
   }
 }

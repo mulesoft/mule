@@ -12,6 +12,8 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getI
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -19,15 +21,15 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -63,6 +65,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private Registry registry;
 
   @Inject
   private PolicyManager policyManager;
@@ -113,10 +118,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     ConfigurationProvider config = parameters.getConfigName().map(this::findConfiguration).orElse(null);
     Map<String, ValueResolver> resolvedParams = resolveParameters(parameters.get(), getInitialiserEvent(muleContext));
     try {
-      OperationMessageProcessor processor = new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext)
-          .setConfigurationProvider(config)
-          .setParameters(resolvedParams)
-          .build();
+      OperationMessageProcessor processor =
+          new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
+              .setConfigurationProvider(config)
+              .setParameters(resolvedParams)
+              .build();
 
       processor.initialise();
       processor.start();

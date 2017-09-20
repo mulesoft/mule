@@ -32,10 +32,9 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -215,7 +214,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void obtainSourceParameters() throws Exception {
-    ConfigurationComponentLocator locator = muleContext.getRegistry().lookupObject(ConfigurationComponentLocator.class);
     Component element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
     assertThat(element, is(instanceOf(ParameterizedSource.class)));
 
@@ -227,7 +225,6 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   @Test
   public void obtainSourceConfigParameters() throws Exception {
-    ConfigurationComponentLocator locator = muleContext.getRegistry().lookupObject(ConfigurationComponentLocator.class);
     Component element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
     assertThat(element, is(instanceOf(ConfiguredComponent.class)));
 

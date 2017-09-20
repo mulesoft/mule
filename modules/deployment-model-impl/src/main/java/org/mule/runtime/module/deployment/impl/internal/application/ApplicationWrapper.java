@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
-
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
@@ -34,13 +32,14 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
     super(delegate);
   }
 
+  @Override
   public String getAppName() {
     return getArtifactName();
   }
 
   @Override
   public Registry getRegistry() {
-    return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+    return getDelegate().getRegistry();
   }
 
   @Override
@@ -68,6 +67,7 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
     return String.format("%s(%s)", getClass().getName(), getDelegate());
   }
 
+  @Override
   public Application getDelegate() {
     return super.getDelegate();
   }

@@ -16,8 +16,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.UnionType;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -29,6 +29,8 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
@@ -36,7 +38,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import org.junit.Test;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -54,6 +58,22 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
       CASTED_SPELLS.add(spell);
     }
   }
+
+  @Inject
+  @Named("bytesCaster")
+  private Flow bytesCaster;
+
+  @Inject
+  @Named("sourceWithExceededBuffer")
+  private Flow sourceWithExceededBuffer;
+
+  @Inject
+  @Named("bytesCasterInTx")
+  private Flow bytesCasterInTx;
+
+  @Inject
+  @Named("bytesCasterWithoutStreaming")
+  private Flow bytesCasterWithoutStreaming;
 
   private String data = randomAlphabetic(2048);
 
@@ -145,25 +165,25 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Test
   @Description("A source generates a cursor stream")
   public void sourceStreaming() throws Exception {
-    startSourceAndListenSpell("bytesCaster", bargainPredicate());
+    startSourceAndListenSpell(bytesCaster, bargainPredicate());
   }
 
   @Test
   @Description("When the max buffer size is exceeded on a stream generated in a source, the correct type of error is mapped")
   public void sourceThrowsBufferSizeExceededError() throws Exception {
-    startSourceAndListenSpell("sourceWithExceededBuffer", s -> TOO_BIG.equals(s));
+    startSourceAndListenSpell(sourceWithExceededBuffer, s -> TOO_BIG.equals(s));
   }
 
   @Test
   @Description("A source generates a cursor in a transaction")
   public void sourceStreamingInTx() throws Exception {
-    startSourceAndListenSpell("bytesCasterInTx", bargainPredicate());
+    startSourceAndListenSpell(bytesCasterInTx, bargainPredicate());
   }
 
   @Test
   @Description("A source is configured not to stream")
   public void sourceWithoutStreaming() throws Exception {
-    startSourceAndListenSpell("bytesCasterWithoutStreaming", bargainPredicate());
+    startSourceAndListenSpell(bytesCasterWithoutStreaming, bargainPredicate());
   }
 
   @Test
@@ -211,8 +231,8 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     assertType(parameter.getType(), Object.class, UnionType.class);
   }
 
-  private void startSourceAndListenSpell(String flowName, Predicate<String> predicate) throws Exception {
-    startFlow(flowName);
+  private void startSourceAndListenSpell(Flow flow, Predicate<String> predicate) throws Exception {
+    flow.start();
     new PollingProber(4000, 100).check(new JUnitLambdaProbe(() -> {
       synchronized (CASTED_SPELLS) {
         return CASTED_SPELLS.stream().anyMatch(predicate);
@@ -224,8 +244,4 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
     return s -> s.equals(BARGAIN_SPELL);
   }
 
-  private void startFlow(String flowName) throws MuleException {
-    Flow flow = muleContext.getRegistry().get(flowName);
-    flow.start();
-  }
 }

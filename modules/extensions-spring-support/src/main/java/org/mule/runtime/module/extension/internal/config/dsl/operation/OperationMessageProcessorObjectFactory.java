@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -15,7 +15,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionOb
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances
@@ -28,16 +27,18 @@ public class OperationMessageProcessorObjectFactory
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel componentModel,
                                                 MuleContext muleContext,
+                                                Registry registry,
                                                 PolicyManager policyManager) {
     super(extensionModel,
           componentModel,
           muleContext,
+          registry,
           policyManager);
   }
 
   @Override
   protected OperationMessageProcessorBuilder getMessageProcessorBuilder() {
-    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext);
+    return new OperationMessageProcessorBuilder(extensionModel, componentModel, policyManager, muleContext, registry);
   }
 
 }

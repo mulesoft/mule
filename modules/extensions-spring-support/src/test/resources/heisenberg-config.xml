@@ -179,7 +179,7 @@
                        candidateDoors="#[app.registry.candidateDoors]"
                        enemies="#[app.registry.enemies]"
                        ricinPacks="#[app.registry.ricinPacks]"
-                       nextDoor="#[java!org::mule::test::module::extension::config::ParameterizedConfigParserTestCase::getDoor()]"
+                       nextDoor="#[java!org::mule::test::module::extension::config::AbstractConfigParserTestCase::getDoor()]"
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"

@@ -42,6 +42,7 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -56,22 +57,19 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.internal.el.ExpressionExecutor;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.el.ExpressionExecutor;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -89,6 +87,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -174,6 +174,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
       muleContext = createMuleContext();
 
+      if (doTestClassInjection()) {
+        muleContext.getInjector().inject(this);
+      }
+
       if (isStartContext() && muleContext != null && !muleContext.isStarted()) {
         startMuleContext();
       }
@@ -211,10 +215,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(listener);
 
     muleContext.start();
-
-    if (doTestClassInjection()) {
-      muleContext.getInjector().inject(this);
-    }
 
     contextStartedLatch.get().await(20, SECONDS);
   }

@@ -10,9 +10,13 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -52,7 +56,7 @@ final class ExtensionRegistry {
 
         @Override
         public Multimap<ConfigurationModel, ConfigurationProvider> load(ExtensionModel key) throws Exception {
-          List<ConfigurationProvider> providers = registry.lookupObjects(ConfigurationProvider.class).stream()
+          List<ConfigurationProvider> providers = registry.lookupAllByType(ConfigurationProvider.class).stream()
               .filter(provider -> provider.getExtensionModel() == key).collect(toImmutableList());
           Multimap multimap = HashMultimap.create();
           providers.forEach(p -> multimap.put(p.getConfigurationModel(), p));
@@ -61,14 +65,14 @@ final class ExtensionRegistry {
       });
 
   private final Map<ExtensionEntityKey, ExtensionModel> extensions = new ConcurrentHashMap<>();
-  private final MuleRegistry registry;
+  private final Registry registry;
 
   /**
    * Creates a new instance
    *
-   * @param registry the {@link MuleRegistry} to use for holding instances
+   * @param registry the {@link Registry} to use for holding instances
    */
-  ExtensionRegistry(MuleRegistry registry) {
+  ExtensionRegistry(Registry registry) {
     this.registry = registry;
   }
 
@@ -124,7 +128,7 @@ final class ExtensionRegistry {
    * @return a {@link ConfigurationProvider}
    */
   Optional<ConfigurationProvider> getConfigurationProvider(String key) {
-    return Optional.ofNullable(registry.get(key));
+    return registry.lookupByName(key);
   }
 
   /**
@@ -133,13 +137,14 @@ final class ExtensionRegistry {
    * The {@code configurationProvider} is registered under a key matching its {@link ConfigurationProvider#getName()}.
    *
    * @param configurationProvider a {@link ConfigurationProvider} to be registered
+   * @param muleContext the owner of the registry to register the configurationProvider in.
    * @throws IllegalArgumentException if {@code configurationProvider} is {@code null}
-   * @throws MuleRuntimeException     if the {@code configurationProvider} could not be registered
+   * @throws MuleRuntimeException if the {@code configurationProvider} could not be registered
    */
-  void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
+  void registerConfigurationProvider(ConfigurationProvider configurationProvider, MuleContext muleContext) {
     checkArgument(configurationProvider != null, "Cannot register a null configurationProvider");
     try {
-      registry.registerObject(configurationProvider.getName(), configurationProvider);
+      registerObject(muleContext, configurationProvider.getName(), configurationProvider);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(createStaticMessage(format("Found exception while registering configuration provider '%s'",
                                                                 configurationProvider.getName())),

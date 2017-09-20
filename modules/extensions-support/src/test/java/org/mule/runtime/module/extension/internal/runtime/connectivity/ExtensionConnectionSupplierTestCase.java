@@ -14,7 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
-import org.junit.Test;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -27,15 +27,22 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
+import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
 
+  @Inject
   private ExtensionConnectionSupplier adapter;
 
+  @Inject
+  private ConnectionManager connectionManager;
+
   @Override
-  protected void doSetUp() throws Exception {
-    adapter = muleContext.getRegistry().lookupObject(ExtensionConnectionSupplier.class);
+  protected boolean doTestClassInjection() {
+    return true;
   }
 
   @Override
@@ -66,7 +73,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     when(transactionConfig.isTransacted()).thenReturn(true);
     when(operationContext.getTransactionConfig()).thenReturn(of(transactionConfig));
 
-    muleContext.getRegistry().lookupObject(ConnectionManager.class).bind(config, connectionProvider);
+    connectionManager.bind(config, connectionProvider);
 
     TransactionCoordination.getInstance().bindTransaction(transaction);
 

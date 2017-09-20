@@ -10,8 +10,8 @@ package org.mule.functional.client;
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -21,32 +21,32 @@ import org.mule.runtime.core.api.util.StringUtils;
  */
 public class QueueReaderMessageProcessor implements Processor {
 
-  private final MuleContext muleContext;
+  private final Registry registry;
   private final String queueName;
   private final Long timeout;
 
   /**
    * Creates a queue reader
    *
-   * @param muleContext application's mule context. Not null.
+   * @param registry application's mule context. Not null.
    * @param queueName name of the queue to use. Non empty
    * @param timeout number of milliseconds to wait for an available event. Non negative. Null means no timeout required.
    */
-  public QueueReaderMessageProcessor(MuleContext muleContext, String queueName, Long timeout) {
-    checkArgument(muleContext != null, "MuleContext cannot be null");
+  public QueueReaderMessageProcessor(Registry registry, String queueName, Long timeout) {
+    checkArgument(registry != null, "Registry cannot be null");
     checkArgument(!StringUtils.isEmpty(queueName), "Queue name cannot be empty");
     if (timeout != null) {
       checkArgument(timeout >= 0L, "Timeout cannot be negative");
     }
 
-    this.muleContext = muleContext;
+    this.registry = registry;
     this.queueName = queueName;
     this.timeout = timeout;
   }
 
   @Override
   public BaseEvent process(BaseEvent event) throws MuleException {
-    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
+    TestConnectorConfig connectorConfig = registry.<TestConnectorConfig>lookupByName(DEFAULT_CONFIG_ID).get();
 
     if (timeout == null) {
       return connectorConfig.take(queueName);

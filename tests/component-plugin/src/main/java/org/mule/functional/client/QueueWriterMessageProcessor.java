@@ -15,18 +15,26 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 /**
  * Writes {@link BaseEvent} to a test connector's queue.
  */
-public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, MuleContextAware, Initialisable {
+public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
-  private MuleContext muleContext;
+  @Inject
+  @Named(DEFAULT_CONFIG_ID)
+  private TestConnectorConfig connectorConfig;
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
   private String name;
   private AttributeEvaluator attributeEvaluator;
   private String content;
@@ -34,7 +42,6 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
 
   @Override
   public BaseEvent process(BaseEvent event) throws MuleException {
-    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
     BaseEvent copy;
     if (attributeEvaluator == null) {
       copy = BaseEvent.builder(event)
@@ -54,11 +61,6 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
     connectorConfig.write(name, copy);
 
     return event;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
   }
 
   public void setContent(String content) {
@@ -87,6 +89,6 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
         attributeEvaluator = new AttributeEvaluator(attribute);
       }
     }
-    attributeEvaluator.initialize(muleContext.getExpressionManager());
+    attributeEvaluator.initialize(expressionManager);
   }
 }

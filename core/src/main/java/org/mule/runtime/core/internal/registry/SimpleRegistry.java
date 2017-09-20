@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.registry;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
@@ -21,6 +22,8 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -134,18 +137,18 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
   private <T> T injectInto(T object) {
     for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
       Class<?> dependencyType = field.getType();
+
+      boolean nullToOptional = false;
+      if (dependencyType.equals(Optional.class)) {
+        dependencyType = (Class<?>) ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+        nullToOptional = true;
+      }
+
       Named nameAnnotation = field.getAnnotation(Named.class);
-      Object dependency;
       try {
         field.setAccessible(true);
-        if (nameAnnotation != null) {
-          dependency = lookupObject(nameAnnotation.value());
-        } else {
-          dependency = lookupObject(dependencyType);
-        }
-        if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
-          dependency = muleContext;
-        }
+        Object dependency =
+            resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
         if (dependency != null) {
           field.set(object, dependency);
         }
@@ -158,17 +161,17 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
     for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
       if (method.getParameters().length == 1) {
         Class<?> dependencyType = method.getParameterTypes()[0];
+
+        boolean nullToOptional = false;
+        if (dependencyType.equals(Optional.class)) {
+          dependencyType = (Class<?>) ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
+          nullToOptional = true;
+        }
+
         Named nameAnnotation = method.getAnnotation(Named.class);
-        Object dependency;
         try {
-          if (nameAnnotation != null) {
-            dependency = lookupObject(nameAnnotation.value());
-          } else {
-            dependency = lookupObject(dependencyType);
-          }
-          if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
-            dependency = muleContext;
-          }
+          Object dependency =
+              resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
           if (dependency != null) {
             method.invoke(object, dependency);
           }
@@ -181,5 +184,19 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
     }
     return object;
+  }
+
+  private Object resolveObjectToInject(Class<?> dependencyType, String name, boolean nullToOptional)
+      throws RegistrationException {
+    Object dependency;
+    if (name != null) {
+      dependency = lookupObject(name);
+    } else {
+      dependency = lookupObject(dependencyType);
+    }
+    if (dependency == null && MuleContext.class.isAssignableFrom(dependencyType)) {
+      dependency = muleContext;
+    }
+    return nullToOptional ? ofNullable(dependency) : dependency;
   }
 }

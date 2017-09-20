@@ -16,6 +16,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
@@ -71,6 +73,7 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(componentModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+        .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(TARGET_PARAMETER_NAME,
                                        fromSimpleParameter(TARGET_PARAMETER_NAME).build())

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -32,8 +30,7 @@ public class MuleContextDeploymentListener implements MuleContextListener {
   }
 
   @Override
-  public void onInitialization(MuleContext context) {
-    Registry registry = context.getRegistry().lookupObject(OBJECT_REGISTRY);
+  public void onInitialization(MuleContext context, Registry registry) {
     deploymentListener.onArtifactInitialised(appName, registry);
   }
 

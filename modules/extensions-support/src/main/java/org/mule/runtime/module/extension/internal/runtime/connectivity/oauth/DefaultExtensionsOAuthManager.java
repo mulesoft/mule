@@ -20,6 +20,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
+
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,13 +32,12 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.util.LazyLookup;
-import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -43,12 +45,16 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
+import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -60,9 +66,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@Link ExtensionsOAuthManager}
@@ -76,6 +79,12 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private MuleExpressionLanguage expressionEvaluator;
+
+  @Inject
+  private Registry registry;
 
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
@@ -187,7 +196,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
         oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
                                                                                                    getObjectStoreSupplier(config)),
-                                                                   muleContext.getExpressionManager());
+                                                                   expressionEvaluator);
     final AuthCodeConfig authCodeConfig = config.getAuthCodeConfig();
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
@@ -295,18 +304,8 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
   }
 
   private Flow lookupFlow(String flowName) {
-    Flow flow;
-    try {
-      flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(flowName);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not obtain flow " + flowName, e));
-    }
-
-    if (flow == null) {
-      throw new IllegalArgumentException("Flow " + flowName + " doesn't exist");
-    }
-
-    return flow;
+    return registry.<Flow>lookupByName(flowName)
+        .orElseThrow(() -> new IllegalArgumentException("Flow " + flowName + " doesn't exist"));
   }
 
   private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(OAuthConfig config,

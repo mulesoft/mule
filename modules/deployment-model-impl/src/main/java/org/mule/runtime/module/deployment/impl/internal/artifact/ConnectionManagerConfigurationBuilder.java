@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,9 +37,7 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
     checkNotNull(parentArtifact, "'parentArtifact' can't be null");
 
     muleContextConfigurer = muleContext -> {
-      ConnectionManagerAdapter parentConnectionManager = parentArtifact.getMuleContext()
-          .getRegistry()
-          .get(OBJECT_CONNECTION_MANAGER);
+      ConnectionManagerAdapter parentConnectionManager = lookupObject(parentArtifact.getMuleContext(), OBJECT_CONNECTION_MANAGER);
       if (parentConnectionManager != null) {
         ConnectionManager connectionManager =
             new CompositeConnectionManager(new DefaultConnectionManager(muleContext), parentConnectionManager);
@@ -72,7 +71,7 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
 
   private void registerConnectionManager(MuleContext muleContext, ConnectionManager connectionManager)
       throws RegistrationException {
-    muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+    muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONNECTION_MANAGER, connectionManager);
   }
 
   @Override

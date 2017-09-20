@@ -213,7 +213,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void parseRevolver() throws Exception {
-    Revolver revolver = muleContext.getRegistry().get("sledgeHammer's");
+    Revolver revolver = registry.<Revolver>lookupByName("sledgeHammer's").get();
     assertThat(revolver, is(notNullValue()));
     assertThat(revolver.getBullets(), is(1));
   }

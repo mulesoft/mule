@@ -11,8 +11,11 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.el.ModuleNamespace;
@@ -25,11 +28,11 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
-import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.DefaultExpressionModuleBuilder;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
+import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutor;
 import org.mule.runtime.module.extension.internal.runtime.function.FunctionParameterDefaultValueResolverFactory;
@@ -48,14 +51,12 @@ import java.util.stream.Stream;
 public final class ExtensionActivator implements Startable, Stoppable {
 
   private final ExtensionErrorsRegistrant extensionErrorsRegistrant;
-  private final MuleRegistry registry;
   private final MuleContext muleContext;
   private final Set<Class<? extends Enum>> enumTypes = new HashSet<>();
   private final List<Object> lifecycleAwareElements = new LinkedList<>();
 
   ExtensionActivator(ExtensionErrorsRegistrant extensionErrorsRegistrant, MuleContext muleContext) {
     this.extensionErrorsRegistrant = extensionErrorsRegistrant;
-    this.registry = muleContext.getRegistry();
     this.muleContext = muleContext;
   }
 
@@ -72,7 +73,8 @@ public final class ExtensionActivator implements Startable, Stoppable {
           final Class<Enum> enumClass = (Class<Enum>) type;
           if (enumTypes.add(enumClass)) {
             try {
-              registry.registerTransformer(new StringToEnum(enumClass));
+              StringToEnum stringToEnum = new StringToEnum(enumClass);
+              registerObject(muleContext, getName(stringToEnum), stringToEnum, Transformer.class);
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
                   + enumClass.getName()), e);
@@ -91,13 +93,10 @@ public final class ExtensionActivator implements Startable, Stoppable {
 
     registerExpressionFunctions(extensionModel.getFunctionModels().stream(), moduleBuilder);
     try {
-      final BindingContext bindingContext = new DefaultBindingContextBuilder()
-          .addModule(moduleBuilder.build()).build();
+      final BindingContext bindingContext = new DefaultBindingContextBuilder().addModule(moduleBuilder.build()).build();
 
-      muleContext.getRegistry()
-          .registerObject(extensionModel.getName() + "GlobalBindingContextProvider",
-                          (GlobalBindingContextProvider) () -> bindingContext);
-
+      registerObject(muleContext, extensionModel.getName() + "GlobalBindingContextProvider",
+                     (GlobalBindingContextProvider) () -> bindingContext);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
