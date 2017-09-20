@@ -81,7 +81,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         return doCreateMuleContext(muleContextBuilder, new ContextConfigurator()
         {
             @Override
-            public void configure(MuleContext muleContext) throws ConfigurationException
+            public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
             {
                 // Configure
                 for (ConfigurationBuilder configBuilder : configurationBuilders)
@@ -103,7 +103,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         return doCreateMuleContext(muleContextBuilder, new ContextConfigurator()
         {
             @Override
-            public void configure(MuleContext muleContext) throws ConfigurationException
+            public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
             {
                 configurationBuilder.configure(muleContext);
 
@@ -144,7 +144,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         return doCreateMuleContext(createMuleContextBuilder(), new ContextConfigurator()
         {
             @Override
-            public void configure(MuleContext muleContext) throws ConfigurationException
+            public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
             {
                 // Configure with startup properties
                 if (properties != null && !properties.isEmpty())
@@ -188,7 +188,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory
         return doCreateMuleContext(contextBuilder, new ContextConfigurator()
         {
             @Override
-            public void configure(MuleContext muleContext) throws ConfigurationException
+            public void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException
             {
                 // Configure with startup properties
                 if (properties != null && !properties.isEmpty())
@@ -287,6 +287,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     private abstract class ContextConfigurator
     {
 
-        public abstract void configure(MuleContext muleContext) throws ConfigurationException;
+        public abstract void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException;
     }
 }

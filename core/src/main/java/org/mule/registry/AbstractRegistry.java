@@ -121,6 +121,10 @@ public abstract class AbstractRegistry implements Registry
         }
         catch (LifecycleException e)
         {
+            if (e.getComponent() instanceof Initialisable)
+            {
+                throw new InitialisationException(e, (Initialisable) e.getComponent());
+            }
             throw new InitialisationException(e, this);
         }
     }
