@@ -110,9 +110,6 @@
         <skipExportTests>true</skipExportTests>
 
         <!-- Properties that can be used to enable/disable parts of the build via cmd line or profiles -->
-        <skipFunctionalTests>true</skipFunctionalTests>
-        <skipIntegrationTests>false</skipIntegrationTests>
-        <skipSystemTests>true</skipSystemTests>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
 
@@ -1987,26 +1984,6 @@
         </plugins>
     </reporting>
     <profiles>
-
-        <profile>
-            <id>ci-server</id>
-            <distributionManagement>
-                <site>
-                    <id>mule-site</id>
-                    <url>file:///home/luntbuild/publish/mule/docs/${project.version}</url>
-                </site>
-            </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>bamboo</id>
-            <distributionManagement>
-                <site>
-                    <id>mule-site</id>
-                    <url>file:///var/www/html/docs/site/${project.version}</url>
-                </site>
-            </distributionManagement>
-        </profile>
         <profile>
             <id>mac</id>
             <activation>
@@ -2019,76 +1996,11 @@
             </properties>
         </profile>
 
-        <!-- C.I. staged build profiles -->
-        <profile>
-            <id>compile</id>
-            <properties>
-                <skipIntegrationTests>true</skipIntegrationTests>
-                <skipVerifications>false</skipVerifications>
-                <skipInstalls>true</skipInstalls>
-                <skipSystemTests>true</skipSystemTests>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>unit</id>
-            <build>
-                <defaultGoal>test</defaultGoal>
-            </build>
-            <properties>
-                <skipIntegrationTests>true</skipIntegrationTests>
-                <skipVerifications>true</skipVerifications>
-                <skipSystemTests>true</skipSystemTests>
-                <skipInstalls>true</skipInstalls>
-            </properties>
-        </profile>
-        <profile>
-            <id>functional</id>
-            <build>
-                <defaultGoal>test</defaultGoal>
-            </build>
-            <properties>
-                <skipFunctionalTests>false</skipFunctionalTests>
-                <skipIntegrationTests>true</skipIntegrationTests>
-                <skipVerifications>true</skipVerifications>
-                <skipSystemTests>true</skipSystemTests>
-                <skipInstalls>true</skipInstalls>
-            </properties>
-        </profile>
-        <profile>
-            <id>integration</id>
-            <build>
-                <defaultGoal>verify</defaultGoal>
-            </build>
-            <properties>
-                <skipIntegrationTests>false</skipIntegrationTests>
-                <skipVerifications>true</skipVerifications>
-                <skipInstalls>true</skipInstalls>
-                <skipSystemTests>true</skipSystemTests>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>system</id>
-            <build>
-                <defaultGoal>verify</defaultGoal>
-            </build>
-            <properties>
-                <skipIntegrationTests>true</skipIntegrationTests>
-                <skipVerifications>true</skipVerifications>
-                <skipInstalls>true</skipInstalls>
-                <skipTests>true</skipTests>
-                <skipSystemTests>false</skipSystemTests>
-            </properties>
-        </profile>
 		<profile>
             <id>release</id>
             <properties>
-                <skipIntegrationTests>true</skipIntegrationTests>
                 <skipVerifications>false</skipVerifications>
                 <skipInstalls>false</skipInstalls>
-                <skipTests>true</skipTests>
-                <skipSystemTests>true</skipSystemTests>
                 <skipGpg>false</skipGpg>
                 <skipNoSnapshotsEnforcerPluginRule>false</skipNoSnapshotsEnforcerPluginRule>
             </properties>
