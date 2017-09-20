@@ -313,7 +313,7 @@ public final class TlsConfiguration
     {
         if (null != trustStoreName)
         {
-            Boolean revocationEnabled = getRevocationCheck() != null;
+            Boolean revocationEnabled = revocationCheck != null;
 
             // Revocation checking is only supported for PKIX algorithm
             if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm))
@@ -329,7 +329,7 @@ public final class TlsConfiguration
 
                 if (revocationEnabled)
                 {
-                    ManagerFactoryParameters tmfParams = getRevocationCheck().configFor(trustStore);
+                    ManagerFactoryParameters tmfParams = revocationCheck.configFor(trustStore);
                     trustManagerFactory.init(tmfParams);
                 }
                 else
@@ -680,11 +680,6 @@ public final class TlsConfiguration
     public void setKeyAlias(String keyAlias)
     {
         this.keyAlias = keyAlias;
-    }
-
-    public RevocationCheck getRevocationCheck()
-    {
-        return revocationCheck;
     }
 
     public void setRevocationCheck(RevocationCheck revocationCheck)
