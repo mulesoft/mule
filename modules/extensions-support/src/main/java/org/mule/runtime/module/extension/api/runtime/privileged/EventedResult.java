@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation;
+package org.mule.runtime.module.extension.api.runtime.privileged;
 
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.Message;
