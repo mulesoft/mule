@@ -104,6 +104,10 @@
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
                   }
                 },
                 "fields": [
@@ -134,6 +138,9 @@
                     "annotations": {
                       "description": {
                         "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
                       }
                     }
                   },
@@ -162,6 +169,9 @@
                     "annotations": {
                       "description": {
                         "value": "A time unit that qualifies the maxIdleTime attribute"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
                       }
                     }
                   }
@@ -2700,6 +2710,10 @@
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
                   }
                 },
                 "fields": [
@@ -2730,6 +2744,9 @@
                     "annotations": {
                       "description": {
                         "value": "A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it\u0027s considered eligible for expiration"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
                       }
                     }
                   },
@@ -2758,6 +2775,9 @@
                     "annotations": {
                       "description": {
                         "value": "A time unit that qualifies the maxIdleTime attribute"
+                      },
+                      "expressionSupport": {
+                        "value": "NOT_SUPPORTED"
                       }
                     }
                   }

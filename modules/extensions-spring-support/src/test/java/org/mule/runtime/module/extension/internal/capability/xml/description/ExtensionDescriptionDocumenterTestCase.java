@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_DESCRIPTION_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
@@ -155,7 +155,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
     List<ParameterModel> params = first.getAllParameterModels();
     assertDescription(params.get(0), "Config parameter");
     assertDescription(params.get(1), "Config Parameter with an Optional value");
-    assertDescription(params.get(2), EXPIRATION_POLICY_DESCRIPTION_DESCRIPTION);
+    assertDescription(params.get(2), EXPIRATION_POLICY_DESCRIPTION);
     assertDescription(params.get(3), "Group parameter 1");
     assertDescription(params.get(4), "Group parameter 2");
 
