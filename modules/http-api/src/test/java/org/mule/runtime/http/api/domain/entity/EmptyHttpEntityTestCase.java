@@ -49,4 +49,9 @@ public class EmptyHttpEntityTestCase {
     assertThat(entity.getParts(), is(empty()));
   }
 
+  @Test
+  public void hasZeroSize() {
+    assertThat(entity.getLength().get(), is(0L));
+  }
+
 }

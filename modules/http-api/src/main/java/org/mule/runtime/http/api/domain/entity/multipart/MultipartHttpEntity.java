@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.http.api.domain.entity.multipart;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Represents a multipart HTTP body.
@@ -49,6 +51,11 @@ public class MultipartHttpEntity implements HttpEntity {
   @Override
   public Collection<HttpPart> getParts() {
     return this.parts;
+  }
+
+  @Override
+  public Optional<Long> getLength() {
+    return empty();
   }
 
 }

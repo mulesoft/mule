@@ -11,6 +11,7 @@ import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * An entity that can be sent or received via an {@link org.mule.runtime.http.api.domain.message.request.HttpRequest} or
@@ -71,5 +72,13 @@ public interface HttpEntity {
    * @see #isComposed()
    */
   Collection<HttpPart> getParts() throws IOException;
+
+  /**
+   * Provides the length (in bytes) of the {@link HttpEntity}, if known. For the most part, only received entities from HTTP
+   * messages that carried a 'Content-Length' header will return a length.
+   *
+   * @return an {@link Optional} with the length (in bytes) or an empty one if unknown
+   */
+  Optional<Long> getLength();
 
 }
