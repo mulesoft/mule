@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.System.arraycopy;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
+import static org.springframework.util.ClassUtils.getAllInterfaces;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -17,12 +19,11 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.connection.DefaultConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.HasDelegate;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -30,11 +31,11 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.Resolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -59,9 +60,9 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   public final Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = doBuild(result);
 
+    provider = applyExtensionClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
-    provider = getExtensionClassloaderAwareConnectionProvider(provider);
 
     return new Pair<>(provider, result);
   }
@@ -100,37 +101,41 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
    * @param provider The {@link ConnectionProvider} to wrap
    * @return The wrapped {@link ConnectionProvider}
    */
-  private ConnectionProvider<C> getExtensionClassloaderAwareConnectionProvider(ConnectionProvider<C> provider) {
+  private ConnectionProvider<C> applyExtensionClassLoaderProxy(ConnectionProvider provider) {
     Enhancer enhancer = new Enhancer();
-    enhancer.setSuperclass(DefaultConnectionProviderWrapper.class);
-    enhancer.setCallback(new MethodInterceptor() {
+    ClassLoader classLoader = getClassLoader(extensionModel);
+    Class<?>[] allInterfaces = getAllInterfaces(provider);
+    int length = allInterfaces.length;
+    Class[] classes = new Class[length + 1];
+    arraycopy(allInterfaces, 0, classes, 0, length);
+    classes[length] = HasDelegate.class;
 
-      LazyValue<ClassLoader> extensionClassLoader = new LazyValue<>(() -> getClassLoader(extensionModel));
+    enhancer.setInterfaces(classes);
+    enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
+      Reference<Object> resultReference = new Reference<>();
+      Reference<Throwable> errorReference = new Reference<>();
 
-      @Override
-      public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        Reference<Object> resultReference = new Reference<>();
-        Reference<Throwable> errorReference = new Reference<>();
+      if (method.getDeclaringClass().equals(HasDelegate.class) && method.getName().equals("getDelegate")) {
+        return provider;
+      }
 
-        withContextClassLoader(extensionClassLoader.get(), () -> {
-          try {
-            resultReference.set(methodProxy.invokeSuper(o, objects));
-          } catch (Throwable t) {
-            errorReference.set(t);
-          }
-        });
-
-        if (errorReference.get() != null) {
-          throw errorReference.get();
-        } else {
-          return resultReference.get();
+      withContextClassLoader(classLoader, () -> {
+        try {
+          resultReference.set(method.invoke(provider, objects));
+        } catch (InvocationTargetException e) {
+          errorReference.set(e.getTargetException());
+        } catch (Throwable t) {
+          errorReference.set(t);
         }
+      });
+
+      if (errorReference.get() != null) {
+        throw errorReference.get();
+      } else {
+        return resultReference.get();
       }
     });
 
-    provider = (ConnectionProvider<C>) enhancer.create(new Class[] {ConnectionProvider.class, MuleContext.class},
-                                                       new Object[] {provider, muleContext});
-    return provider;
+    return (ConnectionProvider<C>) enhancer.create();
   }
-
 }
