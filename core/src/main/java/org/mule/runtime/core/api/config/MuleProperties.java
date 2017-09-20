@@ -146,7 +146,6 @@ public class MuleProperties {
   public static final String OBJECT_PROCESSING_TIME_WATCHER = "_muleProcessingTimeWatcher";
   public static final String OBJECT_POLLING_CONTROLLER = "_mulePollingController";
   public static final String OBJECT_CLUSTER_CONFIGURATION = "_muleClusterConfiguration";
-  public static final String OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR = "_muleConnectorMessageProcessorLocator";
   public static final String OBJECT_EXTENSION_MANAGER = "_muleExtensionManager";
   public static final String OBJECT_EXTENSION_OAUTH_MANAGER = "extensions.oauth.manager";
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";

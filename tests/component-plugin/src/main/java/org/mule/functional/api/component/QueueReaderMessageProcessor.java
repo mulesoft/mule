@@ -5,12 +5,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.client;
+package org.mule.functional.api.component;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
