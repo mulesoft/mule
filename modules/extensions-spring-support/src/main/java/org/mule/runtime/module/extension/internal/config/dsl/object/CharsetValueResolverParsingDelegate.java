@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -38,6 +39,6 @@ public class CharsetValueResolverParsingDelegate implements ValueResolverParsing
    */
   @Override
   public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl) {
-    return new StaticValueResolver<>(Charset.forName(key));
+    return new StaticValueResolver<>(parseCharset(key));
   }
 }
