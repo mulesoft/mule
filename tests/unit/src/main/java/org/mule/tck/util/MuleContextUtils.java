@@ -39,6 +39,8 @@ import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
+import org.mockito.Mockito;
+
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
  *
@@ -92,18 +94,35 @@ public class MuleContextUtils {
     }
   }
 
+  /**
+   * Adds a mock registry to the provided {@code context}. If the context is not a mock, it is {@link Mockito#spy(Class)}ied.
+   */
   public static void mockRegistry(MuleContext context) {
     doReturn(spy(context.getRegistry())).when(context).getRegistry();
   }
 
+  /**
+   * Configures the registry in the provided {@code context} to return the given {@code value} for the given {@code key}.
+   */
   public static void registerIntoMockContext(MuleContext context, String key, Object value) {
     when(context.getRegistry().lookupObject(key)).thenReturn(value);
   }
 
+  /**
+   * Configures the registry in the provided {@code context} to return the given {@code value} for the given {@code clazz}.
+   */
   public static <T> void registerIntoMockContext(MuleContext context, Class<T> clazz, T value) throws RegistrationException {
     when(context.getRegistry().lookupObject(clazz)).thenReturn(value);
   }
 
+  /**
+   * Will find a transformer that is the closest match to the desired input and output.
+   *
+   * @param source The desired input type for the transformer
+   * @param result the desired output type for the transformer
+   * @return A transformer that exactly matches or the will accept the input and output parameters
+   * @throws TransformerException will be thrown if there is more than one match
+   */
   public static <T> Transformer lookupTransformer(MuleContext context, DataType source, DataType result)
       throws TransformerException {
     return context.getRegistry().lookupTransformer(source, result);
