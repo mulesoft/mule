@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.connection;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.core.internal.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -78,14 +76,12 @@ final class ConnectionManagementStrategyFactory {
 
     return poolingProfile.isDisabled() ? withoutManagement(connectionProvider)
         : new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile,
-                                                    (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
-                                                                                               PoolingConnectionProvider.class),
-                                                    muleContext);
+                                                    (PoolingListener<C>) unwrap(connectionProvider), muleContext);
   }
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {
     ConnectionManagementType type = NONE;
-    connectionProvider = unwrapProviderWrapper(connectionProvider);
+    connectionProvider = unwrap(connectionProvider);
     if (connectionProvider instanceof PoolingConnectionProvider) {
       type = POOLING;
     } else if (connectionProvider instanceof CachedConnectionProvider) {
@@ -93,5 +89,10 @@ final class ConnectionManagementStrategyFactory {
     }
 
     return type;
+  }
+
+  private <C> ConnectionProvider<C> unwrap(ConnectionProvider<C> connectionProvider) {
+    return connectionProvider instanceof ConnectionProviderWrapper
+        ? unwrap(((ConnectionProviderWrapper) connectionProvider).getDelegate()) : connectionProvider;
   }
 }
