@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -53,7 +54,7 @@ public class SummaryLogCheckerTestCase extends AbstractMuleTestCase {
     summaryLogChecker.setExclusiveContent(false);
     SummaryLogChecker.SummaryInfo summaryInfo = new SummaryLogChecker.SummaryInfo("key", "value");
     summaryLogChecker.setExpectedInfo(asList(summaryInfo));
-    summaryLogChecker.check("key: value\nkey2: value2");
+    summaryLogChecker.check(String.format("key: value%skey2: value2", lineSeparator()));
   }
 
   @Test
@@ -73,7 +74,7 @@ public class SummaryLogCheckerTestCase extends AbstractMuleTestCase {
     summaryLogChecker.setExclusiveContent(true);
     SummaryLogChecker.SummaryInfo summaryInfo = new SummaryLogChecker.SummaryInfo("key", "value");
     summaryLogChecker.setExpectedInfo(asList(summaryInfo));
-    summaryLogChecker.check("key: value\n" + stringWriter.toString());
+    summaryLogChecker.check(String.format("key: value%s%s", lineSeparator(), stringWriter.toString()));
   }
 
 
