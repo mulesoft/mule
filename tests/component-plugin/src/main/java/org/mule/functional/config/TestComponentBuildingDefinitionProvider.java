@@ -24,7 +24,7 @@ import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
 import org.mule.functional.api.component.LogChecker;
-import org.mule.functional.api.component.OnCheckLogHandler;
+import org.mule.functional.api.component.OnErrorCheckLogHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.SharedConfig;
 import org.mule.functional.api.component.SharedSource;
@@ -187,7 +187,7 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
   private void addOnErrorCheckLogComponentBuildingDefinitions(List<ComponentBuildingDefinition> componentBuildingDefinitions) {
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("on-error-check-log")
-        .withTypeDefinition(fromType(OnCheckLogHandler.class))
+        .withTypeDefinition(fromType(OnErrorCheckLogHandler.class))
         .withSetterParameterDefinition("checkers", fromChildCollectionConfiguration(LogChecker.class).build()).build());
 
     componentBuildingDefinitions
