@@ -6,36 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.System.arraycopy;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
-import static org.springframework.util.ClassUtils.getAllInterfaces;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
-import org.mule.runtime.core.internal.connection.HasDelegate;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-
-import java.lang.reflect.InvocationTargetException;
-
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}
@@ -60,7 +47,6 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   public final Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = doBuild(result);
 
-    provider = applyExtensionClassLoaderProxy(provider);
     provider = applyConnectionManagement(provider);
     provider = applyErrorHandling(provider);
 
@@ -88,54 +74,4 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     return provider;
   }
 
-  /**
-   * Wraps the {@link ConnectionProvider} inside of a dynamic proxy which changes the current {@link ClassLoader} to the
-   * the extension's {@link ClassLoader} when executing any method of this wrapped {@link ConnectionProvider}
-   * <p>
-   * This ensures that every time that the {@link ConnectionProvider} is used, it will work in the correct classloader.
-   * <p>
-   * Although if the {@link ConnectionProvider} is created with the correct classloader and then used with an incorrect
-   * one this may work, due that static class references were loaded correctly, logic loading class in a dynamic way
-   * will fail.
-   *
-   * @param provider The {@link ConnectionProvider} to wrap
-   * @return The wrapped {@link ConnectionProvider}
-   */
-  private ConnectionProvider<C> applyExtensionClassLoaderProxy(ConnectionProvider provider) {
-    Enhancer enhancer = new Enhancer();
-    ClassLoader classLoader = getClassLoader(extensionModel);
-    Class<?>[] allInterfaces = getAllInterfaces(provider);
-    int length = allInterfaces.length;
-    Class[] classes = new Class[length + 1];
-    arraycopy(allInterfaces, 0, classes, 0, length);
-    classes[length] = HasDelegate.class;
-
-    enhancer.setInterfaces(classes);
-    enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
-      Reference<Object> resultReference = new Reference<>();
-      Reference<Throwable> errorReference = new Reference<>();
-
-      if (method.getDeclaringClass().equals(HasDelegate.class) && method.getName().equals("getDelegate")) {
-        return provider;
-      }
-
-      withContextClassLoader(classLoader, () -> {
-        try {
-          resultReference.set(method.invoke(provider, objects));
-        } catch (InvocationTargetException e) {
-          errorReference.set(e.getTargetException());
-        } catch (Throwable t) {
-          errorReference.set(t);
-        }
-      });
-
-      if (errorReference.get() != null) {
-        throw errorReference.get();
-      } else {
-        return resultReference.get();
-      }
-    });
-
-    return (ConnectionProvider<C>) enhancer.create();
-  }
 }

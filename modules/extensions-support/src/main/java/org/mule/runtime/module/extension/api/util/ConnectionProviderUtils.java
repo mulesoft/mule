@@ -5,11 +5,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.internal.connection.util;
+package org.mule.runtime.module.extension.api.util;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
-import org.mule.runtime.core.internal.connection.HasDelegate;
 
 /**
  * Provides utilities to work with {@link ConnectionProvider}
@@ -42,9 +41,9 @@ public final class ConnectionProviderUtils {
    */
   public static ConnectionProvider unwrapProviderWrapper(ConnectionProvider connectionProvider,
                                                          Class<? extends ConnectionProvider> stopClass) {
-    if (connectionProvider instanceof HasDelegate) {
+    if (connectionProvider instanceof ConnectionProviderWrapper) {
       if (stopClass == null || !stopClass.isInstance(connectionProvider)) {
-        return unwrapProviderWrapper(((HasDelegate) connectionProvider).getDelegate(), stopClass);
+        return unwrapProviderWrapper(((ConnectionProviderWrapper) connectionProvider).getDelegate(), stopClass);
       }
     }
     return connectionProvider;

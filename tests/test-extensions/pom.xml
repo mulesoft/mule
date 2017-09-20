@@ -40,7 +40,6 @@
         <module>weave-function-extension</module>
         <module>values-extension</module>
         <module>substitution-group-extension</module>
-        <module>classloading-extension</module>
     </modules>
 
     <build>
