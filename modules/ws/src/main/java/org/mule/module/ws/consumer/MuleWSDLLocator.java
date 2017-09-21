@@ -186,15 +186,15 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         return resultStream;
     }
     
-    private String getAbsoluteURI(String url)
+    private String getAbsoluteURI(String uri)
     {
-        if (url != null)
+        if (uri != null)
         {
-            URL absoluteURI = IOUtils.getResourceAsUrl(url, getClass());
-            return absoluteURI==null?null:absoluteURI.toString();
+            URL absoluteURI = IOUtils.getResourceAsUrl(uri, getClass());
+            return (absoluteURI == null) ? null : absoluteURI.toString();
         }
-        
-        return url;
+
+        return uri;
     }
 
 }
