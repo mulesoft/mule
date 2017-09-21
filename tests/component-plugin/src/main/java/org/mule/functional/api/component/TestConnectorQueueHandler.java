@@ -9,26 +9,26 @@ package org.mule.functional.api.component;
 
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import org.mule.functional.client.TestConnectorConfig;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.event.BaseEvent;
 
 
 public class TestConnectorQueueHandler {
 
-  private MuleContext muleContext;
+  private Registry registry;
 
-  public TestConnectorQueueHandler(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public TestConnectorQueueHandler(Registry registry) {
+    this.registry = registry;
   }
 
   /**
    * Writes a even to to a given queue waiting if necessary for space to become available
-   * 
+   *
    * @param queueName
    * @param event
    */
   public void write(String queueName, BaseEvent event) {
-    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
+    TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     connectorConfig.write(queueName, event);
   }
 
@@ -39,7 +39,7 @@ public class TestConnectorQueueHandler {
    * @return the {@link BaseEvent} read from the queue
    */
   public BaseEvent read(String queueName) {
-    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
+    TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     return connectorConfig.take(queueName);
   }
 
@@ -50,7 +50,7 @@ public class TestConnectorQueueHandler {
    * @return the {@link BaseEvent} read or null if timeout time is exceeded.
    */
   public BaseEvent read(String queueName, long timeout) {
-    TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
+    TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     return connectorConfig.poll(queueName, timeout);
   }
 

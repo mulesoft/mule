@@ -142,7 +142,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_INVOKE));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(muleContext);
+    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(registry);
     assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
@@ -156,7 +156,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(HeisenbergSource.terminateStatus, is(ERROR_BODY));
     assertThat(HeisenbergSource.error, not(empty()));
 
-    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(muleContext);
+    TestConnectorQueueHandler queueHandler = new TestConnectorQueueHandler(registry);
     assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
   }
 

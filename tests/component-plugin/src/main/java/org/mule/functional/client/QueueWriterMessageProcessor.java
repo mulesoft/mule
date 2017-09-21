@@ -10,6 +10,7 @@ package org.mule.functional.client;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.functional.api.component.TestConnectorQueueHandler;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -35,6 +36,9 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
   private String content;
   private Class contentJavaType;
   private TestConnectorQueueHandler queueHandler;
+
+  @Inject
+  private Registry registry;
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
