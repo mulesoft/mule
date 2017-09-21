@@ -487,4 +487,17 @@ public interface AllureConstants {
 
   }
 
+
+  interface XmlSdk {
+
+    String XML_SDK = "Xml SDK";
+
+    interface Streaming {
+
+      String STREAMING = "Streaming consumption in operations";
+
+    }
+
+  }
+
 }

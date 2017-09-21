@@ -14,6 +14,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.ANNO
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME;
 import static org.mule.runtime.config.spring.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.spring.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
@@ -21,10 +22,11 @@ import static org.mule.runtime.core.api.execution.LocationExecutionContextProvid
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
+import com.google.common.collect.ImmutableSet;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.spring.internal.dsl.processor.ObjectTypeVisitor;
@@ -33,12 +35,16 @@ import org.mule.runtime.config.spring.internal.parsers.XmlMetadataAnnotations;
 import org.mule.runtime.config.spring.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-import com.google.common.collect.ImmutableSet;
-
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,15 +52,6 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.function.Consumer;
-
-import javax.xml.namespace.QName;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Processor in the chain of responsibility that knows how to handle a generic {@code ComponentBuildingDefinition}.
@@ -148,9 +145,31 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           processMetadataAnnotationsHelper((Element) customAttributeRetrieve.getNode(), null, beanDefinitionBuilder);
       processAnnotationParameters(componentModel, annotations);
       processNestedAnnotations(componentModel, annotations);
+      processMacroExpandedAnnotations(componentModel, annotations);
       if (!annotations.isEmpty()) {
         beanDefinitionBuilder.addPropertyValue(PROPERTY_NAME, annotations);
       }
+    }
+  }
+
+  /**
+   * Strictly needed when doing the macro expansion, if the current component model was not in the original <flow/> we need to
+   * look for the rootest element that contains it (which happens to be the flow's name) so that later on from that name the
+   * correct {@link ProcessingStrategy} will be picked up. Without that, all the streams managed by the runtime
+   * ({@link CursorStreamProvider} won't be properly handled, ending up in closed streams or even deadlocks.
+   * <p/>
+   * Any alteration on this method should be tightly coupled with {@link ModuleOperationMessageProcessorChainFactoryBean#doGetObject()},
+   * which internally relies on
+   * {@link DefaultMessageProcessorChainBuilder#newLazyProcessorChainBuilder(org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder, org.mule.runtime.core.api.MuleContext, java.util.function.Supplier)}
+   *
+   * @param componentModel that might contain the <flow/>'s name attribute as a custom attribute
+   * @param annotations to alter by adding the {@link AbstractComponent#ROOT_CONTAINER_NAME_KEY} if the component model has the
+   *                    name of the flow.
+   */
+  private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
+    if (componentModel.getCustomAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
+      final Object flowName = componentModel.getCustomAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
+      annotations.put(org.mule.runtime.api.meta.AbstractAnnotatedObject.ROOT_CONTAINER_NAME_KEY, flowName);
     }
   }
 

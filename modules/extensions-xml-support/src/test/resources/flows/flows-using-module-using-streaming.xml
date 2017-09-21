@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-using-streaming="http://www.mulesoft.org/schema/mule/module-using-streaming"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-using-streaming http://www.mulesoft.org/schema/mule/module-using-streaming/current/mule-module-using-streaming.xsd">
+
+    <module-using-streaming:config name="la-plata-config" someUserConfig="userLP" somePassConfig="passLP" port="${httpPort}"/>
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseWithinOperation">
+        <module-using-streaming:do-login-and-plain-entire-stream-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseWithinFlow">
+        <module-using-streaming:do-login-and-leave-entire-stream-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+        <object-to-string-transformer/>
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainBodyStreamResponseWithinOperation">
+        <module-using-streaming:do-login-and-plain-body-stream-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainBodyStreamResponseWithinFlow">
+        <module-using-streaming:do-login-and-leave-stream-body-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+        <object-to-string-transformer/>
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseWithinOperationTns">
+        <module-using-streaming:do-login-and-plain-entire-stream-response-with-tns config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseNestingScopes">
+        <module-using-streaming:do-login-and-plain-entire-stream-response-nesting-scopes config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
+</mule>
