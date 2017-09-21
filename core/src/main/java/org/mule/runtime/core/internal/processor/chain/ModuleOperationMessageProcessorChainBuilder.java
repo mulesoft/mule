@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -24,6 +25,8 @@ import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -32,17 +35,22 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.exception.ErrorMapping;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -193,6 +201,33 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
               .map(this::createEventWithParameters)
               .transform(super::apply)
               .map(eventResult -> processResult(request, eventResult)));
+    }
+
+    /**
+     * Unlike other {@link MessageProcessorChain MessageProcessorChains}, modules could contain error mappings that need to be
+     * considered when resolving exceptions.
+     */
+    @Override
+    protected Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
+      return exception -> {
+        MessagingException messagingException = super.resolveMessagingException(processor).apply(exception);
+        List<ErrorMapping> errorMappings = getErrorMappings(this);
+        if (!errorMappings.isEmpty()) {
+          Error error = messagingException.getEvent().getError().get();
+          ErrorType errorType = error.getErrorType();
+          ErrorType resolvedType = errorMappings.stream()
+              .filter(m -> m.match(errorType))
+              .findFirst()
+              .map(ErrorMapping::getTarget)
+              .orElse(errorType);
+          if (!resolvedType.equals(errorType))
+            messagingException.setProcessedEvent(BaseEvent.builder(messagingException.getEvent())
+                .error(ErrorBuilder.builder(error).errorType(resolvedType).build())
+                .build());
+
+        }
+        return messagingException;
+      };
     }
 
     private BaseEvent processResult(BaseEvent originalEvent, BaseEvent chainEvent) {

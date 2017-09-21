@@ -13,10 +13,10 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
@@ -50,14 +50,12 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
     verify("multipleMappingsDirectlyFromSmartConnector", CONNECT_ERROR_MESSAGE);
   }
 
-  @Ignore("MULE-13298: need support for error mappings in scope")
   @Test
   @Description("Verifies that a mapped error via wildcard is handled.")
   public void mappedRequest() throws Exception {
     verify("simpleMapping", CONNECT_ERROR_MESSAGE);
   }
 
-  @Ignore("MULE-13298: need support for error mappings in scope")
   @Test
   @Description("Verifies that a mapped error via a custom matcher is handled. ")
   public void matchingMappedRequest() throws Exception {
@@ -70,7 +68,6 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
     verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
   }
 
-  @Ignore("MULE-13298: need support for error mappings in scope")
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {

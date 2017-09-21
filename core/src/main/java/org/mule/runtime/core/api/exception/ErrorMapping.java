@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.exception;
+package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 
 import javax.xml.namespace.QName;
 

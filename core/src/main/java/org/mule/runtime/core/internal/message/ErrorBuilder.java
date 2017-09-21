@@ -41,6 +41,9 @@ public final class ErrorBuilder {
     return new ErrorBuilder(e);
   }
 
+  public static ErrorBuilder builder(Error e) {
+    return new ErrorBuilder(e);
+  }
 
   /**
    * Constructor to create a new builder from scratch.
@@ -67,6 +70,20 @@ public final class ErrorBuilder {
     if (muleRoot != null && muleRoot.getMessage() != null) {
       this.description = muleRoot.getMessage();
     }
+  }
+
+  /**
+   * Constructor to create a new builder using the information of another error for default error parametrization.
+   *
+   * @param e the error to base on
+   */
+  private ErrorBuilder(Error e) {
+    this.description = e.getDescription();
+    this.detailedDescription = e.getDetailedDescription();
+    this.exception = e.getCause();
+    this.errorType = e.getErrorType();
+    this.errorMessage = e.getErrorMessage();
+    this.errors = e.getChildErrors();
   }
 
   /**
