@@ -6,16 +6,34 @@
  */
 package org.mule.module.http.functional.requester.ocsp;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import org.junit.runners.Parameterized.Parameters;
 
-@Ignore
-public class HttpRequesterOcspNoRevocationTestCase extends AbstractHttpOscpRevocationTestCase
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+@RunWith(Parameterized.class)
+public class HttpRequesterOcspNoRevocationTestCase extends AbstractHttpOcspRevocationTestCase
 {
 
-    public HttpRequesterOcspNoRevocationTestCase()
+    public HttpRequesterOcspNoRevocationTestCase(String configFile, String certAlias)
     {
-        super(ENTITY_CERTIFIED_REVOCATION_OCSP_SUB_PATH, VALID_OCSP_LIST);
+        super(configFile, VALID_OCSP_LIST, certAlias);
+    }
+
+
+    @Parameters
+    public static Collection<Object[]> data()
+    {
+        return asList(new Object[][]
+                              {
+                                      { "http-requester-ocsp-revocation-config.xml", null },
+                                      { "http-requester-ocsp-revocation-custom-provider-config.xml", "server" },
+                                      { "http-requester-ocsp-revocation-custom-provider-config.xml", "thirdParty" }
+                              });
     }
 
     @Test
