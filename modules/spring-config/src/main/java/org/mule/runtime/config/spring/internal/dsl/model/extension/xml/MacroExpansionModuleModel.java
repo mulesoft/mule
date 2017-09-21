@@ -117,26 +117,6 @@ public class MacroExpansionModuleModel {
     expandGlobalElements(moduleGlobalElements, moduleGlobalElementsNames);
   }
 
-  //  private void expandOperations(Set<String> moduleGlobalElementsNames) {
-  //    applicationModel.executeOnEveryMuleComponentTree(flowComponentModel -> {
-  //      HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
-  //      IntStream.range(0, flowComponentModel.getInnerComponents().size()).forEach(i -> {
-  //        ComponentModel operationRefModel = flowComponentModel.getInnerComponents().get(i);
-  //        lookForOperation(operationRefModel)
-  //            .ifPresent(operationModel -> {
-  //              final ComponentModel moduleOperationChain =
-  //                  createModuleOperationChain(operationRefModel, operationModel, moduleGlobalElementsNames, Optional.empty());
-  //              componentModelsToReplaceByIndex.put(i, moduleOperationChain);
-  //            });
-  //      });
-  //      for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
-  //        entry.getValue().setParent(flowComponentModel);
-  //        flowComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
-  //        flowComponentModel.getInnerComponents().remove(entry.getKey() + 1);
-  //      }
-  //      componentModelsToReplaceByIndex.clear();
-  //    });
-  //  }
   private void expandOperations(Set<String> moduleGlobalElementsNames) {
     applicationModel.executeOnEveryMuleComponentTree(containerComponentModel -> {
       HashMap<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
