@@ -14,10 +14,10 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -189,10 +189,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     @Override
     public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
       return from(publisher)
-          .concatMap(request -> from(processWithChildContext(createEventWithParameters(request),
-                                                             p -> from(p).transform(super::apply),
-                                                             ofNullable(getLocation())))
-                                                                 .map(eventResult -> processResult(request, eventResult)));
+          .concatMap(request -> just(request)
+              .map(this::createEventWithParameters)
+              .transform(super::apply)
+              .map(eventResult -> processResult(request, eventResult)));
     }
 
     private BaseEvent processResult(BaseEvent originalEvent, BaseEvent chainEvent) {
