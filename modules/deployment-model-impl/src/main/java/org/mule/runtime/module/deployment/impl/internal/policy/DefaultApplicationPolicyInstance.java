@@ -24,6 +24,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.context.notification.PolicyNotification;
+import org.mule.runtime.core.api.context.notification.PolicyNotificationListener;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
@@ -137,6 +139,9 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private void enableNotificationListeners(List<NotificationListener> notificationListeners) throws RegistrationException {
     NotificationListenerRegistry listenerRegistry =
         policyContext.getRegistry().lookupByType(NotificationListenerRegistry.class).get();
+
+    policyContext.getMuleContext().getNotificationManager().addInterfaceToType(PolicyNotificationListener.class,
+                                                                               PolicyNotification.class);
 
     notificationListeners.forEach(listenerRegistry::registerListener);
   }

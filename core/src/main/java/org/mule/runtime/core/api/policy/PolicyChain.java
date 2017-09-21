@@ -6,25 +6,30 @@
  */
 package org.mule.runtime.core.api.policy;
 
+import static org.mule.runtime.core.api.context.notification.PolicyNotification.PROCESS_END;
+import static org.mule.runtime.core.api.context.notification.PolicyNotification.PROCESS_START;
 import static reactor.core.publisher.Mono.from;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-
-import org.reactivestreams.Publisher;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -39,6 +44,7 @@ public class PolicyChain extends AbstractComponent
 
   private List<Processor> processors;
   private MessageProcessorChain processorChain;
+  private PolicyNotificationHelper notificationHelper;
 
   public void setProcessors(List<Processor> processors) {
     this.processors = processors;
@@ -49,21 +55,30 @@ public class PolicyChain extends AbstractComponent
     processorChain = new DefaultMessageProcessorChainBuilder().chain(this.processors).build();
     processorChain.setMuleContext(muleContext);
     processorChain.initialise();
+
+    notificationHelper =
+        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
   }
 
   @Override
   public void start() throws MuleException {
-    processorChain.start();
+    if (processorChain != null) {
+      processorChain.start();
+    }
   }
 
   @Override
   public void dispose() {
-    processorChain.dispose();
+    if (processorChain != null) {
+      processorChain.dispose();
+    }
   }
 
   @Override
   public void stop() throws MuleException {
-    processorChain.stop();
+    if (processorChain != null) {
+      processorChain.stop();
+    }
   }
 
   @Override
@@ -73,7 +88,11 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher).transform(processorChain);
+    return from(publisher)
+        .doOnNext(notificationHelper.notification(PROCESS_START))
+        .transform(processorChain)
+        .doOnSuccess(notificationHelper.notification(PROCESS_END))
+        .doOnError(MessagingException.class, notificationHelper.errorNotification(PROCESS_END));
   }
 
 }
