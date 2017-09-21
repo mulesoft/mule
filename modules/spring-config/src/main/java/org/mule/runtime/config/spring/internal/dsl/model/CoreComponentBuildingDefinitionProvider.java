@@ -551,7 +551,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(ConfigurationExtension.class).build())
         .withSetterParameterDefinition("dynamicConfigExpiration",
                                        fromChildConfiguration(DynamicConfigExpiration.class).build())
-        .withSetterParameterDefinition("expressionLanguage", fromChildConfiguration(MVELExpressionLanguage.class).build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .build());
 
