@@ -22,7 +22,7 @@ public class TestConnectorQueueHandler {
   }
 
   /**
-   * Writes a even to to a given queue waiting if necessary for space to become available
+   * Writes a event to a given queue waiting if necessary for space to become available
    *
    * @param queueName
    * @param event

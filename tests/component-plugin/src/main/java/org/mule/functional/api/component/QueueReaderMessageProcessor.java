@@ -25,6 +25,9 @@ public class QueueReaderMessageProcessor implements Processor {
   private final Long timeout;
   private final TestConnectorQueueHandler queueHandler;
 
+  @Inject
+  private Registry registry;
+
   /**
    * Creates a queue reader
    *
@@ -33,7 +36,6 @@ public class QueueReaderMessageProcessor implements Processor {
    * @param timeout number of milliseconds to wait for an available event. Non negative. Null means no timeout required.
    */
   public QueueReaderMessageProcessor(Registry registry, String queueName, Long timeout) {
-    checkArgument(registry != null, "Registry cannot be null");
     checkArgument(!StringUtils.isEmpty(queueName), "Queue name cannot be empty");
     if (timeout != null) {
       checkArgument(timeout >= 0L, "Timeout cannot be negative");
@@ -43,6 +45,7 @@ public class QueueReaderMessageProcessor implements Processor {
     this.queueHandler = new TestConnectorQueueHandler(registry);
     this.queueName = queueName;
     this.timeout = timeout;
+    this.registry = registry;
   }
 
   @Override

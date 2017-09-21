@@ -31,6 +31,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.junit.After;
+import org.junit.Before;
+
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
   /**
