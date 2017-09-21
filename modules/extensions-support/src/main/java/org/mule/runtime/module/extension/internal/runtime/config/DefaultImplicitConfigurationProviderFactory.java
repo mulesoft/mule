@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 

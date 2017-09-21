@@ -28,24 +28,22 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.internal.time.Time;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
-import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -263,14 +261,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   private Time getConfigurationExpirationFrequency() {
-    ExtensionConfig extensionConfig = muleContext.getConfiguration().getExtension(ExtensionConfig.class);
-    final Time defaultFreq = new Time(5L, TimeUnit.MINUTES);
-
-    if (extensionConfig != null) {
-      return extensionConfig.getDynamicConfigExpirationFrequency().orElse(defaultFreq);
-    } else {
-      return defaultFreq;
-    }
+    return muleContext.getConfiguration().getDynamicConfigExpiration().getFrequency();
   }
 
   @Override

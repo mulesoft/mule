@@ -4,11 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.core.internal.config;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_FREQUENCY;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.core.internal.time.LocalTimeSupplier;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,13 +22,21 @@ import java.util.concurrent.TimeUnit;
 public final class ImmutableExpirationPolicy extends AbstractComponent implements ExpirationPolicy {
 
   /**
+   * @return an instance with the default settings
+   */
+  public static ExpirationPolicy getDefault() {
+    return getDefault(new LocalTimeSupplier());
+  }
+
+  /**
    * Returns an instance with the default settings
    *
    * @param timeSupplier the {@link TimeSupplier} for the returned instance to use
    * @return a {@link ExpirationPolicy} with the default settings
    */
   public static ExpirationPolicy getDefault(TimeSupplier timeSupplier) {
-    return new ImmutableExpirationPolicy(5, TimeUnit.MINUTES, timeSupplier);
+    return new ImmutableExpirationPolicy(DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getTime(),
+                                         DYNAMIC_CONFIG_EXPIRATION_FREQUENCY.getUnit(), timeSupplier);
   }
 
   private final long maxIdleTime;

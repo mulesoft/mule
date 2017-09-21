@@ -12,9 +12,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDynamicParameters;
+import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_ELEMENT;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstImplicit;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -55,9 +53,8 @@ final class ConfigurationSchemaDelegate {
     config.setAnnotation(builder.createDocAnnotation(configurationModel.getDescription()));
 
     Optional<TopLevelElement> connectionElement = addConnectionProviderElement(configurationModel);
-    Optional<TopLevelElement> policyElement = addDynamicConfigPolicyElement(configurationModel);
 
-    if (connectionElement.isPresent() || policyElement.isPresent() || !configurationModel.getParameterGroupModels().isEmpty()) {
+    if (connectionElement.isPresent() || !configurationModel.getParameterGroupModels().isEmpty()) {
       final ExplicitGroup sequence = new ExplicitGroup();
       sequence.setMinOccurs(ZERO);
       sequence.setMaxOccurs(MAX_ONE);
@@ -65,13 +62,6 @@ final class ConfigurationSchemaDelegate {
       connectionElement.ifPresent(connection -> {
         sequence.getParticle().add(objectFactory.createElement(connection));
         if (builder.isRequired(connection)) {
-          sequence.setMinOccurs(ONE);
-        }
-      });
-
-      policyElement.ifPresent(policy -> {
-        sequence.getParticle().add(objectFactory.createElement(policy));
-        if (builder.isRequired(policy)) {
           sequence.setMinOccurs(ONE);
         }
       });
@@ -119,23 +109,10 @@ final class ConfigurationSchemaDelegate {
 
       objectElement.setMinOccurs(hasImplicitConnection ? ZERO : ONE);
       objectElement.setMaxOccurs(MAX_ONE);
-      objectElement.setRef(MULE_EXTENSION_CONNECTION_PROVIDER_ELEMENT);
+      objectElement.setRef(MULE_CONNECTION_PROVIDER_ELEMENT);
 
       return Optional.of(objectElement);
     }
-    return empty();
-  }
-
-  private Optional<TopLevelElement> addDynamicConfigPolicyElement(ConfigurationModel configurationModel) {
-    if (!getDynamicParameters(configurationModel).isEmpty()) {
-      TopLevelElement objectElement = new TopLevelElement();
-      objectElement.setMinOccurs(ZERO);
-      objectElement.setMaxOccurs("1");
-      objectElement.setRef(MULE_EXTENSION_DYNAMIC_CONFIG_POLICY_ELEMENT);
-
-      return Optional.of(objectElement);
-    }
-
     return empty();
   }
 }

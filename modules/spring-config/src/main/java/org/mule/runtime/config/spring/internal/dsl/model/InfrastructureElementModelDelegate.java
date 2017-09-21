@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.internal.dsl.model;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -20,6 +21,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
@@ -64,6 +66,12 @@ class InfrastructureElementModelDelegate {
 
       case RECONNECTION_STRATEGY_PARAMETER_NAME:
         createReconnectionStrategy(value, parameterModel, paramDsl, parentConfig, parentElement);
+        return;
+
+      case EXPIRATION_POLICY_PARAMETER_NAME:
+        cloneDeclarationToElement(parameterModel, paramDsl, parentConfig, parentElement,
+                                  (ParameterObjectValue) value,
+                                  EXPIRATION_POLICY_ELEMENT_IDENTIFIER, paramDsl.getNamespace());
         return;
 
       case STREAMING_STRATEGY_PARAMETER_NAME:

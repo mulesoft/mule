@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
@@ -59,7 +60,6 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -75,6 +75,7 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.internal.source.SchedulingStrategy;
 import org.mule.runtime.core.internal.source.polling.CronScheduler;
 import org.mule.runtime.core.internal.source.polling.FixedFrequencyScheduler;
+import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
@@ -576,6 +577,17 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default");
+
+    configuration.onDefaultParameterGroup()
+        .withOptionalParameter("dynamicConfigExpiration")
+        .describedAs(DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION)
+        .ofType(new DynamicConfigExpirationTypeBuilder().buildDynamicConfigExpirationType())
+        .withExpressionSupport(NOT_SUPPORTED)
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(false)
+            .allowsInlineDefinition(true)
+            .allowTopLevelDefinition(false)
+            .build());
   }
 
   private void declareConfigurationProperties(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

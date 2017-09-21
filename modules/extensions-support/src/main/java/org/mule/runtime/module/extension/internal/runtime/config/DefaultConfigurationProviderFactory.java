@@ -16,9 +16,9 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -40,12 +40,12 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ConfigurationModel configurationModel,
                                                                   ResolverSet resolverSet,
                                                                   ConnectionProviderValueResolver connectionProviderResolver,
-                                                                  DynamicConfigPolicy dynamicConfigPolicy,
+                                                                  ExpirationPolicy expirationPolicy,
                                                                   MuleContext muleContext)
       throws Exception {
     configureConnectionProviderResolver(name, connectionProviderResolver);
     return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
-                                            dynamicConfigPolicy.getExpirationPolicy(), muleContext);
+                                            expirationPolicy, muleContext);
   }
 
   /**

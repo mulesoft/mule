@@ -4,7 +4,6 @@
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
   <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
   <xs:import namespace="http://www.mulesoft.org/schema/mule/vegan" schemaLocation="http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd"></xs:import>
   <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">
@@ -125,8 +124,8 @@
             <xs:documentation>Default configuration</xs:documentation>
           </xs:annotation>
           <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
-            <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
@@ -305,12 +304,12 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="connection">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="extension:abstractConnectionProviderType">
+        <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
               <xs:complexType>
                 <xs:choice minOccurs="1" maxOccurs="1">
@@ -340,7 +339,7 @@
           </xs:sequence>
           <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="doorInterface"></xs:attribute>
-          <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionList" use="optional" name="doors"></xs:attribute>
+          <xs:attribute type="mule:expressionList" use="optional" name="doors"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>

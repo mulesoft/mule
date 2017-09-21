@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
@@ -36,6 +37,7 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
@@ -703,6 +705,14 @@ class ConfigurationBasedElementModelFactory {
                                                                      paramDsl.getPrefix()));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
+        }
+        return;
+
+      case EXPIRATION_POLICY_PARAMETER_NAME:
+        ComponentConfiguration expiration = nested.get(newIdentifier(EXPIRATION_POLICY_ELEMENT_IDENTIFIER,
+                                                                     paramDsl.getPrefix()));
+        if (expiration != null) {
+          groupElementBuilder.containing(newElementModel(paramModel, paramDsl, expiration));
         }
         return;
 

@@ -11,14 +11,14 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
@@ -44,7 +44,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private final ConfigurationModel configurationModel;
   private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
 
-  private DynamicConfigPolicy dynamicConfigPolicy;
+  private ExpirationPolicy expirationPolicy;
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
@@ -74,6 +74,10 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   private ConfigurationProvider createInnerInstance() throws ConfigurationException {
+    if (expirationPolicy == null) {
+      expirationPolicy = muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy();
+    }
+
     ResolverSet resolverSet = parametersResolver.getParametersAsHashedResolverSet(configurationModel, muleContext);
     final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
     connectionProviderResolver.getResolverSet()
@@ -87,7 +91,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
                                                                             configurationModel,
                                                                             resolverSet,
                                                                             connectionProviderResolver,
-                                                                            getDynamicConfigPolicy(),
+                                                                            expirationPolicy,
                                                                             muleContext);
       } else {
         configurationProvider = configurationProviderFactory
@@ -106,14 +110,6 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     return configurationProvider;
   }
 
-  private DynamicConfigPolicy getDynamicConfigPolicy() {
-    if (dynamicConfigPolicy == null) {
-      dynamicConfigPolicy = DynamicConfigPolicy.getDefault(timeSupplier);
-    }
-
-    return dynamicConfigPolicy;
-  }
-
   private ConnectionProviderValueResolver getConnectionProviderResolver() {
     return connectionProviderResolver.orElseGet(() -> {
       if (requiresConnection) {
@@ -123,8 +119,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     });
   }
 
-  public void setDynamicConfigPolicy(DynamicConfigPolicy dynamicConfigPolicy) {
-    this.dynamicConfigPolicy = dynamicConfigPolicy;
+  public void setExpirationPolicy(ExpirationPolicy expirationPolicy) {
+    this.expirationPolicy = expirationPolicy;
   }
 
   public void setConnectionProviderResolver(ConnectionProviderResolver connectionProviderResolver) {

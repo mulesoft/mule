@@ -4,13 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.config.dsl.infrastructure;
+package org.mule.runtime.config.spring.internal.factories;
 
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
-import org.mule.runtime.module.extension.internal.runtime.ImmutableExpirationPolicy;
+import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 
 import java.util.concurrent.TimeUnit;
 

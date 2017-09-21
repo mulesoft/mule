@@ -8,11 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
-import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -42,21 +39,13 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
-import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.config.dsl.config.ConfigurationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.connection.ConnectionProviderDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.ConstructDefinitionParser;
-import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigPolicyObjectFactory;
-import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigurationExpiration;
-import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.DynamicConfigurationExpirationObjectFactory;
-import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.ExpirationPolicyObjectFactory;
-import org.mule.runtime.module.extension.internal.config.dsl.infrastructure.ExtensionConfigObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.operation.OperationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
-import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -65,15 +54,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
  * A generic {@link ComponentBuildingDefinitionProvider} which provides definitions capable of handling all extensions registered
  * on the {@link ExtensionManager}.
- * <p>
- * It also provides static definitions for the config elements in the {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
- * namespace, which are used for cross extension configuration
  *
  * @since 4.0
  */
@@ -95,56 +80,19 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   @Override
   public void init() {
     checkState(extensions != null, "extensions cannot be null");
-    extensions.stream()
-        .forEach(this::registerExtensionParsers);
+    extensions.stream().forEach(this::registerExtensionParsers);
   }
 
-  /**
-   * Returns the {@link ComponentBuildingDefinition}s for all the extensions plus for the elements in the
-   * {@link ExtensionXmlNamespaceInfo#EXTENSION_NAMESPACE}
-   */
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
-    Builder baseDefinition =
-        new Builder().withNamespace(EXTENSION_NAMESPACE);
-    definitions.add(
-                    baseDefinition.withIdentifier("extensions-config").withTypeDefinition(fromType(ExtensionConfig.class))
-                        .withObjectFactoryType(ExtensionConfigObjectFactory.class)
-                        .withSetterParameterDefinition("dynamicConfigurationExpiration",
-                                                       fromChildConfiguration(DynamicConfigurationExpiration.class).build())
-                        .build());
-    definitions.add(baseDefinition.withIdentifier("dynamic-configuration-expiration")
-        .withTypeDefinition(fromType(DynamicConfigurationExpiration.class))
-        .withObjectFactoryType(DynamicConfigurationExpirationObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleParameter("frequency").build())
-        .withConstructorParameterDefinition(
-                                            fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value)).build())
-        .build());
-
-    definitions.add(baseDefinition.withIdentifier("dynamic-config-policy")
-        .withTypeDefinition(fromType(DynamicConfigPolicy.class))
-        .withObjectFactoryType(DynamicConfigPolicyObjectFactory.class)
-        .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
-        .build());
-
-    definitions.add(baseDefinition.withIdentifier("expiration-policy").withTypeDefinition(fromType(ExpirationPolicy.class))
-        .withObjectFactoryType(ExpirationPolicyObjectFactory.class)
-        .withSetterParameterDefinition("maxIdleTime", fromSimpleParameter("maxIdleTime").build())
-        .withSetterParameterDefinition("timeUnit",
-                                       fromSimpleParameter("timeUnit", value -> TimeUnit.valueOf((String) value))
-                                           .build())
-        .build());
-
     return definitions;
   }
 
   private void registerExtensionParsers(ExtensionModel extensionModel) {
-
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
-    final Builder definitionBuilder =
-        new Builder().withNamespace(xmlDslModel.getPrefix());
+    final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
 
