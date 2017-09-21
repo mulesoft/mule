@@ -13,6 +13,7 @@ import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -106,6 +107,8 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.MuleContextNotification;
+import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -173,6 +176,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
@@ -2519,7 +2523,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/appPluginPolicy.xml")));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -2548,7 +2552,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/appPluginPolicy.xml")));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -2578,7 +2582,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                        getResourceFile("/appPluginPolicy.xml")));
+                                                        getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
@@ -3295,13 +3299,38 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      getResourceFile("/fooPolicy.xml")));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
     policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
-                                                      getResourceFile("/barPolicy.xml")));
+                                                      getResourceFile("/barPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
+  }
+
+  @Test
+  public void appliesApplicationPolicyWithNotificationListener() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    AtomicInteger notificationListenerInvocations = new AtomicInteger();
+    MuleContextNotificationListener<MuleContextNotification> notificationListener =
+        notification -> notificationListenerInvocations.incrementAndGet();
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), singletonList(notificationListener)));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+    assertThat(notificationListenerInvocations.get(), equalTo(2)); // CONTEXT_STARTING and CONTEXT_STARTED
   }
 
   @Test
@@ -3326,7 +3355,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), brokenPolicyFileBuilder.getId(),
                               new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap(),
-                                                        getResourceFile("/brokenPolicy.xml")));
+                                                        getResourceFile("/brokenPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
@@ -3352,7 +3381,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      getResourceFile("/fooPolicy.xml")));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
 
     executeApplicationFlow("main");
@@ -3374,7 +3403,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      getResourceFile("/fooPolicy.xml")));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -3399,7 +3428,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/appPluginPolicy.xml")));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -3418,7 +3447,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/appPluginPolicy.xml")));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -3437,7 +3466,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      getResourceFile("/appPluginPolicy.xml")));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -3457,7 +3486,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                        getResourceFile("/appPluginPolicy.xml")));
+                                                        getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
