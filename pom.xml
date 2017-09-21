@@ -2170,7 +2170,68 @@
                                 <configuration>
                                     <rules>
                                         <requireReleaseDeps>
-                                            <message>No Snapshots Allowed!</message>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <!-- Due to circular deps in tests the extensions are using SNAPSHOT version -->
+                                                <exclude>org.mule.connectors:mule-file-connector</exclude>
+                                                <exclude>org.mule.connectors:mule-sockets-connector</exclude>
+                                                <exclude>org.mule.modules:mule-module-file-extension-common</exclude>
+                                                <exclude>org.mule.connectors:mule-jms-connector</exclude>
+                                                <exclude>org.mule.connectors:mule-http-connector</exclude>
+                                                <exclude>org.mule.modules:mule-module-cors-kernel</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
+                                        <requireReleaseVersion>
+                                            <message>No Snapshots Allowed in Project Version!</message>
+                                        </requireReleaseVersion>
+                                        <requirePluginVersions>
+                                            <message>Best Practice is to always define plugin versions!</message>
+                                            <unCheckedPluginList>
+                                                org.apache.maven.plugins:maven-clean-plugin
+                                            </unCheckedPluginList>
+                                        </requirePluginVersions>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>release-dry-run</id>
+            <properties>
+                <skipNoSnapshotsEnforcerPluginRule>false</skipNoSnapshotsEnforcerPluginRule>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.services:*</exclude>
+                                                <exclude>org.mule.tools.maven:mule-packager</exclude>
+                                                <!-- Due to circular deps in tests the extensions are using SNAPSHOT version -->
+                                                <exclude>org.mule.connectors:mule-file-connector</exclude>
+                                                <exclude>org.mule.connectors:mule-sockets-connector</exclude>
+                                                <exclude>org.mule.modules:mule-module-file-extension-common</exclude>
+                                                <exclude>org.mule.connectors:mule-jms-connector</exclude>
+                                                <exclude>org.mule.connectors:mule-http-connector</exclude>
+                                                <exclude>org.mule.modules:mule-module-cors-kernel</exclude>
+                                            </excludes>
                                         </requireReleaseDeps>
                                     </rules>
                                     <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
