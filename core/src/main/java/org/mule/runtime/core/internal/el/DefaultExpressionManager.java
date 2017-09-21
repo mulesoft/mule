@@ -54,6 +54,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final String PREFIX_EXPR_SEPARATOR = ":";
   public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
+  protected static final String COMPATILIBILITY_PLUGIN_INSTALLED = "_compatilibilityPluginInstalled";
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular evaluations should be used instead.");
@@ -71,7 +72,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     this.muleContext = muleContext;
     this.streamingManager = streamingManager;
     final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext);
-    final MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+
+    MVELExpressionLanguage mvelExpressionLanguage = null;
+    if (muleContext.getRegistry().lookupObject(COMPATILIBILITY_PLUGIN_INSTALLED) != null) {
+      mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    }
     this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
     this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
   }
@@ -221,36 +226,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parse(String expression, BaseEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     Builder eventBuilder = BaseEvent.builder(event);
-    parseWarning.warn();
-    if (hasMelExpression(expression) || melDefault) {
-      return parser.parse(token -> {
-        Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
-        if (result instanceof Message) {
-          return ((Message) result).getPayload().getValue();
-        } else {
-          return result;
-        }
-      }, expression);
-    } else if (isExpression(expression)) {
-      TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
-      try {
-        return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
-      } catch (TransformerException e) {
-        throw new ExpressionRuntimeException(createStaticMessage(format("Failed to transform %s to %s.", evaluation.getDataType(),
-                                                                        STRING)),
-                                             e);
-      }
-    } else {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(String.format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
-      }
-      return expression;
-    }
-  }
-
-  private String parse(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
-                       ComponentLocation componentLocation)
-      throws ExpressionRuntimeException {
     parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
       return parser.parse(token -> {

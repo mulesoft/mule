@@ -28,6 +28,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.internal.el.DefaultExpressionManager.COMPATILIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
@@ -268,4 +269,14 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     verify(streamingManager).manage(cursorProvider, event);
   }
 
+  @Test
+  public void doNotRegistersMelWhenCompatibilityPluginIsNotInstalled() throws Exception {
+    muleContext.getRegistry().unregisterObject(COMPATILIBILITY_PLUGIN_INSTALLED);
+    DefaultExpressionManager expressionManager = new DefaultExpressionManager(muleContext, mock(StreamingManager.class));
+
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("There is no expression language registered for 'mel'");
+
+    expressionManager.isValid("mel:'Hello'");
+  }
 }

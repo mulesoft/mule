@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.el;
 
 import static java.lang.Boolean.valueOf;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -21,8 +22,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,14 +40,15 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   private static final String EXPR_PREFIX_LANGS_TOKEN = "LANGS";
   private static final String EXPR_PREFIX_PATTERN_TEMPLATE =
       "^\\s*(?:(?:#\\[)?\\s*(" + EXPR_PREFIX_LANGS_TOKEN + "):|\\%(" + EXPR_PREFIX_LANGS_TOKEN + ") \\d).*";
+  static final String MVEL_NOT_INSTALLED_ERROR = "MVEL expression language configured as default but not installed";
 
   private final Pattern exprPrefixPattern;
   private Map<String, ExtendedExpressionLanguageAdaptor> expressionLanguages;
 
   private boolean melDefault = false;
 
-  public ExpressionLanguageAdaptorHandler(DataWeaveExpressionLanguageAdaptor defaultExtendedExpressionLanguage,
-                                          MVELExpressionLanguage mvelExpressionLanguage) {
+  public ExpressionLanguageAdaptorHandler(ExtendedExpressionLanguageAdaptor defaultExtendedExpressionLanguage,
+                                          ExtendedExpressionLanguageAdaptor mvelExpressionLanguage) {
     expressionLanguages = new HashMap<>();
     expressionLanguages.put(DW_PREFIX, defaultExtendedExpressionLanguage);
     expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
@@ -56,9 +56,12 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
     exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
     melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
+    if (isMelDefault() && mvelExpressionLanguage == null) {
+      throw new IllegalStateException(MVEL_NOT_INSTALLED_ERROR);
+    }
   }
 
-  public boolean isMelDefault() {
+  boolean isMelDefault() {
     return melDefault;
   }
 
@@ -144,7 +147,11 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
         return expressionLanguages.get(DW_PREFIX);
       }
     } else {
-      return expressionLanguages.get(languagePrefix);
+      ExtendedExpressionLanguageAdaptor extendedExpressionLanguageAdaptor = expressionLanguages.get(languagePrefix);
+      if (extendedExpressionLanguageAdaptor == null) {
+        throw new IllegalStateException(format("There is no expression language registered for '%s'", languagePrefix));
+      }
+      return extendedExpressionLanguageAdaptor;
     }
   }
 
