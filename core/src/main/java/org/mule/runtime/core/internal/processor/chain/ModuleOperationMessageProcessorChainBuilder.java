@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor.chain;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
@@ -17,7 +18,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -29,20 +29,20 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.reactivestreams.Publisher;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -99,7 +99,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     return new ModuleOperationProcessorChain("wrapping-operation-module-chain", head, processors, processorForLifecycle,
                                              properties, parameters,
                                              extensionModel, operationModel,
-                                             expressionManager);
+                                             expressionManager,
+                                             processingStrategy);
   }
 
   /**
@@ -119,8 +120,9 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
                                   List<Processor> processorsForLifecycle,
                                   Map<String, String> properties, Map<String, String> parameters,
                                   ExtensionModel extensionModel, OperationModel operationModel,
-                                  ExpressionManager expressionManager) {
-      super(name, empty(), head, processors, processorsForLifecycle);
+                                  ExpressionManager expressionManager,
+                                  ProcessingStrategy processingStrategy) {
+      super(name, ofNullable(processingStrategy), head, processors, processorsForLifecycle);
       final List<ParameterModel> propertiesModels =
           extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
               ? extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).get().getAllParameterModels()
