@@ -68,7 +68,7 @@ public class WSConsumerImportedNamespaceTlsTestCase extends AbstractWSDLHttpImpo
         assertThat(requestBody, equalTo(EXPECTED_BODY_PATTERN));
     }
 
-    private MuleWSDLLocator getLocator(WSConsumerConfig config) throws MuleException
+    private MuleWSDLLocator getLocator(WSConsumerConfig config) throws Exception
     {
         HttpRequesterConfig httpRequesterConfig = config.getConnectorConfig();
         String url = config.getWsdlLocation();

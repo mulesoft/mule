@@ -6,23 +6,17 @@
  */
 package org.mule.module.ws.consumer;
 
+import static java.lang.ClassLoader.getSystemResource;
+import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.xmlbeans.impl.schema.StscImporter.resolveRelativePathInArchives;
 import static org.mule.module.ws.consumer.WSDLUtils.getBasePath;
 import static org.mule.transport.http.HttpConnector.HTTPS_URL_PROTOCOL;
 import static org.mule.transport.http.HttpConnector.HTTP_URL_PROTOCOL;
-import static org.apache.commons.io.FilenameUtils.normalize;
-
-import org.mule.api.MuleContext;
-import org.mule.api.MuleException;
-import org.mule.module.http.api.requester.proxy.ProxyConfig;
-import org.mule.module.ws.consumer.wsdl.strategy.factory.HttpRequesterWsdlRetrieverStrategyFactory;
-import org.mule.module.ws.consumer.wsdl.strategy.factory.URLWSDLRetrieverStrategyFactory;
-import org.mule.transport.ssl.api.TlsContextFactory;
-import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,6 +24,11 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.xml.WSDLLocator;
 
 import org.apache.xmlbeans.impl.common.HttpRetriever;
+import org.mule.api.MuleContext;
+import org.mule.module.http.api.requester.proxy.ProxyConfig;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.HttpRequesterWsdlRetrieverStrategyFactory;
+import org.mule.module.ws.consumer.wsdl.strategy.factory.URLWSDLRetrieverStrategyFactory;
+import org.mule.transport.ssl.api.TlsContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -52,7 +51,7 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
     private ProxyConfig proxyConfig;
     private MuleContext muleContext;
 
-    public MuleWSDLLocator(MuleWSDLLocatorConfig config) throws MuleException
+    public MuleWSDLLocator(MuleWSDLLocatorConfig config) throws URISyntaxException, IOException
     {
         this.baseURI = getAbsoluteURI(config.getBaseURI());
         this.useConnectorToRetrieveWsdl = config.isUseConnectorToRetrieveWsdl();
@@ -85,14 +84,14 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
             }
             else
             {
-                URL url = IOUtils.getResourceAsUrl(parentLocation, getClass());
-                if (mustResolveRelativePaths(url))
+                URI uri = new URI(parentLocation);
+                if (mustResolveRelativePaths(uri))
                 {
-                    latestImportedURI = resolveRelativePathInArchives(normalize(getBasePath(url.toString())) + importLocation);
+                    latestImportedURI = resolveRelativePathInArchives(normalize(getBasePath(uri.toString())) + importLocation);
                 }
                 else
                 {
-                    latestImportedURI = normalize((getBasePath(url.toString()) + importLocation));
+                    latestImportedURI = normalize((getBasePath(uri.toString()) + importLocation));
                 }
 
             }
@@ -105,17 +104,17 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         }
     }
 
-    private boolean mustResolveRelativePaths(URL url)
+    private boolean mustResolveRelativePaths(URI uri)
     {
-        return url.getProtocol().equals(JAR) || url.getProtocol().equals(ZIP);
+        return uri.getScheme().equals(JAR) || uri.getScheme().equals(ZIP);
     }
 
-    private InputSource getInputSource(String url) throws WSDLException
+    private InputSource getInputSource(String uri) throws WSDLException
     {
         InputStream resultStream;
         try
         {
-            resultStream = getStreamFrom(url);
+            resultStream = getStreamFrom(uri);
         }
         catch (Exception e)
         {
@@ -161,36 +160,40 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         }
     }
 
-    private boolean isHttpAddress(String url)
+    private boolean isHttpAddress(String uri)
     {
-        return url.startsWith(HTTP_URL_PROTOCOL) || url.startsWith(HTTPS_URL_PROTOCOL);
+        return uri.startsWith(HTTP_URL_PROTOCOL) || uri.startsWith(HTTPS_URL_PROTOCOL);
     }
 
     @Override
-    public InputStream getStreamFrom(String url) throws Exception
+    public InputStream getStreamFrom(String uri) throws Exception
     {
-        boolean isHttpRequester = isHttpAddress(url);
+        boolean isHttpRequester = isHttpAddress(uri);
 
         InputStream resultStream = null;
 
         if (useConnectorToRetrieveWsdl && isHttpRequester)
         {
             resultStream = new HttpRequesterWsdlRetrieverStrategyFactory(tlsContextFactory, proxyConfig, muleContext)
-                                                                                                                     .createWSDLRetrieverStrategy().retrieveWsdlResource(url);
+                                                                                                                     .createWSDLRetrieverStrategy().retrieveWsdlResource(uri);
         }
         else
         {
-            resultStream = new URLWSDLRetrieverStrategyFactory().createWSDLRetrieverStrategy().retrieveWsdlResource(url);
+            resultStream = new URLWSDLRetrieverStrategyFactory().createWSDLRetrieverStrategy().retrieveWsdlResource(uri);
         }
         
         return resultStream;
     }
     
-    private String getAbsoluteURI(String uri)
+    private String getAbsoluteURI(String uri) throws URISyntaxException, IOException
     {
         if (uri != null)
         {
-            URL absoluteURI = IOUtils.getResourceAsUrl(uri, getClass());
+            URI absoluteURI = new URI(uri);
+            if (absoluteURI.getScheme() == null)
+            {
+                return getSystemResource(uri).toString();
+            }
             return (absoluteURI == null) ? null : absoluteURI.toString();
         }
 
