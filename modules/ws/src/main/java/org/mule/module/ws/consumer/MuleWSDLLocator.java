@@ -54,7 +54,7 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
 
     public MuleWSDLLocator(MuleWSDLLocatorConfig config) throws MuleException
     {
-        this.baseURI = config.getBaseURI();
+        this.baseURI = getAbsoluteURI(config.getBaseURI());
         this.useConnectorToRetrieveWsdl = config.isUseConnectorToRetrieveWsdl();
         this.tlsContextFactory = config.getTlsContextFactory();
         this.muleContext = config.getContext();
@@ -184,6 +184,17 @@ public class MuleWSDLLocator implements WSDLLocator, HttpRetriever
         }
         
         return resultStream;
+    }
+    
+    private String getAbsoluteURI(String url)
+    {
+        if (url != null)
+        {
+            URL absoluteURI = IOUtils.getResourceAsUrl(url, getClass());
+            return absoluteURI==null?null:absoluteURI.toString();
+        }
+        
+        return url;
     }
 
 }
