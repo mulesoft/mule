@@ -50,7 +50,9 @@
       "description": "Native Heisenberg support",
       "regexMatcher": "heisenberg.so",
       "requiredClassName": "org.heisenberg.HeisenbergJNI",
-      "type": "NATIVE"
+      "type": "NATIVE",
+      "coordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
+      "optional": false
     }
   ],
   "importedTypes": [],
@@ -1502,7 +1504,9 @@
           "description": "Native Heisenberg support",
           "regexMatcher": "heisenberg.so",
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
-          "type": "NATIVE"
+          "type": "NATIVE",
+          "coordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
+          "optional": false
         }
       ],
       "operations": [
@@ -5752,7 +5756,8 @@
               "description": "Native Heisenberg support",
               "regexMatcher": "heisenberg.so",
               "requiredClassName": "org.heisenberg.HeisenbergJNI",
-              "type": "NATIVE"
+              "type": "NATIVE",
+              "optional": false
             }
           ],
           "stereotype": {
@@ -18641,7 +18646,8 @@
           "description": "Native Heisenberg support",
           "regexMatcher": "heisenberg.so",
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
-          "type": "NATIVE"
+          "type": "NATIVE",
+          "optional": false
         }
       ],
       "stereotype": {
