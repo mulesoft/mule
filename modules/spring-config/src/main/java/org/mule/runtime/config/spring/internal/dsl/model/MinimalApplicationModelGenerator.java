@@ -53,11 +53,7 @@ public class MinimalApplicationModelGenerator {
     required.stream().forEach(componentModel -> {
       final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();
       if (componentLocation != null) {
-        final String location = componentLocation.getLocation();
-        //TODO (gfernandes) munit components has no location :S
-        //if (!location.equals("null")) {
         enableComponentDependencies(componentModel, required);
-        //}
       }
     });
     return dependencyResolver.getApplicationModel();
