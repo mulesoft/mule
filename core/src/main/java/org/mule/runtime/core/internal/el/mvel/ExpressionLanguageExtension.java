@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.el;
+package org.mule.runtime.core.internal.el.mvel;
 
 /**
  * Interface used to implement extensions to be used with a Mule Expression Language implementation. Imports, variables, aliases

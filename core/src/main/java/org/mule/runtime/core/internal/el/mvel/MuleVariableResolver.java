@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import org.mule.runtime.core.api.el.VariableAssignmentCallback;
-
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.mvel2.integration.impl.SimpleSTValueResolver;
 

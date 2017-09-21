@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.mvel.function;
 
-import org.mule.runtime.core.api.el.ExpressionLanguageContext;
-import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
+import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
+import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageFunction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 

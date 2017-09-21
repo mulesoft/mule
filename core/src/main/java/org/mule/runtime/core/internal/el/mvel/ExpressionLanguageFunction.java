@@ -4,16 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-/**
- * @since 3.3
- */
-
-package org.mule.runtime.core.api.el;
+package org.mule.runtime.core.internal.el.mvel;
 
 /**
  * @since 3.3
  */
-public interface VariableAssignmentCallback<T> {
+public interface ExpressionLanguageFunction {
 
-  void assignValue(String name, T value, T newValue);
+  Object call(Object[] params, ExpressionLanguageContext context);
+
 }
