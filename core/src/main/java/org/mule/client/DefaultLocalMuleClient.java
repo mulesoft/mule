@@ -8,7 +8,9 @@ package org.mule.client;
 
 import static org.mule.api.client.SimpleOptionsBuilder.newOptions;
 import static org.mule.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
+import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -34,6 +36,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
+import org.mule.config.bootstrap.ArtifactType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -84,7 +87,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     {
         try
         {
-            return endpoint.request(timeout);
+            return requestMessage(endpoint, timeout);
         }
         catch (Exception e)
         {
@@ -198,12 +201,40 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
         try
         {
-            return endpoint.request(timeout);
+            return requestMessage(endpoint, timeout);
         }
         catch (Exception e)
         {
             throw new ReceiveException(endpoint, timeout, e);
         }
+    }
+
+    private MuleMessage requestMessage(InboundEndpoint endpoint, long timeout) throws Exception
+    {
+        MuleMessage result = endpoint.request(timeout);
+
+        // In scenarios where a message is requested to a shared connector, the original context is overrode by the domain context.
+        // A quick fix is to copy the obtained message with the original context.
+
+        if (messageWasSentToSharedConnector(endpoint, result))
+        {
+            if (result.getClass().equals(DefaultMuleMessage.class))
+            {
+                return new DefaultMuleMessage(result.getPayload(), result, endpoint.getMuleContext());
+            }
+            else if (result.getClass().equals(DefaultMessageCollection.class))
+            {
+                return new DefaultMessageCollection((DefaultMessageCollection) result, endpoint.getMuleContext(), true);
+            }
+        }
+
+        return result;
+    }
+
+    private boolean messageWasSentToSharedConnector (InboundEndpoint endpoint, MuleMessage requestedMessage)
+    {
+        ArtifactType connectorArtifactType = endpoint.getConnector().getMuleContext().getArtifactType();
+        return requestedMessage!= null && connectorArtifactType != null && connectorArtifactType.equals(DOMAIN);
     }
 
     public MuleMessage process(String uri,
