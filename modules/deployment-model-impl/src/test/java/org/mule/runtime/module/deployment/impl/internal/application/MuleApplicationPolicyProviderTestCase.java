@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -65,27 +66,28 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   private final Application application = mock(Application.class);
   private final PolicyPointcut pointcut = mock(PolicyPointcut.class);
   private final PolicyParametrization parametrization1 =
-      new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap(), mock(File.class));
+      new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap(), mock(File.class), emptyList());
   private final PolicyParametrization parametrization2 =
-      new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap(), mock(File.class));
+      new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap(), mock(File.class), emptyList());
   private final PolicyParametrization parametrization3 =
-      new PolicyParametrization(POLICY_ID3, pointcut, ORDER_POLICY3, emptyMap(), mock(File.class));
+      new PolicyParametrization(POLICY_ID3, pointcut, ORDER_POLICY3, emptyMap(), mock(File.class), emptyList());
   private final PolicyTemplateDescriptor policyTemplateDescriptor1 = new PolicyTemplateDescriptor(POLICY_NAME1);
   private final PolicyTemplateDescriptor policyTemplateDescriptor2 = new PolicyTemplateDescriptor(POLICY_NAME2);
   private final PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
-  private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
   private final ApplicationPolicyInstance applicationPolicyInstance1 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance2 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance3 = mock(ApplicationPolicyInstance.class);
   private final Policy policy1 = mock(Policy.class, POLICY_ID1);
   private final Policy policy2 = mock(Policy.class, POLICY_ID2);
-  private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
-  private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
 
   @Rule
   public ExpectedException expectedException = none();
+
+  private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
+  private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
+  private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
+  private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
+  private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
 
   @Before
   public void setUp() throws Exception {
@@ -130,7 +132,6 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
 
     when(policyTemplate1.getDescriptor()).thenReturn(policyTemplateDescriptor1);
     when(policyTemplate2.getDescriptor()).thenReturn(policyTemplateDescriptor2);
-
   }
 
   @Test
@@ -387,4 +388,5 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
 
     policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
   }
+
 }

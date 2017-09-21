@@ -21,6 +21,8 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.Life
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
@@ -49,6 +51,7 @@ import java.util.Optional;
 public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
   public static final String CLUSTER_MANAGER_ID = "_muleClusterManager";
+
   private final Application application;
   private final PolicyTemplate template;
   private final PolicyParametrization parametrization;
@@ -88,7 +91,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         newBuilder().setArtifactType(APP)
             .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
-            .setConfigurationFiles(new String[] {parametrization.getConfig().getAbsolutePath()})
+            .setConfigurationFiles(parametrization.getConfig().getAbsolutePath())
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())
             .setServiceRepository(serviceRepository)
             .setClassLoaderRepository(classLoaderRepository)
@@ -125,10 +128,18 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     });
     try {
       policyContext = artifactBuilder.build();
+      enableNotificationListeners(parametrization.getNotificationListeners());
       policyContext.getMuleContext().start();
     } catch (MuleException e) {
       throw new InitialisationException(createStaticMessage("Cannot create artifact context for the policy instance"), e, this);
     }
+  }
+
+  private void enableNotificationListeners(List<NotificationListener> notificationListeners) throws RegistrationException {
+    NotificationListenerRegistry listenerRegistry =
+        policyContext.getMuleContext().getRegistry().lookupObject(NotificationListenerRegistry.class);
+
+    notificationListeners.forEach(listenerRegistry::registerListener);
   }
 
   private void initPolicyInstance() throws InitialisationException {
