@@ -12,7 +12,8 @@ import javax.net.ssl.SSLSession;
 
 /**
  * Wrapper to contain SSL context and avoid errors due to serialization
- *
+ * 
+ * @since 3.9
  */
 public class SSLSessionProperties implements Serializable
 {
