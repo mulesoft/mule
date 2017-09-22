@@ -23,6 +23,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
