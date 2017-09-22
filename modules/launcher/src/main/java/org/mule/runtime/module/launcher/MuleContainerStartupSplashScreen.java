@@ -9,8 +9,9 @@ package org.mule.runtime.module.launcher;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.sort;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getUserLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import org.mule.runtime.core.api.config.MuleManifest;
@@ -68,8 +69,16 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     }
     if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
       listServicesIfPresent();
+      listServerPluginsIfPresent();
       listPatchesIfPresent();
       listMuleSystemProperties();
+    }
+  }
+
+  private void listServerPluginsIfPresent() {
+    File serverPluginsFolder = getServerPluginsFolder();
+    if (serverPluginsFolder != null && serverPluginsFolder.exists()) {
+      listItems(asList(serverPluginsFolder.list()), "Mule server plugins:");
     }
   }
 
@@ -81,9 +90,9 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   }
 
   private void listPatchesIfPresent() {
-    File patchesDirectory = getUserLibFolder();
+    File patchesDirectory = getPatchesLibFolder();
     if (patchesDirectory != null && patchesDirectory.exists()) {
-      String[] patches = patchesDirectory.list((dir, name) -> name.startsWith("SE-"));
+      String[] patches = patchesDirectory.list();
       sort(patches);
       listItems(asList(patches), "Applied patches:");
     }

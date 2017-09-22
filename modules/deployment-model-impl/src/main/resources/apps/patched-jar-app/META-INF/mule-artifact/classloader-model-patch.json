@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "artifactCoordinates": {
+    "groupId": "patch",
+    "artifactId": "patch",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-cli",
+        "artifactId": "commons-cli",
+        "version": "1.4",
+        "type": "jar"
+      },
+      "uri": "repository/commons-cli/commons-cli/1.4/commons-cli-1.4.jar"
+    }
+  ]
+}

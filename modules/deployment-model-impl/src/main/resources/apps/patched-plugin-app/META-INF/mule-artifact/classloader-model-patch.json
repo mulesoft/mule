@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "artifactCoordinates": {
+    "groupId": "patch",
+    "artifactId": "patch",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-objectstore-connector",
+        "version": "1.0.1",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-objectstore-connector/1.0.1/mule-objectstore-connector-1.0.1-mule-plugin.jar"
+    }
+  ]
+}

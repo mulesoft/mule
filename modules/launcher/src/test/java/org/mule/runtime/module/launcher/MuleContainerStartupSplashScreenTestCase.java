@@ -21,16 +21,18 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   private static final String FIRST_PATCH = "SE-4242-3.8.0.jar";
   private static final String SECOND_PATCH = "SE-9999-3.7.3.jar";
+  private static final String LIBRARY_JAR = "library.jar";
   private static final String COMPLEX_LOG_PART = "* Mule services:                                                     *\n"
       + "*  - myService.zip                                                   *\n"
       + "* Applied patches:                                                   *\n"
       + "*  - " + FIRST_PATCH + "                                               *\n" + "*  - " + SECOND_PATCH
-      + "                                               *\n"
+      + "                                               *\n*  - " + LIBRARY_JAR
+      + "                                                     *\n"
       + "* Mule system properties:                                            *\n";
 
   @BeforeClass
   public static void setUpPatches() {
-    File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
+    File libFolder = newFile(workingDirectory.getRoot(), "lib/patches");
     libFolder.mkdirs();
     newFile(libFolder, FIRST_PATCH).mkdir();
     newFile(libFolder, "library.jar").mkdir();

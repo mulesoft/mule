@@ -15,9 +15,10 @@ import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
-
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
@@ -105,7 +107,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       return false;
     }
 
-    //First get saved zombieFile
+    // First get saved zombieFile
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
 
     if ((zombieArtifact != null) && (!zombieArtifact.updatedZombieApp())) {
@@ -145,6 +147,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       T artifact;
       try {
         artifact = createArtifact(artifactLocation);
+        undeployArtifactIfItsAPatch(artifact);
         trackArtifact(artifact);
       } catch (Throwable t) {
         String artifactName = artifactLocation.getName();
@@ -170,6 +173,23 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       final String msg = "Failed to deploy from URI: " + artifactAchivedUri;
       throw new DeploymentException(createStaticMessage(msg), t);
     }
+  }
+
+  private void undeployArtifactIfItsAPatch(T artifact) {
+    Optional<T> foundMatchingArtifact = artifacts.stream().filter(deployedArtifact -> {
+      BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
+      BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
+      if (deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId()) &&
+          deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
+        MuleVersion deployedVersion = new MuleVersion(deployedBundleDescriptor.getVersion());
+        MuleVersion artifactVersion = new MuleVersion(artifactBundleDescriptor.getVersion());
+        if (artifactVersion.sameBaseVersion(deployedVersion)) {
+          return true;
+        }
+      }
+      return false;
+    }).findAny();
+    foundMatchingArtifact.ifPresent(deployer::undeploy);
   }
 
   private File installArtifact(URI artifactAchivedUri) throws IOException {
@@ -458,7 +478,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     Map<File, Long> initialResourceFiles = new HashMap<>();
 
     private ZombieArtifact(File[] resourceFiles) {
-      //Is exploded artifact
+      // Is exploded artifact
       for (File resourceFile : resourceFiles) {
         initialResourceFiles.put(resourceFile, resourceFile.lastModified());
       }
@@ -473,7 +493,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           .anyMatch((entry) -> !entry.getValue().equals(entry.getKey().lastModified()));
     }
 
-    //Returns true only if all the files exist
+    // Returns true only if all the files exist
     public boolean exists() {
       return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
     }

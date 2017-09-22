@@ -107,6 +107,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.MuleContext;
@@ -121,7 +122,6 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -3494,6 +3494,52 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
+  }
+
+  @Test
+  public void sameApplicationMinorVersionCausesRedeploy() throws Exception {
+    ApplicationFileBuilder appVersion1_0_0 = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.0.0");
+
+    addPackedAppFromBuilder(appVersion1_0_0);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appVersion1_0_0.getId());
+
+    reset(applicationDeploymentListener);
+
+    ApplicationFileBuilder appVersion1_0_1 = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.0.1");
+
+    addPackedAppFromBuilder(appVersion1_0_1);
+    assertUndeploymentSuccess(applicationDeploymentListener, appVersion1_0_0.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appVersion1_0_1.getId());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertAppsDir(NONE, new String[] {appVersion1_0_1.getId()}, true);
+  }
+
+  @Test
+  public void sameDomainMinorVersionCausesRedeploy() throws Exception {
+    DomainFileBuilder domainVersion2_4_2 = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion("2.4.2");
+
+    addPackedDomainFromBuilder(domainVersion2_4_2);
+
+    startDeployment();
+    assertDeploymentSuccess(domainDeploymentListener, domainVersion2_4_2.getId());
+
+    reset(domainDeploymentListener);
+
+    DomainFileBuilder domainVersion2_4_5 = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion("2.4.5");
+
+    addPackedDomainFromBuilder(domainVersion2_4_5);
+    assertUndeploymentSuccess(domainDeploymentListener, domainVersion2_4_2.getId());
+    assertDeploymentSuccess(domainDeploymentListener, domainVersion2_4_5.getId());
+    assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertDomainDir(NONE, new String[] {domainVersion2_4_5.getId()}, true);
   }
 
   private ApplicationFileBuilder createExtensionApplicationWithServices(String appConfigFile,
