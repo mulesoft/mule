@@ -16,9 +16,12 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
+
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
@@ -316,8 +319,13 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected BaseEventContext createEventContext() {
-      return create(this, getLocation());
+    protected BaseEventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
+      return create(this, getLocation(), null, externalCompletionPublisher);
+    }
+
+    @Override
+    protected BaseEventContext createChildEventContext(EventContext parent) {
+      return child((BaseEventContext) parent, ofNullable(getLocation()), getExceptionListener());
     }
   }
 }
