@@ -128,7 +128,7 @@
         <gmavenPluginVersion>1.4</gmavenPluginVersion>
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-        <mavenCompilerVersion>3.1</mavenCompilerVersion>
+        <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
 
         <!--
             The above project.url will not be picked up in the manifest,
@@ -1534,7 +1534,7 @@
                         <fork>true</fork>
                         <maxmem>512m</maxmem>
                         <source>1.7</source>
-                        <target>1.8</target>
+                        <target>1.7</target>
                         <proc>none</proc>
                         <!-- Slightly faster builds, see https://jira.codehaus.org/browse/MCOMPILER-209 -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -1954,7 +1954,7 @@
                                 <charset>ISO-8859-1</charset>
                                 <encoding>ISO-8859-1</encoding>
                                 <source>1.7</source>
-                                <target>1.8</target>
+                                <target>1.7</target>
                                 <!-- Link to the external online JavaDoc -->
                                 <links>
                                     <link>http://docs.oracle.com/javase/7/docs/api/</link>
@@ -2040,6 +2040,35 @@
                         </reportPlugin>
                         -->
                     </reportPlugins>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.16</version>
+                <executions>
+                    <execution>
+                        <id>signature-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <signature>
+                        <groupId>org.codehaus.mojo.signature</groupId>
+                        <artifactId>java17</artifactId>
+                        <version>1.0</version>
+                    </signature>
+                    <ignores>
+                        <!-- Some methods were added in Java 8 -->
+                        <ignore>java.security.cert.*</ignore>
+
+                        <!-- Handler is internal proprietary API and may be removed in a future release -->
+                        <!-- JarURLConnection is internal proprietary API and may be removed in a future release -->
+                        <ignore>sun.net.www.protocol.jar.*</ignore>
+                    </ignores>
                 </configuration>
             </plugin>
         </plugins>

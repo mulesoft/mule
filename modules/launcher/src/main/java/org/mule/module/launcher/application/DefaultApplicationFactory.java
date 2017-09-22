@@ -19,7 +19,7 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
+import com.google.common.base.Optional;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;

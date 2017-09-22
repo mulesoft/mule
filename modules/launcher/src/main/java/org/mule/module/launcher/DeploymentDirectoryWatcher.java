@@ -6,12 +6,13 @@
  */
 package org.mule.module.launcher;
 
-import static java.util.Optional.empty;
+import static com.google.common.base.Optional.absent;
 import static java.lang.String.format;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.module.launcher.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.util.SplashScreen.miniSplash;
+
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.artifact.Artifact;
@@ -34,13 +35,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.common.base.Optional;
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -489,7 +490,7 @@ public class DeploymentDirectoryWatcher implements Runnable
         {
             try
             {
-                Optional<Properties> properties = empty();
+                Optional<Properties> properties = absent();
                 domainArchiveDeployer.deployPackagedArtifact(zip, properties);
             }
             catch (Exception e)

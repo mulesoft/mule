@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +25,7 @@ public class ConcurrentHashSet/* <E> */extends AbstractSet/* <E> */implements Se
 {
     private static final long serialVersionUID = 2454657854757543876L;
 
-    private final ConcurrentHashMap/* <E, Boolean> */map;
+    private final Map/* <E, Boolean> */map;
     private transient Set/* <E> */keySet;
 
     public ConcurrentHashSet()

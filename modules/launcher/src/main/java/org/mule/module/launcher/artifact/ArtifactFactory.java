@@ -8,8 +8,9 @@ package org.mule.module.launcher.artifact;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Properties;
+
+import com.google.common.base.Optional;
 
 /**
  * Generic Factory for an {@link Artifact}.
