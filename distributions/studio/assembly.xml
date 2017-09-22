@@ -51,6 +51,12 @@
             <outputDirectory>lib/user</outputDirectory>
             <scope>runtime</scope>
             <fileMode>0644</fileMode>
+            <useStrictFiltering>true</useStrictFiltering>
+            <includes>
+                <include>junit:junit</include>
+                <include>xmlunit:xmlunit</include>
+                <include>org.mule.tests:mule-tests-functional</include>
+            </includes>
         </dependencySet>
     </dependencySets>
 
