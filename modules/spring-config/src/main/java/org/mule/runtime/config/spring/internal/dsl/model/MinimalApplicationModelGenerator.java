@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.model;
 
-
+import static java.util.Collections.emptyList;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.config.spring.api.LazyComponentInitializer;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,8 +31,6 @@ import java.util.Set;
 // TODO MULE-9688 - refactor this class when the ComponentModel becomes immutable
 public class MinimalApplicationModelGenerator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MinimalApplicationModelGenerator.class);
-
   private ConfigurationDependencyResolver dependencyResolver;
 
   /**
@@ -45,14 +43,41 @@ public class MinimalApplicationModelGenerator {
   }
 
   /**
-   * Resolves the minimal set of {@link ComponentModel}s for a component within a flow.
+   * Resolves the minimal set of {@link ComponentModel componentModels} for the components that pass the {@link LazyComponentInitializer.ComponentLocationFilter}.
    *
-   * @param location the component path in which the component is located.
+   * @param filter to select the {@link ComponentModel componentModels} to be enabled.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
-   * @throws NoSuchComponentModelException if the requested component does not exists.
+   */
+  public ApplicationModel getMinimalModel(LazyComponentInitializer.ComponentLocationFilter filter) {
+    List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(filter);
+    required.stream().forEach(componentModel -> {
+      final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();
+      if (componentLocation != null) {
+        enableComponentDependencies(componentModel, required);
+      }
+    });
+    return dependencyResolver.getApplicationModel();
+  }
+
+  /**
+   * Resolves the minimal set of {@link ComponentModel componentModels} for the component.
+   *
+   * @param location {@link Location} for the requested component to be enabled.
+   * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
+   * @throws NoSuchComponentModelException if the location doesn't match to a component.
    */
   public ApplicationModel getMinimalModel(Location location) {
     ComponentModel requestedComponentModel = dependencyResolver.findRequiredComponentModel(location);
+    enableComponentDependencies(requestedComponentModel, emptyList());
+    return dependencyResolver.getApplicationModel();
+  }
+
+  /**
+   * Enables the {@link ComponentModel} and its dependencies in the {@link ApplicationModel}.
+   *
+   * @param requestedComponentModel the requested {@link ComponentModel} to be enabled.
+   */
+  private void enableComponentDependencies(ComponentModel requestedComponentModel, List<ComponentModel> requiredComponentModels) {
     final Set<String> otherRequiredGlobalComponents = dependencyResolver.resolveComponentDependencies(requestedComponentModel);
     String requestComponentModelName = requestedComponentModel.getNameAttribute();
     if (requestComponentModelName != null
@@ -74,7 +99,7 @@ public class MinimalApplicationModelGenerator {
     while (parentModel != null && parentModel.getParent() != null) {
       parentModel.setEnabled(true);
       for (ComponentModel innerComponent : parentModel.getInnerComponents()) {
-        if (!innerComponent.equals(currentComponentModel)) {
+        if (!innerComponent.equals(currentComponentModel) && !requiredComponentModels.contains(currentComponentModel)) {
           innerComponent.setEnabled(false);
           innerComponent.executedOnEveryInnerComponent(component -> component.setEnabled(false));
         }
@@ -85,9 +110,8 @@ public class MinimalApplicationModelGenerator {
     // Finally we set the requested componentModel as enabled as it could have been disabled when traversing dependencies
     requestedComponentModel.setEnabled(true);
     requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
-    // mule root component model has to be enabled too
+    // Mule root component model has to be enabled too
     this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
-    return dependencyResolver.getApplicationModel();
   }
 
 }

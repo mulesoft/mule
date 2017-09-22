@@ -25,15 +25,17 @@ import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
+import org.mule.runtime.config.spring.api.LazyComponentInitializer;
 import org.mule.runtime.config.spring.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -51,7 +53,8 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
   private Supplier<ConfigurationComponentLocator> componentLocatorSupplier;
 
-  private LazyMuleArtifactContext lazyMuleArtifactContext;
+  private LazyComponentCreator lazyComponentCreator;
+  private LazyComponentInitializer lazyComponentInitializer;
 
   @Inject
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
@@ -59,9 +62,11 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   private ConfigurationComponentLocator componentLocator;
 
-  LazyValueProviderService(LazyMuleArtifactContext artifactContext, Supplier<ValueProviderService> valueProviderServiceSupplier,
+  LazyValueProviderService(LazyMuleArtifactContext lazyComponentCreator, LazyComponentInitializer lazyComponentInitializer,
+                           Supplier<ValueProviderService> valueProviderServiceSupplier,
                            Supplier<ConfigurationComponentLocator> componentLocatorSupplier) {
-    this.lazyMuleArtifactContext = artifactContext;
+    this.lazyComponentCreator = lazyComponentCreator;
+    this.lazyComponentInitializer = lazyComponentInitializer;
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
     this.componentLocatorSupplier = componentLocatorSupplier;
   }
@@ -79,7 +84,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
     Location locationWithOutConnection = locationWithOutConnection(location);
 
     try {
-      lazyMuleArtifactContext.createComponent(locationWithOutConnection);
+      lazyComponentCreator.createComponent(locationWithOutConnection);
 
       ValueProviderModel valueProviderModel = getModel(location, providerName)
           .orElseThrow(() -> new ValueResolvingException(format("Unable to retrieve the model for the provider: [%s] in the location: [%s]",
@@ -88,7 +93,7 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
       if (valueProviderModel.requiresConnection() || valueProviderModel.requiresConfiguration()) {
         // All components are initialized to be able to retrieve the configuration or connection
-        lazyMuleArtifactContext.initializeComponent(location);
+        lazyComponentInitializer.initializeComponent(location);
       }
 
     } catch (ValueResolvingException e) {

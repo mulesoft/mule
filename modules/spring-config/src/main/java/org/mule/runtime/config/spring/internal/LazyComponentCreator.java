@@ -10,22 +10,9 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 /**
- * Initializer for the creation of lazy resources.
- *
- * @since 4.0
+ * Creator for configuration resources.
  */
-public interface LazyComponentInitializer {
-
-  /**
-   * Calling this method guarantees that the requested component from the configuration will be created and
-   * initialized.
-   * <p/>
-   * The requested component must exists in the configuration.
-   *
-   * @param location the location of the configuration component.
-   * @throws MuleRuntimeException if there's a problem creating the component or the component does not exists.
-   */
-  void initializeComponent(Location location);
+public interface LazyComponentCreator {
 
   /**
    * Calling this method guarantees that the requested component from the configuration will be created.
