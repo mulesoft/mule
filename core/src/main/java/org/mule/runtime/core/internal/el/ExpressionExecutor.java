@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
-import org.mule.runtime.core.api.el.ExpressionLanguageContext;
+import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
 
 /**
  * Wraps an expression language engine. Implementations should not wrap expression language engine exceptions, but rather the

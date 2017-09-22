@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.el.mvel;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.ast.FunctionInstance;

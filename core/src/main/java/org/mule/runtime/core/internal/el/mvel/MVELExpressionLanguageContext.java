@@ -7,9 +7,6 @@
 package org.mule.runtime.core.internal.el.mvel;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionLanguageContext;
-import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
-import org.mule.runtime.core.api.el.VariableAssignmentCallback;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.ParserConfiguration;
