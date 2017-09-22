@@ -96,7 +96,6 @@
     </scm>
 
     <modules>
-        <module>buildtools</module>
         <module>core</module>
         <module>core-tests</module>
         <module>modules</module>
@@ -2028,7 +2027,17 @@
                         <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <inherited>false</inherited>
+                        <version>${source.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                    <goal>test-jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
