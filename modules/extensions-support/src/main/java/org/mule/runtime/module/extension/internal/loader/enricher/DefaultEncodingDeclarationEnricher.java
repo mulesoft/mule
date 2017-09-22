@@ -61,7 +61,7 @@ public final class DefaultEncodingDeclarationEnricher implements DeclarationEnri
       if (isEmpty(fields)) {
         return;
       }
-      
+
       final Field defaultEncodingField = fields.iterator().next();
       declaration.addModelProperty(new DefaultEncodingModelProperty(defaultEncodingField));
     });

@@ -22,6 +22,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,8 +38,14 @@ public class PetStoreDefaultEncodingTestCase extends AbstractExtensionFunctional
 
   @Before
   public void setUp() {
+    messageHolder.set(null);
     defaultEncoding = muleContext.getConfiguration().getDefaultEncoding();
     assertThat(defaultEncoding, is(notNullValue()));
+  }
+
+  @After
+  public void tearDown() {
+    messageHolder.set(null);
   }
 
   @Test
