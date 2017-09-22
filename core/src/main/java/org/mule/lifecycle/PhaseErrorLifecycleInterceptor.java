@@ -14,7 +14,7 @@ import org.mule.api.lifecycle.LifecyclePhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import com.google.common.base.Optional;
 
 /**
  * A {@link LifecycleInterceptor} which tracks the completion of the a phase so that if it fails to complete, the another phase is

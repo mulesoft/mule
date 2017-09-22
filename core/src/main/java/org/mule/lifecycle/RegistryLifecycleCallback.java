@@ -6,8 +6,8 @@
  */
 package org.mule.lifecycle;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
 
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
@@ -22,12 +22,13 @@ import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
 
 /**
  * An implementation of {@link LifecycleCallback} for applying {@link Registry} lifecycles
@@ -106,7 +107,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
                 {
                     phase.applyLifecycle(target);
                     duplicates.add(target);
-                    Optional<Exception> optException = empty();
+                    Optional<Exception> optException = absent();
                     interceptor.afterPhaseExecution(phase, target, optException);
                 }
                 else
