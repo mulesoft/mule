@@ -1289,7 +1289,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertMuleContextCreated(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertMuleContextInitialized(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertMuleContextConfigured(applicationDeploymentListener, emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -2723,7 +2722,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
     assertMuleContextCreated(domainDeploymentListener, sharedDomainFileBuilder.getId());
     assertMuleContextInitialized(domainDeploymentListener, sharedDomainFileBuilder.getId());
-    assertMuleContextConfigured(domainDeploymentListener, sharedDomainFileBuilder.getId());
   }
 
   @Test
@@ -3756,24 +3754,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       @Override
       public String describeFailure() {
         return String.format("Did not received notification '%s' for app '%s'", "onArtifactInitialised", appName)
-            + System.lineSeparator() + super.describeFailure();
-      }
-    });
-  }
-
-  private void assertMuleContextConfigured(final DeploymentListener listener, final String appName) {
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener, times(1)).onArtifactConfigured(eq(appName));
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onArtifactConfigured", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });

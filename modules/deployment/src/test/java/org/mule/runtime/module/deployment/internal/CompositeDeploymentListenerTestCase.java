@@ -117,12 +117,4 @@ public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
     verify(listener1, times(1)).onArtifactInitialised(APP_NAME, registry);
     verify(listener2, times(1)).onArtifactInitialised(APP_NAME, registry);
   }
-
-  @Test
-  public void testNotifiesMuleContextConfigured() throws Exception {
-    compositeDeploymentListener.onArtifactConfigured(APP_NAME);
-
-    verify(listener1, times(1)).onArtifactConfigured(APP_NAME);
-    verify(listener2, times(1)).onArtifactConfigured(APP_NAME);
-  }
 }

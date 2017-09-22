@@ -121,17 +121,6 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
     }
   }
 
-  @Override
-  public void onArtifactConfigured(String artifactName) {
-    for (DeploymentListener listener : deploymentListeners) {
-      try {
-        listener.onArtifactConfigured(artifactName);
-      } catch (Throwable t) {
-        logNotificationProcessingError(artifactName, listener, "onArtifactConfigured", t);
-      }
-    }
-  }
-
   private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error) {
     logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification,
                                appName),

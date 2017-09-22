@@ -81,15 +81,6 @@ public interface DeploymentListener {
   }
 
   /**
-   * Notifies the artifact configuration for a given app.
-   *
-   * @param artifactName name of the application that owns the mule context
-   */
-  default void onArtifactConfigured(String artifactName) {
-
-  }
-
-  /**
    * Notifies the artifact initialisation for a given app.
    *
    * @param artifactName name of the application that owns the mule context

@@ -66,11 +66,4 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
 
     verify(deploymentListener).onArtifactInitialised(APP_NAME, registry);
   }
-
-  @Test
-  public void notifiesMuleContextConfigured() throws Exception {
-    contextListener.onConfiguration(muleContext);
-
-    verify(deploymentListener).onArtifactConfigured(APP_NAME);
-  }
 }

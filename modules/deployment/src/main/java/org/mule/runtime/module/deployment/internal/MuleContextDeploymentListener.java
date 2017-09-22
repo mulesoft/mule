@@ -38,7 +38,5 @@ public class MuleContextDeploymentListener implements MuleContextListener {
   }
 
   @Override
-  public void onConfiguration(MuleContext context) {
-    deploymentListener.onArtifactConfigured(appName);
-  }
+  public void onConfiguration(MuleContext context) {}
 }
