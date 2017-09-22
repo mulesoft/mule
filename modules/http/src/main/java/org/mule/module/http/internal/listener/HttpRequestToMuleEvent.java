@@ -71,7 +71,7 @@ public class HttpRequestToMuleEvent
                                            .setRemoteHostAddress(resolveRemoteHostAddress(requestContext))
                                            .setScheme(requestContext.getScheme())
                                            .setClientCertificate(requestContext.getClientConnection().getClientCertificate())
-                                           .setSslSession(requestContext.getClientConnection().getSslSession())
+                                           .setSslSessionProperties(requestContext.getClientConnection().getSslSession())
                                            .addPropertiesTo(inboundProperties);
 
         final Map<String, DataHandler> inboundAttachments = new HashMap<>();
