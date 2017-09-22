@@ -45,11 +45,14 @@ public class ForwardingSoapClient {
   private final LoadingCache<WebServiceDefinition, SoapClient> clientsCache;
   private final MessageDispatcherProvider<MessageDispatcher> dispatcherProvider;
   private final SoapServiceProvider serviceProvider;
+  private final List<WebServiceDefinition> webServiceDefinitions;
+
 
   ForwardingSoapClient(SoapService service,
                        SoapServiceProvider serviceProvider,
                        MessageDispatcherProvider<MessageDispatcher> dispatcherProvider) {
     this.serviceProvider = serviceProvider;
+    this.webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
     this.dispatcherProvider = dispatcherProvider;
     this.clientsCache = CacheBuilder.<WebServiceDefinition, SoapClient>newBuilder()
         .expireAfterAccess(1, MINUTES)
@@ -77,13 +80,12 @@ public class ForwardingSoapClient {
   }
 
   private WebServiceDefinition getWebServiceDefinitionById(String id) {
-    List<WebServiceDefinition> webServiceDefinitions = serviceProvider.getWebServiceDefinitions();
     return webServiceDefinitions.stream().filter(ws -> ws.getServiceId().equals(id)).findAny()
         .orElseThrow(() -> new IllegalArgumentException("Could not find a web service definition with id=[" + id + "]"));
   }
 
   public List<WebServiceDefinition> getAllWebServices() {
-    return copyOf(serviceProvider.getWebServiceDefinitions());
+    return copyOf(webServiceDefinitions);
   }
 
   /**
