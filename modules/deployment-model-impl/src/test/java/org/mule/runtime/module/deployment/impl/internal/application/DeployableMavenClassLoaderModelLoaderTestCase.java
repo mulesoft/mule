@@ -58,19 +58,20 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     testPatchedDependency(PATCHED_JAR_AND_PLUGIN_APP, 3, "mule-sockets-connector", "1.5.8");
   }
 
-  private void testPatchedDependency(String application, int totalExpectedDependencies, String patchedArtifactId, String patchedArtifactVersion) throws InvalidDescriptorLoaderException
-  {
+  private void testPatchedDependency(String application, int totalExpectedDependencies, String patchedArtifactId,
+                                     String patchedArtifactVersion)
+      throws InvalidDescriptorLoaderException {
     DeployableMavenClassLoaderModelLoader deployableMavenClassLoaderModelLoader =
-            new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
+        new DeployableMavenClassLoaderModelLoader(mockMavenClient, mockLocalRepository);
 
     URL patchedAppUrl = getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, application).toString());
     ClassLoaderModel classLoaderModel =
-            deployableMavenClassLoaderModelLoader.load(FileUtils.toFile(patchedAppUrl), emptyMap(), APP);
+        deployableMavenClassLoaderModelLoader.load(FileUtils.toFile(patchedAppUrl), emptyMap(), APP);
     Set<BundleDependency> dependencies = classLoaderModel.getDependencies();
     assertThat(dependencies, hasSize(totalExpectedDependencies));
     List<BundleDependency> connectorsFound = dependencies.stream()
-            .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(patchedArtifactId))
-            .collect(Collectors.toList());
+        .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals(patchedArtifactId))
+        .collect(Collectors.toList());
     assertThat(connectorsFound, hasSize(1));
     assertThat(connectorsFound.get(0).getDescriptor().getVersion(), is(patchedArtifactVersion));
   }

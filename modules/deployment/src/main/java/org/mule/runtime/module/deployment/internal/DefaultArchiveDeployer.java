@@ -176,19 +176,24 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void undeployArtifactIfItsAPatch(T artifact) {
-    Optional<T> foundMatchingArtifact = artifacts.stream().filter(deployedArtifact -> {
-      BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
-      BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
-      if (deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId()) &&
-          deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
-        MuleVersion deployedVersion = new MuleVersion(deployedBundleDescriptor.getVersion());
-        MuleVersion artifactVersion = new MuleVersion(artifactBundleDescriptor.getVersion());
-        if (artifactVersion.sameBaseVersion(deployedVersion)) {
-          return true;
-        }
-      }
-      return false;
-    }).findAny();
+    if (artifact.getDescriptor().getBundleDescriptor() == null) {
+      return;
+    }
+    Optional<T> foundMatchingArtifact = artifacts.stream()
+        .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
+        .filter(deployedArtifact -> {
+          BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
+          BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();
+          if (deployedBundleDescriptor.getGroupId().equals(artifactBundleDescriptor.getGroupId()) &&
+              deployedBundleDescriptor.getArtifactId().equals(artifactBundleDescriptor.getArtifactId())) {
+            MuleVersion deployedVersion = new MuleVersion(deployedBundleDescriptor.getVersion());
+            MuleVersion artifactVersion = new MuleVersion(artifactBundleDescriptor.getVersion());
+            if (artifactVersion.sameBaseVersion(deployedVersion)) {
+              return true;
+            }
+          }
+          return false;
+        }).findAny();
     foundMatchingArtifact.ifPresent(deployer::undeploy);
   }
 

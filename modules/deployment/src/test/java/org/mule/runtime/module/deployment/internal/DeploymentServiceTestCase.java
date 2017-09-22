@@ -1172,9 +1172,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
-    addPackedAppFromBuilder(emptyAppFileBuilder, "1.jar");
-    addPackedAppFromBuilder(emptyAppFileBuilder, "2.jar");
-    addPackedAppFromBuilder(emptyAppFileBuilder, "3.jar");
+    ApplicationFileBuilder app1 = createEmptyApp().withVersion("1.0");
+    ApplicationFileBuilder app2 = createEmptyApp().withVersion("2.0");
+    ApplicationFileBuilder app3 = createEmptyApp().withVersion("3.0");
+
+    addPackedAppFromBuilder(app1, "1.jar");
+    addPackedAppFromBuilder(app2, "2.jar");
+    addPackedAppFromBuilder(app3, "3.jar");
 
     Map<String, Object> startupOptions = new HashMap<>();
     startupOptions.put("app", "3:1:2");
@@ -1194,6 +1198,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertEquals("3", applications.get(0).getArtifactName());
     assertEquals("1", applications.get(1).getArtifactName());
     assertEquals("2", applications.get(2).getArtifactName());
+  }
+
+  private ApplicationFileBuilder createEmptyApp() {
+    return new ApplicationFileBuilder("empty-app").definedBy("empty-config.xml");
   }
 
   @Test
@@ -3497,49 +3505,67 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sameApplicationMinorVersionCausesRedeploy() throws Exception {
-    ApplicationFileBuilder appVersion1_0_0 = new ApplicationFileBuilder("app")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .definedBy("dummy-app-config.xml").withVersion("1.0.0");
-
-    addPackedAppFromBuilder(appVersion1_0_0);
-
-    startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, appVersion1_0_0.getId());
-
-    reset(applicationDeploymentListener);
-
-    ApplicationFileBuilder appVersion1_0_1 = new ApplicationFileBuilder("app")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .definedBy("dummy-app-config.xml").withVersion("1.0.1");
-
-    addPackedAppFromBuilder(appVersion1_0_1);
-    assertUndeploymentSuccess(applicationDeploymentListener, appVersion1_0_0.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, appVersion1_0_1.getId());
-    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-    assertAppsDir(NONE, new String[] {appVersion1_0_1.getId()}, true);
+  public void sameApplicationMinorVersionWithGreaterBugFixVersionCausesRedeploy() throws Exception {
+    testApplicationWithSameMinorVersionCausesRedeploy("1.0.0", "1.0.1");
   }
 
   @Test
-  public void sameDomainMinorVersionCausesRedeploy() throws Exception {
-    DomainFileBuilder domainVersion2_4_2 = new DomainFileBuilder("domain")
-        .definedBy("empty-domain-config.xml").withVersion("2.4.2");
+  public void sameApplicationMinorVersionWithLowerBugFixVersionCausesRedeploy() throws Exception {
+    testApplicationWithSameMinorVersionCausesRedeploy("1.0.1", "1.0.0");
+  }
 
-    addPackedDomainFromBuilder(domainVersion2_4_2);
+  private void testApplicationWithSameMinorVersionCausesRedeploy(String deployedVersion, String patchedVersion) throws Exception {
+    ApplicationFileBuilder deployedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion(deployedVersion);
+
+    addPackedAppFromBuilder(deployedApp);
 
     startDeployment();
-    assertDeploymentSuccess(domainDeploymentListener, domainVersion2_4_2.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, deployedApp.getId());
+
+    reset(applicationDeploymentListener);
+
+    ApplicationFileBuilder patchedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion(patchedVersion);
+
+    addPackedAppFromBuilder(patchedApp);
+    assertUndeploymentSuccess(applicationDeploymentListener, deployedApp.getId());
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, patchedApp.getId());
+    assertThat(deploymentService.getApplications(), hasSize(1));
+    assertAppsDir(NONE, new String[] {patchedApp.getId()}, true);
+  }
+
+  @Test
+  public void sameDomainMinorVersionWithGreaterBugFixVersionCausesRedeploy() throws Exception {
+    testDomainWithSameMinorVersionCausesRedeploy("2.4.2", "2.5.5");
+  }
+
+  @Test
+  public void sameDomainMinorVersionWithLowerBugFixVersionCausesRedeploy() throws Exception {
+    testDomainWithSameMinorVersionCausesRedeploy("2.4.5", "2.4.2");
+  }
+
+  private void testDomainWithSameMinorVersionCausesRedeploy(String deployedVersion, String patchedVersion) throws Exception {
+    DomainFileBuilder deployedDomain = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion(deployedVersion);
+
+    addPackedDomainFromBuilder(deployedDomain);
+
+    startDeployment();
+    assertDeploymentSuccess(domainDeploymentListener, deployedDomain.getId());
 
     reset(domainDeploymentListener);
 
-    DomainFileBuilder domainVersion2_4_5 = new DomainFileBuilder("domain")
-        .definedBy("empty-domain-config.xml").withVersion("2.4.5");
+    DomainFileBuilder patchedDomain = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion(patchedVersion);
 
-    addPackedDomainFromBuilder(domainVersion2_4_5);
-    assertUndeploymentSuccess(domainDeploymentListener, domainVersion2_4_2.getId());
-    assertDeploymentSuccess(domainDeploymentListener, domainVersion2_4_5.getId());
-    assertEquals("Domain has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-    assertDomainDir(NONE, new String[] {domainVersion2_4_5.getId()}, true);
+    addPackedDomainFromBuilder(patchedDomain);
+    assertUndeploymentSuccess(domainDeploymentListener, deployedDomain.getId());
+    assertDeploymentSuccess(domainDeploymentListener, patchedDomain.getId());
+    assertThat(deploymentService.getDomains(), hasSize(2));
+    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, patchedDomain.getId()}, true);
   }
 
   private ApplicationFileBuilder createExtensionApplicationWithServices(String appConfigFile,
