@@ -19,10 +19,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -197,6 +197,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       public void initialise() throws InitialisationException {
         chainBuilder.setProcessingStrategy(processingStrategySupplier.get());
         delegate = chainBuilder.build();
+        delegate.setAnnotations(getAnnotations());
         initialiseIfNeeded(delegate, muleContext);
       }
 

@@ -47,7 +47,7 @@
 
     <flow name="complexMapping">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="MY_REQUESTER"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">
@@ -61,8 +61,8 @@
 
     <flow name="multipleMappings">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
+            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" targetType="MY_OTHER_ERROR"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">

@@ -191,7 +191,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
 
-  private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
+  protected Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
     if (processor instanceof Component) {
       MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
       return exception -> exceptionResolver.resolve(exception, muleContext);
