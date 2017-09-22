@@ -7,6 +7,7 @@
 package org.mule.api.config;
 
 import org.mule.api.MuleContext;
+import org.mule.api.lifecycle.InitialisationException;
 
 /**
  * A <code>ConfigurationBuilder</code> is used to configure a Mule instance,
@@ -31,10 +32,10 @@ public interface ConfigurationBuilder
      * has been called.
      *
      * @param muleContext The current {@link org.mule.api.MuleContext}
-     * @throws ConfigurationException if the configuration fails i.e. an object cannot be created or
-     * initialised properly
+     * @throws ConfigurationException if the configuration fails i.e. an object cannot be created properly.
+     * @throws InitialisationException if the configuration fails because the object cannot be initialised properly.
      */
-    void configure(MuleContext muleContext) throws ConfigurationException;
+    void configure(MuleContext muleContext) throws ConfigurationException, InitialisationException;
 
     /**
      * Indicate whether this ConfigurationBulder has been configured yet
