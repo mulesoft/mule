@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="tlsContext" >
+        <tls:trust-store algorithm="PKIX"/>
+        <tls:revocation-check>
+            <tls:standard-revocation-check/>
+        </tls:revocation-check>
+    </tls:context>
+
+    <http:request-config name="config" host="www.google.com" port="443" tlsContext-ref="tlsContext" protocol="HTTPS" />
+
+    <flow name="test">
+        <http:request config-ref="config" path="/search?q=test" method="GET" />
+    </flow>
+
+</mule>

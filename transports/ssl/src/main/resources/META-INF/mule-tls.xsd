@@ -301,13 +301,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="rcStandardType">
-        <xsd:attribute name="enable" type="xsd:boolean">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Enable certificate revocation checking. Defaults to false.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="onlyEndEntities" type="xsd:boolean">
             <xsd:annotation>
                 <xsd:documentation>
