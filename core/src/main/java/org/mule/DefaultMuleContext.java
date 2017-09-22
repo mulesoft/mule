@@ -414,7 +414,9 @@ public class DefaultMuleContext implements MuleContext
     @Override
     public synchronized void dispose()
     {
-        if (isStarted())
+        if (isStarted() || (lifecycleManager.getLastPhaseExecuted() != null
+                            && (lifecycleManager.getLastPhaseExecuted().equals(Startable.PHASE_NAME)
+                                && lifecycleManager.isLastPhaseExecutionFailed())))
         {
             try
             {

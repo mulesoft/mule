@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @see org.mule.api.lifecycle.LifecyclePhase
  */
-public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
+public class DefaultLifecyclePhase implements LifecyclePhase
 {
     protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
     private Class<?> lifecycleClass;
@@ -54,7 +54,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     private final String name;
     private final String oppositeLifecyclePhase;
     private Set<String> supportedPhases;
-    private MuleContext muleContext;
 
     public DefaultLifecyclePhase(String name, Class<?> lifecycleClass, String oppositeLifecyclePhase)
     {
@@ -63,12 +62,6 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         // DefaultLifecyclePhase interface only has one method
         lifecycleMethod = lifecycleClass.getMethods()[0];
         this.oppositeLifecyclePhase = oppositeLifecyclePhase;
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
     }
 
     /**

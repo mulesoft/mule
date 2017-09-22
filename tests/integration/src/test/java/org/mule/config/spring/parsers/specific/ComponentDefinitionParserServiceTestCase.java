@@ -9,7 +9,6 @@ package org.mule.config.spring.parsers.specific;
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
@@ -241,11 +240,9 @@ public class ComponentDefinitionParserServiceTestCase extends AbstractMuleTestCa
         }
         catch (Exception e)
         {
-            assertEquals(ConfigurationException.class, e.getClass());
-            assertEquals(InitialisationException.class, e.getCause().getClass());
-            assertEquals(BeanDefinitionStoreException.class, e.getCause().getCause().getClass());
-            assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, 
-                e.getCause().getCause().getCause().getClass());
+            assertEquals(InitialisationException.class, e.getClass());
+            assertEquals(BeanDefinitionStoreException.class, e.getCause().getClass());
+            assertEquals(CheckExclusiveClassAttributeObjectFactoryException.class, e.getCause().getCause().getClass());
         }
     }
 

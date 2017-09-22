@@ -9,6 +9,8 @@ package org.mule.lifecycle;
 import org.mule.api.lifecycle.LifecycleInterceptor;
 import org.mule.api.lifecycle.LifecyclePhase;
 
+import java.util.Optional;
+
 /**
  * Implementation of the {@code null object} design pattern for
  * the {@link LifecycleInterceptor} interface
@@ -22,7 +24,7 @@ public final class NullLifecycleInterceptor implements LifecycleInterceptor
      * @return always returns {@code true}
      */
     @Override
-    public boolean beforeLifecycle(LifecyclePhase phase, Object object)
+    public boolean beforePhaseExecution(LifecyclePhase phase, Object object)
     {
         return true;
     }
@@ -31,7 +33,7 @@ public final class NullLifecycleInterceptor implements LifecycleInterceptor
      * NoOp implementation
      */
     @Override
-    public void afterLifecycle(LifecyclePhase phase, Object object)
+    public void afterPhaseExecution(LifecyclePhase phase, Object object, Optional<Exception> exceptionThrownOptional)
     {
 
     }

@@ -51,7 +51,9 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     protected Set<String> completedPhases = new LinkedHashSet<String>(4);
     protected O object;
     protected LifecycleState state;
-
+    private String lastPhaseExecuted;
+    private boolean lastPhaseExecutionFailed;
+    
     private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
 
     public AbstractLifecycleManager(String id, O object)
@@ -86,6 +88,11 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
 
     public void checkPhase(String name) throws IllegalStateException
     {
+        if (lastPhaseExecutionFailed)
+        {
+            return;
+        }
+        
         if (executingPhase != null)
         {
             if (name.equalsIgnoreCase(executingPhase))
@@ -134,22 +141,26 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     {
         try
         {
+            this.lastPhaseExecuted = phase;
             setExecutingPhase(phase);
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
+            lastPhaseExecutionFailed = false;
         }
         // In the case of a connection exception, trigger the reconnection strategy.
         catch (ConnectException ce)
         {
-            MuleContext muleContext = ((AbstractConnector) ce.getFailed()).getMuleContext();
-            muleContext.getExceptionListener().handleException(ce);
+            lastPhaseExecutionFailed = true;
+            doOnConnectException(ce);
         }
         catch (LifecycleException le)
         {
+            lastPhaseExecutionFailed = true;
             throw le;
         }
         catch (Exception e)
         {
+            lastPhaseExecutionFailed = true;
             throw new LifecycleException(e, object);
         }
         finally
@@ -157,6 +168,13 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
             setExecutingPhase(null);
         }
 
+    }
+
+    private void doOnConnectException(ConnectException ce)
+    {
+        MuleContext muleContext = ((AbstractConnector) ce.getFailed()).getMuleContext();
+        muleContext.getExceptionListener().handleException(ce);
+        
     }
 
     public boolean isDirectTransition(String destinationPhase)
@@ -235,5 +253,22 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     public LifecycleState getState()
     {
         return state;
+    }
+    
+    
+    /**
+     * @return the last phase executed name. It may be null if no phase was executed.
+     */
+    public String getLastPhaseExecuted()
+    {
+        return lastPhaseExecuted;
+    }
+
+    /**
+     * @return true if the last phase execution failed. False otherwise.
+     */
+    public boolean isLastPhaseExecutionFailed()
+    {
+        return lastPhaseExecutionFailed;
     }
 }

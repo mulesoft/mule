@@ -16,6 +16,7 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.transport.ConnectException;
 
 /**
  * This is a specialized class that extends {@link RegistryLifecycleManager} and will
@@ -61,29 +62,11 @@ public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleCo
         invokePhase(destinationPhase, object, callback);
     }
 
-     protected void invokePhase(String phase, Object object, LifecycleCallback callback) throws LifecycleException
+    protected void doOnConnectException(ConnectException ce) throws LifecycleException
     {
-        try
-        {
-            setExecutingPhase(phase);
-            callback.onTransition(phase, object);
-            setCurrentPhase(phase);
-        }
-        catch (LifecycleException e)
-        {
-            throw e;
-        }
-        catch (MuleException e)
-        {
-            throw new LifecycleException(e, this);
-        }
-        finally
-        {
-            setExecutingPhase(null);
-        }
-
+        throw new LifecycleException(ce, this);
     }
-
+    
     class MuleContextLifecycleCallback implements LifecycleCallback<MuleContext>
     {
         public void onTransition(String phaseName, MuleContext muleContext) throws MuleException
