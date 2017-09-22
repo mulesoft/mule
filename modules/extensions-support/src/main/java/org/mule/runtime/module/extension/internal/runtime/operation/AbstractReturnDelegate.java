@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
+import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageIterator;
-import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
@@ -125,8 +126,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     }
 
     if (operationContext.hasParameter(ENCODING_PARAMETER_NAME)) {
-      mediaType =
-          mediaType.withCharset(Charset.forName(operationContext.getParameter(ENCODING_PARAMETER_NAME)));
+      mediaType = mediaType.withCharset(parseCharset(operationContext.getParameter(ENCODING_PARAMETER_NAME)));
     } else {
       mediaType = mediaType.withCharset(existingEncoding);
     }
