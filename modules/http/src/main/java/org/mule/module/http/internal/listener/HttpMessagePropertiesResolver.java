@@ -14,6 +14,7 @@ import static org.mule.module.http.internal.HttpParser.extractQueryParams;
 
 import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.listener.properties.SSLSessionProperties;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class HttpMessagePropertiesResolver
     private ListenerPath listenerPath;
     private String scheme;
     private Certificate clientCertificate;
-    private SSLSession sslSession;
+    private SSLSessionProperties sslSessionProperties;
 
     public HttpMessagePropertiesResolver setUri(String uri)
     {
@@ -62,9 +63,12 @@ public class HttpMessagePropertiesResolver
         return this;
     }
     
-    public HttpMessagePropertiesResolver setSslSession(SSLSession sslSession)
+    public HttpMessagePropertiesResolver setSslSessionProperties(SSLSession sslSession)
     {
-        this.sslSession = sslSession;
+        if (sslSession != null)
+        {
+            this.sslSessionProperties = new SSLSessionProperties(sslSession);
+        }
         return this;
     }
 
@@ -97,7 +101,7 @@ public class HttpMessagePropertiesResolver
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_LISTENER_PATH, resolvedListenerPath);
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_RELATIVE_PATH, listenerPath.getRelativePath(path));
         propertiesMap.put(HttpConstants.RequestProperties.HTTP_SCHEME, scheme);
-        propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION, sslSession);
+        propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_SSL_SESSION, sslSessionProperties);
         if (clientCertificate != null)
         {
             propertiesMap.put(HttpConstants.RequestProperties.HTTP_CLIENT_CERTIFICATE, clientCertificate);

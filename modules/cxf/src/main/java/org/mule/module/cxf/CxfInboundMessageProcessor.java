@@ -37,6 +37,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.cxf.support.DelegatingOutputStream;
 import org.mule.module.cxf.transport.MuleUniversalDestination;
 import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.internal.listener.properties.SSLSessionProperties;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
@@ -321,7 +322,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         
         if (muleReqMsg.getInboundProperty(HTTP_CLIENT_SSL_SESSION) != null)
         {
-            SSLSession session = muleReqMsg.getInboundProperty(HTTP_CLIENT_SSL_SESSION); 
+            SSLSessionProperties sessionProperties = muleReqMsg.getInboundProperty(HTTP_CLIENT_SSL_SESSION); 
+            SSLSession session = sessionProperties.retrieveSession();
             TLSSessionInfo tlsinfo = new TLSSessionInfo(session.getCipherSuite(), session, session.getLocalCertificates());
             m.put(TLSSessionInfo.class, tlsinfo);
         }
