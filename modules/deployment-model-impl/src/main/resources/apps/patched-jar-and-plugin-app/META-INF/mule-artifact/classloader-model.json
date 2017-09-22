@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "test",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "pom"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-cli",
+        "artifactId": "commons-cli",
+        "version": "1.2",
+        "type": "jar"
+      },
+      "uri": "repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.4.2",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.4.2/mule-sockets-connector-1.4.2-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-objectstore-connector",
+        "version": "1.0.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-objectstore-connector/1.0.0/mule-objectstore-connector-1.0.0-mule-plugin.jar"
+    }
+  ]
+}

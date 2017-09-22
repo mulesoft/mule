@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -64,8 +65,11 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoaderModelLoader {
 
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR = "classloader-model.json";
+  public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR = "classloader-model-patch.json";
   public static final String CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION =
       Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_DESCRIPTOR).toString();
+  public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
+      Paths.get("META-INF", "mule-artifact", CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR).toString();
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final LocalRepositorySupplierFactory localRepositorySupplierFactory;
@@ -118,7 +122,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
         createClassLoaderModelFromJson(classLoaderModelDescriptor);
-
+    File deployableArtifactRepositoryFolder = getDeployableArtifactRepositoryFolder(artifactFile);
 
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
     classLoaderModelBuilder
@@ -127,10 +131,19 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                      new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
         .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
 
+    Set<BundleDependency> patchBundleDependencies =
+        getPatchedBundledDependencies(artifactFile, deployableArtifactRepositoryFolder);
+
     Set<BundleDependency> bundleDependencies =
-        packagerClassLoaderModel.getDependencies().stream().map(createBundleDependencyFromPackagerDependency(
-                                                                                                             getDeployableArtifactBaseFolder(artifactFile)))
-            .collect(toSet());
+        packagerClassLoaderModel.getDependencies().stream().map(artifact -> {
+          Optional<BundleDependency> patchedBundledDependency =
+              patchBundleDependencies.stream().filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId()
+                  .equals(artifact.getArtifactCoordinates().getGroupId()) &&
+                  bundleDependency.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId()))
+                  .findAny();
+          return patchedBundledDependency
+              .orElse(createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact));
+        }).collect(toSet());
 
     loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
     classLoaderModelBuilder.dependingOn(bundleDependencies);
@@ -138,7 +151,20 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return classLoaderModelBuilder.build();
   }
 
-  private File getDeployableArtifactBaseFolder(File artifactFile) {
+  private Set<BundleDependency> getPatchedBundledDependencies(File artifactFile, File deployableArtifactRepositoryFolder) {
+    Set<BundleDependency> patchBundleDependencies = new HashSet<>();
+    File classLoaderModelPatchDescriptor = getClassLoaderModelPatchDescriptor(artifactFile);
+    if (classLoaderModelPatchDescriptor.exists()) {
+      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModelPatch =
+          createClassLoaderModelFromJson(classLoaderModelPatchDescriptor);
+      patchBundleDependencies.addAll(packagerClassLoaderModelPatch.getDependencies().stream()
+          .map(artifact -> createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact))
+          .collect(toSet()));
+    }
+    return patchBundleDependencies;
+  }
+
+  private File getDeployableArtifactRepositoryFolder(File artifactFile) {
     if (artifactFile.isDirectory()) {
       return artifactFile;
     }
@@ -179,6 +205,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   protected File getClassLoaderModelDescriptor(File artifactFile) {
     return new File(artifactFile, CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION);
+  }
+
+  protected File getClassLoaderModelPatchDescriptor(File artifactFile) {
+    return new File(artifactFile, CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION);
   }
 
   private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes) {

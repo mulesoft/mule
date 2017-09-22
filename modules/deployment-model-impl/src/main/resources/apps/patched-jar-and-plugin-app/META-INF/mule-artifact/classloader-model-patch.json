@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "artifactCoordinates": {
+    "groupId": "patch",
+    "artifactId": "patch",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-cli",
+        "artifactId": "commons-cli",
+        "version": "1.4",
+        "type": "jar"
+      },
+      "uri": "repository/commons-cli/commons-cli/1.4/commons-cli-1.4.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.connectors",
+        "artifactId": "mule-sockets-connector",
+        "version": "1.5.8",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/connectors/mule-sockets-connector/1.5.8/mule-sockets-connector-1.5.8-mule-plugin.jar"
+    }
+  ]
+}

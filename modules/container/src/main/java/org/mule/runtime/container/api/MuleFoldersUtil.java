@@ -31,6 +31,7 @@ public class MuleFoldersUtil {
   public static final String SERVER_PLUGINS = "server-plugins";
   public static final String CONF = "conf";
   public static final String USER_FOLDER = "user";
+  public static final String PATCHES_FOLDER = "patches";
   public static final String SERVICES_FOLDER = "services";
 
 
@@ -169,6 +170,13 @@ public class MuleFoldersUtil {
 
   public static File getUserLibFolder() {
     return new File(getMuleLibFolder(), USER_FOLDER);
+  }
+
+  /**
+   * @return directory where the patches are placed in the runtime
+   */
+  public static File getPatchesLibFolder() {
+    return new File(getMuleLibFolder(), PATCHES_FOLDER);
   }
 
   public static File getContainerAppPluginsFolder() {
