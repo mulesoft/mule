@@ -20,7 +20,7 @@ import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.event.InputEvent;
+import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;

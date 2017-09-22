@@ -17,7 +17,7 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.api.event.InputEvent;
+import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
@@ -80,7 +80,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
     BaseEventContext parentContext = (BaseEventContext) testEvent().getContext();
     assertThat(from(parentContext.getResponsePublisher()).toFuture().isDone(), is(false));
     assertThat(from(parentContext.getCompletionPublisher()).toFuture().isDone(), is(false));
-    
+
     ((BaseEventContext) testEvent().getContext()).success();
     assertThat(from(parentContext.getResponsePublisher()).toFuture().isDone(), is(true));
     assertThat(from(parentContext.getCompletionPublisher()).toFuture().isDone(), is(true));
