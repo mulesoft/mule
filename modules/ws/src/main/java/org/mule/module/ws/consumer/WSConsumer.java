@@ -120,7 +120,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
         {
             wsdlLocator = new MuleWSDLLocator(locatorConfig);
         }
-        catch (Exception e)
+        catch (MuleException e)
         {
             throw new InitialisationException(e, this);
         }
