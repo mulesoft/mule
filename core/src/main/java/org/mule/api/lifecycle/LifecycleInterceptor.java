@@ -6,7 +6,7 @@
  */
 package org.mule.api.lifecycle;
 
-import java.util.Optional;
+import com.google.common.base.Optional;
 
 /**
  * Allows intercepting the application of {@link LifecyclePhase lifecycle phases}
