@@ -9,7 +9,8 @@ package org.mule.lifecycle;
 import org.mule.api.lifecycle.LifecycleInterceptor;
 import org.mule.api.lifecycle.LifecyclePhase;
 
-import java.util.Optional;
+import com.google.common.base.Optional;
+
 
 /**
  * Implementation of the {@code null object} design pattern for
