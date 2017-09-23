@@ -20,7 +20,9 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.capability.xml.DefaultExtensionSchemaGeneratorTestCase.SchemaGeneratorTestUnit.newTestUnit;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
@@ -57,7 +59,6 @@ import org.mule.test.vegan.extension.VeganExtension;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -98,62 +99,27 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
         .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
-    final List<SchemaGeneratorTestUnit> extensions = Arrays.asList(
-                                                                   new SchemaGeneratorTestUnit(javaLoader, MapConnector.class,
-                                                                                               "map.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, ListConnector.class,
-                                                                                               "list.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, TestConnector.class,
-                                                                                               "basic.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               StringListConnector.class,
-                                                                                               "string-list.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               GlobalPojoConnector.class,
-                                                                                               "global-pojo.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               GlobalInnerPojoConnector.class,
-                                                                                               "global-inner-pojo.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, VeganExtension.class,
-                                                                                               "vegan.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               PetStoreConnector.class,
-                                                                                               "petstore.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               MetadataExtension.class,
-                                                                                               "metadata.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               HeisenbergExtension.class,
-                                                                                               "heisenberg.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               SubstitutionGroupExtension.class,
-                                                                                               "substitutiongroup.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TransactionalExtension.class,
-                                                                                               "tx-ext.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               SubTypesMappingConnector.class,
-                                                                                               "subtypes.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader, MarvelExtension.class,
-                                                                                               "marvel.xsd"),
-                                                                   new SchemaGeneratorTestUnit(soapLoader,
-                                                                                               FootballSoapExtension.class,
-                                                                                               "soap.xsd"),
-                                                                   new SchemaGeneratorTestUnit(soapLoader,
-                                                                                               RickAndMortyExtension.class,
-                                                                                               "ram.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TypedValueExtension.class,
-                                                                                               "typed-value.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               TestOAuthExtension.class,
-                                                                                               "test-oauth.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               WeaveFunctionExtension.class,
-                                                                                               "test-fn.xsd"),
-                                                                   new SchemaGeneratorTestUnit(javaLoader,
-                                                                                               ValuesExtension.class,
-                                                                                               "values.xsd"));
+    final List<SchemaGeneratorTestUnit> extensions;
+    extensions = asList(newTestUnit(javaLoader, MapConnector.class, "map.xsd"),
+                        newTestUnit(javaLoader, ListConnector.class, "list.xsd"),
+                        newTestUnit(javaLoader, TestConnector.class, "basic.xsd"),
+                        newTestUnit(javaLoader, StringListConnector.class, "string-list.xsd"),
+                        newTestUnit(javaLoader, GlobalPojoConnector.class, "global-pojo.xsd"),
+                        newTestUnit(javaLoader, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"),
+                        newTestUnit(javaLoader, VeganExtension.class, "vegan.xsd"),
+                        newTestUnit(javaLoader, PetStoreConnector.class, "petstore.xsd"),
+                        newTestUnit(javaLoader, MetadataExtension.class, "metadata.xsd"),
+                        newTestUnit(javaLoader, HeisenbergExtension.class, "heisenberg.xsd"),
+                        newTestUnit(javaLoader, SubstitutionGroupExtension.class, "substitutiongroup.xsd"),
+                        newTestUnit(javaLoader, TransactionalExtension.class, "tx-ext.xsd"),
+                        newTestUnit(javaLoader, SubTypesMappingConnector.class, "subtypes.xsd"),
+                        newTestUnit(javaLoader, MarvelExtension.class, "marvel.xsd"),
+                        newTestUnit(soapLoader, FootballSoapExtension.class, "soap.xsd"),
+                        newTestUnit(soapLoader, RickAndMortyExtension.class, "ram.xsd"),
+                        newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.xsd"),
+                        newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.xsd"),
+                        newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.xsd"),
+                        newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -249,6 +215,10 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
       this.loader = loader;
       this.extensionClass = extensionClass;
       this.fileName = fileName;
+    }
+
+    static SchemaGeneratorTestUnit newTestUnit(ExtensionModelLoader loader, Class<?> extensionClass, String fileName) {
+      return new SchemaGeneratorTestUnit(loader, extensionClass, fileName);
     }
 
     ExtensionModelLoader getLoader() {

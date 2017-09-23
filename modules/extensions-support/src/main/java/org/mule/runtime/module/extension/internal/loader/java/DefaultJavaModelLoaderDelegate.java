@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.ArrayUtils.EMPTY_CLASS_ARRAY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -39,11 +40,12 @@ import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionPara
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionTypeFactory;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
-import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class
@@ -137,10 +139,12 @@ public class DefaultJavaModelLoaderDelegate implements ModelLoaderDelegate {
     ExternalLibraryModelBuilder builder = ExternalLibraryModel.builder()
         .withName(externalLibAnnotation.name())
         .withDescription(externalLibAnnotation.description())
-        .withType(externalLibAnnotation.type());
+        .withType(externalLibAnnotation.type())
+        .isOptional(externalLibAnnotation.optional());
 
     ifNotBlank(externalLibAnnotation.nameRegexpMatcher(), builder::withRegexpMatcher);
     ifNotBlank(externalLibAnnotation.requiredClassName(), builder::withRequiredClassName);
+    ifNotBlank(externalLibAnnotation.coordinates(), builder::withCoordinates);
 
     declarer.withExternalLibrary(builder.build());
   }

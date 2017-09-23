@@ -10,6 +10,7 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -45,12 +46,12 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
+import javax.inject.Inject;
+
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
@@ -63,7 +64,7 @@ import javax.inject.Inject;
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
-    requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE)
+    requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE, coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
 @ErrorTypes(HeisenbergErrors.class)
 public class HeisenbergExtension implements Lifecycle {
 
