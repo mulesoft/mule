@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;

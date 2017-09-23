@@ -10,6 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -101,28 +103,18 @@ public class CompositeDeploymentListenerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testNotifiesMuleContextCreated() throws Exception {
-    MuleContext context = mock(MuleContext.class);
-    compositeDeploymentListener.onMuleContextCreated(APP_NAME, context, customizationService);
+    compositeDeploymentListener.onArtifactCreated(APP_NAME, customizationService);
 
-    verify(listener1, times(1)).onMuleContextCreated(APP_NAME, context, customizationService);
-    verify(listener2, times(1)).onMuleContextCreated(APP_NAME, context, customizationService);
+    verify(listener1, times(1)).onArtifactCreated(APP_NAME, customizationService);
+    verify(listener2, times(1)).onArtifactCreated(APP_NAME, customizationService);
   }
 
   @Test
   public void testNotifiesMuleContextInitialised() throws Exception {
-    MuleContext context = mock(MuleContext.class);
-    compositeDeploymentListener.onMuleContextInitialised(APP_NAME, context);
+    Registry registry = mock(Registry.class);
+    compositeDeploymentListener.onArtifactInitialised(APP_NAME, registry);
 
-    verify(listener1, times(1)).onMuleContextInitialised(APP_NAME, context);
-    verify(listener2, times(1)).onMuleContextInitialised(APP_NAME, context);
-  }
-
-  @Test
-  public void testNotifiesMuleContextConfigured() throws Exception {
-    MuleContext context = mock(MuleContext.class);
-    compositeDeploymentListener.onMuleContextConfigured(APP_NAME, context);
-
-    verify(listener1, times(1)).onMuleContextConfigured(APP_NAME, context);
-    verify(listener2, times(1)).onMuleContextConfigured(APP_NAME, context);
+    verify(listener1, times(1)).onArtifactInitialised(APP_NAME, registry);
+    verify(listener2, times(1)).onArtifactInitialised(APP_NAME, registry);
   }
 }

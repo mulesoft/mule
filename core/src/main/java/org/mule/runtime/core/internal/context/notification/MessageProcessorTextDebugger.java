@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 
 /**
  * Listener for MessageProcessorNotification that delegates notifications to NotificationTextDebugger

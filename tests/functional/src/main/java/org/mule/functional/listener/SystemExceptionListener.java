@@ -14,9 +14,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.registry.RegistrationException;

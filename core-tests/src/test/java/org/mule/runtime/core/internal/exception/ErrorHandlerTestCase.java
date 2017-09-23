@@ -33,7 +33,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;

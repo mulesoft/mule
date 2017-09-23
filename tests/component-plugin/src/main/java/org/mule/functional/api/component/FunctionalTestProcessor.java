@@ -34,7 +34,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;

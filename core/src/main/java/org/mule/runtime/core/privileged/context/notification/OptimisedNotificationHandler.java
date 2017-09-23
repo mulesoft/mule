@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.privileged.context.notification;
 
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 
 /**

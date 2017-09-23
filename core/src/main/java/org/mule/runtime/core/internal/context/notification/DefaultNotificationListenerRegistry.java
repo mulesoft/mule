@@ -10,9 +10,9 @@ import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.serverNotificationManagerNotEnabled;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 
 import java.util.function.Predicate;
 

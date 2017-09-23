@@ -8,7 +8,7 @@
 package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
@@ -25,7 +25,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;

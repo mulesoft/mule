@@ -14,16 +14,17 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
@@ -113,15 +114,17 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
                                        notification.getComponent().getLocation() != null
                                            ? notification.getComponent().getLocation().getLocation()
                                            : null,
-                                       notification.getProcessor());
+                                       notification.getComponent());
+
     EventContext eventContext = notification.getEventContext();
     if (eventContext != null) {
       ((DefaultProcessorsTrace) ((BaseEventContext) eventContext).getProcessorsTrace())
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
-    if (notification.getFlowCallStack() != null) {
-      ((DefaultFlowCallStack) notification.getFlowCallStack())
-          .setCurrentProcessorPath(resolveProcessorRepresentation);
+
+    FlowCallStack flowCallStack = ((BaseEvent) notification.getEvent()).getFlowCallStack();
+    if (flowCallStack != null) {
+      ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(resolveProcessorRepresentation);
     }
   }
 
@@ -145,22 +148,25 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName) {
-    if (notificationInfo.getFlowCallStack() instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) notificationInfo.getFlowCallStack()).push(new FlowStackElement(flowName, null));
+    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
+    if (flowCallStack instanceof DefaultFlowCallStack) {
+      ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(flowName, null));
     }
   }
 
   @Override
   public void onFlowComplete(EnrichedNotificationInfo notificationInfo) {
-    if (notificationInfo.getFlowCallStack() instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) notificationInfo.getFlowCallStack()).pop();
+    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
+    if (flowCallStack instanceof DefaultFlowCallStack) {
+      ((DefaultFlowCallStack) flowCallStack).pop();
     }
   }
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
     if (isFlowTrace()) {
-      return singletonMap(FLOW_STACK_INFO_KEY, notificationInfo.getFlowCallStack().toString());
+      return singletonMap(FLOW_STACK_INFO_KEY, flowCallStack.toString());
     } else {
       return emptyMap();
     }

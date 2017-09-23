@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyIsNotSu
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.toClass;
 
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 
 import java.util.Collection;
 import java.util.HashMap;

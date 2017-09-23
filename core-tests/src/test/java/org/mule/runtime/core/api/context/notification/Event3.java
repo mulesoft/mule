@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.context.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.AbstractServerNotification;
 
 public class Event3 extends AbstractServerNotification {
 

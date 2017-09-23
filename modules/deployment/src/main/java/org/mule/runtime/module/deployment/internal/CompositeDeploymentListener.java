@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListenerManager;
 
@@ -100,34 +100,23 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
   }
 
   @Override
-  public void onMuleContextCreated(String artifactName, MuleContext context, CustomizationService customizationService) {
+  public void onArtifactCreated(String artifactName, CustomizationService customizationService) {
     for (DeploymentListener listener : deploymentListeners) {
       try {
-        listener.onMuleContextCreated(artifactName, context, customizationService);
+        listener.onArtifactCreated(artifactName, customizationService);
       } catch (Throwable t) {
-        logNotificationProcessingError(artifactName, listener, "onMuleContextCreated", t);
+        logNotificationProcessingError(artifactName, listener, "onArtifactCreated", t);
       }
     }
   }
 
   @Override
-  public void onMuleContextInitialised(String artifactName, MuleContext context) {
+  public void onArtifactInitialised(String artifactName, Registry registry) {
     for (DeploymentListener listener : deploymentListeners) {
       try {
-        listener.onMuleContextInitialised(artifactName, context);
+        listener.onArtifactInitialised(artifactName, registry);
       } catch (Throwable t) {
-        logNotificationProcessingError(artifactName, listener, "onMuleContextInitialised", t);
-      }
-    }
-  }
-
-  @Override
-  public void onMuleContextConfigured(String artifactName, MuleContext context) {
-    for (DeploymentListener listener : deploymentListeners) {
-      try {
-        listener.onMuleContextConfigured(artifactName, context);
-      } catch (Throwable t) {
-        logNotificationProcessingError(artifactName, listener, "onMuleContextConfigured", t);
+        logNotificationProcessingError(artifactName, listener, "onArtifactInitialised", t);
       }
     }
   }

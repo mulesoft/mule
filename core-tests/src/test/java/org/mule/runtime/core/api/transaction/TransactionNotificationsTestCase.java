@@ -8,16 +8,16 @@ package org.mule.runtime.core.api.transaction;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_BEGAN;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_COMMITTED;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.IntegerAction;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.context.notification.TransactionNotification;
-import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
+import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.TransactionNotification;
+import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

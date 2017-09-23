@@ -12,7 +12,7 @@ import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListener;
 
 import java.io.File;
 import java.util.List;

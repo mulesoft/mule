@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 
 import java.util.Map;
 

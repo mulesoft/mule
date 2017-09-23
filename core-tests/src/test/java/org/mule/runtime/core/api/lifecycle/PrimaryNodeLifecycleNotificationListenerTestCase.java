@@ -13,8 +13,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotification;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.ClusterNodeNotification;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

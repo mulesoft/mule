@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -14,14 +16,18 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.internal.config.CustomService;
+import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +101,9 @@ public abstract class AbstractRegistry implements Registry {
       throw new InitialisationException(e, this);
     }
     try {
+      // TODO: this is a workaround for MULE-13531
+      injectServiceImpls();
+
       fireLifecycle(Initialisable.PHASE_NAME);
     } catch (InitialisationException e) {
       throw e;
@@ -104,6 +113,28 @@ public abstract class AbstractRegistry implements Registry {
       }
       throw new InitialisationException(e, this);
     }
+  }
+
+  private void injectServiceImpls() throws InitialisationException {
+    DefaultCustomizationService customizationService = (DefaultCustomizationService) muleContext.getCustomizationService();
+
+    ArrayList<Object> services = new ArrayList<>();
+    services.addAll(filterServiceImpls(customizationService.getDefaultServices().values()));
+    services.addAll(filterServiceImpls(customizationService.getCustomServices().values()));
+
+    for (Object s : services) {
+      try {
+        muleContext.getInjector().inject(s);
+      } catch (MuleException e) {
+        throw new InitialisationException(e, this);
+      }
+    }
+  }
+
+  private Collection<Object> filterServiceImpls(Collection<CustomService> services) {
+    return services.stream()
+        .filter(x -> x.getServiceImpl().isPresent())
+        .map(x -> x.getServiceImpl().get()).collect(Collectors.toList());
   }
 
   protected boolean isInitialised() {

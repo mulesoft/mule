@@ -17,28 +17,35 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.api.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import javax.xml.namespace.QName;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -47,13 +54,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import javax.xml.namespace.QName;
 
 @SmallTest
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
@@ -375,7 +375,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     Pipeline flowConstruct = mock(Pipeline.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getName()).thenReturn(name);
 
-    return new PipelineMessageNotification(createInfo(event, null, null), flowConstruct, PROCESS_START);
+    return new PipelineMessageNotification(createInfo(event, null, flowConstruct), flowConstruct.getName(), PROCESS_START);
   }
 
   private Matcher<ProcessorsTrace> hasExecutedProcessors(final String... expectedProcessors) {

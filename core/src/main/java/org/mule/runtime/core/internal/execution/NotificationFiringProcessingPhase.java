@@ -12,7 +12,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.BaseEvent;

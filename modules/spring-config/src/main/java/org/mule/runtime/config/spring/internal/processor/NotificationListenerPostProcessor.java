@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.internal.processor;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import org.springframework.beans.BeansException;

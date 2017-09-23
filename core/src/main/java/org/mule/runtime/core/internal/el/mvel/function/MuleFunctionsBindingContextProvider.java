@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.el.mvel.function;
 
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -31,7 +30,7 @@ public class MuleFunctionsBindingContextProvider implements GlobalBindingContext
   private ConfigurationProperties configurationProperties;
 
   @Inject
-  @Named(OBJECT_CONFIGURATION_COMPONENT_LOCATOR)
+  @Named(ConfigurationComponentLocator.REGISTRY_KEY)
   private ConfigurationComponentLocator componentLocator;
 
 

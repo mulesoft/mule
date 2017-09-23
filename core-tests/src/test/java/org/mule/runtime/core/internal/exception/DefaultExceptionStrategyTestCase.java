@@ -10,14 +10,14 @@ import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.TYPE_ERROR;
-import static org.mule.runtime.core.api.context.notification.ExceptionNotification.EXCEPTION_ACTION;
+import static org.mule.runtime.api.notification.AbstractServerNotification.TYPE_ERROR;
+import static org.mule.runtime.api.notification.ExceptionNotification.EXCEPTION_ACTION;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.IntegerAction;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;

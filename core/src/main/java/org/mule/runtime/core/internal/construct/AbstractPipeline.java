@@ -9,10 +9,10 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_END;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.BaseEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -30,13 +30,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -60,8 +60,6 @@ import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import org.reactivestreams.Publisher;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -71,6 +69,7 @@ import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -374,7 +373,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public BaseEvent process(BaseEvent event) throws MuleException {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
-                                                                 AbstractPipeline.this, PROCESS_END));
+                                                                 AbstractPipeline.this.getName(), PROCESS_END));
       return event;
     }
   }
@@ -385,7 +384,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     public BaseEvent process(BaseEvent event) throws MuleException {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
-                                                                 AbstractPipeline.this, PROCESS_START));
+                                                                 AbstractPipeline.this.getName(), PROCESS_START));
 
       long startTime = currentTimeMillis();
 
@@ -407,7 +406,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     private void fireCompleteNotification(BaseEvent event, MessagingException messagingException) {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
-                                                                 AbstractPipeline.this, PROCESS_COMPLETE));
+                                                                 AbstractPipeline.this.getName(), PROCESS_COMPLETE));
     }
   }
 

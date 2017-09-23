@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.api;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.core.api.MuleContext;
 
 /**
  * Defines a listener for deployment events for Mule applications.
@@ -71,32 +71,20 @@ public interface DeploymentListener {
   }
 
   /**
-   * Notifies the creation of the {@link MuleContext} for a given app.
+   * Notifies the artifact creation for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param context mule context for the application being deployed
+   * @param customizationService customization service for server plugins
    */
-  default void onMuleContextCreated(String artifactName, MuleContext context, CustomizationService customizationService) {
+  default void onArtifactCreated(String artifactName, CustomizationService customizationService) {
 
   }
 
   /**
-   * Notifies the initialization of the {@link MuleContext} for a given app.
+   * Notifies the artifact initialisation for a given app.
    *
    * @param artifactName name of the application that owns the mule context
-   * @param context mule context for the application being deployed
+   * @param registry mule registry for the application being deployed
    */
-  default void onMuleContextInitialised(String artifactName, MuleContext context) {
-
-  }
-
-  /**
-   * Notifies the configuration of the {@link MuleContext} for a given app.
-   *
-   * @param artifactName name of the application that owns the mule context
-   * @param context mule context for the application being deployed
-   */
-  default void onMuleContextConfigured(String artifactName, MuleContext context) {
-
-  }
+  default void onArtifactInitialised(String artifactName, Registry registry) {}
 }

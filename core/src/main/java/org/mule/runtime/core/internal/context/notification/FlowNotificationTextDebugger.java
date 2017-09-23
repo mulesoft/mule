@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
 
 /**
  * Listener for PipelineMessageNotification that delegates notifications to NotificationTextDebugger

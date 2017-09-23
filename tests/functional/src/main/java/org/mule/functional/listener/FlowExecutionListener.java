@@ -9,14 +9,14 @@ package org.mule.functional.listener;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.context.notification.IntegerAction;
-import org.mule.runtime.core.api.context.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
+import org.mule.runtime.api.notification.IntegerAction;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.api.util.concurrent.Latch;
 

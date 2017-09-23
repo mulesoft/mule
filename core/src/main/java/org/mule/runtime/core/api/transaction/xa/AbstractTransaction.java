@@ -9,15 +9,16 @@ package org.mule.runtime.core.api.transaction.xa;
 import static java.lang.System.identityHashCode;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_BEGAN;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_COMMITTED;
-import static org.mule.runtime.core.api.context.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
+import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.context.notification.TransactionNotification;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -78,7 +79,7 @@ public abstract class AbstractTransaction implements Transaction {
     logger.debug("Beginning transaction " + identityHashCode(this));
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
-    fireNotification(new TransactionNotification(this, TRANSACTION_BEGAN, getApplicationName()));
+    fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
   }
 
   @Override
@@ -91,7 +92,7 @@ public abstract class AbstractTransaction implements Transaction {
       }
 
       doCommit();
-      fireNotification(new TransactionNotification(this, TRANSACTION_COMMITTED, getApplicationName()));
+      fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(this);
     }
@@ -103,7 +104,7 @@ public abstract class AbstractTransaction implements Transaction {
       logger.debug("Rolling back transaction " + identityHashCode(this));
       setRollbackOnly();
       doRollback();
-      fireNotification(new TransactionNotification(this, TRANSACTION_ROLLEDBACK, getApplicationName()));
+      fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
     } finally {
       unbindTransaction();
     }
@@ -140,7 +141,7 @@ public abstract class AbstractTransaction implements Transaction {
 
   /**
    * Fires a server notification to all registered
-   * {@link org.mule.runtime.core.api.context.notification.TransactionNotificationListener}s.
+   * {@link TransactionNotificationListener}s.
    *
    */
   protected void fireNotification(TransactionNotification notification) {

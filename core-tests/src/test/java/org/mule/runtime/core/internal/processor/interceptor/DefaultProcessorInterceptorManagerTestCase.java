@@ -15,7 +15,7 @@ import static org.reflections.ReflectionUtils.getFields;
 import static org.reflections.ReflectionUtils.withType;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.interception.ProcessorInterceptorProvider;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.interceptor.a.ProcessorInterceptorFactoryA;
 import org.mule.runtime.core.internal.processor.interceptor.b.ProcessorInterceptorFactoryB;
 import org.mule.runtime.core.internal.processor.interceptor.c.ProcessorInterceptorFactoryC;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class DefaultProcessorInterceptorManagerTestCase extends AbstractMuleTestCase {
 
-  private ProcessorInterceptorProvider manager;
+  private ProcessorInterceptorManager manager;
 
   @Before
   public void before() throws IllegalArgumentException, IllegalAccessException {

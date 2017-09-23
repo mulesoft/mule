@@ -29,7 +29,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;

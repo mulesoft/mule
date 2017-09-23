@@ -96,6 +96,8 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -110,7 +112,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
@@ -1296,7 +1297,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertMuleContextCreated(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertMuleContextInitialized(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertMuleContextConfigured(applicationDeploymentListener, emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -2730,7 +2730,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
     assertMuleContextCreated(domainDeploymentListener, sharedDomainFileBuilder.getId());
     assertMuleContextInitialized(domainDeploymentListener, sharedDomainFileBuilder.getId());
-    assertMuleContextConfigured(domainDeploymentListener, sharedDomainFileBuilder.getId());
   }
 
   @Test
@@ -3802,13 +3801,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextCreated(eq(appName), any(MuleContext.class), any(CustomizationService.class));
+        verify(listener, times(1)).onArtifactCreated(eq(appName), any(CustomizationService.class));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextCreated", appName)
+        return String.format("Did not received notification '%s' for app '%s'", "onArtifactCreated", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });
@@ -3820,31 +3819,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
+        verify(listener, times(1)).onArtifactInitialised(eq(appName), any(Registry.class));
         return true;
       }
 
       @Override
       public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextInitialised", appName)
-            + System.lineSeparator() + super.describeFailure();
-      }
-    });
-  }
-
-  private void assertMuleContextConfigured(final DeploymentListener listener, final String appName) {
-    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
-    prober.check(new JUnitProbe() {
-
-      @Override
-      public boolean test() {
-        verify(listener, times(1)).onMuleContextConfigured(eq(appName), any(MuleContext.class));
-        return true;
-      }
-
-      @Override
-      public String describeFailure() {
-        return String.format("Did not received notification '%s' for app '%s'", "onMuleContextConfigured", appName)
+        return String.format("Did not received notification '%s' for app '%s'", "onArtifactInitialised", appName)
             + System.lineSeparator() + super.describeFailure();
       }
     });

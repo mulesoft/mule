@@ -10,8 +10,12 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -32,6 +36,12 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
   private MuleContext muleContext;
 
   @Mock
+  private MuleRegistry muleRegistry;
+
+  @Mock
+  private Registry registry;
+
+  @Mock
   private CustomizationService customizationService;
 
   private final DeploymentListener deploymentListener = mock(DeploymentListener.class);
@@ -40,25 +50,20 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
   @Before
   public void before() {
     when(muleContext.getCustomizationService()).thenReturn(customizationService);
+    when(muleContext.getRegistry()).thenReturn((muleRegistry));
+    when(muleRegistry.lookupObject(OBJECT_REGISTRY)).thenReturn(registry);
   }
 
   @Test
   public void notifiesMuleContextCreated() throws Exception {
     contextListener.onCreation(muleContext);
-    verify(deploymentListener).onMuleContextCreated(APP_NAME, muleContext, customizationService);
+    verify(deploymentListener).onArtifactCreated(APP_NAME, customizationService);
   }
 
   @Test
   public void notifiesMuleContextInitialized() throws Exception {
     contextListener.onInitialization(muleContext);
 
-    verify(deploymentListener).onMuleContextInitialised(APP_NAME, muleContext);
-  }
-
-  @Test
-  public void notifiesMuleContextConfigured() throws Exception {
-    contextListener.onConfiguration(muleContext);
-
-    verify(deploymentListener).onMuleContextConfigured(APP_NAME, muleContext);
+    verify(deploymentListener).onArtifactInitialised(APP_NAME, registry);
   }
 }

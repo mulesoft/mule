@@ -13,7 +13,7 @@ import static org.mockito.Matchers.eq;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.context.notification.EnrichedNotificationInfo.createInfo;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 

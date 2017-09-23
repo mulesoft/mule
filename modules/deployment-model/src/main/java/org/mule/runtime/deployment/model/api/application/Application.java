@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.deployment.model.api.application;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 
 public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
 
   MuleContext getMuleContext();
+
+  Registry getRegistry();
 
   /**
    * @return the domain associated with the application.

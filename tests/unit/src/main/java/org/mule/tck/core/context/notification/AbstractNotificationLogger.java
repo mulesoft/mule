@@ -6,7 +6,7 @@
  */
 package org.mule.tck.core.context.notification;
 
-import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.api.notification.Notification;
 
 import java.util.LinkedList;
 import java.util.List;

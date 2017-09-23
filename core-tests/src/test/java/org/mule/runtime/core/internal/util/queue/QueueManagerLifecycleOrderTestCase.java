@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.core.api.context.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;

@@ -7,37 +7,35 @@
 package org.mule.runtime.config.spring.internal;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.context.notification.AsyncMessageNotification;
-import org.mule.runtime.core.api.context.notification.AsyncMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.ClusterNodeNotificationListener;
-import org.mule.runtime.core.api.context.notification.ConnectionNotification;
-import org.mule.runtime.core.api.context.notification.ConnectionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.CustomNotification;
-import org.mule.runtime.core.api.context.notification.CustomNotificationListener;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotification;
-import org.mule.runtime.core.api.context.notification.ErrorHandlerNotificationListener;
-import org.mule.runtime.core.api.context.notification.ExceptionNotification;
-import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.context.notification.ManagementNotification;
-import org.mule.runtime.core.api.context.notification.ManagementNotificationListener;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.api.notification.AsyncMessageNotification;
+import org.mule.runtime.api.notification.AsyncMessageNotificationListener;
+import org.mule.runtime.api.notification.ClusterNodeNotificationListener;
+import org.mule.runtime.api.notification.ConnectionNotification;
+import org.mule.runtime.api.notification.ConnectionNotificationListener;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.api.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.api.notification.CustomNotification;
+import org.mule.runtime.api.notification.CustomNotificationListener;
+import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.api.notification.ErrorHandlerNotificationListener;
+import org.mule.runtime.api.notification.ExceptionNotification;
+import org.mule.runtime.api.notification.ExceptionNotificationListener;
+import org.mule.runtime.api.notification.ManagementNotification;
+import org.mule.runtime.api.notification.ManagementNotificationListener;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
+import org.mule.runtime.api.notification.RoutingNotification;
+import org.mule.runtime.api.notification.RoutingNotificationListener;
+import org.mule.runtime.api.notification.SecurityNotification;
+import org.mule.runtime.api.notification.SecurityNotificationListener;
+import org.mule.runtime.api.notification.TransactionNotification;
+import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.context.notification.Notification;
-import org.mule.runtime.core.api.context.notification.NotificationListener;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.context.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.RegistryNotification;
-import org.mule.runtime.core.api.context.notification.RegistryNotificationListener;
-import org.mule.runtime.core.api.context.notification.RoutingNotification;
-import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
-import org.mule.runtime.core.api.context.notification.SecurityNotification;
-import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
-import org.mule.runtime.core.api.context.notification.TransactionNotification;
-import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -68,7 +66,6 @@ public abstract class NotificationConfig<N extends Notification, L extends Notif
         .put("MESSAGE-PROCESSOR", MessageProcessorNotification.class)
         .put("EXCEPTION-STRATEGY", ErrorHandlerNotification.class)
         .put("CONNECTION", ConnectionNotification.class)
-        .put("REGISTRY", RegistryNotification.class)
         .put("CUSTOM", CustomNotification.class)
         .put("EXCEPTION", ExceptionNotification.class)
         .put("TRANSACTION", TransactionNotification.class)
@@ -84,7 +81,6 @@ public abstract class NotificationConfig<N extends Notification, L extends Notif
         .put("MESSAGE-PROCESSOR", MessageProcessorNotificationListener.class)
         .put("EXCEPTION-STRATEGY", ErrorHandlerNotificationListener.class)
         .put("CONNECTION", ConnectionNotificationListener.class)
-        .put("REGISTRY", RegistryNotificationListener.class)
         .put("CUSTOM", CustomNotificationListener.class)
         .put("CONNECTOR-MESSAGE", ConnectorMessageNotificationListener.class)
         .put("EXCEPTION", ExceptionNotificationListener.class)
