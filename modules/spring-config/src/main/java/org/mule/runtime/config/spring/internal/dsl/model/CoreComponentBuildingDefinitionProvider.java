@@ -120,7 +120,7 @@ import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.xa.XaTransactionFactory;
+import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.el.ExpressionLanguageComponent;

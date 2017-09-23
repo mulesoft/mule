@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
-import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;

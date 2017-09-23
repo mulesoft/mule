@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.privileged.transaction.xa;
 
 /**
  * Implementations of this interface hold a reference to a factory of XAResource objects.

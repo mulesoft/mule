@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
@@ -22,12 +22,13 @@ import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.api.util.UUID;
+
+import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.text.MessageFormat;
 
 /**
  * This base class provides low level features for transactions.

@@ -8,10 +8,11 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.AbstractSingleResourceTransaction;
+import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.transaction.Transaction;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A test transaction that does nothing on commit or rollback. The transaction does retain a status so that developers can

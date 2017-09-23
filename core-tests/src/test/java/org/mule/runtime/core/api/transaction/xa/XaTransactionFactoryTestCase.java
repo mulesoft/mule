@@ -15,6 +15,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.transaction.TransactionManager;
