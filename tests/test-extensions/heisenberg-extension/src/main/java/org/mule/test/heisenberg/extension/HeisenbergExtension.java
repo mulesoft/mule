@@ -64,7 +64,8 @@ import java.util.Map;
 @SubTypeMapping(baseType = Investment.class, subTypes = {CarWash.class, CarDealer.class})
 @ExternalLib(name = HeisenbergExtension.HEISENBERG_LIB_NAME, description = HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION,
     nameRegexpMatcher = HeisenbergExtension.HEISENBERG_LIB_FILE_NAME,
-    requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE, coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
+    requiredClassName = HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME, type = NATIVE,
+    coordinates = "org.mule.libs:this-is-a-lib:dll:1.0.0")
 @ErrorTypes(HeisenbergErrors.class)
 public class HeisenbergExtension implements Lifecycle {
 
