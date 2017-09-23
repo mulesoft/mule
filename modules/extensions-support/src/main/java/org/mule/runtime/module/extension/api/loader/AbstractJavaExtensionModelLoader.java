@@ -45,7 +45,7 @@ import org.mule.runtime.module.extension.internal.loader.enricher.ValueProviders
 import org.mule.runtime.module.extension.internal.loader.validation.ComponentLocationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ConnectionProviderModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validation.ExportedTypesModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.InputParametersTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.JavaSubtypesModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.MetadataComponentModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.NullSafeModelValidator;
@@ -70,7 +70,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(
                                                                                          new ConfigurationModelValidator(),
                                                                                          new ConnectionProviderModelValidator(),
-                                                                                         new ExportedTypesModelValidator(),
+                                                                                         new InputParametersTypeModelValidator(),
                                                                                          new JavaSubtypesModelValidator(),
                                                                                          new MetadataComponentModelValidator(),
                                                                                          new NullSafeModelValidator(),

@@ -24047,7 +24047,7 @@
         },
         {
           "key": {
-            "name": "isStolen"
+            "name": "stolen"
           },
           "model": {
             "type": "Boolean",

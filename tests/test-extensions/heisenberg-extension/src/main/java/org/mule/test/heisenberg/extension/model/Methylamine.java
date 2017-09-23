@@ -14,7 +14,7 @@ public class Methylamine {
   private String importer;
 
   @Parameter
-  private boolean isStolen;
+  private boolean stolen;
 
   public String getImporter() {
     return importer;
@@ -25,10 +25,10 @@ public class Methylamine {
   }
 
   public boolean isStolen() {
-    return isStolen;
+    return stolen;
   }
 
   public void setStolen(boolean stolen) {
-    isStolen = stolen;
+    this.stolen = stolen;
   }
 }
