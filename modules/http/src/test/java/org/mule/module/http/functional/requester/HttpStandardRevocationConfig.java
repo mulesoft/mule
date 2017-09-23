@@ -6,6 +6,10 @@
  */
 package org.mule.module.http.functional.requester;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
+import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -19,8 +23,10 @@ public class HttpStandardRevocationConfig extends FunctionalTestCase
     }
 
     @Test
-    public void acceptsEmptyTrustStore() throws Exception
+    public void revocationWorksWithoutTrustStore() throws Exception
     {
-
+        MuleEvent test = runFlow("test");
+        String response = test.getMessage().getPayloadAsString();
+        assertThat(response, containsString("webcache.googleusercontent.com"));
     }
 }

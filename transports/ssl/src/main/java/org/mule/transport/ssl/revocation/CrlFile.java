@@ -52,7 +52,7 @@ public class CrlFile implements RevocationCheck
     @Override
     public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
-        assertNotNull(trustStore, "tls:crl-file requires the 'path' attribute");
+        assertNotNull(path, "tls:crl-file requires the 'path' attribute");
         assertNotNull(trustStore, "tls:crl-file requires a trust store");
 
         try

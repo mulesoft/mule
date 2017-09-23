@@ -23,10 +23,10 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
 {
 
     @Rule
-    public DynamicPort dynamicOcspPort ;
+    public DynamicPort dynamicOcspPort;
 
     @Rule
-    public SystemProperty certAliasSystemProperty ;
+    public SystemProperty certAliasSystemProperty;
 
     private static String RUN_OCSP_SERVER_COMMAND = "openssl ocsp " +
                                                     "-index src/test/resources/tls/ocsp/%s " +
@@ -52,13 +52,13 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
 
     static final String DEFAULT_OCSP_RESPONDER= "server";
 
-    private Process process ;
+    private Process process;
 
-    private final String ocspList ;
+    private final String ocspList;
 
     private int ocspPort;
 
-    private String ocspResponder ;
+    private String ocspResponder;
 
 
     AbstractHttpOcspRevocationTestCase(String configFile, String ocspList, String certAlias)
@@ -79,7 +79,7 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
         }
         else
         {
-            ocspPort = FIXED_OCSP_PORT ;
+            ocspPort = FIXED_OCSP_PORT;
             ocspResponder = DEFAULT_OCSP_RESPONDER;
         }
     }
