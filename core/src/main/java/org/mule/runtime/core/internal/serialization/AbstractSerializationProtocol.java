@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
@@ -27,9 +26,8 @@ import javax.inject.Inject;
  * Base class for implementations of {@link SerializationProtocol} This class implements all the base behavioral contract allowing
  * its extensions to only care about the actual serialization/deserialization part.
  */
-public abstract class AbstractSerializationProtocol implements SerializationProtocol, MuleContextAware {
+public abstract class AbstractSerializationProtocol implements SerializationProtocol {
 
-  @Inject
   protected MuleContext muleContext;
 
   /**
@@ -139,10 +137,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
     return object;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
+  @Inject
   public final void setMuleContext(MuleContext context) {
     muleContext = context;
   }

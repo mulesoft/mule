@@ -25,9 +25,11 @@ import javax.inject.Inject;
 /**
  * Injects the {@link Registry} object for objects stored in the {@link TransientRegistry}.
  *
+ * @since 4.0
  * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also deprecated. Use post processors
  *             for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
+// TODO MULE-11737 Remove this
 @Deprecated
 public class RegistryProcessor implements InjectProcessor {
 
