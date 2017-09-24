@@ -15,12 +15,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 
+import javax.inject.Inject;
+
 /**
  * Reads {@link CoreEvent} from a test connector's queue.
  */
 public class QueueReaderMessageProcessor implements Processor {
 
-  private final Registry registry;
   private final String queueName;
   private final Long timeout;
   private final TestConnectorQueueHandler queueHandler;
