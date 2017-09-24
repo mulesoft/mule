@@ -13,17 +13,18 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.notification.AbstractServerNotification.TYPE_ERROR;
 import static org.mule.runtime.api.notification.ExceptionNotification.EXCEPTION_ACTION;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
 
 public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase {
 
@@ -32,7 +33,8 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
   public void testExceptions() throws Exception {
     InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
     strategy.setMuleContext(muleContext);
-    strategy.setNotificationFirer(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+    strategy
+        .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     strategy.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     strategy.handleException(new IllegalArgumentException("boom"));
     assertEquals(1, strategy.getCount());
@@ -44,7 +46,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     final CountDownLatch latch = new CountDownLatch(1);
     final AtomicInteger notificationCount = new AtomicInteger(0);
 
-    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+    ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener((ExceptionNotificationListener) notification -> {
           if (new IntegerAction(EXCEPTION_ACTION).equals(notification.getAction())) {
             assertEquals("exception", notification.getActionName());
@@ -58,7 +60,8 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCas
     InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
     strategy.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     strategy.setMuleContext(muleContext);
-    strategy.setNotificationFirer(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+    strategy
+        .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     strategy.handleException(new IllegalArgumentException("boom"));
 
     // Wait for the notifcation event to be fired as they are queue

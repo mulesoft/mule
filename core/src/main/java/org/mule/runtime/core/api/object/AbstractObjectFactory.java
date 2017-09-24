@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.api.object;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
-import org.mule.runtime.core.privileged.util.BeanUtils;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.privileged.util.BeanUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates object instances based on the class and sets any properties. This factory is also responsible for applying any object
@@ -31,7 +32,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
   protected String objectClassName;
   protected Class<?> objectClass;
   protected Map properties = null;
-  protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
+  protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<>();
   protected FlowConstruct flowConstruct;
   protected boolean disposed = false;
 
@@ -76,6 +77,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     }
   }
 
+  @Override
   public void initialise() throws InitialisationException {
     if ((objectClassName == null) || (objectClass == null)) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
@@ -83,6 +85,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     disposed = false;
   }
 
+  @Override
   public void dispose() {
     disposed = true;
     // Don't reset the component config state i.e. objectClass since service objects can be recycled
@@ -96,6 +99,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
    *        registry lookups applying processors to newly created objects or even firing custom notifications
    * @throws Exception Can throw any type of exception while creating a new object
    */
+  @Override
   public Object getInstance(MuleContext muleContext) throws Exception {
     if (objectClass == null || disposed) {
       throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
@@ -108,7 +112,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     }
 
     if (isAutoWireObject()) {
-      muleContext.getRegistry().applyProcessors(object);
+      ((MuleContextWithRegistries) muleContext).getRegistry().applyProcessors(object);
     }
     fireInitialisationCallbacks(object);
 
@@ -121,6 +125,7 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     }
   }
 
+  @Override
   public Class<?> getObjectClass() {
     return objectClass;
   }
@@ -147,18 +152,22 @@ public abstract class AbstractObjectFactory extends AbstractComponent implements
     this.properties = properties;
   }
 
+  @Override
   public void addObjectInitialisationCallback(InitialisationCallback callback) {
     initialisationCallbacks.add(callback);
   }
 
+  @Override
   public boolean isSingleton() {
     return false;
   }
 
+  @Override
   public boolean isExternallyManagedLifecycle() {
     return false;
   }
 
+  @Override
   public boolean isAutoWireObject() {
     return true;
   }

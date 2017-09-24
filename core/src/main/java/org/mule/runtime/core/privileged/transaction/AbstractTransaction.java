@@ -7,28 +7,29 @@
 package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.notification.TransactionNotification;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.api.util.UUID;
-
-import java.text.MessageFormat;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
 
 /**
  * This base class provides low level features for transactions.
@@ -47,7 +48,7 @@ public abstract class AbstractTransaction implements Transaction {
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
-      notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+      notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

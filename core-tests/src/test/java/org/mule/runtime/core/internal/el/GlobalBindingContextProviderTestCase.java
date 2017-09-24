@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.util.Optional.of;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.el.BindingContext.builder;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -13,9 +16,6 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_FUNCTIONS;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -23,20 +23,18 @@ import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -46,27 +44,15 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
 
   public static final String KEY = "testProvider";
 
-
   @Override
-  protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder() {
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
 
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        try {
-          DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
-          muleContext.getRegistry().registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
-        } catch (RegistrationException e) {
-          throw new ConfigurationException(e);
-        }
-        super.configure(muleContext);
-        try {
-          muleContext.getRegistry().registerObject(KEY, new TestGlobalBindingContextProvider());
-        } catch (RegistrationException e) {
-          throw new ConfigurationException(e);
-        }
-      }
-    };
+    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+    objects.put(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
+    objects.put(KEY, new TestGlobalBindingContextProvider());
+
+    return objects;
   }
 
   @Test

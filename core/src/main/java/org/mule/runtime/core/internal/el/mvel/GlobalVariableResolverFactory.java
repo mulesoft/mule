@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.ast.FunctionInstance;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,9 @@ public class GlobalVariableResolverFactory extends MVELExpressionLanguageContext
   public GlobalVariableResolverFactory(Map<String, String> aliases, Map<String, Function> functions,
                                        ParserConfiguration parserConfiguration, MuleContext muleContext) {
     super(parserConfiguration, muleContext);
-    List<ExpressionLanguageExtension> extensions = (List<ExpressionLanguageExtension>) muleContext.getRegistry()
-        .lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
+    List<ExpressionLanguageExtension> extensions =
+        (List<ExpressionLanguageExtension>) ((MuleContextWithRegistries) muleContext).getRegistry()
+            .lookupObjectsForLifecycle(ExpressionLanguageExtension.class);
 
     hasTarget = !(aliases.isEmpty() && functions.isEmpty() && extensions.isEmpty());
 

@@ -18,13 +18,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -47,7 +48,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   private ConnectionProvider<Banana> testeableConnectionProvider;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
 
   private DefaultConnectionManager connectionManager;
 

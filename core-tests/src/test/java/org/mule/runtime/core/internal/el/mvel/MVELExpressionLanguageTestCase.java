@@ -50,11 +50,12 @@ import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -219,8 +220,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   public void appTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(singletonMap("app", "'other1'"));
     PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("app", "otherb").build();
-    muleContext.getRegistry().registerObject("foo",
-                                             (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("foo",
+                                                                           (ExpressionLanguageExtension) context -> context
+                                                                               .addVariable("app", "otherc"));
     mvel.initialise();
     assertEquals(MVELArtifactContext.class, evaluate("app", event).getClass());
   }
@@ -230,8 +232,9 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     mvel.setAliases(singletonMap("message", "'other1'"));
     PrivilegedEvent event =
         this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("message", "other2").build();
-    muleContext.getRegistry().registerObject("foo",
-                                             (ExpressionLanguageExtension) context -> context.addVariable("message", "other3"));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("foo",
+                                                                           (ExpressionLanguageExtension) context -> context
+                                                                               .addVariable("message", "other3"));
     mvel.initialise();
     assertEquals(MessageContext.class, evaluate("message", event).getClass());
   }
@@ -239,7 +242,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void extensionTakesPrecedenceOverAutoResolved() throws Exception {
     PrivilegedEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(of("")).addVariable("foo", "other").build();
-    muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
+    ((MuleContextWithRegistries) muleContext).getRegistry()
+        .registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo", event));
   }
@@ -247,7 +251,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException {
     mvel.setAliases(singletonMap("foo", "'bar'"));
-    muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "other"));
+    ((MuleContextWithRegistries) muleContext).getRegistry()
+        .registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "other"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo"));
   }

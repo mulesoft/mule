@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import org.mule.runtime.core.api.registry.Registry;
 import org.mule.tck.core.registry.AbstractRegistryTestCase;
 
 public class CommonBehaviourTransientRegistryTestCase extends AbstractRegistryTestCase {

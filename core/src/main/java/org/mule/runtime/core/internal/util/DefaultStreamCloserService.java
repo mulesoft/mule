@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Closeable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.StreamCloserService;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,10 +22,6 @@ import java.util.Collection;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
 /**
  * Closes streams of different types by looking up available {@link StreamCloser}'s from the Mule registry.
@@ -36,6 +37,7 @@ public class DefaultStreamCloserService implements StreamCloserService {
   private StreamCloser coreStreamTypesCloser = new CoreStreamTypesCloser();
   private Collection<StreamCloser> allStreamClosers = null;
 
+  @Override
   public void closeStream(Object stream) {
     try {
       if (coreStreamTypesCloser.canClose(stream.getClass())) {
@@ -72,18 +74,20 @@ public class DefaultStreamCloserService implements StreamCloserService {
    */
   private Collection<StreamCloser> getAllStreamClosers() throws Exception {
     if (allStreamClosers == null) {
-      allStreamClosers = muleContext.getRegistry().lookupObjects(StreamCloser.class);
+      allStreamClosers = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObjects(StreamCloser.class);
     }
 
     return allStreamClosers;
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     muleContext = context;
   }
 
   static class CoreStreamTypesCloser implements StreamCloser {
 
+    @Override
     public boolean canClose(Class streamType) {
       return InputStream.class.isAssignableFrom(streamType) || InputSource.class.isAssignableFrom(streamType)
           || StreamSource.class.isAssignableFrom(streamType) || Closeable.class.isAssignableFrom(streamType)
@@ -91,6 +95,7 @@ public class DefaultStreamCloserService implements StreamCloserService {
           || (SAXSource.class.isAssignableFrom(streamType) && !streamType.getName().endsWith("StaxSource"));
     }
 
+    @Override
     public void close(Object stream) throws IOException {
       if (stream instanceof InputStream) {
         try {

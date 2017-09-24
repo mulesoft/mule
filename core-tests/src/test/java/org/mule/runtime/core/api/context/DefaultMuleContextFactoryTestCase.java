@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.context;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -34,22 +35,24 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -68,6 +71,19 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   private MuleContext context;
 
+  private SimpleConfigurationBuilder testConfigBuilder;
+  private SimpleConfigurationBuilder testConfigBuilder2;
+
+  @Before
+  public void before() {
+    Map<String, Object> objects = new HashMap<>();
+    objects.put(TEST_STRING_KEY, TEST_STRING_VALUE);
+    objects.put(TEST_OBJECT_NAME, new Banana());
+    testConfigBuilder = new SimpleConfigurationBuilder(objects);
+
+    testConfigBuilder2 = new SimpleConfigurationBuilder(singletonMap(TEST_STRING_KEY2, TEST_STRING_VALUE2));
+  }
+
   @After
   public void disposeContext() {
     if (context != null && !context.isDisposed()) {
@@ -85,7 +101,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContextConfigurationBuilder() throws InitialisationException, ConfigurationException {
-    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, new TestConfigurationBuilder());
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, testConfigBuilder);
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);
@@ -96,8 +112,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   public void testCreateMuleContextListMuleContextBuilder() throws InitialisationException, ConfigurationException {
     List<ConfigurationBuilder> configBuilders = new ArrayList<>();
     configBuilders.add(testServicesConfigurationBuilder);
-    configBuilders.add(new TestConfigurationBuilder());
-    configBuilders.add(new TestConfigurationBuilder2());
+    configBuilders.add(testConfigBuilder);
+    configBuilders.add(testConfigBuilder2);
 
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
     context = muleContextFactory.createMuleContext(configBuilders, muleContextBuilder);
@@ -124,7 +140,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
       throws InitialisationException, ConfigurationException {
     TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
     context = muleContextFactory
-        .createMuleContext(asList(testServicesConfigurationBuilder, new TestConfigurationBuilder2()), muleContextBuilder);
+        .createMuleContext(asList(testServicesConfigurationBuilder, testConfigBuilder2), muleContextBuilder);
 
     assertCustomMuleContext(context);
     assertConfigurationBuilder2Objects(context);
@@ -168,14 +184,14 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     properties.put("testKey3", "testValue3");
     properties.put("testKey4", "testValue4");
 
-    context = muleContextFactory.createMuleContext(asList(testServicesConfigurationBuilder, new TestConfigurationBuilder()),
+    context = muleContextFactory.createMuleContext(asList(testServicesConfigurationBuilder, testConfigBuilder),
                                                    (Map) properties);
 
     assertMuleContextConfiguration(context);
     assertConfigurationBuilder1Objects(context);
 
-    assertEquals("testValue3", context.getRegistry().lookupObject("testKey3"));
-    assertEquals("testValue4", context.getRegistry().lookupObject("testKey4"));
+    assertEquals("testValue3", ((MuleContextWithRegistries) context).getRegistry().lookupObject("testKey3"));
+    assertEquals("testValue4", ((MuleContextWithRegistries) context).getRegistry().lookupObject("testKey4"));
 
     assertNoDefaults(context);
   }
@@ -200,18 +216,18 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private void assertDefaults(MuleContext context) {
-    // Asert existance of defauts in registry
-    assertNotNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
-    assertNotNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNotNull(context.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
+    // Assert existance of defaults in registry
+    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNotNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
   }
 
   private void assertNoDefaults(MuleContext context) {
-    // Asert non-existance of defauts in registry
-    assertNull(context.getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
-    assertNull(context.getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNull(context.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
-    assertNull(context.getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
+    // Assert non-existance of defaults in registry
+    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
+    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
+    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
+    assertNull(((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
   }
 
   private void assertMuleContextConfiguration(MuleContext context) {
@@ -236,9 +252,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   private void assertConfigurationBuilder1Objects(MuleContext context) {
     // Test Registry contents for existance of object configured by
     // TestConfigurationBuilder
-    assertEquals(TEST_STRING_VALUE, context.getRegistry().lookupObject(TEST_STRING_KEY));
+    assertEquals(TEST_STRING_VALUE, ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_STRING_KEY));
 
-    Object obj = context.getRegistry().lookupObject(TEST_OBJECT_NAME);
+    Object obj = ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_OBJECT_NAME);
     assertNotNull(obj);
     assertEquals(Banana.class, obj.getClass());
   }
@@ -246,24 +262,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   private void assertConfigurationBuilder2Objects(MuleContext context) {
     // Test Registry contents for existance of object configured by
     // TestConfigurationBuilder2
-    assertEquals(TEST_STRING_VALUE2, context.getRegistry().lookupObject(TEST_STRING_KEY2));
-  }
-
-  static class TestConfigurationBuilder extends AbstractConfigurationBuilder {
-
-    @Override
-    protected void doConfigure(MuleContext context) throws Exception {
-      context.getRegistry().registerObject(TEST_STRING_KEY, TEST_STRING_VALUE);
-      context.getRegistry().registerObject(TEST_OBJECT_NAME, new Banana());
-    }
-  }
-
-  static class TestConfigurationBuilder2 extends AbstractConfigurationBuilder {
-
-    @Override
-    protected void doConfigure(MuleContext context) throws Exception {
-      context.getRegistry().registerObject(TEST_STRING_KEY2, TEST_STRING_VALUE2);
-    }
+    assertEquals(TEST_STRING_VALUE2, ((MuleContextWithRegistries) context).getRegistry().lookupObject(TEST_STRING_KEY2));
   }
 
   static class TestMuleContextBuilder extends DefaultMuleContextBuilder {

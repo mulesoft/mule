@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
-import org.mule.runtime.core.api.registry.InjectProcessor;
 import org.mule.runtime.core.internal.registry.TransientRegistry;
+import org.mule.runtime.core.privileged.registry.InjectProcessor;
 
 /**
  * Injects the MuleContext object for objects stored in the {@link TransientRegistry} where the

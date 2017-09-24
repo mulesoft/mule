@@ -11,12 +11,13 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockNotificationsHandling;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -40,7 +41,7 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
   private SpringRegistry springRegistry;
 
   @Mock
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
 
   private SpringLifecycleCallback callback;
 

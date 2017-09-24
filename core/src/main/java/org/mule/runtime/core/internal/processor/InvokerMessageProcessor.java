@@ -13,29 +13,31 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
-import static org.mule.runtime.core.internal.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.privileged.util.TemplateParser.PatternInfo;
-import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
+
+import org.slf4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,8 +48,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
@@ -106,26 +106,27 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
     }
 
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(String.format("Initialised %s to use method: '%s'", this, method));
+      LOGGER.debug(format("Initialised %s to use method: '%s'", this, method));
     }
   }
 
   protected void lookupObjectInstance() throws InitialisationException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(String.format("No object instance speciedied.  Looking up single instance of type %s in mule registry",
-                                 objectType));
+      LOGGER.debug(format("No object instance speciedied.  Looking up single instance of type %s in mule registry",
+                          objectType));
     }
 
     try {
-      object = muleContext.getRegistry().lookupObject(objectType);
+      object = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(objectType);
     } catch (RegistrationException e) {
       throw new InitialisationException(initialisationFailure(format("Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
                                                                      objectType)),
                                         this);
     }
     if (object == null) {
-      throw new InitialisationException(CoreMessages
-          .initialisationFailure(format("No instance of '%s' was found in the registry", objectType)), this);
+      throw new InitialisationException(initialisationFailure(format("No instance of '%s' was found in the registry",
+                                                                     objectType)),
+                                        this);
 
     }
   }
@@ -218,8 +219,8 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
   private Object transformArgument(Object arg, Class<?> type) throws TransformerException {
     if (!(type.isAssignableFrom(arg.getClass()))) {
       // Throws TransformerException if no suitable transformer is found
-      arg =
-          muleContext.getRegistry().lookupTransformer(DataType.fromType(arg.getClass()), DataType.fromType(type)).transform(arg);
+      arg = ((MuleContextWithRegistries) muleContext).getRegistry()
+          .lookupTransformer(DataType.fromType(arg.getClass()), DataType.fromType(type)).transform(arg);
     }
     return arg;
   }

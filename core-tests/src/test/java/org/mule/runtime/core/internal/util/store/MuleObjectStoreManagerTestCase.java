@@ -7,24 +7,27 @@
 
 package org.mule.runtime.core.internal.util.store;
 
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -33,14 +36,14 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
-import java.io.Serializable;
-import java.util.NoSuchElementException;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.Serializable;
+import java.util.NoSuchElementException;
 
 @SmallTest
 public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
@@ -53,7 +56,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private SimpleUnitTestSupportSchedulerService schedulerService;
 
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
   private MuleObjectStoreManager storeManager;
 
   @Rule
@@ -62,17 +65,19 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void setup() {
     schedulerService = new SimpleUnitTestSupportSchedulerService();
-    muleContext = mock(MuleContext.class);
+    muleContext = mock(MuleContextWithRegistries.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
-    createRegistryAndBaseStore(muleContext);
-    when(muleContext.getSchedulerService()).thenReturn(schedulerService);
+    Registry registry = mock(Registry.class);
+    createRegistryAndBaseStore(muleContext, registry);
     when(muleContext.getSchedulerBaseConfig())
         .thenReturn(config().withPrefix(MuleObjectStoreManagerTestCase.class.getName() + "#" + name.getMethodName()));
 
     storeManager = new MuleObjectStoreManager();
+    storeManager.setSchedulerService(schedulerService);
+    storeManager.setRegistry(registry);
     storeManager.setMuleContext(muleContext);
   }
 
@@ -161,7 +166,6 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
       throws InitialisationException {
     addJavaSerializerToMockMuleContext(muleContext);
 
-    storeManager.setMuleContext(muleContext);
     storeManager.initialise();
 
     ObjectStorePartition<Serializable> store =
@@ -176,13 +180,10 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     return store;
   }
 
-  private void createRegistryAndBaseStore(MuleContext muleContext) {
-    MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleRegistry.lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY))
-        .thenReturn(createPersistentPartitionableObjectStore(muleContext));
-    when(muleRegistry.lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY)).thenReturn(createTransientPartitionableObjectStore());
-
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
+  private void createRegistryAndBaseStore(MuleContextWithRegistries muleContext, Registry registry) {
+    when(registry.lookupByName(BASE_PERSISTENT_OBJECT_STORE_KEY))
+        .thenReturn(of(createPersistentPartitionableObjectStore(muleContext)));
+    when(registry.lookupByName(BASE_IN_MEMORY_OBJECT_STORE_KEY)).thenReturn(of(createTransientPartitionableObjectStore()));
   }
 
   private PartitionableObjectStore<?> createTransientPartitionableObjectStore() {

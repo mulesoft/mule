@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
@@ -28,30 +29,30 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.queue.QueueManager;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
@@ -70,7 +71,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctx = ctxBuilder.buildMuleContext();
 
     notificationListenerRegistry = new DefaultNotificationListenerRegistry();
-    ctx.getRegistry().registerObject(NotificationListenerRegistry.REGISTRY_KEY, notificationListenerRegistry);
+    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(NotificationListenerRegistry.REGISTRY_KEY,
+                                                                   notificationListenerRegistry);
     testServicesConfigurationBuilder.configure(ctx);
   }
 
@@ -355,11 +357,11 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     ctx.initialise();
 
     // DefaultMuleContext refuses to start without these objects in place
-    SecurityManager securityManager = Mockito.mock(SecurityManager.class);
-    ctx.getRegistry().registerObject(UUID.getUUID(), securityManager);
+    SecurityManager securityManager = mock(SecurityManager.class);
+    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(UUID.getUUID(), securityManager);
 
-    QueueManager queueManager = Mockito.mock(QueueManager.class);
-    ctx.getRegistry().registerObject(UUID.getUUID(), queueManager);
+    QueueManager queueManager = mock(QueueManager.class);
+    ((MuleContextWithRegistries) ctx).getRegistry().registerObject(UUID.getUUID(), queueManager);
 
     ctx.start();
     return ctx;

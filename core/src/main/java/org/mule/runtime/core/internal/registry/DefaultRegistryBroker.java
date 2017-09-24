@@ -7,8 +7,6 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.LifecycleRegistry;
-import org.mule.runtime.core.api.registry.Registry;
 
 import com.google.common.collect.ImmutableList;
 

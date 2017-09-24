@@ -18,11 +18,11 @@ import org.mule.runtime.config.spring.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
-import org.mule.runtime.core.api.registry.LifecycleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
+import org.mule.runtime.core.internal.registry.LifecycleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;

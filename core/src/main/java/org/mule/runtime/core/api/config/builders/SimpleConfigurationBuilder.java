@@ -8,7 +8,8 @@ package org.mule.runtime.core.api.config.builders;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class SimpleConfigurationBuilder extends AbstractConfigurationBuilder {
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     if (objects != null && objects.size() > 0) {
-      muleContext.getRegistry().registerObjects((Map<String, Object>) objects);
+      ((MuleContextWithRegistries) muleContext).getRegistry().registerObjects((Map<String, Object>) objects);
     }
   }
 }

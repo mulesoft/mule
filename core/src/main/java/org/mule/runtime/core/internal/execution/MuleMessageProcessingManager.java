@@ -6,26 +6,30 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Collections.emptySet;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 /**
  * Default implementation for {@link MessageProcessingManager}.
  */
-public class MuleMessageProcessingManager implements MessageProcessingManager, MuleContextAware, Initialisable {
+public class MuleMessageProcessingManager implements MessageProcessingManager, Initialisable {
 
   private final EndProcessPhase endProcessPhase = new EndProcessPhase();
   private MuleContext muleContext;
@@ -34,26 +38,34 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
   @Inject
   private PolicyManager policyManager;
 
+  private Registry registry;
+
+  private Collection<MessageProcessPhase> registryMessageProcessPhases;
+
   @Override
   public void processMessage(MessageProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext) {
     phaseExecutionEngine.process(messageProcessTemplate, messageProcessContext);
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
+  @Inject
+  public void setRegistryMessageProcessPhases(Optional<Collection<MessageProcessPhase>> registryMessageProcessPhases) {
+    // This needs to be an Optional due to https://jira.spring.io/browse/SPR-15338
+    this.registryMessageProcessPhases = registryMessageProcessPhases.orElse(emptySet());
+  }
+
   @Override
   public void initialise() throws InitialisationException {
-    Collection<MessageProcessPhase> registryMessageProcessPhases =
-        muleContext.getRegistry().lookupObjects(MessageProcessPhase.class);
-    List<MessageProcessPhase> messageProcessPhaseList = new ArrayList<MessageProcessPhase>();
+    List<MessageProcessPhase> messageProcessPhaseList = new ArrayList<>();
     if (registryMessageProcessPhases != null) {
       messageProcessPhaseList.addAll(registryMessageProcessPhases);
     }
     messageProcessPhaseList.add(new ValidationPhase());
-    messageProcessPhaseList.add(new FlowProcessingPhase());
+    messageProcessPhaseList.add(new FlowProcessingPhase(registry));
     messageProcessPhaseList.add(new ModuleFlowProcessingPhase(policyManager));
     Collections.sort(messageProcessPhaseList, (messageProcessPhase, messageProcessPhase2) -> {
       int compareValue = 0;
@@ -67,14 +79,14 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, M
     });
 
     for (MessageProcessPhase messageProcessPhase : messageProcessPhaseList) {
-      if (messageProcessPhase instanceof MuleContextAware) {
-        ((MuleContextAware) messageProcessPhase).setMuleContext(muleContext);
-      }
-      if (messageProcessPhase instanceof Initialisable) {
-        ((Initialisable) messageProcessPhase).initialise();
-      }
+      initialiseIfNeeded(messageProcessPhase, muleContext);
     }
 
     phaseExecutionEngine = new PhaseExecutionEngine(messageProcessPhaseList, muleContext.getExceptionListener(), endProcessPhase);
+  }
+
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
   }
 }

@@ -6,20 +6,24 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -30,6 +34,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.Map;
 
 
 public class AggregatorTestCase extends AbstractMuleContextTestCase {
@@ -38,9 +43,14 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     setStartContext(true);
   }
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
+
   @Test
   public void testMessageAggregator() throws Exception {
-    Flow flow = getNamedTestFlow("test");
+    Flow flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     MuleSession session = new DefaultMuleSession();
 
     TestEventAggregator router = new TestEventAggregator(3);

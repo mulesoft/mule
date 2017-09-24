@@ -10,6 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -27,7 +29,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleContextTestCase {
     assertThat(secondUniqueName, startsWith(UNIQUE_NAME_PREFIX));
     assertThat(uniqueName, not(is(secondUniqueName)));
     final String nextName = UNIQUE_NAME_PREFIX + "-2";
-    muleContext.getRegistry().registerObject(nextName, "");
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(nextName, "");
     final String thirdUniqueName = objectNameHelper.getUniqueName(UNIQUE_NAME_PREFIX);
     assertThat(thirdUniqueName, not(is(nextName)));
   }

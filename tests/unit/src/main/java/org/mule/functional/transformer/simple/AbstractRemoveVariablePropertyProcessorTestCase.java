@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,13 +31,13 @@ import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariableP
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 
 @SmallTest
 public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
@@ -73,7 +74,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   }
 
   protected CoreEvent createTestEvent(final Message message) throws MuleException {
-    return eventBuilder().message(message).build();
+    return eventBuilder(muleContext).message(message).build();
   }
 
   @Test

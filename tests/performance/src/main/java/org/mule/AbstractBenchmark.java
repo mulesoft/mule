@@ -18,11 +18,11 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;

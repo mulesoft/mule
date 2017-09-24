@@ -18,30 +18,33 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
@@ -56,8 +59,11 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws InitialisationException, ConfigurationException {
+    Map<String, Object> objects = new HashMap<>();
+    objects.put(OBJECT_QUEUE_MANAGER, rtqm);
+    objects.put(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
     muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
-                                                                    new QueueManagerOnlyConfigurationBuilder());
+                                                                    new SimpleConfigurationBuilder(objects));
     testServicesConfigurationBuilder.configure(muleContext);
   }
 
@@ -68,9 +74,10 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testStartupOrder() throws Exception {
-    muleContext.getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER, mock(NotificationDispatcher.class));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
+                                                                           mock(NotificationDispatcher.class));
     FlowConstruct fc = new RecordingFlow("dummy", muleContext);
-    muleContext.getRegistry().registerFlowConstruct(fc);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerFlowConstruct(fc);
     muleContext.start();
     muleContext.stop();
     assertEquals(4, startStopOrder.size());
@@ -132,16 +139,6 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
     @Override
     public void doStop() throws MuleException {
       startStopOrder.add(this);
-    }
-  }
-
-  private class QueueManagerOnlyConfigurationBuilder extends DefaultsConfigurationBuilder {
-
-    @Override
-    protected void doConfigure(MuleContext muleContext) throws Exception {
-      muleContext.getRegistry().registerObject(OBJECT_QUEUE_MANAGER, rtqm);
-      muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
-
     }
   }
 }

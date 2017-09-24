@@ -18,9 +18,10 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
-import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
-import org.mule.runtime.core.api.registry.Registry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.phases.ContainerManagedLifecyclePhase;
+import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
+import org.mule.runtime.core.internal.registry.Registry;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -63,8 +64,8 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     // and clear it when the phase is fully applied
     Set<Object> duplicates = new HashSet<>();
 
-    final NotificationDispatcher notificationFirer =
-        registryLifecycleManager.muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+    final NotificationDispatcher notificationFirer = ((MuleContextWithRegistries) registryLifecycleManager.muleContext)
+        .getRegistry().lookupObject(NotificationDispatcher.class);
     for (LifecycleObject lifecycleObject : phase.getOrderedLifecycleObjects()) {
       lifecycleObject.firePreNotification(notificationFirer);
 

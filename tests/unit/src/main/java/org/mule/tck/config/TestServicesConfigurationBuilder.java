@@ -12,15 +12,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
@@ -58,7 +59,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
 
   @Override
   public void doConfigure(MuleContext muleContext) throws Exception {
-    MuleRegistry registry = muleContext.getRegistry();
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
     registry.registerObject(schedulerService.getName(), spy(schedulerService));
     registry.registerObject(OBJECT_SCHEDULER_BASE_CONFIG, config());
 

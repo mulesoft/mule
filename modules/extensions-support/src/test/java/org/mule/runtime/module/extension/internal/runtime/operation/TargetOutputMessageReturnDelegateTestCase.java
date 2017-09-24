@@ -11,7 +11,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -23,13 +25,13 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.nio.charset.Charset;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.nio.charset.Charset;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -56,7 +58,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   @Before
   public void before() throws MuleException {
-    event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
+    event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
   }

@@ -12,6 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -27,16 +28,17 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides the same operations previously exposed by {@link Message} but decoupled from Message.
@@ -76,7 +78,7 @@ public class DefaultTransformationService implements TransformationService {
     Transformer transformer;
     if (value != null) {
       try {
-        transformer = muleContext.getRegistry().lookupTransformer(valueDataType, expectedDataType);
+        transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(valueDataType, expectedDataType);
       } catch (TransformerException e) {
         throw new TransformerException(createStaticMessage(String
             .format("The value '%s' of type %s could not be transformed to the desired type %s",
@@ -325,7 +327,7 @@ public class DefaultTransformationService implements TransformationService {
     // The transformer to execute on this message
     Transformer transformer = null;
     try {
-      transformer = muleContext.getRegistry().lookupTransformer(dataType, resultType);
+      transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(dataType, resultType);
       if (transformer == null) {
         throw new MessageTransformerException(CoreMessages.noTransformerFoundForMessage(dataType, resultType), null, message);
       }

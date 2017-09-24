@@ -22,19 +22,22 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.internal.util.SerializationUtils;
@@ -138,11 +141,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
     Transformer trans1 = new TestEventTransformer();
     trans1.setName("OptimusPrime");
-    muleContext.getRegistry().registerTransformer(trans1);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(trans1);
 
     Transformer trans2 = new TestEventTransformer();
     trans2.setName("Bumblebee");
-    muleContext.getRegistry().registerTransformer(trans2);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(trans2);
 
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
@@ -152,7 +155,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
-    CoreEvent event = eventBuilder()
+    CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -160,7 +163,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
-    CoreEvent event = eventBuilder()
+    CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -171,7 +174,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    CoreEvent event = eventBuilder()
+    CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("foo", "bar")
         .build();
@@ -193,7 +196,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     CoreEvent before = testEvent();
 
     // Remove Flow to simulate deserialization when Flow is not available
-    muleContext.getRegistry().unregisterObject(APPLE_FLOW);
+    ((MuleContextWithRegistries) muleContext).getRegistry().unregisterObject(APPLE_FLOW);
 
     CoreEvent after =
         (CoreEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
@@ -228,7 +231,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void eventContextSerializationPublisherConserved() throws Exception {
     CoreEvent result = testEvent();
-    CoreEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null)).flow(getTestFlow(muleContext)).build();
+    CoreEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null))
+        .flow(createAndRegisterFlow(muleContext, "forSerialization", componentLocator)).build();
 
     CoreEvent after =
         (CoreEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),

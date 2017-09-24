@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
@@ -31,13 +32,14 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.util.OneTimeWarning;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -59,39 +61,39 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular evaluations should be used instead.");
 
-  private final MuleContext muleContext;
-  private final StreamingManager streamingManager;
-  private final ExtendedExpressionLanguageAdaptor expressionLanguage;
+  private AtomicBoolean initialized = new AtomicBoolean();
+
+  private MuleContext muleContext;
+  private StreamingManager streamingManager;
+  private Registry registry;
+
+  private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
-  private final boolean melDefault;
-
-
-  @Inject
-  public DefaultExpressionManager(MuleContext muleContext, StreamingManager streamingManager) {
-    this.muleContext = muleContext;
-    this.streamingManager = streamingManager;
-    final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext);
-
-    MVELExpressionLanguage mvelExpressionLanguage = null;
-    if (muleContext.getRegistry().lookupObject(COMPATILIBILITY_PLUGIN_INSTALLED) != null) {
-      mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-    }
-    this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
-    this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
-  }
+  private boolean melDefault;
 
   @Override
   public void initialise() throws InitialisationException {
-    Collection<GlobalBindingContextProvider> contextProviders =
-        muleContext.getRegistry().lookupObjects(GlobalBindingContextProvider.class);
+    if (!initialized.getAndSet(true)) {
+      final DataWeaveExpressionLanguageAdaptor dwExpressionLanguage =
+          DataWeaveExpressionLanguageAdaptor.create(muleContext, registry);
 
-    contextProviders.stream()
-        .map(GlobalBindingContextProvider::getBindingContext)
-        .forEach(expressionLanguage::addGlobalBindings);
+      MVELExpressionLanguage mvelExpressionLanguage = null;
+      if (registry.lookupByName(COMPATILIBILITY_PLUGIN_INSTALLED).isPresent()) {
+        mvelExpressionLanguage = registry.<MVELExpressionLanguage>lookupByName(OBJECT_EXPRESSION_LANGUAGE).get();
+      }
+      this.expressionLanguage = new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage);
+      this.melDefault = ((ExpressionLanguageAdaptorHandler) expressionLanguage).isMelDefault();
 
-    if (melDefault) {
-      LOGGER.warn("Using MEL as the default expression language.");
+      Collection<GlobalBindingContextProvider> contextProviders = registry.lookupAllByType(GlobalBindingContextProvider.class);
+
+      contextProviders.stream()
+          .map(GlobalBindingContextProvider::getBindingContext)
+          .forEach(expressionLanguage::addGlobalBindings);
+
+      if (melDefault) {
+        LOGGER.warn("Using MEL as the default expression language.");
+      }
     }
   }
 
@@ -170,7 +172,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   private TypedValue transform(TypedValue target, DataType sourceType, DataType outputType) throws TransformerException {
     if (target.getValue() != null && !isInstance(outputType.getType(), target.getValue())) {
-      Object result = muleContext.getRegistry().lookupTransformer(sourceType, outputType).transform(target.getValue());
+      Object result = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceType, outputType)
+          .transform(target.getValue());
       return new TypedValue<>(result, outputType);
     } else {
       return target;
@@ -320,11 +323,26 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   /**
    * Checks if an expression has MEL prefix.
-   * 
+   *
    * @param expression the expression to check to see if is a MEL expression.
    * @return true if the expression is a MEL expression
    */
   public static boolean hasMelExpression(String expression) {
     return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
+  }
+
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
   }
 }

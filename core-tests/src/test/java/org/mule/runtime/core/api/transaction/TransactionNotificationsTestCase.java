@@ -11,18 +11,20 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
+
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.concurrent.CountDownLatch;
-
 import org.junit.Test;
+
+import java.util.concurrent.CountDownLatch;
 
 public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase {
 
@@ -34,7 +36,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
     // a global TransactionCoordination instance, which binds it to the current thread.
     Transaction transaction = new DummyTransaction(muleContext);
 
-    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
+    ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationListenerRegistry.class)
         .registerListener(new TransactionNotificationListener<TransactionNotification>() {
 
           @Override

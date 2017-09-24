@@ -7,17 +7,18 @@
 package org.mule.runtime.core.internal.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Resolves data type conversion finding an appropriate converter that is able to execute the required transformation. The lookup
@@ -40,7 +41,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
 
     for (DataType targetDataType : targetDataTypes) {
       try {
-        transformer = muleContext.getRegistry().lookupTransformer(sourceType, targetDataType);
+        transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceType, targetDataType);
 
         if (transformer != null) {
           break;

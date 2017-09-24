@@ -16,13 +16,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.LifecycleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -140,7 +140,12 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
       boolean nullToOptional = false;
       if (dependencyType.equals(Optional.class)) {
-        dependencyType = (Class<?>) ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+        Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+        if (type instanceof ParameterizedType) {
+          dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+        } else {
+          dependencyType = (Class<?>) type;
+        }
         nullToOptional = true;
       }
 
@@ -164,7 +169,12 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
         boolean nullToOptional = false;
         if (dependencyType.equals(Optional.class)) {
-          dependencyType = (Class<?>) ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
+          Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
+          if (type instanceof ParameterizedType) {
+            dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+          } else {
+            dependencyType = (Class<?>) type;
+          }
           nullToOptional = true;
         }
 

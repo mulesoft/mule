@@ -12,7 +12,8 @@ import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocati
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -27,10 +28,10 @@ public class DefaultRegistry implements Registry {
 
   private static final Function<Object, Object> deAnnotator = s -> s == null ? null : removeDynamicAnnotations(s);
 
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
 
   public DefaultRegistry(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    this.muleContext = (MuleContextWithRegistries) muleContext;
   }
 
   @Override

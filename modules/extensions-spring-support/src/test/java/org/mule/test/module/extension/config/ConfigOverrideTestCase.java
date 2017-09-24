@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -210,8 +211,7 @@ public class ConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase 
   }
 
   private <T> T locateConfig(String name) throws MuleException {
-    return (T) muleContext.getExtensionManager()
-        .getConfiguration(name, testEvent()).getValue();
+    return (T) muleContext.getExtensionManager().getConfiguration(name, testEvent()).getValue();
   }
 
   private void pollingProbe(AppleConfig config, String name,

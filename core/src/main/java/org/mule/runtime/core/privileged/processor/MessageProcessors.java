@@ -24,11 +24,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
 
@@ -254,9 +256,10 @@ public class MessageProcessors {
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(MuleContext muleContext, String rootContainerName) {
     Optional<ProcessingStrategy> processingStrategy = empty();
-    Object object = muleContext.getRegistry().get(rootContainerName);
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    Object object = registry.get(rootContainerName);
     if (object instanceof FlowConstruct) {
-      processingStrategy = of(muleContext.getRegistry().lookupFlowConstruct(rootContainerName).getProcessingStrategy());
+      processingStrategy = of(registry.lookupFlowConstruct(rootContainerName).getProcessingStrategy());
     }
     return processingStrategy;
   }

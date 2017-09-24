@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -22,14 +23,14 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.EventGroup;
+import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -55,7 +56,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(EventCorrelatorTestCase.class);
 
-  private MuleContext mockMuleContext = mockContextWithServices();
+  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;
@@ -174,7 +175,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   }
 
   private EventCorrelator createEventCorrelator() throws Exception {
-    when(mockMuleContext.getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+    registerIntoMockContext(mockMuleContext, OBJECT_STORE_MANAGER, mockObjectStoreManager);
     memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
     when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(CoreEvent.class));

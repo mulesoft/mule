@@ -6,33 +6,37 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,25 +47,30 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
-public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.AbstractMuleTestCase {
+public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
 
+  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleContext mockMuleContext;
+  private Registry registry;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private TestMessageProcessTemplateAndContext completeMessageProcessTemplateAndContext;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SystemExceptionHandler mockExceptionListener;
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct flowConstruct;
 
   @Before
   public void setUp() {
     String flowName = "root";
     when(completeMessageProcessTemplateAndContext.getMessageSource().getRootContainerName()).thenReturn(flowName);
-    when(mockMuleContext.getRegistry().get(flowName)).thenReturn(flowConstruct);
+    when(registry.lookupByName(flowName)).thenReturn(of(flowConstruct));
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
+
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
   }
 
@@ -72,13 +81,13 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
 
   @Test
   public void emptyMessageProcessPhaseInRegistry() throws Exception {
-    processAndVerifyDefaultPhasesUsingRegistryPhases(Collections.<MessageProcessPhase>emptyList());
+    processAndVerifyDefaultPhasesUsingRegistryPhases(emptyList());
   }
 
   @Test
   public void notSupportedMessageProcessPhaseInRegistry() throws Exception {
     MessageProcessPhase notSupportedPhase = createNotSupportedPhase();
-    processAndVerifyDefaultPhasesUsingRegistryPhases(Arrays.asList(notSupportedPhase));
+    processAndVerifyDefaultPhasesUsingRegistryPhases(asList(notSupportedPhase));
   }
 
   @Test
@@ -90,7 +99,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
     doCallRealMethod().when(messageProcessPhase).runPhase(any(MessageProcessTemplate.class), any(MessageProcessContext.class),
                                                           any(PhaseResultNotifier.class));
     MuleMessageProcessingManager manager =
-        createManagerUsingPhasesInRegistry(Arrays.<MessageProcessPhase>asList(messageProcessPhase));
+        createManagerUsingPhasesInRegistry(asList(messageProcessPhase));
     manager.processMessage(completeMessageProcessTemplateAndContext, completeMessageProcessTemplateAndContext);
     verify(completeMessageProcessTemplateAndContext, times(0)).routeEvent(any(CoreEvent.class));
     verify(completeMessageProcessTemplateAndContext, times(1)).validateMessage();
@@ -139,7 +148,8 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
       throws InitialisationException {
     MuleMessageProcessingManager manager = new MuleMessageProcessingManager();
     manager.setMuleContext(mockMuleContext);
-    when(mockMuleContext.getRegistry().lookupObjects(MessageProcessPhase.class)).thenReturn(phasesInRegistry);
+    manager.setRegistry(registry);
+    manager.setRegistryMessageProcessPhases(ofNullable(phasesInRegistry));
     manager.initialise();
     return manager;
   }
@@ -148,7 +158,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
     when(completeMessageProcessTemplateAndContext.validateMessage()).thenReturn(true);
 
     manager.processMessage(completeMessageProcessTemplateAndContext, completeMessageProcessTemplateAndContext);
-    InOrder verifyInOrder = Mockito.inOrder(completeMessageProcessTemplateAndContext);
+    InOrder verifyInOrder = inOrder(completeMessageProcessTemplateAndContext);
     verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).validateMessage();
     verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).routeEvent(Mockito.any(CoreEvent.class));
     verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).messageProcessingEnded();

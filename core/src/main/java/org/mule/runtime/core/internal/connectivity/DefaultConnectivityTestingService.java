@@ -10,22 +10,21 @@ import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -41,16 +40,21 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
 
   private ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
+  private MuleContext muleContext;
+  private ConfigurationComponentLocator locator;
+
+  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
 
   @Inject
-  private MuleContext muleContext;
-
   protected void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
-  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
+  @Inject
+  public void setLocator(ConfigurationComponentLocator locator) {
+    this.locator = locator;
   }
 
   @Override
@@ -76,9 +80,8 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
    */
   @Override
   public ConnectionValidationResult testConnection(Location location) {
-    Optional<Component> foundObjectOptional = muleContext.getConfigurationComponentLocator().find(location);
     Object connectivityTestingObject =
-        foundObjectOptional.orElseThrow((() -> new ObjectNotFoundException("No object found with path: " + location)));
+        locator.find(location).orElseThrow((() -> new ObjectNotFoundException("No object found with path: " + location)));
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       if (connectivityTestingStrategy.accepts(connectivityTestingObject)) {
         try {

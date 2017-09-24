@@ -10,15 +10,16 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Test;
 
 public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
 
@@ -52,7 +53,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
 
-    CoreEvent event = eventBuilder().message(of(payload)).build();
+    CoreEvent event = eventBuilder(muleContext).message(of(payload)).build();
 
     assertMapKey(event, KEY, VALUE);
     payload.remove(KEY);
@@ -63,7 +64,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   public void nullKeyWhichGetsValueLater() throws Exception {
     Map<String, String> payload = new HashMap<>();
 
-    CoreEvent event = eventBuilder().message(of(payload)).build();
+    CoreEvent event = eventBuilder(muleContext).message(of(payload)).build();
 
     assertMapKey(event, KEY, null);
 
@@ -72,7 +73,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertMapKey(Object payload, String key, Object expectedValue) throws Exception {
-    assertMapKey(eventBuilder().message(of(payload)).build(), key, expectedValue);
+    assertMapKey(eventBuilder(muleContext).message(of(payload)).build(), key, expectedValue);
   }
 
   private void assertMapKey(CoreEvent event, String key, Object expectedValue) throws Exception {

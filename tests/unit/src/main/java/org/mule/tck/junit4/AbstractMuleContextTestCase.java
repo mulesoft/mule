@@ -9,7 +9,6 @@ package org.mule.tck.junit4;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -17,28 +16,23 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -48,10 +42,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -59,28 +50,15 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.el.ExpressionExecutor;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-
-import javax.xml.namespace.QName;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -89,6 +67,16 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableMap;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
+import javax.xml.namespace.QName;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -150,7 +138,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   private boolean disposeContextPerClass;
   private static boolean logConfigured;
 
-  private ConfigurationComponentLocator componentLocator = mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
+  protected ConfigurationComponentLocator componentLocator = mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
 
   protected boolean isDisposeContextPerClass() {
     return disposeContextPerClass;
@@ -212,7 +200,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
             contextStartedLatch.get().countDown();
           }
         };
-    muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class).registerListener(listener);
+    muleContext.getNotificationManager().addListener(listener);
 
     muleContext.start();
 
@@ -262,7 +250,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         contextBuilder.setObjectSerializer(getObjectSerializer());
         configureMuleContext(contextBuilder);
         context = muleContextFactory.createMuleContext(builders, contextBuilder);
-        createTestFlow(context);
         recordSchedulersOnInit(context);
         if (!isGracefulShutdown()) {
           ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(0);
@@ -272,11 +259,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
     }
     return context;
-  }
-
-  protected void createTestFlow(MuleContext context) {
-    when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build()))
-        .thenReturn(Optional.of(getFakeFlowConstruct(context)));
   }
 
   /**
@@ -322,22 +304,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {}
 
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder() {
-
-      @Override
-      protected void doConfigure(MuleContext muleContext) throws Exception {
-        super.doConfigure(muleContext);
-        muleContext.getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY, componentLocator);
-      }
-    };
-  }
-
-  protected FlowConstruct getFakeFlowConstruct(MuleContext context) {
-    try {
-      return getTestFlow(context);
-    } catch (MuleException e) {
-      throw new RuntimeException(e);
-    }
+    return new DefaultsConfigurationBuilder();
   }
 
   protected String getConfigurationResources() {
@@ -372,7 +339,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void doTearDownAfterMuleContextDispose() throws Exception {}
 
   @AfterClass
-  public static void disposeContext() throws RegistrationException, MuleException {
+  public static void disposeContext() throws MuleException {
     try {
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
         try {
@@ -438,35 +405,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  public static Flow getNamedTestFlow(String name) throws MuleException {
-    Flow flow = builder(name, muleContext).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(name)));
-    muleContext.getRegistry().registerFlowConstruct(flow);
-    return flow;
-  }
-
-  /**
-   * Creates a basic event builder with its context already set.
-   *
-   * @return a basic event builder with its context already set.
-   */
-  protected static CoreEvent.Builder eventBuilder() throws MuleException {
-    FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
-    if (flowConstruct == null) {
-      synchronized (muleContext) {
-        flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
-        if (flowConstruct == null) {
-          flowConstruct = getTestFlow(muleContext);
-        }
-      }
-    }
-
-    return InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
-  }
-
   @Override
   protected <B extends CoreEvent.Builder> B getEventBuilder() throws MuleException {
-    return (B) eventBuilder();
+    return (B) eventBuilder(muleContext);
   }
 
   protected boolean isStartContext() {
@@ -482,55 +423,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected boolean isGracefulShutdown() {
     return false;
-  }
-
-  /**
-   * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any dependencies
-   * are injected and then the object will be initialised. Note that if the object needs to be configured with additional state
-   * that cannot be passed into the constructor you should create an instance first set any additional data on the object then
-   * call {@link #initialiseObject(Object)}.
-   *
-   * @param clazz the class to create an instance of.
-   * @param <T> Object of this type will be returned
-   * @return an initialised instance of <code>class</code>
-   * @throws Exception if there is a problem creating or initializing the object
-   */
-  protected <T extends Object> T createObject(Class<T> clazz) throws Exception {
-    return createObject(clazz, ClassUtils.NO_ARGS);
-  }
-
-  /**
-   * Create an object of instance <code>clazz</code>. It will then register the object with the registry so that any dependencies
-   * are injected and then the object will be initialised. Note that if the object needs to be configured with additional state
-   * that cannot be passed into the constructor you should create an instance first set any additional data on the object then
-   * call {@link #initialiseObject(Object)}.
-   *
-   * @param clazz the class to create an instance of.
-   * @param args constructor parameters
-   * @param <T> Object of this type will be returned
-   * @return an initialised instance of <code>class</code>
-   * @throws Exception if there is a problem creating or initializing the object
-   */
-  @SuppressWarnings("unchecked")
-  protected <T extends Object> T createObject(Class<T> clazz, Object... args) throws Exception {
-    if (args == null) {
-      args = ClassUtils.NO_ARGS;
-    }
-    Object o = ClassUtils.instantiateClass(clazz, args);
-    muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
-    return (T) o;
-  }
-
-  /**
-   * A convenience method that will register an object in the registry using its hashcode as the key. This will cause the object
-   * to have any objects injected and lifecycle methods called. Note that the object lifecycle will be called to the same current
-   * lifecycle as the MuleContext
-   *
-   * @param o the object to register and initialise it
-   * @throws org.mule.runtime.core.api.registry.RegistrationException
-   */
-  protected void initialiseObject(Object o) throws RegistrationException {
-    muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
   }
 
   public SensingNullMessageProcessor getSensingNullMessageProcessor() {

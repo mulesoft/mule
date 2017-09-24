@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -51,7 +53,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   @Before
   public void before() throws MuleException {
-    event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
+    event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);

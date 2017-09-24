@@ -12,12 +12,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -25,12 +27,12 @@ import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
 
@@ -52,7 +54,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder(muleContext).message(of(fruitBowl)).build();
 
     CoreEvent resultEvent = splitter.process(inEvent);
 
@@ -87,7 +89,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder(muleContext).message(of(fruitBowl)).build();
 
     CoreEvent resultEvent = splitter.process(inEvent);
 
@@ -110,7 +112,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder(muleContext).message(of(fruitBowl)).build();
 
     expected.expect(MessagingException.class);
     expected.expectMessage("Expected");

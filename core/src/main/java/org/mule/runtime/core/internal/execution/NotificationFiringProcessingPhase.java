@@ -9,25 +9,26 @@ package org.mule.runtime.core.internal.execution;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
 
 /**
  * Provides a reusable way for concrete {@link MessageProcessPhase}s to fire notifications.
  */
 public abstract class NotificationFiringProcessingPhase<Template extends MessageProcessTemplate>
-    implements MessageProcessPhase<Template>, Comparable<MessageProcessPhase>, MuleContextAware {
+    implements MessageProcessPhase<Template>, Comparable<MessageProcessPhase> {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -62,9 +63,8 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
     return notificationHelper;
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-
   }
 }

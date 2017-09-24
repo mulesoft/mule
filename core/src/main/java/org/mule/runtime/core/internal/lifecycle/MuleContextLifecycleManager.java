@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
@@ -48,11 +49,13 @@ public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleCo
     addDirectTransition(Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
   }
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
     this.object = muleContext;
   }
 
+  @Override
   public void fireLifecycle(String destinationPhase) throws LifecycleException {
     checkPhase(destinationPhase);
     invokePhase(destinationPhase, object, callback);
@@ -65,8 +68,9 @@ public class MuleContextLifecycleManager extends AbstractLifecycleManager<MuleCo
 
   class MuleContextLifecycleCallback implements LifecycleCallback<MuleContext> {
 
+    @Override
     public void onTransition(String phaseName, MuleContext muleContext) throws MuleException {
-      muleContext.getRegistry().fireLifecycle(phaseName);
+      ((MuleContextWithRegistries) muleContext).getRegistry().fireLifecycle(phaseName);
     }
   }
 }

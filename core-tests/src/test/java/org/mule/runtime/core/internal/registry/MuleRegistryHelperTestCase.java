@@ -12,16 +12,17 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
@@ -35,15 +36,16 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setUp() throws Exception {
     t1 = new MockConverterBuilder().named("t1").from(ORANGE_DATA_TYPE).to(FRUIT_DATA_TYPE).build();
-    muleContext.getRegistry().registerTransformer(t1);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(t1);
 
     t2 = new MockConverterBuilder().named("t2").from(DataType.OBJECT).to(FRUIT_DATA_TYPE).build();
-    muleContext.getRegistry().registerTransformer(t2);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(t2);
   }
 
   @Test
   public void lookupsTransformersByType() throws Exception {
-    List trans = muleContext.getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    List trans =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformers(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertEquals(2, trans.size());
     assertTrue(trans.contains(t1));
     assertTrue(trans.contains(t2));
@@ -51,7 +53,8 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void lookupsTransformerByPriority() throws Exception {
-    Transformer result = muleContext.getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
+    Transformer result =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(BLOOD_ORANGE_DATA_TYPE, FRUIT_DATA_TYPE);
     assertNotNull(result);
     assertEquals(t1, result);
   }

@@ -9,8 +9,8 @@ package org.mule.runtime.core.privileged.registry;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import java.util.Collection;
 
@@ -34,7 +34,7 @@ public final class LegacyRegistryUtils {
    * @return object or null if not found
    */
   public static <T> T lookupObject(MuleContext context, String key) {
-    return context.getRegistry().lookupObject(key);
+    return getRegistry(context).lookupObject(key);
   }
 
   /**
@@ -44,7 +44,7 @@ public final class LegacyRegistryUtils {
    * @throws RegistrationException if more than one object is found.
    */
   public static <T> T lookupObject(MuleContext context, Class<T> clazz) throws RegistrationException {
-    return context.getRegistry().lookupObject(clazz);
+    return getRegistry(context).lookupObject(clazz);
   }
 
   /**
@@ -53,7 +53,7 @@ public final class LegacyRegistryUtils {
    * @return collection of objects or empty collection if none found
    */
   public static <T> Collection<T> lookupObjects(MuleContext context, Class<T> clazz) {
-    return context.getRegistry().lookupObjects(clazz);
+    return getRegistry(context).lookupObjects(clazz);
   }
 
   /**
@@ -64,7 +64,7 @@ public final class LegacyRegistryUtils {
    * @return collection of objects or empty collection if none found
    */
   public static <T> Collection<T> lookupObjectsForLifecycle(MuleContext context, Class<T> clazz) {
-    return context.getRegistry().lookupObjectsForLifecycle(clazz);
+    return getRegistry(context).lookupObjectsForLifecycle(clazz);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class LegacyRegistryUtils {
    * @throws RegistrationException if an object with the same key already exists
    */
   public static void registerObject(MuleContext context, String key, Object object) throws RegistrationException {
-    context.getRegistry().registerObject(key, object);
+    getRegistry(context).registerObject(key, object);
   }
 
   /**
@@ -88,14 +88,14 @@ public final class LegacyRegistryUtils {
    */
   public static void registerObject(MuleContext context, String key, Object object, Object metadata)
       throws RegistrationException {
-    context.getRegistry().registerObject(key, object, metadata);
+    getRegistry(context).registerObject(key, object, metadata);
   }
 
   /**
    * @return whether the bean for the given key is declared as a singleton.
    */
   public static boolean isSingleton(MuleContext context, String key) {
-    return context.getRegistry().isSingleton(key);
+    return getRegistry(context).isSingleton(key);
   }
 
   /**
@@ -107,7 +107,7 @@ public final class LegacyRegistryUtils {
    * @throws MuleException if the registry fails to perform the lifecycle change for the object.
    */
   public static Object applyLifecycle(MuleContext context, Object object) throws MuleException {
-    return context.getRegistry().applyLifecycle(object);
+    return getRegistry(context).applyLifecycle(object);
   }
 
   /**
@@ -120,13 +120,17 @@ public final class LegacyRegistryUtils {
    *         lifecycle threw an exception
    */
   public static Object unregisterObject(MuleContext context, String key) throws RegistrationException {
-    return context.getRegistry().unregisterObject(key);
+    return getRegistry(context).unregisterObject(key);
   }
 
   /**
    * @return the object to use a lock when synchronizing access to the context's registry.
    */
   public static Object getRegistryLock(MuleContext context) {
-    return context.getRegistry();
+    return getRegistry(context);
+  }
+
+  private static MuleRegistry getRegistry(MuleContext context) {
+    return ((MuleContextWithRegistries) context).getRegistry();
   }
 }

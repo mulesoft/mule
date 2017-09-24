@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
@@ -17,6 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -86,8 +86,8 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
   private void setupConnectionSupplier() throws Exception {
     String connectionSupplierKey = "extensions.connection.supplier";
 
-    muleContext.getRegistry().unregisterObject(connectionSupplierKey);
-    muleContext.getRegistry().registerObject(connectionSupplierKey, connectionSupplier);
+    ((MuleContextWithRegistries) muleContext).getRegistry().unregisterObject(connectionSupplierKey);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(connectionSupplierKey, connectionSupplier);
     muleContext.getInjector().inject(interceptor);
 
     when(connectionSupplier.getConnection(operationContext)).thenReturn(connectionHandler);

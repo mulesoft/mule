@@ -13,23 +13,25 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-
-import java.util.List;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.reactivestreams.Publisher;
+
+import java.util.List;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -108,8 +110,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         logger
             .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
         try {
-          defaultErrorHandler =
-              new ErrorHandlerFactory().createDefault(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+          defaultErrorHandler = new ErrorHandlerFactory()
+              .createDefault(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
         } catch (RegistrationException e) {
           throw new InitialisationException(createStaticMessage("Could not inject \"catch-all\" handler in default 'error-handler'."),
                                             e, this);

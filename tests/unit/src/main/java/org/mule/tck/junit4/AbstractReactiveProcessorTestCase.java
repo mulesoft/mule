@@ -7,30 +7,30 @@
 package org.mule.tck.junit4;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
-
-import java.util.Collection;
-import java.util.List;
+import org.mule.runtime.core.internal.message.InternalEvent;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+
+import java.util.Collection;
+import java.util.Map;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -59,29 +59,14 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
-    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, configurationComponentLocator);
   }
 
   @Override
-  protected void addBuilders(List<ConfigurationBuilder> builders) {
-    super.addBuilders(builders);
-    builders.add(new ConfigurationBuilder() {
-
-      @Override
-      public void addServiceConfigurator(ServiceConfigurator serviceConfigurator) {}
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        try {
-          muleContext.getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY,
-                                                   configurationComponentLocator);
-        } catch (RegistrationException e) {
-          throw new ConfigurationException(e);
-        }
-      }
-    });
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
   }
 
   @Override

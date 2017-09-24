@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -18,22 +19,25 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -42,6 +46,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.beans.ExceptionListener;
+import java.util.Map;
 
 public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProcessorTestCase implements ExceptionListener {
 
@@ -61,11 +66,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   }
 
   @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
+
+  @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    flow = builder("flow", muleContext).build();
-    flow.initialise();
-    flow.start();
+    flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
 
     messageProcessor = createAsyncDelegateMessageProcessor(target, flow);
     messageProcessor.start();
@@ -75,8 +83,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected void doTearDown() throws Exception {
     messageProcessor.stop();
     messageProcessor.dispose();
-    flow.stop();
-    flow.dispose();
     super.doTearDown();
   }
 

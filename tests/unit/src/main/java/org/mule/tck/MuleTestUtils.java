@@ -13,6 +13,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Injector;
@@ -20,11 +23,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -36,7 +44,7 @@ public final class MuleTestUtils {
 
   /**
    * Creates an {@link Error} mock that will return the provided exception when calling {@link Error#getCause()}
-   * 
+   *
    * @param exception the exception to use to create the mock
    * @return a mocked {@link Error}
    */
@@ -55,19 +63,36 @@ public final class MuleTestUtils {
 
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
-    final Flow flow = builder(APPLE_FLOW, context).withDirectProcessingStrategyFactory().build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(APPLE_FLOW)));
-    if (context.getRegistry() != null) {
-      context.getRegistry().registerFlowConstruct(flow);
-    }
+    return createFlow(context, APPLE_FLOW);
+  }
 
+  public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
+    final Flow flow = builder(flowName, context).withDirectProcessingStrategyFactory().build();
+    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
+    return flow;
+  }
+
+  /**
+   * Creates a new flow and registers it in the given {@code mockComponentLocator}
+   *
+   * @param mockComponentLocator a {@link Mockito#mock(Class)} {@link ConfigurationComponentLocator}
+   */
+  public static Flow createAndRegisterFlow(MuleContext context, String flowName,
+                                           ConfigurationComponentLocator mockComponentLocator)
+      throws MuleException {
+    Flow flow = createFlow(context, flowName);
+    MuleRegistry registry = ((MuleContextWithRegistries) context).getRegistry();
+    if (registry != null) {
+      registry.registerFlowConstruct(flow);
+    }
+    when(mockComponentLocator.find(Location.builder().globalName(flowName).build())).thenReturn(Optional.of(flow));
     return flow;
   }
 
   /**
    * Executes callback with a given system property set and replaces the system property with it's original value once done.
    * Useful for asserting behaviour that is dependent on the presence of a system property.
-   * 
+   *
    * @param propertyName Name of system property to set
    * @param propertyValue Value of system property
    * @param callback Callback implementing the the test code and assertions to be run with system property set.

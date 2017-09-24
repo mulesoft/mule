@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -26,20 +27,22 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.routing.correlation.EventCorrelator;
+import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.internal.routing.correlation.EventCorrelator;
-import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
-
-import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import java.util.function.Supplier;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message. <b>EIP Reference:</b>
@@ -93,7 +96,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   private Supplier<ObjectStore> internalProcessedGroupsObjectStoreFactory() {
     return () -> {
-      ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
+      ObjectStoreManager objectStoreManager = ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
       return objectStoreManager.createObjectStore(storePrefix + ".processedGroups", ObjectStoreSettings.builder()
           .persistent(persistentStores)
           .maxEntries(MAX_PROCESSED_GROUPS)
@@ -118,10 +121,11 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   private Supplier<ObjectStore> internalEventsGroupsObjectStoreSupplier() {
     return () -> {
       ObjectStore objectStore;
+      MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
       if (persistentStores) {
-        objectStore = muleContext.getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
+        objectStore = registry.lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
       } else {
-        objectStore = muleContext.getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY);
+        objectStore = registry.lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY);
       }
       if (objectStore instanceof MuleContextAware) {
         ((MuleContextAware) objectStore).setMuleContext(muleContext);

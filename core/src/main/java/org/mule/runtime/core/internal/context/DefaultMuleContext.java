@@ -52,6 +52,7 @@ import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -63,19 +64,20 @@ import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.connector.ConnectException;
-import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -90,31 +92,27 @@ import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.registry.RegistryBroker;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.config.NullClusterConfiguration;
 import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
+import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.Registry;
+import org.mule.runtime.core.internal.registry.RegistryBroker;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ApplicationShutdownSplashScreen;
@@ -122,6 +120,9 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -130,10 +131,9 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
 
-public class DefaultMuleContext implements MuleContext {
+public class DefaultMuleContext implements MuleContextWithRegistries {
 
   /**
    * TODO: Remove these constants. These constants only make sense until we have a reliable solution for durable persistence in
@@ -540,9 +540,13 @@ public class DefaultMuleContext implements MuleContext {
    *        event traffic and service invocations
    */
   @Override
-  public void setSecurityManager(SecurityManager securityManager) throws RegistrationException {
+  public void setSecurityManager(SecurityManager securityManager) {
     checkLifecycleForPropertySet(OBJECT_SECURITY_MANAGER, Initialisable.PHASE_NAME);
-    registryBroker.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+    try {
+      registryBroker.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   /**
@@ -643,8 +647,12 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public void setQueueManager(QueueManager queueManager) throws RegistrationException {
-    getRegistry().registerObject(OBJECT_QUEUE_MANAGER, queueManager);
+  public void setQueueManager(QueueManager queueManager) {
+    try {
+      getRegistry().registerObject(OBJECT_QUEUE_MANAGER, queueManager);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
     this.queueManager = queueManager;
   }
 

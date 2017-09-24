@@ -26,6 +26,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -34,16 +35,21 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.reactivestreams.Publisher;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,11 +59,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
@@ -67,7 +68,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private static final String UTF_8 = "utf-8";
   private static ObjectSerializer serializer;
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private MuleContextWithRegistries mockMuleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS.get());
   private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
   private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
@@ -97,8 +98,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
       })).transform(mockFailingMessageProcessor);
     });
     MuleLockFactory muleLockFactory = new MuleLockFactory();
-    muleLockFactory.setMuleContext(mockMuleContext);
-    when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_LOCK_PROVIDER)).thenReturn(new SingleServerLockProvider());
+    muleLockFactory.setLockProvider(new SingleServerLockProvider());
     muleLockFactory.initialise();
     when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
     when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);

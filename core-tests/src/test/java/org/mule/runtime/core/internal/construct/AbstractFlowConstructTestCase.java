@@ -10,12 +10,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.api.exception.MuleException;
+
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -132,8 +134,8 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   @Test
   public void testRegisterUnregister() throws MuleException, Exception {
     FlowConstruct construct = getFlowConstruct();
-    muleContext.getRegistry().registerFlowConstruct(construct);
-    assertNotNull(muleContext.getRegistry().lookupFlowConstruct(construct.getName()));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerFlowConstruct(construct);
+    assertNotNull(((MuleContextWithRegistries) muleContext).getRegistry().lookupFlowConstruct(construct.getName()));
   }
 
   @Test

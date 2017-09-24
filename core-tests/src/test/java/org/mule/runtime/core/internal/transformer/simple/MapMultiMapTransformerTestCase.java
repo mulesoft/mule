@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.HashMap;
@@ -23,7 +24,9 @@ public class MapMultiMapTransformerTestCase extends AbstractTransformerTestCase 
 
   @Override
   public Transformer getTransformer() throws Exception {
-    return createObject(MapToMultiMap.class);
+    MapToMultiMap transformer = new MapToMultiMap();
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(String.valueOf(transformer.hashCode()), transformer);
+    return transformer;
   }
 
   @Override

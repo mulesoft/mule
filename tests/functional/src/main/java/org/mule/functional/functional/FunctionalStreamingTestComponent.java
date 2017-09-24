@@ -15,6 +15,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -22,7 +23,6 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
 
 import org.slf4j.Logger;
@@ -197,9 +197,9 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
         }
       }
 
-      throw new RegistrationException(createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
+      throw new MuleRuntimeException(createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
     } else {
-      throw new RegistrationException(createStaticMessage("Flow " + flowName + " not found in Registry"));
+      throw new MuleRuntimeException(createStaticMessage("Flow " + flowName + " not found in Registry"));
     }
   }
 }

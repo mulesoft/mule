@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -16,6 +17,8 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
 import static org.mule.runtime.core.api.util.ObjectUtils.getDouble;
@@ -33,13 +36,13 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -494,15 +497,16 @@ public class DefaultMessageBuilder
           } else {
             try {
               DataType source = fromObject(theContent);
-              Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
+              Transformer transformer =
+                  ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
               if (transformer == null) {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
+                throw new TransformerException(noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
               }
               contents = transformer.transform(theContent);
             } catch (TransformerException ex) {
-              String message = String.format(
-                                             "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
-                                             name, handler.getClass(), theContent.getClass());
+              String message = format(
+                                      "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
+                                      name, handler.getClass(), theContent.getClass());
               logger.error(message);
               throw new IOException(message);
             }
@@ -687,8 +691,7 @@ public class DefaultMessageBuilder
         else if (defaultValue.getClass().isAssignableFrom(value.getClass())) {
           return value;
         } else {
-          throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(value.getClass(), defaultValue.getClass())
-              .getMessage());
+          throw new IllegalArgumentException(objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
         }
       }
     }

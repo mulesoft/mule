@@ -41,6 +41,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
 import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -252,11 +253,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
 
-    when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
-    when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
-        .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
-    doReturn(new DefaultExpressionManager(context, streamingManager)).when(context)
-        .getExpressionManager();
+    registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
+    registerIntoMockContext(context, DefaultExpressionLanguageFactoryService.class,
+                            new WeaveDefaultExpressionLanguageFactoryService());
+    doReturn(new DefaultExpressionManager()).when(context).getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);
 
@@ -280,7 +280,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(context.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE)).thenReturn(new MVELExpressionLanguage(context));
     when(context.getRegistry().lookupObject(DefaultExpressionLanguageFactoryService.class))
         .thenReturn(new WeaveDefaultExpressionLanguageFactoryService());
-    doReturn(new DefaultExpressionManager(context, streamingManager)).when(context)
+    doReturn(new DefaultExpressionManager()).when(context)
         .getExpressionManager();
     FlowConstruct flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getName()).thenReturn(flowName);

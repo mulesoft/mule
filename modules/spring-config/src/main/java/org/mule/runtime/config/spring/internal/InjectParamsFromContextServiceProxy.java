@@ -20,7 +20,6 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 
 import java.lang.reflect.InvocationHandler;
@@ -87,7 +86,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
     }
   }
 
-  private Method resolveInjectableMethod(Method method) throws RegistrationException {
+  private Method resolveInjectableMethod(Method method) {
     Method candidate = null;
 
     for (Method serviceImplMethod : getImplementationDeclaredMethods()) {
@@ -107,8 +106,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
     return candidate;
   }
 
-  private boolean equivalentParams(Parameter[] invocationParams, Parameter[] serviceImplParams)
-      throws RegistrationException {
+  private boolean equivalentParams(Parameter[] invocationParams, Parameter[] serviceImplParams) {
     int i = 0;
     for (Parameter invocationParam : invocationParams) {
       if (!serviceImplParams[i].getType().equals(invocationParam.getType())) {

@@ -13,47 +13,49 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
 
-import java.nio.charset.Charset;
-
 import org.junit.Test;
+
+import java.nio.charset.Charset;
 
 public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
-    muleContext.getRegistry().registerTransformer(new StringToApple());
-    muleContext.getRegistry().registerTransformer(new StringToOrange());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToApple());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToOrange());
   }
 
   @Test
   public void testSimpleDiscovery() throws Exception {
-    Transformer t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Apple.class));
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    Transformer t = registry.lookupTransformer(DataType.STRING, DataType.fromType(Apple.class));
     assertNotNull(t);
     assertEquals(StringToApple.class, t.getClass());
 
-    t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Orange.class));
+    t = registry.lookupTransformer(DataType.STRING, DataType.fromType(Orange.class));
     assertNotNull(t);
     assertEquals(StringToOrange.class, t.getClass());
 
 
     try {
-      muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(Banana.class));
+      registry.lookupTransformer(DataType.STRING, DataType.fromType(Banana.class));
       fail("There is no transformer to go from String to Banana");
     } catch (TransformerException e) {
       // expected
     }
 
 
-    muleContext.getRegistry().registerTransformer(new StringToRedApple());
+    registry.registerTransformer(new StringToRedApple());
 
-    t = muleContext.getRegistry().lookupTransformer(DataType.STRING, DataType.fromType(RedApple.class));
+    t = registry.lookupTransformer(DataType.STRING, DataType.fromType(RedApple.class));
     assertNotNull(t);
     assertEquals(StringToRedApple.class, t.getClass());
   }

@@ -16,18 +16,19 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import org.junit.Test;
-import org.slf4j.Logger;
 
 public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
 
@@ -39,7 +40,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
     muleContext.start();
 
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
 
     muleContext.dispose();
     assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
@@ -50,13 +51,13 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
     muleContext.start();
 
     InterfaceBasedTracker tracker1 = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker1);
+    getRegistry().registerObject(TEST_KEY, tracker1);
 
     InterfaceBasedTracker tracker2 = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker2);
+    getRegistry().registerObject(TEST_KEY, tracker2);
 
     InterfaceBasedTracker tracker3 = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker3);
+    getRegistry().registerObject(TEST_KEY, tracker3);
 
     muleContext.dispose();
     assertEquals(LIFECYCLE_PHASES, tracker1.getTracker().toString());
@@ -82,7 +83,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
     muleContext.start();
 
     JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
 
     muleContext.dispose();
     assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
@@ -91,7 +92,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testObjectLifecycleStates() throws Exception {
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
     assertEquals("[setMuleContext, initialise]", tracker.getTracker().toString());
 
     try {
@@ -135,7 +136,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testObjectLifecycleRestart() throws Exception {
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
 
     muleContext.start();
     assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
@@ -169,7 +170,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
   public void testLifecycleStateOutOfSequenceStartFirst() throws Exception {
     muleContext.start();
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
     // Initialise called implicitly because you cannot start a component without initialising it first
     assertEquals("[setMuleContext, initialise, start]", tracker.getTracker().toString());
 
@@ -190,7 +191,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
     muleContext.start();
     muleContext.stop();
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
-    muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+    getRegistry().registerObject(TEST_KEY, tracker);
     // Start is bypassed because the component was added when the registry was stopped, hence no need to start the component
     // Stop isn't called either because start was not called
     // Initialised is called because that pahse has completed in the registry
@@ -206,11 +207,15 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
 
     InterfaceBasedTracker tracker = new InterfaceBasedTracker();
     try {
-      muleContext.getRegistry().registerObject(TEST_KEY, tracker);
+      getRegistry().registerObject(TEST_KEY, tracker);
       fail("cannot register objects on a disposed registry");
     } catch (RegistrationException e) {
       // Expected
     }
+  }
+
+  private MuleRegistry getRegistry() {
+    return ((MuleContextWithRegistries) muleContext).getRegistry();
   }
 
   public class InterfaceBasedTracker extends AbstractLifecycleTracker {
@@ -219,7 +224,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
 
   public class JSR250ObjectLifecycleTracker implements MuleContextAware {
 
-    private final List<String> tracker = new ArrayList<String>();
+    private final List<String> tracker = new ArrayList<>();
 
     public List<String> getTracker() {
       return tracker;

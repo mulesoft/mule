@@ -8,13 +8,14 @@ package org.mule.runtime.core.internal.routing.requestreply;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.notification.RoutingNotification.ASYNC_REPLY_TIMEOUT;
+import static org.mule.runtime.api.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOutWaitingForId;
-import static org.mule.runtime.api.notification.RoutingNotification.ASYNC_REPLY_TIMEOUT;
-import static org.mule.runtime.api.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,33 +24,35 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.RoutingNotification;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.notification.RoutingNotification;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.routing.ResponseTimeoutException;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+
+import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessorBase
     implements RequestReplyRequesterMessageProcessor, Initialisable, Startable, Stoppable, Disposable {
@@ -140,7 +143,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   @Override
   public void initialise() throws InitialisationException {
     name = format(NAME_TEMPLATE, storePrefix, muleContext.getConfiguration().getId(), getLocation().getRootContainerName());
-    store = ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER))
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    store = ((ObjectStoreManager) registry.get(OBJECT_STORE_MANAGER))
         .createObjectStore(name, ObjectStoreSettings.builder()
             .persistent(false)
             .maxEntries(MAX_PROCESSED_GROUPS)
@@ -148,7 +152,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             .expirationInterval(UNCLAIMED_INTERVAL)
             .build());
     try {
-      notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+      notificationFirer = registry.lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new InitialisationException(e, this);
     }
@@ -174,7 +178,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   public void dispose() {
     if (store != null) {
       try {
-        ((ObjectStoreManager) muleContext.getRegistry().get(OBJECT_STORE_MANAGER)).disposeStore(name);
+        ((ObjectStoreManager) ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER))
+            .disposeStore(name);
       } catch (ObjectStoreException e) {
         logger.debug("Exception disposing of store", e);
       }

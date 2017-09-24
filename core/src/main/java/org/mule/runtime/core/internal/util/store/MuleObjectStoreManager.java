@@ -12,19 +12,23 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.store.PartitionableExpirableObjectStore;
+
+import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
@@ -32,14 +36,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
 
-import org.slf4j.Logger;
+import javax.inject.Inject;
 
-public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAware, Initialisable, Disposable {
+public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable, Disposable {
 
   private static Logger LOGGER = getLogger(MuleObjectStoreManager.class);
   public static final int UNBOUNDED = 0;
 
+  private SchedulerService schedulerService;
+  private Registry registry;
   private MuleContext muleContext;
+
   private final ConcurrentMap<String, ObjectStore<?>> stores = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, ScheduledFuture<?>> monitors = new ConcurrentHashMap<>();
 
@@ -64,19 +71,15 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
       throw new InitialisationException(e, this);
     }
 
-    scheduler = muleContext.getSchedulerService()
+    scheduler = schedulerService
         .customScheduler(muleContext.getSchedulerBaseConfig().withName("ObjectStoreManager-Monitor").withMaxConcurrentTasks(1));
   }
 
   private ObjectStore<?> lookupBaseStore(String key, String baseType) throws InitialisationException {
-    ObjectStore<?> store = muleContext.getRegistry().lookupObject(key);
-    if (store == null) {
-      throw new InitialisationException(createStaticMessage(format(
-                                                                   "%s base store of key '%s' does not exists", baseType, key)),
-                                        this);
-    }
-
-    return store;
+    return registry.<ObjectStore>lookupByName(key)
+        .orElseThrow(() -> new InitialisationException(createStaticMessage(format("%s base store of key '%s' does not exists",
+                                                                                  baseType, key)),
+                                                       this));
   }
 
   @Override
@@ -217,11 +220,6 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
     }
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
-
   public void clearStoreCache() {
     stores.clear();
   }
@@ -304,5 +302,20 @@ public class MuleObjectStoreManager implements ObjectStoreManager, MuleContextAw
 
   public void setBaseTransientStoreKey(String baseTransientStoreKey) {
     this.baseTransientStoreKey = baseTransientStoreKey;
+  }
+
+  @Inject
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
+
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.connection.CompositeConnectionManager;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
@@ -64,13 +63,12 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
     }
   }
 
-  private void registerDefaultConnectionManager(MuleContext muleContext) throws RegistrationException {
+  private void registerDefaultConnectionManager(MuleContext muleContext) {
     registerConnectionManager(muleContext, new DefaultConnectionManager(muleContext));
 
   }
 
-  private void registerConnectionManager(MuleContext muleContext, ConnectionManager connectionManager)
-      throws RegistrationException {
+  private void registerConnectionManager(MuleContext muleContext, ConnectionManager connectionManager) {
     muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CONNECTION_MANAGER, connectionManager);
   }
 
