@@ -283,10 +283,7 @@ class MuleExtensionModelDeclarer {
 
     raiseError.onDefaultParameterGroup()
         .withRequiredParameter("type")
-        .ofType(BaseTypeBuilder.create(JAVA).stringType()
-            .enumOf("ANY", "REDELIVERY_EXHAUSTED", "TRANSFORMATION", "EXPRESSION", "SECURITY", "CLIENT_SECURITY",
-                    "SERVER_SECURITY", "ROUTING", "CONNECTIVITY", "RETRY_EXHAUSTED", "TIMEOUT")
-            .build())
+        .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The error type to raise.");
 
