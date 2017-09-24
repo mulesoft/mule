@@ -12,7 +12,7 @@ import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -39,7 +39,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
     runThread(testEvent(), true);
   }
 
-  protected void runThread(BaseEvent event, boolean doTest) throws InterruptedException {
+  protected void runThread(CoreEvent event, boolean doTest) throws InterruptedException {
     AtomicBoolean success = new AtomicBoolean(false);
     Thread thread = new Thread(new SetExceptionPayload((PrivilegedEvent) event, success));
     thread.start();

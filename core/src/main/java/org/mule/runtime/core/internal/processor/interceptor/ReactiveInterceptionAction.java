@@ -17,7 +17,7 @@ import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -59,7 +59,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
     }
 
     return just(interceptionEvent.resolve())
-        .cast(BaseEvent.class)
+        .cast(CoreEvent.class)
         .transform(next)
         .cast(InternalEvent.class)
         .map(event -> {

@@ -18,7 +18,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
@@ -30,7 +30,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptorHandler;
@@ -111,7 +111,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   public void eventCompatibilityVariables() throws MuleException {
     String expression = "_muleEvent";
     Object mvelFlowResult = expressionLanguageAdapter.evaluate(melify(expression), testEvent(), emptyBindingContext).getValue();
-    assertThat(mvelFlowResult, is(instanceOf(BaseEvent.class)));
+    assertThat(mvelFlowResult, is(instanceOf(CoreEvent.class)));
 
     expectedException.expect(RuntimeException.class);
     expressionLanguageAdapter.evaluate(expression, testEvent(), emptyBindingContext).getValue();
@@ -158,8 +158,8 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that variables can be modified under MVEL but not DW.")
   public void variablesMutation() throws Exception {
-    BaseEvent event = testEvent();
-    BaseEvent.Builder builder1 = builder(event);
+    CoreEvent event = testEvent();
+    CoreEvent.Builder builder1 = builder(event);
     TypedValue result = expressionLanguageAdapter.evaluate(melify("flowVars.put(\'key\',\'value\')"),
                                                            event,
                                                            builder1,
@@ -168,7 +168,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
     assertThat(result.getValue(), is(nullValue()));
     assertThat(builder1.build().getVariables().keySet(), contains("key"));
 
-    BaseEvent.Builder builder2 = builder(event);
+    CoreEvent.Builder builder2 = builder(event);
     TypedValue result2 = expressionLanguageAdapter.evaluate("vars.put(\'key\',\'value\')",
                                                             event,
                                                             builder2,
@@ -181,8 +181,8 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that the payload can be modified under MVEL but not DW.")
   public void payloadMutation() throws Exception {
-    BaseEvent event = eventBuilder().message(of(1)).build();
-    BaseEvent.Builder builder1 = builder(event);
+    CoreEvent event = eventBuilder().message(of(1)).build();
+    CoreEvent.Builder builder1 = builder(event);
     String expression = "payload = 3";
     TypedValue result = expressionLanguageAdapter.evaluate(melify(expression),
                                                            event,
@@ -191,7 +191,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
                                                            emptyBindingContext);
     assertThat(result.getValue(), is(1));
     assertThat(builder1.build().getMessage().getPayload().getValue(), is(3));
-    BaseEvent.Builder builder2 = builder(event);
+    CoreEvent.Builder builder2 = builder(event);
 
     expectedException.expect(ExpressionRuntimeException.class);
     expressionLanguageAdapter.evaluate(expression,
@@ -204,8 +204,8 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that enrichment using an Object only works for MVEL.")
   public void enrichObjectCompatibility() throws MuleException {
-    BaseEvent event = testEvent();
-    BaseEvent.Builder builder = builder(event);
+    CoreEvent event = testEvent();
+    CoreEvent.Builder builder = builder(event);
     String myPayload = "myPayload";
     String expression = "payload";
     expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
@@ -218,12 +218,12 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that enrichment using a TypedValue only works for MVEL.")
   public void enrichTypedValueCompatibility() throws MuleException {
-    BaseEvent event = testEvent();
-    BaseEvent.Builder builder = builder(event);
+    CoreEvent event = testEvent();
+    CoreEvent.Builder builder = builder(event);
     TypedValue myPayload = new TypedValue("myPayload", STRING);
     String expression = "payload";
     expressionLanguageAdapter.enrich(melify(expression), event, builder, TEST_CONNECTOR_LOCATION, myPayload);
-    BaseEvent enrichedEvent = builder.build();
+    CoreEvent enrichedEvent = builder.build();
     assertThat(enrichedEvent.getMessage().getPayload().getValue(), is(myPayload.getValue()));
     assertThat(enrichedEvent.getMessage().getPayload().getDataType(), is(myPayload.getDataType()));
 

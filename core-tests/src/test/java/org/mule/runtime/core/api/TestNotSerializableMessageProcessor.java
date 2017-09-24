@@ -9,7 +9,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 public class TestNotSerializableMessageProcessor extends AbstractComponent implements Processor {
@@ -19,7 +19,7 @@ public class TestNotSerializableMessageProcessor extends AbstractComponent imple
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return event;
   }
 }

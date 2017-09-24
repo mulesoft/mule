@@ -23,27 +23,27 @@ import reactor.core.publisher.Mono;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
- * maintained during all execution originating from a given source message and all instances of {@link BaseEvent} created as part of
+ * maintained during all execution originating from a given source message and all instances of {@link CoreEvent} created as part of
  * the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow this
  * {@link BaseEventContext} will be maintained, while whenever there is a connector boundary a new instance will be created by the
  * receiving source.
  *
- * @see BaseEvent
+ * @see CoreEvent
  * @since 4.0
  */
 public interface BaseEventContext extends EventContext {
 
   /**
-   * Complete this {@link BaseEventContext} successfully with no result {@link BaseEvent}.
+   * Complete this {@link BaseEventContext} successfully with no result {@link CoreEvent}.
    */
   void success();
 
   /**
-   * Complete this {@link BaseEventContext} successfully with a result {@link BaseEvent}.
+   * Complete this {@link BaseEventContext} successfully with a result {@link CoreEvent}.
    *
    * @param event the result event.
    */
-  void success(BaseEvent event);
+  void success(CoreEvent event);
 
   /**
    * Complete this {@link BaseEventContext} unsuccessfully with an error.
@@ -90,7 +90,7 @@ public interface BaseEventContext extends EventContext {
    * response subscribers that are executed before the source, client or parent flow receives to be registered. In order to
    * subscribe after response processing you can use the response {@link Publisher}.
    * <p/>
-   * Any asynchronous processing initiated as part of processing the request {@link BaseEvent} maybe still be in process when this
+   * Any asynchronous processing initiated as part of processing the request {@link CoreEvent} maybe still be in process when this
    * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
    * complete.
    *
@@ -98,14 +98,14 @@ public interface BaseEventContext extends EventContext {
    * @see #getResponsePublisher()
    * @see #getCompletionPublisher()
    */
-  Publisher<BaseEvent> getBeforeResponsePublisher();
+  Publisher<CoreEvent> getBeforeResponsePublisher();
 
   /**
    * A {@link Publisher} that completes when a response is ready or an error was produced for this {@link BaseEventContext}. Any
    * subscribers registered before the response completes will be executed after the response has been processed by the source,
    * client or parent flow. In order to subscribe before response processing you can use the before response {@link Publisher}.
    * <p/>
-   * Any asynchronous processing initiated as part of processing the request {@link BaseEvent} maybe still be in process when this
+   * Any asynchronous processing initiated as part of processing the request {@link CoreEvent} maybe still be in process when this
    * {@link Publisher} completes. The completion {@link Publisher} can be used to perform an action after all processing is
    * complete.
    *
@@ -113,7 +113,7 @@ public interface BaseEventContext extends EventContext {
    * @see #getBeforeResponsePublisher() ()
    * @see #getCompletionPublisher()
    */
-  Publisher<BaseEvent> getResponsePublisher();
+  Publisher<CoreEvent> getResponsePublisher();
 
   /**
    * A {@link Publisher} that completes when a this {@link BaseEventContext} and all child {@link BaseEventContext}'s have completed. In

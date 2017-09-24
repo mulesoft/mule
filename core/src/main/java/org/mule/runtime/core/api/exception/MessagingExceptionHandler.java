@@ -12,14 +12,14 @@ import static reactor.core.publisher.Mono.just;
 
 import java.util.function.Function;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.reactivestreams.Publisher;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
-public interface MessagingExceptionHandler extends ExceptionHandler, Function<MessagingException, Publisher<BaseEvent>> {
+public interface MessagingExceptionHandler extends ExceptionHandler, Function<MessagingException, Publisher<CoreEvent>> {
 
   /**
    * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
@@ -28,10 +28,10 @@ public interface MessagingExceptionHandler extends ExceptionHandler, Function<Me
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
    */
-  BaseEvent handleException(MessagingException exception, BaseEvent event);
+  CoreEvent handleException(MessagingException exception, CoreEvent event);
 
   @Override
-  default Publisher<BaseEvent> apply(MessagingException exception) {
+  default Publisher<CoreEvent> apply(MessagingException exception) {
     try {
       exception.setProcessedEvent(handleException(exception, exception.getEvent()));
       if (exception.handled()) {

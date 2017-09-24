@@ -12,7 +12,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 /**
  * Default implementatio of {@link FlowListener}.
  * <p>
- * It uses an {@link BaseEvent}'s response {@link Publisher} to suscribe to the event termination and execute the necessary logic.
+ * It uses an {@link CoreEvent}'s response {@link Publisher} to suscribe to the event termination and execute the necessary logic.
  *
  * @since 4.0
  */
@@ -46,7 +46,7 @@ public class DefaultFlowListener implements FlowListener {
    *
    * @param event the event on which the operation is being executed.
    */
-  public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, BaseEvent event) {
+  public DefaultFlowListener(ExtensionModel extensionModel, OperationModel operationModel, CoreEvent event) {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     from(((BaseEventContext) event.getContext()).getResponsePublisher())
@@ -81,7 +81,7 @@ public class DefaultFlowListener implements FlowListener {
     onComplete = handler;
   }
 
-  private void onTerminate(BaseEvent event, Throwable error) {
+  private void onTerminate(CoreEvent event, Throwable error) {
     try {
       if (event != null && successConsumer != null) {
         try {

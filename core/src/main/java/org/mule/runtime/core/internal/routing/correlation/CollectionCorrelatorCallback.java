@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing.correlation;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.AggregationException;
 import org.mule.runtime.core.internal.routing.EventGroup;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -50,7 +50,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    *         exception handler for this component
    */
   @Override
-  public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
+  public CoreEvent aggregateEvents(EventGroup events) throws AggregationException {
     return events.getMessageCollectionEvent();
   }
 
@@ -68,7 +68,7 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    * Creates a new EventGroup that will expect the number of events as returned by {@link org.mule.runtime.core.api.message.GroupCorrelation#getGroupSize()}.
    */
   @Override
-  public EventGroup createEventGroup(BaseEvent event, Object groupId) {
+  public EventGroup createEventGroup(CoreEvent event, Object groupId) {
     return new EventGroup(groupId, muleContext,
                           event.getGroupCorrelation().isPresent() ? event.getGroupCorrelation().get().getGroupSize().isPresent()
                               ? Optional.of(event.getGroupCorrelation().get().getGroupSize().getAsInt())

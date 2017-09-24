@@ -54,7 +54,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -227,12 +227,12 @@ public final class ExtensionsTestUtils {
     });
   }
 
-  public static <C> C getConfigurationFromRegistry(String key, BaseEvent muleEvent, MuleContext muleContext)
+  public static <C> C getConfigurationFromRegistry(String key, CoreEvent muleEvent, MuleContext muleContext)
       throws Exception {
     return (C) getConfigurationInstanceFromRegistry(key, muleEvent, muleContext).getValue();
   }
 
-  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, BaseEvent muleEvent,
+  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, CoreEvent muleEvent,
                                                                            MuleContext muleContext)
       throws Exception {
     ExtensionManager extensionManager = muleContext.getExtensionManager();

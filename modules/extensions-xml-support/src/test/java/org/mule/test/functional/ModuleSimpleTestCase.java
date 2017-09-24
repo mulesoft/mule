@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -54,63 +54,63 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlow() throws Exception {
-    BaseEvent event = flowRunner("testSetPayloadHardcodedFlow").run();
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlow").run();
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 
   @Test
   public void testSetPayloadParamFlow() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadParamFlow").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload"));
   }
 
   @Test
   public void testSetPayloadParamDefaultFlow() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadParamDefaultUseOptionalFlow() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamDefaultUseOptionalFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("15"));
   }
 
   @Test
   public void testSetPayloadNoSideEffectFlowVariable() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadNoSideEffectFlowVariable").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("10"));
     assertThat(muleEvent.getVariables().get("testVar").getValue(), is("unchanged value"));
   }
 
   @Test
   public void testDoNothingFlow() throws Exception {
-    BaseEvent muleEvent = flowRunner("testDoNothingFlow").run();
+    CoreEvent muleEvent = flowRunner("testDoNothingFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("before calling"));
     assertThat(muleEvent.getVariables().get("variableBeforeCalling").getValue(), is("value of flowvar before calling"));
   }
 
   @Test
   public void testSetPayloadParamValueAppender() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadParamValueAppender").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("new payload from module"));
   }
 
   @Test
   public void testSetPayloadConcatParamsValues() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadConcatParamsValues").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("105"));
   }
 
   @Test
   public void testSetPayloadUsingUndefinedParam() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadUsingUndefinedParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadHardcodedFlowWithTarget() throws Exception {
-    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
     assertThat(targetVariable, notNullValue());
@@ -121,7 +121,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable() throws Exception {
-    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
@@ -132,7 +132,7 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload() throws Exception {
-    BaseEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload").run();
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetAndTargetValuePayload").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("existing-variable");
     assertThat(targetVariable, notNullValue());
@@ -143,13 +143,13 @@ public class ModuleSimpleTestCase extends AbstractXmlExtensionMuleArtifactFuncti
 
   @Test
   public void testSetPayloadUsingOptionalParam() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadUsingOptionalParam").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void testSetPayloadUsingParamValueMoreThanOnceFlow() throws Exception {
-    BaseEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
+    CoreEvent muleEvent = flowRunner("testSetPayloadUsingParamValueMoreThanOnceFlow").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("a payload written 2 or more times in the same operation using the same parameter"));
   }

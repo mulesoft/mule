@@ -24,7 +24,7 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -57,15 +57,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private List<Processor> processors;
 
   @Override
-  public BaseEvent process(final BaseEvent event) throws MuleException {
+  public CoreEvent process(final CoreEvent event) throws MuleException {
     if (nestedChain == null) {
       return event;
     } else {
-      ExecutionTemplate<BaseEvent> executionTemplate =
+      ExecutionTemplate<CoreEvent> executionTemplate =
           createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-      ExecutionCallback<BaseEvent> processingCallback = () -> {
+      ExecutionCallback<CoreEvent> processingCallback = () -> {
         try {
-          BaseEvent e = processToApply(event, p -> from(p)
+          CoreEvent e = processToApply(event, p -> from(p)
               .flatMap(request -> processWithChildContext(request, nestedChain, ofNullable(getLocation()),
                                                           messagingExceptionHandler)));
           return e;
@@ -85,7 +85,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     if (nestedChain == null) {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {

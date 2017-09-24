@@ -42,7 +42,7 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -193,7 +193,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Publisher<Void> onCompletion(BaseEvent event, Map<String, Object> parameters) {
+    public Publisher<Void> onCompletion(CoreEvent event, Map<String, Object> parameters) {
       return from(onSuccessExecutor.execute(event, parameters, context)).doOnSuccess(v -> commit());
     }
 
@@ -204,8 +204,8 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public void onTerminate(Either<MessagingException, BaseEvent> result) throws Exception {
-      BaseEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
+    public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
+      CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
       from(onTerminateExecutor.execute(event, emptyMap(), context))
           .doAfterTerminate((v, e) -> context.releaseConnection())
           .subscribe();
@@ -234,7 +234,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Map<String, Object> createResponseParameters(BaseEvent event) throws MessagingException {
+    public Map<String, Object> createResponseParameters(CoreEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.successCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
@@ -244,7 +244,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     }
 
     @Override
-    public Map<String, Object> createFailureResponseParameters(BaseEvent event) throws MessagingException {
+    public Map<String, Object> createFailureResponseParameters(CoreEvent event) throws MessagingException {
       try {
         ResolverSetResult parameters = SourceAdapter.this.errorCallbackParameters.resolve(from(event, configurationInstance));
         return parameters.asMap();
@@ -424,7 +424,7 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
         .map(modelProperty -> modelProperty.getDeclaringField().getName()).orElse(defaultName);
   }
 
-  private MessagingException createSourceException(BaseEvent event, Throwable cause) {
+  private MessagingException createSourceException(CoreEvent event, Throwable cause) {
     MessagingException messagingException = new MessagingException(event, cause);
 
     return exceptionResolver.resolve(messagingException, muleContext);

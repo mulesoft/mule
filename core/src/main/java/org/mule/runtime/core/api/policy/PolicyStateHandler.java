@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.policy;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Optional;
@@ -15,7 +15,7 @@ import java.util.Optional;
  * State handler for policies execution.
  *
  * Keeps track of the operation associated with a certain context of execution. Such context of execution is defined by the unique
- * identifier of the generated {@link BaseEvent}.
+ * identifier of the generated {@link CoreEvent}.
  * 
  * Implementations will be executed concurrently but always using different identifiers. There will be no concurrent invocation
  * for the same identifier.
@@ -50,7 +50,7 @@ public interface PolicyStateHandler {
    * @return the latest state of the policy for the given identifier. It may be empty if no other policy was executed before for
    *         this context.
    */
-  Optional<BaseEvent> getLatestState(PolicyStateId identifier);
+  Optional<CoreEvent> getLatestState(PolicyStateId identifier);
 
   /**
    * Updates the event of the policy for the context with the given identifier.
@@ -58,6 +58,6 @@ public interface PolicyStateHandler {
    * @param identifier the identifier of the context
    * @param lastStateEvent the last state of the event
    */
-  void updateState(PolicyStateId identifier, BaseEvent lastStateEvent);
+  void updateState(PolicyStateId identifier, CoreEvent lastStateEvent);
 
 }

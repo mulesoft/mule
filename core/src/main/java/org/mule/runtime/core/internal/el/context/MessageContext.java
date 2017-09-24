@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.el.context;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -35,11 +35,11 @@ import javax.activation.DataHandler;
  */
 public class MessageContext {
 
-  private BaseEvent event;
-  private BaseEvent.Builder eventBuilder;
+  private CoreEvent event;
+  private CoreEvent.Builder eventBuilder;
   private MuleContext muleContext;
 
-  public MessageContext(BaseEvent event, BaseEvent.Builder eventBuilder, MuleContext muleContext) {
+  public MessageContext(CoreEvent event, CoreEvent.Builder eventBuilder, MuleContext muleContext) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;

@@ -36,7 +36,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
@@ -72,7 +72,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   private Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
-  private BaseEvent event;
+  private CoreEvent event;
   private Latch waitLatch = new Latch();
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
@@ -90,7 +90,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> error(new RuntimeException("failing"))
             .doOnError(e -> count.getAndIncrement()));
     when(mockWaitingMessageProcessor.apply(any(Publisher.class))).thenAnswer(invocationOnMock -> {
-      Mono<BaseEvent> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocationOnMock.getArgumentAt(0, Publisher.class));
       return mono.doOnNext(checkedConsumer(event1 -> {
         waitingMessageProcessorExecutionLatch.countDown();
         waitLatch.await(2000, MILLISECONDS);
@@ -121,7 +121,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   public void messageDigestFailure() throws Exception {
     when(message.getPayload()).thenReturn(new TypedValue<>(new Object(), OBJECT));
     irp.initialise();
-    BaseEvent process = irp.process(event);
+    CoreEvent process = irp.process(event);
     assertThat(process, nullValue());
   }
 

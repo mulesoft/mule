@@ -21,7 +21,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -55,7 +55,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final Map<String, Object> variables = new HashMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
-  private BaseEvent event;
+  private CoreEvent event;
   private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
@@ -69,7 +69,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * @param configuration         the {@link ConfigurationInstance} that the operation will use
    * @param parameters            the parameters that the operation will use
    * @param componentModel        the {@link ComponentModel} for the component being executed
-   * @param event                 the current {@link BaseEvent}
+   * @param event                 the current {@link CoreEvent}
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
    * @param location              the {@link ComponentLocation location} of the executing component
@@ -80,7 +80,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  Optional<ConfigurationInstance> configuration,
                                  Map<String, Object> parameters,
                                  M componentModel,
-                                 BaseEvent event,
+                                 CoreEvent event,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
                                  ComponentLocation location,
@@ -163,12 +163,12 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public BaseEvent getEvent() {
+  public CoreEvent getEvent() {
     return event;
   }
 
   @Override
-  public void changeEvent(BaseEvent updated) {
+  public void changeEvent(CoreEvent updated) {
     requireNonNull(event);
     event = updated;
     securityContext = event.getSecurityContext();

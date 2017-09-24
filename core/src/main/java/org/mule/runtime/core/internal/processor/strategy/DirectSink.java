@@ -10,7 +10,7 @@ import static reactor.core.publisher.DirectProcessor.create;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.ReactorSink;
 
@@ -34,23 +34,23 @@ class DirectSink implements Sink, Disposable {
    *
    * @param function the processor to process events emitted onto stream, typically this processor will represent the flow
    *        pipeline.
-   * @param eventConsumer event consumer called just before {@link BaseEvent}'s emission.
+   * @param eventConsumer event consumer called just before {@link CoreEvent}'s emission.
    */
-  public DirectSink(Function<Publisher<BaseEvent>, Publisher<BaseEvent>> function,
-                    Consumer<BaseEvent> eventConsumer) {
-    DirectProcessor<BaseEvent> directProcessor = create();
+  public DirectSink(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> function,
+                    Consumer<CoreEvent> eventConsumer) {
+    DirectProcessor<CoreEvent> directProcessor = create();
     reactorSink =
         new ReactorSink(directProcessor.serialize().connectSink(), directProcessor.transform(function).doOnError(throwable -> {
         }).subscribe(), eventConsumer);
   }
 
   @Override
-  public void accept(BaseEvent event) {
+  public void accept(CoreEvent event) {
     reactorSink.accept(event);
   }
 
   @Override
-  public boolean emit(BaseEvent event) {
+  public boolean emit(CoreEvent event) {
     return reactorSink.emit(event);
   }
 

@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * {@link ValueResolver} implementation for {@link TypedValue} that are not resolved from an
@@ -38,7 +38,7 @@ public final class TypedValueValueResolverWrapper<T> implements ValueResolver<Ty
   }
 
   /**
-   * Resolves the value of {@link this#resolver} using the given {@link BaseEvent} and returns the correspondent
+   * Resolves the value of {@link this#resolver} using the given {@link CoreEvent} and returns the correspondent
    * {@link TypedValue}
    *
    * @param context a {@link ValueResolvingContext} to resolve the {@link ValueResolver}

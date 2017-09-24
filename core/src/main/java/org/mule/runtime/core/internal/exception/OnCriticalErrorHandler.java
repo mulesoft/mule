@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.exception;
 import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -31,7 +31,7 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
 
   @Override
-  public boolean accept(BaseEvent event) {
+  public boolean accept(CoreEvent event) {
     Optional<Error> error = event.getError();
     return error.isPresent() && criticalMatcher.match(error.get().getErrorType());
   }
@@ -42,13 +42,13 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   }
 
   @Override
-  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
     logException(exception);
     return event;
   }
 
   @Override
-  public Publisher<BaseEvent> apply(MessagingException exception) {
+  public Publisher<CoreEvent> apply(MessagingException exception) {
     logException(exception);
     return error(exception);
   }

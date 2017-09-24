@@ -21,7 +21,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -44,7 +44,7 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
   private Message message;
 
   @Mock
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock
   private Processor messageProcessor;

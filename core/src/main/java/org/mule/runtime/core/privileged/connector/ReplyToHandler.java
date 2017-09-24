@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.connector;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.exception.MuleException;
 
 /**
@@ -18,6 +18,6 @@ import org.mule.runtime.api.exception.MuleException;
 @Deprecated
 public interface ReplyToHandler {
 
-  BaseEvent processReplyTo(BaseEvent event, Message returnMessage, Object replyTo) throws MuleException;
+  CoreEvent processReplyTo(CoreEvent event, Message returnMessage, Object replyTo) throws MuleException;
 
 }

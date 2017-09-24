@@ -9,7 +9,7 @@ package org.mule;
 import static java.util.Collections.singletonList;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class FlowCPULightProcessorBenchmark extends AbstractFlowBenchmark {
   }
 
   @Benchmark
-  public BaseEvent processor() throws MuleException {
+  public CoreEvent processor() throws MuleException {
     return cpuLightProcessor.process(createEvent(flow));
   }
 

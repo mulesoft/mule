@@ -19,7 +19,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -43,11 +43,11 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void exception() throws Exception {
-    BaseEvent event = createEvent();
+    CoreEvent event = createEvent();
     RuntimeException rte = new RuntimeException();
     when(mockError.getCause()).thenReturn(rte);
     when(mockError.getErrorType()).thenReturn(mockErrorType);
-    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
+    event = CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     Object exception = evaluate("exception", event);
 
     assertThat(exception, is(instanceOf(MessagingException.class)));
@@ -56,8 +56,8 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void assignException() throws Exception {
-    BaseEvent event = createEvent();
-    event = BaseEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
+    CoreEvent event = createEvent();
+    event = CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     RuntimeException runtimeException = new RuntimeException();
     when(mockError.getCause()).thenReturn(runtimeException);
     when(mockError.getErrorType()).thenReturn(mockErrorType);
@@ -66,7 +66,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void exceptionCausedBy() throws Exception {
-    BaseEvent event = createEvent();
+    CoreEvent event = createEvent();
     Message message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),

@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
@@ -108,23 +108,23 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    BaseEvent event = BaseEvent.builder(context).message(of("foo")).build();
+    CoreEvent event = CoreEvent.builder(context).message(of("foo")).build();
 
     assertThat(evaluate("p", event), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    BaseEvent event = BaseEvent.builder(context).message(of("")).build();
+    CoreEvent event = CoreEvent.builder(context).message(of("")).build();
 
-    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
+    CoreEvent.Builder eventBuilder = CoreEvent.builder(event);
     evaluate("p='bar'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    BaseEvent event = BaseEvent.builder(context).message(of("")).build();
+    CoreEvent event = CoreEvent.builder(context).message(of("")).build();
     evaluate("p=m.uniqueId", event);
   }
 
@@ -142,7 +142,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
   @Test
   public void testMuleMessageAvailableInFunction() throws MuleException {
     InternalMessage message = mock(InternalMessage.class);
-    BaseEvent event = getEventBuilder().message(message).build();
+    CoreEvent event = getEventBuilder().message(message).build();
 
     assertThat(evaluate("muleMessage()", event), is(message));
   }

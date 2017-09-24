@@ -36,7 +36,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -79,7 +79,7 @@ public class LookupFunction implements ExpressionFunction {
         Error incomingError = lookupValue(context, ERROR, null);
 
         Message message = Message.builder(incomingMessage).value(payload).build();
-        BaseEvent event = BaseEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
+        CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
             .variables(incomingVariables)
             .error(incomingError)
             .message(message)

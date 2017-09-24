@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_O
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
@@ -47,7 +47,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void testNoRoute() throws Exception {
-    BaseEvent inputEvent = fooEvent();
+    CoreEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -62,7 +62,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void testNoMatchingNorDefaultRoute() throws Exception {
     choiceRouter.addRoute(payloadZapExpression(), newChain(empty(), new TestMessageProcessor("bar")));
-    BaseEvent inputEvent = fooEvent();
+    CoreEvent inputEvent = fooEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -102,7 +102,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.setMuleContext(muleContext);
     choiceRouter.initialise();
 
-    BaseEvent inputEvent = zapEvent();
+    CoreEvent inputEvent = zapEvent();
     assertThat(process(choiceRouter, inputEvent), is(inputEvent));
   }
 
@@ -116,11 +116,11 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
   }
 
-  protected BaseEvent fooEvent() throws MuleException {
+  protected CoreEvent fooEvent() throws MuleException {
     return eventBuilder().message(of("foo")).build();
   }
 
-  protected BaseEvent zapEvent() throws MuleException {
+  protected CoreEvent zapEvent() throws MuleException {
     return eventBuilder().message(of("zap")).build();
   }
 

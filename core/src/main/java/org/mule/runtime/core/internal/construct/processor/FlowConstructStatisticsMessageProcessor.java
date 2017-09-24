@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.construct.processor;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -24,7 +24,7 @@ public class FlowConstructStatisticsMessageProcessor extends AbstractComponent
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (flowConstructStatistics.isEnabled()) {
       flowConstructStatistics.incReceivedEvents();
     }

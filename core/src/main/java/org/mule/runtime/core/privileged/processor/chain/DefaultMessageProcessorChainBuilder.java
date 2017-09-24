@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -216,12 +216,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       }
 
       @Override
-      public BaseEvent process(BaseEvent event) throws MuleException {
+      public CoreEvent process(CoreEvent event) throws MuleException {
         return delegate.process(event);
       }
 
       @Override
-      public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return delegate.apply(publisher);
       }
     };

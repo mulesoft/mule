@@ -17,7 +17,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 
 import javax.inject.Inject;
@@ -81,7 +81,7 @@ public abstract class AbstractSecurityFilter extends AbstractComponent implement
   }
 
   @Override
-  public abstract SecurityContext doFilter(BaseEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract SecurityContext doFilter(CoreEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
 }

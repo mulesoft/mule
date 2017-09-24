@@ -31,7 +31,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -129,7 +129,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
     when(transformer.transform(anyObject())).thenReturn(1);
 
-    BaseEvent muleEvent = mock(BaseEvent.class);
+    CoreEvent muleEvent = mock(CoreEvent.class);
 
     Message result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
@@ -146,7 +146,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
     when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
 
-    BaseEvent muleEvent = mock(BaseEvent.class);
+    CoreEvent muleEvent = mock(CoreEvent.class);
 
     Message result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
@@ -163,7 +163,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
     when(transformer.transform(anyString())).thenReturn(1);
 
-    BaseEvent muleEvent = mock(BaseEvent.class);
+    CoreEvent muleEvent = mock(CoreEvent.class);
 
     Message result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
@@ -180,7 +180,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
     when(transformer.transform(message)).thenReturn(TEST_PAYLOAD);
 
-    BaseEvent muleEvent = mock(BaseEvent.class);
+    CoreEvent muleEvent = mock(CoreEvent.class);
 
     Message result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
@@ -260,7 +260,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void setsDefaultFlowVariableDataType() throws Exception {
-    BaseEvent muleEvent = BaseEvent.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD).build();
+    CoreEvent muleEvent = CoreEvent.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD).build();
 
     assertVariableDataType(muleEvent, STRING);
   }
@@ -269,7 +269,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsCustomFlowVariableDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    BaseEvent muleEvent = BaseEvent.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD, dataType).build();
+    CoreEvent muleEvent = CoreEvent.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD, dataType).build();
 
     assertVariableDataType(muleEvent, dataType);
   }
@@ -334,12 +334,12 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     assertThat(actualDataType, like(dataType));
   }
 
-  private void assertVariableDataType(BaseEvent event, DataType dataType) {
+  private void assertVariableDataType(CoreEvent event, DataType dataType) {
     DataType actualDataType = event.getVariables().get(TEST_PROPERTY).getDataType();
     assertThat(actualDataType, like(dataType));
   }
 
-  private void assertSessionVariableDataType(BaseEvent event, DataType dataType) {
+  private void assertSessionVariableDataType(CoreEvent event, DataType dataType) {
     DataType actualDataType = ((PrivilegedEvent) event).getSession().getPropertyDataType(TEST_PROPERTY);
     assertThat(actualDataType, like(dataType));
   }

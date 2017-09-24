@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 
 /**
@@ -24,7 +24,7 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes before emitting a result event, with an optional timeout.
- * <li>Collects results into a result {@link BaseEvent} with a {@link java.util.Map<String,
+ * <li>Collects results into a result {@link CoreEvent} with a {@link java.util.Map<String,
  * org.mule.runtime.api.message.Message>} payload where the {@link java.util.Map} key is a string representation of the sequence
  * number of the {@link ForkJoinStrategy.RoutingPair}.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
@@ -33,8 +33,8 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 public class CollectMapForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
 
   @Override
-  protected Function<List<BaseEvent>, BaseEvent> createResultEvent(BaseEvent original,
-                                                                   BaseEvent.Builder resultBuilder) {
+  protected Function<List<CoreEvent>, CoreEvent> createResultEvent(CoreEvent original,
+                                                                   CoreEvent.Builder resultBuilder) {
     return list -> resultBuilder
         .message(of(list.stream().collect(toMap(event -> Integer.toString(event.getGroupCorrelation().get().getSequence()),
                                                 event -> event.getMessage()))))

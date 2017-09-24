@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.extension;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -68,7 +68,7 @@ public interface ExtensionManager {
    * @param event the current Event
    * @return a {@link ConfigurationInstance}
    */
-  ConfigurationInstance getConfiguration(String configurationProviderName, BaseEvent event);
+  ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
 
   /**
    * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
@@ -98,11 +98,11 @@ public interface ExtensionManager {
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
   Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                   BaseEvent muleEvent);
+                                                   CoreEvent muleEvent);
 
   /**
    * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
-   * {@link #getConfiguration(String, BaseEvent)} method.
+   * {@link #getConfiguration(String, CoreEvent)} method.
    * <p>
    * This means that the returned provided will be located using the same set of rules as the aforementioned method.
    *
@@ -123,7 +123,7 @@ public interface ExtensionManager {
 
   /**
    * Registered the given {@link ConfigurationProvider} which should be later be used to serve invocations to
-   * {@link #getConfigurationProvider(ExtensionModel, ComponentModel)} and {@link #getConfiguration(String, BaseEvent)}
+   * {@link #getConfigurationProvider(ExtensionModel, ComponentModel)} and {@link #getConfiguration(String, CoreEvent)}
    *
    * @param configurationProvider a {@link ConfigurationProvider}
    */

@@ -31,7 +31,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
@@ -65,12 +65,12 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
       mock(MessageSourceResponseParametersProcessor.class, RETURNS_DEEP_STUBS);
   private Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
-  private BaseEvent initialEvent;
-  private BaseEvent modifiedEvent;
-  private BaseEvent firstPolicyResultEvent;
-  private BaseEvent secondPolicyResultEvent;
+  private CoreEvent initialEvent;
+  private CoreEvent modifiedEvent;
+  private CoreEvent firstPolicyResultEvent;
+  private CoreEvent secondPolicyResultEvent;
   private Processor flowExecutionProcessor = mock(Processor.class);
-  private BaseEvent nextProcessResultEvent = mock(BaseEvent.class);
+  private CoreEvent nextProcessResultEvent = mock(CoreEvent.class);
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory =
       mock(SourcePolicyProcessorFactory.class, RETURNS_DEEP_STUBS);
   private Processor firstPolicySourcePolicyProcessor = mock(Processor.class);
@@ -86,7 +86,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      Mono<BaseEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
       return mono.doOnNext(event -> ((BaseEventContext) event.getContext()).success(event));
     });
     when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyResultEvent));
@@ -119,11 +119,11 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     assertThat(sourcePolicyResult.isRight(), is(true));
     assertThat(sourcePolicyResult.getRight().getResult().getMessage(), is(firstPolicyResultEvent.getMessage()));
     verify(flowExecutionProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((BaseEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(modifiedEvent.getMessage()));
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(firstPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((BaseEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(initialEvent.getMessage()));
   }
 
@@ -138,15 +138,15 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     assertThat(sourcePolicyResult.isRight(), is(true));
     assertThat(sourcePolicyResult.getRight().getResult().getMessage(), is(firstPolicyResultEvent.getMessage()));
     verify(flowExecutionProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((BaseEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(modifiedEvent.getMessage()));
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(firstPolicy), any());
     verify(sourcePolicyProcessorFactory).createSourcePolicy(same(secondPolicy), any());
     verify(firstPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((BaseEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(initialEvent.getMessage()));
     verify(secondPolicySourcePolicyProcessor).apply(publisherArgumentCaptor.capture());
-    assertThat(((BaseEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
+    assertThat(((CoreEvent) from(publisherArgumentCaptor.getValue()).block()).getMessage(),
                equalTo(modifiedEvent.getMessage()));
   }
 
@@ -182,7 +182,7 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     RuntimeException policyException = new RuntimeException("policy failure");
     reset(flowExecutionProcessor);
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
-      Mono<BaseEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
+      Mono<CoreEvent> mono = from(invocation.getArgumentAt(0, Publisher.class));
       mono.doOnNext(event -> ((BaseEventContext) event.getContext()).error(policyException)).subscribe();
       return empty();
     });
@@ -198,8 +198,8 @@ public class CompositeSourcePolicyTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private BaseEvent createTestEvent() {
-    return BaseEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
+  private CoreEvent createTestEvent() {
+    return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build()).build();
   }
 

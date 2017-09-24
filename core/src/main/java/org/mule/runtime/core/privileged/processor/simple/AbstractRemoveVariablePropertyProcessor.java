@@ -10,7 +10,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.WildcardAttributeEvaluator;
@@ -35,9 +35,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (wildcardAttributeEvaluator.hasWildcards()) {
-      AtomicReference<BaseEvent> resultEvent = new AtomicReference<>(event);
+      AtomicReference<CoreEvent> resultEvent = new AtomicReference<>(event);
       wildcardAttributeEvaluator.processValues(getPropertyNames((PrivilegedEvent) event), matchedValue -> {
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));

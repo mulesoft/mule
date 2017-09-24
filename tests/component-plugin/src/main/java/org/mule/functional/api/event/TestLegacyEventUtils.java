@@ -8,7 +8,7 @@ package org.mule.functional.api.event;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -17,7 +17,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.lang.reflect.Field;
 
 /**
- * Test utilities to access encapsulated fields and behavior from {@link BaseEvent}s.
+ * Test utilities to access encapsulated fields and behavior from {@link CoreEvent}s.
  *
  * @since 4.0
  */
@@ -35,7 +35,7 @@ public final class TestLegacyEventUtils {
    *
    * @return the message processors trace associated to the given event.
    */
-  public static ProcessorsTrace getProcessorsTrace(BaseEvent event) {
+  public static ProcessorsTrace getProcessorsTrace(CoreEvent event) {
     return ((BaseEventContext) event.getContext()).getProcessorsTrace();
   }
 
@@ -43,7 +43,7 @@ public final class TestLegacyEventUtils {
    * @return the {@link MessagingExceptionHandler} to be applied if an exception is unhandled during the processing of the given
    *         event.
    */
-  public static MessagingExceptionHandler getEffectiveExceptionHandler(BaseEvent event) {
+  public static MessagingExceptionHandler getEffectiveExceptionHandler(CoreEvent event) {
     Field exceptionHandlerField;
     try {
       exceptionHandlerField = event.getContext().getClass().getSuperclass().getDeclaredField("exceptionHandler");
@@ -70,15 +70,15 @@ public final class TestLegacyEventUtils {
     }
   }
 
-  public static Object getSessionProperty(BaseEvent event, String property) {
+  public static Object getSessionProperty(CoreEvent event, String property) {
     return ((PrivilegedEvent) event).getSession().getProperty(property);
   }
 
-  public static DataType getSessionPropertyDataType(BaseEvent event, String property) {
+  public static DataType getSessionPropertyDataType(CoreEvent event, String property) {
     return ((PrivilegedEvent) event).getSession().getPropertyDataType(property);
   }
 
-  public static Object removeSessionProperty(BaseEvent event, String property) {
+  public static Object removeSessionProperty(CoreEvent event, String property) {
     return ((PrivilegedEvent) event).getSession().removeProperty(property);
   }
 
@@ -87,7 +87,7 @@ public final class TestLegacyEventUtils {
    *
    * @return event for currently executing thread.
    */
-  public static BaseEvent getCurrentEvent() {
+  public static CoreEvent getCurrentEvent() {
     return PrivilegedEvent.getCurrentEvent();
   }
 }

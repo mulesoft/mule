@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 
 /**
@@ -26,6 +26,6 @@ public interface ResponseCompletionCallback {
    * @param event the event that was the source for the response.
    * @return the event that is the result of the exception strategy.
    */
-  BaseEvent responseSentWithFailure(MessagingException e, BaseEvent event);
+  CoreEvent responseSentWithFailure(MessagingException e, CoreEvent event);
 
 }

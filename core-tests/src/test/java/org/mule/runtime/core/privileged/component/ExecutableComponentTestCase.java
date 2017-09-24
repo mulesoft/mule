@@ -12,14 +12,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -34,7 +34,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   private TestExecutableComponent executableComponent = new TestExecutableComponent();
   private Message requestMessage;
   private Message responseMessage = of("Response");
-  private AtomicReference<BaseEvent> componentInEvent = new AtomicReference<>();
+  private AtomicReference<CoreEvent> componentInEvent = new AtomicReference<>();
 
 
   @Override
@@ -90,7 +90,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   final class TestExecutableComponent extends AbstractExecutableComponent implements ReactiveProcessor {
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher).map(event -> {
         componentInEvent.set(event);
         return builder(event).message(responseMessage).build();

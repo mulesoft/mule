@@ -14,7 +14,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -101,7 +101,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   @Ignore("MULE-13440")
   public void manyNestedOperations() throws Exception {
-    BaseEvent event = runFlow("killMany");
+    CoreEvent event = runFlow("killMany");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
         + "bye bye, Nazi dudes\n";
 
@@ -111,7 +111,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
   @Test
   @Ignore("MULE-13440")
   public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception {
-    BaseEvent event = runFlow("killManyButOnlyOneProvided");
+    CoreEvent event = runFlow("killManyButOnlyOneProvided");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
 
     assertThat(expected, is(((PrivilegedEvent) event).getMessageAsString(muleContext)));
@@ -119,7 +119,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void anything() throws Exception {
-    BaseEvent event = flowRunner("executeAnything")
+    CoreEvent event = flowRunner("executeAnything")
         .withPayload("Killed the following because I'm the one who knocks:").run();
     String expected = "Killed the following because I'm the one who knocks:";
 
@@ -128,7 +128,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void neverFailsWrapperFailingChain() throws Exception {
-    BaseEvent event = flowRunner("neverFailsWrapperFailingChain").run();
+    CoreEvent event = flowRunner("neverFailsWrapperFailingChain").run();
 
     assertThat(event.getMessage().getPayload().getValue(), is("ERROR"));
     assertThat(event.getVariables().get("varName").getValue(), is("varValue"));
@@ -136,7 +136,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void neverFailsWrapperSuccessChain() throws Exception {
-    BaseEvent event = flowRunner("neverFailsWrapperSuccessChain")
+    CoreEvent event = flowRunner("neverFailsWrapperSuccessChain")
         .withVariable("newpayload", "newpayload2")
         .run();
 
@@ -146,7 +146,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void payloadModifier() throws Exception {
-    BaseEvent event = flowRunner("payloadModifier").run();
+    CoreEvent event = flowRunner("payloadModifier").run();
 
     assertThat(event.getMessage().getPayload().getValue(), is("MESSAGE"));
     assertThat(event.getVariables().get("newPayload").getValue(), is("MESSAGE"));
@@ -155,7 +155,7 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void neverFailsWrapperNoChain() throws Exception {
-    BaseEvent event = flowRunner("neverFailsWrapperNoChain").run();
+    CoreEvent event = flowRunner("neverFailsWrapperNoChain").run();
 
     assertThat(event.getMessage().getPayload().getValue(), is("EMPTY"));
   }

@@ -55,7 +55,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
@@ -130,7 +130,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ResolverSetResult parameters;
 
-  protected BaseEvent event;
+  protected CoreEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected InternalMessage message;
@@ -290,7 +290,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
         when(mockOperationPolicy.process(any()))
             .thenAnswer(operationPolicyInvocationMock -> ((OperationExecutionFunction) invocationOnMock.getArguments()[3])
                 .execute((Map<String, Object>) invocationOnMock.getArguments()[2],
-                         (BaseEvent) invocationOnMock.getArguments()[1]));
+                         (CoreEvent) invocationOnMock.getArguments()[1]));
       }
       return mockOperationPolicy;
     });
@@ -300,7 +300,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor = setUpOperationMessageProcessor();
   }
 
-  protected BaseEvent configureEvent() throws Exception {
+  protected CoreEvent configureEvent() throws Exception {
     when(message.getPayload())
         .thenReturn(new TypedValue<>(TEST_PAYLOAD,
                                      DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));

@@ -14,7 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.privileged.event.Acceptor;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -52,9 +52,9 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final BaseEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
 
-    BaseEvent resultEvent = splitter.process(inEvent);
+    CoreEvent resultEvent = splitter.process(inEvent);
 
     assertThat(listener.events, hasSize(3));
     assertThat(listener.events.get(0).getMessage().getPayload().getValue(), instanceOf(Fruit.class));
@@ -87,9 +87,9 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final BaseEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
 
-    BaseEvent resultEvent = splitter.process(inEvent);
+    CoreEvent resultEvent = splitter.process(inEvent);
 
     assertThat(resultEvent.getMessage().getPayload().getValue(), nullValue());
   }
@@ -110,7 +110,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    final BaseEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
+    final CoreEvent inEvent = eventBuilder().message(of(fruitBowl)).build();
 
     expected.expect(MessagingException.class);
     expected.expectMessage("Expected");
@@ -119,10 +119,10 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
 
   private static class MultipleEventSensingMessageProcessor implements Processor {
 
-    List<BaseEvent> events = new ArrayList<>();
+    List<CoreEvent> events = new ArrayList<>();
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       events.add(event);
       return event;
     }
@@ -139,18 +139,18 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
         }
 
         @Override
-        public boolean accept(BaseEvent event) {
+        public boolean accept(CoreEvent event) {
           return filtersErrors;
         }
       };
     }
 
     @Override
-    protected List<BaseEvent> splitMessage(BaseEvent event) {
+    protected List<CoreEvent> splitMessage(CoreEvent event) {
       FruitBowl bowl = (FruitBowl) event.getMessage().getPayload().getValue();
-      List<BaseEvent> parts = new ArrayList<>();
+      List<CoreEvent> parts = new ArrayList<>();
       for (Fruit fruit : bowl.getFruit()) {
-        parts.add(BaseEvent.builder(event).message(of(fruit)).build());
+        parts.add(CoreEvent.builder(event).message(of(fruit)).build());
       }
       return parts;
     }

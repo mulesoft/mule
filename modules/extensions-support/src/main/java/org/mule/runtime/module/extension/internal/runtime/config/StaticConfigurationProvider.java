@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -32,7 +32,7 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   /**
    * Returns {@link #configuration}.
    *
-   * @param muleEvent the current {@link BaseEvent}
+   * @param muleEvent the current {@link CoreEvent}
    * @return {@link #configuration}
    */
   @Override

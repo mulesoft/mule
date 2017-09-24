@@ -26,7 +26,7 @@ import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -52,7 +52,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   private ServerNotificationManager eventNotificationHandler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;

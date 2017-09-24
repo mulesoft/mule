@@ -15,7 +15,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
@@ -82,7 +82,7 @@ public class CompositeSourcePolicy extends
    * {@link MessagingException} to signal that the failure was through the the flow exception and not the policy logic.
    */
   @Override
-  protected Publisher<BaseEvent> processNextOperation(BaseEvent event) {
+  protected Publisher<CoreEvent> processNextOperation(CoreEvent event) {
     return just(event)
         .then(request -> from(processWithChildContext(request, flowExecutionProcessor, empty())))
         .map(flowExecutionResponse -> {
@@ -92,7 +92,7 @@ public class CompositeSourcePolicy extends
               .map(parametersTransformer -> parametersTransformer
                   .fromSuccessResponseParametersToMessage(originalResponseParameters))
               .orElseGet(flowExecutionResponse::getMessage);
-          return BaseEvent.builder(event).message(message).build();
+          return CoreEvent.builder(event).message(message).build();
 
         })
         .onErrorMap(MessagingException.class, messagingException -> {
@@ -102,7 +102,7 @@ public class CompositeSourcePolicy extends
               .map(parametersTransformer -> parametersTransformer
                   .fromFailureResponseParametersToMessage(originalFailureResponseParameters))
               .orElse(messagingException.getEvent().getMessage());
-          return new FlowExecutionException(BaseEvent.builder(event).message(message).build(),
+          return new FlowExecutionException(CoreEvent.builder(event).message(message).build(),
                                             messagingException.getCause(),
                                             messagingException.getFailingComponent());
         });
@@ -113,7 +113,7 @@ public class CompositeSourcePolicy extends
    * wrapped policy / flow.
    */
   @Override
-  protected Publisher<BaseEvent> processPolicy(Policy policy, Processor nextProcessor, BaseEvent event) {
+  protected Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event) {
     return just(event).transform(sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor));
   }
 
@@ -131,7 +131,7 @@ public class CompositeSourcePolicy extends
    * @throws Exception if there was an unexpected failure thrown by executing the chain.
    */
   @Override
-  public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(BaseEvent sourceEvent) {
+  public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent) {
     return from(MessageProcessors.process(sourceEvent, getPolicyProcessor()))
         .<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>map(policiesResultEvent -> {
           Supplier<Map<String, Object>> responseParameters = () -> getParametersTransformer()

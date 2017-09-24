@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -37,8 +37,8 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    event = BaseEvent.builder(event)
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    event = CoreEvent.builder(event)
         .addVariable(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString())
         .addVariable(FLOW_CONSRUCT_PROPERTY, registry.lookupByName(getRootContainerName()).orElse(null)).build();
     return event;

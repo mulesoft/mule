@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 
@@ -18,7 +18,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.privileged.connector.DispatchException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.routing.RoutingException;
 
@@ -71,8 +71,8 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
   }
 
   @Override
-  public BaseEvent route(BaseEvent event, List<Processor> messageProcessors) throws MuleException {
-    BaseEvent returnEvent = null;
+  public CoreEvent route(CoreEvent event, List<Processor> messageProcessors) throws MuleException {
+    CoreEvent returnEvent = null;
 
     boolean failed = true;
     Exception failExceptionCause = null;
@@ -122,10 +122,10 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
    * @return
    * @throws MuleException
    */
-  protected final BaseEvent sendRequest(final BaseEvent routedEvent, final Message message, final Processor route,
+  protected final CoreEvent sendRequest(final CoreEvent routedEvent, final Message message, final Processor route,
                                         boolean awaitResponse)
       throws MuleException {
-    BaseEvent result;
+    CoreEvent result;
     try {
       result = sendRequestEvent(routedEvent, message, route, awaitResponse);
     } catch (MuleException me) {
@@ -150,7 +150,7 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
     return result;
   }
 
-  private BaseEvent sendRequestEvent(BaseEvent routedEvent, Message message, Processor route, boolean awaitResponse)
+  private CoreEvent sendRequestEvent(CoreEvent routedEvent, Message message, Processor route, boolean awaitResponse)
       throws MuleException {
     if (route == null) {
       throw new DispatchException(objectIsNull("route"), null);
@@ -161,6 +161,6 @@ public class FirstSuccessfulRoutingStrategy implements RoutingStrategy {
 
   interface RouteProcessor {
 
-    BaseEvent processRoute(Processor route, BaseEvent event) throws MuleException;
+    CoreEvent processRoute(Processor route, CoreEvent event) throws MuleException;
   }
 }

@@ -18,7 +18,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -54,7 +54,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
   @Override
   public ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
                                                                    ConfigurationModel implicitConfigurationModel,
-                                                                   BaseEvent event,
+                                                                   CoreEvent event,
                                                                    MuleContext muleContext) {
     if (implicitConfigurationModel == null || !canBeUsedImplicitly(implicitConfigurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()

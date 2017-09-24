@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.streaming.bytes.factory;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -44,7 +44,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    * {@inheritDoc}
    */
   @Override
-  public final Object of(BaseEvent event, InputStream inputStream) {
+  public final Object of(CoreEvent event, InputStream inputStream) {
     if (inputStream instanceof CursorStream) {
       return streamingManager.manage(((CursorStream) inputStream).getProvider(), event);
     }
@@ -71,6 +71,6 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
    * @param event
    * @return
    */
-  protected abstract Object resolve(InputStream inputStream, BaseEvent event);
+  protected abstract Object resolve(InputStream inputStream, CoreEvent event);
 
 }

@@ -12,7 +12,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -31,7 +31,7 @@ public class TestSecurityFilter extends AbstractAuthenticationFilter {
   }
 
   @Override
-  public SecurityContext authenticate(BaseEvent event)
+  public SecurityContext authenticate(CoreEvent event)
       throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
       EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     called = true;

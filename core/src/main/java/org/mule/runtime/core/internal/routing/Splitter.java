@@ -10,7 +10,7 @@ import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.cr
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.privileged.event.Acceptor;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
@@ -26,7 +26,7 @@ import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 public class Splitter extends AbstractMessageSequenceSplitter implements Initialisable, Router {
 
   private ExpressionConfig config = new ExpressionConfig("#[payload]");
-  private SplittingStrategy<BaseEvent, MessageSequence<?>> strategy;
+  private SplittingStrategy<CoreEvent, MessageSequence<?>> strategy;
   private String filterOnErrorType = null;
 
   public Splitter() {
@@ -39,7 +39,7 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
   }
 
   @Override
-  protected MessageSequence<?> splitMessageIntoSequence(BaseEvent event) {
+  protected MessageSequence<?> splitMessageIntoSequence(CoreEvent event) {
     return this.strategy.split(event);
   }
 
@@ -61,7 +61,7 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
       }
 
       @Override
-      public boolean accept(BaseEvent event) {
+      public boolean accept(CoreEvent event) {
         return filterOnErrorTypeMatcher != null && filterOnErrorTypeMatcher.match(event.getError().get().getErrorType());
       }
     };

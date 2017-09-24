@@ -28,7 +28,7 @@ import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -111,7 +111,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       interceptedProcessor = publisher -> from(publisher)
           .cast(InternalEvent.class)
           .map(doBefore(interceptor, component, dslParameters))
-          .cast(BaseEvent.class)
+          .cast(CoreEvent.class)
           .transform(next)
           .onErrorMap(MessagingException.class, error -> {
             return createMessagingException(doAfter(interceptor, component, of(error.getCause()))
@@ -253,7 +253,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
         .build();
   }
 
-  private Map<String, ?> internalParametersFrom(BaseEvent event) {
+  private Map<String, ?> internalParametersFrom(CoreEvent event) {
     return ((InternalEvent) event).getInternalParameters();
   }
 
@@ -301,7 +301,7 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     return builder.build();
   }
 
-  private MessagingException createMessagingException(BaseEvent event, Throwable cause, Component processor) {
+  private MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
 

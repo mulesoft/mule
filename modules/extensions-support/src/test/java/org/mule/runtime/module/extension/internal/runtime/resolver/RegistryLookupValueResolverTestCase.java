@@ -18,7 +18,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.H
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -36,7 +36,7 @@ public class RegistryLookupValueResolverTestCase extends AbstractMuleTestCase {
   private static final String FAKE_KEY = "not there";
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;

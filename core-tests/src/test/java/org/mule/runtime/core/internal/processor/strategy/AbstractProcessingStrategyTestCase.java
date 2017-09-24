@@ -47,7 +47,7 @@ import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -152,7 +152,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   protected Processor failingProcessor = new ThreadTrackingProcessor() {
 
     @Override
-    public BaseEvent process(BaseEvent event) {
+    public CoreEvent process(CoreEvent event) {
       throw new RuntimeException("FAILURE");
     }
   };
@@ -162,7 +162,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     private AtomicInteger count = new AtomicInteger();
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       if (count.getAndIncrement() % 10 < 5) {
         return super.process(event);
       } else {
@@ -426,7 +426,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   @Test
   public abstract void tx() throws Exception;
 
-  protected BaseEvent processFlow(BaseEvent event) throws Exception {
+  protected CoreEvent processFlow(CoreEvent event) throws Exception {
     setMuleContextIfNeeded(flow, muleContext);
     switch (mode) {
       case FLOW:
@@ -443,7 +443,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
   }
 
-  protected void dispatchFlow(BaseEvent event, Consumer<BaseEvent> onSuccess,
+  protected void dispatchFlow(CoreEvent event, Consumer<CoreEvent> onSuccess,
                               Consumer<Throwable> onError) {
     setMuleContextIfNeeded(flow, muleContext);
     switch (mode) {
@@ -487,7 +487,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
               .processors(asList(cpuLightProcessor, new ThreadTrackingProcessor() {
 
                 @Override
-                public BaseEvent process(BaseEvent event) throws MuleException {
+                public CoreEvent process(CoreEvent event) throws MuleException {
                   try {
                     Thread.sleep(3);
                   } catch (InterruptedException e) {
@@ -511,7 +511,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
       for (int i = 0; i < STREAM_ITERATIONS; i++) {
         cachedThreadPool.submit(() -> Flux.just(newEvent())
-            .cast(BaseEvent.class).transform(triggerableMessageSource.getListener())
+            .cast(CoreEvent.class).transform(triggerableMessageSource.getListener())
             .doOnNext(event -> processed.getAndIncrement())
             .doOnError(e -> rejected.getAndIncrement()).subscribe());
       }
@@ -541,7 +541,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       threads.add(currentThread().getName());
       if (invocations.getAndDecrement() > 0) {
         allLatchedLatch.countDown();
@@ -643,13 +643,13 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   class ThreadTrackingProcessor implements Processor, InternalProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       threads.add(currentThread().getName());
       return event;
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       if (getProcessingType() == CPU_LITE_ASYNC) {
         return from(publisher).transform(processorPublisher -> Processor.super.apply(publisher))
             .publishOn(fromExecutorService(custom));
@@ -695,12 +695,12 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   class AnnotatedAsyncProcessor extends AbstractComponent implements AnnotatedProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return asyncProcessor.process(event);
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return asyncProcessor.apply(publisher);
     }
 

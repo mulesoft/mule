@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.privileged.transport.LegacyInboundEndpoint;
@@ -33,8 +33,8 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
   protected Processor requestMessageProcessor;
 
   @Override
-  protected void sendAsyncRequest(BaseEvent event) throws MuleException {
-    event = BaseEvent.builder(event)
+  protected void sendAsyncRequest(CoreEvent event) throws MuleException {
+    event = CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
             .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, getLocation().getRootContainerName())
             .build())

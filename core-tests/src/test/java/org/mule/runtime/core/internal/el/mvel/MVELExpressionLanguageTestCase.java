@@ -48,7 +48,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.el.context.MessageContext;
@@ -401,7 +401,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   public void returnsDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(JSON).charset(UTF_16.name()).build();
 
-    BaseEvent event = createEvent(TEST_MESSAGE, dataType);
+    CoreEvent event = createEvent(TEST_MESSAGE, dataType);
 
     TypedValue typedValue = evaluateTyped("payload", event);
 
@@ -417,13 +417,13 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     }
   }
 
-  protected TypedValue evaluateTyped(String expression, BaseEvent event) throws Exception {
+  protected TypedValue evaluateTyped(String expression, CoreEvent event) throws Exception {
     if (variant.equals(Variant.EXPRESSION_WITH_DELIMITER)) {
-      return mvel.evaluate("#[mel:" + expression + "]", event, BaseEvent.builder(event),
+      return mvel.evaluate("#[mel:" + expression + "]", event, CoreEvent.builder(event),
                            ((Component) flowConstruct).getLocation(),
                            BindingContext.builder().build());
     } else {
-      return mvel.evaluate(expression, event, BaseEvent.builder(event), ((Component) flowConstruct).getLocation(),
+      return mvel.evaluate(expression, event, CoreEvent.builder(event), ((Component) flowConstruct).getLocation(),
                            BindingContext.builder().build());
     }
   }

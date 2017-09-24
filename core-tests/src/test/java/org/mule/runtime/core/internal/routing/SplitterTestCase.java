@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
@@ -123,7 +123,7 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     Splitter splitter = new Splitter();
     splitter.setMuleContext(muleContext);
     splitter.initialise();
-    BaseEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(toSplit).session(session).build();
+    CoreEvent event = this.<PrivilegedEvent.Builder>getEventBuilder().message(toSplit).session(session).build();
     assertSame(event, splitter.process(event));
   }
 
@@ -167,10 +167,10 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       eventBuilder.addVariable(entry.getKey(), entry.getValue());
     }
-    BaseEvent event = eventBuilder.build();
+    CoreEvent event = eventBuilder.build();
 
     splitter.process(event);
-    List<BaseEvent> splits = grabber.getEvents();
+    List<CoreEvent> splits = grabber.getEvents();
     assertEquals(count, splits.size());
 
     Set<Object> actualSequences = new HashSet<>();
@@ -180,8 +180,8 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
 
   private void assertSplitParts(int count, boolean counted, Map<String, Serializable> inboundProps,
                                 Map<String, Serializable> outboundProps, Map<String, Object> invocationProps,
-                                List<BaseEvent> splits, Set<Object> actualSequences) {
-    for (BaseEvent event : splits) {
+                                List<CoreEvent> splits, Set<Object> actualSequences) {
+    for (CoreEvent event : splits) {
       Message msg = event.getMessage();
       assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
@@ -206,15 +206,15 @@ public class SplitterTestCase extends AbstractMuleContextTestCase {
 
   private static class Grabber implements Processor {
 
-    private List<BaseEvent> events = new ArrayList<>();
+    private List<CoreEvent> events = new ArrayList<>();
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       events.add(event);
       return null;
     }
 
-    public List<BaseEvent> getEvents() {
+    public List<CoreEvent> getEvents() {
       return events;
     }
   }

@@ -21,7 +21,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
@@ -54,7 +54,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor cpuIntensiveProcessor = new Processor() {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       // Roughly 5mS on modern CPU.
       consumeCPU(2500000);
       return event;
@@ -69,7 +69,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   static final Processor blockingProcessor = new Processor() {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       try {
         sleep(20);
       } catch (InterruptedException e) {
@@ -143,8 +143,8 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  public BaseEvent processSourceBlocking() throws MuleException {
-    return source.trigger(BaseEvent.builder(create(flow, CONNECTOR_LOCATION))
+  public CoreEvent processSourceBlocking() throws MuleException {
+    return source.trigger(CoreEvent.builder(create(flow, CONNECTOR_LOCATION))
         .message(of(PAYLOAD)).build());
   }
 
@@ -152,7 +152,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
   public CountDownLatch processSourceStream() throws MuleException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(getStreamIterations());
     for (int i = 0; i < getStreamIterations(); i++) {
-      Mono.just(BaseEvent.builder(create(flow, CONNECTOR_LOCATION))
+      Mono.just(CoreEvent.builder(create(flow, CONNECTOR_LOCATION))
           .message(of(PAYLOAD)).build()).transform(source.getListener()).doOnNext(event -> latch.countDown())
           .subscribe();
     }

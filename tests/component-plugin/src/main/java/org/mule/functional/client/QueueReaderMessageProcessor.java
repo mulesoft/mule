@@ -12,12 +12,12 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 
 /**
- * Reads {@link BaseEvent} from a test connector's queue.
+ * Reads {@link CoreEvent} from a test connector's queue.
  */
 public class QueueReaderMessageProcessor implements Processor {
 
@@ -45,7 +45,7 @@ public class QueueReaderMessageProcessor implements Processor {
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = registry.<TestConnectorConfig>lookupByName(DEFAULT_CONFIG_ID).get();
 
     if (timeout == null) {

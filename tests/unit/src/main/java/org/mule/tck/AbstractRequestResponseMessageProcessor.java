@@ -12,7 +12,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
@@ -26,24 +26,24 @@ import reactor.core.publisher.Mono;
  * request and response processing phases while supporting non-blocking execution.
  * <p>
  * In order to define the process during the request phase you should override the
- * {@link #processRequest(BaseEvent)} method. Symmetrically, if you need to define a process to be executed
- * during the response phase, then you should override the {@link #processResponse(BaseEvent)} method.
+ * {@link #processRequest(CoreEvent)} method. Symmetrically, if you need to define a process to be executed
+ * during the response phase, then you should override the {@link #processResponse(CoreEvent)} method.
  * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
- * override the {@link #processFinally(BaseEvent, MessagingException)} method.
+ * override the {@link #processFinally(CoreEvent, MessagingException)} method.
  *
  * @since 3.7.0
  */
 public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
-    Flux<BaseEvent> flux = from(publisher).transform(processRequest());
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    Flux<CoreEvent> flux = from(publisher).transform(processRequest());
     if (next != null) {
       flux = flux.transform(applyNext());
     }
@@ -67,7 +67,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * @return result of request processing.
    * @throws MuleException exception thrown by implementations of this method whiile performing response processing
    */
-  protected BaseEvent processRequest(BaseEvent request) throws MuleException {
+  protected CoreEvent processRequest(CoreEvent request) throws MuleException {
     return request;
   }
 
@@ -93,7 +93,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * @return result of response processing.
    * @throws MuleException exception thrown by implementations of this method whiile performing response processing
    */
-  protected BaseEvent processResponse(BaseEvent response) throws MuleException {
+  protected CoreEvent processResponse(CoreEvent response) throws MuleException {
     return response;
   }
 
@@ -115,11 +115,11 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    *        the rest of the Flow following this message processor too.
    * @param exception the exception thrown during processing if any. If not exception was thrown then this parameter is null
    */
-  protected void processFinally(BaseEvent event, MessagingException exception) {
+  protected void processFinally(CoreEvent event, MessagingException exception) {
 
   }
 
-  protected BaseEvent processCatch(BaseEvent event, MessagingException exception) throws MessagingException {
+  protected CoreEvent processCatch(CoreEvent event, MessagingException exception) throws MessagingException {
     throw exception;
   }
 

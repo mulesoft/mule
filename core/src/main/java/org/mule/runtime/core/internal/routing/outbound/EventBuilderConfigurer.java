@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.routing.outbound;
 
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 
 /**
- * Provides a way to define callbacks that work on instances of {@link BaseEvent} {@link Builder}s.
+ * Provides a way to define callbacks that work on instances of {@link CoreEvent} {@link Builder}s.
  *
  * @since 4.0
  */
@@ -20,7 +20,7 @@ public interface EventBuilderConfigurer {
   /**
    * Applies changes on the given {@code builder}.
    * 
-   * @param builder the {@link BaseEvent} builder to configure.
+   * @param builder the {@link CoreEvent} builder to configure.
    */
   void configure(Builder builder);
 

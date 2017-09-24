@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
- * Provides a value which is dependant on a {@link BaseEvent}
+ * Provides a value which is dependant on a {@link CoreEvent}
  *
  * @since 3.7.0
  */

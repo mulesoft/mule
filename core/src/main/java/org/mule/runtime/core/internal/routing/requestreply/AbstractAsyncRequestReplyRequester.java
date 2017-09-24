@@ -30,7 +30,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.RoutingNotification;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -79,7 +79,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected ObjectStore store;
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (replyMessageSource == null) {
       return processNext(event);
     } else {
@@ -102,7 +102,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  private void addLock(BaseEvent event) {
+  private void addLock(CoreEvent event) {
     String correlationId = getAsyncReplyCorrelationId(event);
     locks.put(correlationId, new RequestReplyLatch(event.getGroupCorrelation().map(gc -> gc.getGroupSize().orElse(-1)).orElse(-1),
                                                    event.getGroupCorrelation().map(gc -> gc.getSequence()).orElse(-1)));
@@ -189,17 +189,17 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     // template method
   }
 
-  private String getAsyncReplyCorrelationId(BaseEvent event) {
+  private String getAsyncReplyCorrelationId(CoreEvent event) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(event.getContext().getCorrelationId());
     return stringBuilder.toString();
   }
 
-  protected void sendAsyncRequest(BaseEvent event) throws MuleException {
+  protected void sendAsyncRequest(CoreEvent event) throws MuleException {
     processNext(event);
   }
 
-  private PrivilegedEvent receiveAsyncReply(BaseEvent event) throws MuleException {
+  private PrivilegedEvent receiveAsyncReply(CoreEvent event) throws MuleException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
     System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = getLatch(asyncReplyCorrelationId);
@@ -277,7 +277,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   class InternalAsyncReplyMessageProcessor extends AbstractComponent implements Processor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       String messageId = getAsyncReplyCorrelationId(event);
 
       RequestReplyLatch requestReplyLatch = locks.get(messageId);
@@ -314,7 +314,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
             if (isAlreadyProcessed(new ProcessedEvents(correlationId, EndReason.FINISHED_BY_TIMEOUT))) {
               deleteEvent = true;
-              BaseEvent event = multipleEvent.getEvent();
+              CoreEvent event = multipleEvent.getEvent();
               if (logger.isDebugEnabled()) {
                 logger.debug("An event was received for an event group that has already been processed, "
                     + "this is because the async-reply timed out. GroupCorrelation Id is: "
@@ -328,7 +328,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
               if (requestReplyLatch != null) {
                 PrivilegedEvent event = retrieveEvent(correlationId);
 
-                BaseEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
+                CoreEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
                 if (previousResult != null) {
                   // this would indicate that we need a better way to prevent
                   // continued aggregation for a group that is currently being

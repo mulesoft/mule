@@ -11,7 +11,7 @@ import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelE
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.util.Copiable;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.w3c.dom.NodeList;
 
-public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<BaseEvent, MessageSequence<?>> {
+public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<CoreEvent, MessageSequence<?>> {
 
   private ExpressionSplittingStrategy expressionSplitterStrategy;
 
@@ -43,7 +43,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public MessageSequence<?> split(BaseEvent event) {
+  public MessageSequence<?> split(CoreEvent event) {
     if (expressionSplitterStrategy.hasDefaultExpression()) {
       Message msg = event.getMessage();
       Object payload = msg.getPayload().getValue();

@@ -30,7 +30,7 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.notification.AsyncMessageNotification;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -52,7 +52,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 /**
- * Processes {@link BaseEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
+ * Processes {@link CoreEvent}'s asynchronously using a {@link ProcessingStrategy} to schedule asynchronous processing of
  * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be executed in a
  * different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is present then an
  * exception is thrown.
@@ -118,12 +118,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .doOnNext(request -> just(request)
@@ -131,7 +131,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             .transform(innerPublisher -> from(innerPublisher)
                 .doOnNext(fireAsyncScheduledNotification())
                 .doOnNext(asyncRequest -> just(asyncRequest)
-                    .cast(BaseEvent.class)
+                    .cast(CoreEvent.class)
                     .transform(scheduleAsync(delegate))
                     .doOnNext(event -> fireAsyncCompleteNotification(event, null))
                     .doOnError(MessagingException.class, e -> fireAsyncCompleteNotification(e.getEvent(), e))
@@ -142,7 +142,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
                     .subscribe(event -> asyncRequest.getContext().success(event),
                                throwable -> asyncRequest.getContext().error(throwable))))
             .subscribe(requestUnbounded()))
-        .cast(BaseEvent.class);
+        .cast(CoreEvent.class);
   }
 
 
@@ -164,12 +164,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .session(new DefaultMuleSession(event.getSession())).build();
   }
 
-  private Consumer<BaseEvent> fireAsyncScheduledNotification() {
+  private Consumer<CoreEvent> fireAsyncScheduledNotification() {
     return event -> muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(createInfo(event, null, this), getLocation(), PROCESS_ASYNC_SCHEDULED));
   }
 
-  private void fireAsyncCompleteNotification(BaseEvent event, MessagingException exception) {
+  private void fireAsyncCompleteNotification(CoreEvent event, MessagingException exception) {
     muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(createInfo(event, exception, this), getLocation(),
                                                        PROCESS_ASYNC_COMPLETE));

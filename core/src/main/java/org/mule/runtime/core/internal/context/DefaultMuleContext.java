@@ -81,7 +81,7 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -253,9 +253,9 @@ public class DefaultMuleContext implements MuleContext {
       // Unwrap all throwables to be consistent with reactor default hook.
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
-      if (signal instanceof BaseEvent) {
+      if (signal instanceof CoreEvent) {
         return throwable instanceof MessagingException ? throwable
-            : new MessagingException((BaseEvent) signal, throwable);
+            : new MessagingException((CoreEvent) signal, throwable);
       } else {
         return throwable;
       }

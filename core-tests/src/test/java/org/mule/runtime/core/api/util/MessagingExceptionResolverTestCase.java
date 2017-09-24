@@ -28,7 +28,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
@@ -57,7 +57,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private static final String EXPECTED_MESSAGE = "THIS MESSAGE SHOULD BE THROWN";
 
   private Component processor = mock(Component.class);
-  private BaseEvent event;
+  private CoreEvent event;
   private MuleContext context = mock(MuleContext.class);
   private FlowCallStack flowCallStack = mock(FlowCallStack.class);
   private Message message = mock(Message.class);
@@ -204,7 +204,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     assertThat(error.get().getErrorType(), is(expected));
   }
 
-  private MessagingException newMessagingException(Throwable e, BaseEvent event, Component processor) {
+  private MessagingException newMessagingException(Throwable e, CoreEvent event, Component processor) {
     return new MessagingException(createStaticMessage(ERROR_MESSAGE), event, e, processor);
   }
 
@@ -218,7 +218,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public class TestProcessor implements AnnotatedProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return nullPayloadEvent();
     }
 

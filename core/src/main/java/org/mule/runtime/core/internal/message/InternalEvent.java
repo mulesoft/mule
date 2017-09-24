@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
@@ -55,12 +55,12 @@ public interface InternalEvent extends PrivilegedEvent {
   FlowConstruct getFlowConstruct();
 
   /**
-   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(BaseEvent event) {
+  static Builder builder(CoreEvent event) {
     return new DefaultEventBuilder((InternalEvent) event);
   }
 

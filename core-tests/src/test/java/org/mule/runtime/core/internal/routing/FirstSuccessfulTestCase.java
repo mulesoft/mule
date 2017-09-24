@@ -23,7 +23,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -73,7 +73,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testRouteReturnsNullMessage() throws Exception {
-    Processor nullEventMp = event -> BaseEvent.builder(event).message(null).build();
+    Processor nullEventMp = event -> CoreEvent.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
@@ -102,7 +102,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     Message msg = of(message);
     try {
-      BaseEvent event = mp.process(this.<PrivilegedEvent.Builder>getEventBuilder().message(msg).session(session).build());
+      CoreEvent event = mp.process(this.<PrivilegedEvent.Builder>getEventBuilder().message(msg).session(session).build());
       Message returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -123,7 +123,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       try {
         Message msg;
         Error error = null;
@@ -137,7 +137,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = of("No " + rejectIfMatches);
         }
-        BaseEvent muleEvent = eventBuilder().message(msg).error(error).build();
+        CoreEvent muleEvent = eventBuilder().message(msg).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

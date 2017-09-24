@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
@@ -140,7 +140,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
               .build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))
-          .cast(BaseEvent.class)
+          .cast(CoreEvent.class)
           .transform(listener)
           .subscribe(requestUnbounded());
     } catch (Exception e) {

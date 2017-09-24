@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 
 import org.reactivestreams.Subscriber;
@@ -33,10 +33,10 @@ public final class Operators {
    * @param mapper map function
    * @return custom operator {@link BiConsumer} to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)}.
    */
-  public static BiConsumer<BaseEvent, SynchronousSink<BaseEvent>> nullSafeMap(Function<BaseEvent, BaseEvent> mapper) {
+  public static BiConsumer<CoreEvent, SynchronousSink<CoreEvent>> nullSafeMap(Function<CoreEvent, CoreEvent> mapper) {
     return (event, sink) -> {
       if (event != null) {
-        BaseEvent result = mapper.apply(event);
+        CoreEvent result = mapper.apply(event);
         if (result != null) {
           sink.next(result);
         } else {

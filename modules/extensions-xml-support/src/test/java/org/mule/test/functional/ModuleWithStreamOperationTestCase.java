@@ -14,7 +14,7 @@ import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 
 import java.util.Map;
@@ -67,7 +67,7 @@ public class ModuleWithStreamOperationTestCase extends AbstractModuleWithHttpTes
 
   @Test
   public void testHttpDoLoginAndPlainEntireStreamResponseNestingScopes() throws Exception {
-    BaseEvent muleEvent = flowRunner("testHttpDoLoginAndPlainEntireStreamResponseNestingScopes").run();
+    CoreEvent muleEvent = flowRunner("testHttpDoLoginAndPlainEntireStreamResponseNestingScopes").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
     Map<String, String> resultMap = (Map<String, String>) muleEvent.getMessage().getPayload().getValue();
     assertThat(resultMap.size(), is(3));
@@ -78,7 +78,7 @@ public class ModuleWithStreamOperationTestCase extends AbstractModuleWithHttpTes
   }
 
   private void assertFlow(String flowName, String response) throws Exception {
-    BaseEvent muleEvent = flowRunner(flowName).run();
+    CoreEvent muleEvent = flowRunner(flowName).run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(response));
   }
 }

@@ -17,7 +17,7 @@ import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.For
 
 import org.junit.Test;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
@@ -41,7 +41,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
   @Description("This strategy waits for all routes to return and then returns the original event.")
   public void joinOnly() throws Throwable {
 
-    BaseEvent original = testEvent();
+    CoreEvent original = testEvent();
 
     Processor processor1 = createProcessorSpy(of(1));
     Processor processor2 = createProcessorSpy(of(2));
@@ -52,12 +52,12 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
     RoutingPair pair3 = createRoutingPair(processor3);
 
 
-    BaseEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
+    CoreEvent result = invokeStrategyBlocking(strategy, original, asList(pair1, pair2, pair3));
 
     assertThat(result, is(original));
-    verify(processor1, times(1)).process(any(BaseEvent.class));
-    verify(processor2, times(1)).process(any(BaseEvent.class));
-    verify(processor2, times(1)).process(any(BaseEvent.class));
+    verify(processor1, times(1)).process(any(CoreEvent.class));
+    verify(processor2, times(1)).process(any(CoreEvent.class));
+    verify(processor2, times(1)).process(any(CoreEvent.class));
   }
 
 }

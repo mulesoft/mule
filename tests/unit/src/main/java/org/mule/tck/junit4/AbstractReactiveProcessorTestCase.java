@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -35,9 +35,9 @@ import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or {@link Flow} that
- * implements both {@link Processor#process(BaseEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
+ * implements both {@link Processor#process(CoreEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
  * approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
- * {@link #process(Processor, BaseEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
+ * {@link #process(Processor, CoreEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)
 public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleContextTestCase {
@@ -91,11 +91,11 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   }
 
   @Override
-  protected BaseEvent process(Processor processor, BaseEvent event) throws Exception {
+  protected CoreEvent process(Processor processor, CoreEvent event) throws Exception {
     return process(processor, event, true);
   }
 
-  protected BaseEvent process(Processor processor, BaseEvent event, boolean unwrapMessagingException) throws Exception {
+  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {

@@ -17,7 +17,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -27,7 +27,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
@@ -54,9 +54,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private RuntimeException exception = new IllegalArgumentException();
   private BaseEventContext eventContext;
-  private BaseEvent input;
-  private BaseEvent output;
-  private BaseEvent response;
+  private CoreEvent input;
+  private CoreEvent output;
+  private CoreEvent response;
   private Flow flow;
 
   @Before
@@ -396,12 +396,12 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return delegate.apply(publisher);
     }
   }

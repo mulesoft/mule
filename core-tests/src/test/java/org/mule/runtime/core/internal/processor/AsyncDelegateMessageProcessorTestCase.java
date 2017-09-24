@@ -26,7 +26,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -82,9 +82,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void process() throws Exception {
-    BaseEvent request = testEvent();
+    CoreEvent request = testEvent();
 
-    BaseEvent result = process(messageProcessor, request);
+    CoreEvent result = process(messageProcessor, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
     ((BaseEventContext) request.getContext()).success(result);
@@ -116,8 +116,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      BaseEvent request = testEvent();
-      BaseEvent result = process(messageProcessor, request);
+      CoreEvent request = testEvent();
+      CoreEvent result = process(messageProcessor, request);
 
       // Wait until processor in async is executed to allow assertions on sensed event
       asyncEntryLatch.countDown();
@@ -150,7 +150,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     process();
   }
 
-  private void assertTargetEvent(BaseEvent request) {
+  private void assertTargetEvent(CoreEvent request) {
     // Assert that event is processed in async thread
     assertNotNull(target.sensedEvent);
     assertThat(request, not(sameInstance(target.sensedEvent)));
@@ -159,7 +159,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     assertThat(target.thread, not(sameInstance(currentThread())));
   }
 
-  private void assertResponse(BaseEvent result) throws MuleException {
+  private void assertResponse(CoreEvent result) throws MuleException {
     // Assert that response is echoed by async and no exception is thrown in flow
     assertThat(testEvent(), sameInstance(result));
     assertThat(exceptionThrown, nullValue());
@@ -184,11 +184,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   class TestListener implements Processor {
 
-    BaseEvent sensedEvent;
+    CoreEvent sensedEvent;
     Thread thread;
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       try {
         asyncEntryLatch.await();
       } catch (InterruptedException e) {

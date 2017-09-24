@@ -23,7 +23,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
@@ -61,17 +61,17 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     when(contextA.getCorrelationId()).thenReturn("1");
 
     Message okMessage = InternalMessage.builder().value("OK").build();
-    BaseEvent event = BaseEvent.builder(contextA).message(okMessage).build();
+    CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
 
     // This one will process the event on the target endpoint
-    BaseEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, sameInstance(event));
 
     final BaseEventContext contextB = mock(BaseEventContext.class);
     when(contextB.getCorrelationId()).thenReturn("1");
 
     // This will not process, because the ID is a duplicate
-    event = BaseEvent.builder(contextB).message(okMessage).build();
+    event = CoreEvent.builder(contextB).message(okMessage).build();
 
     expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
@@ -83,19 +83,19 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message okMessage = of("OK");
-    BaseEvent event = BaseEvent.builder(context).message(okMessage).build();
+    CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
     //Set MEL expression to hash value
     idempotent.setIdExpression(melExpression);
 
     // This one will process the event on the target endpoint
-    BaseEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
     assertEquals(idempotent.getObjectStore().retrieve("OK"), "1");
 
     // This will not process, because the message is a duplicate
     okMessage = of("OK");
-    event = BaseEvent.builder(context).message(okMessage).build();
+    event = CoreEvent.builder(context).message(okMessage).build();
 
     expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
@@ -110,19 +110,19 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message okMessage = of("Hello");
-    BaseEvent event = BaseEvent.builder(context).message(okMessage).build();
+    CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
     //Set DW expression to hash value
     idempotent.setIdExpression(dwExpression);
 
     // This one will process the event on the target endpoint
-    BaseEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
     assertEquals(idempotent.getObjectStore().retrieve("Hello World"), "1");
 
     // This will not process, because the message is a duplicate
     okMessage = of("Hello");
-    event = BaseEvent.builder(context).message(okMessage).build();
+    event = CoreEvent.builder(context).message(okMessage).build();
 
     expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
@@ -139,7 +139,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message message = of(payload);
-    BaseEvent event = BaseEvent.builder(context).message(message).build();
+    CoreEvent event = CoreEvent.builder(context).message(message).build();
 
     //Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
@@ -150,14 +150,14 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     // This one will process the event on the target endpoint
-    BaseEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
     assertEquals(idempotent.getObjectStore()
         .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
 
     // This will not process, because the message is a duplicate
     message = of(payload);
-    event = BaseEvent.builder(context).message(message).build();
+    event = CoreEvent.builder(context).message(message).build();
 
     expected.expect(ValidationException.class);
     processedEvent = idempotent.process(event);
@@ -175,7 +175,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message message = of(payload);
-    BaseEvent event = BaseEvent.builder(context).message(message).build();
+    CoreEvent event = CoreEvent.builder(context).message(message).build();
 
     //Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
@@ -186,14 +186,14 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     // This one will process the event on the target endpoint
-    BaseEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
     assertEquals(idempotent.getObjectStore()
         .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), "1");
 
     // This will process, because the message is a new one
     Message otherMessage = of(otherPayload);
-    event = BaseEvent.builder(context).message(otherMessage).build();
+    event = CoreEvent.builder(context).message(otherMessage).build();
 
     processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);

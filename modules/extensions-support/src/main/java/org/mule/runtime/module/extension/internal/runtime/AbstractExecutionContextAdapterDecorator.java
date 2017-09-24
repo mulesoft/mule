@@ -10,7 +10,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -35,12 +35,12 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
-  public BaseEvent getEvent() {
+  public CoreEvent getEvent() {
     return decorated.getEvent();
   }
 
   @Override
-  public void changeEvent(BaseEvent updated) {
+  public void changeEvent(CoreEvent updated) {
     decorated.changeEvent(updated);
   }
 

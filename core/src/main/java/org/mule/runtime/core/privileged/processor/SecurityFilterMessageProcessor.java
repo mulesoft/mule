@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 
@@ -53,15 +53,15 @@ public class SecurityFilterMessageProcessor extends AbstractComponent
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher).map(event -> {
       try {
-        return BaseEvent.builder(event).securityContext(filter.doFilter(event)).build();
+        return CoreEvent.builder(event).securityContext(filter.doFilter(event)).build();
       } catch (Exception e) {
         throw propagate(e);
       }

@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -25,8 +25,8 @@ public class DefaultPolicyStateHandlerTestCase extends AbstractMuleTestCase {
   private static final String TEST_POLICY_ID = "test-policy-id";
   private static final String TEST_POLICY_ID2 = "test-policy-id2";
 
-  private BaseEvent eventTestExecutionId = mock(BaseEvent.class);
-  private BaseEvent eventTestExecutionId2 = mock(BaseEvent.class);
+  private CoreEvent eventTestExecutionId = mock(CoreEvent.class);
+  private CoreEvent eventTestExecutionId2 = mock(CoreEvent.class);
 
   private DefaultPolicyStateHandler defaultPolicyStateHandler = new DefaultPolicyStateHandler();
 

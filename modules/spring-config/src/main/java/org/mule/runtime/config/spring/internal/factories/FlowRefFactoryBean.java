@@ -31,7 +31,7 @@ import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -155,12 +155,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher).flatMap(event -> {
         Processor referencedProcessor;
         try {
@@ -182,7 +182,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
       });
     }
 
-    protected Processor resolveReferencedProcessor(BaseEvent event) throws MuleException {
+    protected Processor resolveReferencedProcessor(CoreEvent event) throws MuleException {
       String flowName;
       if (isExpression) {
         flowName = muleContext.getExpressionManager().parse(refName, event, getLocation());

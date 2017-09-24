@@ -21,7 +21,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -52,7 +52,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   private Processor policyProcessor;
   private String executionId;
-  private BaseEvent initialEvent;
+  private CoreEvent initialEvent;
 
   @Before
   public void before() {
@@ -67,21 +67,21 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
 
   @Test
   public void variablesAddedInNextProcessorNotPropagated() throws MuleException {
-    BaseEvent initialEventWithVars = BaseEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
-    BaseEvent modifiedVarsEvent = BaseEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
+    CoreEvent initialEventWithVars = CoreEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
+    CoreEvent modifiedVarsEvent = CoreEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedVarsEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEventWithVars).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    BaseEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
+    CoreEvent resultEvent = just(initialEventWithVars).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getVariables().keySet(), initialEventWithVars.getVariables().keySet());
   }
 
   @Test
   public void variablesAddedBeforeNextProcessorNotPropagatedToIt() throws MuleException {
-    BaseEvent initialEventWithVars = BaseEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
-    BaseEvent modifiedVarsEvent = BaseEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
+    CoreEvent initialEventWithVars = CoreEvent.builder(initialEvent).addVariable(INIT_VAR_NAME, INIT_VAR_VALUE).build();
+    CoreEvent modifiedVarsEvent = CoreEvent.builder(initialEvent).addVariable(ADDED_VAR_NAME, ADDED_VAR_VALUE).build();
     when(flowProcessor.apply(any())).thenReturn(just(initialEventWithVars));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedVarsEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -89,25 +89,25 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEventWithVars).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((BaseEvent) from(eventCaptor.getValue()).block()).getVariables().keySet(),
+    assertEquals(((CoreEvent) from(eventCaptor.getValue()).block()).getVariables().keySet(),
                  initialEventWithVars.getVariables().keySet());
   }
 
   @Test
   public void messageModifiedByNextProcessorIsPropagated() throws MuleException {
-    BaseEvent modifiedMessageEvent = BaseEvent.builder(initialEvent).message(MESSAGE).build();
+    CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    BaseEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
+    CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
     assertEquals(resultEvent.getMessage(), MESSAGE);
   }
 
   @Test
   public void messageModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
-    BaseEvent modifiedMessageEvent = BaseEvent.builder(initialEvent).message(MESSAGE).build();
+    CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedMessageEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedMessageEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -115,18 +115,18 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     just(initialEvent).transform(policyProcessor).block();
 
     verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((BaseEvent) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
+    assertEquals(((CoreEvent) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
   }
 
   @Test
   public void sessionModifiedByNextProcessorIsPropagated() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    BaseEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
+    CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(initialEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
 
-    BaseEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
+    CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
     assertEquals(((PrivilegedEvent) resultEvent).getSession(), session);
   }
@@ -134,7 +134,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   @Test
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() throws MuleException {
     DefaultMuleSession session = new DefaultMuleSession();
-    BaseEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
+    CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     when(flowProcessor.apply(any())).thenReturn(just(modifiedSessionEvent));
     when(policy.getPolicyChain().apply(any()))
         .thenAnswer(invocation -> just(modifiedSessionEvent).transform(policyStateHandler.retrieveNextOperation(executionId)));
@@ -145,9 +145,9 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     assertEquals(((PrivilegedEvent) from(eventCaptor.getValue()).block()).getSession(), session);
   }
 
-  private BaseEvent createTestEvent() {
+  private CoreEvent createTestEvent() {
     when(mockFlowConstruct.getUniqueIdString()).thenReturn(executionId);
-    return BaseEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
+    return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build())
         .build();
   }

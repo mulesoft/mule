@@ -15,7 +15,7 @@ import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -130,7 +130,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *
    * @param flow the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link BaseEvent} of this
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
    *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
    *        {@link BaseEventContext} to depend on completion of source.
@@ -151,7 +151,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
-   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link BaseEvent} of this
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
   *        context, if available.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
   *        {@link BaseEventContext} to depend on completion of source.

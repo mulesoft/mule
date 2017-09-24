@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -35,7 +35,7 @@ public class NullCursorStreamProviderFactory extends AbstractCursorStreamProvide
    * @return the given {@code inputStream} wrapped in an {@link Either} instance
    */
   @Override
-  protected Object resolve(InputStream inputStream, BaseEvent event) {
+  protected Object resolve(InputStream inputStream, CoreEvent event) {
     return inputStream;
   }
 }

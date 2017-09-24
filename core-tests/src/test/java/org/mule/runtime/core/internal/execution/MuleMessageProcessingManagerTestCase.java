@@ -21,7 +21,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.privileged.execution.EndPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
@@ -92,7 +92,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
     MuleMessageProcessingManager manager =
         createManagerUsingPhasesInRegistry(Arrays.<MessageProcessPhase>asList(messageProcessPhase));
     manager.processMessage(completeMessageProcessTemplateAndContext, completeMessageProcessTemplateAndContext);
-    verify(completeMessageProcessTemplateAndContext, times(0)).routeEvent(any(BaseEvent.class));
+    verify(completeMessageProcessTemplateAndContext, times(0)).routeEvent(any(CoreEvent.class));
     verify(completeMessageProcessTemplateAndContext, times(1)).validateMessage();
     verify(completeMessageProcessTemplateAndContext, times(1)).messageProcessingEnded();
   }
@@ -150,7 +150,7 @@ public class MuleMessageProcessingManagerTestCase extends org.mule.tck.junit4.Ab
     manager.processMessage(completeMessageProcessTemplateAndContext, completeMessageProcessTemplateAndContext);
     InOrder verifyInOrder = Mockito.inOrder(completeMessageProcessTemplateAndContext);
     verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).validateMessage();
-    verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).routeEvent(Mockito.any(BaseEvent.class));
+    verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).routeEvent(Mockito.any(CoreEvent.class));
     verifyInOrder.verify(completeMessageProcessTemplateAndContext, times(1)).messageProcessingEnded();
   }
 

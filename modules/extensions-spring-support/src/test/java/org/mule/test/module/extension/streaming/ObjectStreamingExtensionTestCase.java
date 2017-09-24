@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Test
   @Description("Stores an object stream in a variable leaving without modifying the original payload")
   public void getObjectStreamWithTargetValue() throws Exception {
-    BaseEvent event = flowRunner("getStreamWithTargetValue").withPayload(data).run();
+    CoreEvent event = flowRunner("getStreamWithTargetValue").withPayload(data).run();
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(String.class)));
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), equalTo(data.get(0)));
   }
@@ -64,7 +64,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   @Test
   @Description("Stores an object stream in a variable leaving without modifying the original payload")
   public void getObjectStreamWithTargetVariable() throws Exception {
-    BaseEvent event = flowRunner("getStreamWithTarget").keepStreamsOpen().withPayload(data).run();
+    CoreEvent event = flowRunner("getStreamWithTarget").keepStreamsOpen().withPayload(data).run();
     assertThat(event.getVariables().get(MY_STREAM_VAR).getValue(), is(instanceOf(CursorIteratorProvider.class)));
     assertThat(IteratorUtils.toList(((CursorIteratorProvider) event.getVariables().get(MY_STREAM_VAR).getValue()).openCursor()),
                equalTo(data));
@@ -97,7 +97,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   }
 
   private List<String> getStream(String flowName) throws Exception {
-    BaseEvent result = flowRunner(flowName)
+    CoreEvent result = flowRunner(flowName)
         .withPayload(data)
         .run();
 

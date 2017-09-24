@@ -15,7 +15,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -37,8 +37,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
-    final BaseEvent testEvent = testEvent();
-    when(messageProcessor.process(any(BaseEvent.class))).thenReturn(testEvent);
+    final CoreEvent testEvent = testEvent();
+    when(messageProcessor.process(any(CoreEvent.class))).thenReturn(testEvent);
     when(messageProcessor.apply(any(Publisher.class))).thenReturn(Mono.just(testEvent));
   }
 
@@ -46,20 +46,20 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   public void yieldsNestedProcessor() throws Exception {
     ProcessorChainValueResolver resolver = new ProcessorChainValueResolver(messageProcessor);
     muleContext.getInjector().inject(resolver);
-    final BaseEvent event = testEvent();
+    final CoreEvent event = testEvent();
 
     Chain nestedProcessor = resolver.resolve(ValueResolvingContext.from(event));
     nestedProcessor.process(result -> {
       assertThat(result.getOutput(), is(TEST_PAYLOAD));
 
-      ArgumentCaptor<BaseEvent> captor = ArgumentCaptor.forClass(BaseEvent.class);
+      ArgumentCaptor<CoreEvent> captor = ArgumentCaptor.forClass(CoreEvent.class);
       try {
         verify(messageProcessor).process(captor.capture());
       } catch (MuleException e) {
         throw new RuntimeException(e);
       }
 
-      BaseEvent capturedEvent = captor.getValue();
+      CoreEvent capturedEvent = captor.getValue();
       assertThat(capturedEvent, is(event));
     }, (e, r) -> fail(e.getMessage()));
   }

@@ -28,7 +28,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.internal.util.store.ProvidedObjectStoreWrapper;
 import org.mule.runtime.core.internal.util.store.ProvidedPartitionableObjectStoreWrapper;
@@ -147,8 +147,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    BaseEvent result = eventCorrelator.process(event);
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    CoreEvent result = eventCorrelator.process(event);
     if (result == null) {
       return null;
     }
@@ -156,7 +156,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
   }
 
@@ -189,7 +189,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
-  public void setEventGroupsObjectStore(PartitionableObjectStore<BaseEvent> eventGroupsObjectStore) {
+  public void setEventGroupsObjectStore(PartitionableObjectStore<CoreEvent> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
         //TODO: Delete ProvidedObjectStoreWrapper if not needed when moving this to compatibility
         new ProvidedPartitionableObjectStoreWrapper(eventGroupsObjectStore, internalEventsGroupsObjectStoreSupplier());

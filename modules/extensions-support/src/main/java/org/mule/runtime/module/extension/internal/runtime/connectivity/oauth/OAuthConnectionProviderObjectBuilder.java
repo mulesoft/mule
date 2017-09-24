@@ -36,7 +36,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -139,7 +139,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     return buildAuthCodeConfig(map);
   }
 
-  private AuthCodeConfig buildAuthCodeConfig(BaseEvent event) throws MuleException {
+  private AuthCodeConfig buildAuthCodeConfig(CoreEvent event) throws MuleException {
     Map<String, Object> map =
         (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME).resolve(from(event));
     return buildAuthCodeConfig(map);
@@ -156,7 +156,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                               (String) map.get(AFTER_FLOW_PARAMETER_NAME));
   }
 
-  private OAuthCallbackConfig buildOAuthCallbackConfig(BaseEvent event) throws MuleException {
+  private OAuthCallbackConfig buildOAuthCallbackConfig(CoreEvent event) throws MuleException {
     Map<String, Object> map =
         (Map<String, Object>) resolverSet.getResolvers().get(OAUTH_CALLBACK_GROUP_NAME).resolve(from(event));
     return buildOAuthCallbackConfig(map);
@@ -174,7 +174,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
                                    (String) map.get(EXTERNAL_CALLBACK_URL_PARAMETER_NAME));
   }
 
-  private Optional<OAuthObjectStoreConfig> buildOAuthObjectStoreConfig(BaseEvent event) throws MuleException {
+  private Optional<OAuthObjectStoreConfig> buildOAuthObjectStoreConfig(CoreEvent event) throws MuleException {
     final ValueResolver resolver = resolverSet.getResolvers().get(OAUTH_STORE_CONFIG_GROUP_NAME);
     if (resolver == null) {
       return empty();
@@ -213,7 +213,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
         .ifPresent(property -> delegate.accept(parameter, property)));
   }
 
-  private Map<String, String> getCustomParameters(BaseEvent event) {
+  private Map<String, String> getCustomParameters(CoreEvent event) {
     Map<String, String> oauthParams = new HashMap<>();
     withCustomParameters((parameter, property) -> {
       String alias = property.getRequestAlias();
@@ -234,7 +234,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
     return oauthParams;
   }
 
-  private String resolveString(BaseEvent event, ValueResolver resolver) throws MuleException {
+  private String resolveString(CoreEvent event, ValueResolver resolver) throws MuleException {
     Object value = resolver.resolve(from(event));
     return value != null ? StringMessageUtils.toString(value) : null;
   }
@@ -250,7 +250,7 @@ public class OAuthConnectionProviderObjectBuilder<C> extends DefaultConnectionPr
   }
 
   private OAuthConfig getInitialOAuthConfig() throws MuleException {
-    final BaseEvent initialiserEvent = getInitialiserEvent();
+    final CoreEvent initialiserEvent = getInitialiserEvent();
     MapValueResolver mapResolver =
         staticOnly((MapValueResolver) resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME));
     AuthCodeConfig authCodeConfig = buildAuthCodeConfig(mapResolver.resolve(from(initialiserEvent)));

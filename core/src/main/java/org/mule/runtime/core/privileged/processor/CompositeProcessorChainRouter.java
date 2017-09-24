@@ -23,7 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -62,10 +62,10 @@ public class CompositeProcessorChainRouter extends AbstractExecutableComponent i
     return publisher -> from(publisher).flatMapMany(initial -> fromIterable(processorChains).reduce(initial, processChain()));
   }
 
-  private BiFunction<BaseEvent, MessageProcessorChain, BaseEvent> processChain() {
+  private BiFunction<CoreEvent, MessageProcessorChain, CoreEvent> processChain() {
     return (event, processorChain) -> {
       BaseEventContext childContext = child((BaseEventContext) event.getContext(), ofNullable(getLocation()));
-      BaseEvent result = from(processWithChildContext(event, processorChain, childContext)).block();
+      CoreEvent result = from(processWithChildContext(event, processorChain, childContext)).block();
       // Block until all child contexts are complete
       from(childContext.getCompletionPublisher()).block();
       return result;

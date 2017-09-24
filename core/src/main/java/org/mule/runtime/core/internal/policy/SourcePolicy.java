@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -29,6 +29,6 @@ public interface SourcePolicy {
    *        execute the successful or failure response function of the source.
    * @return the result of processing the {@code event} through the policy chain.
    */
-  Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(BaseEvent sourceEvent);
+  Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent);
 
 }

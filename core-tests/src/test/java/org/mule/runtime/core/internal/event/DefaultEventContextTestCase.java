@@ -29,7 +29,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -111,7 +111,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void successWithResult() throws Exception {
     BaseEventContext parent = context.get();
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
     assertCompletionNotDone(parent);
     parent.success(event);
 
@@ -157,7 +157,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void beforeResponse() throws Exception {
     BaseEventContext parent = context.get();
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
 
     Latch latch = new Latch();
     Latch lock = new Latch();
@@ -201,7 +201,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     BaseEventContext parent = context.get();
     BaseEventContext child = DefaultEventContext.child(parent, empty());
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
 
     child.success(event);
 
@@ -223,7 +223,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     BaseEventContext parent = context.get();
     BaseEventContext child = DefaultEventContext.child(parent, empty());
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
     parent.success(event);
 
     awaitAndAssertResponse(parent, event);
@@ -327,7 +327,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     BaseEventContext parent = context.get();
     BaseEventContext child1 = DefaultEventContext.child(parent, empty());
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
     Scheduler testScheduler = muleContext.getSchedulerService().ioScheduler();
 
     try {
@@ -483,7 +483,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     MonoProcessor<Void> externalCompletion = MonoProcessor.create();
     BaseEventContext parent = contextWithCompletion.apply(externalCompletion);
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
     assertCompletionNotDone(parent);
     parent.success(event);
 
@@ -519,7 +519,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     BaseEventContext parent = contextWithCompletion.apply(externalCompletion);
     BaseEventContext child = DefaultEventContext.child(parent, empty());
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
 
     child.success(event);
 
@@ -547,7 +547,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(child);
     BaseEventContext deserializedChild = muleContext.getObjectSerializer().getExternalProtocol().deserialize(bytes);
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
 
     deserializedChild.success(event);
 
@@ -564,7 +564,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(parent);
     BaseEventContext deserializedParent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(bytes);
 
-    BaseEvent event = testEvent();
+    CoreEvent event = testEvent();
 
     deserializedParent.success(event);
 
@@ -601,7 +601,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     assertThat(from(parent.getBeforeResponsePublisher()).toFuture().isDone(), is(true));
   }
 
-  private void awaitAndAssertResponse(BaseEventContext parent, BaseEvent event) {
+  private void awaitAndAssertResponse(BaseEventContext parent, CoreEvent event) {
     assertThat(from(parent.getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT)), equalTo(event));
   }
 

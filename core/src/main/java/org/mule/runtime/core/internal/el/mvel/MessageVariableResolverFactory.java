@@ -13,7 +13,7 @@ import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -113,7 +113,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     return super.getNextFactoryVariableResolver(name);
   }
 
-  private MessagingException wrapIfNecessary(BaseEvent event, Throwable exception) {
+  private MessagingException wrapIfNecessary(CoreEvent event, Throwable exception) {
     if (exception instanceof MessagingException) {
       return (MessagingException) exception;
     } else {

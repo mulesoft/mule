@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing.outbound;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -16,8 +16,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.routing.MessageSequence;
@@ -34,7 +34,7 @@ import java.util.Optional;
 
 /**
  * Base implementation of a {@link Message} splitter, that converts its payload in a {@link MessageSequence}, and process each
- * element of it. Implementations must implement {@link #splitMessageIntoSequence(BaseEvent)} and determine how the message is split.
+ * element of it. Implementations must implement {@link #splitMessageIntoSequence(CoreEvent)} and determine how the message is split.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www .eaipatterns.com/Sequencer.html</a>
  * 
@@ -55,13 +55,13 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     }
 
     @Override
-    public boolean accept(BaseEvent event) {
+    public boolean accept(CoreEvent event) {
       return false;
     }
   };
 
   @Override
-  public final BaseEvent process(BaseEvent event) throws MuleException {
+  public final CoreEvent process(CoreEvent event) throws MuleException {
     if (isSplitRequired(event)) {
       MessageSequence<?> seq = splitMessageIntoSequence(event);
       if (!seq.isEmpty()) {
@@ -75,7 +75,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     }
   }
 
-  protected boolean isSplitRequired(BaseEvent event) {
+  protected boolean isSplitRequired(CoreEvent event) {
     return true;
   }
 
@@ -86,17 +86,17 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
    * @return a sequence of elements
    * @throws MuleException
    */
-  protected abstract MessageSequence<?> splitMessageIntoSequence(BaseEvent event) throws MuleException;
+  protected abstract MessageSequence<?> splitMessageIntoSequence(CoreEvent event) throws MuleException;
 
-  protected List<BaseEvent> processParts(MessageSequence<?> seq, BaseEvent originalEvent) throws MuleException {
-    List<BaseEvent> resultEvents = new ArrayList<>();
+  protected List<CoreEvent> processParts(MessageSequence<?> seq, CoreEvent originalEvent) throws MuleException {
+    List<CoreEvent> resultEvents = new ArrayList<>();
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;
     if (batchSize > 1) {
       messageSequence = new PartitionedMessageSequence<>(seq, batchSize);
     }
     Integer count = messageSequence.size();
-    BaseEvent lastResult = null;
+    CoreEvent lastResult = null;
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
@@ -113,7 +113,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       try {
         // TODO MULE-13052 Migrate Splitter and Foreach implementation to non-blocking
-        BaseEvent resultEvent = processToApplyWithChildContext(builder.build(), applyNext());
+        CoreEvent resultEvent = processToApplyWithChildContext(builder.build(), applyNext());
         if (resultEvent != null) {
           resultEvents.add(builder(originalEvent.getContext(), resultEvent).build());
           lastResult = resultEvent;
@@ -130,20 +130,20 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     return resultEvents;
   }
 
-  protected Map<String, ?> resolvePropagatedFlowVars(BaseEvent lastResult) {
+  protected Map<String, ?> resolvePropagatedFlowVars(CoreEvent lastResult) {
     return emptyMap();
   }
 
-  protected void propagateFlowVars(BaseEvent previousResult, final Builder builder) {
+  protected void propagateFlowVars(CoreEvent previousResult, final Builder builder) {
     // Nothing to do
   }
 
-  private void initEventBuilder(Object sequenceValue, BaseEvent originalEvent, Builder builder,
+  private void initEventBuilder(Object sequenceValue, CoreEvent originalEvent, Builder builder,
                                 Map<String, ?> flowVarsFromLastResult) {
     if (sequenceValue instanceof EventBuilderConfigurer) {
       ((EventBuilderConfigurer) sequenceValue).configure(builder);
-    } else if (sequenceValue instanceof BaseEvent) {
-      final BaseEvent payloadAsEvent = (BaseEvent) sequenceValue;
+    } else if (sequenceValue instanceof CoreEvent) {
+      final CoreEvent payloadAsEvent = (CoreEvent) sequenceValue;
       builder.message(payloadAsEvent.getMessage());
       for (String flowVarName : payloadAsEvent.getVariables().keySet()) {
         if (!flowVarsFromLastResult.containsKey(flowVarName)) {

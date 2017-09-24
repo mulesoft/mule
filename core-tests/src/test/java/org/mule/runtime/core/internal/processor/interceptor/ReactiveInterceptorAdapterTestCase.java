@@ -54,7 +54,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
@@ -146,7 +146,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor = prepareInterceptor(new ProcessorInterceptor() {});
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -175,7 +175,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -205,7 +205,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -236,7 +236,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -270,7 +270,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -301,7 +301,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -335,7 +335,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -723,7 +723,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -752,7 +752,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -787,7 +787,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -820,7 +820,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -852,7 +852,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -887,7 +887,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -924,7 +924,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -962,7 +962,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -999,7 +999,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -1037,7 +1037,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -1074,7 +1074,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -1382,7 +1382,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     if (useMockInterceptor) {
@@ -1415,7 +1415,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
 
     if (useMockInterceptor) {
@@ -1451,7 +1451,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       };
     }, () -> interceptor2);
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -1488,7 +1488,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       };
     });
 
-    BaseEvent result = process(flow, eventBuilder().message(Message.of("")).build());
+    CoreEvent result = process(flow, eventBuilder().message(Message.of("")).build());
     assertThat(result.getMessage().getPayload().getValue(), is(""));
     assertThat(result.getError().isPresent(), is(false));
 
@@ -1575,7 +1575,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return event;
     }
   }
@@ -1593,12 +1593,12 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return event;
     }
 
     @Override
-    public void resolveParameters(BaseEvent.Builder eventBuilder,
+    public void resolveParameters(CoreEvent.Builder eventBuilder,
                                   BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer) {
       afterConfigurer.accept(singletonMap("operationParam", new ProcessorParameterValue() {
 
@@ -1700,7 +1700,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   }
 
-  private static final class EventPayloadMatcher extends TypeSafeMatcher<BaseEvent> {
+  private static final class EventPayloadMatcher extends TypeSafeMatcher<CoreEvent> {
 
     private Matcher<Object> payloadMatcher;
 
@@ -1714,7 +1714,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     }
 
     @Override
-    protected boolean matchesSafely(BaseEvent item) {
+    protected boolean matchesSafely(CoreEvent item) {
       return payloadMatcher.matches(item.getMessage().getPayload().getValue());
     }
 

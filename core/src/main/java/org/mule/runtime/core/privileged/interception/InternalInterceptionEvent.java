@@ -7,11 +7,11 @@
 package org.mule.runtime.core.privileged.interception;
 
 import org.mule.runtime.api.interception.InterceptionEvent;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.MuleSession;
 
 /**
- * Adds support for compatibility attribues of the {@link BaseEvent} to {@link InterceptionEvent}.
+ * Adds support for compatibility attribues of the {@link CoreEvent} to {@link InterceptionEvent}.
  *
  * @since 4.0
  */

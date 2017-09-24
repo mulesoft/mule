@@ -10,7 +10,7 @@ import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 import org.hamcrest.Description;
@@ -18,11 +18,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * {@link Matcher} for {@link BaseEvent} instances.
+ * {@link Matcher} for {@link CoreEvent} instances.
  *
  * @since 4.0
  */
-public class EventMatcher extends TypeSafeMatcher<BaseEvent> {
+public class EventMatcher extends TypeSafeMatcher<CoreEvent> {
 
   private Matcher<Message> messageMatcher;
   private Matcher<ErrorType> errorTypeMatcher;
@@ -52,7 +52,7 @@ public class EventMatcher extends TypeSafeMatcher<BaseEvent> {
   }
 
   @Override
-  protected boolean matchesSafely(BaseEvent item) {
+  protected boolean matchesSafely(CoreEvent item) {
     return messageMatcher != null ? messageMatcher.matches(item.getMessage()) : true
         && errorTypeMatcher != null ? errorTypeMatcher.matches(item.getError().get().getErrorType()) : true;
   }

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.execution;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -55,7 +55,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       new HashMap<Boolean, Map<MuleTransactionConfig, Boolean>>();
   private boolean hasTransactionInContext;
   private TransactionConfig transactionConfig;
-  private BaseEvent mockMuleEvent = Mockito.mock(BaseEvent.class);
+  private CoreEvent mockMuleEvent = Mockito.mock(CoreEvent.class);
   private Transaction mockTransaction = Mockito.mock(Transaction.class);
 
   @Parameterized.Parameters
@@ -106,18 +106,18 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   public void testTransactionalState() throws Exception {
     boolean shouldThrowException = resultMap.get(hasTransactionInContext).get(transactionConfig);
     Exception thrownException = null;
-    BaseEvent result = null;
+    CoreEvent result = null;
     if (hasTransactionInContext) {
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     }
-    ValidateTransactionalStateInterceptor<BaseEvent> interceptor =
-        new ValidateTransactionalStateInterceptor<BaseEvent>(new ExecuteCallbackInterceptor<BaseEvent>(),
+    ValidateTransactionalStateInterceptor<CoreEvent> interceptor =
+        new ValidateTransactionalStateInterceptor<CoreEvent>(new ExecuteCallbackInterceptor<CoreEvent>(),
                                                              transactionConfig);
     try {
-      result = interceptor.execute(new ExecutionCallback<BaseEvent>() {
+      result = interceptor.execute(new ExecutionCallback<CoreEvent>() {
 
         @Override
-        public BaseEvent process() throws Exception {
+        public CoreEvent process() throws Exception {
           return mockMuleEvent;
         }
       }, new ExecutionContext());

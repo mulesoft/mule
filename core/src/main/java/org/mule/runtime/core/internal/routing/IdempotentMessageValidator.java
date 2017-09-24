@@ -33,7 +33,7 @@ import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -117,11 +117,11 @@ public class IdempotentMessageValidator extends AbstractComponent
         .build());
   }
 
-  protected String getValueForEvent(BaseEvent event) throws MessagingException {
+  protected String getValueForEvent(CoreEvent event) throws MessagingException {
     return (String) muleContext.getExpressionManager().evaluate(valueExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
-  protected String getIdForEvent(BaseEvent event) throws MuleException {
+  protected String getIdForEvent(CoreEvent event) throws MuleException {
     return (String) muleContext.getExpressionManager().evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
   }
 
@@ -141,7 +141,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     this.store = store;
   }
 
-  private boolean accept(BaseEvent event) {
+  private boolean accept(CoreEvent event) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
@@ -168,7 +168,7 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   @Override
-  public final BaseEvent process(BaseEvent event) throws MuleException {
+  public final CoreEvent process(CoreEvent event) throws MuleException {
     if (accept(event)) {
       return event;
     } else {
@@ -176,7 +176,7 @@ public class IdempotentMessageValidator extends AbstractComponent
     }
   }
 
-  protected boolean isNewMessage(BaseEvent event) {
+  protected boolean isNewMessage(CoreEvent event) {
     try {
       String id = this.getIdForEvent(event);
       if (store == null) {

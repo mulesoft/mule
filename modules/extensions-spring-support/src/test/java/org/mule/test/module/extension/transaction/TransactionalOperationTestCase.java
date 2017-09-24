@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
@@ -70,7 +70,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void pagedOperationInTx() throws Exception {
-    BaseEvent event = flowRunner("pagedOperationInTx").run();
+    CoreEvent event = flowRunner("pagedOperationInTx").run();
     Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
     assertThat(accumulator, is(notNullValue()));
     assertThat(accumulator, hasSize(2));
@@ -84,7 +84,7 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void pagedOperationWithoutTx() throws Exception {
-    BaseEvent event = flowRunner("pagedOperationWithoutTx").run();
+    CoreEvent event = flowRunner("pagedOperationWithoutTx").run();
     Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
     assertThat(accumulator, is(notNullValue()));
     assertThat(accumulator, hasSize(2));

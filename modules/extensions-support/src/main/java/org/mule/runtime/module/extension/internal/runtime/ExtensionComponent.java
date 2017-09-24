@@ -47,7 +47,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -344,7 +344,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException {
-    BaseEvent fakeEvent = getInitialiserEvent(muleContext);
+    CoreEvent fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -366,15 +366,15 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private ExtensionResolvingContext getResolvingContext() {
-    BaseEvent fakeEvent = getInitialiserEvent(muleContext);
+    CoreEvent fakeEvent = getInitialiserEvent(muleContext);
     return new ExtensionResolvingContext(() -> getConfiguration(fakeEvent), connectionManager);
   }
 
   /**
-   * @param event a {@link BaseEvent}
-   * @return a configuration instance for the current component with a given {@link BaseEvent}
+   * @param event a {@link CoreEvent}
+   * @return a configuration instance for the current component with a given {@link CoreEvent}
    */
-  protected Optional<ConfigurationInstance> getConfiguration(BaseEvent event) {
+  protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event) {
     if (!requiresConfig.get()) {
       return empty();
     }

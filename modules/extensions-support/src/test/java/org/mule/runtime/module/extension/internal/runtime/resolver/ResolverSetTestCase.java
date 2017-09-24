@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -41,7 +41,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private Map<ParameterModel, ValueResolver> mapping;
 
   @Mock
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock
   private ValueResolvingContext resolvingContext;

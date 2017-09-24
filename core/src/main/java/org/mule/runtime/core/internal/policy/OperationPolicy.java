@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.reactivestreams.Publisher;
 
@@ -20,6 +20,6 @@ public interface OperationPolicy {
    * @return the result of processing the {@code event} through the policy chain.
    * @throws Exception
    */
-  Publisher<BaseEvent> process(BaseEvent operationEvent);
+  Publisher<CoreEvent> process(CoreEvent operationEvent);
 
 }

@@ -16,7 +16,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.v
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -58,7 +58,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   @Test(expected = IllegalModelDefinitionException.class)
   public void muleEventReturnType() {
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(BaseEvent.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(CoreEvent.class), false, emptySet()));
     validate(extensionModel, validator);
   }
 

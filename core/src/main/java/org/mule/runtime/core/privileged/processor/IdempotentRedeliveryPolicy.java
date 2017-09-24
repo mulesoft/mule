@@ -25,7 +25,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -154,7 +154,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     boolean exceptionSeen = false;
     boolean tooMany = false;
     AtomicInteger counter = null;
@@ -184,8 +184,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        BaseEvent returnEvent =
-            processNext(BaseEvent
+        CoreEvent returnEvent =
+            processNext(CoreEvent
                 .builder(DefaultEventContext.child((BaseEventContext) event.getContext(), empty()), event).build());
         counter = findCounter(messageId);
         if (counter != null) {
@@ -230,13 +230,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     return counter;
   }
 
-  private String getIdForEvent(BaseEvent event) throws Exception {
+  private String getIdForEvent(CoreEvent event) throws Exception {
     if (useSecureHash) {
       Object payload = event.getMessage().getPayload().getValue();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event = BaseEvent.builder(event).message(Message.builder(event.getMessage()).value(bytes).build()).build();
+        event = CoreEvent.builder(event).message(Message.builder(event.getMessage()).value(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

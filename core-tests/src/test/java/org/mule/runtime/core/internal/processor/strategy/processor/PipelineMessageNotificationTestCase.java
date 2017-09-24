@@ -38,7 +38,7 @@ import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -70,7 +70,7 @@ import org.mockito.ArgumentMatcher;
 @RunWith(Parameterized.class)
 public class PipelineMessageNotificationTestCase extends AbstractReactiveProcessorTestCase {
 
-  private BaseEvent event;
+  private CoreEvent event;
   private NotificationDispatcher notificationFirer;
   private TestPipeline pipeline;
   private final String pipelineName = "testPipeline";
@@ -217,9 +217,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     private int expectedAction;
     private boolean exceptionExpected;
-    private BaseEvent event;
+    private CoreEvent event;
 
-    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, BaseEvent event) {
+    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, CoreEvent event) {
       this.expectedAction = expectedAction;
       this.exceptionExpected = exceptionExpected;
       this.event = event;
@@ -249,7 +249,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   public static class ExceptionThrowingMessageProcessor implements Processor, InternalProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       throw new IllegalStateException();
     }
   }

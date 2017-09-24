@@ -20,7 +20,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.HashMap;
@@ -71,19 +71,19 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public TypedValue evaluate(String expression, BaseEvent event, BindingContext context)
+  public TypedValue evaluate(String expression, CoreEvent event, BindingContext context)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).evaluate(expression, event, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event, BindingContext context)
+  public TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, BindingContext context)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).evaluate(expression, expectedOutputType, event, context);
   }
 
   @Override
-  public TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event,
+  public TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event,
                              ComponentLocation componentLocation,
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
@@ -92,7 +92,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation,
+  public TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation,
                              BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).evaluate(expression, event, componentLocation, bindingContext);
@@ -104,7 +104,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public TypedValue evaluate(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
+  public TypedValue evaluate(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
                              ComponentLocation componentLocation,
                              BindingContext bindingContext)
       throws ExpressionRuntimeException {
@@ -112,28 +112,28 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
-  public void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
+  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
                      ComponentLocation componentLocation,
                      Object object) {
     selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, object);
   }
 
   @Override
-  public void enrich(String expression, BaseEvent event, BaseEvent.Builder eventBuilder,
+  public void enrich(String expression, CoreEvent event, CoreEvent.Builder eventBuilder,
                      ComponentLocation componentLocation,
                      TypedValue value) {
     selectExpressionLanguage(expression).enrich(expression, event, eventBuilder, componentLocation, value);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, ComponentLocation componentLocation,
+  public Iterator<TypedValue<?>> split(String expression, CoreEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).split(expression, event, componentLocation, bindingContext);
   }
 
   @Override
-  public Iterator<TypedValue<?>> split(String expression, BaseEvent event, BindingContext bindingContext)
+  public Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).split(expression, event, bindingContext);
   }

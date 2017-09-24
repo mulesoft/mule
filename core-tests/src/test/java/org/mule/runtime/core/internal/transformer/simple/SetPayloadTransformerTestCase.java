@@ -20,7 +20,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,7 +37,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
   private SetPayloadTransformer setPayloadTransformer;
   private MuleContext mockMuleContext;
-  private BaseEvent mockMuleEvent;
+  private CoreEvent mockMuleEvent;
   private InternalMessage mockMuleMessage;
   private ExtendedExpressionManager mockExpressionManager;
 
@@ -47,12 +47,12 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     mockMuleContext = mock(MuleContext.class);
     setPayloadTransformer.setMuleContext(mockMuleContext);
     mockExpressionManager = mock(ExtendedExpressionManager.class);
-    mockMuleEvent = mock(BaseEvent.class);
+    mockMuleEvent = mock(CoreEvent.class);
     mockMuleMessage = mock(InternalMessage.class);
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(BaseEvent.class), any(ComponentLocation.class)))
+    when(mockExpressionManager.parse(anyString(), any(CoreEvent.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 

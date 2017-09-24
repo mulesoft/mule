@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.processor;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.Map;
@@ -31,14 +31,14 @@ public interface ParametersResolverProcessor<T extends ComponentModel> {
    * @param afterConfigurer the action to perform after resolving the parameters on the builder.
    * @throws MuleException for any exception that occurs while resolving the parameters
    */
-  void resolveParameters(BaseEvent.Builder eventBuilder, BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
+  void resolveParameters(CoreEvent.Builder eventBuilder, BiConsumer<Map<String, Object>, ExecutionContext> afterConfigurer)
       throws MuleException;
 
   /**
    * Perform the required cleanup a the parameters in an {@link ExecutionContext} resolved by calling
-   * {@link #resolveParameters(BaseEvent)}.
+   * {@link #resolveParameters(CoreEvent)}.
    * <p>
-   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(BaseEvent)}.
+   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(CoreEvent)}.
    *
    * @param executionContext the context that contains the resolved parameters
    */

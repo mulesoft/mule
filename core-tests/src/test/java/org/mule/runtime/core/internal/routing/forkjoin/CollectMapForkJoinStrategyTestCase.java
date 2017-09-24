@@ -19,7 +19,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
@@ -50,7 +50,7 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
     RoutingPair pair2 = createRoutingPair(route2Result);
     RoutingPair pair3 = createRoutingPair(route3Result);
 
-    BaseEvent result = invokeStrategyBlocking(strategy, testEvent(), asList(pair1, pair2, pair3));
+    CoreEvent result = invokeStrategyBlocking(strategy, testEvent(), asList(pair1, pair2, pair3));
 
     assertThat(result.getMessage().getPayload().getValue(), instanceOf(Map.class));
     Map<String, Message> resultMap = (Map<String, Message>) result.getMessage().getPayload().getValue();

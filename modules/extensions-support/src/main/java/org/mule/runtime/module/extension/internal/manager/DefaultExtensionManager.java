@@ -33,7 +33,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -141,7 +141,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    * {@inheritDoc}
    */
   @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName, BaseEvent muleEvent) {
+  public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent muleEvent) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(format("There is no registered configurationProvider under name '%s'",
                                                                configurationProviderName)));
@@ -152,7 +152,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    */
   @Override
   public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                          BaseEvent muleEvent) {
+                                                          CoreEvent muleEvent) {
 
     ConfigurationInstance instance =
         getConfigurationProvider(extensionModel, componentModel).map(p -> p.get(muleEvent)).orElse(null);
@@ -196,7 +196,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   }
 
   private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
-                                           BaseEvent muleEvent) {
+                                           CoreEvent muleEvent) {
     String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
     if (!extensionRegistry
         .getConfigurationProvider(implicitConfigurationProviderName)

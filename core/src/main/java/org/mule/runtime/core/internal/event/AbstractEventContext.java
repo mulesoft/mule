@@ -13,7 +13,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -38,8 +38,8 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   protected static final MessagingExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private transient MonoProcessor<BaseEvent> beforeResponseProcessor;
-  private transient MonoProcessor<BaseEvent> responseProcessor;
+  private transient MonoProcessor<CoreEvent> beforeResponseProcessor;
+  private transient MonoProcessor<CoreEvent> responseProcessor;
   private transient MonoProcessor<Void> completionProcessor;
   private transient Disposable completionSubscriberDisposable;
   private transient final List<BaseEventContext> childContexts = new LinkedList<>();
@@ -119,7 +119,7 @@ abstract class AbstractEventContext implements BaseEventContext {
    * {@inheritDoc}
    */
   @Override
-  public final void success(BaseEvent event) {
+  public final void success(CoreEvent event) {
     synchronized (this) {
       if (responseProcessor.isTerminated()) {
         LOGGER.debug(this + " response was already completed, ignoring.");
@@ -168,12 +168,12 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   @Override
-  public Publisher<BaseEvent> getBeforeResponsePublisher() {
+  public Publisher<CoreEvent> getBeforeResponsePublisher() {
     return beforeResponseProcessor;
   }
 
   @Override
-  public Publisher<BaseEvent> getResponsePublisher() {
+  public Publisher<CoreEvent> getResponsePublisher() {
     return responseProcessor;
   }
 

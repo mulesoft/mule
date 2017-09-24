@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -76,8 +76,8 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    return BaseEvent.builder(event)
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    return CoreEvent.builder(event)
         .message(Message.builder(event.getMessage()).value(ifInputStream(event.getMessage().getPayload().getValue(), in -> {
           try {
             logger.debug("arrived at " + toString());
@@ -136,7 +136,7 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
   }
 
   private void doCallback(byte[] startData, long startDataSize, byte[] endData, long endDataSize, long endRingPointer,
-                          long streamLength, BaseEvent event)
+                          long streamLength, CoreEvent event)
       throws Exception {
     // make a nice summary of the data
     StringBuilder result = new StringBuilder("Received stream");

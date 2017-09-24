@@ -20,7 +20,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -63,7 +63,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private ResolverSetResult resolverSetResult;
 
   @Mock
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock
   private MuleContext muleContext;

@@ -23,7 +23,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
@@ -69,17 +69,17 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    BaseEvent event1 =
+    CoreEvent event1 =
         InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
-    BaseEvent event2 =
+    CoreEvent event2 =
         InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
-    BaseEvent event3 =
+    CoreEvent event3 =
         InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
 
-    BaseEvent resultEvent = router.process(event1);
+    CoreEvent resultEvent = router.process(event1);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
@@ -111,11 +111,11 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    BaseEvent event1 =
+    CoreEvent event1 =
         InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
-    BaseEvent event2 =
+    CoreEvent event2 =
         InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
-    BaseEvent event3 =
+    CoreEvent event3 =
         InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
 
     // set a resequencing comparator. We need to reset the router since it will
@@ -130,7 +130,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     assertNull(router.process(event2));
     assertNull(router.process(event3));
 
-    BaseEvent resultEvent = router.process(event1);
+    CoreEvent resultEvent = router.process(event1);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);

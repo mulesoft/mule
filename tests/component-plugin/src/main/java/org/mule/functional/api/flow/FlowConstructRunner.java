@@ -14,7 +14,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 
 import org.mockito.Mockito;
@@ -33,10 +33,10 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
   protected Registry registry;
   protected TestEventBuilder eventBuilder = new TestEventBuilder();
-  private BaseEvent requestEvent;
+  private CoreEvent requestEvent;
 
   /**
-   * Prepares the given data to be sent as the payload of the {@link BaseEvent} to the configured flow.
+   * Prepares the given data to be sent as the payload of the {@link CoreEvent} to the configured flow.
    *
    * @param payload the payload to use in the message
    * @return this {@link FlowRunner}
@@ -48,7 +48,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link BaseEvent} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link CoreEvent} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -60,7 +60,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares the given data to be sent as the attributes of the {@link BaseEvent} to the configured flow.
+   * Prepares the given data to be sent as the attributes of the {@link CoreEvent} to the configured flow.
    *
    * @param attributes the message attributes
    * @return this {@link FlowRunner}
@@ -148,7 +148,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link BaseEvent#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -159,7 +159,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link BaseEvent#getGroupCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link CoreEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -197,7 +197,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Will spy the built {@link Message} and {@link BaseEvent}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link CoreEvent}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link FlowRunner}
    */
@@ -216,7 +216,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
     this.registry = registry;
   }
 
-  protected BaseEvent getOrBuildEvent() {
+  protected CoreEvent getOrBuildEvent() {
     if (requestEvent == null) {
       doBuildEvent();
     }
@@ -228,7 +228,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    *
    * @return an event that would be used to go through the flow.
    */
-  public BaseEvent buildEvent() {
+  public CoreEvent buildEvent() {
     if (requestEvent == null) {
       doBuildEvent();
       return requestEvent;

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -25,7 +25,7 @@ public class VoidReturnDelegateTestCase extends AbstractMuleTestCase {
 
   @Test
   public void returnsMuleEvent() throws MuleException {
-    BaseEvent event = newEvent();
+    CoreEvent event = newEvent();
     ExecutionContextAdapter operationContext = mock(ExecutionContextAdapter.class);
     when(operationContext.getEvent()).thenReturn(event);
 

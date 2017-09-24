@@ -14,7 +14,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -89,7 +89,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<BaseEvent> processNextOperation(BaseEvent event);
+  protected abstract Publisher<CoreEvent> processNextOperation(CoreEvent event);
 
   /**
    * Template method for executing a policy.
@@ -101,7 +101,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
    * @return the result to use for the next policy in the chain.
    * @throws Exception if the execution of the policy fails.
    */
-  protected abstract Publisher<BaseEvent> processPolicy(Policy policy, Processor nextProcessor, BaseEvent event);
+  protected abstract Publisher<CoreEvent> processPolicy(Policy policy, Processor nextProcessor, CoreEvent event);
 
   /**
    * Inner class that implements the actually chaining of policies.
@@ -111,12 +111,12 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
     private int index = 0;
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .then(event -> {
             checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");

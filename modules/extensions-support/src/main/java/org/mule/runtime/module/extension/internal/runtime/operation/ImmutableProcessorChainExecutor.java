@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -43,19 +43,19 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
   /**
    * Event that will be cloned for dispatching
    */
-  private final BaseEvent originalEvent;
+  private final CoreEvent originalEvent;
 
-  private BaseEvent currentEvent;
+  private CoreEvent currentEvent;
   private Consumer<Result> successHandler;
   private BiConsumer<Throwable, Result> errorHandler;
 
   /**
    * Creates a new immutable instance
    *
-   * @param event the original {@link BaseEvent} for the execution of the given chain
+   * @param event the original {@link CoreEvent} for the execution of the given chain
    * @param chain a {@link Processor} chain to be executed
    */
-  public ImmutableProcessorChainExecutor(BaseEvent event, MessageProcessorChain chain) {
+  public ImmutableProcessorChainExecutor(CoreEvent event, MessageProcessorChain chain) {
     this.originalEvent = event;
     this.currentEvent = event;
     this.chain = chain;
@@ -68,7 +68,7 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
 
   @Override
   public void process(Object payload, Object attributes, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
-    BaseEvent customEvent = BaseEvent.builder(originalEvent)
+    CoreEvent customEvent = CoreEvent.builder(originalEvent)
         .message(Message.builder()
             .payload(TypedValue.of(payload))
             .attributes(TypedValue.of(attributes))
@@ -98,7 +98,7 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
     this.errorHandler = onError;
   }
 
-  private void doProcess(BaseEvent updatedEvent, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
+  private void doProcess(CoreEvent updatedEvent, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     setHandlers(onSuccess, onError);
     from(processWithChildContext(updatedEvent, chain, ofNullable(chain.getLocation())))
         .doOnSuccess(this::handleSuccess)
@@ -107,7 +107,7 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
         .subscribe();
   }
 
-  private void handleSuccess(BaseEvent childEvent) {
+  private void handleSuccess(CoreEvent childEvent) {
     Result result = childEvent != null ? EventedResult.from(childEvent) : Result.builder().build();
     try {
       successHandler.accept(result);
@@ -116,7 +116,7 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
     }
   }
 
-  private BaseEvent handleError(Throwable error, BaseEvent childEvent) {
+  private CoreEvent handleError(Throwable error, CoreEvent childEvent) {
     try {
       errorHandler.accept(error, EventedResult.from(childEvent));
     } catch (Throwable e) {

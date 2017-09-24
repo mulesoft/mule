@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.privileged.event;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * Provides capability to only accept handling certain MuleEvents.
@@ -14,11 +14,11 @@ import org.mule.runtime.core.api.event.BaseEvent;
 public interface Acceptor {
 
   /**
-   * @param event {@link BaseEvent} to route through exception handler
+   * @param event {@link CoreEvent} to route through exception handler
    * @return true if this {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} should handler exception false
    *         otherwise
    */
-  boolean accept(BaseEvent event);
+  boolean accept(CoreEvent event);
 
   /**
    * @return true if accepts any message, false otherwise.

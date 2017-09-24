@@ -18,7 +18,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -53,7 +53,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
     event = addExceptionPayload(exception, event);
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
@@ -64,8 +64,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Publisher<BaseEvent> apply(MessagingException exception) {
-    BaseEvent event = addExceptionPayload(exception, exception.getEvent());
+  public Publisher<CoreEvent> apply(MessagingException exception) {
+    CoreEvent event = addExceptionPayload(exception, exception.getEvent());
     exception.setProcessedEvent(event);
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
@@ -81,7 +81,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public boolean accept(BaseEvent event) {
+  public boolean accept(CoreEvent event) {
     return true;
   }
 
@@ -90,8 +90,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     return true;
   }
 
-  private BaseEvent addExceptionPayload(MessagingException exception, BaseEvent event) {
-    return BaseEvent.builder(event)
+  private CoreEvent addExceptionPayload(MessagingException exception, CoreEvent event) {
+    return CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
   }
