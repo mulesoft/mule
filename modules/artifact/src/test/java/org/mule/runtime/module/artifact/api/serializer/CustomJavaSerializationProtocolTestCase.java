@@ -28,15 +28,15 @@ import org.mule.runtime.module.artifact.api.serializer.protocol.CustomJavaSerial
 import org.mule.tck.core.internal.serialization.AbstractSerializerProtocolContractTestCase;
 import org.mule.tck.util.CompilerUtils;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
 
@@ -57,7 +57,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     when(classLoaderRepository.getId(null)).thenReturn(empty());
     serializationProtocol = new CustomJavaSerializationProtocol(classLoaderRepository);
 
-    initialiseIfNeeded(serializationProtocol, muleContext);
+    initialiseIfNeeded(serializationProtocol, true, muleContext);
   }
 
   @Test(expected = SerializationException.class)
