@@ -17,10 +17,10 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
@@ -77,6 +77,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
@@ -90,6 +92,9 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
   private static final String CONFIG = "config";
   private static final String ALTERNATIVE_CONFIG = "alternative-config";
+
+  @Inject
+  private MetadataService metadataManager;
 
   public MetadataOperationTestCase(ResolutionType resolutionType) {
     super(resolutionType);
@@ -378,7 +383,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
   @Test
   public void multipleCaches() throws Exception {
-    MetadataService metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
     Map<String, ? extends MetadataCache> caches = getMetadataCaches(metadataManager);
     caches.keySet().forEach(metadataManager::disposeCache);
 
@@ -441,7 +445,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         .addIndexPart(0).build();
     getSuccessComponentDynamicMetadata();
 
-    MetadataService metadataManager = muleContext.getRegistry().lookupObject(MetadataService.class);
     MetadataCache configCache = getMetadataCaches(metadataManager).get(CONFIG);
 
     assertThat(configCache.get(AGE).get(), is(AGE_VALUE));

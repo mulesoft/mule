@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -24,8 +25,10 @@ public interface MuleContextListener {
    * Notifies after initialization of a {@link MuleContext} instance.
    *
    * @param context initialized context
+   * @param registry the registry of the initialized context
+   * @param object
    */
-  void onInitialization(MuleContext context);
+  void onInitialization(MuleContext context, Registry registry);
 
   /**
    * Notifies the configuration of a {@link MuleContext} instance, after this notification, the context is ready to be used.

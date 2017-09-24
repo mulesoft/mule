@@ -6,11 +6,12 @@
  */
 package org.mule.test.module.extension;
 
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -24,17 +25,19 @@ public abstract class AbstractHeisenbergConfigTestCase extends AbstractExtension
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    createHeisenbergObjects();
   }
 
-  private void createHeisenbergObjects() throws RegistrationException {
-    muleContext.getRegistry().registerObject("recipes", ImmutableMap.<String, Long>builder()
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    final Map<String, Object> objects = new HashMap<>();
+
+    objects.put("recipes", ImmutableMap.<String, Long>builder()
         .put("methylamine", 75l)
         .put("pseudoephedrine", 0l)
         .put("P2P", 25l)
         .build());
 
-    muleContext.getRegistry().registerObject("deathsBySeasons", ImmutableMap.<String, List<String>>builder()
+    objects.put("deathsBySeasons", ImmutableMap.<String, List<String>>builder()
         .put("s01", ImmutableList.<String>builder()
             .add("emilio")
             .add("domingo")
@@ -46,27 +49,29 @@ public abstract class AbstractHeisenbergConfigTestCase extends AbstractExtension
         .build());
 
     Ricin ricin = new Ricin(new KnockeableDoor("Lidia", "Stevia coffe shop"), 22L);
-    muleContext.getRegistry().registerObject("labeledRicins", ImmutableMap.<String, Ricin>builder()
+    objects.put("labeledRicins", ImmutableMap.<String, Ricin>builder()
         .put("pojo", ricin)
         .build());
 
-    muleContext.getRegistry().registerObject("monthlyIncomes", ImmutableList.<Long>builder()
+    objects.put("monthlyIncomes", ImmutableList.<Long>builder()
         .add(12000L)
         .add(500L)
         .build());
 
-    muleContext.getRegistry().registerObject("enemies", ImmutableList.<String>builder()
+    objects.put("enemies", ImmutableList.<String>builder()
         .add("Gustavo Fring")
         .add("Hank")
         .build());
 
-    muleContext.getRegistry().registerObject("ricinPacks", ImmutableSet.<Ricin>builder()
+    objects.put("ricinPacks", ImmutableSet.<Ricin>builder()
         .add(ricin).build());
 
 
-    muleContext.getRegistry().registerObject("candidateDoors", ImmutableMap.<String, KnockeableDoor>builder()
+    objects.put("candidateDoors", ImmutableMap.<String, KnockeableDoor>builder()
         .put("skyler", new KnockeableDoor("Skyler", "308 Negra Arroyo Lane"))
         .put("saul", new KnockeableDoor("Saul", "Shopping Mall"))
         .build());
+
+    return objects;
   }
 }

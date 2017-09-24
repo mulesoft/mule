@@ -14,17 +14,17 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.spring.internal.ServerNotificationManagerConfigurator;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.spring.internal.NotificationConfig.DisabledNotificationConfig;
 import org.mule.runtime.config.spring.internal.NotificationConfig.EnabledNotificationConfig;
+import org.mule.runtime.config.spring.internal.ServerNotificationManagerConfigurator;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.api.util.Pair;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -35,7 +35,7 @@ import org.springframework.context.ApplicationContext;
 
 public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleTestCase {
 
-  private MuleRegistry registry;
+  private Registry registry;
   private ServerNotificationManager notificationManager;
   private MuleContext context;
   private ServerNotificationManagerConfigurator configurator;
@@ -45,15 +45,15 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
 
   @Before
   public void before() {
-    registry = mock(MuleRegistry.class);
+    registry = mock(Registry.class);
 
     notificationManager = mock(ServerNotificationManager.class);
     context = mock(MuleContext.class);
-    doReturn(registry).when(context).getRegistry();
     doReturn(notificationManager).when(context).getNotificationManager();
 
     configurator = new ServerNotificationManagerConfigurator();
     configurator.setMuleContext(context);
+    configurator.setRegistry(registry);
     final ApplicationContext springContext = mock(ApplicationContext.class);
     doReturn(new String[0]).when(springContext).getBeanNamesForType(NotificationListener.class, false, true);
     configurator.setApplicationContext(springContext);
@@ -65,7 +65,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
                                                                                    .when(registry)
-                                                                                   .lookupObjects(NotificationsProvider.class);
+                                                                                   .lookupAllByType(NotificationsProvider.class);
 
     configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
                                                                                      CompliantNotification.class)));
@@ -83,7 +83,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                                                                new Pair(CompliantNotification.class,
                                                                         CompliantNotificationListener.class))))
                                                                             .when(registry)
-                                                                            .lookupObjects(NotificationsProvider.class);
+                                                                            .lookupAllByType(NotificationsProvider.class);
 
     configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
                                                                                      CompliantNotification.class)));
@@ -99,7 +99,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
                                                                                    .when(registry)
-                                                                                   .lookupObjects(NotificationsProvider.class);
+                                                                                   .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setEventClass(CompliantNotification.class);
@@ -115,7 +115,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
                                                                                    .when(registry)
-                                                                                   .lookupObjects(NotificationsProvider.class);
+                                                                                   .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setEventName("test:COMPLIANT");
@@ -131,7 +131,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
                                                                                    .when(registry)
-                                                                                   .lookupObjects(NotificationsProvider.class);
+                                                                                   .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setInterfaceClass(CompliantNotificationListener.class);
@@ -144,7 +144,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
   @Test
   public void nonCompliantNotification() throws InitialisationException {
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("nonCompliant", new Pair(null, null)))).when(registry)
-        .lookupObjects(NotificationsProvider.class);
+        .lookupAllByType(NotificationsProvider.class);
 
     expected.expect(InitialisationException.class);
     expected.expectMessage(containsString("'nonCompliant'"));

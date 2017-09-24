@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.registry;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 
-import static java.util.stream.Collectors.toSet;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
@@ -38,7 +36,7 @@ public class DefaultRegistry implements Registry {
   @Override
   public <T> Optional<T> lookupByType(Class<T> objectType) {
     try {
-      return (Optional<T>) ofNullable(deAnnotator.apply(muleContext.getRegistry().lookupObject(objectType)));
+      return ofNullable(muleContext.getRegistry().lookupObject(objectType));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -46,11 +44,11 @@ public class DefaultRegistry implements Registry {
 
   @Override
   public <T> Optional<T> lookupByName(String name) {
-    return (Optional<T>) ofNullable(deAnnotator.apply(muleContext.getRegistry().lookupObject(name)));
+    return (Optional<T>) ofNullable(muleContext.getRegistry().lookupObject(name));
   }
 
   @Override
   public <T> Collection<T> lookupAllByType(Class<T> serviceType) {
-    return (Collection<T>) muleContext.getRegistry().lookupObjects(serviceType).stream().map(deAnnotator).collect(toSet());
+    return muleContext.getRegistry().lookupObjects(serviceType);
   }
 }

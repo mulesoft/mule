@@ -16,7 +16,9 @@ import static org.mule.runtime.config.spring.internal.InjectParamsFromContextSer
 import static org.mule.runtime.config.spring.internal.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.spring.internal.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.api.MetadataInvocationHandler;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,14 +27,14 @@ import org.mule.runtime.core.internal.config.preferred.Preferred;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleContextTestCase {
@@ -40,13 +42,21 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
+  @Inject
+  private Registry registry;
+
   private Object augmentedParam;
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @Test
   public void notAugmentedInvocation() throws Exception {
     BaseService service = new BasicService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -57,7 +67,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void augmentedInvocation() throws Exception {
     BaseService service = new AugmentedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -68,7 +78,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void augmentedSubclassInvocation() throws Exception {
     BaseService service = new AugmentedSubclassMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -79,7 +89,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void augmentedSubclassOverridesInvocation() throws Exception {
     BaseService service = new AugmentedSubclassOverridesMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -88,13 +98,13 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
 
   @Test
   public void augmentedWithPreferredInvocation() throws Exception {
-    muleContext.getRegistry().registerObject("myBean", new MyBean());
+    registerObject(muleContext, "myBean", new MyBean());
     final MyPreferredBean preferredBean = new MyPreferredBean();
-    muleContext.getRegistry().registerObject("myPreferredBean", preferredBean);
+    registerObject(muleContext, "myPreferredBean", preferredBean);
 
     BaseService service = new AugmentedWithPreferredMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -105,7 +115,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void namedAugmentedInvocation() throws Exception {
     BaseService service = new NamedAugmentedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -116,7 +126,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void invalidNamedAugmentedInvocation() throws Exception {
     BaseService service = new InvalidNamedAugmentedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     expected.expect(IllegalDependencyInjectionException.class);
     expected.expectMessage(format(NO_OBJECT_FOUND_FOR_PARAM, "param", "augmented", "InvalidNamedAugmentedMethodService"));
@@ -128,7 +138,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void hiddenAugmentedInvocation() throws Exception {
     BaseService service = new HiddenAugmentedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -140,7 +150,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     BaseOverloadedService service = new OverloadedAugmentedMethodService();
 
     final BaseOverloadedService serviceProxy =
-        (BaseOverloadedService) createInjectProviderParamsServiceProxy(service, muleContext);
+        (BaseOverloadedService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -152,7 +162,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     BaseOverloadedService service = new OverloadedAugmentedMethodService();
 
     final BaseOverloadedService serviceProxy =
-        (BaseOverloadedService) createInjectProviderParamsServiceProxy(service, muleContext);
+        (BaseOverloadedService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented(1);
 
@@ -163,7 +173,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void ambiguousAugmentedInvocation() throws Exception {
     BaseService service = new AmbiguousAugmetedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     expected.expect(IllegalDependencyInjectionException.class);
     expected.expectMessage(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService"));
@@ -176,7 +186,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void invalidAugmentedInvocation() throws Exception {
     BaseService service = new InvalidAugmetedMethodService();
 
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
     serviceProxy.augmented();
 
@@ -196,7 +206,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     };
     final BaseService innerProxy =
         (BaseService) newProxyInstance(service.getClass().getClassLoader(), new Class<?>[] {BaseService.class}, noOpHandler);
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(innerProxy, muleContext);
+    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(innerProxy, registry);
 
     serviceProxy.augmented();
 

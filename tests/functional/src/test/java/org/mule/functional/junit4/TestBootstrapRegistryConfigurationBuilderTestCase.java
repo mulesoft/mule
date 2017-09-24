@@ -16,6 +16,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -23,15 +24,26 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class TestBootstrapRegistryConfigurationBuilderTestCase extends AbstractMuleContextTestCase {
+
+  @Inject
+  @Named("testObject1")
+  private Object testObject1;
+
+  @Inject
+  @Named("testObject2")
+  private Object testObject2;
 
   public TestBootstrapRegistryConfigurationBuilderTestCase() {
     setStartContext(false);
@@ -39,8 +51,9 @@ public class TestBootstrapRegistryConfigurationBuilderTestCase extends AbstractM
 
   @Test
   public void usesAllPluginBootstrapFiles() throws Exception {
-    assertThat(muleContext.getRegistry().lookupObject("testObject1"), is(not(nullValue())));
-    assertThat(muleContext.getRegistry().lookupObject("testObject2"), is(not(nullValue())));
+    muleContext.getInjector().inject(this);
+    assertThat(testObject1, is(not(nullValue())));
+    assertThat(testObject2, is(not(nullValue())));
   }
 
   @Override

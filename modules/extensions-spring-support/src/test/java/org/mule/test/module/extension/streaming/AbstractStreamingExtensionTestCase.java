@@ -8,20 +8,19 @@ package org.mule.test.module.extension.streaming;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingStatistics;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import javax.inject.Inject;
+
 abstract class AbstractStreamingExtensionTestCase extends AbstractExtensionFunctionalTestCase {
 
+  @Inject
   private StreamingManager streamingManager;
-
-  @Override
-  protected void doSetUp() throws Exception {
-    streamingManager = muleContext.getRegistry().lookupObject(StreamingManager.class);
-  }
 
   @Override
   protected void doTearDownAfterMuleContextDispose() throws Exception {

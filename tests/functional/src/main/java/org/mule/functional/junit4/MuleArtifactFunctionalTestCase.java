@@ -10,10 +10,10 @@ package org.mule.functional.junit4;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
@@ -52,10 +52,10 @@ import javax.inject.Inject;
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
 
   @Inject
-  protected Registry registry;
+  protected ConfigurationComponentLocator locator;
 
   @Inject
-  protected ConfigurationComponentLocator locator;
+  protected NotificationListenerRegistry notificationListenerRegistry;
 
   private BaseEvent _testEvent;
 

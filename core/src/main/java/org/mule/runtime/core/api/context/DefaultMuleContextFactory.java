@@ -10,8 +10,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -24,13 +26,13 @@ import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation that uses {@link DefaultMuleContextBuilder} to build new {@link MuleContext} instances.
@@ -255,7 +257,7 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
 
   private void notifyMuleContextInitialized(MuleContext context) {
     for (MuleContextListener listener : listeners) {
-      listener.onInitialization(context);
+      listener.onInitialization(context, context.getRegistry().<Registry>lookupObject(OBJECT_REGISTRY));
     }
   }
 

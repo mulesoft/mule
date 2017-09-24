@@ -16,8 +16,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.test.allure.AllureConstants.RegistryFeature.DomainObjectRegistrationStory.OBJECT_REGISTRATION;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObjects;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObjectsForLifecycle;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
+import static org.mule.test.allure.AllureConstants.RegistryFeature.DomainObjectRegistrationStory.OBJECT_REGISTRATION;
+
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,6 +37,9 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.allure.AllureConstants;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -39,8 +47,6 @@ import java.util.concurrent.Future;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Feature(REGISTRY)
 public class ApplicationWithDomainRegistryTestCase extends AbstractMuleTestCase {
@@ -60,34 +66,34 @@ public class ApplicationWithDomainRegistryTestCase extends AbstractMuleTestCase 
   @Story(OBJECT_REGISTRATION)
   @Test
   public void lookupByTypeSearchInParentAlso() throws Exception {
-    domainContext.getRegistry().registerObject(BEAN_KEY, BEAN_KEY);
-    applicationContext.getRegistry().registerObject(ANOTHER_BEAN_KEY, ANOTHER_BEAN_KEY);
-    Collection<String> values = applicationContext.getRegistry().lookupObjects(String.class);
+    registerObject(domainContext, BEAN_KEY, BEAN_KEY);
+    registerObject(applicationContext, ANOTHER_BEAN_KEY, ANOTHER_BEAN_KEY);
+    Collection<String> values = lookupObjects(applicationContext, String.class);
     assertThat(values, hasSize(2));
   }
 
   @Story(OBJECT_REGISTRATION)
   @Test
   public void lookupByIdReturnsApplicationContextBeanEvenIfSameBeanIsInDomain() throws Exception {
-    applicationContext.getRegistry().registerObject(BEAN_KEY, BEAN_KEY);
-    domainContext.getRegistry().registerObject(BEAN_KEY, new Integer(10));
-    assertThat(applicationContext.getRegistry().get(BEAN_KEY), is(instanceOf(String.class)));
+    registerObject(applicationContext, BEAN_KEY, BEAN_KEY);
+    registerObject(domainContext, BEAN_KEY, new Integer(10));
+    assertThat(lookupObject(applicationContext, BEAN_KEY), is(instanceOf(String.class)));
   }
 
   @Story(OBJECT_REGISTRATION)
   @Test
   public void lookupByLifecycleReturnsApplicationContextBeanOnly() throws Exception {
-    domainContext.getRegistry().registerObject(BEAN_KEY, BEAN_KEY);
-    applicationContext.getRegistry().registerObject(ANOTHER_BEAN_KEY, ANOTHER_BEAN_KEY);
-    assertThat(applicationContext.getRegistry().lookupObjectsForLifecycle(String.class).size(), is(1));
+    registerObject(domainContext, BEAN_KEY, BEAN_KEY);
+    registerObject(applicationContext, ANOTHER_BEAN_KEY, ANOTHER_BEAN_KEY);
+    assertThat(lookupObjectsForLifecycle(applicationContext, String.class).size(), is(1));
   }
 
   @Story(AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION)
   @Test
   public void lookupByIdReturnsParentApplicationContextBean() throws Exception {
     Object value = new Object();
-    applicationContext.getRegistry().registerObject(BEAN_KEY, value);
-    assertThat(applicationContext.getRegistry().get(BEAN_KEY), is(value));
+    registerObject(applicationContext, BEAN_KEY, value);
+    assertThat(lookupObject(applicationContext, BEAN_KEY), is(value));
   }
 
   @Story(AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION)
@@ -115,7 +121,7 @@ public class ApplicationWithDomainRegistryTestCase extends AbstractMuleTestCase 
     try {
       final Future<?> submittedStop = threadPool.submit(() -> {
         try {
-          applicationContext.getRegistry().registerObject(BEAN_KEY, asyncStartableBean);
+          registerObject(applicationContext, BEAN_KEY, asyncStartableBean);
         } catch (RegistrationException e) {
           throw new MuleRuntimeException(e);
         }

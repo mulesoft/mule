@@ -7,22 +7,22 @@
 package org.mule.functional.api.flow;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
+
+import org.mockito.Mockito;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
-
-import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for running events through batch FlowConstructs.
@@ -31,7 +31,7 @@ import org.mockito.Mockito;
  */
 public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
-  protected MuleContext muleContext;
+  protected Registry registry;
   protected TestEventBuilder eventBuilder = new TestEventBuilder();
   private BaseEvent requestEvent;
 
@@ -210,10 +210,10 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   /**
    * Initializes this runner with a mule context.
    *
-   * @param muleContext the context of the mule application
+   * @param registry the registry for the currently running test
    */
-  public FlowConstructRunner(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public FlowConstructRunner(Registry registry) {
+    this.registry = registry;
   }
 
   protected BaseEvent getOrBuildEvent() {
@@ -244,9 +244,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   protected FlowConstruct getFlowConstruct() {
-    final FlowConstruct flow = muleContext.getRegistry().lookupFlowConstruct(getFlowConstructName());
-    requireNonNull(flow, format("No flow with name '%s' found.", getFlowConstructName()));
-    return flow;
+    return registry.<FlowConstruct>lookupByName(getFlowConstructName())
+        .orElseThrow(() -> new NullPointerException(format("No flow with name '%s' found.", getFlowConstructName())));
   }
 
   /**

@@ -7,6 +7,7 @@
 
 package org.mule.functional.junit4;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -18,8 +19,8 @@ import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeF
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -119,13 +120,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @Override
   protected ObjectSerializer getObjectSerializer() {
     return new ArtifactObjectSerializer(classLoaderRepository);
-  }
-
-  @Override
-  protected MuleContext createMuleContext() throws Exception {
-    MuleContext muleContext = super.createMuleContext();
-    muleContext.getRegistry().registerObject(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository);
-    return muleContext;
   }
 
   /**
@@ -238,6 +232,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
     builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
                                                                            pluginClassLoaders));
+
+    builders.add(0, new SimpleConfigurationBuilder(singletonMap(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository)));
   }
 
   /**

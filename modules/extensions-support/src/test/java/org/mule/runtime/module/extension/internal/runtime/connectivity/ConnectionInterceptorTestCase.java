@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -21,15 +23,15 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {

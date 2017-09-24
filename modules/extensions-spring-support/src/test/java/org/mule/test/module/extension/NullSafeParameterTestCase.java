@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.vegan.extension.BananaConfig;
@@ -23,9 +24,16 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.junit.Test;
 
 public class NullSafeParameterTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Inject
+  @Named("nullSafeOnSourceGroupAndPojo")
+  private Flow nullSafeOnSourceGroupAndPojoFlow;
 
   @Override
   protected String getConfigFile() {
@@ -110,8 +118,7 @@ public class NullSafeParameterTestCase extends AbstractExtensionFunctionalTestCa
 
   @Test
   public void nullSafeOnSourceGroupAndPojo() throws Exception {
-    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("nullSafeOnSourceGroupAndPojo");
-    flow.start();
-    assertThat(flow.getLifecycleState().isStarted(), is(true));
+    nullSafeOnSourceGroupAndPojoFlow.start();
+    assertThat(nullSafeOnSourceGroupAndPojoFlow.getLifecycleState().isStarted(), is(true));
   }
 }

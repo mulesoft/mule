@@ -58,7 +58,6 @@ import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -68,8 +67,6 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIV
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
-import static org.mule.runtime.core.api.event.BaseEventContext.create;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
@@ -97,6 +94,7 @@ import static org.mule.runtime.module.deployment.internal.TestApplicationFactory
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -108,23 +106,19 @@ import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.config.StartupContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -165,6 +159,17 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestContainerModuleDiscoverer;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -179,21 +184,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -574,7 +569,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // just assert no privileged entries were put in the registry
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
-    final MuleRegistry registry = getMuleRegistry(app);
 
     // Checks that the configuration's ID was properly configured
     assertThat(app.getMuleContext().getConfiguration().getId(), equalTo(dummyAppDescriptorFileBuilder.getId()));
@@ -600,12 +594,12 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, globalPropertyAppFileBuilder.getId());
 
     final Application app = findApp(globalPropertyAppFileBuilder.getId(), 1);
-    final MuleRegistry registry = getMuleRegistry(app);
 
-    ConfigurationProperties configurationProperties = registry.lookupObject(ConfigurationProperties.class);
-    assertThat(configurationProperties, is(notNullValue()));
+    Optional<ConfigurationProperties> configurationProperties =
+        app.getRegistry().<ConfigurationProperties>lookupByType(ConfigurationProperties.class);
+    assertThat(configurationProperties.isPresent(), is(true));
 
-    String appHome = configurationProperties.resolveStringProperty("appHome")
+    String appHome = configurationProperties.get().resolveStringProperty("appHome")
         .orElseThrow(() -> new RuntimeException("Could not find property appHome"));
     assertThat(new File(appHome).exists(), is(true));
   }
@@ -1840,9 +1834,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     final Application application = findApp(applicationFileBuilder.getId(), 1);
-    final Object lookupObject = application.getMuleContext().getRegistry().lookupObject("plugin.echotest");
-    assertThat(lookupObject, is(not(nullValue())));
-    assertThat(lookupObject.getClass().getName(), equalTo("org.foo.EchoTest"));
+    final Optional<Object> lookupObject = application.getRegistry().lookupByName("plugin.echotest");
+    assertThat(lookupObject.isPresent(), is(true));
+    assertThat(lookupObject.get().getClass().getName(), equalTo("org.foo.EchoTest"));
   }
 
   @Test
@@ -2944,7 +2938,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Ensure resources are registered at domain's registry
     Domain domain = findADomain(sharedDomainFileBuilder.getId());
-    assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
+    assertThat(domain.getRegistry().lookupByName("http-listener-config").isPresent(), is(true));
 
     ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
 
@@ -3865,10 +3859,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     });
   }
 
-  private MuleRegistry getMuleRegistry(Application app) {
-    return withContextClassLoader(app.getArtifactClassLoader().getClassLoader(), () -> app.getMuleContext().getRegistry());
-  }
-
   private void assertDeploymentFailure(final DeploymentListener listener, final String artifactName) {
     assertDeploymentFailure(listener, artifactName, times(1));
   }
@@ -4190,14 +4180,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     prober.check(new FileExists(appFolder));
   }
 
-  private void executeApplicationFlow(String flowName) throws MuleException {
-    Flow mainFlow =
-        (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
-    Message muleMessage = of(TEST_MESSAGE);
-
-    mainFlow.process(InternalEvent.builder(create(mainFlow, TEST_CONNECTOR_LOCATION)).message(muleMessage)
-        .flow(mainFlow)
-        .build());
+  private void executeApplicationFlow(String flowName) throws Exception {
+    final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName);
+    flowRunner.withPayload(TEST_MESSAGE).run();
+    flowRunner.dispose();
   }
 
   private void assertNoZombiePresent(Map<String, Map<URI, Long>> zombieMap) {

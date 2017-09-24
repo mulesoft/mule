@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationListener;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -101,30 +101,29 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
                                                                                      new DefaultExtensionManagerFactory()));
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
-      MuleRegistry applicationRegistry = application.getMuleContext().getRegistry();
+      Registry applicationRegistry = application.getRegistry();
       /*
        * OBJECT_POLICY_MANAGER_STATE_HANDLER is not proxied as it doesn't implement any lifecycle interfaces (Startable, Stoppable
        * or Disposable)
        */
       customizationService.overrideDefaultServiceImpl(OBJECT_POLICY_MANAGER_STATE_HANDLER,
-                                                      applicationRegistry.lookupObject(OBJECT_POLICY_MANAGER_STATE_HANDLER));
+                                                      applicationRegistry.lookupByName(OBJECT_POLICY_MANAGER_STATE_HANDLER)
+                                                          .get());
       customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
                                                       createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupObject(OBJECT_LOCK_PROVIDER)));
+                                                          .lookupByName(OBJECT_LOCK_PROVIDER).get()));
       customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
                                                       createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY)));
+                                                          .lookupByName(BASE_PERSISTENT_OBJECT_STORE_KEY).get()));
       customizationService.overrideDefaultServiceImpl(BASE_IN_MEMORY_OBJECT_STORE_KEY,
                                                       createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY)));
+                                                          .lookupByName(BASE_IN_MEMORY_OBJECT_STORE_KEY).get()));
       customizationService.overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
                                                       createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupObject(OBJECT_TIME_SUPPLIER)));
-      Object muleClusterManager = applicationRegistry.lookupObject(CLUSTER_MANAGER_ID);
-      if (muleClusterManager != null) {
-        customizationService.registerCustomServiceImpl(CLUSTER_MANAGER_ID,
-                                                       createLifecycleFilterProxy(muleClusterManager));
-      }
+                                                          .lookupByName(OBJECT_TIME_SUPPLIER).get()));
+
+      applicationRegistry.lookupByName(CLUSTER_MANAGER_ID).ifPresent(muleClusterManager -> customizationService
+          .registerCustomServiceImpl(CLUSTER_MANAGER_ID, createLifecycleFilterProxy(muleClusterManager)));
     });
     try {
       policyContext = artifactBuilder.build();
@@ -137,20 +136,13 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   private void enableNotificationListeners(List<NotificationListener> notificationListeners) throws RegistrationException {
     NotificationListenerRegistry listenerRegistry =
-        policyContext.getMuleContext().getRegistry().lookupObject(NotificationListenerRegistry.class);
+        policyContext.getRegistry().lookupByType(NotificationListenerRegistry.class).get();
 
     notificationListeners.forEach(listenerRegistry::registerListener);
   }
 
   private void initPolicyInstance() throws InitialisationException {
-    try {
-      policyInstance = policyContext.getMuleContext().getRegistry().lookupObject(DefaultPolicyInstance.class);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(createStaticMessage(
-                                                            String.format("More than one %s found on context",
-                                                                          ApplicationPolicyInstance.class)),
-                                        e, this);
-    }
+    policyInstance = policyContext.getRegistry().lookupByType(DefaultPolicyInstance.class).get();
   }
 
   @Override

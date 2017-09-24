@@ -26,7 +26,6 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
@@ -38,7 +37,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -60,13 +58,13 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultMuleApplication implements Application {
 
@@ -212,7 +210,7 @@ public class DefaultMuleApplication implements Application {
         artifactBuilder.setMuleContextListener(muleContextListener);
       }
       artifactContext = artifactBuilder.build();
-      setMuleContext(artifactContext.getMuleContext());
+      setMuleContext(artifactContext.getMuleContext(), artifactContext.getRegistry());
     } catch (Exception e) {
       setStatusToFailed();
 
@@ -229,10 +227,10 @@ public class DefaultMuleApplication implements Application {
 
   protected void setArtifactContext(final ArtifactContext artifactContext) {
     this.artifactContext = artifactContext;
-    setMuleContext(this.artifactContext.getMuleContext());
+    setMuleContext(artifactContext.getMuleContext(), artifactContext.getRegistry());
   }
 
-  private void setMuleContext(final MuleContext muleContext) {
+  private void setMuleContext(final MuleContext muleContext, Registry registry) {
     statusListener = new MuleContextNotificationListener<MuleContextNotification>() {
 
       @Override
@@ -250,11 +248,7 @@ public class DefaultMuleApplication implements Application {
       }
     };
 
-    try {
-      notificationRegistrer = muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
+    notificationRegistrer = registry.lookupByType(NotificationListenerRegistry.class).get();
     notificationRegistrer.registerListener(statusListener);
   }
 

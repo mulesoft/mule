@@ -57,6 +57,17 @@ public final class LegacyRegistryUtils {
   }
 
   /**
+   * Look up all objects of a given type that lifecycle should be applied to. This method differs from
+   * {@link #lookupObjects(Class)} in that it allows implementations to provide an alternative implementation of lookup for
+   * lifecycle. For example only returning pre-existing objects and not creating new ones on the fly.
+   *
+   * @return collection of objects or empty collection if none found
+   */
+  public static <T> Collection<T> lookupObjectsForLifecycle(MuleContext context, Class<T> clazz) {
+    return context.getRegistry().lookupObjectsForLifecycle(clazz);
+  }
+
+  /**
    * Registers an object in the registry with a key.
    *
    * @param key the key to store the value against. This is a non-null value

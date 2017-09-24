@@ -19,9 +19,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -34,11 +32,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Inject;
+
 import org.junit.Test;
 
 public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final String POLICY_ID = "policyId";
+
+  @Inject
+  private PolicyProvider policyProvider;
 
   @Override
   protected String getConfigFile() {
@@ -58,7 +61,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       public void configure(MuleContext muleContext) throws ConfigurationException {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
         muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
-                                                                        new TestPolicyProvider(policyReference, muleContext));
+                                                                        new TestPolicyProvider(policyReference));
       }
 
       @Override
@@ -70,8 +73,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void parsesPolicy() throws Exception {
-    PolicyProvider policyProvider = muleContext.getRegistry().lookupObject(PolicyProvider.class);
-
     assertThat(policyProvider, instanceOf(TestPolicyProvider.class));
     TestPolicyProvider testPolicyProvider = (TestPolicyProvider) policyProvider;
     assertThat(testPolicyProvider.policyReference.get(), is(not(nullValue())));
@@ -83,14 +84,15 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     assertThat(operationParameterizedPolicies.size(), equalTo(1));
   }
 
-  private static class TestPolicyProvider implements PolicyProvider, Initialisable {
+  private static class TestPolicyProvider implements PolicyProvider, Startable {
 
     private final AtomicReference<Optional<PolicyInstance>> policyReference;
-    private final MuleContext muleContext;
 
-    public TestPolicyProvider(AtomicReference<Optional<PolicyInstance>> policyReference, MuleContext muleContext) {
+    @Inject
+    private PolicyInstance policyInstance;
+
+    public TestPolicyProvider(AtomicReference<Optional<PolicyInstance>> policyReference) {
       this.policyReference = policyReference;
-      this.muleContext = muleContext;
     }
 
     @Override
@@ -108,15 +110,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     private PolicyInstance getPolicyFromRegistry() {
-      try {
-        return muleContext.getRegistry().lookupObject(PolicyInstance.class);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
+      return policyInstance;
     }
 
     @Override
-    public void initialise() throws InitialisationException {
+    public void start() {
       if (policyReference.get() == null) {
         PolicyInstance policyInstance = getPolicyFromRegistry();
         policyReference.set(ofNullable(policyInstance));

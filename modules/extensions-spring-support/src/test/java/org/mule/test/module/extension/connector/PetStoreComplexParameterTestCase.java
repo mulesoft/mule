@@ -9,16 +9,18 @@ package org.mule.test.module.extension.connector;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetCage;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class PetStoreComplexParameterTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -28,15 +30,19 @@ public class PetStoreComplexParameterTestCase extends AbstractExtensionFunctiona
   }
 
   @Override
-  protected void doSetUp() throws Exception {
-    muleContext.getRegistry().registerObject("birds", ImmutableMap.<String, Integer>builder()
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    final Map<String, Object> objects = new HashMap<>();
+
+    objects.put("birds", ImmutableMap.<String, Integer>builder()
         .put("mockingjay", 15)
         .put("mockingbird", 10)
         .build());
-    muleContext.getRegistry().registerObject("ammenities", ImmutableList.<String>builder()
+    objects.put("ammenities", ImmutableList.<String>builder()
         .add("spinning wheel")
         .add("food can")
         .build());
+
+    return objects;
   }
 
   @Override

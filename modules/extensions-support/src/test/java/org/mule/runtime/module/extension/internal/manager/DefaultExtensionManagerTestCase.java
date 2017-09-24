@@ -20,6 +20,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -30,6 +31,7 @@ import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -37,6 +39,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -49,6 +52,7 @@ import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
@@ -58,11 +62,17 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.ImmutableList;
 
@@ -75,12 +85,6 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -209,11 +213,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     stubRegistryKeys(muleContext, EXTENSION1_CONFIG_INSTANCE_NAME, EXTENSION1_OPERATION_NAME, EXTENSION1_NAME);
 
-    ConnectionManagerAdapter connectionManagerAdapter = mock(ConnectionManagerAdapter.class);
-    when(muleContext.getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER))
-        .thenReturn(connectionManagerAdapter);
-    when(muleContext.getRegistry().lookupObject(MuleMetadataService.class)).thenReturn(mock(MuleMetadataService.class));
-    when(muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).thenReturn(connectionManagerAdapter);
+    registerIntoMockContext(muleContext, OBJECT_CONNECTION_MANAGER, mock(ConnectionManagerAdapter.class));
+    registerIntoMockContext(muleContext, MuleMetadataService.class, mock(MuleMetadataService.class));
   }
 
   private void registerExtensions(ExtensionModel... extensionModels) {
@@ -263,8 +264,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
-    when(muleContext.getRegistry().get(getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel)))
-        .thenReturn(extension1ConfigurationProvider);
+    registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel),
+                            extension1ConfigurationProvider);
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
 
@@ -280,11 +281,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
     MuleRegistry registry = muleContext.getRegistry();
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
-    when(registry.lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
 
     doAnswer(invocation -> {
-      when(registry.get(getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel)))
-          .thenReturn(extension1ConfigurationProvider);
+      registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1, extension1ConfigurationModel),
+                              extension1ConfigurationProvider);
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
 
@@ -300,7 +300,6 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalStateException.class)
   public void getOperationExecutorWithNotImplicitConfig() {
-    when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class)).thenReturn(emptyList());
     makeExtension1ConfigurationNotImplicit();
 
     extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
@@ -342,7 +341,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel, parameter, parameterOfRepeatedEnumType);
     extensionsManager.registerExtension(extensionModel1);
 
-    verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
+    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
   }
 
   @Test
@@ -358,7 +357,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     mockParameters(extension1ConfigurationModel, parameter);
     extensionsManager.registerExtension(extensionModel1);
 
-    verify(muleContext.getRegistry()).registerTransformer(any(StringToEnum.class));
+    verify(muleContext.getRegistry()).registerObject(anyString(), any(StringToEnum.class), eq(Transformer.class));
   }
 
   private void makeExtension1ConfigurationNotImplicit() {
@@ -388,8 +387,9 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private void registerConfigurationProvider() throws RegistrationException {
     extensionsManager.registerConfigurationProvider(extension1ConfigurationProvider);
     verify(muleContext.getRegistry()).registerObject(extension1ConfigurationProvider.getName(), extension1ConfigurationProvider);
-    when(muleContext.getRegistry().lookupObjects(ConfigurationProvider.class))
-        .thenReturn(asList(extension1ConfigurationProvider));
-    when(muleContext.getRegistry().get(extension1ConfigurationProvider.getName())).thenReturn(extension1ConfigurationProvider);
+    registerIntoMockContext(muleContext, ConfigurationProvider.class,
+                            extension1ConfigurationProvider);
+    registerIntoMockContext(muleContext, extension1ConfigurationProvider.getName(),
+                            extension1ConfigurationProvider);
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,11 +25,13 @@ public final class ConstructMessageProcessorBuilder
   public ConstructMessageProcessorBuilder(ExtensionModel extensionModel,
                                           ConstructModel operationModel,
                                           PolicyManager policyManager,
-                                          MuleContext muleContext) {
+                                          MuleContext muleContext,
+                                          Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, muleContext);
+    super(extensionModel, operationModel, policyManager, muleContext, registry);
   }
 
+  @Override
   protected ConstructMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
     return new ConstructMessageProcessor(extensionModel, operationModel,
                                          configurationProvider, target, targetValue,

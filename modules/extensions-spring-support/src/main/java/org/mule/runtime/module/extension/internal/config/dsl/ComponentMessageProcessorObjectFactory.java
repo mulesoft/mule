@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -32,6 +34,7 @@ import java.util.List;
 public abstract class ComponentMessageProcessorObjectFactory<M extends ComponentModel, P extends ComponentMessageProcessor>
     extends AbstractExtensionObjectFactory<P> {
 
+  protected final Registry registry;
   protected final ExtensionModel extensionModel;
   protected final M componentModel;
   protected final PolicyManager policyManager;
@@ -45,8 +48,10 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
   public ComponentMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 M componentModel,
                                                 MuleContext muleContext,
+                                                Registry registry,
                                                 PolicyManager policyManager) {
     super(muleContext);
+    this.registry = registry;
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.policyManager = policyManager;

@@ -24,15 +24,16 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import io.qameta.allure.Feature;
@@ -76,27 +77,22 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
 
         @Override
         protected final void addBuilders(List<ConfigurationBuilder> builders) {
-          builders.add(new AbstractConfigurationBuilder() {
+          Map<String, Object> baseRegistry = new HashMap<>();
+          baseRegistry.put("httpService", mock(HttpService.class, RETURNS_DEEP_STUBS.get()));
+          baseRegistry.put("schedulerService", mock(SchedulerService.class, RETURNS_DEEP_STUBS.get()));
+          baseRegistry.put("elService", new DefaultExpressionLanguageFactoryService() {
 
             @Override
-            protected void doConfigure(MuleContext muleContext) throws Exception {
-              muleContext.getRegistry().registerObject("httpService", mock(HttpService.class, RETURNS_DEEP_STUBS.get()));
-              muleContext.getRegistry().registerObject("schedulerService",
-                                                       mock(SchedulerService.class, RETURNS_DEEP_STUBS.get()));
-              muleContext.getRegistry().registerObject("elService", new DefaultExpressionLanguageFactoryService() {
+            public ExpressionLanguage create() {
+              return mock(ExpressionLanguage.class, RETURNS_DEEP_STUBS.get());
+            }
 
-                @Override
-                public ExpressionLanguage create() {
-                  return mock(ExpressionLanguage.class, RETURNS_DEEP_STUBS.get());
-                }
-
-                @Override
-                public String getName() {
-                  return "test-el";
-                }
-              });
+            @Override
+            public String getName() {
+              return "test-el";
             }
           });
+          builders.add(new SimpleConfigurationBuilder(baseRegistry));
         }
       }.setApplicationResources(new String[] {
           configFile

@@ -10,12 +10,16 @@ import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 
 import org.junit.Test;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
@@ -24,6 +28,10 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
   private static final String TYPE = "jks";
   private static final String ALGORITHM = "SunX509";
 
+  @Inject
+  @Named("tlsContext")
+  private TlsContextFactory tlsContextFactory;
+
   @Override
   protected String getConfigFile() {
     return "tls-namespace-config.xml";
@@ -31,7 +39,6 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
 
   @Test
   public void testTlsContextProperties() throws Exception {
-    TlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
     assertThat(tlsContextFactory.getEnabledProtocols(), is(new String[] {"TLSv1"}));
     assertThat(tlsContextFactory.getEnabledCipherSuites(), is(new String[] {"TLS_DHE_DSS_WITH_AES_128_CBC_SHA"}));
 
@@ -52,7 +59,6 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
 
   @Test
   public void testTlsContextKeyStoreProperties() throws Exception {
-    TlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
     TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
 
     assertThat(keyStoreConfig.getPath(), endsWith("serverKeystore"));
@@ -65,7 +71,6 @@ public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase 
 
   @Test
   public void testTlsContextTrustStoreProperties() throws Exception {
-    TlsContextFactory tlsContextFactory = muleContext.getRegistry().get("tlsContext");
     TlsContextTrustStoreConfiguration trustStoreConfig = tlsContextFactory.getTrustStoreConfiguration();
 
     assertThat(trustStoreConfig.getPath(), endsWith("trustStore"));

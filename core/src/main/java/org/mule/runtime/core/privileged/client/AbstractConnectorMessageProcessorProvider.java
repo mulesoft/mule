@@ -7,16 +7,17 @@
 
 package org.mule.runtime.core.privileged.client;
 
-import org.mule.runtime.core.api.MessageExchangePattern;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
-import org.mule.runtime.core.privileged.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.connector.ConnectorOperationProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -24,6 +25,8 @@ import com.google.common.cache.LoadingCache;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 /**
  * Base class for implementing {@link ConnectorOperationProvider}
@@ -37,6 +40,8 @@ public abstract class AbstractConnectorMessageProcessorProvider
   private final LoadingCache<RequestCacheKey, Processor> cachedMessageProcessors;
   protected MuleContext muleContext;
 
+  @Inject
+  protected Registry registry;
 
   /**
    * Creates a new instance with a default message processors cache.

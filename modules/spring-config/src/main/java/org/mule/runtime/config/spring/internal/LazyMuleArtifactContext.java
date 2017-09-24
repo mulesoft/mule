@@ -20,12 +20,17 @@ import static org.mule.runtime.config.spring.internal.LazyValueProviderService.N
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+
 import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.config.spring.api.LazyComponentInitializer;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
@@ -38,13 +43,13 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -78,26 +83,20 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
           artifactType, pluginsClassLoaders, parentConfigurationProperties);
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
-                                                                     new LazyConnectivityTestingService(this,
-                                                                                                        () -> muleContext
-                                                                                                            .getRegistry()
-                                                                                                            .get(
-                                                                                                                 NON_LAZY_CONNECTIVITY_TESTING_SERVICE)));
+                                                                     new LazyConnectivityTestingService(this, () -> getRegistry()
+                                                                         .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
+                                                                         .get()));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
                                                                      DefaultConnectivityTestingService.class);
     muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_SERVICE_KEY,
-                                                                     new LazyMetadataService(this,
-                                                                                             () -> muleContext
-                                                                                                 .getRegistry()
-                                                                                                 .get(
-                                                                                                      NON_LAZY_METADATA_SERVICE)));
+                                                                     new LazyMetadataService(this, () -> getRegistry()
+                                                                         .<MetadataService>lookupByName(NON_LAZY_METADATA_SERVICE)
+                                                                         .get()));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_METADATA_SERVICE, MuleMetadataService.class);
     muleContext.getCustomizationService().overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
-                                                                     new LazyValueProviderService(this, this,
-                                                                                                  () -> muleContext
-                                                                                                      .getRegistry()
-                                                                                                      .get(
-                                                                                                           NON_LAZY_VALUE_PROVIDER_SERVICE),
+                                                                     new LazyValueProviderService(this, this, () -> getRegistry()
+                                                                         .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
+                                                                         .get(),
                                                                                                   muleContext::getConfigurationComponentLocator));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
                                                                      MuleValueProviderService.class);
@@ -122,7 +121,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     muleContext.withLifecycleLock(() -> {
       if (muleContext.isInitialised()) {
         for (String createdComponentModelName : createdComponentModels) {
-          Object object = muleContext.getRegistry().get(createdComponentModelName);
+          Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
             initialiseIfNeeded(object, true, muleContext);
           } catch (InitialisationException e) {
@@ -132,7 +131,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       }
       if (muleContext.isStarted()) {
         for (String createdComponentModelName : createdComponentModels) {
-          Object object = muleContext.getRegistry().get(createdComponentModelName);
+          Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
             startIfNeeded(object);
           } catch (MuleException e) {
@@ -181,7 +180,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel.get(), false);
       createdComponents.set(applicationComponents);
       // This is required to force the execution of postProcessAfterInitialization() for each created component
-      applicationComponents.forEach(component -> muleContext.getRegistry().get(component));
+      applicationComponents.forEach(component -> getRegistry().lookupByName(component).get());
     });
     trackingPostProcessor.stopTracking();
     return createdComponents.get();
@@ -191,7 +190,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     if (muleContext.isStarted()) {
       beanNames.forEach(beanName -> {
         try {
-          muleContext.getRegistry().unregisterObject(beanName);
+          unregisterObject(muleContext, beanName);
         } catch (Exception e) {
           logger
               .warn(format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",

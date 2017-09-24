@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -28,6 +29,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Map;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleContextTestCase {
@@ -49,9 +52,13 @@ public abstract class AbstractConfigurationProviderTestCase<T> extends AbstractM
   protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
   protected LifecycleAwareConfigurationProvider provider;
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_TIME_SUPPLIER, timeSupplier);
+  }
+
   @Before
   public void before() throws Exception {
-    muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
     muleContext.getInjector().inject(provider);
     spyInjector(muleContext);
   }

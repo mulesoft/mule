@@ -12,9 +12,11 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
+import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
@@ -63,6 +65,23 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
     }
   };
 
+  private static Registry staticRegistry;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    staticRegistry = this.registry;
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    staticRegistry = null;
+    super.doTearDown();
+  }
+
+  public static KnockeableDoor getDoor() throws Exception {
+    return staticRegistry.<KnockeableDoor>lookupByName("door").get();
+  }
 
   protected HeisenbergExtension lookupHeisenberg(String key) throws Exception {
     return lookupHeisenberg(key, getHeisenbergEvent());

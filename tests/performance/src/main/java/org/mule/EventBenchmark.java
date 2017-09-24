@@ -9,14 +9,17 @@ package org.mule;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.event.BaseEvent.Builder;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -42,7 +45,7 @@ public class EventBenchmark extends AbstractBenchmark {
     muleContext = createMuleContextWithServices();
     muleContext.start();
     flow = createFlow(muleContext);
-    muleContext.getRegistry().registerFlowConstruct(flow);
+    registerObject(muleContext, FLOW_NAME, flow, FlowConstruct.class);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     BaseEvent.Builder eventBuilder =
         BaseEvent.builder(create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
@@ -54,7 +57,7 @@ public class EventBenchmark extends AbstractBenchmark {
 
   @TearDown
   public void teardown() throws MuleException {
-    stopIfNeeded(muleContext.getRegistry().lookupObject(SchedulerService.class));
+    stopIfNeeded(lookupObject(muleContext, SchedulerService.class));
     muleContext.dispose();
   }
 

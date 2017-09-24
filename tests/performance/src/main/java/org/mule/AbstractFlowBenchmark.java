@@ -12,20 +12,21 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.openjdk.jmh.infra.Blackhole.consumeCPU;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorStreamProcessingStrategyFactory;
 import org.mule.tck.TriggerableMessageSource;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -33,6 +34,10 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
+
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import reactor.core.publisher.Mono;
 
 @State(Scope.Benchmark)
@@ -123,7 +128,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
     source = new TriggerableMessageSource();
     flow = builder(FLOW_NAME, muleContext).processors(getMessageProcessors()).source(source)
         .processingStrategyFactory(factory).build();
-    muleContext.getRegistry().registerFlowConstruct(flow);
+    registerObject(muleContext, FLOW_NAME, flow, FlowConstruct.class);
   }
 
   protected abstract List<Processor> getMessageProcessors();
@@ -132,7 +137,7 @@ public abstract class AbstractFlowBenchmark extends AbstractBenchmark {
 
   @TearDown
   public void teardown() throws MuleException {
-    SchedulerService schedulerService = muleContext.getRegistry().lookupObject(SchedulerService.class);
+    SchedulerService schedulerService = lookupObject(muleContext, SchedulerService.class);
     muleContext.dispose();
     stopIfNeeded(schedulerService);
   }

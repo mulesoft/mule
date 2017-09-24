@@ -10,15 +10,14 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.util.MuleContextUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +31,7 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
 
   private static final String APP_NAME = "app";
 
-  @Mock
-  private MuleContext muleContext;
-
-  @Mock
-  private MuleRegistry muleRegistry;
+  private MuleContext muleContext = MuleContextUtils.mockContextWithServices();
 
   @Mock
   private Registry registry;
@@ -50,8 +45,6 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
   @Before
   public void before() {
     when(muleContext.getCustomizationService()).thenReturn(customizationService);
-    when(muleContext.getRegistry()).thenReturn((muleRegistry));
-    when(muleRegistry.lookupObject(OBJECT_REGISTRY)).thenReturn(registry);
   }
 
   @Test
@@ -62,7 +55,7 @@ public class MuleContextDeploymentListenerTestCase extends AbstractMuleTestCase 
 
   @Test
   public void notifiesMuleContextInitialized() throws Exception {
-    contextListener.onInitialization(muleContext);
+    contextListener.onInitialization(muleContext, registry);
 
     verify(deploymentListener).onArtifactInitialised(APP_NAME, registry);
   }

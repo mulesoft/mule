@@ -14,8 +14,16 @@ import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 
 public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
 
+  /**
+   * @return the artifact {@link MuleContext}
+   */
+  @Override
   MuleContext getMuleContext();
 
+  /**
+   * @return the registry of the artifact.
+   */
+  @Override
   Registry getRegistry();
 
   /**

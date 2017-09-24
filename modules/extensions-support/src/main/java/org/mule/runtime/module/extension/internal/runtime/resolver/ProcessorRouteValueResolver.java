@@ -9,15 +9,16 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.util.ObjectNameHelper;
 import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.util.ObjectNameHelper;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor;
 
@@ -75,7 +76,7 @@ public final class ProcessorRouteValueResolver implements ValueResolver<Chain> {
   private Once getInitialiaser() {
     return Once.of(() -> {
       try {
-        muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), chain);
+        registerObject(muleContext, new ObjectNameHelper(muleContext).getUniqueName(""), chain);
         LifecycleUtils.initialiseIfNeeded(chain, muleContext);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Could not register nested operation message processor"), e);

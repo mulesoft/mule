@@ -11,17 +11,18 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import static org.mule.runtime.core.api.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.internal.client.SimpleOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.client.SimpleOptionsBuilder;
-import org.mule.runtime.core.api.processor.Processor;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
+
 import org.mule.functional.client.TestConnectorConfig;
 import org.mule.functional.client.TestConnectorMessageProcessorProvider;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.client.SimpleOptionsBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -32,13 +33,13 @@ public class TestConnectorMessageProcessorProviderTestCase extends AbstractMuleT
   private static final String PATH_URL = "test://path";
   private static final String ANOTHER_PATH = "test://another";
 
-  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+  private final MuleContext muleContext = mockContextWithServices();
   private final TestConnectorMessageProcessorProvider messageProcessorProvider = new TestConnectorMessageProcessorProvider();
   private final TestConnectorConfig connectorConfig = new TestConnectorConfig();
 
   @Before
   public void setUp() throws Exception {
-    when(muleContext.getRegistry().get(TestConnectorConfig.DEFAULT_CONFIG_ID)).thenReturn(connectorConfig);
+    registerIntoMockContext(muleContext, DEFAULT_CONFIG_ID, connectorConfig);
     messageProcessorProvider.setMuleContext(muleContext);
   }
 

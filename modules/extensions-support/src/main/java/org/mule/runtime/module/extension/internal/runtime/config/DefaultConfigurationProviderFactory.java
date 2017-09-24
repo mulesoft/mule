@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.withExtensionClassLoader;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -67,8 +69,8 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         configuration = new ConfigurationInstanceFactory(extensionModel, configurationModel, resolverSet, muleContext)
             .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
       } catch (MuleException e) {
-        throw new ConfigurationException(createStaticMessage(String
-            .format("Could not create configuration '%s' for the '%s'", name, extensionModel.getName())),
+        throw new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
+                                                                    extensionModel.getName())),
                                          e);
       }
 

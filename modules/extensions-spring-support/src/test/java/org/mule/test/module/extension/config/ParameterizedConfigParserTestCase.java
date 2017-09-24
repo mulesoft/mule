@@ -29,6 +29,11 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -38,11 +43,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestCase {
@@ -251,10 +251,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     calendar.set(YEAR, DEATH_YEAR);
 
     return calendar;
-  }
-
-  public static KnockeableDoor getDoor() throws Exception {
-    return muleContext.getRegistry().lookupObject("door");
   }
 
   private void assertLabeledRicin(HeisenbergExtension heisenberg) {

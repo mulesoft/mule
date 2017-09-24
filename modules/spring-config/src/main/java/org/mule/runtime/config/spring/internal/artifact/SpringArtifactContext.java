@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.spring.internal.artifact;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.spring.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -38,13 +37,14 @@ public class SpringArtifactContext implements ArtifactContext {
   /**
    * @return the artifact {@link MuleContext}
    */
+  @Override
   public MuleContext getMuleContext() {
     return this.muleArtifactContext.getMuleContext();
   }
 
   @Override
   public Registry getRegistry() {
-    return getMuleContext().getRegistry().get(OBJECT_REGISTRY);
+    return this.muleArtifactContext.getRegistry();
   }
 
 }

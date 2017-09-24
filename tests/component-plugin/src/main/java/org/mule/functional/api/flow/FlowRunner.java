@@ -6,10 +6,10 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -50,11 +50,11 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
   /**
    * Initializes this flow runner.
    *
-   * @param muleContext the context of the mule application
+   * @param registry the registry for the currently running test
    * @param flowName the name of the flow to run events through
    */
-  public FlowRunner(MuleContext muleContext, String flowName) {
-    super(muleContext);
+  public FlowRunner(Registry registry, String flowName) {
+    super(registry);
     this.flowName = flowName;
   }
 
@@ -69,7 +69,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action.getAction());
     transactionConfig.setFactory(factory);
 
-    txExecutionTemplate = createTransactionalExecutionTemplate(muleContext, transactionConfig);
+    txExecutionTemplate = createTransactionalExecutionTemplate(registry.lookupByType(MuleContext.class).get(), transactionConfig);
 
     return this;
   }
@@ -181,10 +181,9 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * Dispatch behaves differently to {@link FlowRunner#run()} in that it does not propagate any exceptions to the test case or
    * return a result.
    */
-  public void dispatchAsync() throws Exception {
+  public void dispatchAsync(Scheduler scheduler) throws Exception {
+    this.scheduler = scheduler;
     Flow flow = (Flow) getFlowConstruct();
-    scheduler =
-        muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig().withShutdownTimeout(0, SECONDS));
     try {
       scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
     } catch (Exception e) {
@@ -208,7 +207,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
 
   /**
    * Verifies asserts on flowNamesToVerify
-   * 
+   *
    * @param flowNamesToVerify
    * @throws Exception
    */

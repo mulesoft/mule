@@ -7,10 +7,11 @@
 
 package org.mule.runtime.deployment.model.api;
 
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
@@ -65,6 +66,11 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    * @return MuleContext created from the artifact configurations files.
    */
   MuleContext getMuleContext();
+
+  /**
+   * @return the registry of the artifact.
+   */
+  Registry getRegistry();
 
   /**
    * @return the directory where the artifact content is stored.

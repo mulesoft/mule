@@ -8,8 +8,11 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -18,19 +21,58 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
+import org.junit.After;
+import org.junit.Before;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
+import javax.inject.Inject;
 
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
+  /**
+   * Provides access for infrastructure objects of each deployed Mule artifact.
+   */
+  protected static class ArtifactInstanceInfrastructure {
+
+    @Inject
+    private Registry registry;
+
+    @Inject
+    private MuleContext muleContext;
+
+    @Inject
+    private SchedulerService schedulerService;
+
+    @Inject
+    private NotificationListenerRegistry notificationListenerRegistry;
+
+    public Registry getRegistry() {
+      return registry;
+    }
+
+    public MuleContext getMuleContext() {
+      return muleContext;
+    }
+
+    public SchedulerService getSchedulerService() {
+      return getMuleContext().getSchedulerService();
+    }
+
+    public NotificationListenerRegistry getNotificationListenerRegistry() {
+      return notificationListenerRegistry;
+    }
+
+  }
+
   private final Map<String, MuleContext> muleContexts = new HashMap<>();
+  private Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
   private final List<MuleContext> disposedContexts = new ArrayList<>();
   private MuleContext domainContext;
+  private ArtifactInstanceInfrastructure domainInfrastructure;
 
   protected String getDomainConfig() {
     return null;
@@ -72,10 +114,17 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     }.setDomainConfig(getDomainConfigs());
 
     domainContext = domainContextBuilder.build();
+    domainInfrastructure = new ArtifactInstanceInfrastructure();
+    domainContext.getInjector().inject(domainInfrastructure);
     ApplicationConfig[] applicationConfigs = getConfigResources();
+
     for (ApplicationConfig applicationConfig : applicationConfigs) {
       MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources);
       muleContexts.put(applicationConfig.applicationName, muleContext);
+
+      ArtifactInstanceInfrastructure appInfrasturcture = new ArtifactInstanceInfrastructure();
+      muleContext.getInjector().inject(appInfrasturcture);
+      applsInfrastructures.put(applicationConfig.applicationName, appInfrasturcture);
     }
   }
 
@@ -93,7 +142,9 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
       }
     }
     muleContexts.clear();
+    applsInfrastructures.clear();
     disposeMuleContext(domainContext);
+    domainInfrastructure = null;
   }
 
   protected MuleContext createAppMuleContext(String[] configResource) throws Exception {
@@ -106,8 +157,16 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     return muleContexts.get(applicationName);
   }
 
+  public ArtifactInstanceInfrastructure getInfrastructureForApp(String applicationName) {
+    return applsInfrastructures.get(applicationName);
+  }
+
   public MuleContext getMuleContextForDomain() {
     return domainContext;
+  }
+
+  public ArtifactInstanceInfrastructure getDomainInfrastructure() {
+    return domainInfrastructure;
   }
 
   protected ConfigurationBuilder getBuilder() {

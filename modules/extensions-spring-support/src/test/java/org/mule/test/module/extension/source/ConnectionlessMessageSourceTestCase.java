@@ -9,9 +9,9 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.component.location.Location;
+
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
@@ -28,7 +28,6 @@ public class ConnectionlessMessageSourceTestCase extends AbstractExtensionFuncti
 
   @Test
   public void obtainDisconnectedSourceConfigParameters() throws Exception {
-    ConfigurationComponentLocator locator = muleContext.getRegistry().lookupObject(ConfigurationComponentLocator.class);
     Component element = locator.find(Location.builder().globalName("source").addSourcePart().build()).get();
     assertThat(element, is(instanceOf(ConfiguredComponent.class)));
 

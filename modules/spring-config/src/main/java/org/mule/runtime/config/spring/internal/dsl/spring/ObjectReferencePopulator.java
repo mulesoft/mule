@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.config.spring.internal.dsl.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_OAUTH_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.api.time.TimeSupplier;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthManager;
 
@@ -32,7 +35,10 @@ class ObjectReferencePopulator {
 
   // TODO MULE-9682: Load this list dynamically and define the whole set of objects that can be injected.
   private static ImmutableMap<Class<?>, String> OBJECT_REFERENCES =
-      new ImmutableMap.Builder().put(MuleContext.class, OBJECT_MULE_CONTEXT).put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
+      new ImmutableMap.Builder()
+          .put(Registry.class, MuleProperties.OBJECT_REGISTRY)
+          .put(MuleContext.class, OBJECT_MULE_CONTEXT)
+          .put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
           .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER)
           .put(PolicyManager.class, OBJECT_POLICY_MANAGER)
           .put(ExtensionsOAuthManager.class, OBJECT_EXTENSION_OAUTH_MANAGER)
@@ -46,8 +52,7 @@ class ObjectReferencePopulator {
   public void populate(Class<?> type, Consumer<String> typeIdConsumer) {
     String referenceName = OBJECT_REFERENCES.get(type);
     if (referenceName == null) {
-      throw new MuleRuntimeException(CoreMessages
-          .createStaticMessage("Could not determine reference object of type: " + type.getName()));
+      throw new MuleRuntimeException(createStaticMessage("Could not determine reference object of type: " + type.getName()));
     }
     typeIdConsumer.accept(referenceName);
   }

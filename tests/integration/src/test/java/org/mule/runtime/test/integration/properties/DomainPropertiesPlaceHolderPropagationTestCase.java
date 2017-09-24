@@ -14,6 +14,7 @@ import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.After;
@@ -55,11 +56,13 @@ public class DomainPropertiesPlaceHolderPropagationTestCase extends AbstractMule
   }
 
   private String getApplicationProperty(String property) throws RegistrationException {
-    return applicationContext.getRegistry().lookupObject(ConfigurationProperties.class).resolveStringProperty(property).get();
+    return new DefaultRegistry(applicationContext).<ConfigurationProperties>lookupByType(ConfigurationProperties.class).get()
+        .resolveStringProperty(property).get();
   }
 
   private String getDomainProperty(String property) throws org.mule.runtime.core.api.registry.RegistrationException {
-    return domainContext.getRegistry().lookupObject(ConfigurationProperties.class).resolveStringProperty(property).get();
+    return new DefaultRegistry(domainContext).<ConfigurationProperties>lookupByType(ConfigurationProperties.class).get()
+        .resolveStringProperty(property).get();
   }
 
   private void configureContexts(String domainConfig, String appConfig) throws Exception {

@@ -18,10 +18,10 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import org.junit.Test;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Test;
 
 public class ExtensionAsInjectedDependenciesTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -62,7 +62,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends AbstractExtensionFu
   }
 
   private void assertCorrectProviderInjected(String key, ConfigurationProvider expected) {
-    assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
+    assertThat(expected, is(sameInstance(registry.lookupByName(key).get())));
   }
 
   public static class Dependent {

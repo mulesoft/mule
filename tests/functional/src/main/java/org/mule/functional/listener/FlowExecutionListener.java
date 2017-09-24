@@ -11,14 +11,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotificationListener;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,35 +35,31 @@ public class FlowExecutionListener {
   /**
    * Constructor for releasing latch when any flow execution completes
    */
-  public FlowExecutionListener(MuleContext muleContext) {
-    createFlowExecutionListener(muleContext);
+  public FlowExecutionListener(NotificationListenerRegistry notificationListenerRegistry) {
+    createFlowExecutionListener(notificationListenerRegistry);
   }
 
   /**
    * Constructor for releasing latch when flow with name flowName completes
    */
-  public FlowExecutionListener(String flowName, MuleContext muleContext) {
+  public FlowExecutionListener(String flowName, NotificationListenerRegistry notificationListenerRegistry) {
     this.flowName = flowName;
-    createFlowExecutionListener(muleContext);
+    createFlowExecutionListener(notificationListenerRegistry);
   }
 
-  private void createFlowExecutionListener(MuleContext muleContext) {
-    try {
-      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
-          .registerListener((PipelineMessageNotificationListener<PipelineMessageNotification>) notification -> {
-            if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
-              return;
+  private void createFlowExecutionListener(NotificationListenerRegistry notificationListenerRegistry) {
+    notificationListenerRegistry
+        .registerListener((PipelineMessageNotificationListener<PipelineMessageNotification>) notification -> {
+          if (flowName != null && !notification.getResourceIdentifier().equals(flowName)) {
+            return;
+          }
+          if (new IntegerAction(PROCESS_COMPLETE).equals(notification.getAction())) {
+            for (Callback<EnrichedNotificationInfo> callback : callbacks) {
+              callback.execute(notification.getInfo());
             }
-            if (new IntegerAction(PROCESS_COMPLETE).equals(notification.getAction())) {
-              for (Callback<EnrichedNotificationInfo> callback : callbacks) {
-                callback.execute(notification.getInfo());
-              }
-              flowExecutedLatch.countDown();
-            }
-          });
-    } catch (RegistrationException e) {
-      throw new RuntimeException(e);
-    }
+            flowExecutedLatch.countDown();
+          }
+        });
   }
 
   public void waitUntilFlowIsComplete() {

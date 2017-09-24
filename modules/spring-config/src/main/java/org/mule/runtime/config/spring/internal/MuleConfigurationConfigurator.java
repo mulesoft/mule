@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.internal;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -16,15 +17,16 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
+import org.springframework.beans.factory.SmartFactoryBean;
+
 import java.util.List;
 
-import org.springframework.beans.factory.SmartFactoryBean;
+import javax.inject.Inject;
 
 /**
  * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
@@ -32,18 +34,17 @@ import org.springframework.beans.factory.SmartFactoryBean;
  * only work if the MuleContext has not yet been started, otherwise the modifications will be ignored (and warnings logged).
  */
 // TODO MULE-9638 remove usage of SmartFactoryBean
-public class MuleConfigurationConfigurator extends AbstractComponentFactory implements MuleContextAware, SmartFactoryBean {
+public class MuleConfigurationConfigurator extends AbstractComponentFactory implements SmartFactoryBean {
 
+  @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private Registry registry;
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
   private DefaultMuleConfiguration config = new DefaultMuleConfiguration();
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-  }
 
   @Override
   public boolean isEagerInit() {
@@ -58,11 +59,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   private void validateDefaultErrorHandler() {
     String defaultErrorHandler = config.getDefaultErrorHandlerName();
     if (defaultErrorHandler != null) {
-      MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultErrorHandler);
-      if (messagingExceptionHandler == null) {
-        throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-            .format("No global error handler defined with name '%s'.", defaultErrorHandler)));
-      }
+      MessagingExceptionHandler messagingExceptionHandler = registry.<MessagingExceptionHandler>lookupByName(defaultErrorHandler)
+          .orElseThrow(() -> new MuleRuntimeException(CoreMessages.createStaticMessage(String
+              .format("No global error handler defined with name '%s'.", defaultErrorHandler))));
       if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
         MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
             (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;

@@ -11,12 +11,11 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleContext;
+
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,19 +37,14 @@ public class ExceptionListener {
   /**
    * Constructor for creating a listener for any exception thrown within a flow or message source.
    */
-  public ExceptionListener(MuleContext muleContext) {
-    try {
-      muleContext.getRegistry().lookupObject(NotificationListenerRegistry.class)
-          .registerListener((ExceptionNotificationListener) notification -> {
-            exceptionNotifications.add(notification);
-            exceptionThrownLatch.countDown();
-            for (Consumer<ExceptionNotification> listener : listeners) {
-              listener.accept(notification);
-            }
-          });
-    } catch (RegistrationException e) {
-      throw new RuntimeException(e);
-    }
+  public ExceptionListener(NotificationListenerRegistry notificationListenerRegistry) {
+    notificationListenerRegistry.registerListener((ExceptionNotificationListener) notification -> {
+      exceptionNotifications.add(notification);
+      exceptionThrownLatch.countDown();
+      for (Consumer<ExceptionNotification> listener : listeners) {
+        listener.accept(notification);
+      }
+    });
   }
 
   public ExceptionListener waitUntilAllNotificationsAreReceived() {

@@ -9,7 +9,9 @@ package org.mule.functional.junit4;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.spring.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
@@ -20,12 +22,14 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.FlowAssert;
 
+import org.junit.After;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.After;
+import javax.inject.Inject;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -40,6 +44,9 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
+
+  @Inject
+  protected Registry registry;
 
   private volatile boolean tearingDown = false;
   private Set<FlowRunner> runners = new HashSet<>();
@@ -90,7 +97,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   }
 
   protected FlowConstruct getFlowConstruct(String flowName) throws Exception {
-    return muleContext.getRegistry().lookupFlowConstruct(flowName);
+    return registry.<FlowConstruct>lookupByName(flowName).get();
   }
 
   @Override
@@ -130,7 +137,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   /**
    * Initializes a builder to construct an event and the running context to run it through a flow.
-   * 
+   *
    * @param flowName
    * @return the {@link FlowRunner}
    */
@@ -139,7 +146,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
       if (tearingDown) {
         throw new IllegalStateException("Already tearing down.");
       }
-      final FlowRunner flowRunner = new FlowRunner(muleContext, flowName);
+      final FlowRunner flowRunner = new FlowRunner(registry, flowName);
       runners.add(flowRunner);
       return flowRunner;
     }
@@ -147,22 +154,13 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   /**
    * Runs the given flow with a default event
-   * 
+   *
    * @param flowName the name of the flow to be executed
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
   protected BaseEvent runFlow(String flowName) throws Exception {
     return flowRunner(flowName).run();
-  }
-
-  /**
-   * Retrieve a flow by name from the registry
-   * 
-   * @param name Name of the flow to retrieve
-   */
-  protected Flow lookupFlowConstruct(String name) {
-    return (Flow) muleContext.getRegistry().lookupFlowConstruct(name);
   }
 
   @After

@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -26,9 +28,10 @@ public final class OperationMessageProcessorBuilder
   public OperationMessageProcessorBuilder(ExtensionModel extensionModel,
                                           OperationModel operationModel,
                                           PolicyManager policyManager,
-                                          MuleContext muleContext) {
+                                          MuleContext muleContext,
+                                          Registry registry) {
 
-    super(extensionModel, operationModel, policyManager, muleContext);
+    super(extensionModel, operationModel, policyManager, muleContext, registry);
   }
 
   @Override

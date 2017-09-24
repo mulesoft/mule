@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.client.DefaultOperationParameters.b
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -32,10 +33,13 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 
@@ -49,12 +53,12 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   private static final String HEISENBERG_CONFIG = "heisenberg";
   private static final String ALIAS_OUTPUT = "jeje, my name is Juani and I'm 23 years old";
 
+  @Inject
   protected ExtensionsClient client;
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    this.client = muleContext.getRegistry().lookupObject(ExtensionsClient.class);
     HeisenbergOperations.disposed = false;
   }
 
