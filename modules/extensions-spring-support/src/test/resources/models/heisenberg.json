@@ -51,7 +51,7 @@
       "regexMatcher": "heisenberg.so",
       "requiredClassName": "org.heisenberg.HeisenbergJNI",
       "type": "NATIVE",
-      "coordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
+      "suggestedCoordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
       "optional": false
     }
   ],
@@ -1505,7 +1505,7 @@
           "regexMatcher": "heisenberg.so",
           "requiredClassName": "org.heisenberg.HeisenbergJNI",
           "type": "NATIVE",
-          "coordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
+          "suggestedCoordinates": "org.mule.libs:this-is-a-lib:dll:1.0.0",
           "optional": false
         }
       ],
