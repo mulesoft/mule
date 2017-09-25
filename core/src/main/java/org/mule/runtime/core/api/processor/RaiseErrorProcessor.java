@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.processor;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,7 +18,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import javax.inject.Inject;
@@ -46,7 +47,7 @@ public class RaiseErrorProcessor extends AbstractComponent implements Processor,
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     String message = descriptionEvaluator.resolveValue(event);
     throw new TypedException(new DefaultMuleException(message), errorType);
   }
