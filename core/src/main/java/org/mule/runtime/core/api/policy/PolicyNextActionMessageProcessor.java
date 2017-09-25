@@ -7,16 +7,23 @@
 package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
+import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 
 import javax.inject.Inject;
 
@@ -30,10 +37,15 @@ import org.reactivestreams.Publisher;
  *
  * @since 4.0
  */
-public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor {
+public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
   @Inject
   private PolicyStateHandler policyStateHandler;
+
+  @Inject
+  private MuleContext muleContext;
+
+  private PolicyNotificationHelper notificationHelper;
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -49,7 +61,20 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
             return error(new MuleRuntimeException(createStaticMessage("There's no next operation configured for event context id "
                 + event.getContext().getId())));
           }
-          return just(event).transform(nextOperation);
+
+          return just(event)
+              .doOnNext(notificationHelper.notification(BEFORE_NEXT))
+              .transform(nextOperation)
+              .doOnSuccess(notificationHelper.notification(AFTER_NEXT))
+              .doOnError(MessagingException.class, notificationHelper.errorNotification(AFTER_NEXT));
         });
   }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    notificationHelper =
+        new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(),
+                                     this);
+  }
+
 }

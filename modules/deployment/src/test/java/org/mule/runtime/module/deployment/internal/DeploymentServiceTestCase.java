@@ -65,8 +65,10 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_ARTIFACTS_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
-import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
+import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
+import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
+import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
+import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
@@ -109,8 +111,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.api.notification.PolicyNotification;
+import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -159,17 +161,6 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestContainerModuleDiscoverer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -189,6 +180,17 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 public class DeploymentServiceTestCase extends AbstractMuleTestCase {
@@ -3324,7 +3326,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     List<Integer> notificationListenerActionIds = new ArrayList<>();
-    MuleContextNotificationListener<MuleContextNotification> notificationListener =
+    PolicyNotificationListener<PolicyNotification> notificationListener =
         notification -> notificationListenerActionIds.add(notification.getAction().getActionId());
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
@@ -3334,8 +3336,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
-    assertThat(notificationListenerActionIds, hasSize(2));
-    assertThat(notificationListenerActionIds, hasItems(CONTEXT_STARTING, CONTEXT_STARTED));
+    assertThat(notificationListenerActionIds, hasSize(4));
+    assertThat(notificationListenerActionIds, hasItems(PROCESS_START, BEFORE_NEXT, AFTER_NEXT, PROCESS_END));
   }
 
   @Test
