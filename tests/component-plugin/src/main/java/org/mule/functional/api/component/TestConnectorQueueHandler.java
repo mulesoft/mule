@@ -10,7 +10,7 @@ package org.mule.functional.api.component;
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
 import org.mule.functional.client.TestConnectorConfig;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 
 public class TestConnectorQueueHandler {
@@ -27,7 +27,7 @@ public class TestConnectorQueueHandler {
    * @param queueName
    * @param event
    */
-  public void write(String queueName, BaseEvent event) {
+  public void write(String queueName, CoreEvent event) {
     TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     connectorConfig.write(queueName, event);
   }
@@ -36,9 +36,9 @@ public class TestConnectorQueueHandler {
    * Reads an event from a given queue waiting if necessary until an element becomes available.
    *
    * @param queueName
-   * @return the {@link BaseEvent} read from the queue
+   * @return the {@link CoreEvent} read from the queue
    */
-  public BaseEvent read(String queueName) {
+  public CoreEvent read(String queueName) {
     TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     return connectorConfig.take(queueName);
   }
@@ -47,9 +47,9 @@ public class TestConnectorQueueHandler {
    * Reads an event from a given queue waiting up to the specified wait time if necessary for an element to become available.
    * @param queueName
    * @param timeout
-   * @return the {@link BaseEvent} read or null if timeout time is exceeded.
+   * @return the {@link CoreEvent} read or null if timeout time is exceeded.
    */
-  public BaseEvent read(String queueName, long timeout) {
+  public CoreEvent read(String queueName, long timeout) {
     TestConnectorConfig connectorConfig = (TestConnectorConfig) registry.lookupByName(DEFAULT_CONFIG_ID).get();
     return connectorConfig.poll(queueName, timeout);
   }
