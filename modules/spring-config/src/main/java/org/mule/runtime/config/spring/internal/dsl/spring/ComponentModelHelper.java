@@ -13,6 +13,7 @@ import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.FLOW
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.spring.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.spring.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -157,6 +158,8 @@ public class ComponentModelHelper {
   }
 
   public static boolean isRouter(ComponentModel componentModel) {
-    return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class);
+    return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class)
+        || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
+        || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
   }
 }
