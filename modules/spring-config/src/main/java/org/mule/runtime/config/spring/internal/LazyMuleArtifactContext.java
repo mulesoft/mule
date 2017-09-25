@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;

@@ -15,8 +15,8 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_S
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.spring.api.dsl.ArtifactDeclarationXmlSerializer;

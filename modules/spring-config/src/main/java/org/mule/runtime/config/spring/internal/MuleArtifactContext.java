@@ -33,7 +33,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;

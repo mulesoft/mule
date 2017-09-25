@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;

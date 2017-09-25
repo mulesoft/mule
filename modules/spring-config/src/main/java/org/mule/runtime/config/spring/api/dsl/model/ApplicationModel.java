@@ -33,8 +33,8 @@ import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoes
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.ClassUtils;
-import org.mule.runtime.api.app.declaration.ArtifactDeclaration;
-import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.TypedComponentIdentifier;

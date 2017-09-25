@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.internal.dsl.model;
 
 import static java.util.stream.Collectors.toMap;
-import org.mule.runtime.api.app.declaration.ElementDeclaration;
+import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.spring.api.dsl.model.DslElementModelFactory;
