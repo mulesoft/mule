@@ -6,6 +6,8 @@
  */
 package org.mule.transport.ssl.revocation;
 
+import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.security.tls.RevocationCheck;
 
 import java.net.URI;
@@ -15,9 +17,11 @@ import java.security.KeyStore;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.EnumSet;
+import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -45,8 +49,11 @@ public class CustomOcspResponder implements RevocationCheck
     }
 
     @Override
-    public ManagerFactoryParameters configFor(KeyStore trustStore)
+    public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
+        checkArgument(url != null, "tls:custom-ocsp-responder requires the 'url' attribute");
+        checkArgument(trustStore != null, "tls:custom-ocsp-responder requires a trust store");
+
         try
         {
             CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");

@@ -6,6 +6,8 @@
  */
 package org.mule.transport.ssl.revocation;
 
+import static org.mule.util.Preconditions.checkArgument;
+
 import org.mule.api.security.tls.RevocationCheck;
 import org.mule.util.IOUtils;
 
@@ -26,6 +28,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
@@ -49,22 +52,14 @@ public class CrlFile implements RevocationCheck
     }
 
     @Override
-    public ManagerFactoryParameters configFor(KeyStore trustStore)
+    public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
+        checkArgument(path != null, "tls:crl-file requires the 'path' attribute");
+        checkArgument(trustStore != null, "tls:crl-file requires a trust store");
+
         try
         {
-            // When creating build parameters we must manually trust each certificate (which is automatic otherwise)
-            Enumeration<String> aliases = trustStore.aliases();
-            HashSet<TrustAnchor> trustAnchors = new HashSet<>();
-            while (aliases.hasMoreElements())
-            {
-                String alias = aliases.nextElement();
-                if (trustStore.isCertificateEntry(alias))
-                {
-                    trustAnchors.add(new TrustAnchor((X509Certificate) trustStore.getCertificate(alias), null));
-                }
-            }
-
+            Set<TrustAnchor> trustAnchors = getTrustAnchorsFromKeyStore(trustStore);
             PKIXBuilderParameters pbParams = new PKIXBuilderParameters(trustAnchors, new X509CertSelector());
 
             // Make sure revocation checking is enabled (com.sun.net.ssl.checkRevocation)
@@ -106,6 +101,22 @@ public class CrlFile implements RevocationCheck
         }
 
         return crlList;
+    }
+
+    private static Set<TrustAnchor> getTrustAnchorsFromKeyStore(KeyStore keyStore) throws GeneralSecurityException
+    {
+        Enumeration<String> aliases = keyStore.aliases();
+        HashSet<TrustAnchor> trustAnchors = new HashSet<>();
+        while (aliases.hasMoreElements())
+        {
+            String alias = aliases.nextElement();
+            if (keyStore.isCertificateEntry(alias))
+            {
+                trustAnchors.add(new TrustAnchor((X509Certificate) keyStore.getCertificate(alias), null));
+            }
+        }
+
+        return trustAnchors;
     }
 
     @Override

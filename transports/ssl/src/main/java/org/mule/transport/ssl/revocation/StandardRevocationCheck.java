@@ -13,6 +13,7 @@ import java.security.KeyStore;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.PKIXRevocationChecker;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class StandardRevocationCheck implements RevocationCheck
     }
 
     @Override
-    public ManagerFactoryParameters configFor(KeyStore trustStore)
+    public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
         try
         {
@@ -81,7 +82,16 @@ public class StandardRevocationCheck implements RevocationCheck
             }
             rc.setOptions(options);
 
-            PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
+            PKIXBuilderParameters pkixParams;
+            if (trustStore != null)
+            {
+                pkixParams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
+            }
+            else
+            {
+                pkixParams = new PKIXBuilderParameters(defaultTrustAnchors, new X509CertSelector());
+            }
+
             pkixParams.addCertPathChecker(rc);
 
             return new CertPathTrustManagerParameters(pkixParams);
