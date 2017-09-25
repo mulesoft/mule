@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.context.notification.PolicyNotification;
+import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;

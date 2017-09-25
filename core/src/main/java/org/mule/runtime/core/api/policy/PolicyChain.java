@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.policy;
 
-import static org.mule.runtime.core.api.context.notification.PolicyNotification.PROCESS_END;
-import static org.mule.runtime.core.api.context.notification.PolicyNotification.PROCESS_START;
+import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
+import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;

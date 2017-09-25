@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.context.notification.PolicyNotification.AFTER_NEXT;
-import static org.mule.runtime.core.api.context.notification.PolicyNotification.BEFORE_NEXT;
+import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
+import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
