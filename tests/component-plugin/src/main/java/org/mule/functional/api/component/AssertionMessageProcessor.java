@@ -18,7 +18,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.processor.FlowAssertion;
@@ -56,7 +56,7 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (event == null) {
       return null;
     }

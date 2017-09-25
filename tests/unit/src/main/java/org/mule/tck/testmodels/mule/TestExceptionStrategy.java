@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
@@ -51,7 +51,7 @@ public class TestExceptionStrategy implements MessagingExceptionHandler, SystemE
     this.testProperty = testProperty;
   }
 
-  public BaseEvent handleException(Exception exception, BaseEvent event, RollbackSourceCallback rollbackMethod) {
+  public CoreEvent handleException(Exception exception, CoreEvent event, RollbackSourceCallback rollbackMethod) {
     ExceptionCallback callback = null;
     synchronized (callbackLock) {
       if (this.callback != null) {
@@ -73,7 +73,7 @@ public class TestExceptionStrategy implements MessagingExceptionHandler, SystemE
     return event;
   }
 
-  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
     return handleException(exception, event, null);
   }
 

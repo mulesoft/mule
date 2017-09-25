@@ -12,7 +12,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyEventConverter;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -32,10 +32,10 @@ import reactor.core.publisher.Mono;
  * {@link Processor}.
  * <p>
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link BaseEvent} modified by the policy behaviour can
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link CoreEvent} modified by the policy behaviour can
  * be stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
- * {@link BaseEvent} from the policy to the next operation {@link BaseEvent} or from the next operation result to the
- * {@link BaseEvent} that must continue the execution of the policy.
+ * {@link CoreEvent} from the policy to the next operation {@link CoreEvent} or from the next operation result to the
+ * {@link CoreEvent} that must continue the execution of the policy.
  * <p>
  */
 public class OperationPolicyProcessor implements Processor {
@@ -62,17 +62,17 @@ public class OperationPolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public BaseEvent process(BaseEvent operationEvent) throws MuleException {
+  public CoreEvent process(CoreEvent operationEvent) throws MuleException {
     return processToApply(operationEvent, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .then(operationEvent -> {
           PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
-          Optional<BaseEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
+          Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
           PrivilegedEvent variablesProviderEvent =
               (PrivilegedEvent) latestPolicyState
                   .orElseGet(() -> PrivilegedEvent.builder(operationEvent.getContext()).message(of(null)).build());
@@ -87,7 +87,7 @@ public class OperationPolicyProcessor implements Processor {
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent) {
     return just(policyEvent)
-        .cast(BaseEvent.class)
+        .cast(CoreEvent.class)
         .transform(policy.getPolicyChain())
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
@@ -98,12 +98,12 @@ public class OperationPolicyProcessor implements Processor {
     return new Processor() {
 
       @Override
-      public BaseEvent process(BaseEvent event) throws MuleException {
+      public CoreEvent process(CoreEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return from(publisher)
             .cast(PrivilegedEvent.class)
             .then(policyExecuteNextEvent -> {
@@ -111,7 +111,7 @@ public class OperationPolicyProcessor implements Processor {
               policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
               return just(policyExecuteNextEvent)
                   .map(event -> policyEventConverter.createEvent(event, operationEvent))
-                  .cast(BaseEvent.class)
+                  .cast(CoreEvent.class)
                   .transform(nextOperation)
                   .cast(PrivilegedEvent.class)
                   .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));

@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * Can be used to sense request and response threads used during processing.
@@ -23,13 +23,13 @@ public class SensingNullRequestResponseMessageProcessor extends AbstractRequestR
   public Thread responseThread;
 
   @Override
-  protected BaseEvent processRequest(BaseEvent event) throws MuleException {
+  protected CoreEvent processRequest(CoreEvent event) throws MuleException {
     requestThread = Thread.currentThread();
     return super.processRequest(event);
   }
 
   @Override
-  protected BaseEvent processResponse(BaseEvent response) throws MuleException {
+  protected CoreEvent processResponse(CoreEvent response) throws MuleException {
     responseThread = Thread.currentThread();
     return super.processRequest(response);
   }

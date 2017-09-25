@@ -17,7 +17,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -65,7 +65,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
     }
 
     @Override
-    protected Consumer<BaseEvent> createOnEventConsumer() {
+    protected Consumer<CoreEvent> createOnEventConsumer() {
       // Do nothing given event should still be processed when transaction is active
       return event -> {
       };
@@ -87,7 +87,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
       }
 
       @Override
-      public void accept(BaseEvent event) {
+      public void accept(CoreEvent event) {
         if (isTransactionActive()) {
           syncSink.accept(event);
         } else {
@@ -96,7 +96,7 @@ public class TransactionAwareWorkQueueProcessingStrategyFactory extends WorkQueu
       }
 
       @Override
-      public boolean emit(BaseEvent event) {
+      public boolean emit(CoreEvent event) {
         if (isTransactionActive()) {
           return syncSink.emit(event);
         } else {

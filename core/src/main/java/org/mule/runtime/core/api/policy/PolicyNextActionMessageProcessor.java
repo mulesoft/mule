@@ -15,7 +15,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import javax.inject.Inject;
@@ -36,12 +36,12 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private PolicyStateHandler policyStateHandler;
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .flatMapMany(event -> {
           Processor nextOperation = policyStateHandler.retrieveNextOperation(event.getContext().getCorrelationId());

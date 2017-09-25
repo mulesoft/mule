@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * Writes {@link BaseEvent} to a test connector's queue.
+ * Writes {@link CoreEvent} to a test connector's queue.
  */
 public class QueueWriterMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
@@ -41,17 +41,17 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
   private Class contentJavaType;
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    BaseEvent copy;
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    CoreEvent copy;
     if (attributeEvaluator == null) {
-      copy = BaseEvent.builder(event)
+      copy = CoreEvent.builder(event)
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)
           .build();
     } else {
       Object payloadValue = attributeEvaluator.resolveTypedValue(event).getValue();
-      copy = BaseEvent.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
+      copy = CoreEvent.builder(event).message(Message.builder(event.getMessage()).value(payloadValue).build())
           // Queue works based on MuleEvent for testing purposes. A real operation
           // would not be aware of the error field and just the plain message would be sent.
           .error(null)

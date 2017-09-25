@@ -23,7 +23,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -80,9 +80,9 @@ public class MuleExtensionUtils {
   /**
    * Creates an empty event for extension initialization purposes
    *
-   * @return a new {@link BaseEvent}
+   * @return a new {@link CoreEvent}
    */
-  public static BaseEvent getInitialiserEvent() {
+  public static CoreEvent getInitialiserEvent() {
     return getInitialiserEvent(null);
   }
 
@@ -90,9 +90,9 @@ public class MuleExtensionUtils {
    * Creates an empty event for extension initialization pusposes
    *
    * @param muleContext context on which the event will be associated.
-   * @return a new {@link BaseEvent}
+   * @return a new {@link CoreEvent}
    */
-  public static BaseEvent getInitialiserEvent(MuleContext muleContext) {
+  public static CoreEvent getInitialiserEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
 
       @Override

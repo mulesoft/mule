@@ -18,7 +18,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -57,7 +57,7 @@ public class TestEventBuilder {
   private ReplyToHandler replyToHandler;
 
   private Function<Message, Message> spyMessage = input -> input;
-  private Function<BaseEvent, BaseEvent> spyEvent = input -> input;
+  private Function<CoreEvent, CoreEvent> spyEvent = input -> input;
 
   private Publisher<Void> externalCompletionCallback = null;
 
@@ -75,7 +75,7 @@ public class TestEventBuilder {
 
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link BaseEvent} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link CoreEvent} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -172,7 +172,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link BaseEvent#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -183,7 +183,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link BaseEvent#getGroupCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link CoreEvent#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -234,7 +234,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Will spy the built {@link Message} and {@link BaseEvent}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link CoreEvent}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -256,7 +256,7 @@ public class TestEventBuilder {
    * @param flow the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
-  public BaseEvent build(FlowConstruct flow) {
+  public CoreEvent build(FlowConstruct flow) {
     final Message.Builder messageBuilder;
 
     messageBuilder = Message.builder().value(payload).mediaType(mediaType);
@@ -276,13 +276,13 @@ public class TestEventBuilder {
       eventContext = create(flow, TEST_CONNECTOR_LOCATION, sourceCorrelationId);
     }
 
-    BaseEvent.Builder builder = InternalEvent.builder(eventContext)
+    CoreEvent.Builder builder = InternalEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).groupCorrelation(ofNullable(groupCorrelation))
         .flow(flow).replyToHandler(replyToHandler);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
-    BaseEvent event = builder.build();
+    CoreEvent event = builder.build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
@@ -315,6 +315,6 @@ public class TestEventBuilder {
 
   private interface Attachment {
 
-    BaseEvent addOutboundTo(BaseEvent event, String key);
+    CoreEvent addOutboundTo(CoreEvent event, String key);
   }
 }

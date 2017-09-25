@@ -15,7 +15,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -58,8 +58,8 @@ public class RedeliveryExceeded extends AbstractComponent implements Initialisab
     }
   }
 
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    BaseEvent result = event;
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    CoreEvent result = event;
     if (!messageProcessors.isEmpty()) {
       result = configuredMessageProcessors.process(event);
     }
@@ -70,7 +70,7 @@ public class RedeliveryExceeded extends AbstractComponent implements Initialisab
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> eventPublisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
     if (!messageProcessors.isEmpty()) {
       return Flux.from(eventPublisher).transform(configuredMessageProcessors);
     } else {
@@ -78,8 +78,8 @@ public class RedeliveryExceeded extends AbstractComponent implements Initialisab
     }
   }
 
-  private BaseEvent removeErrorFromEvent(BaseEvent result) {
-    return BaseEvent.builder(result).error(null)
+  private CoreEvent removeErrorFromEvent(CoreEvent result) {
+    return CoreEvent.builder(result).error(null)
         .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
   }
 

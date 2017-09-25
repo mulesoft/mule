@@ -26,8 +26,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -131,8 +131,8 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    BaseEvent resultEvent = event;
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    CoreEvent resultEvent = event;
     Object[] args = evaluateArguments(event, arguments);
 
     if (LOGGER.isDebugEnabled()) {
@@ -150,7 +150,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
     return resultEvent;
   }
 
-  protected Object[] evaluateArguments(BaseEvent event, List<?> argumentTemplates) throws MessagingException {
+  protected Object[] evaluateArguments(CoreEvent event, List<?> argumentTemplates) throws MessagingException {
     int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
     Object[] args = new Object[argSize];
     try {
@@ -167,7 +167,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
   }
 
   @SuppressWarnings("unchecked")
-  protected Object evaluateExpressionCandidate(Object expressionCandidate, BaseEvent event) throws TransformerException {
+  protected Object evaluateExpressionCandidate(Object expressionCandidate, CoreEvent event) throws TransformerException {
     if (expressionCandidate instanceof Collection<?>) {
       Collection<Object> collectionTemplate = (Collection<Object>) expressionCandidate;
       Collection<Object> newCollection = new ArrayList<>();
@@ -240,8 +240,8 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
     this.arguments = arguments;
   }
 
-  protected BaseEvent createResultEvent(BaseEvent event, Object result) throws MuleException {
-    Builder eventBuilder = BaseEvent.builder(event);
+  protected CoreEvent createResultEvent(CoreEvent event, Object result) throws MuleException {
+    Builder eventBuilder = CoreEvent.builder(event);
     if (result instanceof Message) {
       eventBuilder.message((Message) result);
     } else if (result != null) {

@@ -32,7 +32,7 @@ import org.mule.runtime.api.store.SimpleMemoryObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -98,7 +98,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    BaseEvent resultEvent = asyncReplyMP.process(testEvent());
+    CoreEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event when we receive async reply
     assertEquals(((PrivilegedEvent) testEvent()).getMessageAsString(muleContext),
@@ -116,7 +116,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    BaseEvent resultEvent = asyncReplyMP.process(testEvent());
+    CoreEvent resultEvent = asyncReplyMP.process(testEvent());
 
     // Can't assert same because we copy event for async and also on async reply currently
     assertEquals(((PrivilegedEvent) testEvent()).getMessageAsString(muleContext),
@@ -136,7 +136,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    BaseEvent event = eventBuilder().message(of(TEST_MESSAGE)).build();
+    CoreEvent event = eventBuilder().message(of(TEST_MESSAGE)).build();
 
     try {
       asyncReplyMP.process(event);
@@ -208,7 +208,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     for (int i = 0; i < 500; i++) {
       scheduler.execute(() -> {
         try {
-          BaseEvent resultEvent = asyncReplyMP.process(testEvent());
+          CoreEvent resultEvent = asyncReplyMP.process(testEvent());
 
           // Can't assert same because we copy event for async currently
           assertEquals(((PrivilegedEvent) testEvent()).getMessageAsString(muleContext),
@@ -232,7 +232,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP(muleContext);
 
     try {
-      BaseEvent event =
+      CoreEvent event =
           eventBuilder().message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();

@@ -13,7 +13,7 @@ import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEA
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -87,13 +87,13 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
     return lookupHeisenberg(key, getHeisenbergEvent());
   }
 
-  protected HeisenbergExtension lookupHeisenberg(String key, BaseEvent event) throws Exception {
+  protected HeisenbergExtension lookupHeisenberg(String key, CoreEvent event) throws Exception {
     return getConfigurationFromRegistry(key, event, muleContext);
   }
 
-  protected BaseEvent getHeisenbergEvent() throws Exception {
+  protected CoreEvent getHeisenbergEvent() throws Exception {
     WEAPON.setMicrogramsPerKilo(10L);
-    BaseEvent event = BaseEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(""))
+    CoreEvent event = CoreEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(""))
         .addVariable("lidia", LIDIA)
         .addVariable("myName", HeisenbergExtension.HEISENBERG)
         .addVariable("age", HeisenbergExtension.AGE)

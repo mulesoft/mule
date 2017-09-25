@@ -42,7 +42,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
@@ -83,7 +83,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private SourcePolicy sourcePolicy;
   private SourcePolicySuccessResult successResult;
   private SourcePolicyFailureResult failureResult;
-  private BaseEvent event;
+  private CoreEvent event;
   private MessagingException messagingException;
   private RuntimeException mockException;
 
@@ -91,7 +91,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private Supplier<Map<String, Object>> failingParameterSupplier = () -> {
     throw mockException;
   };
-  private Function<BaseEvent, Map<String, Object>> failingParameterFunction = event -> {
+  private Function<CoreEvent, Map<String, Object>> failingParameterFunction = event -> {
     throw mockException;
   };
 
@@ -106,7 +106,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     when(muleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
-    event = mock(BaseEvent.class);
+    event = mock(CoreEvent.class);
     mockException = mock(RuntimeException.class);
 
     final PolicyManager policyManager = mock(PolicyManager.class);
@@ -120,7 +120,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(failureResult.getMessagingException()).then(invocation -> messagingException);
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      event = invocation.getArgumentAt(0, BaseEvent.class);
+      event = invocation.getArgumentAt(0, CoreEvent.class);
       return just(right(successResult));
     });
 
@@ -333,7 +333,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any());
-    verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(BaseEvent.class))));
+    verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(CoreEvent.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
     verify(template).afterPhaseExecution(any());
@@ -374,7 +374,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   private void configureThrowingFlow(RuntimeException failure, boolean inErrorHandler) {
     when(sourcePolicy.process(any())).thenAnswer(invocation -> {
-      messagingException = buildFailingFlowException(invocation.getArgumentAt(0, BaseEvent.class), failure);
+      messagingException = buildFailingFlowException(invocation.getArgumentAt(0, CoreEvent.class), failure);
       messagingException.setInErrorHandler(inErrorHandler);
       return just(left(failureResult));
     });
@@ -389,8 +389,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   }
 
 
-  private MessagingException buildFailingFlowException(final BaseEvent event, final Exception exception) {
-    return new MessagingException(BaseEvent.builder(event)
+  private MessagingException buildFailingFlowException(final CoreEvent event, final Exception exception) {
+    return new MessagingException(CoreEvent.builder(event)
         .error(ErrorBuilder.builder(exception).errorType(ERROR_FROM_FLOW).build())
         .build(), exception);
   }

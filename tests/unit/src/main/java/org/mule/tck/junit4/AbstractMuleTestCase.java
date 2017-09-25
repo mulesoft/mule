@@ -26,7 +26,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.junit4.rule.WarningTimeout;
@@ -261,16 +261,16 @@ public abstract class AbstractMuleTestCase {
     }
   }
 
-  private BaseEvent _testEvent;
-  private BaseEvent _nullPayloadEvent;
+  private CoreEvent _testEvent;
+  private CoreEvent _nullPayloadEvent;
 
   /**
-   * Creates and caches a test {@link BaseEvent} instance for the scope of the current test method.
+   * Creates and caches a test {@link CoreEvent} instance for the scope of the current test method.
    *
    * @return test event.
    * @throws MuleException
    */
-  protected BaseEvent testEvent() throws MuleException {
+  protected CoreEvent testEvent() throws MuleException {
     if (_testEvent == null) {
       _testEvent = newEvent();
     }
@@ -278,13 +278,13 @@ public abstract class AbstractMuleTestCase {
   }
 
   /**
-   * Create a new {@link BaseEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
+   * Create a new {@link CoreEvent} for each invocation. Useful if multiple distinct event instances are needed in a single
    * test method.
    *
    * @return new test event.
    * @throws MuleException
    */
-  protected <E extends BaseEvent> E newEvent() throws MuleException {
+  protected <E extends CoreEvent> E newEvent() throws MuleException {
     return (E) getEventBuilder().message(of(TEST_PAYLOAD)).build();
   }
 
@@ -294,11 +294,11 @@ public abstract class AbstractMuleTestCase {
    * @return a event builder to use to build a test event
    * @throws MuleException
    */
-  protected <B extends BaseEvent.Builder> B getEventBuilder() throws MuleException {
+  protected <B extends CoreEvent.Builder> B getEventBuilder() throws MuleException {
     return (B) eventBuilder();
   }
 
-  protected BaseEvent nullPayloadEvent() throws MuleException {
+  protected CoreEvent nullPayloadEvent() throws MuleException {
     if (_nullPayloadEvent == null) {
       _nullPayloadEvent = eventBuilder().message(of(null)).build();
     }

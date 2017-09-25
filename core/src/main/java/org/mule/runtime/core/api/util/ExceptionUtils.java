@@ -20,7 +20,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.ErrorMapping;
@@ -156,7 +156,7 @@ public class ExceptionUtils {
    * @param locator the {@link ErrorTypeLocator}.
    * @return the resolved {@link ErrorType}
    */
-  public static Error getErrorFromFailingProcessor(BaseEvent currentEvent,
+  public static Error getErrorFromFailingProcessor(CoreEvent currentEvent,
                                                    Component processor,
                                                    Throwable cause,
                                                    ErrorTypeLocator locator) {
@@ -186,21 +186,21 @@ public class ExceptionUtils {
   }
 
   /**
-   * Create new {@link BaseEvent} with {@link org.mule.runtime.api.message.Error} instance set.
+   * Create new {@link CoreEvent} with {@link org.mule.runtime.api.message.Error} instance set.
    *
    * @param currentEvent event when error occured.
    * @param obj message processor/source.
    * @param me messaging exception.
    * @param locator the mule context.
-   * @return new {@link BaseEvent} with relevant {@link org.mule.runtime.api.message.Error} set.
+   * @return new {@link CoreEvent} with relevant {@link org.mule.runtime.api.message.Error} set.
    */
-  public static BaseEvent createErrorEvent(BaseEvent currentEvent, Component obj,
+  public static CoreEvent createErrorEvent(CoreEvent currentEvent, Component obj,
                                            MessagingException me, ErrorTypeLocator locator) {
     Throwable cause = me.getCause() != null ? me.getCause() : me;
     List<ErrorMapping> errorMappings = getErrorMappings(obj);
     if (!errorMappings.isEmpty() || isMessagingExceptionCause(me, cause)) {
       Error newError = getErrorFromFailingProcessor(currentEvent, obj, cause, locator);
-      BaseEvent newEvent = BaseEvent.builder(me.getEvent()).error(newError).build();
+      CoreEvent newEvent = CoreEvent.builder(me.getEvent()).error(newError).build();
       me.setProcessedEvent(newEvent);
       return newEvent;
     } else {

@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -39,7 +39,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     return new DirectSink(pipeline, createOnEventConsumer());
   }
 
-  protected Consumer<BaseEvent> createOnEventConsumer() {
+  protected Consumer<CoreEvent> createOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
         ((BaseEventContext) event.getContext()).error(new MessagingException(event,
@@ -57,25 +57,25 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
    */
   static final class ReactorSink implements Sink, Disposable {
 
-    private final BlockingSink<BaseEvent> blockingSink;
+    private final BlockingSink<CoreEvent> blockingSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
 
-    ReactorSink(BlockingSink<BaseEvent> blockingSink, reactor.core.Disposable disposable,
-                Consumer<BaseEvent> onEventConsumer) {
+    ReactorSink(BlockingSink<CoreEvent> blockingSink, reactor.core.Disposable disposable,
+                Consumer<CoreEvent> onEventConsumer) {
       this.blockingSink = blockingSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
     }
 
     @Override
-    public void accept(BaseEvent event) {
+    public void accept(CoreEvent event) {
       onEventConsumer.accept(event);
       blockingSink.accept(event);
     }
 
     @Override
-    public boolean emit(BaseEvent event) {
+    public boolean emit(CoreEvent event) {
       onEventConsumer.accept(event);
       return blockingSink.emit(event) != BACKPRESSURED;
     }

@@ -32,7 +32,7 @@ import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.privileged.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -89,7 +89,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  private Either<Error, Message> createEitherResult(BaseEvent muleEvent) {
+  private Either<Error, Message> createEitherResult(CoreEvent muleEvent) {
     if (muleEvent == null) {
       // This should never return a null event. This happen because of mule 3.x behaviour with filters.
       // We will just return an error in this case.
@@ -168,7 +168,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     final Processor connectorMessageProcessor =
         getConnectorMessageProcessLocator().locateConnectorOperation(url, operationOptions, ONE_WAY);
     if (connectorMessageProcessor != null) {
-      final BaseEvent event = connectorMessageProcessor.process(createMuleEvent(of(null)));
+      final CoreEvent event = connectorMessageProcessor.process(createMuleEvent(of(null)));
       if (event == null) {
         return right(empty());
       }
@@ -181,15 +181,15 @@ public class DefaultLocalMuleClient implements MuleClient {
     }
   }
 
-  protected BaseEvent createMuleEvent(Message message) throws MuleException {
+  protected CoreEvent createMuleEvent(Message message) throws MuleException {
     return baseEventBuilder(message).build();
   }
 
-  private BaseEvent.Builder baseEventBuilder(Message message) {
+  private CoreEvent.Builder baseEventBuilder(Message message) {
     return InternalEvent.builder(create(flowConstruct, fromSingleComponent("muleClient"))).message(message).flow(flowConstruct);
   }
 
-  protected BaseEvent returnEvent(BaseEvent event) {
+  protected CoreEvent returnEvent(CoreEvent event) {
     if (event != null) {
       return event;
     } else {

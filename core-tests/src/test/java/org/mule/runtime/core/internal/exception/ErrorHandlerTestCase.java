@@ -34,7 +34,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -72,7 +72,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   private DefaultMessagingExceptionHandlerAcceptor defaultMessagingExceptionHandler =
       spy(new DefaultMessagingExceptionHandlerAcceptor());
 
-  private BaseEvent event;
+  private CoreEvent event;
 
   private MuleContext mockMuleContext = mockMuleContext();
   @Mock
@@ -87,10 +87,10 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     event = getEventBuilder().message(Message.of("")).error(mockError).build();
 
     mockException = new MessagingException(event, new Exception());
-    BaseEvent handledEvent = testEvent();
-    when(mockTestExceptionStrategy1.accept(any(BaseEvent.class))).thenReturn(true);
+    CoreEvent handledEvent = testEvent();
+    when(mockTestExceptionStrategy1.accept(any(CoreEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy1.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
-    when(mockTestExceptionStrategy2.accept(any(BaseEvent.class))).thenReturn(true);
+    when(mockTestExceptionStrategy2.accept(any(CoreEvent.class))).thenReturn(true);
     when(mockTestExceptionStrategy2.apply(any(MessagingException.class))).thenReturn(just(handledEvent));
   }
 
@@ -102,12 +102,12 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setRootContainerName("root");
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(BaseEvent.class))).thenReturn(false);
-    when(mockTestExceptionStrategy2.accept(any(BaseEvent.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(CoreEvent.class))).thenReturn(false);
+    when(mockTestExceptionStrategy2.accept(any(CoreEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, event);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(mockTestExceptionStrategy2, times(0)).apply(any(MessagingException.class));
-    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(BaseEvent.class));
+    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(CoreEvent.class));
   }
 
   @Test
@@ -118,11 +118,11 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setRootContainerName("root");
     errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(BaseEvent.class))).thenReturn(false);
+    when(mockTestExceptionStrategy1.accept(any(CoreEvent.class))).thenReturn(false);
     errorHandler.handleException(mockException, event);
     verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
     verify(defaultMessagingExceptionHandler, times(0)).apply(any(MessagingException.class));
-    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(BaseEvent.class));
+    verify(mockTestExceptionStrategy2, times(1)).handleException(eq(mockException), any(CoreEvent.class));
   }
 
   @Test
@@ -192,7 +192,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
 
     @Override
-    public boolean accept(BaseEvent event) {
+    public boolean accept(CoreEvent event) {
       return true;
     }
 
@@ -202,7 +202,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+    public CoreEvent handleException(MessagingException exception, CoreEvent event) {
       exception.setHandled(true);
       return event;
     }

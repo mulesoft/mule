@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.component;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static reactor.core.publisher.Mono.empty;
@@ -24,7 +24,7 @@ import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -52,8 +52,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   @Override
   public final CompletableFuture<ExecutionResult> execute(InputEvent inputEvent) {
     MonoProcessor monoProcessor = MonoProcessor.create();
-    BaseEvent.Builder builder = BaseEvent.builder(createEventContext(monoProcessor));
-    BaseEvent event = builder.message(inputEvent.getMessage())
+    CoreEvent.Builder builder = CoreEvent.builder(createEventContext(monoProcessor));
+    CoreEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
         .parameters(inputEvent.getParameters())
@@ -62,7 +62,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
     return from(MessageProcessors.process(event, getExecutableFunction()))
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
-          BaseEvent messagingExceptionEvent = messagingException.getEvent();
+          CoreEvent messagingExceptionEvent = messagingException.getEvent();
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
                                                  messagingExceptionEvent);
         })
@@ -72,12 +72,12 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<Event> execute(Event event) {
-    BaseEvent internalEvent;
+    CoreEvent internalEvent;
     BaseEventContext child = createChildEventContext(event.getContext());
-    if (event instanceof BaseEvent) {
-      internalEvent = builder(child, (BaseEvent) event).build();
+    if (event instanceof CoreEvent) {
+      internalEvent = builder(child, (CoreEvent) event).build();
     } else {
-      internalEvent = BaseEvent.builder(createEventContext(empty()))
+      internalEvent = CoreEvent.builder(createEventContext(empty()))
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
@@ -88,7 +88,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
     return from(MessageProcessors.process(internalEvent, getExecutableFunction()))
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
-          BaseEvent messagingExceptionEvent = messagingException.getEvent();
+          CoreEvent messagingExceptionEvent = messagingException.getEvent();
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(), messagingExceptionEvent);
         })
         .map(r -> builder(event.getContext(), r).build())

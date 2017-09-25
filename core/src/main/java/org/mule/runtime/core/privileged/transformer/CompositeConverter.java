@@ -13,7 +13,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -129,10 +129,10 @@ public class CompositeConverter extends AbstractComponent implements Converter, 
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        event = BaseEvent.builder(event)
+        event = CoreEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (MessageTransformerException e) {
         throw e;

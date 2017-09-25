@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static reactor.core.publisher.Mono.empty;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ public class NullSourceCallbackExecutor implements SourceCallbackExecutor {
    * @return {@code null}
    */
   @Override
-  public Publisher<Void> execute(BaseEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
+  public Publisher<Void> execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
     return empty();
   }
 }

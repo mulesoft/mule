@@ -36,7 +36,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -102,7 +102,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   public void operationWithReturnValueOnTarget() throws Exception {
     FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload(EMPTY_STRING);
 
-    BaseEvent responseEvent = runner.run();
+    CoreEvent responseEvent = runner.run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), is(EMPTY_STRING));
 
@@ -147,7 +147,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void voidOperationWithoutParameters() throws Exception {
-    BaseEvent responseEvent = flowRunner("die").withPayload(EMPTY).run();
+    CoreEvent responseEvent = flowRunner("die").withPayload(EMPTY).run();
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), is(EMPTY));
     assertThat(getConfig(HEISENBERG).getEndingHealth(), is(DEAD));
@@ -220,7 +220,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void optionalParameterWithDefaultOverride() throws Exception {
-    BaseEvent event =
+    CoreEvent event =
         flowRunner("customKillWithoutDefault").withPayload(EMPTY_STRING).withVariable("goodbye", GOODBYE_MESSAGE)
             .withVariable("victim", VICTIM).run();
 
@@ -315,14 +315,14 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     Ricin ricinWeapon = new Ricin();
     ricinWeapon.setMicrogramsPerKilo(10L);
 
-    BaseEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withVariable("weapon", ricinWeapon).run();
+    CoreEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withVariable("weapon", ricinWeapon).run();
     assertThat(event.getMessage().getPayload().getValue(), is(KILL_RESULT));
   }
 
 
   @Test
   public void connectionProviderDefaultValueSaulPhoneNumber() throws Exception {
-    BaseEvent getSaulNumber = runFlow("getSaulNumber");
+    CoreEvent getSaulNumber = runFlow("getSaulNumber");
     assertThat(getSaulNumber.getMessage().getPayload().getValue(), is(SAUL_OFFICE_NUMBER));
   }
 
@@ -334,7 +334,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     ricinWeapon2.setMicrogramsPerKilo(10L);
 
     List<Weapon> weaponList = Arrays.asList(ricinWeapon1, ricinWeapon2);
-    BaseEvent event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withVariable("weapons", weaponList).run();
+    CoreEvent event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withVariable("weapons", weaponList).run();
 
     List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
     assertThat(event.getMessage().getPayload().getValue(), is(result));
@@ -466,7 +466,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     Map<String, String> map = new HashMap<>();
     map.put(Apple.class.getSimpleName(), expectedMessage);
     listOfMaps.add(map);
-    BaseEvent event = flowRunner("eatComplexListOfMaps").withPayload(listOfMaps).run();
+    CoreEvent event = flowRunner("eatComplexListOfMaps").withPayload(listOfMaps).run();
     List<Map<String, String>> result = (List<Map<String, String>>) event.getMessage().getPayload().getValue();
     assertThat(result, hasSize(1));
     assertThat(result.get(0).get(Apple.class.getSimpleName()), is(expectedMessage));
@@ -498,7 +498,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
     assertThat(actual, is(knock(expected)));
   }
 
-  private void assertKillPayload(BaseEvent event) throws MuleException {
+  private void assertKillPayload(CoreEvent event) throws MuleException {
     assertThat(event.getMessage().getPayload().getValue(),
                is(format("%s, %s", GOODBYE_MESSAGE, VICTIM)));
   }
@@ -508,13 +508,13 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   }
 
   private void doTestExpressionEnemy(Object enemyIndex) throws Exception {
-    BaseEvent event = flowRunner("expressionEnemy").withPayload(EMPTY).withVariable("enemy", enemyIndex).run();
+    CoreEvent event = flowRunner("expressionEnemy").withPayload(EMPTY).withVariable("enemy", enemyIndex).run();
 
     assertThat(event.getMessage().getPayload().getValue(), is(GUSTAVO_FRING));
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils.getConfigurationFromRegistry(name, BaseEvent
+    return ExtensionsTestUtils.getConfigurationFromRegistry(name, CoreEvent
         .builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(EMPTY_STRING)).build(), muleContext);
   }
 }

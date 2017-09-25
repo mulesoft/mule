@@ -57,7 +57,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -450,7 +450,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    *
    * @return a basic event builder with its context already set.
    */
-  protected static BaseEvent.Builder eventBuilder() throws MuleException {
+  protected static CoreEvent.Builder eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = muleContext.getRegistry().lookupFlowConstruct(APPLE_FLOW);
     if (flowConstruct == null) {
       synchronized (muleContext) {
@@ -465,7 +465,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   @Override
-  protected <B extends BaseEvent.Builder> B getEventBuilder() throws MuleException {
+  protected <B extends CoreEvent.Builder> B getEventBuilder() throws MuleException {
     return (B) eventBuilder();
   }
 
@@ -602,7 +602,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 
-  protected BaseEvent process(Processor processor, BaseEvent event) throws Exception {
+  protected CoreEvent process(Processor processor, CoreEvent event) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     return processor.process(event);
   }

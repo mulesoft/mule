@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
@@ -25,11 +25,11 @@ interface SourceCallbackExecutor {
   /**
    * Executes the callback
    *
-   * @param event      the result {@link BaseEvent}
+   * @param event      the result {@link CoreEvent}
    * @param parameters
    * @param context    a {@link SourceCallbackContext} @return the callback's result
    * @return a Publisher which completes either with no value or with an error
    */
-  Publisher<Void> execute(BaseEvent event, Map<String, Object> parameters, SourceCallbackContext context);
+  Publisher<Void> execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context);
 
 }

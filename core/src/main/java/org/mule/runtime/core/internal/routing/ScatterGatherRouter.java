@@ -14,7 +14,7 @@ import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPai
 import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.fromIterable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 
@@ -41,7 +41,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter {
   private List<MessageProcessorChain> routes = emptyList();
 
   @Override
-  protected Consumer<BaseEvent> onEvent() {
+  protected Consumer<CoreEvent> onEvent() {
     return event -> validateMessageIsNotConsumable(event.getMessage());
   }
 
@@ -54,7 +54,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter {
   }
 
   @Override
-  protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(BaseEvent event) {
+  protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
     return fromIterable(routes).map(route -> of(event, route));
   }
 

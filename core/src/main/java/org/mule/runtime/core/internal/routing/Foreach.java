@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -25,8 +25,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.event.BaseEvent.Builder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -60,7 +60,7 @@ import reactor.core.publisher.Flux;
  * <p>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
  * <p>
- * The {@link BaseEvent} sent to the next message processor is the same that arrived to foreach.
+ * The {@link CoreEvent} sent to the next message processor is the same that arrived to foreach.
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
@@ -72,18 +72,18 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
   private int batchSize = 1;
-  private SplittingStrategy<BaseEvent, Iterator<TypedValue<?>>> splittingStrategy;
+  private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
   private String rootMessageVariableName = DEFAULT_ROOT_MESSAGE_VARIABLE;
   private String counterVariableName = DEFAULT_COUNTER_VARIABLE;
   private MessageProcessorChain nestedChain;
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .doOnNext(event -> {
           if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
@@ -102,7 +102,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                   ? originalEvent.getVariables().get(rootMessageVariableName).getValue()
                   : null;
 
-          final BaseEvent requestEvent =
+          final CoreEvent requestEvent =
               builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
 
           return splitAndProcess(requestEvent)
@@ -113,7 +113,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
               })
               .onErrorMap(MessagingException.class, me -> {
                 // Restore variables in case of error also
-                BaseEvent.Builder exceptionEventBuilder = builder(me.getEvent());
+                CoreEvent.Builder exceptionEventBuilder = builder(me.getEvent());
                 restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
                 me.setProcessedEvent(exceptionEventBuilder.build());
                 return me;
@@ -139,9 +139,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private Flux<BaseEvent> splitAndProcess(BaseEvent request) {
+  private Flux<CoreEvent> splitAndProcess(CoreEvent request) {
     AtomicInteger count = new AtomicInteger();
-    final AtomicReference<BaseEvent> currentEvent = new AtomicReference<>(request);
+    final AtomicReference<CoreEvent> currentEvent = new AtomicReference<>(request);
     return fromIterable(
                         // Split into sequence of TypedValue
                         () -> splitRequest(request))
@@ -161,7 +161,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                                 partEventBuilder.message(Message.builder().payload(typedValue).build());
                               }
                               return just(partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build())
-                                  .transform(nestedChain).doOnNext(result -> currentEvent.set(BaseEvent.builder(result).build()));
+                                  .transform(nestedChain).doOnNext(result -> currentEvent.set(CoreEvent.builder(result).build()));
                             })
                             // This can potentially be improved but simplest way currently to determine if split results in empty
                             // iterator is to check atomic count
@@ -175,10 +175,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                               }
                             }))
                             .takeLast(1)
-                            .map(s -> BaseEvent.builder(currentEvent.get()).message(request.getMessage()).build());
+                            .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build());
   }
 
-  private Iterator<TypedValue<?>> splitRequest(BaseEvent request) {
+  private Iterator<TypedValue<?>> splitRequest(CoreEvent request) {
     Object payloadValue = request.getMessage().getPayload().getValue();
     if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
       // Support EventBuilderConfigurerList currently used by Batch Module

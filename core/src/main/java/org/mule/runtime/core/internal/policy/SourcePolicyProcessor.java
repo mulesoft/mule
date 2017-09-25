@@ -12,7 +12,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
@@ -32,9 +32,9 @@ import org.reactivestreams.Publisher;
  * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
  *
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link BaseEvent} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link BaseEvent}
- * from the policy to the next operation {@link BaseEvent} or from the next operation result to the {@link BaseEvent} that must continue
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link CoreEvent} modified by the policy behaviour can be
+ * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link CoreEvent}
+ * from the policy to the next operation {@link CoreEvent} or from the next operation result to the {@link CoreEvent} that must continue
  * the execution of the policy.
  *
  * If a non-empty {@code sourcePolicyParametersTransformer} is passed to this class, then it will be used to convert the result of
@@ -71,12 +71,12 @@ public class SourcePolicyProcessor implements Processor {
    * @throws MuleException
    */
   @Override
-  public BaseEvent process(BaseEvent sourceEvent) throws MuleException {
+  public CoreEvent process(CoreEvent sourceEvent) throws MuleException {
     return processToApply(sourceEvent, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
         .then(sourceEvent -> {
@@ -87,7 +87,7 @@ public class SourcePolicyProcessor implements Processor {
               .map(event -> policyEventConverter.createEvent(sourceEvent,
                                                              PrivilegedEvent.builder(sourceEvent.getContext()).message(of(null))
                                                                  .build()))
-              .cast(BaseEvent.class)
+              .cast(CoreEvent.class)
               .transform(policy.getPolicyChain())
               .cast(PrivilegedEvent.class)
               .map(event -> policyEventConverter.createEvent(event, sourceEvent));
@@ -98,19 +98,19 @@ public class SourcePolicyProcessor implements Processor {
     return new Processor() {
 
       @Override
-      public BaseEvent process(BaseEvent event) throws MuleException {
+      public CoreEvent process(CoreEvent event) throws MuleException {
         return processToApply(event, this);
       }
 
       @Override
-      public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+      public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return from(publisher)
             .cast(PrivilegedEvent.class)
             .then(event -> just(event)
                 .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),
                                                                     request))
                 .map(request -> policyEventConverter.createEvent(request, sourceEvent))
-                .cast(BaseEvent.class)
+                .cast(CoreEvent.class)
                 .transform(nextProcessor)
                 .cast(PrivilegedEvent.class)
                 .map(result -> policyEventConverter.createEvent(result, event)));

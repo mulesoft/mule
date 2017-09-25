@@ -18,7 +18,7 @@ import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepositor
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -37,13 +37,13 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleTestCase {
     MessagingException messagingException = mock(MessagingException.class);
     when(messagingException.getDetailedMessage()).thenReturn("Log");
     handler.apply(messagingException);
-    handler.handleException(messagingException, mock(BaseEvent.class));
+    handler.handleException(messagingException, mock(CoreEvent.class));
     verify(handler, times(2)).logException(any(MessagingException.class));
   }
 
   @Test
   public void acceptsCritical() {
-    BaseEvent event = mock(BaseEvent.class);
+    CoreEvent event = mock(CoreEvent.class);
     Error error = mock(Error.class);
     when(event.getError()).thenReturn(Optional.of(error));
     when(error.getErrorType()).thenReturn(CRITICAL_ERROR_TYPE);
@@ -53,7 +53,7 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void acceptsCriticalChild() {
-    BaseEvent event = mock(BaseEvent.class);
+    CoreEvent event = mock(CoreEvent.class);
     Error error = mock(Error.class);
     when(event.getError()).thenReturn(Optional.of(error));
     ErrorType errorType = mock(ErrorType.class);

@@ -23,7 +23,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.el.ExpressionExecutor;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
@@ -44,8 +44,8 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
   protected MVELExpressionLanguageContext context;
   protected RegexExpressionLanguageFuntion regexFuntion;
   protected MuleContext muleContext;
-  private BaseEvent event;
-  private BaseEvent.Builder eventBuilder;
+  private CoreEvent event;
+  private CoreEvent.Builder eventBuilder;
   private InternalMessage message;
 
   @Before
@@ -203,7 +203,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     message = mock(InternalMessage.class);
 
     event = getEventBuilder().message(message).build();
-    eventBuilder = BaseEvent.builder(event);
+    eventBuilder = CoreEvent.builder(event);
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     when(transformedMessage.getPayload()).thenReturn(new TypedValue<>(payload, DataType.fromObject(payload)));
     DefaultTransformationService transformationService = mock(DefaultTransformationService.class);

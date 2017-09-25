@@ -16,7 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -43,7 +43,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     String key = identifierEvaluator.resolveValue(event);
     if (key == null) {
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");

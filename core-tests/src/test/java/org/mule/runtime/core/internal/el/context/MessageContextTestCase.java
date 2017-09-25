@@ -26,7 +26,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -37,7 +37,7 @@ import java.util.Optional;
 
 public class MessageContextTestCase extends AbstractELTestCase {
 
-  private BaseEvent event;
+  private CoreEvent event;
   private Message message;
 
   public MessageContextTestCase(String mvelOptimizer) {
@@ -52,14 +52,14 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void message() throws Exception {
-    BaseEvent event = BaseEvent.builder(context).message(Message.of("foo")).build();
+    CoreEvent event = CoreEvent.builder(context).message(Message.of("foo")).build();
     assertTrue(evaluate("message", event) instanceof MessageContext);
     assertEquals("foo", evaluate("message.payload", event));
   }
 
   @Test
   public void assignToMessage() throws Exception {
-    BaseEvent event = BaseEvent.builder(context).message(Message.of("")).build();
+    CoreEvent event = CoreEvent.builder(context).message(Message.of("")).build();
     assertImmutableVariable("message='foo'", event);
   }
 
@@ -103,7 +103,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void assignPayload() throws Exception {
     message = Message.of("");
-    BaseEvent.Builder eventBuilder = BaseEvent.builder(event);
+    CoreEvent.Builder eventBuilder = CoreEvent.builder(event);
     evaluate("message.payload = 'foo'", event, eventBuilder);
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), equalTo("foo"));
   }

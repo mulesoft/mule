@@ -13,7 +13,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -54,7 +54,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends AbstractExtensionFu
     assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
 
     final int age = 52;
-    BaseEvent event = BaseEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(""))
+    CoreEvent event = CoreEvent.builder(create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION)).message(of(""))
         .addVariable("age", age).build();
 
     HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event, muleContext);

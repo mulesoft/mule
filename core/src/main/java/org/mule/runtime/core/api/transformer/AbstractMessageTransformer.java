@@ -17,7 +17,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -79,12 +79,12 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   }
 
   @Override
-  public Object transform(Object src, BaseEvent event) throws MessageTransformerException {
+  public Object transform(Object src, CoreEvent event) throws MessageTransformerException {
     return transform(src, resolveEncoding(src), event);
   }
 
   @Override
-  public final Object transform(Object src, Charset enc, BaseEvent event) throws MessageTransformerException {
+  public final Object transform(Object src, Charset enc, CoreEvent event) throws MessageTransformerException {
     DataType sourceType = DataType.fromType(src.getClass());
     if (!isSourceDataTypeSupported(sourceType)) {
       if (isIgnoreBadInput()) {
@@ -106,8 +106,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = (Message) src;
     }
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
-    else if (src instanceof BaseEvent) {
-      event = (BaseEvent) src;
+    else if (src instanceof CoreEvent) {
+      event = (CoreEvent) src;
       message = event.getMessage();
     } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
       message = of(src);
@@ -140,7 +140,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Check if the return class is supported by this transformer
    */
-  protected Object checkReturnClass(Object object, BaseEvent event) throws MessageTransformerException {
+  protected Object checkReturnClass(Object object, CoreEvent event) throws MessageTransformerException {
 
     // Null is a valid return type
     if (object == null && isAllowNullReturn()) {
@@ -165,5 +165,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Transform the message
    */
-  public abstract Object transformMessage(BaseEvent event, Charset outputEncoding) throws MessageTransformerException;
+  public abstract Object transformMessage(CoreEvent event, Charset outputEncoding) throws MessageTransformerException;
 }

@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -59,7 +59,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void setFlowVariableDefaultDataType() throws Exception {
-    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
+    muleEvent = (PrivilegedEvent) CoreEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
     DataType dataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(dataType, like(String.class, MediaType.ANY, null));
@@ -69,7 +69,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setFlowVariableCustomDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    muleEvent = (PrivilegedEvent) BaseEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
+    muleEvent = (PrivilegedEvent) CoreEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));

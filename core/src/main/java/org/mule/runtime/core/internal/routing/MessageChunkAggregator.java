@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
@@ -48,14 +48,14 @@ public class MessageChunkAggregator extends AbstractAggregator {
        *         group is removed and passed to the exception handler for this componenet
        */
       @Override
-      public BaseEvent aggregateEvents(EventGroup events) throws AggregationException {
+      public CoreEvent aggregateEvents(EventGroup events) throws AggregationException {
         PrivilegedEvent[] collectedEvents;
         try {
           collectedEvents = events.toArray(false);
         } catch (ObjectStoreException e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         }
-        BaseEvent firstEvent = collectedEvents[0];
+        CoreEvent firstEvent = collectedEvents[0];
         Arrays.sort(collectedEvents, eventComparator);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 

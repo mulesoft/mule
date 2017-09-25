@@ -29,7 +29,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
@@ -83,7 +83,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private Interceptor interceptor2;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock
   private ConnectionProviderValueResolver<Object> connectionProviderValueResolver;

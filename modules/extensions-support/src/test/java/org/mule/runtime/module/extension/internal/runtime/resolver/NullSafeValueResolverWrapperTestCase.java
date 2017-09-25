@@ -15,7 +15,7 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueR
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -38,7 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Mock
   private ObjectTypeParametersResolver objectTypeParametersResolver;

@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import javax.inject.Inject;
@@ -57,25 +57,25 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
   @Inject
   protected NotificationListenerRegistry notificationListenerRegistry;
 
-  private BaseEvent _testEvent;
+  private CoreEvent _testEvent;
 
   /**
-   * Creates and caches a test {@link BaseEvent} instance for the scope of the current test method.
+   * Creates and caches a test {@link CoreEvent} instance for the scope of the current test method.
    *
    * @return test event.
    * @throws MuleException
    */
   @Override
-  protected BaseEvent testEvent() throws MuleException {
+  protected CoreEvent testEvent() throws MuleException {
     if (_testEvent == null) {
       _testEvent = baseEvent();
     }
     return _testEvent;
   }
 
-  private BaseEvent baseEvent() throws MuleException {
+  private CoreEvent baseEvent() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
-    return BaseEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(Message.of(TEST_PAYLOAD)).build();
+    return CoreEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(Message.of(TEST_PAYLOAD)).build();
   }
 
   @Override

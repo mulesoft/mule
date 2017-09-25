@@ -59,7 +59,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
@@ -176,7 +176,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(just(builder().output(payload).mediaType(mediaType).build()));
 
     event =
-        BaseEvent.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
+        CoreEvent.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -192,7 +192,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     when(operationExecutor.execute(any(ExecutionContext.class))).thenReturn(just(builder().output(payload).build()));
     event =
-        BaseEvent.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
+        CoreEvent.builder(event).message(Message.builder().value("").attributesValue(mock(Object.class)).build()).build();
 
     Message message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
@@ -371,7 +371,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void precalculateExecutionContext() throws MuleException {
     final AtomicReference<PrecalculatedExecutionContextAdapter> context = new AtomicReference<>();
 
-    messageProcessor.resolveParameters(BaseEvent.builder(event), (params, ctx) -> {
+    messageProcessor.resolveParameters(CoreEvent.builder(event), (params, ctx) -> {
       assertThat(ctx, instanceOf(PrecalculatedExecutionContextAdapter.class));
       context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
     });

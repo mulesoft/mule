@@ -17,7 +17,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -29,14 +29,14 @@ public class ExpressionBenchmark extends AbstractBenchmark {
 
 
   private MuleContext muleContext;
-  private BaseEvent event;
+  private CoreEvent event;
   private EventContext context;
 
   @Setup
   public void setup() throws MuleException {
     muleContext = createMuleContextWithServices();
     context = create(createFlow(muleContext), CONNECTOR_LOCATION);
-    event = BaseEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
+    event = CoreEvent.builder(context).message(of(PAYLOAD)).addVariable("foo", "bar").build();
   }
 
   @TearDown

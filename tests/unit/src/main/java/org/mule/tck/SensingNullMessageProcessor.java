@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutorService;
 
 public class SensingNullMessageProcessor implements Processor, Disposable {
 
-  public BaseEvent event;
+  public CoreEvent event;
   public Latch latch = new Latch();
   public Thread thread;
   private ExecutorService executor = newSingleThreadExecutor(new NamedThreadFactory(SensingNullMessageProcessor.class.getName()));
@@ -40,14 +40,14 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
     this.appendString = appendString;
   }
 
-  private void sense(BaseEvent event) {
+  private void sense(CoreEvent event) {
     sleepIfNeeded();
     this.event = event;
     thread = Thread.currentThread();
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     sense(event);
     if (!isEmpty(appendString)) {
       event = append(event);
@@ -60,8 +60,8 @@ public class SensingNullMessageProcessor implements Processor, Disposable {
     }
   }
 
-  private BaseEvent append(BaseEvent event) {
-    return BaseEvent.builder(event).message(of(event.getMessage().getPayload().getValue() + appendString)).build();
+  private CoreEvent append(CoreEvent event) {
+    return CoreEvent.builder(event).message(of(event.getMessage().getPayload().getValue() + appendString)).build();
   }
 
   private void sleepIfNeeded() {

@@ -16,7 +16,7 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.security.AbstractAuthenticationFilter;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
@@ -41,7 +41,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
    * @throws SecurityException if authentication fails
    */
   @Override
-  public SecurityContext authenticate(BaseEvent event)
+  public SecurityContext authenticate(CoreEvent event)
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     Authentication authentication = getAuthenticationToken(event);
     Authentication authResult;
@@ -66,7 +66,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     return context;
   }
 
-  protected Authentication getAuthenticationToken(BaseEvent event) throws UnauthorisedException {
+  protected Authentication getAuthenticationToken(CoreEvent event) throws UnauthorisedException {
     ExpressionManager expressionManager = (ExpressionManager) registry.lookupByName(OBJECT_EXPRESSION_MANAGER).get();
 
     Object usernameEval = expressionManager.evaluate(username, event).getValue();

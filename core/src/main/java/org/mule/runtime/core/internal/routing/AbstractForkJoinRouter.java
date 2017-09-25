@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
@@ -22,7 +22,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -64,12 +64,12 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   private String targetValue = "#[payload]";
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .doOnNext(onEvent())
         .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event)))
@@ -90,9 +90,9 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   /**
    * Template method to perform any operation using the original event before processing.
    *
-   * @return event function to apply to incoming {@link BaseEvent}
+   * @return event function to apply to incoming {@link CoreEvent}
    */
-  protected Consumer<BaseEvent> onEvent() {
+  protected Consumer<CoreEvent> onEvent() {
     return event -> {
     };
   }
@@ -103,7 +103,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
    * @param event the incoming event in the route.
    * @return a potentially non-finite
    */
-  protected abstract Publisher<RoutingPair> getRoutingPairs(BaseEvent event);
+  protected abstract Publisher<RoutingPair> getRoutingPairs(CoreEvent event);
 
   @Override
   public void initialise() throws InitialisationException {
@@ -206,7 +206,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
    */
   protected abstract ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory();
 
-  private TypedValue getTargetValue(BaseEvent event) {
+  private TypedValue getTargetValue(CoreEvent event) {
     return muleContext.getExpressionManager().evaluate(targetValue, getTargetBindingContext(event.getMessage()));
   }
 

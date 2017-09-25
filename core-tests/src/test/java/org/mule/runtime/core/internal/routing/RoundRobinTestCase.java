@@ -21,7 +21,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -111,7 +111,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     public void run() {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
-        BaseEvent event =
+        CoreEvent event =
             InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
                 .session(session).build();
         try {
@@ -129,7 +129,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     private List<Object> payloads = new ArrayList<>();
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       payloads.add(event.getMessage().getPayload().getValue());
       count++;
       if (count % 3 == 0) {

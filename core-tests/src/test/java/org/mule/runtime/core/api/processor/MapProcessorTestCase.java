@@ -15,7 +15,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static reactor.core.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -37,7 +37,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Mock
   private BaseEventContext eventContext;
 
-  private BaseEvent event = BaseEvent.builder(eventContext).message(Message.of(TEST_PAYLOAD)).build();
+  private CoreEvent event = CoreEvent.builder(eventContext).message(Message.of(TEST_PAYLOAD)).build();
 
   private RuntimeException exception = new RuntimeException() {};
 
@@ -46,8 +46,8 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private Processor testProcessor = event -> BaseEvent.builder(eventContext).message(of(TEST_PAYLOAD)).build();
-  private Processor testProcessorReturnsNull = event -> BaseEvent.builder(eventContext).message(of(null)).build();
+  private Processor testProcessor = event -> CoreEvent.builder(eventContext).message(of(TEST_PAYLOAD)).build();
+  private Processor testProcessorReturnsNull = event -> CoreEvent.builder(eventContext).message(of(null)).build();
   private Processor testProcessorThrowsException = event -> {
     throw exception;
   };
@@ -57,37 +57,37 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapBlocking() throws Exception {
-    BaseEvent result = testProcessor.process(event);
+    CoreEvent result = testProcessor.process(event);
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamBlockingGet() {
-    BaseEvent result = just(event).transform(testProcessor).block();
+    CoreEvent result = just(event).transform(testProcessor).block();
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamSubscribe() throws Exception {
-    BaseEvent result = just(event).transform(testProcessor).block();
+    CoreEvent result = just(event).transform(testProcessor).block();
     assertThat(result.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapBlockingNullResult() throws Exception {
-    BaseEvent result = testProcessorReturnsNull.process(event);
+    CoreEvent result = testProcessorReturnsNull.process(event);
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamBlockingGetNullResult() {
-    BaseEvent result = just(event).transform(testProcessorReturnsNull).block();
+    CoreEvent result = just(event).transform(testProcessorReturnsNull).block();
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeNullResult() throws Exception {
-    BaseEvent result = just(event).transform(testProcessorReturnsNull).block();
+    CoreEvent result = just(event).transform(testProcessorReturnsNull).block();
     assertThat(result.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
@@ -101,7 +101,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   public void mapStreamBlockingGetExceptionThrown() throws Throwable {
     thrown.expect(is(instanceOf(MessagingException.class)));
     thrown.expectCause(is(exception));
-    BaseEvent result;
+    CoreEvent result;
     try {
       result = just(event).transform(testProcessorThrowsException).block();
     } catch (Exception e) {
@@ -129,7 +129,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapStreamBlockingGetErrorThrown() throws Throwable {
-    BaseEvent result = null;
+    CoreEvent result = null;
     try {
       result = just(event).transform(testProcessorThrowsError).block();
     } catch (Exception e) {

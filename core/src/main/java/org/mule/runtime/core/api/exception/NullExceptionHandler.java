@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -28,12 +28,12 @@ public final class NullExceptionHandler implements MessagingExceptionHandler {
   }
 
   @Override
-  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
     throw new RuntimeException(exception);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(MessagingException exception) {
+  public Publisher<CoreEvent> apply(MessagingException exception) {
     return Mono.error(exception);
   }
 }

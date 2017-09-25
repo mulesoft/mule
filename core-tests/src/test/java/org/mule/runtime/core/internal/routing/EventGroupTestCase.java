@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
@@ -34,7 +34,7 @@ import java.util.Set;
 
 public class EventGroupTestCase extends AbstractMuleContextTestCase {
 
-  private PartitionableObjectStore<BaseEvent> objectStore;
+  private PartitionableObjectStore<CoreEvent> objectStore;
 
   @Before
   public void before() throws RegistrationException {
@@ -53,7 +53,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     assertTrue(eg.iterator().hasNext());
 
     // now add events while we iterate over the group
-    Iterator<BaseEvent> i = eg.iterator();
+    Iterator<CoreEvent> i = eg.iterator();
     assertNotNull(i.next());
     eg.addEvent(eventBuilder().message(Message.of("foo3")).build());
     assertNotNull(i.next());
@@ -172,7 +172,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     eg.addEvent(eventBuilder().message(Message.of("foo2")).build());
 
     Object[] array1 = IteratorUtils.toArray(eg.iterator(false));
-    BaseEvent[] array2 = eg.toArray(false);
+    CoreEvent[] array2 = eg.toArray(false);
     assertTrue(Arrays.equals(array1, array2));
   }
 
@@ -183,14 +183,14 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     String es = eg.toString();
     assertTrue(es.endsWith("events=0}"));
 
-    BaseEvent firstEvent = eventBuilder().message(Message.of("foo")).build();
+    CoreEvent firstEvent = eventBuilder().message(Message.of("foo")).build();
     String firstId = firstEvent.getCorrelationId();
     eg.addEvent(firstEvent);
     es = eg.toString();
     assertTrue(es.contains("events=1"));
     assertTrue(es.endsWith("[" + firstId + "]}"));
 
-    BaseEvent secondEvent = eventBuilder()
+    CoreEvent secondEvent = eventBuilder()
         .message(Message.of("foo2"))
         .build();
     String secondId = secondEvent.getCorrelationId();

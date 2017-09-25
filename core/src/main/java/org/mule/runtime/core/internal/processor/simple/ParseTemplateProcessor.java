@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.processor.simple;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
@@ -58,19 +58,19 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) {
+  public CoreEvent process(CoreEvent event) {
     evaluateCorrectArguments();
     Object result = muleContext.getExpressionManager().parse(content, event, null);
     Message resultMessage = Message.builder(event.getMessage()).value(result).nullAttributesValue().build();
     if (target == null) {
-      return BaseEvent.builder(event).message(resultMessage).build();
+      return CoreEvent.builder(event).message(resultMessage).build();
     } else {
       if (targetValue == null) { //Return the whole message
-        return BaseEvent.builder(event).addVariable(target, resultMessage).build();
+        return CoreEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
-        return BaseEvent.builder(event).addVariable(target,
+        return CoreEvent.builder(event).addVariable(target,
                                                     muleContext.getExpressionManager()
-                                                        .evaluate(targetValue, BaseEvent.builder(event)
+                                                        .evaluate(targetValue, CoreEvent.builder(event)
                                                             .message(resultMessage).build()))
             .build();
       }

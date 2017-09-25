@@ -14,7 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
@@ -32,7 +32,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public interface PrivilegedEvent extends BaseEvent {
+public interface PrivilegedEvent extends CoreEvent {
 
   class CurrentEventHolder {
 
@@ -40,7 +40,7 @@ public interface PrivilegedEvent extends BaseEvent {
   }
 
   /**
-   * @return the context applicable to all events created from the same root {@link BaseEvent} from a {@link MessageSource}.
+   * @return the context applicable to all events created from the same root {@link CoreEvent} from a {@link MessageSource}.
    */
   @Override
   BaseEventContext getContext();
@@ -161,30 +161,30 @@ public interface PrivilegedEvent extends BaseEvent {
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(BaseEvent event) {
+  static Builder builder(CoreEvent event) {
     return new DefaultEventBuilder((InternalEvent) event);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link BaseEvent} instance and and {@link EventContext}. A new
-   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link BaseEvent}. This builder
-   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link BaseEvent}
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance and and {@link EventContext}. A new
+   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link CoreEvent}. This builder
+   * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
    * @param event existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(EventContext context, BaseEvent event) {
+  static Builder builder(EventContext context, CoreEvent event) {
     return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
-  public interface Builder extends BaseEvent.Builder {
+  public interface Builder extends CoreEvent.Builder {
 
     /**
      * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source

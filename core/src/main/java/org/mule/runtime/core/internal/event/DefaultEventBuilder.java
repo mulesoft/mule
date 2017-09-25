@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
@@ -289,7 +289,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
    * <code>EventImplementation</code> represents any data event occurring in the Mule environment. All data sent or received
    * within the Mule environment will be passed between components as an MuleEvent.
    * <p>
-   * The {@link BaseEvent} holds some data and provides helper methods for obtaining the data in a format that the receiving
+   * The {@link CoreEvent} holds some data and provides helper methods for obtaining the data in a format that the receiving
    * Mule component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
    * components.
    */

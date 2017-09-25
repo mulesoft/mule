@@ -10,7 +10,7 @@ import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class FlowCPUIntensiveProcessorBenchmark extends AbstractFlowBenchmark {
   }
 
   @Benchmark
-  public BaseEvent processor() throws MuleException {
+  public CoreEvent processor() throws MuleException {
     return cpuIntensiveProcessor.process(createEvent(flow));
   }
 

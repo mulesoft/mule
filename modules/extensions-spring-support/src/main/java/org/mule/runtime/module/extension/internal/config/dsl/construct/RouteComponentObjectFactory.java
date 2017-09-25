@@ -12,7 +12,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -26,7 +26,7 @@ import java.util.List;
  * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements.
  * <p>
  * The objects are parsed as a {@link ValueResolver}. If that resolver is not static, then a value is obtained using a default
- * {@link BaseEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
+ * {@link CoreEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
  *
  * @since 4.0
  */

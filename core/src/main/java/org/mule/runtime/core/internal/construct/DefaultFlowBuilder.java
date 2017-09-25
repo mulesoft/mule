@@ -28,7 +28,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -221,16 +221,16 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    public BaseEvent process(final BaseEvent event) throws MuleException {
+    public CoreEvent process(final CoreEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
           .flatMap(event -> {
-            BaseEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
+            CoreEvent request = createMuleEventForCurrentFlow((PrivilegedEvent) event);
             // Use sink and potentially shared stream in Flow by dispatching incoming event via sink and then using
             // response publisher to operate of the result of flow processing before returning
             try {
@@ -242,7 +242,7 @@ public class DefaultFlowBuilder implements Builder {
             return Mono.from(((BaseEventContext) request.getContext()).getResponsePublisher())
                 .cast(PrivilegedEvent.class)
                 .map(r -> {
-                  BaseEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
+                  CoreEvent result = createReturnEventForParentFlowConstruct(r, (InternalEvent) event);
                   return result;
                 })
                 .onErrorMap(MessagingException.class, me -> {

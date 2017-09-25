@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQU
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -21,8 +21,8 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
     implements RequestReplyReplierMessageProcessor, InternalProcessor {
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
-    BaseEvent resultEvent;
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    CoreEvent resultEvent;
     PrivilegedEvent privilegedEvent = (PrivilegedEvent) event;
     if (shouldProcessEvent(privilegedEvent)) {
       Object replyTo = privilegedEvent.getReplyToDestination();
@@ -43,7 +43,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
 
   protected abstract boolean shouldProcessEvent(PrivilegedEvent event);
 
-  protected BaseEvent processReplyTo(BaseEvent event, BaseEvent result, ReplyToHandler replyToHandler, Object replyTo)
+  protected CoreEvent processReplyTo(CoreEvent event, CoreEvent result, ReplyToHandler replyToHandler, Object replyTo)
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = ((InternalMessage) result.getMessage()).getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);

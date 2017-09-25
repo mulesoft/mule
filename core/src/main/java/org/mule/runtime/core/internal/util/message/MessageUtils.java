@@ -14,7 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -66,7 +66,7 @@ public final class MessageUtils {
    * @param event Used for the case where a {@link CursorProvider} is created, register the one in it.
    * @return a {@link Message}
    */
-  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, BaseEvent event) {
+  public static Message toMessage(Result result, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
     return toMessage(result, ((Optional<MediaType>) result.getMediaType()).orElse(ANY), cursorProviderFactory, event);
   }
 
@@ -84,7 +84,7 @@ public final class MessageUtils {
   public static Message toMessage(Result<?, ?> result,
                                   MediaType mediaType,
                                   CursorProviderFactory cursorProviderFactory,
-                                  BaseEvent event) {
+                                  CoreEvent event) {
     Object value = streamingContent(result.getOutput(), cursorProviderFactory, event);
     Message.Builder builder = Message.builder()
         .payload(new TypedValue<>(value, builder(DataType.fromObject(value)).mediaType(mediaType).build(),
@@ -101,12 +101,12 @@ public final class MessageUtils {
    *
    * @param results a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param event the {@link BaseEvent} which originated the results being transformed
+   * @param event the {@link CoreEvent} which originated the results being transformed
    * @return a {@link List} of {@link Message}
    */
   public static List<Message> toMessageCollection(Collection<Result> results,
                                                   CursorProviderFactory cursorProviderFactory,
-                                                  BaseEvent event) {
+                                                  CoreEvent event) {
     if (!(results instanceof List)) {
       results = new ArrayList<>(results);
     }
@@ -119,12 +119,12 @@ public final class MessageUtils {
    *
    * @param results a collection of {@link Result} items
    * @param cursorProviderFactory the {@link CursorProviderFactory} used to handle streaming cursors
-   * @param event the {@link BaseEvent} which originated the results being transformed
+   * @param event the {@link CoreEvent} which originated the results being transformed
    * @return a similar collection of {@link Message}
    */
   public static Iterator<Message> toMessageIterator(Iterator<Result> results,
                                                     CursorProviderFactory cursorProviderFactory,
-                                                    BaseEvent event) {
+                                                    CoreEvent event) {
     if (results instanceof StreamingIterator) {
       return new ResultToMessageStreamingIterator((StreamingIterator<Result>) results, cursorProviderFactory, event);
     } else {

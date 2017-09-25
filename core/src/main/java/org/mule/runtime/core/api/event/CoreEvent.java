@@ -32,7 +32,7 @@ import java.util.Optional;
  *
  * @see Message
  */
-public interface BaseEvent extends Serializable, Event {
+public interface CoreEvent extends Serializable, Event {
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
@@ -73,34 +73,34 @@ public interface BaseEvent extends Serializable, Event {
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link BaseEvent} instance. The existing {@link EventContext} is
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is
    * conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(BaseEvent event) {
+  static Builder builder(CoreEvent event) {
     return new DefaultEventBuilder((InternalEvent) event);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link BaseEvent} instance and and {@link EventContext}. A new
-   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link BaseEvent}. This builder
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance and and {@link EventContext}. A new
+   * {@link EventContext} is used instead of the existing instance referenced by the existing {@link CoreEvent}. This builder
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same
-   * {@link BaseEvent} needs a new context.
+   * {@link CoreEvent} needs a new context.
    *
    * @param event existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(EventContext context, BaseEvent event) {
+  static Builder builder(EventContext context, CoreEvent event) {
     return new DefaultEventBuilder((BaseEventContext) context, (InternalEvent) event);
   }
 
   interface Builder {
 
     /**
-     * Set the {@link Message} to construct {@link BaseEvent} with.
+     * Set the {@link Message} to construct {@link CoreEvent} with.
      *
      * @param message the message instance.
      * @return the builder instance
@@ -147,7 +147,7 @@ public interface BaseEvent extends Serializable, Event {
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
-     * feed to it in a new and isolated {@link BaseEvent}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link CoreEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param properties properties to be set.
@@ -161,7 +161,7 @@ public interface BaseEvent extends Serializable, Event {
      * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
      * <p>
      * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
-     * feed to it in a new and isolated {@link BaseEvent}, so that we can guarantee that for each invocation there's a real variable
+     * feed to it in a new and isolated {@link CoreEvent}, so that we can guarantee that for each invocation there's a real variable
      * scoping for them.
      *
      * @param parameters parameters to be set.
@@ -225,11 +225,11 @@ public interface BaseEvent extends Serializable, Event {
     Builder securityContext(SecurityContext securityContext);
 
     /**
-     * Build a new {@link BaseEvent} based on the state configured in the {@link Builder}.
+     * Build a new {@link CoreEvent} based on the state configured in the {@link Builder}.
      *
-     * @return new {@link BaseEvent} instance.
+     * @return new {@link CoreEvent} instance.
      */
-    BaseEvent build();
+    CoreEvent build();
 
   }
 
@@ -242,7 +242,7 @@ public interface BaseEvent extends Serializable, Event {
    * @param <T> the variable type
    * @return the value of the variables if it exists otherwise {@code null}.
    */
-  static <T> T getVariableValueOrNull(String key, BaseEvent event) {
+  static <T> T getVariableValueOrNull(String key, CoreEvent event) {
     if (event.getVariables().containsKey(key)) {
       return (T) event.getVariables().get(key).getValue();
     } else {

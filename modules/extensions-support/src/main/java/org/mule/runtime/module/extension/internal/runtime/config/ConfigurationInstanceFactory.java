@@ -17,7 +17,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -74,13 +74,13 @@ public final class ConfigurationInstanceFactory<T> {
    * configuration will use to obtain connections. If the connection does not need such a concept you can provide a {@code null}
    *
    * @param name                       the name of the configuration to return
-   * @param event                      the current {@link BaseEvent}
+   * @param event                      the current {@link CoreEvent}
    * @param connectionProviderResolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
   public <C> ConfigurationInstance createConfiguration(String name,
-                                                       BaseEvent event,
+                                                       CoreEvent event,
                                                        ConnectionProviderValueResolver<C> connectionProviderResolver)
       throws MuleException {
 
@@ -106,14 +106,14 @@ public final class ConfigurationInstanceFactory<T> {
    *
    * @param name                       the name of the configuration to return
    * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
-   * @param event                      the current {@link BaseEvent}
+   * @param event                      the current {@link CoreEvent}
    * @param connectionProviderResolver an optional resolver to obtain a {@link ConnectionProvider}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
   public <C> ConfigurationInstance createConfiguration(String name,
                                                        ResolverSetResult configValues,
-                                                       BaseEvent event,
+                                                       CoreEvent event,
                                                        Optional<ConnectionProviderValueResolver<C>> connectionProviderResolver)
       throws MuleException {
 
@@ -141,7 +141,7 @@ public final class ConfigurationInstanceFactory<T> {
    *
    * @param name                       the name of the configuration to return
    * @param configValues               the {@link ResolverSetResult} with the evaluated config parameters values
-   * @param event                      the current {@link BaseEvent}
+   * @param event                      the current {@link CoreEvent}
    * @param connectionProviderResolver a resolver to obtain a {@link ConnectionProvider}
    * @param connectionProviderValues   e {@link ResolverSetResult} with the evaluated connection parameters values
    * @return a {@link ConfigurationInstance}
@@ -149,7 +149,7 @@ public final class ConfigurationInstanceFactory<T> {
    */
   public <C> ConfigurationInstance createConfiguration(String name,
                                                        ResolverSetResult configValues,
-                                                       BaseEvent event,
+                                                       CoreEvent event,
                                                        ConnectionProviderValueResolver<C> connectionProviderResolver,
                                                        ResolverSetResult connectionProviderValues)
       throws MuleException {
@@ -183,7 +183,7 @@ public final class ConfigurationInstanceFactory<T> {
     return config;
   }
 
-  private Pair<T, ResolverSetResult> createConfigurationInstance(String name, BaseEvent event) throws MuleException {
+  private Pair<T, ResolverSetResult> createConfigurationInstance(String name, CoreEvent event) throws MuleException {
     Pair<T, ResolverSetResult> config = configurationObjectBuilder.build(from(event));
     injectRefName(configurationModel, config.getFirst(), name);
 

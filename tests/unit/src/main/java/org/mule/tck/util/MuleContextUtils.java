@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -133,7 +133,7 @@ public class MuleContextUtils {
    *
    * @return a basic event builder with its context already set.
    */
-  public static <B extends BaseEvent.Builder> B eventBuilder() throws MuleException {
+  public static <B extends CoreEvent.Builder> B eventBuilder() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(mockContextWithServices());
     return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }

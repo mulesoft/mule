@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
@@ -44,7 +44,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -125,9 +125,9 @@ public class ModuleFlowProcessingPhase
       final FlowConstruct flowConstruct = (FlowConstruct) muleContext.getConfigurationComponentLocator().find(Location.builder()
           .globalName(messageSource.getRootContainerName()).build()).get();
       final ComponentLocation sourceLocation = messageSource.getLocation();
-      final Consumer<Either<MessagingException, BaseEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
+      final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
-      final BaseEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
+      final CoreEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
 
       FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct.getExceptionListener(), templateEvent);
       flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
@@ -156,7 +156,7 @@ public class ModuleFlowProcessingPhase
   /*
    * Consumer invoked for each new execution of this processing phase.
    */
-  private Consumer<BaseEvent> onMessageReceived(MessageProcessContext messageProcessContext, FlowConstruct flowConstruct) {
+  private Consumer<CoreEvent> onMessageReceived(MessageProcessContext messageProcessContext, FlowConstruct flowConstruct) {
     return request -> fireNotification(messageProcessContext.getMessageSource(), request,
                                        flowConstruct, MESSAGE_RECEIVED);
   }
@@ -216,9 +216,9 @@ public class ModuleFlowProcessingPhase
    * response. Error caused by failures in the flow error handler do not result in an error message being sent.
    */
   private Mono<Void> sendErrorResponse(MessagingException messagingException,
-                                       Function<BaseEvent, Map<String, Object>> errorParameters,
+                                       Function<CoreEvent, Map<String, Object>> errorParameters,
                                        final PhaseContext ctx) {
-    BaseEvent event = messagingException.getEvent();
+    CoreEvent event = messagingException.getEvent();
     if (messagingException.inErrorHandler()) {
       return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, messagingException.getCause(),
                                             messagingException));
@@ -240,7 +240,7 @@ public class ModuleFlowProcessingPhase
    * within an error handler.
    */
   private Consumer<Throwable> onFailure(PhaseResultNotifier phaseResultNotifier,
-                                        Consumer<Either<MessagingException, BaseEvent>> terminateConsumer) {
+                                        Consumer<Either<MessagingException, CoreEvent>> terminateConsumer) {
     return throwable -> {
       onTerminate(terminateConsumer, left(throwable));
       throwable = throwable instanceof SourceErrorException ? throwable.getCause() : throwable;
@@ -249,7 +249,7 @@ public class ModuleFlowProcessingPhase
     };
   }
 
-  private Consumer<Either<MessagingException, BaseEvent>> getTerminateConsumer(MessageSource messageSource,
+  private Consumer<Either<MessagingException, CoreEvent>> getTerminateConsumer(MessageSource messageSource,
                                                                                ModuleFlowProcessingPhaseTemplate template) {
     return eventOrException -> template.afterPhaseExecution(eventOrException.mapLeft(messagingException -> {
       messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
@@ -258,11 +258,11 @@ public class ModuleFlowProcessingPhase
     }));
   }
 
-  private BaseEvent createEvent(ModuleFlowProcessingPhaseTemplate template, ComponentLocation sourceLocation,
+  private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, ComponentLocation sourceLocation,
                                 Publisher<Void> responseCompletion, FlowConstruct flowConstruct)
       throws MuleException {
     Message message = template.getMessage();
-    BaseEvent templateEvent = InternalEvent
+    CoreEvent templateEvent = InternalEvent
         .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
                         NullExceptionHandler.getInstance()))
         .message(message)
@@ -290,7 +290,7 @@ public class ModuleFlowProcessingPhase
   }
 
 
-  private BaseEvent emptyEvent(BaseEvent request) {
+  private CoreEvent emptyEvent(CoreEvent request) {
     return builder(request).message(of(null)).build();
   }
 
@@ -302,8 +302,8 @@ public class ModuleFlowProcessingPhase
    *        {@link MessagingException} or {@link SourceErrorException} are valid values on the {@code left} side of this
    *        parameter.
    */
-  private void onTerminate(Consumer<Either<MessagingException, BaseEvent>> terminateConsumer,
-                           Either<Throwable, BaseEvent> result) {
+  private void onTerminate(Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
+                           Either<Throwable, CoreEvent> result) {
     safely(() -> terminateConsumer.accept(result.mapLeft(throwable -> {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
@@ -326,23 +326,23 @@ public class ModuleFlowProcessingPhase
   private class FlowProcessor extends AbstractComponent implements Processor {
 
     private final ModuleFlowProcessingPhaseTemplate template;
-    private final BaseEvent templateEvent;
+    private final CoreEvent templateEvent;
     private final MessagingExceptionHandler messagingExceptionHandler;
 
     public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, MessagingExceptionHandler messagingExceptionHandler,
-                         BaseEvent templateEvent) {
+                         CoreEvent templateEvent) {
       this.template = template;
       this.templateEvent = templateEvent;
       this.messagingExceptionHandler = messagingExceptionHandler;
     }
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       return processToApply(event, this);
     }
 
     @Override
-    public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .flatMapMany(event -> processWithChildContext(event,
                                                         p -> from(p).flatMapMany(e -> template.routeEventAsync(e))
@@ -359,12 +359,12 @@ public class ModuleFlowProcessingPhase
     final ModuleFlowProcessingPhaseTemplate template;
     final MessageProcessContext messageProcessContext;
     final PhaseResultNotifier phaseResultNotifier;
-    final Consumer<Either<MessagingException, BaseEvent>> terminateConsumer;
+    final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer;
 
     PhaseContext(ModuleFlowProcessingPhaseTemplate template,
                  MessageProcessContext messageProcessContext,
                  PhaseResultNotifier phaseResultNotifier,
-                 Consumer<Either<MessagingException, BaseEvent>> terminateConsumer) {
+                 Consumer<Either<MessagingException, CoreEvent>> terminateConsumer) {
       this.template = template;
       this.messageProcessContext = messageProcessContext;
       this.phaseResultNotifier = phaseResultNotifier;

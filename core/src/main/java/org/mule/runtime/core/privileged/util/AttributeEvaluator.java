@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -39,7 +39,7 @@ public class AttributeEvaluator {
 
   private String attributeValue;
   private ExtendedExpressionManager expressionManager;
-  private Function<BaseEvent, TypedValue> expressionResolver;
+  private Function<CoreEvent, TypedValue> expressionResolver;
 
   /**
    * Creates a new Attribute Evaluator instance with a given attribute value
@@ -111,11 +111,11 @@ public class AttributeEvaluator {
     return remainingString.contains(DEFAULT_EXPRESSION_POSTFIX);
   }
 
-  public <T> TypedValue<T> resolveTypedValue(BaseEvent event) {
+  public <T> TypedValue<T> resolveTypedValue(CoreEvent event) {
     return expressionResolver.apply(event);
   }
 
-  public <T> T resolveValue(BaseEvent event) {
+  public <T> T resolveValue(CoreEvent event) {
     final TypedValue<T> resolveTypedValue = resolveTypedValue(event);
     return resolveTypedValue.getValue();
   }

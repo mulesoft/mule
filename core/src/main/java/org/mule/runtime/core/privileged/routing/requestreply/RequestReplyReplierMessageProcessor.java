@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.privileged.routing.requestreply;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * <p>
- * Processes a {@link BaseEvent}'s by invoking the next {@link Processor} and then rather than returning the result to this processors
+ * Processes a {@link CoreEvent}'s by invoking the next {@link Processor} and then rather than returning the result to this processors
  * {@link MessageSource} sending it via a seperate reply {@link Processor},
  * <p>
  * Some implementations may not use the replyTo messageProcessor but rather use a message property to determine what should be

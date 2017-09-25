@@ -15,7 +15,7 @@ import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -47,7 +47,7 @@ public class ThrowProcessorTestCase extends AbstractMuleContextTestCase {
     expectedException.expect(TestException.class);
     expectedException.expectCause(instanceOf(IOException.class));
     expectedException.expect(new TypedExceptionErrorMatcher(EXPRESSION));
-    throwProcessor.process(mock(BaseEvent.class));
+    throwProcessor.process(mock(CoreEvent.class));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class ThrowProcessorTestCase extends AbstractMuleContextTestCase {
     expectedException.expect(TypedException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     expectedException.expect(new TypedExceptionErrorMatcher(SECURITY));
-    throwProcessor.process(mock(BaseEvent.class));
+    throwProcessor.process(mock(CoreEvent.class));
   }
 
   public static class TestException extends TypedException {

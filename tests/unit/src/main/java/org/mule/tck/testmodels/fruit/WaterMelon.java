@@ -11,7 +11,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
     return bitten;
   }
 
-  public void myEventHandler(BaseEvent event, MuleContext muleContext) throws MuleException {
+  public void myEventHandler(CoreEvent event, MuleContext muleContext) throws MuleException {
     logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: "
         + ((PrivilegedEvent) event).getMessageAsString(null));
     bite();

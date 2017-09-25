@@ -16,7 +16,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -67,7 +67,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected Mono<BaseEvent> doProcess(BaseEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
+  protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext)
         .onErrorResume(AccessTokenExpiredException.class, e -> {
           OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);

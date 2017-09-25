@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -37,7 +37,7 @@ public class MVELDeepInvokeBenchmark extends AbstractBenchmark {
 
   private MuleContext muleContext;
   private Flow flow;
-  private BaseEvent event;
+  private CoreEvent event;
 
   @Setup
   public void setup() throws MuleException {

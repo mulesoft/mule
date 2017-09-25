@@ -19,7 +19,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -78,7 +78,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   }
 
   @Override
-  public ConfigurationInstance getConfiguration(String configurationProviderName, BaseEvent event) {
+  public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(event))
         .orElseThrow(() -> new IllegalArgumentException(
                                                         format(
@@ -88,7 +88,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
 
   @Override
   public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                          BaseEvent event) {
+                                                          CoreEvent event) {
     Optional<ConfigurationInstance> configuration = childExtensionManager.getConfiguration(extensionModel, componentModel, event);
 
     if (configuration.isPresent()) {

@@ -12,15 +12,15 @@ import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPai
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 
 import java.util.Map;
 
 /**
- * The result of routing an {@link BaseEvent} to {@code n} {@link MessageProcessorChain} routes, or {@code n}
- * {@link BaseEvent}'s to the same {@link MessageProcessorChain} route typically by using {@link ForkJoinStrategy}.
+ * The result of routing an {@link CoreEvent} to {@code n} {@link MessageProcessorChain} routes, or {@code n}
+ * {@link CoreEvent}'s to the same {@link MessageProcessorChain} route typically by using {@link ForkJoinStrategy}.
  * <p>
  * Results are indexed using the order of {@link RoutingPair} as defined by the router. With
  * {@link org.mule.runtime.core.internal.routing.ScatterGatherRouter} this is the order of routes as defined in configuration.

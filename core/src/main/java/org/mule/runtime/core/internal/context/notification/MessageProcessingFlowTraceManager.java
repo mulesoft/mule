@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
@@ -122,7 +122,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
           .addExecutedProcessors(resolveProcessorRepresentation);
     }
 
-    FlowCallStack flowCallStack = ((BaseEvent) notification.getEvent()).getFlowCallStack();
+    FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
       ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(resolveProcessorRepresentation);
     }
@@ -148,7 +148,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName) {
-    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
+    FlowCallStack flowCallStack = ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack();
     if (flowCallStack instanceof DefaultFlowCallStack) {
       ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(flowName, null));
     }
@@ -156,7 +156,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void onFlowComplete(EnrichedNotificationInfo notificationInfo) {
-    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
+    FlowCallStack flowCallStack = ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack();
     if (flowCallStack instanceof DefaultFlowCallStack) {
       ((DefaultFlowCallStack) flowCallStack).pop();
     }
@@ -164,7 +164,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    FlowCallStack flowCallStack = ((BaseEvent) notificationInfo.getEvent()).getFlowCallStack();
+    FlowCallStack flowCallStack = ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack();
     if (isFlowTrace()) {
       return singletonMap(FLOW_STACK_INFO_KEY, flowCallStack.toString());
     } else {

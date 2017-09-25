@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 
 import java.util.function.Consumer;
 
 /**
- * Used to dispatch {@link BaseEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained
- * by subscribing to the {@link BaseEvent}'s {@link BaseEventContext}.
+ * Used to dispatch {@link CoreEvent}'s asynchronously for processing. The result of asynchronous processing can be obtained
+ * by subscribing to the {@link CoreEvent}'s {@link BaseEventContext}.
  * <p/>
  * All Sinks must support concurrent calls from multiple publishers and it is then up to each implementation to determine how to
  * handle this, i.e.
@@ -25,24 +25,24 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public interface Sink extends Consumer<BaseEvent> {
+public interface Sink extends Consumer<CoreEvent> {
 
   /**
-   * Submit the given {@link BaseEvent} for processing without a timeout. If the {@link BaseEvent} cannot be processed
+   * Submit the given {@link CoreEvent} for processing without a timeout. If the {@link CoreEvent} cannot be processed
    * immediately due to back-pressure then this method will block until in can be processed.
    *
-   * @param event the {@link BaseEvent} to dispatch for processing
+   * @param event the {@link CoreEvent} to dispatch for processing
    */
   @Override
-  void accept(BaseEvent event);
+  void accept(CoreEvent event);
 
   /**
-   * Submit the given {@link BaseEvent} for processing. If the {@link BaseEvent} cannot be processed immediately due to
+   * Submit the given {@link CoreEvent} for processing. If the {@link CoreEvent} cannot be processed immediately due to
    * back-pressure then this method will return {@code false}.
    *
-   * @param event the {@link BaseEvent} to dispatch for processing
-   * @return {@code true} is the {@link BaseEvent} was submitted for processing successfully, {@code false} otherwise.
+   * @param event the {@link CoreEvent} to dispatch for processing
+   * @return {@code true} is the {@link CoreEvent} was submitted for processing successfully, {@code false} otherwise.
    */
-  boolean emit(BaseEvent event);
+  boolean emit(CoreEvent event);
 
 }

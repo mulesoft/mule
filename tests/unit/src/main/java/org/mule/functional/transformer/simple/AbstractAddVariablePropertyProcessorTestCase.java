@@ -29,7 +29,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -53,7 +53,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public static final String NULL_EXPRESSION = "#['someValueNull']";
   public static final Charset CUSTOM_ENCODING = UTF_8;
 
-  private BaseEvent event;
+  private CoreEvent event;
   private Message message;
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
@@ -69,15 +69,15 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     typedValue = new TypedValue(EXPRESSION_VALUE, STRING);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), any(BaseEvent.class))).thenReturn(typedValue);
-    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(BaseEvent.class))).thenReturn(typedValue);
+    when(mockExpressionManager.evaluate(eq(EXPRESSION), eq(STRING), any(), any(CoreEvent.class))).thenReturn(typedValue);
+    when(mockExpressionManager.evaluate(eq(EXPRESSION), any(CoreEvent.class))).thenReturn(typedValue);
     addVariableProcessor.setMuleContext(mockMuleContext);
 
     message = of("");
     event = createTestEvent(message);
   }
 
-  protected BaseEvent createTestEvent(Message message) throws MuleException {
+  protected CoreEvent createTestEvent(Message message) throws MuleException {
     return eventBuilder().message(message).build();
   }
 
@@ -139,7 +139,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
                like(String.class, APPLICATION_XML, getDefaultEncoding(mockMuleContext)));
   }
 
-  protected abstract DataType getVariableDataType(BaseEvent event, String key);
+  protected abstract DataType getVariableDataType(CoreEvent event, String key);
 
   @Test(expected = IllegalArgumentException.class)
   public void testAddVariableWithNullKey() throws InitialisationException, TransformerException {
@@ -191,10 +191,10 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     verifyRemoved(event, PLAIN_STRING_KEY);
   }
 
-  protected abstract void verifyAdded(BaseEvent event, String key, String value);
+  protected abstract void verifyAdded(CoreEvent event, String key, String value);
 
-  protected abstract void verifyNotAdded(BaseEvent mockEvent);
+  protected abstract void verifyNotAdded(CoreEvent mockEvent);
 
-  protected abstract void verifyRemoved(BaseEvent mockEvent, String key);
+  protected abstract void verifyRemoved(CoreEvent mockEvent, String key);
 
 }

@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
@@ -112,7 +112,7 @@ public class ExpectedError implements TestRule {
                 getStackTraceAsString(e)));
   }
 
-  private void failDueToExceptionWithoutError(Throwable e, BaseEvent event) {
+  private void failDueToExceptionWithoutError(Throwable e, CoreEvent event) {
     fail(format("An exception was caught but it didn't contain information about the error \n Event: \n %s \n Caught exception was:\n %s %s",
                 event, e, getStackTraceAsString(e)));
   }
@@ -155,7 +155,7 @@ public class ExpectedError implements TestRule {
           failDueToUnexpectedException(exception);
         }
 
-        BaseEvent event = exception.getEvent();
+        CoreEvent event = exception.getEvent();
         if (!event.getError().isPresent()) {
           failDueToExceptionWithoutError(exception, event);
         }

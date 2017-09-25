@@ -13,7 +13,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -205,12 +205,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       source.setListener(new Processor() {
 
         @Override
-        public BaseEvent process(BaseEvent event) throws MuleException {
+        public CoreEvent process(CoreEvent event) throws MuleException {
           return processToApply(event, this);
         }
 
         @Override
-        public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+        public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
           return from(publisher)
               .doOnNext(assertStarted())
               .transform(dispatchToFlow(sink));
@@ -323,7 +323,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
-  public Consumer<BaseEvent> assertStarted() {
+  public Consumer<CoreEvent> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
         throw propagate(new MessagingException(event,
@@ -371,7 +371,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private class ProcessEndProcessor extends AbstractComponent implements Processor, InternalProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_END));
       return event;
@@ -382,7 +382,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private class ProcessorStartCompleteProcessor implements Processor, InternalProcessor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_START));
 
@@ -404,7 +404,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       return event;
     }
 
-    private void fireCompleteNotification(BaseEvent event, MessagingException messagingException) {
+    private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_COMPLETE));
     }

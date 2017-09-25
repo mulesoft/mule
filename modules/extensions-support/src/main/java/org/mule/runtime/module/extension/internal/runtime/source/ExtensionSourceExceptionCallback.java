@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
@@ -18,14 +18,14 @@ import java.util.function.Consumer;
 
 /**
  * Channels exceptions through the
- * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, BaseEvent)}.
+ * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, CoreEvent)}.
  *
  * @since 4.0
  */
 class ExtensionSourceExceptionCallback implements ExceptionCallback {
 
   private final ResponseCompletionCallback completionCallback;
-  private final BaseEvent event;
+  private final CoreEvent event;
   private final Consumer<MessagingException> errorResponseHandler;
   private final MessageProcessContext messageProcessorContext;
 
@@ -33,11 +33,11 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
    * Creates a new instance
    * 
    * @param completionCallback the callback used to send the failure response
-   * @param event the related {@link BaseEvent}
-   * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link BaseEvent} which results
+   * @param event the related {@link CoreEvent}
+   * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link CoreEvent} which results
    * @param messageProcessContext
    */
-  public ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, BaseEvent event,
+  public ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, CoreEvent event,
                                           Consumer<MessagingException> errorResponseCallback,
                                           MessageProcessContext messageProcessContext) {
     this.completionCallback = completionCallback;
@@ -47,20 +47,20 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
   }
 
   /**
-   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, BaseEvent)} over the
+   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, CoreEvent)} over the
    * {@link #completionCallback}, using the {@code exception} and {@link #event}
    *
    * @param exception a {@link Throwable}
-   * @return a response {@link BaseEvent}
+   * @return a response {@link CoreEvent}
    */
   @Override
   public void onException(Throwable exception) {
     MessagingException messagingException = exception instanceof MessagingException ? (MessagingException) exception
         : new MessagingException(event, exception);
-    BaseEvent errorEvent = createErrorEvent(event, messageProcessorContext.getMessageSource(), messagingException,
+    CoreEvent errorEvent = createErrorEvent(event, messageProcessorContext.getMessageSource(), messagingException,
                                             messageProcessorContext.getErrorTypeLocator());
     messagingException.setProcessedEvent(errorEvent);
-    BaseEvent errorHandlingEvent = completionCallback.responseSentWithFailure(messagingException, errorEvent);
+    CoreEvent errorHandlingEvent = completionCallback.responseSentWithFailure(messagingException, errorEvent);
     messagingException.setProcessedEvent(errorHandlingEvent);
     errorResponseHandler.accept(messagingException);
   }

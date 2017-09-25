@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,13 +73,13 @@ public class AbstractBenchmark {
     return builder(FLOW_NAME, muleContext).build();
   }
 
-  public BaseEvent createEvent(Flow flow) {
+  public CoreEvent createEvent(Flow flow) {
     return createEvent(flow, PAYLOAD);
   }
 
-  public BaseEvent createEvent(Flow flow, Object payload) {
+  public CoreEvent createEvent(Flow flow, Object payload) {
     try {
-      return BaseEvent.builder(create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
+      return CoreEvent.builder(create(flow, CONNECTOR_LOCATION)).message(of(payload)).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

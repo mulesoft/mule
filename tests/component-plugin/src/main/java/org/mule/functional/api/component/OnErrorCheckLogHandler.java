@@ -9,7 +9,7 @@ package org.mule.functional.api.component;
 import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -33,7 +33,7 @@ public class OnErrorCheckLogHandler extends AbstractExceptionListener
   }
 
   @Override
-  public BaseEvent handleException(MessagingException exception, BaseEvent event) {
+  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
     exception.setHandled(true);
     String messageToLog = createMessageToLog(exception);
     for (LogChecker checker : this.checkers) {
@@ -55,7 +55,7 @@ public class OnErrorCheckLogHandler extends AbstractExceptionListener
   }
 
   @Override
-  public boolean accept(BaseEvent event) {
+  public boolean accept(CoreEvent event) {
     return true;
   }
 

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import java.util.Map;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.reactivestreams.Publisher;
 
@@ -25,8 +25,8 @@ public interface OperationExecutionFunction {
    *
    * @param parameters the set of parameters required to execute the function.
    * @param operationEvent the event to use for executing the operation.
-   * @return an {@link BaseEvent} as result of the operation execution.
+   * @return an {@link CoreEvent} as result of the operation execution.
    */
-  Publisher<BaseEvent> execute(Map<String, Object> parameters, BaseEvent operationEvent);
+  Publisher<CoreEvent> execute(Map<String, Object> parameters, CoreEvent operationEvent);
 
 }

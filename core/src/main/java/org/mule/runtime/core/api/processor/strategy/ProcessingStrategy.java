@@ -10,7 +10,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.processor.Sink;
 public interface ProcessingStrategy {
 
   /**
-   * Creates instances of {@link Sink} to be used for emitting {@link BaseEvent}'s to be processed. Each {@link Sink} should be used
+   * Creates instances of {@link Sink} to be used for emitting {@link CoreEvent}'s to be processed. Each {@link Sink} should be used
    * independent streams that implement the {@link Pipeline}.
    *
    * @param flowConstruct pipeline instance.

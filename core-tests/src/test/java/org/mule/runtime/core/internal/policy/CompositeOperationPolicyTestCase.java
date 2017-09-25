@@ -27,7 +27,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
@@ -54,11 +54,11 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
   private Policy firstPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private Policy secondPolicy = mock(Policy.class, RETURNS_DEEP_STUBS);
   private FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
-  private BaseEvent initialEvent;
-  private BaseEvent firstPolicyProcessorResultEvent;
-  private BaseEvent secondPolicyResultProcessorEvent;
+  private CoreEvent initialEvent;
+  private CoreEvent firstPolicyProcessorResultEvent;
+  private CoreEvent secondPolicyResultProcessorEvent;
   private OperationExecutionFunction operationExecutionFunction = mock(OperationExecutionFunction.class);
-  private BaseEvent nextProcessResultEvent;
+  private CoreEvent nextProcessResultEvent;
 
   private OperationPolicyProcessorFactory operationPolicyProcessorFactory = mock(OperationPolicyProcessorFactory.class);
   private Processor firstPolicyOperationPolicyProcessor = mock(Processor.class);
@@ -69,7 +69,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     initialEvent = createTestEvent();
     firstPolicyProcessorResultEvent = createTestEvent();
     secondPolicyResultProcessorEvent = createTestEvent();
-    nextProcessResultEvent = BaseEvent.builder(createTestEvent()).message(Message.of("HELLO")).build();
+    nextProcessResultEvent = CoreEvent.builder(createTestEvent()).message(Message.of("HELLO")).build();
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
     when(operationExecutionFunction.execute(any(), any())).thenAnswer(invocationOnMock -> just(nextProcessResultEvent));
     when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyProcessorResultEvent));
@@ -98,7 +98,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
                                                             operationPolicyParametersTransformer, operationPolicyProcessorFactory,
                                                             operationParametersProcessor, operationExecutionFunction);
 
-    BaseEvent result = from(compositeOperationPolicy.process(initialEvent))
+    CoreEvent result = from(compositeOperationPolicy.process(initialEvent))
         .doOnNext(event1 -> System.out.println("FINAL " + event1.getMessage().getPayload().getValue())).block();
 
     assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
@@ -113,7 +113,7 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
                                                             operationPolicyParametersTransformer, operationPolicyProcessorFactory,
                                                             operationParametersProcessor, operationExecutionFunction);
 
-    BaseEvent result = from(compositeOperationPolicy.process(initialEvent)).block();
+    CoreEvent result = from(compositeOperationPolicy.process(initialEvent)).block();
     assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), same(initialEvent));
     verify(operationPolicyProcessorFactory).createOperationPolicy(same(firstPolicy), any());
@@ -164,8 +164,8 @@ public class CompositeOperationPolicyTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private BaseEvent createTestEvent() {
-    return BaseEvent.builder(create(mockFlowConstruct, fromSingleComponent("http"))).message(Message.of(null)).build();
+  private CoreEvent createTestEvent() {
+    return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http"))).message(Message.of(null)).build();
   }
 
 }

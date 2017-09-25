@@ -10,7 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
 
   @Test
   public void testSetPayloadUsingContent() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testSetPayloadUsingContent").run();
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingContent").run();
     final Object value = muleEvent.getMessage().getPayload().getValue();
     assertThat(value, instanceOf(String.class));
     assertThat(value, is("smart connector content"));
@@ -36,14 +36,14 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
 
   @Test
   public void testSetPayloadUsingContentAndSimpleParameter() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testSetPayloadUsingContentAndSimpleParameter").run();
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingContentAndSimpleParameter").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("attribute value:[value from attribute], value of content (accessing map under key smart):[smart connector content]"));
   }
 
   @Test
   public void testSetPayloadUsingPrimary() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testSetPayloadUsingPrimary").run();
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingPrimary").run();
     final Object value = muleEvent.getMessage().getPayload().getValue();
     assertThat(value, instanceOf(String.class));
     assertThat(value, is("smart connector primary"));
@@ -51,7 +51,7 @@ public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunct
 
   @Test
   public void testSetPayloadUsingContentAndPrimaryAndSimpleParameter() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testSetPayloadUsingContentAndPrimaryAndSimpleParameter").run();
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingContentAndPrimaryAndSimpleParameter").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),
                is("attribute value:[value from attribute], value of content:[smart connector content], value of primary:[smart connector primary]"));
   }

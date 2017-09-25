@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.message.GroupCorrelation.of;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
@@ -37,13 +37,13 @@ public class MessageChunkSplitter extends AbstractSplitter {
   }
 
   @Override
-  protected boolean isSplitRequired(BaseEvent event) {
+  protected boolean isSplitRequired(CoreEvent event) {
     return messageSize != 0;
   }
 
   @Override
-  protected List<?> splitMessage(BaseEvent event) throws RoutingException {
-    List<BaseEvent> messageParts = new ArrayList<>();
+  protected List<?> splitMessage(CoreEvent event) throws RoutingException {
+    List<CoreEvent> messageParts = new ArrayList<>();
     byte[] data;
     try {
       data = ((InternalEvent) event).getMessageAsBytes(muleContext);
@@ -67,7 +67,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final BaseEvent childEvent = BaseEvent.builder(event).message(Message.builder(message).value(buffer).build())
+      final CoreEvent childEvent = CoreEvent.builder(event).message(Message.builder(message).value(buffer).build())
           .groupCorrelation(Optional.of(of(count, parts))).build();
 
       messageParts.add(childEvent);

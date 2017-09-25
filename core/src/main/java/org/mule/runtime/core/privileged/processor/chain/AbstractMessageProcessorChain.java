@@ -30,7 +30,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -80,14 +80,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = resolveInterceptors();
-    Flux<BaseEvent> stream = from(publisher);
+    Flux<CoreEvent> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
@@ -119,7 +119,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(event -> setCurrentEvent(event))
-        .cast(BaseEvent.class)
+        .cast(CoreEvent.class)
         .transform(next));
 
     // #3 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
@@ -131,7 +131,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .add((processor, next) -> processingStrategy.onProcessor(new ReactiveProcessor() {
 
             @Override
-            public Publisher<BaseEvent> apply(Publisher<BaseEvent> eventPublisher) {
+            public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPublisher) {
               return next.apply(eventPublisher);
             }
 
@@ -147,18 +147,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .transform(next)
         .cast(PrivilegedEvent.class)
         .doOnNext(result -> setCurrentEvent(result))
-        .cast(BaseEvent.class));
+        .cast(CoreEvent.class));
 
     // #5 Fire MessageProcessor notifications before and after processor execution.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
-        .cast(BaseEvent.class)
+        .cast(CoreEvent.class)
         .transform(next)
         .cast(PrivilegedEvent.class)
         .doOnNext(postNotification(processor))
         .doOnError(MessagingException.class, errorNotification(processor))
-        .cast(BaseEvent.class));
+        .cast(CoreEvent.class));
 
     // #6 If the processor returns a CursorProvider, then have the StreamingManager manage it
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -186,7 +186,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return interceptors;
   }
 
-  private MessagingException resolveException(Component processor, BaseEvent event, Throwable throwable) {
+  private MessagingException resolveException(Component processor, CoreEvent event, Throwable throwable) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
   }
@@ -228,7 +228,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, BaseEvent event, Processor processor,
+  private void fireNotification(ServerNotificationManager serverNotificationManager, CoreEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {

@@ -24,7 +24,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -129,7 +129,7 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
   @Test
   @Description("Rewing a stream and consume it twice")
   public void rewind() throws Exception {
-    BaseEvent result = flowRunner("rewind").withPayload(data).run();
+    CoreEvent result = flowRunner("rewind").withPayload(data).run();
     Message firstRead = (Message) result.getVariables().get("firstRead").getValue();
     Message secondRead = (Message) result.getVariables().get("secondRead").getValue();
 
@@ -153,7 +153,7 @@ public class BytesStreamingExtensionTestCase extends AbstractStreamingExtensionT
 
   private void doSeek(String flowName) throws Exception {
     final int position = 10;
-    BaseEvent result = flowRunner(flowName)
+    CoreEvent result = flowRunner(flowName)
         .withPayload(data)
         .withVariable("position", position)
         .run();

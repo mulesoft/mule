@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.slf4j.Logger;
@@ -32,11 +32,11 @@ public class TestReceiver implements Processor, MuleContextAware {
   protected AtomicInteger count = new AtomicInteger(0);
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     try {
       final Message message = event.getMessage();
 
-      return BaseEvent.builder(event)
+      return CoreEvent.builder(event)
           .message(Message.builder(message)
               .value(receive(muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
                   .getValue().toString()))

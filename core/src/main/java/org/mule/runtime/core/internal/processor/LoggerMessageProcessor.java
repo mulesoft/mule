@@ -15,7 +15,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 
@@ -55,14 +55,14 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     return withCursoredEvent(event, cursored -> {
       log(cursored);
       return event;
     });
   }
 
-  protected void log(BaseEvent event) {
+  protected void log(CoreEvent event) {
     if (event == null) {
       logWithLevel(null);
     } else {

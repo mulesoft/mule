@@ -8,14 +8,14 @@
 package org.foo.echo;
 
 import org.mule.functional.api.component.EventCallback;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.MuleContext;
 
 import org.bar.BarUtils;
 
 public class Plugin2Echo implements EventCallback{
 
-  public void eventReceived(BaseEvent event, Object component, MuleContext muleContext) throws Exception {
+  public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
     new BarUtils().doStuff();
   }
 }

@@ -15,7 +15,7 @@ import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessi
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -99,7 +99,7 @@ class TransactionAwareProactorStreamProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected Consumer<BaseEvent> createOnEventConsumer() {
+    protected Consumer<CoreEvent> createOnEventConsumer() {
       // Do nothing given event should still be processed when transaction is active
       return event -> {
       };

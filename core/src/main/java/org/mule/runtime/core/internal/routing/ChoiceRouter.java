@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 
@@ -25,7 +25,7 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
   private MuleContext muleContext;
 
   @Override
-  protected Optional<Processor> selectProcessor(BaseEvent event) {
+  protected Optional<Processor> selectProcessor(CoreEvent event) {
     return getConditionalMessageProcessors().stream()
         .filter(cmp -> muleContext.getExpressionManager().evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
         .findFirst()
@@ -33,7 +33,7 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
   }
 
   @Override
-  protected Processor getProcessorToRoute(BaseEvent event) throws RoutePathNotFoundException {
+  protected Processor getProcessorToRoute(CoreEvent event) throws RoutePathNotFoundException {
     try {
       return super.getProcessorToRoute(event);
     } catch (RoutePathNotFoundException e) {

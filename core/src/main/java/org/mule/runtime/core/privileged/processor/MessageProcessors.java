@@ -9,7 +9,7 @@ package org.mule.runtime.core.privileged.processor;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.api.event.BaseEvent.builder;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static reactor.core.publisher.Mono.from;
@@ -20,7 +20,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -79,11 +79,11 @@ public class MessageProcessors {
 
   /**
    * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
-   * a {@link BaseEvent} result is available or throws an exception in the case of an error. This is currently used widely to
-   * continue to support the blocking {@link Processor#process(BaseEvent)} API when the implementation of a {@link Processor} is
+   * a {@link CoreEvent} result is available or throws an exception in the case of an error. This is currently used widely to
+   * continue to support the blocking {@link Processor#process(CoreEvent)} API when the implementation of a {@link Processor} is
    * implemented via {@link ReactiveProcessor#apply(Object)}.
    * <p>
-   * The {@link BaseEvent} returned by this method will <b>not</b> be completed with a {@link BaseEvent} or {@link Throwable}
+   * The {@link CoreEvent} returned by this method will <b>not</b> be completed with a {@link CoreEvent} or {@link Throwable}
    * unless the delegate {@link Processor} does this.
    *
    * TODO MULE-13054 Remove blocking processor API
@@ -93,17 +93,17 @@ public class MessageProcessors {
    * @return result event
    * @throws MuleException if an error occurs
    */
-  public static BaseEvent processToApply(BaseEvent event, ReactiveProcessor processor) throws MuleException {
+  public static CoreEvent processToApply(CoreEvent event, ReactiveProcessor processor) throws MuleException {
     return processToApply(event, processor, false);
   }
 
   /**
    * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
-   * a {@link BaseEvent} result is available or throws an exception in the case of an error. This is currently used widely to
-   * continue to support the blocking {@link Processor#process(BaseEvent)} API when the implementation of a {@link Processor} is
+   * a {@link CoreEvent} result is available or throws an exception in the case of an error. This is currently used widely to
+   * continue to support the blocking {@link Processor#process(CoreEvent)} API when the implementation of a {@link Processor} is
    * implemented via {@link ReactiveProcessor#apply(Object)}.
    * <p>
-   * The {@link BaseEvent} returned by this method will be completed with a {@link BaseEvent} or {@link Throwable} if
+   * The {@link CoreEvent} returned by this method will be completed with a {@link CoreEvent} or {@link Throwable} if
    * {@code completeContext} is {@code true}.
    *
    * TODO MULE-13054 Remove blocking processor API
@@ -113,7 +113,7 @@ public class MessageProcessors {
    * @return result event
    * @throws MuleException if an error occurs
    */
-  public static BaseEvent processToApply(BaseEvent event, ReactiveProcessor processor, boolean completeContext)
+  public static CoreEvent processToApply(CoreEvent event, ReactiveProcessor processor, boolean completeContext)
       throws MuleException {
     try {
       return just(event)
@@ -130,8 +130,8 @@ public class MessageProcessors {
 
   /**
    * Adapt a {@link ReactiveProcessor} that implements {@link ReactiveProcessor#apply(Object)} to a blocking API that blocks until
-   * a {@link BaseEvent} result is available or throws an exception in the case of an error. This method differs from
-   * {@link #processToApply(BaseEvent, ReactiveProcessor)} in that processing will be scoped using a child {@link EventContext}
+   * a {@link CoreEvent} result is available or throws an exception in the case of an error. This method differs from
+   * {@link #processToApply(CoreEvent, ReactiveProcessor)} in that processing will be scoped using a child {@link EventContext}
    * such that completion of the {@link EventContext} in the delegate {@link Processor} does not complete the original
    * {@link EventContext}.
    *
@@ -140,7 +140,7 @@ public class MessageProcessors {
    * @return result event
    * @throws MuleException if an error occurs
    */
-  public static BaseEvent processToApplyWithChildContext(BaseEvent event, ReactiveProcessor processor)
+  public static CoreEvent processToApplyWithChildContext(CoreEvent event, ReactiveProcessor processor)
       throws MuleException {
     try {
       return just(event)
@@ -154,17 +154,17 @@ public class MessageProcessors {
   }
 
   /**
-   * Process an {@link BaseEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<BaseEvent>} via which
-   * the future {@link BaseEvent} or {@link Throwable} will be published.
+   * Process an {@link CoreEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<BaseEvent>} via which
+   * the future {@link CoreEvent} or {@link Throwable} will be published.
    * <p/>
-   * The {@link BaseEvent} returned by this method <b>will</b> be completed with the same {@link BaseEvent} instance and if an
+   * The {@link CoreEvent} returned by this method <b>will</b> be completed with the same {@link CoreEvent} instance and if an
    * error occurs during processing the {@link EventContext} will be completed with the error.
    *
    * @param event event to process
    * @param processor processor to use
    * @return future result
    */
-  public static Publisher<BaseEvent> process(BaseEvent event, ReactiveProcessor processor) {
+  public static Publisher<CoreEvent> process(CoreEvent event, ReactiveProcessor processor) {
     return just(event).transform(processor)
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
         .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
@@ -180,13 +180,13 @@ public class MessageProcessors {
    * @param componentLocation
    * @return the future result of processing processor.
    */
-  public static Publisher<BaseEvent> processWithChildContext(BaseEvent event, ReactiveProcessor processor,
+  public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation) {
     return internalProcessWithChildContext(event, processor,
                                            child(((BaseEventContext) event.getContext()), componentLocation), true);
   }
 
-  public static Publisher<BaseEvent> processWithChildContext(BaseEvent event, ReactiveProcessor processor,
+  public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              BaseEventContext childContext) {
     return internalProcessWithChildContext(event, processor, childContext, true);
   }
@@ -204,7 +204,7 @@ public class MessageProcessors {
    * @param exceptionHandler used to handle {@link MessagingException}'s.
    * @return the future result of processing processor.
    */
-  public static Publisher<BaseEvent> processWithChildContext(BaseEvent event, ReactiveProcessor processor,
+  public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation,
                                                              MessagingExceptionHandler exceptionHandler) {
     return internalProcessWithChildContext(event, processor,
@@ -213,7 +213,7 @@ public class MessageProcessors {
                                            true);
   }
 
-  private static Publisher<BaseEvent> internalProcessWithChildContext(BaseEvent event, ReactiveProcessor processor,
+  private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       EventContext child, boolean completeParentOnEmpty) {
     return just(builder(child, event).build())
         .transform(processor)
@@ -229,7 +229,7 @@ public class MessageProcessors {
         });
   }
 
-  private static Consumer<BaseEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
+  private static Consumer<CoreEvent> completeSuccessIfNeeded(EventContext child, boolean complete) {
     return result -> {
       if (!(from(((BaseEventContext) child).getResponsePublisher()).toFuture().isDone()) && complete) {
         ((BaseEventContext) child).success(result);

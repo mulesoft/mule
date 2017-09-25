@@ -17,7 +17,7 @@ import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -69,7 +69,7 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
     DateTime dateTime = new DateTime(calendar, locale);
     dateTime.changeTimeZone("Pacific/Midway");
 
-    BaseEvent event = eventBuilder().message(of(dateTime)).build();
+    CoreEvent event = eventBuilder().message(of(dateTime)).build();
     byte[] bytes = serializationProtocol.serialize(event.getMessage());
 
     InternalMessage message = serializationProtocol.deserialize(bytes);

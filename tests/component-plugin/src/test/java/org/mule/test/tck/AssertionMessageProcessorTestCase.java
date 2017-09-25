@@ -24,7 +24,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -47,7 +47,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   protected MuleContext muleContext;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  protected BaseEvent mockEvent;
+  protected CoreEvent mockEvent;
 
   @Mock
   protected InternalMessage muleMessage;
@@ -58,11 +58,11 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     expressionManager = mock(ExtendedExpressionManager.class);
     when(expressionManager.isValid(anyString())).thenReturn(true);
     when(expressionManager.validate(anyString())).thenReturn(success());
-    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(BaseEvent.class), any(ComponentLocation.class),
+    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(CoreEvent.class), any(ComponentLocation.class),
                                            anyBoolean(),
                                            anyBoolean()))
                                                .thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(BaseEvent.class), any(ComponentLocation.class),
+    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(CoreEvent.class), any(ComponentLocation.class),
                                            anyBoolean(),
                                            anyBoolean()))
                                                .thenReturn(false);

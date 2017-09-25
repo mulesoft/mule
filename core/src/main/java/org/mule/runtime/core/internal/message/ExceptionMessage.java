@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class ExceptionMessage implements Serializable {
   private String connectorName;
   private Date timeStamp;
 
-  public ExceptionMessage(BaseEvent event, Throwable exception, String componentName, String connectorName) {
+  public ExceptionMessage(CoreEvent event, Throwable exception, String componentName, String connectorName) {
     this.payload = event.getMessage().getPayload().getValue();
     properties = new HashMap<>();
     this.exception = exception;

@@ -19,7 +19,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
 import org.junit.Before;
@@ -28,9 +28,9 @@ import org.mockito.ArgumentCaptor;
 
 public class PayloadTestCase extends AbstractELTestCase {
 
-  private BaseEvent event;
+  private CoreEvent event;
   private Message message;
-  private BaseEvent.Builder eventBuilder;
+  private CoreEvent.Builder eventBuilder;
 
   public PayloadTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -40,7 +40,7 @@ public class PayloadTestCase extends AbstractELTestCase {
   public void setup() throws MuleException {
     message = mock(InternalMessage.class);
     event = getEventBuilder().message(message).build();
-    eventBuilder = spy(BaseEvent.builder(event));
+    eventBuilder = spy(CoreEvent.builder(event));
   }
 
   @Test

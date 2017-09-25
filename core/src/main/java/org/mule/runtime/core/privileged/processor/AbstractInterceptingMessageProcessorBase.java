@@ -14,7 +14,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -56,7 +56,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
 
   protected Processor next;
 
-  protected BaseEvent processNext(BaseEvent event) throws MuleException {
+  protected CoreEvent processNext(CoreEvent event) throws MuleException {
     if (next == null) {
       return event;
     } else if (event == null) {
@@ -81,7 +81,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractC
     return ObjectUtils.toString(this);
   }
 
-  protected boolean isEventValid(BaseEvent event) {
+  protected boolean isEventValid(CoreEvent event) {
     return event != null;
   }
 

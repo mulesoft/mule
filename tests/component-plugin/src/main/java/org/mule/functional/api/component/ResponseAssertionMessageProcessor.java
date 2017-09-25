@@ -23,7 +23,7 @@ import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -66,7 +66,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public BaseEvent process(BaseEvent event) throws MuleException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
     if (event == null) {
       return null;
     }
@@ -74,8 +74,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public Publisher<BaseEvent> apply(Publisher<BaseEvent> publisher) {
-    Flux<BaseEvent> flux = from(publisher).map(event -> {
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    Flux<CoreEvent> flux = from(publisher).map(event -> {
       try {
         return processRequest(event);
       } catch (MuleException e) {
@@ -92,7 +92,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     });
   }
 
-  private BaseEvent processRequest(BaseEvent event) throws MuleException {
+  private CoreEvent processRequest(CoreEvent event) throws MuleException {
     if (taskTokenInThread.get() != null) {
       requestTaskToken = taskTokenInThread.get();
     } else {
@@ -102,7 +102,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return super.process(event);
   }
 
-  private BaseEvent processResponse(BaseEvent event) throws MuleException {
+  private CoreEvent processResponse(CoreEvent event) throws MuleException {
     if (event == null) {
       return event;
     }
@@ -124,7 +124,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return currentThread().getName() + " - " + new UUID().toString();
   }
 
-  private BaseEvent processNext(BaseEvent event) throws MuleException {
+  private CoreEvent processNext(CoreEvent event) throws MuleException {
     if (event != null) {
       return next.process(event);
     } else {

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROP
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -43,13 +43,13 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
   protected transient Map<String, Object> serializedData = null;
 
   @Override
-  public BaseEvent processReplyTo(final BaseEvent event, final Message returnMessage, final Object replyTo)
+  public CoreEvent processReplyTo(final CoreEvent event, final Message returnMessage, final Object replyTo)
       throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("sending reply to: " + replyTo);
     }
 
-    return BaseEvent.builder(event)
+    return CoreEvent.builder(event)
         // make sure remove the replyTo property as not cause a a forever replyto loop
         .removeVariable(MULE_REPLY_TO_PROPERTY)
         // MULE-4617. This is fixed with MULE-4620, but lets remove this property anyway as it should never be true from a replyTo

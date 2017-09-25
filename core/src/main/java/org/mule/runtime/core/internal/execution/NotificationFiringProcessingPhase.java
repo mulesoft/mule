@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   protected MuleContext muleContext;
 
-  protected void fireNotification(Component source, BaseEvent event, FlowConstruct flow, int action) {
+  protected void fireNotification(Component source, CoreEvent event, FlowConstruct flow, int action) {
     try {
       if (event == null) {
         // Null result only happens when there's a filter in the chain.

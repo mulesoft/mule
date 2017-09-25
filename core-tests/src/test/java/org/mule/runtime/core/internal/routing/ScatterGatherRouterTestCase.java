@@ -33,7 +33,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -71,7 +71,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("RoutingPairs are created for each route configured. Each RoutingPair has the same input event.")
   public void routingPairs() throws Exception {
-    BaseEvent event = mock(BaseEvent.class);
+    CoreEvent event = mock(CoreEvent.class);
     MessageProcessorChain route1 = mock(MessageProcessorChain.class);
     MessageProcessorChain route2 = mock(MessageProcessorChain.class);
     MessageProcessorChain route3 = mock(MessageProcessorChain.class);
@@ -88,7 +88,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Test
   @Description("By default the router result populates the outgoing message payload.")
   public void defaultTarget() throws Exception {
-    BaseEvent original = testEvent();
+    CoreEvent original = testEvent();
     MessageProcessorChain route1 = newChain(empty(), event -> event);
     MessageProcessorChain route2 = newChain(empty(), event -> event);
 
@@ -109,7 +109,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   public void customTargetMessage() throws Exception {
     final String variableName = "foo";
 
-    BaseEvent original = testEvent();
+    CoreEvent original = testEvent();
     MessageProcessorChain route1 = newChain(empty(), event -> event);
     MessageProcessorChain route2 = newChain(empty(), event -> event);
 
@@ -133,7 +133,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   public void customTargetDefaultPayload() throws Exception {
     final String variableName = "foo";
 
-    BaseEvent original = testEvent();
+    CoreEvent original = testEvent();
     MessageProcessorChain route1 = newChain(empty(), event -> event);
     MessageProcessorChain route2 = newChain(empty(), event -> event);
 
@@ -202,7 +202,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
 
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expectCause(instanceOf(MuleRuntimeException.class));
-    router.process(BaseEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
+    router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
   }
 
   @Test

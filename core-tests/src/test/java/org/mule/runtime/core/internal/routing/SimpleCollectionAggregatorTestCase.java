@@ -19,7 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -58,17 +58,17 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    BaseEvent event1 =
+    CoreEvent event1 =
         InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3)))
             .flow(flow)
             .build();
-    BaseEvent event2 = InternalEvent.builder(executionContext).message(message2).flow(flow).build();
-    BaseEvent event3 = InternalEvent.builder(executionContext).message(message3).flow(flow).build();
+    CoreEvent event2 = InternalEvent.builder(executionContext).message(message2).flow(flow).build();
+    CoreEvent event3 = InternalEvent.builder(executionContext).message(message3).flow(flow).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
 
-    BaseEvent resultEvent = router.process(event3);
+    CoreEvent resultEvent = router.process(event3);
 
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
@@ -102,12 +102,12 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     BaseEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
     Message message1 = of("test event A");
 
-    BaseEvent event1 =
+    CoreEvent event1 =
         InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 1)))
             .flow(flow)
             .build();
 
-    BaseEvent resultEvent = router.process(event1);
+    CoreEvent resultEvent = router.process(event1);
 
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
@@ -145,19 +145,19 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     Message messageCollection1 = Message.of(list);
     Message messageCollection2 = Message.of(list2);
 
-    BaseEvent event1 =
+    CoreEvent event1 =
         InternalEvent.builder(executionContext).message(messageCollection1)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
             .flow(flow)
             .build();
-    BaseEvent event2 =
+    CoreEvent event2 =
         InternalEvent.builder(executionContext).message(messageCollection2)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
             .flow(flow)
             .build();
 
     assertNull(router.process(event1));
-    BaseEvent resultEvent = router.process(event2);
+    CoreEvent resultEvent = router.process(event2);
     assertNotNull(resultEvent);
     Message resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);

@@ -11,7 +11,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 
@@ -40,7 +40,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link BaseEvent} or
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
@@ -49,13 +49,13 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event) throws ExpressionRuntimeException;
+  TypedValue evaluate(String expression, CoreEvent event) throws ExpressionRuntimeException;
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link BaseEvent} or
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
@@ -65,14 +65,14 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation)
+  TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException;
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link BaseEvent} or
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
@@ -82,7 +82,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event, BindingContext context) throws ExpressionRuntimeException;
+  TypedValue evaluate(String expression, CoreEvent event, BindingContext context) throws ExpressionRuntimeException;
 
   /**
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
@@ -90,7 +90,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * expression when executed. Variable provided in the map will only be available if there are no conflict with context variables
    * provided by the expression language implementation.
    * <p>
-   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link BaseEvent} or
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link CoreEvent} or
    * {@link InternalMessage} mutation performed within the expression will impact within the context of expression evaluation but
    * will not mutated the {@code event} parameter.
    *
@@ -101,7 +101,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation, BindingContext context)
+  TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation, BindingContext context)
       throws ExpressionRuntimeException;
 
   /**
@@ -118,7 +118,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
 
   /**
    * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
-   * result and an {@link BaseEvent}.
+   * result and an {@link CoreEvent}.
    *
    * @param expression the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
@@ -128,12 +128,12 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
    */
-  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, BaseEvent event)
+  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, CoreEvent event)
       throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression according to a given {@link BindingContext}, the global one, the {@link DataType} of the expected
-   * result and an {@link BaseEvent}.
+   * result and an {@link CoreEvent}.
    *
    * @param expression the EL expression
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
@@ -145,7 +145,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of the expression plus its type
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression or during transformation
    */
-  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, BaseEvent event,
+  TypedValue evaluate(String expression, DataType expectedOutputType, BindingContext context, CoreEvent event,
                       ComponentLocation componentLocation, boolean failOnNull)
       throws ExpressionRuntimeException;
 
@@ -154,31 +154,31 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * {@code null}, {@code false} will be returned.
    *
    * @param expression a single expression to be evaluated and transformed
-   * @param event the {@link BaseEvent} to consider
+   * @param event the {@link CoreEvent} to consider
    * @param componentLocation the location of the component where the event is being processed
    * @return {@link true} if the expression evaluated to that or "true", false otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  boolean evaluateBoolean(String expression, BaseEvent event, ComponentLocation componentLocation)
+  boolean evaluateBoolean(String expression, CoreEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression considering a {@code boolean} as output.
    *
    * @param expression a single expression to be evaluated and transformed
-   * @param event the {@link BaseEvent} to consider
+   * @param event the {@link CoreEvent} to consider
    * @param componentLocation the location of the component where the event is being processed
    * @param nullReturnsTrue whether or not a {@link null} outcome should be considered a {@link true}
    * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@link true}
    * @return {@link true} if the expression evaluated to that, "true" or the above flags where considered, {@link false} otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  boolean evaluateBoolean(String expression, BaseEvent event, ComponentLocation componentLocation, boolean nullReturnsTrue,
+  boolean evaluateBoolean(String expression, CoreEvent event, ComponentLocation componentLocation, boolean nullReturnsTrue,
                           boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException;
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, an {@link BaseEvent} and a flowName.
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a flowName.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed
@@ -187,13 +187,13 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, BaseEvent event, ComponentLocation componentLocation,
+  Iterator<TypedValue<?>> split(String expression, CoreEvent event, ComponentLocation componentLocation,
                                 BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, an {@link BaseEvent}.
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent}.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed
@@ -201,7 +201,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, BaseEvent event, BindingContext bindingContext)
+  Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
 }

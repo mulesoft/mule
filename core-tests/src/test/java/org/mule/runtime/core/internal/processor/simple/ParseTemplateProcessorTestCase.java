@@ -18,7 +18,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -37,7 +37,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   private static final String INVALID_LOCATION = "wrong_error.html";
 
   private ParseTemplateProcessor parseTemplateProcessor;
-  private BaseEvent event;
+  private CoreEvent event;
   private InternalMessage mockMuleMessage = mock(InternalMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
@@ -97,7 +97,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
     when(mockExpressionManager.parse(expectedExpression, event, null)).thenReturn("Parsed");
 
-    BaseEvent response = parseTemplateProcessor.process(event);
+    CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals("Parsed", response.getMessage().getPayload().getValue());
 
@@ -117,7 +117,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
     when(mockExpressionManager.parse(template, event, null)).thenReturn(template);
 
-    BaseEvent response = parseTemplateProcessor.process(event);
+    CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals(template, response.getMessage().getPayload().getValue());
 
@@ -139,7 +139,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getAttributes()).thenReturn(TypedValue.of(new HashMap<>()));
     when(mockExpressionManager.parse(any(), any(), any())).thenReturn("Parsed");
 
-    BaseEvent response = parseTemplateProcessor.process(event);
+    CoreEvent response = parseTemplateProcessor.process(event);
     assertNotNull(response);
     assertEquals(payload, response.getMessage().getPayload().getValue());
     assertEquals("Parsed",

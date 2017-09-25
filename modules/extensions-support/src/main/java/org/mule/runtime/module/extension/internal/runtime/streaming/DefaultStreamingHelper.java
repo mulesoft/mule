@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -32,18 +32,18 @@ public class DefaultStreamingHelper implements StreamingHelper {
 
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
-  private final BaseEvent event;
+  private final CoreEvent event;
 
   /**
    * Creates a new instance
    *
    * @param cursorProviderFactory the {@link CursorProviderFactory} configured on the executing component
    * @param streamingManager      the application's {@link StreamingManager}
-   * @param event                 the {@link BaseEvent} being currently executed
+   * @param event                 the {@link CoreEvent} being currently executed
    */
   public DefaultStreamingHelper(CursorProviderFactory cursorProviderFactory,
                                 StreamingManager streamingManager,
-                                BaseEvent event) {
+                                CoreEvent event) {
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.event = event;

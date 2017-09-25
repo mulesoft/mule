@@ -13,13 +13,13 @@ import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.Iterator;
 
 /**
- * Binds Mule Core concepts {@link BaseEvent} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
+ * Binds Mule Core concepts {@link CoreEvent} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
  *
  * @since 4.0
  */
@@ -35,7 +35,7 @@ public interface ExpressionLanguageAdaptor {
   void addGlobalBindings(BindingContext bindingContext);
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, an {@link BaseEvent} and a {@link FlowConstruct}.
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a {@link FlowConstruct}.
    *
    * @param expression the expression to be executed
    * @param event the current event being processed
@@ -44,7 +44,7 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event, ComponentLocation componentLocation, BindingContext bindingContext)
+  TypedValue evaluate(String expression, CoreEvent event, ComponentLocation componentLocation, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
   /**
@@ -55,7 +55,7 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, BaseEvent event, BindingContext context) throws ExpressionRuntimeException;
+  TypedValue evaluate(String expression, CoreEvent event, BindingContext context) throws ExpressionRuntimeException;
 
   /**
    * Evaluates an expression according to a given {@link BindingContext} and outputs .
@@ -67,11 +67,11 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event, BindingContext context)
+  TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, BindingContext context)
       throws ExpressionRuntimeException;
 
   /**
-   * Evaluates an expression according to a given {@link BindingContext}, an {@link BaseEvent} and a {@link FlowConstruct}.
+   * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a {@link FlowConstruct}.
    *
    * @param expression the expression to be executed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
@@ -83,7 +83,7 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  TypedValue evaluate(String expression, DataType expectedOutputType, BaseEvent event, ComponentLocation componentLocation,
+  TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, ComponentLocation componentLocation,
                       BindingContext context,
                       boolean failOnNull)
       throws ExpressionRuntimeException;
@@ -107,7 +107,7 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, BaseEvent event, ComponentLocation componentLocation,
+  Iterator<TypedValue<?>> split(String expression, CoreEvent event, ComponentLocation componentLocation,
                                 BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
@@ -121,6 +121,6 @@ public interface ExpressionLanguageAdaptor {
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
-  Iterator<TypedValue<?>> split(String expression, BaseEvent event, BindingContext bindingContext)
+  Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 }

@@ -14,7 +14,7 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
@@ -69,7 +69,7 @@ public class CursorManager {
    * @param creatorEvent the event that created the provider
    * @return a {@link CursorContext}
    */
-  public CursorProvider manage(CursorProvider provider, BaseEvent creatorEvent) {
+  public CursorProvider manage(CursorProvider provider, CoreEvent creatorEvent) {
     final BaseEventContext ownerContext = getRoot(((BaseEventContext) creatorEvent.getContext()));
     registerEventContext(ownerContext);
     registry.getUnchecked(ownerContext.getId()).addProvider(provider);

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
- * Helper class that creates an {@link BaseEvent} maintaining variables from different scopes.
+ * Helper class that creates an {@link CoreEvent} maintaining variables from different scopes.
  *
  * @since 4.0
  */
 public class PolicyEventConverter {
 
   /**
-   * Creates a new {@link BaseEvent} based on a message and another event which is used to get the variables and
+   * Creates a new {@link CoreEvent} based on a message and another event which is used to get the variables and
    * {@link BaseEventContext}
    *
    * @param event provider of the message and session parts of the event

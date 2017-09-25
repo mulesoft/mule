@@ -11,7 +11,7 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -65,19 +65,19 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
     user.put("userId", "somename-id");
     final Map<String, Object> payload = new HashMap<>();
     payload.put("User", user);
-    final BaseEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(payload).run();
+    final CoreEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(payload).run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
   }
 
   @Test
   public void testSendingXsdType1FromExpression() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testIsXsdType1FromExpressionFlow").run();
+    final CoreEvent muleEvent = flowRunner("testIsXsdType1FromExpressionFlow").run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
   }
 
   @Test
   public void testIsXsdType1WithNamespaceFromExpression() throws Exception {
-    final BaseEvent muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
+    final CoreEvent muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE_WITH_NAMESPACE);
   }
 

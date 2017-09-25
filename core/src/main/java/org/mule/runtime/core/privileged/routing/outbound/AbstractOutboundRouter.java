@@ -22,7 +22,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -71,10 +71,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   private Cache<Processor, MessageProcessorChain> processorChainCache = newBuilder().build();
 
   @Override
-  public BaseEvent process(final BaseEvent event) throws MuleException {
-    ExecutionTemplate<BaseEvent> executionTemplate =
+  public CoreEvent process(final CoreEvent event) throws MuleException {
+    ExecutionTemplate<CoreEvent> executionTemplate =
         createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
-    ExecutionCallback<BaseEvent> processingCallback = () -> {
+    ExecutionCallback<CoreEvent> processingCallback = () -> {
       try {
         return route(event);
       } catch (RoutingException e1) {
@@ -92,11 +92,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
   }
 
-  protected abstract BaseEvent route(BaseEvent event) throws MuleException;
+  protected abstract CoreEvent route(CoreEvent event) throws MuleException;
 
-  protected final BaseEvent sendRequest(final BaseEvent event, final Processor route, boolean awaitResponse)
+  protected final CoreEvent sendRequest(final CoreEvent event, final Processor route, boolean awaitResponse)
       throws MuleException {
-    BaseEvent result;
+    CoreEvent result;
     try {
       result = sendRequestEvent(event, route, awaitResponse);
     } catch (MessagingException me) {
@@ -191,14 +191,14 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   /**
    * Send message event to destination.
    */
-  protected BaseEvent sendRequestEvent(BaseEvent event, Processor route, boolean awaitResponse) throws MuleException {
+  protected CoreEvent sendRequestEvent(CoreEvent event, Processor route, boolean awaitResponse) throws MuleException {
     if (route == null) {
       throw new DispatchException(objectIsNull("connector operation"), null);
     }
     return doProcessRoute(route, event);
   }
 
-  protected BaseEvent doProcessRoute(Processor route, BaseEvent event) throws MuleException {
+  protected CoreEvent doProcessRoute(Processor route, CoreEvent event) throws MuleException {
     if (route instanceof MessageProcessorChain) {
       return route.process(event);
     } else {

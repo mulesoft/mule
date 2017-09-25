@@ -16,7 +16,7 @@ import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -69,7 +69,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
       Message okMessage = InternalMessage.builder().value("OK").build();
       BaseEventContext context = mock(BaseEventContext.class);
       when(context.getCorrelationId()).thenReturn("1");
-      BaseEvent event = BaseEvent.builder(context).message(okMessage).build();
+      CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
       try {
         event = validator.process(event);
