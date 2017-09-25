@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsErrorNamespace;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -71,7 +74,7 @@ class ExtensionErrorsRegistrant {
     ErrorModel retryExhaustedError = newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, errorExtensionNamespace)
         .withParent(newError(RETRY_EXHAUSTED_ERROR_IDENTIFIER, MULE).build()).build();
 
-    errorTypes.forEach(this::getErrorType);
+    errorTypes.forEach(errorModel -> getErrorType(errorModel, extensionModel));
 
     ExtensionWalker extensionWalker = new IdempotentExtensionWalker() {
 
@@ -79,8 +82,8 @@ class ExtensionErrorsRegistrant {
       protected void onOperation(OperationModel model) {
         if (!errorTypes.isEmpty()) {
           ExceptionMapper.Builder builder = ExceptionMapper.builder();
-          builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel));
-          builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError));
+          builder.addExceptionMapping(ConnectionException.class, getErrorType(connectivityErrorModel, extensionModel));
+          builder.addExceptionMapping(RetryPolicyExhaustedException.class, getErrorType(retryExhaustedError, extensionModel));
 
           String elementName = syntaxResolver.resolve(model).getElementName();
           errorTypeLocator.addComponentExceptionMapper(createIdentifier(elementName, extensionNamespace),
@@ -91,16 +94,22 @@ class ExtensionErrorsRegistrant {
     extensionWalker.walk(extensionModel);
   }
 
-  private ErrorType getErrorType(ErrorModel errorModel) {
+  private ErrorType getErrorType(ErrorModel errorModel, ExtensionModel extensionModel) {
     ComponentIdentifier identifier = createIdentifier(errorModel.getType(), errorModel.getNamespace());
     Optional<ErrorType> optionalError = errorTypeRepository.getErrorType(identifier);
-    return optionalError.orElseGet(() -> createErrorType(errorModel, identifier));
+    return optionalError.orElseGet(() -> createErrorType(errorModel, identifier, extensionModel));
   }
 
-  private ErrorType createErrorType(ErrorModel errorModel, ComponentIdentifier identifier) {
+  private ErrorType createErrorType(ErrorModel errorModel, ComponentIdentifier identifier, ExtensionModel extensionModel) {
     final ErrorType errorType;
+
+    if (identifier.getNamespace().equals(MULE)) {
+      throw new MuleRuntimeException(createStaticMessage(format("The extension [%s] tried to register the [%s] error with [%s] namespace, which is not allowed.",
+                                                                extensionModel.getName(), identifier, MULE)));
+    }
+
     if (errorModel.getParent().isPresent()) {
-      errorType = errorTypeRepository.addErrorType(identifier, getErrorType(errorModel.getParent().get()));
+      errorType = errorTypeRepository.addErrorType(identifier, getErrorType(errorModel.getParent().get(), extensionModel));
     } else {
       errorType = errorTypeRepository.addErrorType(identifier, null);
     }
