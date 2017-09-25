@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.exception;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface ErrorTypeRepository {
@@ -49,6 +50,13 @@ public interface ErrorTypeRepository {
    * @return an {@link Optional} with the corresponding {@link ErrorType} or an empty one
    */
   Optional<ErrorType> getErrorType(ComponentIdentifier errorTypeIdentifier);
+
+  /**
+   * Returns the collection of current error namespaces.
+   *
+   * @return a collection of all present namespaces
+   */
+  Collection<String> getErrorNamespaces();
 
   /**
    * Gets the {@link ErrorType} instance for ANY error type.

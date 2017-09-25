@@ -106,6 +106,7 @@ import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -253,6 +254,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
   private static final String LOG_EXCEPTION = "logException";
+  private static final String RAISE_ERROR = "raise-error";
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
@@ -753,6 +755,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withDefaultValue(valueOf(DEFAULT_POOL_INITIALISATION_POLICY)).build())
         .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
         .build());
+
+    componentBuildingDefinitions
+        .add(baseDefinition.withIdentifier(RAISE_ERROR).withTypeDefinition(fromType(RaiseErrorProcessor.class))
+            .withSetterParameterDefinition("type", fromSimpleParameter("type").build())
+            .withSetterParameterDefinition("description", fromSimpleParameter("description").build()).build());
 
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
     componentBuildingDefinitions.addAll(getIdempotentValidatorsDefinitions());

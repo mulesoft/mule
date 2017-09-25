@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -20,7 +20,7 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
-@Story(EXCEPTION_MAPPINGS)
+@Story(ERROR_MAPPINGS)
 public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String CONNECT_ERROR_MESSAGE = "Could not connect.";

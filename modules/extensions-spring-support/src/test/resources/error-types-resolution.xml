@@ -23,10 +23,10 @@
 
     <flow name="mapping">
         <petstore:fails-to-read-stream config-ref="invalid-config" content="CONTENT!!!!">
-            <error-mapping sourceType="CONNECTIVITY" targetType="A_MAPPING"/>
+            <error-mapping sourceType="CONNECTIVITY" targetType="APP:A_MAPPING"/>
         </petstore:fails-to-read-stream>
         <error-handler>
-            <on-error-continue type="A_MAPPING">
+            <on-error-continue type="APP:A_MAPPING">
                 <set-payload value="Mapped"/>
             </on-error-continue>
             <on-error-continue>

@@ -3050,6 +3050,35 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="raise-error" type="raiseErrorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Throws an error with the specified type and description.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="raiseErrorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="type" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The error type to raise.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="description" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The description of this error.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 
     <!--==================================-->
     <!-- Routing (1-n) Message Processors  -->

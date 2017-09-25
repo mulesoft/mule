@@ -121,7 +121,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(5));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(6));
     assertThat(coreExtensionModel.getConstructModels(), hasSize(7));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
@@ -214,7 +214,29 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModels.get(2).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(paramModels.get(2).getType(), instanceOf(StringType.class));
     assertThat(paramModels.get(2).isRequired(), is(false));
+  }
 
+  @Test
+  public void raiseError() {
+    final OperationModel raiseErrorModel = coreExtensionModel.getOperationModel("raiseError").get();
+
+    assertThat(raiseErrorModel.getErrorModels(), empty());
+    assertThat(raiseErrorModel.getExecutionType(), is(CPU_LITE));
+
+    assertOutputSameAsInput(raiseErrorModel);
+
+    final List<ParameterModel> paramModels = raiseErrorModel.getAllParameterModels();
+    assertThat(paramModels, hasSize(2));
+
+    assertThat(paramModels.get(0).getName(), is("type"));
+    assertThat(paramModels.get(0).getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(paramModels.get(0).getType(), instanceOf(DefaultStringType.class));
+    assertThat(paramModels.get(0).isRequired(), is(true));
+
+    assertThat(paramModels.get(1).getName(), is("description"));
+    assertThat(paramModels.get(1).getExpressionSupport(), is(SUPPORTED));
+    assertThat(paramModels.get(1).getType(), instanceOf(StringType.class));
+    assertThat(paramModels.get(1).isRequired(), is(false));
   }
 
   @Test

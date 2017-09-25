@@ -19,10 +19,10 @@
     <flow name="multipleMappingsDirectlyFromSmartConnector">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]"/>
         <error-handler>
-            <on-error-continue type="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY">
+            <on-error-continue type="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
-            <on-error-continue type="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION">
+            <on-error-continue type="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION">
                 <set-payload value="Bad expression."/>
             </on-error-continue>
             <on-error-continue>
@@ -33,10 +33,10 @@
 
     <flow name="simpleMapping">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
-            <error-mapping targetType="MY_REQUESTER"/>
+            <error-mapping targetType="APP:MY_REQUESTER"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -47,10 +47,10 @@
 
     <flow name="complexMapping">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
-            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -61,14 +61,14 @@
 
     <flow name="multipleMappings">
         <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
-            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <error-mapping sourceType="SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" targetType="MY_OTHER_ERROR"/>
+            <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
+            <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
-            <on-error-continue type="MY_OTHER_ERROR">
+            <on-error-continue type="APP:MY_OTHER_ERROR">
                 <set-payload value="Bad expression."/>
             </on-error-continue>
             <on-error-continue>
@@ -79,9 +79,9 @@
 
     <flow name="simpleMappingProxy">
         <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
-                                              errorMappingTargetType="MY_REQUESTER"/>
+                                              errorMappingTargetType="APP:MY_REQUESTER"/>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -92,9 +92,9 @@
 
     <flow name="complexMappingProxy">
         <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
-                                              errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"/>
+                                              errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"/>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -105,13 +105,13 @@
 
     <flow name="multipleMappingsProxy">
         <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
-                                              errorMappingTargetType="MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"
-                                              secondErrorMappingTargetType="MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION"/>
+                                              errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"
+                                              secondErrorMappingTargetType="APP:MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION"/>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
-            <on-error-continue type="MY_OTHER_ERROR">
+            <on-error-continue type="APP:MY_OTHER_ERROR">
                 <set-payload value="Bad expression."/>
             </on-error-continue>
             <on-error-continue>

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -76,6 +79,12 @@ public final class CompositeErrorTypeRepository implements ErrorTypeRepository {
       errorType = parentErrorTypeRepository.getErrorType(errorTypeIdentifier);
     }
     return errorType;
+  }
+
+  @Override
+  public Collection<String> getErrorNamespaces() {
+    return concat(parentErrorTypeRepository.getErrorNamespaces().stream(),
+                  childErrorTypeRepository.getErrorNamespaces().stream()).collect(toSet());
   }
 
   /**
