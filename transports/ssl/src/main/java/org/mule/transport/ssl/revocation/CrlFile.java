@@ -6,7 +6,6 @@
  */
 package org.mule.transport.ssl.revocation;
 
-import static org.mule.api.security.tls.TlsConfiguration.getTrustAnchorsFromKeyStore;
 import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.security.tls.RevocationCheck;
@@ -25,7 +24,10 @@ import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
@@ -99,6 +101,22 @@ public class CrlFile implements RevocationCheck
         }
 
         return crlList;
+    }
+
+    private static Set<TrustAnchor> getTrustAnchorsFromKeyStore(KeyStore keyStore) throws GeneralSecurityException
+    {
+        Enumeration<String> aliases = keyStore.aliases();
+        HashSet<TrustAnchor> trustAnchors = new HashSet<>();
+        while (aliases.hasMoreElements())
+        {
+            String alias = aliases.nextElement();
+            if (keyStore.isCertificateEntry(alias))
+            {
+                trustAnchors.add(new TrustAnchor((X509Certificate) keyStore.getCertificate(alias), null));
+            }
+        }
+
+        return trustAnchors;
     }
 
     @Override

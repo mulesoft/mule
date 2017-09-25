@@ -8,13 +8,15 @@ package org.mule.api.security.tls;
 
 import static java.lang.String.format;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.config.i18n.CoreMessages.cannotLoadFromClasspath;
+import static org.mule.config.i18n.CoreMessages.failedToLoad;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
 import org.mule.api.security.TlsDirectTrustStore;
 import org.mule.api.security.TlsIndirectKeyStore;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ArrayUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
@@ -257,7 +259,7 @@ public final class TlsConfiguration
         catch (Exception e)
         {
             throw new CreateException(
-                    CoreMessages.failedToLoad("KeyStore: " + keyStoreName), e, this);
+                    failedToLoad("KeyStore: " + keyStoreName), e, this);
         }
 
         try
@@ -267,7 +269,7 @@ public final class TlsConfiguration
         }
         catch (Exception e)
         {
-            throw new CreateException(CoreMessages.failedToLoad("Key Manager"), e, this);
+            throw new CreateException(failedToLoad("Key Manager"), e, this);
         }
     }
 
@@ -279,7 +281,7 @@ public final class TlsConfiguration
         if (null == is)
         {
             throw new FileNotFoundException(
-                CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+                cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
         }
 
         tempKeyStore.load(is, keyStorePassword.toCharArray());
@@ -332,7 +334,7 @@ public final class TlsConfiguration
         if (revocationEnabled && !REVOCATION_KEYSTORE_ALGORITHM.equalsIgnoreCase(trustManagerAlgorithm))
         {
             String errorText = formatInvalidCrlAlgorithm(getTrustManagerAlgorithm());
-            throw new CreateException(CoreMessages.createStaticMessage(errorText), this);
+            throw new CreateException(createStaticMessage(errorText), this);
         }
 
         try
@@ -353,7 +355,7 @@ public final class TlsConfiguration
         catch (Exception e)
         {
             throw new CreateException(
-                    CoreMessages.failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
+                    failedToLoad("Trust Manager (" + trustManagerAlgorithm + ")"), e, this);
         }
     }
 
@@ -382,7 +384,7 @@ public final class TlsConfiguration
         catch (Exception e)
         {
             throw new CreateException(
-                    CoreMessages.failedToLoad("TrustStore: " + trustStoreName), e, this);
+                    failedToLoad("TrustStore: " + trustStoreName), e, this);
         }
 
         return trustStore;
@@ -404,22 +406,6 @@ public final class TlsConfiguration
         for (Certificate cert : x509Certificates)
         {
             trustAnchors.add(new TrustAnchor((X509Certificate) cert, null));
-        }
-
-        return trustAnchors;
-    }
-
-    public static Set<TrustAnchor> getTrustAnchorsFromKeyStore(KeyStore keyStore) throws GeneralSecurityException
-    {
-        Enumeration<String> aliases = keyStore.aliases();
-        HashSet<TrustAnchor> trustAnchors = new HashSet<>();
-        while (aliases.hasMoreElements())
-        {
-            String alias = aliases.nextElement();
-            if (keyStore.isCertificateEntry(alias))
-            {
-                trustAnchors.add(new TrustAnchor((X509Certificate) keyStore.getCertificate(alias), null));
-            }
         }
 
         return trustAnchors;
