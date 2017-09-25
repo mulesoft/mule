@@ -28,7 +28,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -73,26 +72,26 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalOperationModelDefinitionException.class)
+  @Test(expected = IllegalModelDefinitionException.class)
   public void encodingOperationArgumentWrongType() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "encodingWrongType");
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalOperationModelDefinitionException.class)
+  @Test(expected = IllegalModelDefinitionException.class)
   public void repeatedEncodingOperationArgument() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "repeatedEncoding");
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalOperationModelDefinitionException.class)
+  @Test(expected = IllegalModelDefinitionException.class)
   public void repeatedEncodingOperationArgumentObjectFields() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "argumentWithRepeatedEncodingFields");
     ParameterModel parameterModel = mock(ParameterModel.class);
-    when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class)) ;
+    when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class));
     mockParameters(operationModel, parameterModel);
     validate(extensionModel, validator);
   }
@@ -103,7 +102,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
     when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
     ParameterModel parameterModel = mock(ParameterModel.class);
-    when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class)) ;
+    when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class));
     mockParameters(sourceModel, parameterModel);
 
     mockImplementingType(sourceModel, SourceRepeatedEncoding.class);
@@ -150,7 +149,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     @Parameter
     @Optional
     public String someParameter;
-    
+
     @DefaultEncoding
     private String encoding1;
 
@@ -160,19 +159,19 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static class Operations {
 
-    public void repeatedEncoding(@DefaultEncoding String encoding1, @DefaultEncoding String encoding2){
+    public void repeatedEncoding(@DefaultEncoding String encoding1, @DefaultEncoding String encoding2) {
 
     }
 
-    public void argumentWithRepeatedEncodingFields(RepeatedEncoding encoding){
+    public void argumentWithRepeatedEncodingFields(RepeatedEncoding encoding) {
 
     }
 
-    public void singleEncoding(@DefaultEncoding String encoding1){
+    public void singleEncoding(@DefaultEncoding String encoding1) {
 
     }
 
-    public void encodingWrongType(@DefaultEncoding Integer encoding1){
+    public void encodingWrongType(@DefaultEncoding Integer encoding1) {
 
     }
   }
@@ -184,7 +183,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
     @DefaultEncoding
     private String encoding2;
-    
+
     @Override
     public void onStart(SourceCallback sourceCallback) throws MuleException {
 
@@ -222,8 +221,8 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
   private void withMethod(OperationModel operationModel, String operationName) {
     when(operationModel.getModelProperty(ImplementingMethodModelProperty.class))
-            .thenReturn(getApiMethods(Operations.class).stream()
-                    .filter(m -> m.getName().equals(operationName))
-                    .findFirst().map(ImplementingMethodModelProperty::new));
+        .thenReturn(getApiMethods(Operations.class).stream()
+            .filter(m -> m.getName().equals(operationName))
+            .findFirst().map(ImplementingMethodModelProperty::new));
   }
 }

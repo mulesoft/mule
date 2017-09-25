@@ -390,8 +390,9 @@ public final class ExtensionsTestUtils {
     assertThat(metadataType, is(instanceOf(typeQualifier)));
     getType(metadataType).ifPresent(type -> assertThat(expectedRawType.isAssignableFrom(type), is(true)));
   }
-  
+
   public static void mockImplementingType(EnrichableModel model, Class<?> type) {
-    when(model.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(java.util.Optional.of(new ImplementingTypeModelProperty(type)));
+    when(model.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(java.util.Optional.of(new ImplementingTypeModelProperty(type)));
   }
 }

@@ -1009,10 +1009,10 @@ public final class IntrospectionUtils {
 
       if (!field.getDeclaringClass().isInstance(target)) {
         throw new IllegalConfigurationModelDefinitionException(
-                format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
-                        field.toString(),
-                        annotationClass.getSimpleName(),
-                        target.getClass().getName()));
+                                                               format("field '%s' is annotated with @%s but not defined on an instance of type '%s'",
+                                                                      field.toString(),
+                                                                      annotationClass.getSimpleName(),
+                                                                      target.getClass().getName()));
       }
       new FieldSetter<>(field).set(target, value);
     });
@@ -1029,8 +1029,8 @@ public final class IntrospectionUtils {
       return;
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
-              "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
-              type.getName(), fields.size(), annotationClass));
+                                                       "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
+                                                       type.getName(), fields.size(), annotationClass));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, value);
@@ -1060,7 +1060,7 @@ public final class IntrospectionUtils {
    */
   public static void injectDefaultEncoding(EnrichableModel model, Object target, String encoding) {
     injectFieldFromModelProperty(target, encoding, model.getModelProperty(DefaultEncodingModelProperty.class),
-            DefaultEncoding.class);
+                                 DefaultEncoding.class);
   }
 
   /**
