@@ -9,7 +9,7 @@
 
     <wsdl:types>
         <xsd:schema targetNamespace="http://consumer.ws.module.mule.org/">
-            <xsd:include schemaLocation="included schema@@@***/TestSchema.xsd"/>
+            <xsd:include schemaLocation="included schema/TestSchema.xsd"/>
         </xsd:schema>
     </wsdl:types>
     <wsdl:message name="noParams">
