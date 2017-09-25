@@ -6,7 +6,7 @@
  */
 package org.mule.transport.ssl.revocation;
 
-import static org.mule.api.security.tls.TlsConfiguration.assertNotNull;
+import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.security.tls.RevocationCheck;
 
@@ -51,8 +51,8 @@ public class CustomOcspResponder implements RevocationCheck
     @Override
     public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
-        assertNotNull(url, "tls:custom-ocsp-responder requires the 'url' attribute");
-        assertNotNull(trustStore, "tls:custom-ocsp-responder requires a trust store");
+        checkArgument(url != null, "tls:custom-ocsp-responder requires the 'url' attribute");
+        checkArgument(trustStore != null, "tls:custom-ocsp-responder requires a trust store");
 
         try
         {

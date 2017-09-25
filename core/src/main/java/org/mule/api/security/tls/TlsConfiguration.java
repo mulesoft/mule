@@ -8,6 +8,7 @@ package org.mule.api.security.tls;
 
 import static java.lang.String.format;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.TlsDirectKeyStore;
@@ -233,10 +234,10 @@ public final class TlsConfiguration
     {
         if (!anon)
         {
-            assertNotNull(getKeyStore(), "The KeyStore location cannot be null");
-            assertNotNull(getKeyPassword(), "The Key password cannot be null");
-            assertNotNull(getKeyStorePassword(), "The KeyStore password cannot be null");
-            assertNotNull(getKeyManagerAlgorithm(), "The Key Manager Algorithm cannot be null");
+            checkArgument(getKeyStore() != null, "The KeyStore location cannot be null");
+            checkArgument(getKeyPassword() != null, "The Key password cannot be null");
+            checkArgument(getKeyStorePassword() != null, "The KeyStore password cannot be null");
+            checkArgument(getKeyManagerAlgorithm() != null, "The Key Manager Algorithm cannot be null");
         }
     }
 
@@ -422,14 +423,6 @@ public final class TlsConfiguration
         }
 
         return trustAnchors;
-    }
-
-    public static void assertNotNull(Object value, String message)
-    {
-        if (null == value)
-        {
-            throw new IllegalArgumentException(message);
-        }
     }
 
     public static String defaultForNull(String value, String deflt)

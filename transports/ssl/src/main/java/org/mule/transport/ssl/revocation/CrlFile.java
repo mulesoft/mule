@@ -6,8 +6,8 @@
  */
 package org.mule.transport.ssl.revocation;
 
-import static org.mule.api.security.tls.TlsConfiguration.assertNotNull;
 import static org.mule.api.security.tls.TlsConfiguration.getTrustAnchorsFromKeyStore;
+import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.security.tls.RevocationCheck;
 import org.mule.util.IOUtils;
@@ -52,8 +52,8 @@ public class CrlFile implements RevocationCheck
     @Override
     public ManagerFactoryParameters configFor(KeyStore trustStore, Set<TrustAnchor> defaultTrustAnchors)
     {
-        assertNotNull(path, "tls:crl-file requires the 'path' attribute");
-        assertNotNull(trustStore, "tls:crl-file requires a trust store");
+        checkArgument(path != null, "tls:crl-file requires the 'path' attribute");
+        checkArgument(trustStore != null, "tls:crl-file requires a trust store");
 
         try
         {
