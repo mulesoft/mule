@@ -1,0 +1,12 @@
+{
+  "op-declares-output": {
+    "output": {
+      "format": "json",
+      "type": "Binary"
+    },
+    "outputAttributes": {
+      "format": "xml",
+      "type": "Number"
+    }
+  }
+}

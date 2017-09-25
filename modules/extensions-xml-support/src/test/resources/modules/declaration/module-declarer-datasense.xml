@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-declarer-datasense"
+
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <!-- The idea of the whole module is to show that despite declaring specific types of an output or attributes, if the
+    datasense propagation defines a declaration, that declared type (calculated) will be picked up instead of the one defined
+    in the XML module document -->
+    <operation name="op-declares-output">
+        <parameters>
+            <parameter name="aParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="string" doc:description="Documentation for the output [op-declares-output]"/>
+    </operation>
+
+    <operation name="op-declares-attributes">
+        <parameters>
+            <parameter name="aParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output-attributes type="number" doc:description="Documentation for the output-attribute [op-declares-attributes]"/>
+    </operation>
+
+    <operation name="op-declares-output-and-attributes">
+        <parameters>
+            <parameter name="aParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+        <output type="any" doc:description="Documentation for the output [op-declares-output-and-attributes]"/>
+        <output-attributes type="boolean" doc:description="Documentation for the output-attribute [op-declares-output-and-attributes]"/>
+    </operation>
+
+    <operation name="op-declares-nothing">
+        <parameters>
+            <parameter name="aParameter" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[parameters.aParameter as String]"/>
+        </body>
+    </operation>
+</module>
