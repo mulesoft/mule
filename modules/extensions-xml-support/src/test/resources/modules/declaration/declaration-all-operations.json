@@ -1,0 +1,42 @@
+{
+  "op-declares-output": {
+    "output": {
+      "format": "json",
+      "type": "Binary"
+    },
+    "outputAttributes": {
+      "format": "xml",
+      "type": "Number"
+    }
+  },
+  "op-declares-attributes": {
+    "output": {
+      "format": "xml",
+      "type": "Date"
+    },
+    "outputAttributes": {
+      "format": "csv",
+      "type": "Number"
+    }
+  },
+  "op-declares-output-and-attributes": {
+    "output": {
+      "format": "xml",
+      "type": "Number"
+    },
+    "outputAttributes": {
+      "format": "java",
+      "type": "Void"
+    }
+  },
+  "op-declares-nothing": {
+    "output": {
+      "format": "json",
+      "type": "String"
+    },
+    "outputAttributes": {
+      "format": "csv",
+      "type": "String"
+    }
+  }
+}

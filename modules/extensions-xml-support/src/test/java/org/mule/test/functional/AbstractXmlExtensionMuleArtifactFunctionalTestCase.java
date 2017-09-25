@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -80,6 +81,7 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
           Map<String, Object> params = new HashMap<>();
           params.put(XmlExtensionModelLoader.RESOURCE_XML, modulePath);
           params.put(XmlExtensionModelLoader.VALIDATE_XML, shouldValidateXml());
+          operationsOutputPath().ifPresent(path -> params.put(XmlExtensionModelLoader.RESOURCE_DECLARATION, path));
           final DslResolvingContext dslResolvingContext = getDefault(extensions);
           final ExtensionModel extensionModel =
               new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), dslResolvingContext, params);
@@ -102,6 +104,14 @@ public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends
    */
   protected boolean shouldValidateXml() {
     return false;
+  }
+
+  /**
+   * Parameter to re-type operations' output if exists. It should map to 
+   * @return the string of the parameter that represents the declaration file.
+   */
+  protected Optional<String> operationsOutputPath() {
+    return Optional.empty();
   }
 
 }

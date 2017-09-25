@@ -515,6 +515,12 @@ public interface AllureConstants {
 
     }
 
+    interface Declaration {
+
+      String DECLARATION_DATASENSE = "Declaration override of calculated metadata types";
+
+    }
+
   }
 
 }

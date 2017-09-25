@@ -1,0 +1,12 @@
+{
+  "operation-that-doesnot-exist": {
+    "output": {
+      "format": "java",
+      "type": "Binary"
+    },
+    "outputAttributes": {
+      "format": "java",
+      "type": "Number"
+    }
+  }
+}

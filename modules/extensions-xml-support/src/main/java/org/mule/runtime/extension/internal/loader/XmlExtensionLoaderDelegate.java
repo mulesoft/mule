@@ -31,6 +31,15 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.catalog.api.TypeResolver;
@@ -78,18 +87,24 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
 import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
 import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,21 +113,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -153,7 +153,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String NAMESPACE_SEPARATOR = ":";
 
   private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
-  private static final String TRANSFORMATION_BODY_REMOVAL = "META-INF/transform_for_tns.xsl";
+  private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
@@ -204,19 +204,22 @@ public final class XmlExtensionLoaderDelegate {
 
   private final String modulePath;
   private final boolean validateXml;
+  private final Optional<String> declarationPath;
   // TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
   private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
+  private Map<String, DeclarationOperation> declarationMap;
 
   /**
    * @param modulePath relative path to a file that will be loaded from the current {@link ClassLoader}. Non null.
    * @param validateXml true if the XML of the Smart Connector must ve valid, false otherwise. It will be false at runtime, as
-   *                   the packaging of a connector will previously validate it's XML.
+   * @param declarationPath relative path to a file that contains the {@link MetadataType}s of all <operations/>.
    */
-  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml) {
+  public XmlExtensionLoaderDelegate(String modulePath, boolean validateXml, Optional<String> declarationPath) {
     checkArgument(!isEmpty(modulePath), "modulePath must not be empty");
     this.modulePath = modulePath;
     this.validateXml = validateXml;
+    this.declarationPath = declarationPath;
   }
 
   public void declare(ExtensionLoadingContext context) {
@@ -233,7 +236,7 @@ public final class XmlExtensionLoaderDelegate {
                                                 getCustomTypeFilename(), modulePath),
                                          e);
     }
-
+    loadDeclaration();
     Document moduleDocument = getModuleDocument(context, resource);
     loadModuleExtension(context.getExtensionDeclarer(), resource, moduleDocument,
                         context.getDslResolvingContext().getExtensions());
@@ -282,6 +285,27 @@ public final class XmlExtensionLoaderDelegate {
     return modulePath.replace(XML_SUFFIX, TYPES_XML_SUFFIX);
   }
 
+  /**
+   * If a declaration file does exists, then it reads into a map to use it later on when describing the {@link ExtensionModel} of
+   * the current <module/> for ever <operation/>s output and output attributes.
+   *
+   */
+  private void loadDeclaration() {
+    declarationMap = new HashMap<>();
+    declarationPath.ifPresent(operationsOutputPathValue -> {
+      final URL operationsOutputResource = getResource(operationsOutputPathValue);
+      if (operationsOutputResource != null) {
+        try {
+          declarationMap = DeclarationOperation.fromString(IOUtils.toString(operationsOutputResource));
+        } catch (IOException e) {
+          throw new IllegalArgumentException(format("The declarations file [%s] for the module '%s' cannot be read properly",
+                                                    operationsOutputPathValue, modulePath),
+                                             e);
+        }
+      }
+    });
+  }
+
   private Document getModuleDocument(ExtensionLoadingContext context, URL resource) {
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
         validateXml ? schemaValidatingDocumentLoader() : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
@@ -309,7 +333,7 @@ public final class XmlExtensionLoaderDelegate {
     ExtensionModel result = null;
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     try {
-      final Source xslt = new StreamSource(getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_BODY_REMOVAL));
+      final Source xslt = new StreamSource(getClass().getClassLoader().getResourceAsStream(TRANSFORMATION_FOR_TNS_RESOURCE));
       final Source moduleToTransform = new StreamSource(resource.openStream());
       TransformerFactory.newInstance()
           .newTransformer(xslt)
@@ -615,9 +639,27 @@ public final class XmlExtensionLoaderDelegate {
     operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
     operationDeclarer.describedAs(getDescription(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
-    extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel);
-    extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel);
+    extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel,
+                      getDeclarationOutputFor(operationName));
+    extractOutputType(operationDeclarer.withOutputAttributes(), OPERATION_OUTPUT_ATTRIBUTES_IDENTIFIER, operationModel,
+                      getDeclarationOutputAttributesFor(operationName));
     declareErrorModels(operationDeclarer, xmlDslModel, operationName, operationModel);
+  }
+
+  private Optional<MetadataType> getDeclarationOutputFor(String operationName) {
+    Optional<MetadataType> result = Optional.empty();
+    if (declarationMap.containsKey(operationName)) {
+      result = Optional.of(declarationMap.get(operationName).getOutput());
+    }
+    return result;
+  }
+
+  private Optional<MetadataType> getDeclarationOutputAttributesFor(String operationName) {
+    Optional<MetadataType> result = Optional.empty();
+    if (declarationMap.containsKey(operationName)) {
+      result = Optional.of(declarationMap.get(operationName).getOutputAttributes());
+    }
+    return result;
   }
 
   /**
@@ -745,19 +787,33 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void extractOutputType(OutputDeclarer outputDeclarer, ComponentIdentifier componentIdentifier,
-                                 ComponentModel operationModel) {
+                                 ComponentModel operationModel, Optional<MetadataType> calculatedOutput) {
     Optional<ComponentModel> outputAttributesComponentModel = operationModel.getInnerComponents()
         .stream()
         .filter(child -> child.getIdentifier().equals(componentIdentifier)).findFirst();
-    //if tye element is absent, it will default to the VOID type
-    if (outputAttributesComponentModel.isPresent()) {
-      String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
-      final MetadataType metadataType = extractType(receivedOutputAttributeType);
-      outputDeclarer.describedAs(getDescription(outputAttributesComponentModel.get()))
-          .ofType(metadataType);
+    outputAttributesComponentModel
+        .ifPresent(outputComponentModel -> outputDeclarer.describedAs(getDescription(outputComponentModel)));
+
+    MetadataType metadataType = getMetadataType(outputAttributesComponentModel, calculatedOutput);
+    outputDeclarer.ofType(metadataType);
+  }
+
+  private MetadataType getMetadataType(Optional<ComponentModel> outputAttributesComponentModel,
+                                       Optional<MetadataType> declarationMetadataType) {
+    MetadataType metadataType;
+    //the calculated metadata has precedence over the one configured in the xml
+    if (declarationMetadataType.isPresent()) {
+      metadataType = declarationMetadataType.get();
     } else {
-      outputDeclarer.ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+      //if tye element is absent, it will default to the VOID type
+      if (outputAttributesComponentModel.isPresent()) {
+        String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
+        metadataType = extractType(receivedOutputAttributeType);
+      } else {
+        metadataType = BaseTypeBuilder.create(JAVA).voidType().build();
+      }
     }
+    return metadataType;
   }
 
   private MetadataType extractType(String receivedType) {
