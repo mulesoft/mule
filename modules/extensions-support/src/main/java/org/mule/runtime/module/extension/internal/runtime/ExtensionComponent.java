@@ -322,12 +322,24 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected <R> R runWithMetadataContext(Function<MetadataContext, R> metadataContextFunction)
       throws MetadataResolvingException, ConnectionException {
-    MetadataContext context = getMetadataContext();
+    MetadataContext context = null;
     R result;
     try {
+      context = withContextClassLoader(getClassLoader(this.extensionModel), this::getMetadataContext);
       result = metadataContextFunction.apply(context);
+    } catch (MuleRuntimeException e) {
+      // TODO(MULE-13621) this should be deleted once the configuration is created lazily in the getMetadataContext method.
+      try {
+        throw e.getCause();
+      } catch (MetadataResolvingException | ConnectionException cause) {
+        throw cause;
+      } catch (Throwable t) {
+        throw e;
+      }
     } finally {
-      context.dispose();
+      if (context != null) {
+        context.dispose();
+      }
     }
     return result;
   }
