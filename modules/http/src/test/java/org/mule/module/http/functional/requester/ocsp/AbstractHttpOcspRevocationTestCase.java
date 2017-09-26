@@ -103,16 +103,15 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
     }
 
     /**
-     *
      * @param commandOutput the error stream of the ocsp servver process.
      * @return the first line of the ocsp server command output.
      * @throws IOException
      */
-    private String getOcspServerCommandOutput (InputStream commandOutput) throws IOException
+    private String getOcspServerCommandOutput(InputStream commandOutput) throws IOException
     {
-        char aux ;
+        char aux;
         StringBuilder stringBuilder = new StringBuilder();
-        while((aux = (char) commandOutput.read()) != '\n')
+        while ((aux = (char) commandOutput.read()) != '\n')
         {
             stringBuilder.append(aux);
         }
