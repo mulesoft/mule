@@ -145,6 +145,7 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
    *
    * @return {@link PrivilegedEvent} with the result.
    */
+  @Override
   public InternalEvent resolve() {
     final InternalEvent newEvent = interceptedOutput.build();
     if (interceptedInput != newEvent) {
