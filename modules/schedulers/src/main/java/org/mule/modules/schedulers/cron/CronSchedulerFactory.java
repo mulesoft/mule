@@ -10,15 +10,18 @@ import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
 import static java.util.TimeZone.getTimeZone;
 
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.schedule.Scheduler;
+import org.mule.api.schedule.SchedulerCreationException;
 import org.mule.api.schedule.SchedulerFactory;
 import org.mule.transport.PollingReceiverWorker;
 
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 /**
  * <p>
@@ -47,10 +50,22 @@ public class CronSchedulerFactory extends SchedulerFactory<PollingReceiverWorker
 
     protected TimeZone resolveTimeZone(String name)
     {
-        TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
+        TimeZone resolvedTimeZone = timeZone == null || timeZone.equals("") ? Calendar.getInstance().getTimeZone()
+                : getTimeZone(timeZone);
+        if(timeZone!=null) {
+            if ((!timeZone.equals("GMT") && resolvedTimeZone.getID().equals(TZ_GMT_ID))) {
+                throw new SchedulerCreationException("Invalid Timezone");
+            }
+        }
+        else
+        {
+            timeZone=Calendar.getInstance().getTimeZone().getID();
+        }
+
         if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
         {
-            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
+            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone,
+                    name, TZ_GMT_ID));
         }
         return resolvedTimeZone;
     }
