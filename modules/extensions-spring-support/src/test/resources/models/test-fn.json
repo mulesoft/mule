@@ -897,48 +897,12 @@
   "messageSources": [],
   "errors": [
     {
-      "type": "CONNECTIVITY",
-      "namespace": "FN",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "FN:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "FN",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "FN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     }
   ],
   "modelProperties": {},

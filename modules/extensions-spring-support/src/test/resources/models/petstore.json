@@ -830,30 +830,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1119,30 +1097,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1408,30 +1364,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1682,38 +1616,9 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "PET_ERROR",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:PET_ERROR",
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2137,30 +2042,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2411,30 +2294,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2806,30 +2667,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "PETSTORE",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "PETSTORE:RETRY_EXHAUSTED",
+            "PETSTORE:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -13677,56 +13516,16 @@
   ],
   "errors": [
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "PETSTORE:PET_ERROR",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "ANY",
-      "namespace": "MULE"
+      "error": "PETSTORE:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "PETSTORE",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "PETSTORE",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "PET_ERROR",
-      "namespace": "PETSTORE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "PETSTORE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},

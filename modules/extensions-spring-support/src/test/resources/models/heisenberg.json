@@ -1536,30 +1536,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "HEISENBERG",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "HEISENBERG",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "HEISENBERG:RETRY_EXHAUSTED",
+            "HEISENBERG:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "heisenberg-empire",
@@ -3664,30 +3642,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "HEISENBERG",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "HEISENBERG",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "HEISENBERG:RETRY_EXHAUSTED",
+            "HEISENBERG:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "heisenberg-empire",
@@ -12177,38 +12133,8 @@
       "supportsStreaming": false,
       "nestedComponents": [],
       "errors": [
-        {
-          "type": "OAUTH2",
-          "namespace": "HEISENBERG",
-          "parent": {
-            "type": "CONNECTIVITY",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          }
-        },
-        {
-          "type": "HEALTH",
-          "namespace": "HEISENBERG",
-          "parent": {
-            "type": "CONNECTIVITY",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          }
-        }
+        "HEISENBERG:OAUTH2",
+        "HEISENBERG:HEALTH"
       ],
       "stereotype": {
         "type": "heisenberg-empire",
@@ -14131,38 +14057,8 @@
         }
       ],
       "errors": [
-        {
-          "type": "OAUTH2",
-          "namespace": "HEISENBERG",
-          "parent": {
-            "type": "CONNECTIVITY",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          }
-        },
-        {
-          "type": "HEALTH",
-          "namespace": "HEISENBERG",
-          "parent": {
-            "type": "CONNECTIVITY",
-            "namespace": "HEISENBERG",
-            "parent": {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
-          }
-        }
+        "HEISENBERG:OAUTH2",
+        "HEISENBERG:HEALTH"
       ],
       "stereotype": {
         "type": "PROCESSOR",
@@ -17991,18 +17887,7 @@
       "supportsStreaming": false,
       "nestedComponents": [],
       "errors": [
-        {
-          "type": "VALIDATION",
-          "namespace": "HEISENBERG",
-          "parent": {
-            "type": "VALIDATION",
-            "namespace": "MULE",
-            "parent": {
-              "type": "ANY",
-              "namespace": "MULE"
-            }
-          }
-        }
+        "HEISENBERG:VALIDATION"
       ],
       "stereotype": {
         "type": "VALIDATOR",
@@ -19648,100 +19533,24 @@
   ],
   "errors": [
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "HEISENBERG:VALIDATION",
+      "parent": "MULE:VALIDATION"
     },
     {
-      "type": "ANY",
-      "namespace": "MULE"
+      "error": "HEISENBERG:OAUTH2",
+      "parent": "HEISENBERG:CONNECTIVITY"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "HEISENBERG:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "HEISENBERG:HEALTH",
+      "parent": "HEISENBERG:CONNECTIVITY"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "VALIDATION",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "VALIDATION",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "OAUTH2",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "CONNECTIVITY",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      }
-    },
-    {
-      "type": "VALIDATION",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "HEALTH",
-      "namespace": "HEISENBERG",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "HEISENBERG",
-        "parent": {
-          "type": "CONNECTIVITY",
-          "namespace": "MULE",
-          "parent": {
-            "type": "ANY",
-            "namespace": "MULE"
-          }
-        }
-      }
+      "error": "HEISENBERG:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},
