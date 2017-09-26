@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.lang.NotImplementedException;
+import static java.lang.System.getProperties;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -29,8 +32,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFact
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.ServiceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,15 +46,14 @@ import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static java.lang.System.getProperties;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
-import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -75,9 +75,11 @@ public class MuleDeploymentService implements DeploymentService {
    */
   private final CompositeDeploymentListener applicationDeploymentListener = new CompositeDeploymentListener();
   private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
+  private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
   private final ArchiveDeployer<Domain> domainDeployer;
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private DefaultArchiveDeployer<Application> applicationDeployer;
+  private DomainBundleArchiveDeployer domainBundleDeployer;
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> schedulerServiceSupplier) {
@@ -90,13 +92,16 @@ public class MuleDeploymentService implements DeploymentService {
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
                                                             new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-    this.domainDeployer = new DomainArchiveDeployer(
-                                                    new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
+    this.domainDeployer = new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
                                                                                  new DomainDeploymentTemplate(applicationDeployer,
                                                                                                               this),
-                                                                                 new DeploymentMuleContextListenerFactory(domainDeploymentListener)),
+                                                                                 new DeploymentMuleContextListenerFactory(
+                                                                                                                          domainDeploymentListener)),
                                                     applicationDeployer, this);
     this.domainDeployer.setDeploymentListener(domainDeploymentListener);
+
+    this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
+                                                                applicationDeployer, applications);
 
     if (useParallelDeployment()) {
       if (isDeployingSelectedAppsInOrder()) {
@@ -105,11 +110,13 @@ public class MuleDeploymentService implements DeploymentService {
       }
       logger.info("Using parallel deployment");
       this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications,
+          new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                                                 applications,
                                                  schedulerServiceSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(domainDeployer, applicationDeployer, domains, applications, schedulerServiceSupplier,
+          new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
+                                         schedulerServiceSupplier,
                                          deploymentLock);
     }
   }
@@ -266,6 +273,11 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   @Override
+  public void deployDomainBundle(URI domainArchiveUri) throws IOException {
+    executeSynchronized(() -> domainBundleDeployer.deployArtifact(domainArchiveUri));
+  }
+
+  @Override
   public void addStartupListener(StartupListener listener) {
     this.startupListeners.add(listener);
   }
@@ -293,6 +305,16 @@ public class MuleDeploymentService implements DeploymentService {
   @Override
   public void removeDomainDeploymentListener(DeploymentListener listener) {
     domainDeploymentListener.removeDeploymentListener(listener);
+  }
+
+  @Override
+  public void addDomainBundleDeploymentListener(DeploymentListener listener) {
+    domainBundleDeploymentListener.addDeploymentListener(listener);
+  }
+
+  @Override
+  public void removeDomainBundleDeploymentListener(DeploymentListener listener) {
+    domainBundleDeploymentListener.removeDeploymentListener(listener);
   }
 
   public void setDomainFactory(ArtifactFactory<Domain> domainFactory) {

@@ -103,6 +103,10 @@ public class MuleProcessController {
     getController().deployDomain(domain);
   }
 
+  public void deployDomainBundle(String domain) {
+    getController().deployDomainBundle(domain);
+  }
+
   public File getLog() {
     return getController().getLog();
   }

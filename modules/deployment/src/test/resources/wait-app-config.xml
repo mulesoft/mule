@@ -6,6 +6,6 @@
 
     <description>Application with a Wait Components that waits during initialization</description>
 
-    <object name="waitComponent" class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$WaitComponent" />
+    <object name="waitComponent" class="org.mule.runtime.module.deployment.internal.WaitComponent" />
 
 </mule>

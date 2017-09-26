@@ -6,6 +6,6 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd">
 
-    <core:object name="waitComponent" class="org.mule.runtime.module.deployment.internal.DeploymentServiceTestCase$WaitComponent" />
+    <core:object name="waitComponent" class="org.mule.runtime.module.deployment.internal.WaitComponent" />
 
 </mule-domain>
