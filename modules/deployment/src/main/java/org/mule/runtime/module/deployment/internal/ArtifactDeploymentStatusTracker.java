@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ArtifactDeploymentStatusTracker implements DeploymentListener {
 
-  public static enum DeploymentState {
+  public enum DeploymentState {
     // The deployment is in progress
     DEPLOYING,
     // The deployment was finished with a failure

@@ -32,11 +32,14 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
 
   private Scheduler threadPoolExecutor;
 
-  public ParallelDeploymentDirectoryWatcher(ArchiveDeployer<Domain> domainArchiveDeployer,
+  public ParallelDeploymentDirectoryWatcher(
+                                            DomainBundleArchiveDeployer domainBundleDeployer,
+                                            ArchiveDeployer<Domain> domainArchiveDeployer,
                                             ArchiveDeployer<Application> applicationArchiveDeployer,
                                             ObservableList<Domain> domains, ObservableList<Application> applications,
                                             Supplier<SchedulerService> schedulerServiceSupplier, ReentrantLock deploymentLock) {
-    super(domainArchiveDeployer, applicationArchiveDeployer, domains, applications, schedulerServiceSupplier, deploymentLock);
+    super(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications,
+          schedulerServiceSupplier, deploymentLock);
   }
 
   @Override

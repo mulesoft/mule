@@ -6,9 +6,6 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
@@ -16,9 +13,10 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-
-import io.qameta.allure.Attachment;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
 import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -34,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import io.qameta.allure.Attachment;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -91,6 +90,7 @@ public class MuleDeployment extends MuleInstallation {
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
   private List<String> applications = new ArrayList<>();
   private List<String> domains = new ArrayList<>();
+  private List<String> domainBundles = new ArrayList<>();
   private List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
   private Map<String, String> properties = new HashMap<>();
@@ -201,13 +201,24 @@ public class MuleDeployment extends MuleInstallation {
     }
 
     /**
-     * Specifies domains or domain-bundles to be deployed to the domains folder.
+     * Specifies domains to be deployed to the domains folder.
      * 
      * @param domains
      * @return
      */
     public Builder withDomains(String... domains) {
       Collections.addAll(deployment.domains, domains);
+      return this;
+    }
+
+    /**
+     * Specifies domain-bundles to be deployed to the domains folder.
+     *
+     * @param domainBundles domain bundle full paths to deploy
+     * @return same builder instance
+     */
+    public Builder withDomainBundles(String... domainBundles) {
+      Collections.addAll(deployment.domainBundles, domainBundles);
       return this;
     }
 
@@ -291,6 +302,8 @@ public class MuleDeployment extends MuleInstallation {
     if (mule.isRunning()) {
       logger.warn("Mule Server was already running");
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
+      logger.info("Deploying domain bundles");
+      domainBundles.forEach((domainBundle) -> mule.deployDomainBundle(domainBundle));
       logger.info("Redeploying domains");
       domains.forEach((domain) -> redeployDomain(domain));
       logger.info("Redeploying applications");
@@ -298,6 +311,8 @@ public class MuleDeployment extends MuleInstallation {
       logger.info("Redeployment successful");
     } else {
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
+      logger.info("Deploying domain bundles");
+      domainBundles.forEach((domainBundle) -> mule.deployDomainBundle(domainBundle));
       domains.forEach((domain) -> mule.deployDomain(domain));
       applications.forEach((application) -> mule.deploy(application));
       logger.info("Starting Mule Server");

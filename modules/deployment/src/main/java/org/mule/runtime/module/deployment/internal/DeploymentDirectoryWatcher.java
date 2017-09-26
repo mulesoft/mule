@@ -15,9 +15,11 @@ import static org.apache.commons.collections.CollectionUtils.select;
 import static org.apache.commons.collections.CollectionUtils.subtract;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ARTIFACT_NAME_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
@@ -65,8 +67,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
   public static final String CHANGE_CHECK_INTERVAL_PROPERTY = "mule.launcher.changeCheckInterval";
-  public static final IOFileFilter ZIP_ARTIFACT_FILTER =
+  public static final IOFileFilter JAR_ARTIFACT_FILTER =
       new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
+  public static final IOFileFilter ZIP_ARTIFACT_FILTER =
+      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
@@ -79,16 +83,19 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final ArtifactTimestampListener<Domain> domainTimestampListener;
   private final ObservableList<Application> applications;
   private final ObservableList<Domain> domains;
+  private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
   private ScheduledExecutorService artifactDirMonitorTimer;
 
   protected volatile boolean dirty;
 
-  public DeploymentDirectoryWatcher(final ArchiveDeployer<Domain> domainArchiveDeployer,
+  public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                    final ArchiveDeployer<Domain> domainArchiveDeployer,
                                     final ArchiveDeployer<Application> applicationArchiveDeployer, ObservableList<Domain> domains,
                                     ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
                                     final ReentrantLock deploymentLock) {
+    this.domainBundleDeployer = domainBundleDeployer;
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
     this.deploymentLock = deploymentLock;
@@ -131,20 +138,25 @@ public class DeploymentDirectoryWatcher implements Runnable {
     String appString = (String) options.get("app");
 
     try {
-
-      String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
-      String[] packagedDomains = domainsDir.list(ZIP_ARTIFACT_FILTER);
-
-      deployPackedDomains(packagedDomains);
-      deployExplodedDomains(explodedDomains);
+      //String[] domainBundles = domainsDir.list(ZIP_ARTIFACT_FILTER);
+      //deployDomainBundles(domainBundles);
 
       if (appString == null) {
-        String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        String[] packagedApps = appsDir.list(ZIP_ARTIFACT_FILTER);
+        //String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+        //String[] packagedApps = appsDir.list(JAR_ARTIFACT_FILTER);
+        //
+        //deployPackedApps(packagedApps);
+        //deployExplodedApps(explodedApps);
 
-        deployPackedApps(packagedApps);
-        deployExplodedApps(explodedApps);
+        // only start the monitor thread if we launched in default mode without explicitly
+        // stated applications to launch
+        scheduleChangeMonitor();
       } else {
+        String[] explodedDomains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
+        String[] packagedDomains = domainsDir.list(JAR_ARTIFACT_FILTER);
+
+        deployPackedDomains(packagedDomains);
+        deployExplodedDomains(explodedDomains);
         String[] apps = appString.split(":");
         apps = removeDuplicateAppNames(apps);
 
@@ -163,20 +175,13 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
+        if (logger.isInfoEnabled()) {
+          logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+        }
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
         deploymentLock.unlock();
-      }
-    }
-
-    // only start the monitor thread if we launched in default mode without explicitly
-    // stated applications to launch
-    if (!(appString != null)) {
-      scheduleChangeMonitor();
-    } else {
-      if (logger.isInfoEnabled()) {
-        logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     }
   }
@@ -278,10 +283,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
       undeployRemovedDomains();
 
-      // list new apps
+      deployDomainBundles();
+
+      // list new domains
       String[] domains = domainsDir.list(DirectoryFileFilter.DIRECTORY);
 
-      final String[] domainZips = domainsDir.list(ZIP_ARTIFACT_FILTER);
+      final String[] domainZips = domainsDir.list(JAR_ARTIFACT_FILTER);
 
       redeployModifiedDomains();
 
@@ -299,7 +306,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       // list new apps
       String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
 
-      final String[] appZips = appsDir.list(ZIP_ARTIFACT_FILTER);
+      final String[] appZips = appsDir.list(JAR_ARTIFACT_FILTER);
 
       deployPackedApps(appZips);
 
@@ -317,6 +324,19 @@ public class DeploymentDirectoryWatcher implements Runnable {
         deploymentLock.unlock();
       }
       dirty = false;
+    }
+  }
+
+  private void deployDomainBundles() {
+    final String[] domainBundles = domainsDir.list(ZIP_ARTIFACT_FILTER);
+
+    for (String domainBundle : domainBundles) {
+      try {
+        File domainBundleFile = new File(getDomainsFolder(), domainBundle);
+        domainBundleDeployer.deployArtifact(domainBundleFile.toURI());
+      } catch (Exception e) {
+        // Ignore and continue
+      }
     }
   }
 

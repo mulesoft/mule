@@ -47,6 +47,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
+  public static final String ZIP_FILE_SUFFIX = ".zip";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
 
   private final ArtifactDeployer<T> deployer;

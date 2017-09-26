@@ -38,6 +38,7 @@ public class Controller {
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
   private static final String DOMAIN_DEPLOY_ERROR = "Error deploying domain %s.";
+  private static final String DOMAIN_BUNDLE_DEPLOY_ERROR = "Error deploying domain bundle %s.";
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
@@ -115,6 +116,16 @@ public class Controller {
       }
     } catch (IOException e) {
       throw new MuleControllerException(String.format(DOMAIN_DEPLOY_ERROR, domain), e);
+    }
+  }
+
+  protected void deployDomainBundle(String domainBundle) {
+    File domainBundleFile = new File(domainBundle);
+    verify(domainBundleFile.exists(), "Domain bundle does not exist: %s", domainBundle);
+    try {
+      copyFileToDirectory(domainBundleFile, this.domainsDir);
+    } catch (IOException e) {
+      throw new MuleControllerException(String.format(DOMAIN_BUNDLE_DEPLOY_ERROR, domainBundle), e);
     }
   }
 

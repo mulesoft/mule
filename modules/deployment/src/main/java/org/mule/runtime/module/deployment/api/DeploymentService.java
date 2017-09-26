@@ -19,7 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Manages deploy of mule applications
  */
-public interface DeploymentService extends DeploymentListenerManager, DomainDeploymentListenerManager {
+public interface DeploymentService extends DeploymentListenerManager, DomainDeploymentListenerManager,
+    DomainBundleDeploymentListenerManager {
 
   /**
    * Finds an active application by name.
@@ -111,9 +112,9 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   void undeployDomain(String domainName);
 
   /**
-   * Deploys a domain bundled as a zip from the given URL to the mule container
+   * Deploys a domain artifact from the given URL to the mule container
    *
-   * @param domainArchiveUri location of the zip domain file
+   * @param domainArchiveUri location of the domain file
    * @throws IOException
    */
   void deployDomain(URI domainArchiveUri) throws IOException;
@@ -124,6 +125,14 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    * @param domainName then name of the domain to redeploy
    */
   void redeployDomain(String domainName);
+
+  /**
+   * Deploys a domain bundle from the given URL to the mule container
+   *
+   * @param domainArchiveUri location of the ZIP domain file
+   * @throws IOException if there is any problem reading the file
+   */
+  void deployDomainBundle(URI domainArchiveUri) throws IOException;
 
   void start();
 
