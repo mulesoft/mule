@@ -103,7 +103,7 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
     }
 
     /**
-     * @param commandOutput the error stream of the ocsp servver process.
+     * @param commandOutput the error stream of the ocsp server process.
      * @return the first line of the ocsp server command output.
      * @throws IOException
      */
