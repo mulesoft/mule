@@ -1,4 +1,5 @@
-http\://www.mulesoft.org/schema/mule/core/current/mule.xsd=META-INF/mule.xsd
+http\://www.mulesoft.org/schema/mule/core/current/mule-core.xsd=META-INF/mule-core.xsd
+http\://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd=META-INF/mule-core-common.xsd
 http\://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd=META-INF/mule-domain.xsd
 http\://www.mulesoft.org/schema/mule/module/current/mule-module.xsd=META-INF/mule-module.xsd
 http\://www.mulesoft.org/schema/mule/schemadoc/current/mule-schemadoc.xsd=META-INF/mule-schemadoc.xsd

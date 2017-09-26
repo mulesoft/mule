@@ -1,21 +1,14 @@
 {
-  "name": "Mule functional test plugin (TCK)",
+  "name": "Mule core deprecated schemas",
   "minMuleVersion": "4.0.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
       "exportedPackages": [
-        "org.mule.functional.api.component",
-        "org.mule.functional.api.event",
-        "org.mule.functional.api.exception",
-        "org.mule.functional.api.flow",
-        "org.mule.functional.api.notification",
-        "org.mule.functional.api.registry"
       ],
       "exportedResources": [
         "META-INF/spring.schemas",
-        "META-INF/mule-test.xsd",
         "META-INF/mule-core-deprecated.xsd"
       ]
     }

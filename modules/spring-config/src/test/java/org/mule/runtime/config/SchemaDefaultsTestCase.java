@@ -18,7 +18,7 @@ import org.junit.Test;
 
 public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase {
 
-  private static String MULE_CORE_SCHEMA_FILE = "META-INF/mule.xsd";
+  private static String MULE_CORE_SCHEMA_FILE = "META-INF/mule-core-common.xsd";
   private Document schema;
 
   @Override

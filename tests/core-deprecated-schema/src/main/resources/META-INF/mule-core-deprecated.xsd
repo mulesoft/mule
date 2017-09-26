@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/core"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/core"
+            attributeFormDefault="unqualified"
+            elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd"/>
+
+    <xsd:complexType name="baseSplitterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="splitter" substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor. The expression
+                may return a collection, or map, or a
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseSplitterType">
+                    <xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                    <xsd:attribute name="filterOnErrorType" type="errorIdentifierType" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A comma separated list of error types that should be handled by filtering the split part, rather than propagating the error. Filtered parts are not included in the aggregated response collection. This is useful to use validations inside this component.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="message-chunk-splitter" substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseSplitterType">
+                    <xsd:attribute name="messageSize" type="substitutableInt" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message chunk size (in bytes) that the current message will be split into. Note that this is mutually exclusive to the 'numberOfMessages' property.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="baseAggregatorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInterceptingMessageProcessorType">
+                <xsd:attribute name="timeout" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines a timeout in Milliseconds to wait for events to be aggregated. By default the router will throw an exeception if the router is waiting for a correlation group and times out before all group enties are received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="failOnTimeout" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            When false, incomplete aggregation groups will be forwarded to a component on timeout as a java.util.List. When true (default), a CorrelationTimeoutException is thrown and RoutingNotification.CORRELATION_TIMEOUT is fired. The component doesn't receive any messages in this case.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="processed-groups-object-store" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The object store where the processed groups are going to be stored. It is recommended that this object store has a max capacity and an expiration interval.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="event-groups-object-store" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The object store where the event groups are going to be stored.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+
+                <xsd:attribute name="persistentStores" type="substitutableBoolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines if the object stores used are persistent or not. This will only be used for the internally built object stores.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="storePrefix" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the prefix of the object store names. This will only be used for the internally built object stores.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="resequencer" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Holds back a group of messages and resequences them using each message's correlation sequence property.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="collection-aggregator" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configures a Collection Response Router. This will return a MuleMessageCollection message type that will contain all messages received for a each correlation group.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="message-chunk-aggregator" type="baseAggregatorType"
+                 substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Combines two or more messages into a single message by matching messages with a given Correlation ID. Correlation IDs are set on messages when they are dispatched by certain outbound routers, such as the Recipient List and Message Splitter routers. These messages can be aggregated back together again using this router.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="commonTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="topLevelProcessorType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="abstract-transformer" abstract="true" type="commonTransformerType" substitutionGroup="top-level-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for transformer elements. Transformers convert message payloads.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="commonTransformerType">
+                <xsd:attribute name="returnClass" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The class of the message generated by the transformer. This is used if transformers are auto-selected and to validate that the transformer returns the correct type.  Note that if you need to specify an array type you need postfix the class name with '[]'. For example, if you want return a an Orange[], you set the return class to 'org.mule.tck.testmodels.fruit.Orange[]'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ignoreBadInput" type="substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Many transformers only accept certain classes. Such transformers are never called with inappropriate input (whatever the value of this attribute). If a transformer forms part of a chain and cannot accept the current message class, this flag controls whether the remaining part of the chain is evaluated. If true, the next transformer is called. If false the chain ends, keeping the result generated up to that point.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attributeGroup ref="mimeTypeAttributes">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The mime type of the transformer's output
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attributeGroup>
+                <xsd:attribute name="encoding" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            String encoding used for transformer output.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--==============================================================-->
+    <!--   Transformer elements                                       -->
+    <!--==============================================================-->
+
+    <xsd:element name="transformer" type="refTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A reference to a transformer defined elsewhere.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="refTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="commonTransformerType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the transformer to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="auto-transformer" type="abstractTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that uses the transform discovery mechanism to convert the message payload. This transformer works much better when transforming custom object types rather than Java types, because there is less chance for ambiguity.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="custom-transformer" type="customTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A user-implemented transformer.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence>
+                    <xsd:group ref="propertiesGroup"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the Transformer interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that encodes a string using XML entities.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xml-entity-decoder-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that decodes a string containing XML entities.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="gzip-compress-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that compresses a byte array using gzip.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="gzip-uncompress-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that uncompresses a byte array using gzip.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="byte-array-to-hex-string-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a byte array to a string of hexadecimal digits.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="hex-string-to-byte-array-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a string of hexadecimal digits to a byte array.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="byte-array-to-object-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a byte array to an object (either deserializing or converting to a string).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="object-to-byte-array-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that serializes all objects except strings (which are converted using getBytes()).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="object-to-string-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that gives a human-readable description of various types (useful for debugging).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="byte-array-to-serializable-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a byte array to an object (deserializing the object).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="serializable-to-byte-array-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts an object to a byte array (serializing the object).
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="byte-array-to-string-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a byte array to a string.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="string-to-byte-array-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a string to a byte array.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="append-string-transformer" type="appendStringTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that appends a string to a string payload.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="appendStringTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="message" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The string to append.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that encrypts a message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="decrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that decrypts a message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="encryptionTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="strategy-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that evaluates one or more expressions on the current message. Each expression equates to a parameter in the return message. The return message for two or more expressions will be an Object[].
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="expressionTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="return-argument">
+                        <xsd:annotation>
+                            <xsd:documentation>If all expressions return null or NullPayload on this transformer, this flag will cause the source payload to be returned without modification.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attributeGroup ref="expressionAttributes"/>
+                            <!--
+                             -->
+                            <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
+                                <xsd:annotation>
+                                    <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="expression-component" substitutionGroup="abstract-mixed-content-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent mixed="true">
+                <xsd:extension base="abstractMixedContentMessageProcessorType">
+                    <xsd:attribute name="file" use="optional"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="invoke" type="invokeType" substitutionGroup="top-level-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Invokes the method of a given object using method arguments expressed using mule expressions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="invokeType">
+        <xsd:complexContent>
+            <xsd:extension base="topLevelProcessorType">
+                <xsd:attribute name="object-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to the object whose method will be invoked.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="method" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the method to be invoked.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="methodArguments" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="methodArgumentTypes" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="processor" type="refMessageProcessorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A reference to a message processor defined elsewhere.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="refMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the message processor to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-processor" type="customMessageProcessorType" substitutionGroup="top-level-processor"/>
+
+    <xsd:complexType name="customMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="topLevelProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="propertiesGroup"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="enricher" type="messageEnricherType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Enriches the current message, using expressins to define source and target,
+                with the result of processing a nested message processor.  Use the target and optionally sourcre attributes
+                for 1-1 enrichment.  If you require n-m enrichment than use the child 'enrich' elements instead.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="messageEnricherType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" />
+                    <xsd:element name="enrich" type="extractEnrichPairType" minOccurs="0"
+                                 maxOccurs="unbounded" />
+                </xsd:sequence>
+                <xsd:attribute name="source" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An expression used to extract a value from the result of the
+                            enrichment message processor. If an
+                            expression is not specified then the payload of the
+                            message is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="target" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The enricher expression used to enrich the current message with the result
+                            the processing of the enrichement message processor specified.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="extractEnrichPairType">
+        <xsd:attributeGroup ref="enricherSourceTargetAttributes" />
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="enricherSourceTargetAttributes">
+        <xsd:attribute name="source" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    An expression used to extract a value from the result of the
+                    enrichment message processor. If an
+                    expression is not specified then the payload of the
+                    message is used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="target" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The enricher expression used to enrich the current message with the result
+                    the processing of the enrichement message processor specified.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Provides support for the asynchronous request/reply pattern where a message is sent via a one-way message processor
+                and an asynchronous response is receivad via a separate message source.  Message flow is blocked while
+                waiting for the reply message.  Note: This does not currently support setting of replyTo property on the outbound message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="requestReplyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrMixedContentMessageProcessor">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message processor that will perform the asynchronous request.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
+                    <xsd:element ref="abstract-message-source">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The message source from which the asynchronous reply message will be received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="timeout" type="substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time (ms) to wait for an asynchronous reply message to be received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="storePrefix" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the prefix of the object store names.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="reconnect" type="reconnectSimpleStrategyType"
+                 substitutionGroup="abstract-reconnection-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                A reconnection strategy that allows the user to configure how many times a reconnection should be attempted and how long to wait between attempts.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="reconnectSimpleStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractReconnectionStrategyType">
+                <xsd:attribute name="frequency" type="substitutableLong" default="2000">
+                    <xsd:annotation>
+                        <xsd:documentation>How often (in ms) to reconnect</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="count" type="substitutableInt" default="2">
+                    <xsd:annotation>
+                        <xsd:documentation>How many reconnection attempts to make</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="reconnect-forever" type="reconnectForeverStrategyType"
+                 substitutionGroup="abstract-reconnection-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                A reconnection strategy that retries an infinite number of times at the specified frequency.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="reconnectForeverStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractReconnectionStrategyType">
+                <xsd:attribute name="frequency" type="substitutableLong" default="2000">
+                    <xsd:annotation>
+                        <xsd:documentation>How often (in ms) to reconnect</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A chain of message processors that can be used within other processors or routers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="flowType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:group ref="messageSource" minOccurs="0" maxOccurs="1"/>
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor"/>
+                        <xsd:element name="response">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    An outbound endpoint
+                                </xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:complexType>
+                                <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:choice>
+                    <xsd:choice minOccurs="0" maxOccurs="1">
+                        <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this flow construct.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialState" default="started">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial state of the flow. Usually a flow is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped").
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:union>
+                            <xsd:simpleType>
+                                <xsd:restriction base="propertyPlaceholderType"/>
+                            </xsd:simpleType>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="started"/>
+                                    <xsd:enumeration value="stopped"/>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:union>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="maxConcurrency">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize for performance when processing messages.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="substitutableInt"/>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>
