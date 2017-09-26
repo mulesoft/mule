@@ -13910,7 +13910,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -14120,7 +14124,11 @@
               "namespace": "HEISENBERG",
               "parent": {
                 "type": "heisenberg-empire",
-                "namespace": "HEISENBERG"
+                "namespace": "HEISENBERG",
+                "parent": {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
               }
             }
           ],
@@ -14342,7 +14350,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -14577,7 +14589,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -14759,7 +14775,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -14945,7 +14965,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -15297,7 +15321,11 @@
         "namespace": "HEISENBERG",
         "parent": {
           "type": "heisenberg-empire",
-          "namespace": "HEISENBERG"
+          "namespace": "HEISENBERG",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
@@ -18039,7 +18067,11 @@
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "heisenberg-empire",
-                    "namespace": "HEISENBERG"
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "PROCESSOR",
+                      "namespace": "MULE"
+                    }
                   }
                 }
               ],
@@ -18283,7 +18315,11 @@
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "heisenberg-empire",
-                    "namespace": "HEISENBERG"
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "PROCESSOR",
+                      "namespace": "MULE"
+                    }
                   }
                 }
               ],
@@ -18449,7 +18485,11 @@
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "heisenberg-empire",
-                    "namespace": "HEISENBERG"
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "PROCESSOR",
+                      "namespace": "MULE"
+                    }
                   }
                 }
               ],

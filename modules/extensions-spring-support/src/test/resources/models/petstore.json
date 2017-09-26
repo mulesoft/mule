@@ -3105,7 +3105,15 @@
             "namespace": "PETSTORE",
             "parent": {
               "type": "CUSTOM_CONNECTION",
-              "namespace": "PETSTORE"
+              "namespace": "PETSTORE",
+              "parent": {
+                "type": "ZOO_CONNECTION",
+                "namespace": "ZOO",
+                "parent": {
+                  "type": "CONNECTION",
+                  "namespace": "MULE"
+                }
+              }
             }
           },
           "parameterGroupModels": [
@@ -4536,8 +4544,12 @@
             "type": "CUSTOM_CONNECTION",
             "namespace": "PETSTORE",
             "parent": {
-              "type": "CONNECTION",
-              "namespace": "MULE"
+              "type": "ZOO_CONNECTION",
+              "namespace": "ZOO",
+              "parent": {
+                "type": "CONNECTION",
+                "namespace": "MULE"
+              }
             }
           },
           "parameterGroupModels": [
@@ -9087,7 +9099,15 @@
         "namespace": "PETSTORE",
         "parent": {
           "type": "CUSTOM_CONNECTION",
-          "namespace": "PETSTORE"
+          "namespace": "PETSTORE",
+          "parent": {
+            "type": "ZOO_CONNECTION",
+            "namespace": "ZOO",
+            "parent": {
+              "type": "CONNECTION",
+              "namespace": "MULE"
+            }
+          }
         }
       },
       "parameterGroupModels": [
@@ -10518,8 +10538,12 @@
         "type": "CUSTOM_CONNECTION",
         "namespace": "PETSTORE",
         "parent": {
-          "type": "CONNECTION",
-          "namespace": "MULE"
+          "type": "ZOO_CONNECTION",
+          "namespace": "ZOO",
+          "parent": {
+            "type": "CONNECTION",
+            "namespace": "MULE"
+          }
         }
       },
       "parameterGroupModels": [
