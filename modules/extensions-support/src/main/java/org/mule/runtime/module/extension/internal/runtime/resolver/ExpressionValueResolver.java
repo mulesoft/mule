@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -70,6 +71,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   @Override
   public void initialise() throws InitialisationException {
     // TODO (elrodro83) MULE-13627 remove this initialization
+    initialiseIfNeeded(extendedExpressionManager);
     initEvaluator();
   }
 
