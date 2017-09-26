@@ -157,6 +157,33 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void classLoaderModelWithIncludeTestDependencies() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "include-test-dependencies");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.isIncludeTestDependencies(), is(true));
+  }
+
+  @Test
+  public void classLoaderModelWithoutIncludeTestDependencies() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "do-not-include-test-dependencies");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.isIncludeTestDependencies(), is(false));
+  }
+
+  @Test
+  public void classLoaderModelDefaultIncludeTestDependencies() throws Exception {
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "custom-config-files");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.isIncludeTestDependencies(), is(false));
+  }
+
+  @Test
   public void classLoaderModelWithSingleDependency() throws Exception {
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "single-dependency");
 

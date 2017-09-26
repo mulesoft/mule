@@ -93,6 +93,11 @@ public class TestDomainWrapper implements Domain {
   }
 
   @Override
+  public void lazyInit(boolean disableXmlValidations) {
+    delegate.lazyInit(disableXmlValidations);
+  }
+
+  @Override
   public void start() throws DeploymentStartException {
     delegate.start();
   }

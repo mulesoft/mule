@@ -36,4 +36,9 @@ public final class ArtifactDescriptorConstants {
    */
   public static final String EXPORTED_RESOURCES = "exportedResources";
 
+  /**
+   * Property that defines to include or not scope test dependencies when building class loader model of a given artifact.
+   */
+  public static final String INCLUDE_TEST_DEPENDENCIES = "includeTestDependencies";
+
 }

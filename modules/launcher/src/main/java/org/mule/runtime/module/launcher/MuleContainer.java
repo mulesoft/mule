@@ -23,12 +23,14 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
@@ -358,6 +360,14 @@ public class MuleContainer {
    */
   public DeploymentService getDeploymentService() {
     return deploymentService;
+  }
+
+  /**
+   * @return {@link ArtifactFactory<Application>} for creating an application.
+   */
+  // TODO MULE-10392: To be removed once we have methods to deploy with properties
+  public ArtifactFactory<Application> getApplicationFactory() {
+    return artifactResourcesRegistry.getApplicationFactory();
   }
 
   /**

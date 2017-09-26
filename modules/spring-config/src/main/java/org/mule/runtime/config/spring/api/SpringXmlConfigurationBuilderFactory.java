@@ -31,18 +31,18 @@ public final class SpringXmlConfigurationBuilderFactory {
 
   public static ConfigurationBuilder createConfigurationBuilder(String configResource, boolean lazyInit)
       throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit);
+    return new SpringXmlConfigurationBuilder(new String[] {configResource}, lazyInit, true);
   }
 
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, boolean lazyInit)
       throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResources, lazyInit);
+    return new SpringXmlConfigurationBuilder(configResources, lazyInit, true);
   }
 
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, MuleContext domainContext)
       throws ConfigurationException {
     final SpringXmlConfigurationBuilder springXmlConfigurationBuilder =
-        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, false);
+        new SpringXmlConfigurationBuilder(configResources, emptyMap(), APP, false, false);
     if (domainContext != null) {
       springXmlConfigurationBuilder.setParentContext(domainContext);
     }
@@ -58,6 +58,6 @@ public final class SpringXmlConfigurationBuilderFactory {
   public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                                                 ArtifactType artifactType)
       throws ConfigurationException {
-    return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, false);
+    return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, false, false);
   }
 }

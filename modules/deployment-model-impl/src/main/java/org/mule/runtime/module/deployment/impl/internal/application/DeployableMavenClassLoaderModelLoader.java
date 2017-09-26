@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_GROUP_ID;
@@ -33,6 +33,7 @@ import org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClass
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,7 +52,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoaderModelLoader {
 
-  public static final String ADD_TEST_DEPENDENCIES_KEY = "mule.embedded.maven.addTestDependenciesToAppClassPath";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   public DeployableMavenClassLoaderModelLoader(MavenClient mavenClient,
@@ -132,8 +132,8 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
   }
 
   @Override
-  protected boolean enabledTestDependencies() {
-    return getBoolean(ADD_TEST_DEPENDENCIES_KEY);
+  protected boolean includeTestDependencies(Map<String, Object> attributes) {
+    return Boolean.valueOf((String) attributes.getOrDefault(INCLUDE_TEST_DEPENDENCIES, "false"));
   }
 
   @Override

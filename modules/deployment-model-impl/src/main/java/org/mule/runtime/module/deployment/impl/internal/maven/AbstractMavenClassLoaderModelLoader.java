@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
@@ -19,6 +20,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
@@ -238,14 +240,15 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File temporaryDirectory = createTempDir();
     try {
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
-          mavenClient.resolveArtifactDependencies(artifactFile, enabledTestDependencies(), of(mavenRepository),
+          mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes), of(mavenRepository),
                                                   of(temporaryDirectory));
       final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
       classLoaderModelBuilder
           .exportingPackages(new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(attributes, PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(attributes, PRIVILEGED_ARTIFACTS_IDS)))
-          .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)));
+          .exportingResources(new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES)))
+          .includeTestDependencies(valueOf(getSimpleAttribute(attributes, INCLUDE_TEST_DEPENDENCIES, "false")));
       Set<BundleDependency> bundleDependencies =
           dependencies.stream().filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
               .map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
@@ -333,12 +336,16 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return (List<String>) attributeObject;
   }
 
+  private <T> T getSimpleAttribute(Map<String, Object> attributes, String attribute, T defaultValue) {
+    return (T) attributes.getOrDefault(attribute, defaultValue);
+  }
+
   /**
    * Template method to enable/disable test dependencies as part of the artifact classpath.
    *
    * @return true if test dependencies must be part of the artifact classpath, false otherwise.
    */
-  protected boolean enabledTestDependencies() {
+  protected boolean includeTestDependencies(Map<String, Object> attributes) {
     return false;
   }
 

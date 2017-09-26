@@ -13,7 +13,6 @@ import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNE
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.spring.internal.LazyMetadataService.NON_LAZY_METADATA_SERVICE;
 import static org.mule.runtime.config.spring.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
@@ -21,8 +20,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -31,8 +28,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.spring.api.LazyComponentInitializer;
-import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.spring.internal.dsl.model.MinimalApplicationModelGenerator;
@@ -43,13 +40,13 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * Implementation of {@link MuleArtifactContext} that allows to create configuration components lazily.
@@ -71,17 +68,19 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * @param optionalObjectsController     the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *                                      org.mule.runtime.config.spring.internal.SpringRegistry
    * @param parentConfigurationProperties
+   * @param disableXmlValidations         {@code true} when loading XML configs it will not apply validations.
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                  ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                                  Map<String, String> artifactProperties, ArtifactType artifactType,
                                  List<ClassLoader> pluginsClassLoaders,
-                                 Optional<ConfigurationProperties> parentConfigurationProperties)
+                                 Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController, artifactProperties,
-          artifactType, pluginsClassLoaders, parentConfigurationProperties);
+          artifactType, pluginsClassLoaders, parentConfigurationProperties, disableXmlValidations);
     this.applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
+
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
                                                                      new LazyConnectivityTestingService(this, () -> getRegistry()
                                                                          .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
@@ -110,11 +109,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
     super.prepareBeanFactory(beanFactory);
     trackingPostProcessor = new TrackingPostProcessor();
     addBeanPostProcessors(beanFactory, trackingPostProcessor);
-  }
-
-  @Override
-  protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
-    return noValidationDocumentLoader();
   }
 
   private void applyLifecycle(List<String> createdComponentModels) {

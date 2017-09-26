@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -25,7 +26,8 @@ public class ClassLoaderModel {
    * Defines a {@link ClassLoaderModel} with empty configuration
    */
   public static final ClassLoaderModel NULL_CLASSLOADER_MODEL =
-      new ClassLoaderModel(new URL[0], new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>());
+      new ClassLoaderModel(new URL[0], new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>(),
+                           false);
 
   private final URL[] urls;
   private final Set<String> exportedPackages;
@@ -33,16 +35,18 @@ public class ClassLoaderModel {
   private final Set<BundleDependency> dependencies;
   private final Set<String> privilegedExportedPackages;
   private final Set<String> privilegedArtifacts;
+  private final boolean includeTestDependencies;
 
   private ClassLoaderModel(URL[] urls, Set<String> exportedPackages, Set<String> exportedResources,
                            Set<BundleDependency> dependencies, Set<String> privilegedExportedPackages,
-                           Set<String> privilegedArtifacts) {
+                           Set<String> privilegedArtifacts, boolean includeTestDependencies) {
     this.urls = urls;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
     this.dependencies = dependencies;
     this.privilegedExportedPackages = privilegedExportedPackages;
     this.privilegedArtifacts = privilegedArtifacts;
+    this.includeTestDependencies = includeTestDependencies;
   }
 
   /**
@@ -88,6 +92,13 @@ public class ClassLoaderModel {
   }
 
   /**
+   * @return {@code true} if the model should include {@code test} scope dependencies when resolving the class loader {@link URL urls} for the artifact.
+   */
+  public boolean isIncludeTestDependencies() {
+    return includeTestDependencies;
+  }
+
+  /**
    * Builds a {@link ClassLoaderModel}
    */
   public static class ClassLoaderModelBuilder {
@@ -98,6 +109,7 @@ public class ClassLoaderModel {
     private Set<BundleDependency> dependencies = new HashSet<>();
     private Set<String> privilegedExportedPackages = new HashSet<>();
     private Set<String> privilegedArtifacts = new HashSet<>();
+    private Boolean includeTestDependencies = FALSE;
 
     /**
      * Creates an empty builder.
@@ -188,12 +200,23 @@ public class ClassLoaderModel {
     }
 
     /**
+     * Sets this model to include test dependencies on class loader URL resolution.
+     *
+     * @param includeTestDependencies {@code true} to include test dependencies.
+     * @return same builder instance.
+     */
+    public ClassLoaderModelBuilder includeTestDependencies(boolean includeTestDependencies) {
+      this.includeTestDependencies = includeTestDependencies;
+      return this;
+    }
+
+    /**
      * Creates a {@link ClassLoaderModel} with the current configuration.
      * @return a non null {@link ClassLoaderModel}
      */
     public ClassLoaderModel build() {
       return new ClassLoaderModel(urls.toArray(new URL[0]), packages, resources, dependencies, privilegedExportedPackages,
-                                  privilegedArtifacts);
+                                  privilegedArtifacts, includeTestDependencies);
     }
   }
 }

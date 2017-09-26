@@ -131,15 +131,20 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public void init() {
-    doInit(false);
+    doInit(false, false);
   }
 
   @Override
   public void lazyInit() {
-    doInit(true);
+    doInit(true, true);
   }
 
-  public void doInit(boolean lazy) throws DeploymentInitException {
+  @Override
+  public void lazyInit(boolean disableXmlValidations) {
+    doInit(true, disableXmlValidations);
+  }
+
+  public void doInit(boolean lazy, boolean disableXmlValidations) throws DeploymentInitException {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
     }
@@ -152,6 +157,7 @@ public class DefaultMuleDomain implements Domain {
           .setExtensionModelLoaderRepository(extensionModelLoaderManager)
           .setArtifactType(DOMAIN)
           .setEnableLazyInit(lazy)
+          .setDisableXmlValidations(disableXmlValidations)
           .setClassLoaderRepository(classLoaderRepository)
           .setServiceRepository(serviceRepository);
 

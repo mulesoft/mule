@@ -95,6 +95,7 @@ public class ArtifactContextBuilder {
   private ServiceRepository serviceRepository = Collections::emptyList;
   private ExtensionModelLoaderRepository extensionModelLoaderRepository = (loaderDescriber) -> empty();
   private boolean enableLazyInit;
+  private boolean disableXmlValidations;
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
   private PolicyProvider policyProvider;
@@ -297,6 +298,17 @@ public class ArtifactContextBuilder {
   }
 
   /**
+   * Allows to create an {@link ArtifactContext} that will not check for XSD validations.
+   *
+   * @param disableXmlValidations {@code true} if the artifact context must be created without XSD validations, false otherwise.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
+    this.disableXmlValidations = disableXmlValidations;
+    return this;
+  }
+
+  /**
    * Provides a {@link ClassLoaderRepository} containing all registered class loaders on the container.
    *
    * @param classLoaderRepository repository of available class loaders. Non null.
@@ -377,6 +389,7 @@ public class ArtifactContextBuilder {
                     .setArtifactProperties(artifactProperties)
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
+                    .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators);
             if (parentArtifact != null) {
               artifactContextConfigurationBuilder.setParentContext(parentArtifact.getMuleContext());

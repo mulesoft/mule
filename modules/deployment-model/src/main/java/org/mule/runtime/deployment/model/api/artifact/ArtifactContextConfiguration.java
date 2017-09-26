@@ -33,6 +33,7 @@ public class ArtifactContextConfiguration {
   private Map<String, String> artifactProperties = emptyMap();
   private ArtifactType artifactType;
   private boolean enableLazyInitialization;
+  private boolean disableXmlValidations;
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
 
@@ -90,6 +91,15 @@ public class ArtifactContextConfiguration {
    */
   public boolean isEnableLazyInitialization() {
     return enableLazyInitialization;
+  }
+
+  /**
+   * Allows to create an {@link ArtifactContext} that will not check for XSD validations.
+   *
+   * @return {@code true} if the artifact context will be created without XSD validations, false otherwise.
+   */
+  public boolean isDisableXmlValidations() {
+    return disableXmlValidations;
   }
 
   /**
@@ -169,6 +179,16 @@ public class ArtifactContextConfiguration {
      */
     public ArtifactContextConfigurationBuilder setEnableLazyInitialization(boolean enableLazyInitialization) {
       artifactContextConfiguration.enableLazyInitialization = enableLazyInitialization;
+      return this;
+    }
+
+    /**
+     * Allows to create an {@link ArtifactContext} that will not check for XSD validations.
+     *
+     * @param disableXmlValidations {@code true} if the artifact context must be created without XSD validations, false otherwise.
+     */
+    public ArtifactContextConfigurationBuilder setDisableXmlValidations(boolean disableXmlValidations) {
+      artifactContextConfiguration.disableXmlValidations = disableXmlValidations;
       return this;
     }
 
