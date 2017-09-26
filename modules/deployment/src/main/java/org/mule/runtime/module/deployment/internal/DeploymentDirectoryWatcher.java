@@ -138,16 +138,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     String appString = (String) options.get("app");
 
     try {
-      //String[] domainBundles = domainsDir.list(ZIP_ARTIFACT_FILTER);
-      //deployDomainBundles(domainBundles);
-
       if (appString == null) {
-        //String[] explodedApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        //String[] packagedApps = appsDir.list(JAR_ARTIFACT_FILTER);
-        //
-        //deployPackedApps(packagedApps);
-        //deployExplodedApps(explodedApps);
-
         // only start the monitor thread if we launched in default mode without explicitly
         // stated applications to launch
         scheduleChangeMonitor();
@@ -258,6 +249,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   // Cycle is:
   // undeployArtifact removed apps
   // undeployArtifact removed domains
+  // deploy domain bundles
   // deploy domain archives
   // deploy domain exploded
   // redeploy modified apps

@@ -7,7 +7,6 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -21,7 +20,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
@@ -88,6 +86,7 @@ public class DomainBundleArchiveDeployer {
         deployDomain(tempFolder);
       } catch (Exception e) {
         // Ignore, deploy applications anyway
+        LOGGER.warn("Domain bundle's domain was not deployed", e);
       }
 
       deployApplications(tempFolder);
@@ -119,7 +118,6 @@ public class DomainBundleArchiveDeployer {
     }
 
     Set<String> deployedApps = new HashSet<>();
-    //Set<String> originalDomainApps = getOriginalDomainApps(domainName);
     boolean applicationDeploymentError = false;
     for (String applicationArtifact : applicationArtifacts) {
       try {
@@ -128,15 +126,6 @@ public class DomainBundleArchiveDeployer {
         applicationDeploymentError = true;
       }
     }
-
-    //originalDomainApps.removeAll(deployedApps);
-    //for (String undeployedApp : originalDomainApps) {
-    //  try {
-    //    applicationDeployer.undeployArtifact(undeployedApp);
-    //  } catch (Exception e) {
-    //    applicationDeploymentError = true;
-    //  }
-    //}
 
     if (applicationDeploymentError) {
       throw new DeploymentException(createStaticMessage("There was an error deploying the bundled applications"));
@@ -180,11 +169,6 @@ public class DomainBundleArchiveDeployer {
     FileUtils.unzip(bundleFile, tempFolder);
     bundleFile.delete();
     return tempFolder;
-  }
-
-  private Set<String> getOriginalDomainApps(String domainName) {
-    return applications.stream().filter(a -> domainName.equals(a.getDomain().getArtifactName())).map(Artifact::getArtifactName)
-        .collect(toSet());
   }
 
   private Domain findDomain(String domainName) {
