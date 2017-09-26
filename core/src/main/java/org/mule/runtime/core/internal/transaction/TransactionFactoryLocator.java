@@ -77,7 +77,8 @@ public final class TransactionFactoryLocator implements Disposable {
 
   private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() {
     Map<TransactionType, TypedTransactionFactory> factories = new HashMap<>();
-    load(TypedTransactionFactory.class).forEach(factory -> factories.put(factory.getType(), factory));
+    load(TypedTransactionFactory.class, this.getClass().getClassLoader())
+        .forEach(factory -> factories.put(factory.getType(), factory));
     return factories;
   }
 }

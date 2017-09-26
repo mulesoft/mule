@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.privileged.transaction.xa;
 
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;

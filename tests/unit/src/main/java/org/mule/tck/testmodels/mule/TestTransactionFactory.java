@@ -6,9 +6,9 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 
 /**
@@ -27,8 +27,6 @@ public class TestTransactionFactory implements TransactionFactory {
   public TestTransactionFactory(Transaction mockTransaction) {
     this.mockTransaction = mockTransaction;
   }
-
-
 
   public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
     Transaction testTransaction;

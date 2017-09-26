@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.processor.DelegateTransaction;
 

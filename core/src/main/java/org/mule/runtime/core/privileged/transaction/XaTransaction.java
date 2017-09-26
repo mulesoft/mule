@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.privileged.transaction;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tx.MuleXaObject;
@@ -14,6 +14,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
+import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -23,10 +30,6 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.

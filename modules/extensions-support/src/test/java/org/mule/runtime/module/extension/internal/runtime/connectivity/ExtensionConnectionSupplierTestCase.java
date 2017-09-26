@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.transaction.xa.XaTransaction;
+import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;

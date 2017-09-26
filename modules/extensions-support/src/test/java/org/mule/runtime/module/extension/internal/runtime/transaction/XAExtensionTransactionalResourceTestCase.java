@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.transaction.xa.XaTransaction;
+import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.util.queue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
-import org.mule.runtime.core.api.transaction.xa.AbstractResourceManager;
-import org.mule.runtime.core.api.transaction.xa.AbstractTransactionContext;
+import org.mule.runtime.core.internal.transaction.xa.AbstractResourceManager;
+import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 

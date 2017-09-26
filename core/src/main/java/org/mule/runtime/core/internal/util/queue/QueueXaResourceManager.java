@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.transaction.xa.AbstractTransactionContext;
-import org.mule.runtime.core.api.transaction.xa.AbstractXAResourceManager;
-import org.mule.runtime.core.api.transaction.xa.AbstractXaTransactionContext;
+import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
+import org.mule.runtime.core.internal.transaction.xa.AbstractXAResourceManager;
+import org.mule.runtime.core.internal.transaction.xa.AbstractXaTransactionContext;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import javax.transaction.xa.XAResource;

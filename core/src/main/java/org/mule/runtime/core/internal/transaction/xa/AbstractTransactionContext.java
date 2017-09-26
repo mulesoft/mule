@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.internal.transaction.xa;
 
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.UUID;
 
 import javax.transaction.Status;

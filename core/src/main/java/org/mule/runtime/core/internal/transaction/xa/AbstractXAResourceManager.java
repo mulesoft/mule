@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.internal.transaction.xa;
+
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +41,7 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
 
   protected abstract int doPrepare(T context) throws ResourceManagerException;
 
-  protected T getTransactionalResource(Xid xid) {
+  T getTransactionalResource(Xid xid) {
     T context = getActiveTransactionalResource(xid);
     if (context != null) {
       return context;

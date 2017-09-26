@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction.xa;
+package org.mule.runtime.core.privileged.transaction.xa;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransaction
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.transaction.ExternalXaTransaction;
+import org.mule.runtime.core.privileged.transaction.XaTransaction;
 
 import javax.transaction.TransactionManager;
 

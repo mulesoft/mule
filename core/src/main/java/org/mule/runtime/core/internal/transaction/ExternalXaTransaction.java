@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.transaction;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.xa.AbstractTransaction;
-import org.mule.runtime.core.api.transaction.xa.XaTransaction;
+import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
+import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.text.MessageFormat;
