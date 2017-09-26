@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.stream.Collectors.toMap;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isProcessorChain;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRoute;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR_DEFINITION;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.IntersectionType;
 import org.mule.metadata.api.model.ObjectType;
@@ -55,7 +56,6 @@ import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeType
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.api.stereotype.StereotypeDefinition;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
@@ -193,49 +193,10 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       });
     }
 
-    // private void addStereotypes(String namespace, MethodWrapper methodElement,
-    //                             ComponentDeclaration declaration, StereotypeModel defaultStereotype) {
-    //
-    //   Stereotype stereotypes = methodElement.getMethod().getAnnotation(Stereotype.class);
-    //   if (stereotypes == null) {
-    //     addStereotypes(namespace, methodElement.getDeclaringClass(), declaration, defaultStereotype);
-    //   } else {
-    //     addStereotypes(namespace, declaration, stereotypes, defaultStereotype);
-    //   }
-    //
-    //   addAllowedStereotypes(namespace, declaration, methodElement);
-    // }
-
-    // void addStereotypes(String namespace, Class<?> annotatedClass,
-    //                     WithStereotypesDeclaration declaration, StereotypeModel defaultStereotype) {
-    //   addStereotypes(namespace, declaration, getAnnotation(annotatedClass, Stereotype.class),
-    //                  defaultStereotype);
-    // }
-    //
-    // private void addStereotypes(String namespace, WithStereotypesDeclaration declaration,
-    //                             Stereotype customStereotype, StereotypeModel defaultStereotype) {
-    //
-    //   if (customStereotype != null) {
-    //     declaration.withStereotype(getStereotype(customStereotype.value(), namespace));
-    //   } else {
-    //     declaration.withStereotype(defaultStereotype);
-    //   }
-    // }
-
-    // private StereotypeModel getStereotype(Class<? extends StereotypeDefinition> definitionClass, String namespace) {
-    //   try {
-    //     return getStereotype(instantiateClass(definitionClass), namespace);
-    //   } catch (Exception e) {
-    //     throw new IllegalModelDefinitionException("Invalid StereotypeDefinition found with name: "
-    //         + definitionClass.getName(), e);
-    //   }
-    // }
-
     private String getStereotypePrefix(ExtensionDeclarer extensionDeclarer) {
       return extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
     }
   }
-
 
   private static abstract class StereotypeResolver<T extends WithAnnotations> {
 
@@ -263,10 +224,22 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                                                    String namespace,
                                                    Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
       return stereotypesCache.computeIfAbsent(stereotypeDefinition, definition -> {
+
+        if (!isBlank(stereotypeDefinition.getNamespace()) && !namespace.equals(stereotypeDefinition.getNamespace())) {
+          throw new IllegalModelDefinitionException(format(
+                                                           "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
+                                                               + "stereotypes on namespaces other than its own",
+                                                           stereotypeDefinition.getName(), stereotypeDefinition.getNamespace(),
+                                                           namespace));
+        }
+
         final StereotypeModelBuilder builder = newStereotype(stereotypeDefinition.getName(), namespace);
         stereotypeDefinition.getParent().ifPresent(parent -> {
-          String parentNamespace = parent instanceof MuleStereotypeDefinition ? "MULE" : namespace;
-          builder.withParent(newStereotype(parent.getName(), parentNamespace).build());
+          String parentNamespace = parent.getNamespace();
+          if (isBlank(parentNamespace)) {
+            parentNamespace = namespace;
+          }
+          builder.withParent(getStereotype(parent, parentNamespace, stereotypesCache));
         });
 
         return builder.build();
