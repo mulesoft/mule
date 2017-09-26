@@ -14,6 +14,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -88,9 +89,8 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
     @Before
     public void setUp() throws Exception
     {
-        // Running the ocsp server in a fixed port causes that sometimes the server fails at initialisation.
-        assumeFalse("Since openssl ocsp command has a flaky behavior the test will be ignored when the port number is not dynamic.", FIXED_OCSP_PORT == ocspPort);
         process = Runtime.getRuntime().exec(format(RUN_OCSP_SERVER_COMMAND, ocspList, ocspPort, ocspResponder, ocspResponder));
+        assumeFalse("Since openssl ocsp command has a flaky behavior the test will be ignored if an error occurs in server initialisation.", getOcspServerCommandOutput(process.getErrorStream()).contains("Error"));
     }
 
     @After
@@ -100,6 +100,22 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
         {
             process.destroy();
         }
+    }
+
+    /**
+     * @param commandOutput the error stream of the ocsp server process.
+     * @return the first line of the ocsp server command output.
+     * @throws IOException
+     */
+    private String getOcspServerCommandOutput(InputStream commandOutput) throws IOException
+    {
+        char aux;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((aux = (char) commandOutput.read()) != '\n')
+        {
+            stringBuilder.append(aux);
+        }
+        return stringBuilder.toString();
     }
 
 }
