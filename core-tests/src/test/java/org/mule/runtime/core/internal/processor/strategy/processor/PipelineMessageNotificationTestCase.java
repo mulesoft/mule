@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy.processor;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -33,13 +34,15 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedServerNotification;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.api.notification.FlowConstructNotification;
+import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
@@ -57,6 +60,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
+import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -154,6 +158,8 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void verifySucess() {
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(FlowConstructNotification.class)));
+
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
     verify(notificationFirer, times(1))
@@ -164,18 +170,18 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void verifyException() {
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(FlowConstructNotification.class)));
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
+    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(ErrorHandlerNotification.class)));
+
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_START, false, event)));
     verify(notificationFirer, times(1))
         .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(PROCESS_COMPLETE, true, null)));
     verify(notificationFirer, times(1))
-        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_START,
-                                                                          false, null)));
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_START, true, event)));
     verify(notificationFirer, times(1))
-        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_END,
-                                                                          false, null)));
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(PipelineMessageNotification.class)));
-    verify(notificationFirer, times(2)).dispatch(argThat(instanceOf(ErrorHandlerNotification.class)));
+        .dispatch(argThat(new PipelineMessageNotificiationArgumentMatcher(ErrorHandlerNotification.PROCESS_END, true, event)));
   }
 
   private class TestPipeline extends DefaultFlow {
@@ -213,7 +219,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   }
 
-  private class PipelineMessageNotificiationArgumentMatcher extends ArgumentMatcher<PipelineMessageNotification> {
+  private class PipelineMessageNotificiationArgumentMatcher extends ArgumentMatcher<Notification> {
 
     private int expectedAction;
     private boolean exceptionExpected;
@@ -234,15 +240,22 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       EnrichedServerNotification notification = (EnrichedServerNotification) argument;
       Exception exception = notification.getException();
 
-      if (exceptionExpected) {
-        return expectedAction == notification.getAction().getActionId() && exception != null && notification.getEvent() != null
-            && notification.getEvent().getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
-      } else {
-        return expectedAction == notification.getAction().getActionId() && exception == null && notification.getEvent() != null
-            && notification.getEvent().getMessage() != null
-            && (this.event == null || this.event.getMessage().equals(notification.getEvent().getMessage()));
-      }
+      boolean result =
+          expectedAction == notification.getAction().getActionId()
+              && (notification.getEvent() == null) == (this.event == null)
+              && (this.event == null ||
+                  (this.event.getMessage().getPayload().equals(notification.getEvent().getMessage().getPayload()) &&
+                      this.event.getMessage().getAttributes().equals(notification.getEvent().getMessage().getAttributes())))
+              && exceptionExpected == (exception != null);
+
+      return result;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      super.describeTo(description);
+      description.appendText(format("expectedAction = %d, exceptionExpected = %s, event = %s", expectedAction, exceptionExpected,
+                                    event));
     }
   }
 
