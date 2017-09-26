@@ -9,25 +9,26 @@ package org.mule.runtime.core.internal.transformer;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SmallTest
 public class DynamicDataTypeConverterResolverTestCase extends AbstractMuleTestCase {
 
-  private MuleContext muleContext = mock(MuleContext.class);
+  private MuleContextWithRegistries muleContext = mock(MuleContextWithRegistries.class);
   private MuleRegistry muleRegistry = mock(MuleRegistry.class);
 
   @Test

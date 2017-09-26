@@ -6,45 +6,29 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+import static java.util.Optional.of;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import org.junit.Before;
 
-
 public abstract class AbstractWeaveExpressionLanguageTestCase extends AbstractMuleContextTestCase {
 
   protected DataWeaveExpressionLanguageAdaptor expressionLanguage;
 
+  private DefaultExpressionLanguageFactoryService weaveExpressionExecutor;
+  protected Registry registry = mock(Registry.class);
+
   @Before
   public void setUp() {
-    expressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext);
+    weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
+    when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class)).thenReturn(of(weaveExpressionExecutor));
+    expressionLanguage = DataWeaveExpressionLanguageAdaptor.create(muleContext, registry);
   }
 
-  @Override
-  protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder() {
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        try {
-          DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService();
-          muleContext.getRegistry().registerObject(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
-          muleContext.getRegistry().registerObject(weaveExpressionExecutor.getName(), weaveExpressionExecutor);
-        } catch (RegistrationException e) {
-          throw new ConfigurationException(e);
-        }
-        super.configure(muleContext);
-      }
-    };
-  }
 }

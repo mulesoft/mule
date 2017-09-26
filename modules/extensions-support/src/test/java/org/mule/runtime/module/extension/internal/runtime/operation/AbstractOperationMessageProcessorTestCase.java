@@ -27,6 +27,7 @@ import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
@@ -37,6 +38,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -63,6 +65,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -79,9 +82,9 @@ import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -136,7 +139,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected InternalMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleContext context;
+  protected MuleContextWithRegistries context;
 
   @Mock
   protected ConfigurationInstance configurationInstance;
@@ -188,8 +191,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Before
   public void before() throws Exception {
-    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
-    cursorStreamProviderFactory = spy(getDefaultCursorStreamProviderFactory(muleContext));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
+    cursorStreamProviderFactory = spy(getDefaultCursorStreamProviderFactory(streamingManager));
     event = configureEvent();
     when(context.getInjector().inject(any())).thenAnswer(invocationOnMock -> {
       final Object subject = invocationOnMock.getArguments()[0];
@@ -306,13 +309,13 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
                                      DataType.builder().mediaType(MediaType.create("*", "*", defaultCharset())).build()));
     when(message.getAttributes())
         .thenReturn(new TypedValue<>(null, DataType.builder().fromObject(null).build()));
-    return eventBuilder().message(message).build();
+    return eventBuilder(muleContext).message(message).build();
   }
 
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
-    muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
     muleContext.getInjector().inject(messageProcessor);
     messageProcessor.initialise();
     return messageProcessor;

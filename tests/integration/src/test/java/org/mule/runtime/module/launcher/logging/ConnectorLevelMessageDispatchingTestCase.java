@@ -15,7 +15,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.module.launcher.logging.rule.UseMuleLog4jContextFactory;

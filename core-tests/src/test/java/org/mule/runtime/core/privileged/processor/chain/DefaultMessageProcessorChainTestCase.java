@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
@@ -36,6 +37,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 import static reactor.core.publisher.Flux.from;
@@ -45,6 +48,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
@@ -52,16 +56,13 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
@@ -69,6 +70,8 @@ import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStra
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -140,6 +143,11 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();
     flow.initialise();
     flow.start();
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @After
@@ -679,6 +687,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Test
   public void testAll() throws Exception {
+    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     ScatterGatherRouter scatterGatherRouter = new ScatterGatherRouter();
     scatterGatherRouter.setAnnotations(getAppleFlowComponentLocationAnnotations());
     scatterGatherRouter

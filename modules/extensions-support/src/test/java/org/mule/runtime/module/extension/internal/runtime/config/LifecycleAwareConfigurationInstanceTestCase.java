@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
@@ -119,8 +120,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Override
   protected void doSetUp() throws Exception {
-    muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
-    muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
 
     retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
@@ -282,7 +283,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void disposeMetadataCacheWhenConfigIsDisposed() throws Exception {
-    MuleMetadataService muleMetadataManager = muleContext.getRegistry().lookupObject(MuleMetadataService.class);
+    MuleMetadataService muleMetadataManager =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
     interceptable.start();
     interceptable.stop();

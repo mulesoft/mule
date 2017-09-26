@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -16,18 +17,26 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
   private Orange testObject = new Orange(new Integer(4), new Double(14.3), "nice!");
 
+  @Override
   public Transformer getTransformer() throws Exception {
-    return createObject(SerializableToByteArray.class);
+    SerializableToByteArray transfromer = new SerializableToByteArray();
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
+    return transfromer;
   }
 
+  @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    return createObject(ByteArrayToSerializable.class);
+    ByteArrayToSerializable transfromer = new ByteArrayToSerializable();
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
+    return transfromer;
   }
 
+  @Override
   public Object getTestData() {
     return testObject;
   }
 
+  @Override
   public Object getResultData() {
     return SerializationUtils.serialize(testObject);
   }

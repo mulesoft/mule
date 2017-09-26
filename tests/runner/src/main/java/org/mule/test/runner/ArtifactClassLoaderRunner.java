@@ -12,6 +12,7 @@ import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
@@ -31,7 +32,20 @@ import org.mule.test.runner.api.DependencyResolver;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
-import org.mule.test.runner.utils.AnnotationUtils;
+
+import org.junit.internal.builders.AnnotatedBuilder;
+import org.junit.runner.Description;
+import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.RunnerBuilder;
+import org.junit.runners.model.TestClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
@@ -47,20 +61,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import org.junit.internal.builders.AnnotatedBuilder;
-import org.junit.runner.Description;
-import org.junit.runner.Runner;
-import org.junit.runner.manipulation.Filter;
-import org.junit.runner.manipulation.Filterable;
-import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.RunnerBuilder;
-import org.junit.runners.model.TestClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -88,7 +88,7 @@ import org.slf4j.LoggerFactory;
  * {@link AetherClassPathClassifier} for more details about this. In order to allow the classification to resolve Maven artifact
  * from the local Maven repository, if the default location is not used {@code $USER_HOME/.m2/repository}, the following system
  * property has to be to the local Maven repository location when running a test from IDE:
- * 
+ *
  * <pre>
  * System.getProperty("localRepository")
  * </pre>
@@ -144,10 +144,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
         .loadClassWithApplicationClassLoader(RunnerDelegateTo.class.getName());
 
-    final AnnotatedBuilder annotatedBuilder = new AnnotatedBuilder(builder);
-    delegate = annotatedBuilder
-        .buildRunner(AnnotationUtils.getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"),
-                     isolatedTestClass);
+    delegate = new AnnotatedBuilder(builder)
+        .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
 
     if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
       throw Throwables.propagate(errorWhileSettingClassLoaders);

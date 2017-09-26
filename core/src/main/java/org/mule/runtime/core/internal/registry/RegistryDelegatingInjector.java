@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.registry;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.registry.RegistryProvider;
 
 /**
  * An implementation of {@link Injector} which uses a {@link RegistryProvider} to look for {@link Registry} instances which also

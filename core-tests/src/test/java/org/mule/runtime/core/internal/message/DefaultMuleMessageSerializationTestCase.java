@@ -13,6 +13,7 @@ import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentE
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -42,7 +43,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void testNonSerializablePayload() throws Exception {
     // add a transformer to the registry that can convert a NonSerializable to byte[]. This
     // will be used during Serialization
-    muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new NonSerializableToByteArray());
 
     final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 

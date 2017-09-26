@@ -7,26 +7,28 @@
 package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
+
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 /**
@@ -45,17 +47,17 @@ public class MuleObjectStoreManagerIntegrationTestCase extends AbstractMuleConte
   }
 
   @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
-        {new ObjectStoreFactory(false)},
-        {new ObjectStoreFactory(true)}
+  public static Collection<Object> parameters() {
+    return asList(new Object[] {
+        new ObjectStoreFactory(false),
+        new ObjectStoreFactory(true)
     });
   }
 
   @Before
   public void injectMuleContext() {
     objectStoreFactory
-        .setMuleObjectStoreManager(muleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER));
+        .setMuleObjectStoreManager(((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER));
   }
 
   @Test

@@ -11,14 +11,16 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
 
 public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
@@ -44,7 +46,7 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
     testMap.put("2", "two");
     testMap.put("3", "three");
 
-    mapSplitter.process(eventBuilder().message(of(testMap)).build());
+    mapSplitter.process(eventBuilder(muleContext).message(of(testMap)).build());
 
     assertThat(splitPayloads, hasSize(3));
     assertThat(splitPayloads.get(0), instanceOf(Map.Entry.class));

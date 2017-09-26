@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.MuleTestUtils.createFlow;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -23,8 +31,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
@@ -35,8 +44,6 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -52,10 +59,15 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     setStartContext(true);
   }
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
+
   @Test
   public void testMessageResequencer() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getNamedTestFlow("test");
+    Flow flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     assertNotNull(flow);
 
     TestEventResequencer router = new TestEventResequencer(3);
@@ -69,12 +81,9 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    CoreEvent event1 =
-        InternalEvent.builder(context).message(message1).flow(getTestFlow(muleContext)).session(session).build();
-    CoreEvent event2 =
-        InternalEvent.builder(context).message(message2).flow(getTestFlow(muleContext)).session(session).build();
-    CoreEvent event3 =
-        InternalEvent.builder(context).message(message3).flow(getTestFlow(muleContext)).session(session).build();
+    CoreEvent event1 = InternalEvent.builder(context).message(message1).flow(flow).session(session).build();
+    CoreEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
+    CoreEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event2));
     assertNull(router.process(event3));
@@ -92,12 +101,13 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testMessageResequencerWithComparator() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getNamedTestFlow("test");
+    Flow flow = createFlow(muleContext, "test");
     assertNotNull(flow);
 
-    ConfigurationComponentLocator configurationComponentLocator = Mockito.mock(ConfigurationComponentLocator.class);
-    Mockito.when(configurationComponentLocator.find(Matchers.any(Location.class))).thenReturn(of(flow));
-    muleContext.getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY, configurationComponentLocator);
+    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
+    when(configurationComponentLocator.find(any(Location.class))).thenReturn(of(flow));
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY,
+                                                                           configurationComponentLocator);
 
     TestEventResequencer router = new TestEventResequencer(3);
     Map<QName, Object> fakeComponentLocationAnnotations =

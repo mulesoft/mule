@@ -44,7 +44,7 @@ import java.util.concurrent.ScheduledFuture;
  * <p>
  * The {@link DefaultSchedulerMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.Scheduler} at the
  * initialization phase. This {@link org.mule.runtime.api.scheduler.Scheduler} can be stopped/started and executed by using the
- * {@link org.mule.runtime.core.api.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule server.
+ * {@link org.mule.runtime.core.internal.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule server.
  * </p>
  */
 public class DefaultSchedulerMessageSource extends AbstractComponent

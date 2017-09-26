@@ -49,30 +49,31 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -200,11 +201,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(empty());
 
-    muleContext.getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_STREAMING_MANAGER, streamingManager);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
-    cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(muleContext);
+    cursorStreamProviderFactory = getDefaultCursorStreamProviderFactory(streamingManager);
 
     sourceAdapter = createSourceAdapter();
 
@@ -220,10 +221,11 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     mockExceptionEnricher(extensionModel, null);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
-    retryPolicyTemplate.setNotificationFirer(muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+    retryPolicyTemplate
+        .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
-    muleContext.getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
 
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
 

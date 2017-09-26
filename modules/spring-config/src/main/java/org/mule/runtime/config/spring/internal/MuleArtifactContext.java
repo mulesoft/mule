@@ -77,23 +77,13 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import org.mule.runtime.core.internal.registry.TransformerResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +109,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
@@ -139,7 +140,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final DefaultRegistry serviceDiscoverer;
   private final ConfigurationDependencyResolver dependencyResolver;
   protected ApplicationModel applicationModel;
-  protected MuleContext muleContext;
+  protected MuleContextWithRegistries muleContext;
   private ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
@@ -179,7 +180,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
-    this.muleContext = muleContext;
+    this.muleContext = (MuleContextWithRegistries) muleContext;
     this.artifactConfigResources = artifactConfigResources;
     this.optionalObjectsController = optionalObjectsController;
     this.artifactProperties = artifactProperties;
@@ -352,7 +353,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
-                          new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext.getRegistry(), beanFactory),
+                          new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
+                              .getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
@@ -590,7 +592,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
-  public MuleContext getMuleContext() {
+  public MuleContextWithRegistries getMuleContext() {
     return muleContext;
   }
 

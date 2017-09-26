@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 
 import org.slf4j.Logger;
 
@@ -109,7 +111,7 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   protected ObjectStore<String> createMessageIdStore() throws InitialisationException {
-    ObjectStoreManager objectStoreManager = muleContext.getRegistry().get(OBJECT_STORE_MANAGER);
+    ObjectStoreManager objectStoreManager = ((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
     return objectStoreManager.createObjectStore(storePrefix, ObjectStoreSettings.builder()
         .persistent(false)
         .entryTtl(MINUTES.toMillis(5))

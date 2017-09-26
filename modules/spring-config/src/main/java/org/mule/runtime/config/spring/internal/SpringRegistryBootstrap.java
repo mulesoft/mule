@@ -18,23 +18,24 @@ import org.mule.runtime.config.spring.internal.factories.BootstrapObjectFactoryB
 import org.mule.runtime.config.spring.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
-import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
+import org.mule.runtime.core.internal.config.bootstrap.BootstrapObjectFactory;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.TransformerBootstrapProperty;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.Registry;
+import org.mule.runtime.core.internal.registry.RegistryProvider;
 import org.mule.runtime.core.privileged.transformer.TransformerUtils;
-
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
+
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 /**
  * Specialization of {@link SimpleRegistryBootstrap which instead of registering the objects directly into a {@link Registry},
@@ -113,11 +114,11 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
    * the created {@code beanDefinitionRegistry}. Then, the absorbed registry is unregistered from the context
    */
   private void absorbAndDiscardOtherRegistries() {
-    if (!(muleContext.getRegistry() instanceof RegistryProvider)) {
+    if (!(((MuleContextWithRegistries) muleContext).getRegistry() instanceof RegistryProvider)) {
       return;
     }
 
-    for (Registry registry : ((RegistryProvider) muleContext.getRegistry()).getRegistries()) {
+    for (Registry registry : ((RegistryProvider) ((MuleContextWithRegistries) muleContext).getRegistry()).getRegistries()) {
       if (registry instanceof SpringRegistry) {
         continue;
       }
@@ -126,7 +127,7 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
         registerInstance(entry.getKey(), entry.getValue());
       }
 
-      muleContext.removeRegistry(registry);
+      ((MuleContextWithRegistries) muleContext).removeRegistry(registry);
     }
   }
 

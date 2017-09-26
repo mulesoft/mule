@@ -11,12 +11,8 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.LifecycleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.core.api.registry.RegistryBroker;
-import org.mule.runtime.core.api.registry.RegistryProvider;
 import org.mule.runtime.core.internal.lifecycle.RegistryBrokerLifecycleManager;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.ArrayList;
 import java.util.Collection;

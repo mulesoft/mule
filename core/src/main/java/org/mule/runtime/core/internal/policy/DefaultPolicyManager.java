@@ -14,11 +14,11 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -29,7 +29,9 @@ import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
@@ -130,16 +132,15 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable {
     try {
       operationPolicyProcessorFactory = new DefaultOperationPolicyProcessorFactory(policyStateHandler);
       sourcePolicyProcessorFactory = new DefaultSourcePolicyProcessorFactory(policyStateHandler);
-      policyProvider = muleContext.getRegistry().lookupObject(PolicyProvider.class);
+      MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+      policyProvider = registry.lookupObject(PolicyProvider.class);
       if (policyProvider == null) {
         policyProvider = new NullPolicyProvider();
       }
-      sourcePolicyParametersTransformerCollection =
-          muleContext.getRegistry().lookupObjects(SourcePolicyParametersTransformer.class);
-      operationPolicyParametersTransformerCollection =
-          muleContext.getRegistry().lookupObjects(OperationPolicyParametersTransformer.class);
-      sourcePointcutFactories = muleContext.getRegistry().lookupObjects(SourcePolicyPointcutParametersFactory.class);
-      operationPointcutFactories = muleContext.getRegistry().lookupObjects(OperationPolicyPointcutParametersFactory.class);
+      sourcePolicyParametersTransformerCollection = registry.lookupObjects(SourcePolicyParametersTransformer.class);
+      operationPolicyParametersTransformerCollection = registry.lookupObjects(OperationPolicyParametersTransformer.class);
+      sourcePointcutFactories = registry.lookupObjects(SourcePolicyPointcutParametersFactory.class);
+      operationPointcutFactories = registry.lookupObjects(OperationPolicyPointcutParametersFactory.class);
     } catch (RegistrationException e) {
       throw new InitialisationException(e, this);
     }

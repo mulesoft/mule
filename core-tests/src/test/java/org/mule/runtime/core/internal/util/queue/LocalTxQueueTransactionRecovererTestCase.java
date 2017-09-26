@@ -13,22 +13,23 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.Serializable;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.Serializable;
 
 public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContextTestCase {
 
@@ -77,7 +78,7 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
   @Test
   public void pollAndFailThenRecoverWithTwoElements() throws Exception {
     final String MESSAGE_CONTENT_2 = TEST_PAYLOAD + "2";
-    CoreEvent testEvent2 = eventBuilder().message(of(MESSAGE_CONTENT_2)).build();
+    CoreEvent testEvent2 = eventBuilder(muleContext).message(of(MESSAGE_CONTENT_2)).build();
 
     inQueue.offer(testEvent(), 0, TIMEOUT);
     inQueue.offer(testEvent2, 0, TIMEOUT);

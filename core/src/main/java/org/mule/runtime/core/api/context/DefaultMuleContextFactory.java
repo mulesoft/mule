@@ -21,10 +21,11 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AutoConfigurationBuilder;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,7 +258,8 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
 
   private void notifyMuleContextInitialized(MuleContext context) {
     for (MuleContextListener listener : listeners) {
-      listener.onInitialization(context, context.getRegistry().<Registry>lookupObject(OBJECT_REGISTRY));
+      listener.onInitialization(context,
+                                ((MuleContextWithRegistries) context).getRegistry().<Registry>lookupObject(OBJECT_REGISTRY));
     }
   }
 

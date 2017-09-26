@@ -17,21 +17,24 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.SimpleMemoryObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.Processor;
@@ -46,17 +49,18 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+
 import java.beans.ExceptionListener;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
 
 public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase implements ExceptionListener {
 
@@ -65,16 +69,23 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
   private Scheduler scheduler;
 
   private TestAsyncRequestReplyRequester asyncReplyMP;
-  private Flow flow;
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>();
+
+    objects.put(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
+    objects.put(REGISTRY_KEY, componentLocator);
+
+    return objects;
+  }
+
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    muleContext.getRegistry().registerObject(OBJECT_STORE_MANAGER, new MuleObjectStoreManager());
     scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
-    flow = builder("flowName", muleContext).build();
-    flow.initialise();
-    flow.start();
+    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
   }
 
   @Override
@@ -84,8 +95,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       asyncReplyMP.stop();
       asyncReplyMP.dispose();
     }
-    flow.stop();
-    flow.dispose();
     super.doTearDown();
   }
 
@@ -136,7 +145,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setReplySource(target.getMessageSource());
     asyncReplyMP.setMuleContext(muleContext);
 
-    CoreEvent event = eventBuilder().message(of(TEST_MESSAGE)).build();
+    CoreEvent event = eventBuilder(muleContext).message(of(TEST_MESSAGE)).build();
 
     try {
       asyncReplyMP.process(event);
@@ -233,7 +242,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     try {
       CoreEvent event =
-          eventBuilder().message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
+          eventBuilder(muleContext).message(of("message1")).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

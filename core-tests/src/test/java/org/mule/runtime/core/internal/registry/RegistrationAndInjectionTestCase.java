@@ -20,7 +20,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -48,7 +49,8 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   @Test
   public void applyLifecycleUponUnregistration() throws Exception {
     applyLifecycleUponRegistration();
-    TestLifecycleObject object = (TestLifecycleObject) muleContext.getRegistry().unregisterObject(KEY);
+    TestLifecycleObject object =
+        (TestLifecycleObject) ((MuleContextWithRegistries) muleContext).getRegistry().unregisterObject(KEY);
     assertThat(object, is(notNullValue()));
     assertShutdown(object);
   }
@@ -73,10 +75,10 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   public void injectWithInheritance() throws Exception {
     TestLifecycleObject child1 = new TestLifecycleObject();
     TestLifecycleObject child2 = new TestLifecycleObject();
-    muleContext.getRegistry().registerObject(KEY, child1);
-    muleContext.getRegistry().registerObject(KEY2, child2);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(KEY, child1);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(KEY2, child2);
 
-    assertThat(muleContext.getRegistry().lookupByType(TestLifecycleObject.class).size(), is(2));
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().lookupByType(TestLifecycleObject.class).size(), is(2));
 
     ExtendedTestLifecycleObject object = new ExtendedTestLifecycleObject();
 
@@ -90,7 +92,7 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   @Test
   public void muleContextAware() throws Exception {
     MuleContextAware muleContextAware = mock(MuleContextAware.class);
-    muleContext.getRegistry().registerObject(KEY, muleContextAware);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(KEY, muleContextAware);
     assertRegistered(muleContextAware);
     verify(muleContextAware).setMuleContext(muleContext);
   }
@@ -98,13 +100,14 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   @Test
   public void lifecycleSateAware() throws Exception {
     LifecycleStateAware lifecycleStateAware = mock(LifecycleStateAware.class);
-    muleContext.getRegistry().registerObject(KEY, lifecycleStateAware);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(KEY, lifecycleStateAware);
     assertRegistered(lifecycleStateAware);
     verify(lifecycleStateAware).setLifecycleState(any(LifecycleState.class));
   }
 
   private void assertInjection(TestLifecycleObject object) {
-    assertThat(muleContext.getRegistry().get(OBJECT_STORE_MANAGER), is(object.getObjectStoreManager()));
+    assertThat(((MuleContextWithRegistries) muleContext).getRegistry().get(OBJECT_STORE_MANAGER),
+               is(object.getObjectStoreManager()));
     assertThat(object.getMuleContext(), is(muleContext));
 
     // just to make sure that injection is to thank for this
@@ -112,13 +115,13 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   }
 
   private void assertRegistered(Object object) {
-    Object registered = muleContext.getRegistry().get(KEY);
+    Object registered = ((MuleContextWithRegistries) muleContext).getRegistry().get(KEY);
     assertThat(registered, is(sameInstance(object)));
   }
 
   private TestLifecycleObject registerObject() throws RegistrationException {
     TestLifecycleObject object = new TestLifecycleObject();
-    muleContext.getRegistry().registerObject(KEY, object);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(KEY, object);
 
     return object;
   }

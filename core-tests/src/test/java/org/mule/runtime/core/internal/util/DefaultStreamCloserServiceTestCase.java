@@ -11,9 +11,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -24,24 +32,17 @@ import java.util.Collection;
 
 import javax.xml.transform.sax.SAXSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.xml.sax.InputSource;
-
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultStreamCloserServiceTestCase {
 
   private DefaultStreamCloserService service;
 
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
 
   @Before
   public void setUp() {
-    this.muleContext = mock(MuleContext.class, Mockito.RETURNS_DEEP_STUBS);
+    this.muleContext = mock(MuleContextWithRegistries.class, Mockito.RETURNS_DEEP_STUBS);
 
     this.service = new DefaultStreamCloserService();
     this.service.setMuleContext(this.muleContext);

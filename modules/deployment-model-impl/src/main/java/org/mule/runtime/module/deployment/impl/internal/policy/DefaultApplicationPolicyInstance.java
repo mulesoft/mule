@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.policy.PolicyPointcut;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -136,7 +135,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     }
   }
 
-  private void enableNotificationListeners(List<NotificationListener> notificationListeners) throws RegistrationException {
+  private void enableNotificationListeners(List<NotificationListener> notificationListeners) {
     NotificationListenerRegistry listenerRegistry =
         policyContext.getRegistry().lookupByType(NotificationListenerRegistry.class).get();
 

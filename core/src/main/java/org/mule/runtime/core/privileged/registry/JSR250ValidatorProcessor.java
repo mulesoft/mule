@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.registry;
 
-import org.mule.runtime.core.api.registry.InjectProcessor;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.registry.TransientRegistry;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;

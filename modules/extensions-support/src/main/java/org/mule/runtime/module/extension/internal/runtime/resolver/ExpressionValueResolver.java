@@ -8,15 +8,20 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+
 import org.apache.commons.lang3.StringUtils;
 
-import javax.inject.Inject;
 import java.util.function.BiConsumer;
+
+import javax.inject.Inject;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -27,7 +32,7 @@ import java.util.function.BiConsumer;
  * @param <T>
  * @since 4.0
  */
-public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<T> {
+public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<T>, Initialisable {
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
@@ -63,8 +68,13 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
   }
 
   @Override
-  public T resolve(ValueResolvingContext context) throws MuleException {
+  public void initialise() throws InitialisationException {
+    // TODO (elrodro83) MULE-13627 remove this initialization
     initEvaluator();
+  }
+
+  @Override
+  public T resolve(ValueResolvingContext context) throws MuleException {
     TypedValue typedValue = evaluator.resolveTypedValue(context.getEvent());
 
     Object value = typedValue.getValue();

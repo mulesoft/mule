@@ -47,15 +47,15 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -112,7 +112,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   @Mock
   private ExtensionModel extensionModel3WithRepeatedName;
 
-  private MuleContext muleContext = mockContextWithServices();
+  private MuleContextWithRegistries muleContext = mockContextWithServices();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel extension1ConfigurationModel;

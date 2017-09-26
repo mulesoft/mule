@@ -8,22 +8,25 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.ResolverException;
-import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.privileged.transformer.TransformerChain;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
+import org.mule.runtime.core.privileged.transformer.TransformerChain;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,9 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Will discover transformers based on type information only. It looks for transformers that support the source and result types
@@ -84,12 +84,13 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
       return transformer;
     }
 
-    List<Transformer> trans = muleContext.getRegistry().lookupTransformers(source, result);
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    List<Transformer> trans = registry.lookupTransformers(source, result);
 
     Transformer compositeTransformer = graphTransformerResolver.resolve(source, result);
     if (compositeTransformer != null) {
       // Needs to create a new list because the lookup returns a cached instance
-      trans = new LinkedList<Transformer>(trans);
+      trans = new LinkedList<>(trans);
       trans.add(compositeTransformer);
     }
 
@@ -109,13 +110,13 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
         return null;
       }
       // Perform a more general search
-      trans = muleContext.getRegistry().lookupTransformers(source, DataType.OBJECT);
+      trans = registry.lookupTransformers(source, DataType.OBJECT);
 
       transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
       if (transformer != null) {
         transformer = new TransformerChain(transformer, secondPass);
         try {
-          muleContext.getRegistry().registerTransformer(transformer);
+          registry.registerTransformer(transformer);
         } catch (MuleException e) {
           throw new ResolverException(e.getI18nMessage(), e);
         }
@@ -157,7 +158,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
   }
 
   private List<TransformerWeighting> calculateTransformerWeightings(List<Transformer> transformers, Class input, Class output) {
-    List<TransformerWeighting> weightings = new ArrayList<TransformerWeighting>(transformers.size());
+    List<TransformerWeighting> weightings = new ArrayList<>(transformers.size());
 
     for (Transformer transformer : transformers) {
       TransformerWeighting transformerWeighting = new TransformerWeighting(input, output, transformer);

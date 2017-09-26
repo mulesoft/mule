@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -53,6 +55,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   @Override
   public void initialise() throws InitialisationException {
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
+    initialiseIfNeeded(valueResolverDelegate);
     resolver = context -> {
       Object resolvedValue = valueResolverDelegate.resolve(context);
       return isInstance(expectedType, resolvedValue)

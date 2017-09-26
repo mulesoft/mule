@@ -20,6 +20,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,12 +36,12 @@ import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariableProp
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.nio.charset.Charset;
 
 import javax.activation.MimeTypeParseException;
-
-import org.junit.Before;
-import org.junit.Test;
 
 @SmallTest
 public abstract class AbstractAddVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
@@ -78,7 +79,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   }
 
   protected CoreEvent createTestEvent(Message message) throws MuleException {
-    return eventBuilder().message(message).build();
+    return eventBuilder(muleContext).message(message).build();
   }
 
   @Test

@@ -13,21 +13,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.queue.QueueConfiguration.MAXIMUM_CAPACITY;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.util.queue.QueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
 
@@ -122,7 +123,7 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
     QueueStore queue = createQueue();
     ArrayList<CoreEvent> events = new ArrayList<>(NUMBER_OF_ITEMS);
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      CoreEvent testEvent = eventBuilder().message(of("some data")).build();
+      CoreEvent testEvent = eventBuilder(muleContext).message(of("some data")).build();
       events.add(testEvent);
       queue.offer(testEvent, 0, NUMBER_OF_ITEMS);
 

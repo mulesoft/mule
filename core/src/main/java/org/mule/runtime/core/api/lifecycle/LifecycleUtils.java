@@ -21,11 +21,11 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import java.util.Collection;
-import java.util.Optional;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
+
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Utility class for performing lifecycle operations on objects, as long as they implement cooresponding annotations such as
@@ -55,7 +55,7 @@ public class LifecycleUtils {
 
   /**
    * The same as {@link #initialiseIfNeeded(Object)}, only that before checking for {@code object} being {@link Initialisable}, it
-   * uses the given {@code muleContext} to perform further initialization.
+   * uses the given {@code muleContext} to perform further initialization and dependency injection on the {@code object}.
    * <p>
    * It checks if the {@code object} implements {@link MuleContextAware}, in which case it will invoke
    * {@link MuleContextAware#setMuleContext(MuleContext)} with the given {@code muleContext}.
@@ -66,7 +66,7 @@ public class LifecycleUtils {
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
    */
   public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException {
-    initialiseIfNeeded(object, false, muleContext);
+    initialiseIfNeeded(object, true, muleContext);
   }
 
   /**

@@ -17,6 +17,7 @@ import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREF
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
@@ -24,15 +25,12 @@ import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
 
@@ -50,29 +48,27 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private ExpressionLanguage expressionExecutor;
   private MuleContext muleContext;
 
-  public static DataWeaveExpressionLanguageAdaptor create(MuleContext muleContext) {
-    try {
-      return new DataWeaveExpressionLanguageAdaptor(muleContext, muleContext.getRegistry()
-          .lookupObject(DefaultExpressionLanguageFactoryService.class));
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to obtain expression executor."), e);
-    }
+  public static DataWeaveExpressionLanguageAdaptor create(MuleContext muleContext, Registry registry) {
+    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry,
+                                                  registry.lookupByType(DefaultExpressionLanguageFactoryService.class).get());
   }
 
   @Inject
-  public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, DefaultExpressionLanguageFactoryService service) {
+  public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
+                                            DefaultExpressionLanguageFactoryService service) {
     this.expressionExecutor = service.create();
     this.muleContext = muleContext;
-    registerGlobalBindings();
+    registerGlobalBindings(registry);
   }
 
-  private void registerGlobalBindings() {
+  private void registerGlobalBindings(Registry registry) {
     BindingContext.Builder contextBuilder = BindingContext.builder();
     contextBuilder.addBinding(MULE,
                               new TypedValue<>(new MuleInstanceContext(muleContext), fromType(MuleInstanceContext.class)));
     contextBuilder.addBinding(SERVER, new TypedValue<>(new ServerContext(), fromType(ServerContext.class)));
     contextBuilder
-        .addBinding(APP, new TypedValue<>(new DataWeaveArtifactContext(muleContext), fromType(DataWeaveArtifactContext.class)));
+        .addBinding(APP, new TypedValue<>(new DataWeaveArtifactContext(muleContext, registry),
+                                          fromType(DataWeaveArtifactContext.class)));
     addGlobalBindings(contextBuilder.build());
   }
 

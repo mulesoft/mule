@@ -13,8 +13,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -30,11 +33,17 @@ import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = getLogger(DefaultSchedulerMessageSourceTestCase.class);
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
 
   @Test
   public void simplePoll() throws Exception {
@@ -95,6 +104,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   }
 
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
+    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     schedulerMessageSource =
         new DefaultSchedulerMessageSource(muleContext, scheduler());
     schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());

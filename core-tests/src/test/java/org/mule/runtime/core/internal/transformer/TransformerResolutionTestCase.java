@@ -10,20 +10,20 @@ package org.mule.runtime.core.internal.transformer;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.Orange;
 
-import java.nio.charset.Charset;
-
 import org.junit.Test;
+
+import java.nio.charset.Charset;
 
 @SmallTest
 public class TransformerResolutionTestCase extends AbstractMuleContextTestCase {
@@ -34,13 +34,14 @@ public class TransformerResolutionTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void resolvesMultipleApplicableTransformers() throws MuleException {
-    muleContext.getRegistry().registerTransformer(new StringToOrange());
-    muleContext.getRegistry().registerTransformer(new StringToApple());
-    muleContext.getRegistry().registerTransformer(new StringToFruit());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToOrange());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToApple());
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(new StringToFruit());
 
 
     try {
-      Transformer transformer = muleContext.getRegistry().lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
+      Transformer transformer =
+          ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(DataType.STRING, FRUIT_DATA_TYPE);
       assertTrue(String.format("Expected a %s transformer but got %s", StringToFruit.class.getName(),
                                transformer.getClass().getName()),
                  transformer instanceof StringToFruit);

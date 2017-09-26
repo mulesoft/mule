@@ -20,9 +20,9 @@ import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 
 import org.mule.functional.client.TestConnectorConfig;
 import org.mule.functional.client.TestConnectorMessageProcessorProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.client.SimpleOptionsBuilder;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class TestConnectorMessageProcessorProviderTestCase extends AbstractMuleT
   private static final String PATH_URL = "test://path";
   private static final String ANOTHER_PATH = "test://another";
 
-  private final MuleContext muleContext = mockContextWithServices();
+  private final MuleContextWithRegistries muleContext = mockContextWithServices();
   private final TestConnectorMessageProcessorProvider messageProcessorProvider = new TestConnectorMessageProcessorProvider();
   private final TestConnectorConfig connectorConfig = new TestConnectorConfig();
 

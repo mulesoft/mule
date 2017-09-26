@@ -25,16 +25,17 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -56,14 +57,13 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public static final MediaType APPLICATION_XML_CUSTOM = APPLICATION_XML.withCharset(CUSTOM_ENCODING);
   public static final String CUSTOM_CONTENT_TYPE = CUSTOM_MIME_TYPE + "; charset=" + CUSTOM_ENCODING;
 
-  private MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private MuleContextWithRegistries muleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS);
   private DefaultTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(DEFAULT_ENCODING.name());
-    when(muleContext.getRegistry().lookupObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE))
-        .thenReturn(mock(RetryPolicyTemplate.class));
+    registerIntoMockContext(muleContext, OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, mock(RetryPolicyTemplate.class));
     transformationService = new DefaultTransformationService(muleContext);
   }
 

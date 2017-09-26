@@ -6,17 +6,21 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -25,6 +29,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase {
@@ -33,10 +38,15 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     setStartContext(true);
   }
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
+
   @Test
   public void testMessageProcessor() throws Exception {
     MuleSession session = new DefaultMuleSession();
-    Flow flow = getNamedTestFlow("test");
+    Flow flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     assertNotNull(flow);
 
     MessageChunkAggregator router = new MessageChunkAggregator();

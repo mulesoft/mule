@@ -16,10 +16,11 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -87,7 +88,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     Message message = of(singletonList(TEST_MESSAGE));
 
-    roundRobin.process(eventBuilder().message(message).build());
+    roundRobin.process(eventBuilder(muleContext).message(message).build());
 
     verify(route1).apply(any(Publisher.class));
     verify(route2, never()).apply(any(Publisher.class));

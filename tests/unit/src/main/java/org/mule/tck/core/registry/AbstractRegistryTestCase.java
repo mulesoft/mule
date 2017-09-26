@@ -9,7 +9,8 @@ package org.mule.tck.core.registry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.runtime.core.api.registry.Registry;
+
+import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

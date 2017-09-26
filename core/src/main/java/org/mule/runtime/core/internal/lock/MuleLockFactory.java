@@ -12,16 +12,16 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.concurrent.locks.Lock;
 
-public class MuleLockFactory implements LockFactory, MuleContextAware, Initialisable, Disposable {
+import javax.inject.Inject;
+import javax.inject.Named;
+
+public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 
   private LockGroup lockGroup;
   private LockProvider lockProvider;
-  private MuleContext muleContext;
 
   @Override
   public synchronized Lock createLock(String lockId) {
@@ -37,18 +37,12 @@ public class MuleLockFactory implements LockFactory, MuleContextAware, Initialis
 
   @Override
   public void initialise() throws InitialisationException {
-    if (lockProvider == null) {
-      lockProvider = muleContext.getRegistry().get(OBJECT_LOCK_PROVIDER);
-    }
     lockGroup = new InstanceLockGroup(lockProvider);
   }
 
+  @Inject
+  @Named(OBJECT_LOCK_PROVIDER)
   public void setLockProvider(LockProvider lockProvider) {
     this.lockProvider = lockProvider;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
   }
 }

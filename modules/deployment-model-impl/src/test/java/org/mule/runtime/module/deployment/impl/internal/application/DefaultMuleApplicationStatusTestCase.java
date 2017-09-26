@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -30,11 +29,11 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
+import org.junit.Test;
+
 import java.io.File;
 
 import javax.inject.Inject;
-
-import org.junit.Test;
 
 /**
  * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -71,7 +70,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   }
 
   @Test
-  public void initialised() throws RegistrationException {
+  public void initialised() {
     // the context was initialised before we gave it to the application, so we need
     // to fire the notification again since the listener wasn't there
     notificationDispatcher.dispatch(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));

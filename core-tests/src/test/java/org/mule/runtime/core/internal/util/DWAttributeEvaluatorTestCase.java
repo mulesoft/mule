@@ -22,6 +22,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -30,11 +31,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
+import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -65,9 +66,10 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private StreamingManager streamingManager;
 
   @Before
-  public void setUp() throws RegistrationException {
+  public void setUp() throws MuleException {
     when(streamingManager.manage(any(CursorProvider.class), any(CoreEvent.class))).then(returnsFirstArg());
-    expressionManager = new DefaultExpressionManager(muleContext, streamingManager);
+    expressionManager = new DefaultExpressionManager();
+    initialiseIfNeeded(expressionManager, muleContext);
   }
 
   @Test

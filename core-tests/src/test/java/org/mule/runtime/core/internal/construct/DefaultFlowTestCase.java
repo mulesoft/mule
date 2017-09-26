@@ -26,6 +26,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -145,7 +146,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    CoreEvent event = eventBuilder()
+    CoreEvent event = eventBuilder(muleContext)
         .message(of(TEST_PAYLOAD))
         .build();
     CoreEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), event);

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.registry;
+package org.mule.runtime.core.privileged.registry;
 
 import org.mule.runtime.core.internal.registry.TransientRegistry;
 
@@ -13,7 +13,7 @@ import org.mule.runtime.core.internal.registry.TransientRegistry;
  * correct time.
  * <p/>
  * Developers must not implement this interface directly. Instead use either
- * {@link org.mule.runtime.core.api.registry.InjectProcessor} or {@link org.mule.runtime.core.api.registry.PreInitProcessor}.
+ * {@link org.mule.runtime.core.privileged.registry.InjectProcessor} or {@link org.mule.runtime.core.privileged.registry.PreInitProcessor}.
  *
  * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also deprecated. Use post processors
  *             for currently supported registries instead (i.e: {@link org.mule.runtime.core.config.spring.SpringRegistry})

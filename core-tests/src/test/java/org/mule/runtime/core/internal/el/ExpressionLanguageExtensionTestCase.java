@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -16,24 +17,21 @@ import static org.mule.runtime.api.message.Message.of;
 import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
-import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
+import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
+import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.internal.el.mvel.MVELArtifactContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.junit.Test;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
@@ -45,19 +43,8 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
   }
 
   @Override
-  protected ConfigurationBuilder getBuilder() throws Exception {
-    return new DefaultsConfigurationBuilder() {
-
-      @Override
-      public void configure(MuleContext muleContext) throws ConfigurationException {
-        super.configure(muleContext);
-        try {
-          muleContext.getRegistry().registerObject("key1", new TestExtension());
-        } catch (RegistrationException e) {
-          throw new ConfigurationException(e);
-        }
-      }
-    };
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap("key1", new TestExtension());
   }
 
   @Test

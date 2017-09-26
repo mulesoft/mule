@@ -21,7 +21,6 @@ import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -107,7 +106,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static TestServicesMuleContextConfigurator serviceConfigurator;
 
   @BeforeClass
-  public static void configureClassLoaderRepository() throws RegistrationException {
+  public static void configureClassLoaderRepository() {
     classLoaderRepository = new TestClassLoaderRepository();
   }
 

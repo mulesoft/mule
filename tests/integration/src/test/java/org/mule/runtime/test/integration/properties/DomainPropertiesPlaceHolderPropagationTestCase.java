@@ -13,7 +13,6 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -37,7 +36,7 @@ public class DomainPropertiesPlaceHolderPropagationTestCase extends AbstractMule
     appPropertiesPrecedeDomainPropertiesScenario();
   }
 
-  private void appPropertiesPrecedeDomainPropertiesScenario() throws RegistrationException {
+  private void appPropertiesPrecedeDomainPropertiesScenario() {
     String domainPropertyObject = getDomainProperty("domainPropertyObject");
     assertThat(domainPropertyObject, is("9999"));
     String appPropertyObject = getApplicationProperty("appPropertyObject");
@@ -46,7 +45,7 @@ public class DomainPropertiesPlaceHolderPropagationTestCase extends AbstractMule
     assertThat(app2PropertyObject, is("service"));
   }
 
-  private void propertiesPropagatesScenario() throws RegistrationException {
+  private void propertiesPropagatesScenario() {
     String domainPropertyObject = getDomainProperty("domainPropertyObject");
     assertThat(domainPropertyObject, is("9999"));
     String appPropertyObject = getApplicationProperty("appPropertyObject");
@@ -55,12 +54,12 @@ public class DomainPropertiesPlaceHolderPropagationTestCase extends AbstractMule
     assertThat(inlinePropertyObject, is("file contents\n"));
   }
 
-  private String getApplicationProperty(String property) throws RegistrationException {
+  private String getApplicationProperty(String property) {
     return new DefaultRegistry(applicationContext).<ConfigurationProperties>lookupByType(ConfigurationProperties.class).get()
         .resolveStringProperty(property).get();
   }
 
-  private String getDomainProperty(String property) throws org.mule.runtime.core.api.registry.RegistrationException {
+  private String getDomainProperty(String property) {
     return new DefaultRegistry(domainContext).<ConfigurationProperties>lookupByType(ConfigurationProperties.class).get()
         .resolveStringProperty(property).get();
   }

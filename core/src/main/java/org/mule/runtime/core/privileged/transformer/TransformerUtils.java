@@ -7,24 +7,26 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
+
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransformerUtils {
 
@@ -78,7 +80,7 @@ public class TransformerUtils {
       StringTokenizer st = new StringTokenizer(names, COMMA);
       while (st.hasMoreTokens()) {
         String key = st.nextToken().trim();
-        Transformer transformer = muleContext.getRegistry().lookupTransformer(key);
+        Transformer transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(key);
 
         if (transformer == null) {
           throw new DefaultMuleException(CoreMessages.objectNotRegistered("Transformer", key));
@@ -134,7 +136,7 @@ public class TransformerUtils {
                                                 MuleContext muleContext) {
     Transformer transformer;
     try {
-      transformer = muleContext.getRegistry().lookupTransformer(sourceDataType, resultDataType);
+      transformer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(sourceDataType, resultDataType);
     } catch (TransformerException e) {
       LOGGER.debug("Could not find a transformer from type {} to {}", sourceDataType.getType().getName(),
                    resultDataType.getType().getName());

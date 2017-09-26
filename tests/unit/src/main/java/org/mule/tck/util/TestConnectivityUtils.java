@@ -11,10 +11,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.hamcrest.Matcher;
@@ -27,10 +28,10 @@ import org.hamcrest.Matcher;
 public class TestConnectivityUtils {
 
   private static final Matcher NULL_VALUE = nullValue();
-  private MuleContext muleContext;
+  private Registry registry;
 
-  public TestConnectivityUtils(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public TestConnectivityUtils(Registry registry) {
+    this.registry = registry;
   }
 
   /**
@@ -63,7 +64,8 @@ public class TestConnectivityUtils {
 
   private void assertConnection(String configName, boolean isSuccess, Matcher<Exception> exceptionMatcher,
                                 Matcher<ErrorType> codeMatcher) {
-    ConnectivityTestingService testingService = muleContext.getRegistry().get(CONNECTIVITY_TESTING_SERVICE_KEY);
+    ConnectivityTestingService testingService =
+        registry.<ConnectivityTestingService>lookupByName(CONNECTIVITY_TESTING_SERVICE_KEY).get();
     ConnectionValidationResult validationResult = testingService.testConnection(builder().globalName(configName).build());
     assertThat(validationResult.isValid(), is(isSuccess));
     if (!isSuccess) {

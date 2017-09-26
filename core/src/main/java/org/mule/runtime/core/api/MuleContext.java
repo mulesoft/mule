@@ -8,10 +8,13 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -28,15 +31,9 @@ import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.ProcessingTimeWatcher;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.registry.Registry;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
@@ -99,9 +96,8 @@ public interface MuleContext extends Lifecycle {
    *
    * @param securityManager the security manager used by this Mule instance to authenticate and authorise incoming and outgoing
    *        event traffic and service invocations
-   * @throws RegistrationException
    */
-  void setSecurityManager(SecurityManager securityManager) throws InitialisationException, RegistrationException;
+  void setSecurityManager(SecurityManager securityManager) throws InitialisationException;
 
   /**
    * Gets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
@@ -120,10 +116,8 @@ public interface MuleContext extends Lifecycle {
    * Sets the queue manager used by mule for queuing events. This is used for service queues
    *
    * @param queueManager
-   * @throws RegistrationException
-   *
    */
-  void setQueueManager(QueueManager queueManager) throws RegistrationException;
+  void setQueueManager(QueueManager queueManager);
 
   /**
    * Gets the queue manager used by mule for queuing events. This is used for service queues.
@@ -146,8 +140,6 @@ public interface MuleContext extends Lifecycle {
 
   LifecycleManager getLifecycleManager();
 
-  MuleRegistry getRegistry();
-
   /**
    * Returns a {@link Injector} capable of injecting dependencies into objects
    *
@@ -165,18 +157,6 @@ public interface MuleContext extends Lifecycle {
    * @since 3.5.0
    */
   StreamCloserService getStreamCloserService();
-
-  /**
-   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-   */
-  @Deprecated
-  void addRegistry(Registry registry);
-
-  /**
-   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-   */
-  @Deprecated
-  void removeRegistry(Registry registry);
 
   /**
    * Returns the date when the server was started.

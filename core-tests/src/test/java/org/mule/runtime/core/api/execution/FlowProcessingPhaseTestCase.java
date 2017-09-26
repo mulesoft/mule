@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -19,21 +20,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.execution.FlowProcessingPhase;
 import org.mule.runtime.core.internal.execution.MessageProcessPhase;
 import org.mule.runtime.core.internal.execution.PhaseResultNotifier;
-import org.mule.runtime.core.privileged.exception.ResponseDispatchException;
 import org.mule.runtime.core.internal.execution.ValidationPhase;
+import org.mule.runtime.core.privileged.exception.ResponseDispatchException;
 import org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.RequestResponseFlowProcessingPhaseTemplate;
@@ -54,15 +57,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
-  private FlowProcessingPhase phase = new FlowProcessingPhase() {
-
-    // We cannot mock this method since its protected
-    @Override
-    protected NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager) {
-      return notificationHelper;
-    };
-  };
-
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowProcessingPhaseTemplate mockTemplate;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -82,19 +76,34 @@ public class FlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MessageSource messageSource;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleContext muleContext;
+  private MuleContextWithRegistries muleContext;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Registry registry;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS, extraInterfaces = {Component.class})
   private FlowConstruct flowConstruct;
+
+  private FlowProcessingPhase phase = new FlowProcessingPhase(registry) {
+
+    // We cannot mock this method since its protected
+    @Override
+    protected NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager) {
+      return notificationHelper;
+    };
+  };
 
   @Before
   public void before() {
     phase.setMuleContext(muleContext);
+
+    Registry registry = mock(Registry.class);
+    when(registry.lookupByName(any())).thenReturn(of(this.flowConstruct));
+    phase.setRegistry(registry);
+
     ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
     when(mockComponentLocation.getRootContainerName()).thenReturn("root");
     when(messageSource.getLocation()).thenReturn(mockComponentLocation);
     when(mockContext.getTransactionConfig()).thenReturn(empty());
     when(mockContext.getMessageSource()).thenReturn(messageSource);
-    when(muleContext.getRegistry().get(any())).thenReturn(this.flowConstruct);
   }
 
   @Test

@@ -20,8 +20,10 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,9 +34,15 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.internal.el.context.MessageContext;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptorHandler;
+import org.mule.runtime.core.internal.el.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +51,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -63,7 +67,8 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Before
   public void setUp() {
     super.setUp();
-    MVELExpressionLanguage mvelExpressionLanguage = muleContext.getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    MVELExpressionLanguage mvelExpressionLanguage =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     expressionLanguageAdapter = new ExpressionLanguageAdaptorHandler(expressionLanguage, mvelExpressionLanguage);
   }
 
@@ -181,7 +186,7 @@ public class ExtendedExpressionLanguageAdapterTestCase extends AbstractWeaveExpr
   @Test
   @Description("Verifies that the payload can be modified under MVEL but not DW.")
   public void payloadMutation() throws Exception {
-    CoreEvent event = eventBuilder().message(of(1)).build();
+    CoreEvent event = eventBuilder(muleContext).message(of(1)).build();
     CoreEvent.Builder builder1 = builder(event);
     String expression = "payload = 3";
     TypedValue result = expressionLanguageAdapter.evaluate(melify(expression),

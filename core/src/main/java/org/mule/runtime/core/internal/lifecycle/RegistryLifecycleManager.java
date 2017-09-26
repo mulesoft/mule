@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
-import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
@@ -23,6 +22,7 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
+import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -4,17 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.registry;
+package org.mule.runtime.core.privileged.registry;
 
 import org.mule.runtime.core.internal.registry.TransientRegistry;
 
 /**
- * Fired after the inject phase but before the initialise lifecycle phase
- *
+ * An object processor that will get called during the inject phase
+ * 
  * @deprecated as of 3.7.0 since these are only used by {@link TransientRegistry} which is also
  *             deprecated. Use post processors for currently supported registries instead (i.e:
  *             {@link org.mule.runtime.core.config.spring.SpringRegistry})
  */
 @Deprecated
-public interface PreInitProcessor extends ObjectProcessor {
+public interface InjectProcessor extends ObjectProcessor {
+
 }

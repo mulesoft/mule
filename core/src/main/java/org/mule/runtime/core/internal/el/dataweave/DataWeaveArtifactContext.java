@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.internal.el.context.AbstractArtifactContext;
 import org.mule.runtime.core.privileged.el.context.AbstractMapContext;
 
@@ -23,13 +21,13 @@ import java.util.Set;
  */
 public class DataWeaveArtifactContext extends AbstractArtifactContext {
 
-  public DataWeaveArtifactContext(MuleContext muleContext) {
-    super(muleContext);
+  public DataWeaveArtifactContext(MuleContext muleContext, Registry registry) {
+    super(muleContext, registry);
   }
 
   @Override
-  protected Map<String, Object> createRegistry(MuleRegistry registry) {
-    return new RegistryWrapperMap(registry.get(OBJECT_REGISTRY));
+  protected Map<String, Object> createRegistry(Registry registry) {
+    return new RegistryWrapperMap(registry);
   }
 
   /**

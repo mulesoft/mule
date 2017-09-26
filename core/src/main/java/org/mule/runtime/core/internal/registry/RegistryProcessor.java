@@ -15,7 +15,7 @@ import static org.reflections.ReflectionUtils.withType;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.InjectProcessor;
+import org.mule.runtime.core.privileged.registry.InjectProcessor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

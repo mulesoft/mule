@@ -10,11 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.registry.RegistrationException;
-
-import java.util.Map;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.junit.Test;
+
+import java.util.Map;
 
 public class AppContextTestCase extends AbstractELTestCase {
 
@@ -70,7 +72,7 @@ public class AppContextTestCase extends AbstractELTestCase {
   @Test
   public void registryGet() throws RegistrationException {
     Object o = new Object();
-    muleContext.getRegistry().registerObject("myObject", o);
+    getRegistry().registerObject("myObject", o);
     assertEquals(o, evaluate("app.registry.myObject"));
     assertEquals(o, evaluate("app.registry['myObject']"));
   }
@@ -78,20 +80,24 @@ public class AppContextTestCase extends AbstractELTestCase {
   @Test
   public void registryPut() throws RegistrationException {
     evaluate("app.registry.myString ='dan'");
-    assertEquals("dan", muleContext.getRegistry().lookupObject("myString"));
+    assertEquals("dan", getRegistry().lookupObject("myString"));
   }
 
   @Test
   public void registryPutAll() throws RegistrationException {
     evaluate("app.registry.putAll({'1' :'one', '2' : 'two'})");
-    assertEquals("one", muleContext.getRegistry().lookupObject("1"));
-    assertEquals("two", muleContext.getRegistry().lookupObject("2"));
+    assertEquals("one", getRegistry().lookupObject("1"));
+    assertEquals("two", getRegistry().lookupObject("2"));
   }
 
   @Test
   public void registryContainsKey() throws RegistrationException {
-    muleContext.getRegistry().registerObject("myString", "dan");
+    getRegistry().registerObject("myString", "dan");
     assertTrue((Boolean) evaluate("app.registry.containsKey('myString')"));
+  }
+
+  private MuleRegistry getRegistry() {
+    return ((MuleContextWithRegistries) muleContext).getRegistry();
   }
 
   @Test

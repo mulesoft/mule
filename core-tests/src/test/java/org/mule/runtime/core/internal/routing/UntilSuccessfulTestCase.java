@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,19 +16,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -36,6 +39,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+import java.util.Map;
 
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
@@ -85,8 +92,14 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
+  }
+
+  @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     untilSuccessful = buildUntilSuccessful(1000L);
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
@@ -135,7 +148,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     final CoreEvent testEvent =
-        eventBuilder().message(of(new ByteArrayInputStream("test_data".getBytes()))).build();
+        eventBuilder(muleContext).message(of(new ByteArrayInputStream("test_data".getBytes()))).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
   }
@@ -147,7 +160,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final CoreEvent testEvent = eventBuilder().message(of("ERROR")).build();
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
     expected.expect(MessagingException.class);
     expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
     try {
@@ -164,7 +177,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final CoreEvent testEvent = eventBuilder().message(of("ERROR")).build();
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);

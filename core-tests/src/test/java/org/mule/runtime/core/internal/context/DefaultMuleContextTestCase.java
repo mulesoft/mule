@@ -28,20 +28,20 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.connector.SchedulerController;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
-import org.mule.runtime.core.api.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
-import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
+import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -126,7 +126,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     final int clusterNodeId = 22;
     final String clusterId = "some-id";
     createMuleContext();
-    context.getRegistry().registerObject(OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
+    ((MuleContextWithRegistries) context).getRegistry().registerObject(OBJECT_CLUSTER_CONFIGURATION, new ClusterConfiguration() {
 
       @Override
       public String getClusterId() {
@@ -154,7 +154,8 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void overriddenMulePollingController() throws Exception {
     createMuleContext();
-    context.getRegistry().registerObject(OBJECT_POLLING_CONTROLLER, (SchedulerController) () -> false);
+    ((MuleContextWithRegistries) context).getRegistry().registerObject(OBJECT_POLLING_CONTROLLER,
+                                                                       (SchedulerController) () -> false);
     context.start();
     assertThat(context.isPrimaryPollingInstance(), is(false));
   }
@@ -162,8 +163,9 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void getStreamCloserService() throws Exception {
     createMuleContext();
-    StreamCloserService serviceFromRegistry = context.getRegistry().lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
-    MuleRegistryHelper registry = spy((MuleRegistryHelper) context.getRegistry());
+    StreamCloserService serviceFromRegistry =
+        ((MuleContextWithRegistries) context).getRegistry().lookupObject(OBJECT_MULE_STREAM_CLOSER_SERVICE);
+    MuleRegistryHelper registry = spy((MuleRegistryHelper) ((MuleContextWithRegistries) context).getRegistry());
     ((DefaultMuleContext) context).setMuleRegistry(registry);
 
     StreamCloserService streamCloserService = context.getStreamCloserService();
@@ -181,7 +183,7 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
   @Test
   public void cachesDataTypeConversionResolver() throws Exception {
     createMuleContext();
-    disposeIfNeeded(context.getRegistry(), LOGGER);
+    disposeIfNeeded(((MuleContextWithRegistries) context).getRegistry(), LOGGER);
     final MuleRegistryHelper muleRegistry = mock(MuleRegistryHelper.class);
     ((DefaultMuleContext) context).setMuleRegistry(muleRegistry);
 

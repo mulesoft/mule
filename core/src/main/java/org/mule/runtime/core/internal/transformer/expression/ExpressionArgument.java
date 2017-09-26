@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 
 import javax.inject.Inject;
@@ -105,8 +106,8 @@ public class ExpressionArgument extends AbstractComponent {
       if (!getReturnClass().isInstance(result)) {
         // If the return type does not match, lets attempt to transform it before throwing an error
         try {
-          Transformer t =
-              muleContext.getRegistry().lookupTransformer(DataType.fromObject(result), DataType.fromType(getReturnClass()));
+          Transformer t = ((MuleContextWithRegistries) muleContext).getRegistry()
+              .lookupTransformer(DataType.fromObject(result), DataType.fromType(getReturnClass()));
           result = t.transform(result);
         } catch (TransformerException e) {
           throw new ExpressionRuntimeException(transformUnexpectedType(result.getClass(), getReturnClass()), e);

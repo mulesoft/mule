@@ -11,10 +11,11 @@ import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -117,11 +118,11 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   protected CoreEvent fooEvent() throws MuleException {
-    return eventBuilder().message(of("foo")).build();
+    return eventBuilder(muleContext).message(of("foo")).build();
   }
 
   protected CoreEvent zapEvent() throws MuleException {
-    return eventBuilder().message(of("zap")).build();
+    return eventBuilder(muleContext).message(of("zap")).build();
   }
 
   @Test

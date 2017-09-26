@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
+
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.api.config.ParentMuleContextAwareConfigurationBuild
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import org.springframework.context.ApplicationContext;
@@ -175,7 +177,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     // muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
-    muleContext.addRegistry(registry);
+    ((MuleContextWithRegistries) muleContext).addRegistry(registry);
   }
 
   private void createRegistryWithParentContext(MuleContext muleContext, ApplicationContext applicationContext,
@@ -220,6 +222,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   public void setParentContext(MuleContext domainContext) {
-    this.domainContext = domainContext.getRegistry().get("springApplicationContext");
+    this.domainContext = ((MuleContextWithRegistries) domainContext).getRegistry().get("springApplicationContext");
   }
 }

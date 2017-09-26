@@ -16,19 +16,16 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.api.registry.RegistryBroker;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
-import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
-import org.mule.runtime.core.internal.registry.TransientRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
+import org.junit.Test;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
 
 public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
 
@@ -56,8 +53,8 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
     reg1.registerObject("flow", new LifecycleTrackerFlow("flow", muleContext));
     reg2.registerObject("flow2", new LifecycleTrackerFlow("flow2", muleContext));
 
-    muleContext.addRegistry(reg1);
-    muleContext.addRegistry(reg2);
+    ((MuleContextWithRegistries) muleContext).addRegistry(reg1);
+    ((MuleContextWithRegistries) muleContext).addRegistry(reg2);
 
     muleContext.start();
 
@@ -125,14 +122,15 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
     final String KEY2 = "Kiwi";
     final Object VALUE2 = new Kiwi();
 
-    muleContext.getRegistry().registerObject(KEY1, VALUE1);
-    muleContext.getRegistry().registerObject(KEY2, VALUE2);
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    registry.registerObject(KEY1, VALUE1);
+    registry.registerObject(KEY2, VALUE2);
 
-    assertThat(muleContext.getRegistry().get(KEY1), is(VALUE1));
-    assertThat(muleContext.getRegistry().get(KEY2), is(VALUE2));
+    assertThat(registry.get(KEY1), is(VALUE1));
+    assertThat(registry.get(KEY2), is(VALUE2));
 
-    assertThat(muleContext.getRegistry().lookupObject(Apple.class), is(VALUE1));
-    assertThat(muleContext.getRegistry().lookupObject(Kiwi.class), is(VALUE2));
+    assertThat(registry.lookupObject(Apple.class), is(VALUE1));
+    assertThat(registry.lookupObject(Kiwi.class), is(VALUE2));
   }
 
 }

@@ -18,15 +18,17 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
+
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -41,7 +43,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+  private MuleContextWithRegistries mockMuleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS);
   private ServiceRegistry mockServiceRegistry = mock(ServiceRegistry.class, RETURNS_DEEP_STUBS);
   private ConnectivityTestingStrategy mockConnectivityTestingStrategy =
       mock(ConnectivityTestingStrategy.class, RETURNS_DEEP_STUBS);
@@ -53,11 +55,13 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
     connectivityTestingService = new DefaultConnectivityTestingService();
     connectivityTestingService.setServiceRegistry(mockServiceRegistry);
     connectivityTestingService.setMuleContext(mockMuleContext);
+    connectivityTestingService.setLocator(mockMuleContext.getConfigurationComponentLocator());
+
     when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class)))
         .thenReturn(of(fakeConnectivityTestingObject));
     when(mockServiceRegistry.lookupProviders(any(), any())).thenReturn(asList(mockConnectivityTestingStrategy));
     when(mockConnectivityTestingStrategy.accepts(fakeConnectivityTestingObject)).thenReturn(true);
-    when(mockMuleContext.getRegistry().get(TEST_IDENTIFIER)).thenReturn(fakeConnectivityTestingObject);
+    registerIntoMockContext(mockMuleContext, TEST_IDENTIFIER, fakeConnectivityTestingObject);
     connectivityTestingService.initialise();
   }
 
@@ -92,7 +96,10 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   public void nonExistentConnectivityTestingObject() {
     reset(mockMuleContext);
     when(mockMuleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(empty());
+
+    connectivityTestingService.setLocator(mockMuleContext.getConfigurationComponentLocator());
     expectedException.expect(ObjectNotFoundException.class);
+
     connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
   }
 

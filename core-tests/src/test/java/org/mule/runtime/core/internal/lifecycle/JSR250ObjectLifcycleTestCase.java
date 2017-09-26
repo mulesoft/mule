@@ -8,12 +8,14 @@ package org.mule.runtime.core.internal.lifecycle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import org.junit.Test;
 
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods
@@ -23,7 +25,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testNormalBehaviour() throws Exception {
     JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-    muleContext.getRegistry().registerObject("test", tracker);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("test", tracker);
 
     muleContext.dispose();
     assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
@@ -32,7 +34,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTwoPostConstructAnnotations() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new DupePostConstructJSR250ObjectLifecycleTracker());
+      ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("test",
+                                                                             new DupePostConstructJSR250ObjectLifecycleTracker());
       fail("Object has two @PostConstruct annotations");
     } catch (IllegalArgumentException e) {
       // expected
@@ -42,7 +45,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testTwoPreDestroyAnnotations() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new DupePreDestroyJSR250ObjectLifecycleTracker());
+      ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("test",
+                                                                             new DupePreDestroyJSR250ObjectLifecycleTracker());
       fail("Object has two @PreDestroy annotations");
     } catch (IllegalArgumentException e) {
       // expected
@@ -52,7 +56,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testBadReturnTypePostConstructMethod() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new BadReturnTypePostConstructLifecycleMethodObject());
+      ((MuleContextWithRegistries) muleContext).getRegistry()
+          .registerObject("test", new BadReturnTypePostConstructLifecycleMethodObject());
       fail("PostContruct Lifecycle method has a non-void return type");
     } catch (IllegalArgumentException e) {
       // expected
@@ -62,7 +67,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testBadParamPreDestroyMethod() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new BadParamPreDestroyLifecycleMethodObject());
+      ((MuleContextWithRegistries) muleContext).getRegistry().registerObject("test",
+                                                                             new BadParamPreDestroyLifecycleMethodObject());
       fail("PreDestroy Lifecycle method has a parameter");
     } catch (IllegalArgumentException e) {
       // expected
@@ -72,7 +78,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testBadStaticPreDestroyMethod() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new BadStaticMethodPostConstructLifecycleMethodObject());
+      ((MuleContextWithRegistries) muleContext).getRegistry()
+          .registerObject("test", new BadStaticMethodPostConstructLifecycleMethodObject());
       fail("PostConstruct Lifecycle method is static");
     } catch (IllegalArgumentException e) {
       // expected
@@ -82,7 +89,8 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testBadCheckedExceptionPreDestroyMethod() throws Exception {
     try {
-      muleContext.getRegistry().registerObject("test", new BadCheckedExceptionPreDestroyLifecycleMethodObject());
+      ((MuleContextWithRegistries) muleContext).getRegistry()
+          .registerObject("test", new BadCheckedExceptionPreDestroyLifecycleMethodObject());
       fail("PreDestroy Lifecycle method throws a checked exception");
     } catch (IllegalArgumentException e) {
       // expected

@@ -18,15 +18,16 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.junit.Rule;
@@ -133,7 +134,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     enricher.setEnrichmentMessageProcessor((InternalTestProcessor) event -> CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).value("enriched").build()).build());
     CoreEvent in =
-        eventBuilder().message(InternalMessage.builder().value("").addOutboundProperty("foo", "bar").build()).build();
+        eventBuilder(muleContext).message(InternalMessage.builder().value("").addOutboundProperty("foo", "bar").build()).build();
     CoreEvent out = process(enricher, in);
     assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
     assertThat(((InternalMessage) out.getMessage()).getOutboundProperty("foo"), equalTo("bar"));
@@ -146,7 +147,7 @@ public class MessageEnricherTestCase extends AbstractReactiveProcessorTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[mel:message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor((InternalTestProcessor) event -> CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).value("enriched").build()).build());
-    CoreEvent in = eventBuilder().message(of("")).addVariable("flowFoo", "bar").build();
+    CoreEvent in = eventBuilder(muleContext).message(of("")).addVariable("flowFoo", "bar").build();
     ((PrivilegedEvent) in).getSession().setProperty("sessionFoo", "bar");
 
     CoreEvent out = process(enricher, in);

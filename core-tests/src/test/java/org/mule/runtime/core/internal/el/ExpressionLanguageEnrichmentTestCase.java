@@ -14,10 +14,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -45,7 +47,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Before
   public void setup() throws Exception {
     expressionLanguage = new MVELExpressionLanguage(muleContext);
-    muleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
 
   @Test
@@ -95,7 +97,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichFlowVariable() throws Exception {
-    CoreEvent event = eventBuilder().message(of("")).build();
+    CoreEvent event = eventBuilder(muleContext).message(of("")).build();
     CoreEvent.Builder eventBuilder = CoreEvent.builder(event);
     expressionLanguage.enrich("flowVars['foo']", event, eventBuilder, ((Component) flowConstruct).getLocation(), "bar");
     assertThat(eventBuilder.build().getVariables().get("foo").getValue(), is("bar"));
@@ -104,7 +106,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichSessionVariable() throws Exception {
-    CoreEvent event = eventBuilder().message(Message.of("")).build();
+    CoreEvent event = eventBuilder(muleContext).message(Message.of("")).build();
     CoreEvent.Builder eventBuilder = CoreEvent.builder(event);
     expressionLanguage.enrich("sessionVars['foo']", event, eventBuilder, ((Component) flowConstruct).getLocation(), "bar");
     assertThat(((PrivilegedEvent) eventBuilder.build()).getSession().getProperty("foo"), equalTo("bar"));

@@ -50,8 +50,10 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -65,16 +67,20 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.internal.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.weave.v2.model.structure.QualifiedName;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -91,9 +97,6 @@ import javax.xml.namespace.QName;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -131,7 +134,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void splitByJson() throws Exception {
     CoreEvent jsonMessage =
-        eventBuilder().message(Message.builder().value("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
+        eventBuilder(muleContext).message(Message.builder().value("[1,2,3]").mediaType(APPLICATION_JSON).build()).build();
     Iterator<TypedValue<?>> payload = expressionLanguage.split("payload", jsonMessage, BindingContext.builder().build());
     assertThat(payload.hasNext(), is(true));
     assertThat(payload.next().getValue().toString(), is("1"));
@@ -145,7 +148,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void expectedOutputShouldBeUsed() throws Exception {
     CoreEvent jsonMessage =
-        eventBuilder().message(Message.builder().value("{\"student\": false}").mediaType(APPLICATION_JSON).build()).build();
+        eventBuilder(muleContext).message(Message.builder().value("{\"student\": false}").mediaType(APPLICATION_JSON).build())
+            .build();
     TypedValue result = expressionLanguage.evaluate("payload.student", BOOLEAN, jsonMessage, BindingContext.builder().build());
     assertThat(result.getValue(), is(false));
   }
@@ -367,7 +371,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessRegistryBean() throws MuleException {
     CoreEvent event = testEvent();
-    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is("DataWeave"));
   }
@@ -375,7 +379,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessRegistryAnnotatedBean() throws MuleException {
     CoreEvent event = testEvent();
-    muleContext.getRegistry().registerObject("myBean", new MyAnnotatedBean("DataWeave"));
+    when(registry.lookupByName("myBean")).thenReturn(of(new MyAnnotatedBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", DataType.fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyAnnotatedBean.class)));
@@ -387,7 +391,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
     annotatedMyBean.setName("DataWeave");
-    muleContext.getRegistry().registerObject("myBean", annotatedMyBean);
+    when(registry.lookupByName("myBean")).thenReturn(of(annotatedMyBean));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", DataType.fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyBean.class)));
@@ -396,7 +400,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessServerFileSeparator() throws MuleException {
     CoreEvent event = testEvent();
-    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
   }
@@ -404,7 +408,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessMuleVersion() throws MuleException {
     CoreEvent event = testEvent();
-    muleContext.getRegistry().registerObject("myBean", new MyBean("DataWeave"));
+    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
   }
@@ -428,7 +432,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     ExpressionLanguage expressionLanguage = spy(ExpressionLanguage.class);
     when(languageFactory.create()).thenReturn(expressionLanguage);
     CoreEvent event = testEvent();
-    new DataWeaveExpressionLanguageAdaptor(muleContext, languageFactory).evaluate("#[payload]", event, bindingContext);
+    new DataWeaveExpressionLanguageAdaptor(muleContext, registry, languageFactory).evaluate("#[payload]", event, bindingContext);
     verify(expressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
@@ -436,7 +440,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void entrySetFunction() throws Exception {
     final String key = "foo";
     final String value = "bar";
-    CoreEvent event = eventBuilder().message(Message.builder().value(singletonMap(key, value)).build()).build();
+    CoreEvent event = eventBuilder(muleContext).message(Message.builder().value(singletonMap(key, value)).build()).build();
     TypedValue result =
         expressionLanguage.evaluate("dw::core::Objects::entrySet(payload)", event, BindingContext.builder().build());
     assertThat(result.getValue(), instanceOf(List.class));

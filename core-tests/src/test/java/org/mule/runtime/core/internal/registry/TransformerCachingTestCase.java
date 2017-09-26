@@ -10,42 +10,45 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import java.io.FilterInputStream;
 import java.nio.charset.Charset;
-
-import org.junit.Test;
 
 public class TransformerCachingTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testCacheUpdate() throws Exception {
     DataType sourceType = DataType.fromType(FilterInputStream.class);
-    Transformer trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
+    MuleRegistry registry = ((MuleContextWithRegistries) muleContext).getRegistry();
+    Transformer trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
 
     Transformer trans2 = new FilterInputStreamToByteArray();
-    muleContext.getRegistry().registerTransformer(trans2);
+    registry.registerTransformer(trans2);
 
-    trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
+    trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof FilterInputStreamToByteArray);
 
-    trans = muleContext.getRegistry().lookupTransformer(INPUT_STREAM, BYTE_ARRAY);
+    trans = registry.lookupTransformer(INPUT_STREAM, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
 
-    muleContext.getRegistry().unregisterTransformer(trans2.getName());
+    registry.unregisterTransformer(trans2.getName());
 
-    trans = muleContext.getRegistry().lookupTransformer(sourceType, BYTE_ARRAY);
+    trans = registry.lookupTransformer(sourceType, BYTE_ARRAY);
     assertNotNull(trans);
     assertTrue(trans instanceof InputStreamToByteArray);
   }

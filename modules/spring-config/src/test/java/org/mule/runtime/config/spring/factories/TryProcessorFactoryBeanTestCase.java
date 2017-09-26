@@ -9,17 +9,18 @@ package org.mule.runtime.config.spring.factories;
 import static java.util.Collections.singletonMap;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
+
 import org.mule.runtime.config.spring.internal.factories.TryProcessorFactoryBean;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -32,14 +33,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleContext muleContextMock;
+  private MuleContextWithRegistries muleContextMock;
 
   private SimpleRegistry registry;
 
   @Before
   public void setUp() throws RegistrationException {
-    when(muleContextMock.getRegistry().lookupObject(StreamingManager.class))
-        .thenReturn(mock(StreamingManager.class));
+    registerIntoMockContext(muleContextMock, StreamingManager.class, mock(StreamingManager.class));
     registry = new SimpleRegistry(muleContextMock);
     registry.registerObject("txFactory", new TransactionFactoryLocator());
   }

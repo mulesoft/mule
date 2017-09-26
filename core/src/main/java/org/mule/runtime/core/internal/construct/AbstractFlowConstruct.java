@@ -16,31 +16,33 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.getSimpleName;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
-
-import java.beans.ExceptionListener;
-import java.util.Optional;
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.beans.ExceptionListener;
+import java.util.Optional;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that:
@@ -79,8 +81,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     this.exceptionListener = exceptionListener.orElse(muleContext.getDefaultErrorHandler(of(name)));
     this.initialState = initialState;
     try {
-      this.lifecycleManager =
-          new FlowConstructLifecycleManager(this, muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+      this.lifecycleManager = new FlowConstructLifecycleManager(this, ((MuleContextWithRegistries) muleContext).getRegistry()
+          .lookupObject(NotificationDispatcher.class));
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

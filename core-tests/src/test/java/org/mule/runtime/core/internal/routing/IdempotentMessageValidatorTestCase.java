@@ -13,19 +13,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.message.Message.of;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
@@ -44,7 +44,8 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
 
   @Before
   public void reset() {
-    //Needs to create a new validator for every test because the idExpression needs to be reset and there is not way of knowing the default from the test
+    // Needs to create a new validator for every test because the idExpression needs to be reset and there is not way of knowing
+    // the default from the test
     idempotent = new IdempotentMessageValidator();
     idempotent.setStorePrefix("foo");
     idempotent.setObjectStore(new InMemoryObjectStore<String>());
@@ -85,7 +86,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message okMessage = of("OK");
     CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
-    //Set MEL expression to hash value
+    // Set MEL expression to hash value
     idempotent.setIdExpression(melExpression);
 
     // This one will process the event on the target endpoint
@@ -112,7 +113,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message okMessage = of("Hello");
     CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
 
-    //Set DW expression to hash value
+    // Set DW expression to hash value
     idempotent.setIdExpression(dwExpression);
 
     // This one will process the event on the target endpoint
@@ -141,12 +142,13 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message message = of(payload);
     CoreEvent event = CoreEvent.builder(context).message(message).build();
 
-    //Set DW expression to hash value
+    // Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
 
-    //Evaluate DW expression outside MessageValidator
+    // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
-        new DataWeaveExpressionLanguageAdaptor(muleContext, new WeaveDefaultExpressionLanguageFactoryService());
+        new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
+                                               new WeaveDefaultExpressionLanguageFactoryService());
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     // This one will process the event on the target endpoint
@@ -177,12 +179,13 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message message = of(payload);
     CoreEvent event = CoreEvent.builder(context).message(message).build();
 
-    //Set DW expression to hash value
+    // Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
 
-    //Evaluate DW expression outside MessageValidator
+    // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
-        new DataWeaveExpressionLanguageAdaptor(muleContext, new WeaveDefaultExpressionLanguageFactoryService());
+        new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
+                                               new WeaveDefaultExpressionLanguageFactoryService());
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     // This one will process the event on the target endpoint

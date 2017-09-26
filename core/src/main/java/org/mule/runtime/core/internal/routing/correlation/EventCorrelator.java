@@ -12,46 +12,47 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.api.notification.RoutingNotification.CORRELATION_TIMEOUT;
 import static org.mule.runtime.api.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.message.GroupCorrelation.NOT_SET;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.notification.RoutingNotification;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableObjectStore;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.notification.RoutingNotification;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.routing.EventGroup;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.privileged.util.monitor.Expirable;
 import org.mule.runtime.core.privileged.util.monitor.ExpiryMonitor;
-import org.mule.runtime.core.internal.routing.EventGroup;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EventCorrelator implements Startable, Stoppable {
 
@@ -106,7 +107,7 @@ public class EventCorrelator implements Startable, Stoppable {
     this.callback = callback;
     this.muleContext = muleContext;
     try {
-      this.notificationFirer = muleContext.getRegistry().lookupObject(NotificationDispatcher.class);
+      this.notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }

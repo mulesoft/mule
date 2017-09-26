@@ -23,6 +23,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -31,10 +32,10 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -114,7 +115,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    process(simpleForeach, eventBuilder().message(of(arrayList)).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(arrayList)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -124,7 +125,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     String[] array = new String[2];
     array[0] = "bar";
     array[1] = "zip";
-    process(simpleForeach, eventBuilder().message(of(array)).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(array)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -135,7 +136,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     list.add(of("bar"));
     list.add(of("zip"));
 
-    process(simpleForeach, eventBuilder().message(of(list)).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(list)).build());
 
     assertSimpleProcessedMessages();
   }
@@ -143,7 +144,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    final CoreEvent testEvent = eventBuilder().message(of(iterable)).build();
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of(iterable)).build();
     process(simpleForeach, testEvent);
 
     assertSimpleProcessedMessages();
@@ -152,7 +153,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void iteratorPayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    process(simpleForeach, eventBuilder().message(of(iterable.iterator())).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(iterable.iterator())).build());
 
     assertSimpleProcessedMessages();
   }
@@ -161,14 +162,14 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void mapPayload() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage(Foreach.MAP_NOT_SUPPORTED_MESSAGE);
-    process(simpleForeach, eventBuilder().message(of(singletonMap("foo", "bar"))).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
   @Test
   public void mapEntrySetExpression() throws Exception {
     simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
     simpleForeach.initialise();
-    process(simpleForeach, eventBuilder().message(of(singletonMap("foo", "bar"))).build());
+    process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
   @Test
@@ -187,7 +188,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     payload.add(elem2);
     payload.add(elem3);
 
-    process(nestedForeach, eventBuilder().message(of(payload)).build());
+    process(nestedForeach, eventBuilder(muleContext).message(of(payload)).build());
 
     assertNestedProcessedMessages();
   }
@@ -202,7 +203,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     payload[2][0] = "b2";
     payload[2][1] = "c1";
 
-    process(nestedForeach, eventBuilder().message(of(payload)).build());
+    process(nestedForeach, eventBuilder(muleContext).message(of(payload)).build());
     assertNestedProcessedMessages();
   }
 
@@ -225,7 +226,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     parentList.add(of(list2));
     Message parentCollection = of(parentList);
 
-    process(nestedForeach, eventBuilder().message(parentCollection).build());
+    process(nestedForeach, eventBuilder(muleContext).message(parentCollection).build());
 
     assertNestedProcessedMessages();
   }
@@ -234,7 +235,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void nestedIterablePayload() throws Exception {
     Iterable<DummySimpleIterableClass> iterable = new DummyNestedIterableClass();
 
-    process(nestedForeach, eventBuilder().message(of(iterable)).build());
+    process(nestedForeach, eventBuilder(muleContext).message(of(iterable)).build());
     assertNestedProcessedMessages();
   }
 
@@ -242,7 +243,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   public void nestedIteratorPayload() throws Exception {
     Iterable<DummySimpleIterableClass> iterable = new DummyNestedIterableClass();
 
-    process(nestedForeach, eventBuilder().message(of(iterable)).build());
+    process(nestedForeach, eventBuilder(muleContext).message(of(iterable)).build());
     assertNestedProcessedMessages();
   }
 
@@ -259,7 +260,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(), false);
+    process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(), false);
   }
 
   private Foreach createForeach() {
@@ -279,7 +280,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     expectedException.expect(instanceOf(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(foreach));
     expectedException.expectCause(instanceOf(ExpressionRuntimeException.class));
-    process(foreach, eventBuilder().message(of(new DummyNestedIterableClass().iterator())).build(),
+    process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(),
             false);
   }
 
@@ -292,7 +293,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreachMp.setBatchSize(2);
     foreachMp.initialise();
 
-    foreachMp.process(eventBuilder().message(of(asList(1, 2, 3))).build());
+    foreachMp.process(eventBuilder(muleContext).message(of(asList(1, 2, 3))).build());
 
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
@@ -308,7 +309,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreachMp.setBatchSize(2);
     foreachMp.setCollectionExpression("vars.collection");
     foreachMp.initialise();
-    foreachMp.process(eventBuilder().addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
+    foreachMp.process(eventBuilder(muleContext).addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
@@ -320,7 +321,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    CoreEvent in = eventBuilder().message(of(arrayList)).build();
+    CoreEvent in = eventBuilder(muleContext).message(of(arrayList)).build();
     process(simpleForeach, in);
 
     assertSimpleProcessedMessages();
@@ -336,7 +337,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void empty() throws Exception {
-    CoreEvent input = eventBuilder().message(of(emptyList())).build();
+    CoreEvent input = eventBuilder(muleContext).message(of(emptyList())).build();
     CoreEvent result = process(simpleForeach, input);
 
     assertThat(result.getMessage(), equalTo(input.getMessage()));
