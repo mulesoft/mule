@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -18,11 +17,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions
@@ -70,7 +69,7 @@ public class ExpressionValueResolver<T> implements ExpressionBasedValueResolver<
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(extendedExpressionManager);
+    // TODO (elrodro83) MULE-13627 remove this initialization
     initEvaluator();
   }
 

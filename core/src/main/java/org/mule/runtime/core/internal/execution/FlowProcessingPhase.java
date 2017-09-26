@@ -42,6 +42,11 @@ public class FlowProcessingPhase extends NotificationFiringProcessingPhase<FlowP
 
   private Registry registry;
 
+  /**
+   * Creates a new FlowProcessingPhase with the provided {@link Registry}.
+   * 
+   * @param registry the registry to perform flow lookups.
+   */
   public FlowProcessingPhase(Registry registry) {
     this.registry = registry;
   }

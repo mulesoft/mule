@@ -14,22 +14,17 @@ import org.mule.runtime.core.internal.registry.Registry;
  * Declares {@link MuleRegistry} handling methods for {@link MuleContext}.
  *
  * @since 4.0
+ *
+ * @deprecated Use {@link org.mule.runtime.api.artifact.Registry} instead.
  */
 // TODO MULE-13627 Remove downcasts to this interface
+@Deprecated
 public interface MuleContextWithRegistries extends MuleContext {
 
   MuleRegistry getRegistry();
 
-  /**
-   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-   */
-  @Deprecated
   void addRegistry(Registry registry);
 
-  /**
-   * @deprecated as of 3.7.0. This will be removed in Mule 4.0
-   */
-  @Deprecated
   void removeRegistry(Registry registry);
 
 }

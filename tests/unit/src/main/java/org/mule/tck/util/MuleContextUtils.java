@@ -212,13 +212,14 @@ public class MuleContextUtils {
 
   /**
    * Creates a basic event builder with its context already set.
-   *
-   * @return a basic event builder with its context already set.
    */
   public static <B extends CoreEvent.Builder> B eventBuilder() throws MuleException {
     return eventBuilder(mockContextWithServices());
   }
 
+  /**
+   * Creates a basic event builder with its context built from the provided {@code muleContext}.
+   */
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);

@@ -26,13 +26,13 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 
+import org.mockito.Mockito;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -61,11 +61,17 @@ public final class MuleTestUtils {
     return spy;
   }
 
+  /**
+   * Creates an empty flow named {@link MuleTestUtils#APPLE_FLOW}.
+   */
   public static Flow getTestFlow(MuleContext context) throws MuleException {
     // Use direct processing strategy given flow used in test event is not used for processing.
     return createFlow(context, APPLE_FLOW);
   }
 
+  /**
+   * Creates an empty flow with the provided name.
+   */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
     final Flow flow = builder(flowName, context).withDirectProcessingStrategyFactory().build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));

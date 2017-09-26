@@ -112,7 +112,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
 
   protected void lookupObjectInstance() throws InitialisationException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("No object instance speciedied.  Looking up single instance of type %s in mule registry",
+      LOGGER.debug(format("No object instance specified. Looking up single instance of type %s in mule registry",
                           objectType));
     }
 
