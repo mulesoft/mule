@@ -86,5 +86,7 @@ public interface DeploymentListener {
    * @param artifactName name of the application that owns the mule context
    * @param registry mule registry for the application being deployed
    */
-  default void onArtifactInitialised(String artifactName, Registry registry) {}
+  default void onArtifactInitialised(String artifactName, Registry registry) {
+
+  }
 }
