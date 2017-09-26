@@ -41,6 +41,8 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
@@ -55,6 +57,7 @@ import org.junit.Test;
  */
 public class ApplicationPolicyDeploymentTestCase extends DeploymentServiceTestCase {
 
+  private static final int POLICY_NOTIFICATION_TIMEOUT = 5000;
 
   private static final String BAR_POLICY_ID = "barPolicy";
   private static final String POLICY_PROPERTY_VALUE = "policyPropertyValue";
@@ -138,8 +141,16 @@ public class ApplicationPolicyDeploymentTestCase extends DeploymentServiceTestCa
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
-    assertThat(notificationListenerActionIds, hasSize(4));
-    assertThat(notificationListenerActionIds, hasItems(PROCESS_START, BEFORE_NEXT, AFTER_NEXT, PROCESS_END));
+    new PollingProber(POLICY_NOTIFICATION_TIMEOUT, 100).check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        assertThat(notificationListenerActionIds, hasSize(4));
+        assertThat(notificationListenerActionIds, hasItems(PROCESS_START, BEFORE_NEXT, AFTER_NEXT, PROCESS_END));
+        return true;
+      }
+      
+    });
   }
 
   @Test
