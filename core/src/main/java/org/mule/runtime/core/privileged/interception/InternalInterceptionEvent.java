@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.interception;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 /**
  * Adds support for compatibility attribues of the {@link CoreEvent} to {@link InterceptionEvent}.
@@ -31,5 +32,12 @@ public interface InternalInterceptionEvent extends InterceptionEvent {
    * @return the builder instance
    */
   InternalInterceptionEvent session(MuleSession session);
+
+  /**
+   * Updates the state of this object if needed.
+   *
+   * @return {@link PrivilegedEvent} with the result.
+   */
+  PrivilegedEvent resolve();
 
 }
