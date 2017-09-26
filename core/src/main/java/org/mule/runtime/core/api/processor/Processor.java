@@ -38,7 +38,7 @@ public interface Processor extends ReactiveProcessor {
   CoreEvent process(CoreEvent event) throws MuleException;
 
   /**
-   * Applies a {@link Publisher< InternalEvent >} function transforming a stream of {@link CoreEvent}'s.
+   * Applies a {@link Publisher< CoreEvent >} function transforming a stream of {@link CoreEvent}'s.
    * <p>
    * The default implementation delegates to {@link #process(CoreEvent)} and will:
    * <ol>
