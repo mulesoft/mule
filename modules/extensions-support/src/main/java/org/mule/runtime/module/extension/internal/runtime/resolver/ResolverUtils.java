@@ -13,7 +13,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
-
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,7 +24,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.stackable
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 /**
  * Utility class to share common behaviour between resolvers
@@ -70,17 +68,14 @@ public class ResolverUtils {
                                            muleContext);
   }
 
-  /**
-   * Gets a {@link ValueResolver} for the parameter if it has an associated a default value or encoding.
-   *
-   * @param hasDefaultEncoding whether the parameter has to use runtime's default encoding or not
-   * @return {@link Supplier} for obtaining the the proper {@link ValueResolver} for the default value, {@code null} if there is
-   *         no default.
-   */
-  static ValueResolver<?> getDefaultValueResolver(boolean hasDefaultEncoding, MuleContext muleContext,
-                                                  Supplier<ValueResolver<?>> supplier) {
-    // TODO MULE-13066
-    return hasDefaultEncoding ? new StaticValueResolver<>(muleContext.getConfiguration().getDefaultEncoding()) : supplier.get();
+  static ValueResolver<?> getDefaultValueResolver(ParameterModel parameter, MuleContext muleContext) {
+    Object defaultValue = parameter.getDefaultValue();
+    if (defaultValue instanceof String) {
+      return getExpressionBasedValueResolver((String) defaultValue, parameter, muleContext);
+    } else if (defaultValue != null) {
+      return new StaticValueResolver<>(defaultValue);
+    }
+    return null;
   }
 
   public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)

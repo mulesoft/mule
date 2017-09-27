@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
 
 
@@ -20,11 +22,22 @@
         </petstore:cage>
     </petstore:config>
 
-    <flow name="fieldEncoding">
-        <petstore:get-cage config-ref="config"/>
+    <flow name="configEncoding">
+        <petstore:get-config config-ref="config"/>
     </flow>
 
+    <petstore:phone-number name="topLevelPhoneNumber" mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
+
     <flow name="topLevelEncoding">
+        <petstore:get-default-encoding usePhoneNumber="true" phoneNumber="topLevelPhoneNumber"/>
+    </flow>
+
+    <flow name="sourceEncoding" initialState="stopped">
+        <petstore:pet-source birds="Primate"/>
+        <test:processor class="org.mule.test.module.extension.connector.PetStoreDefaultEncodingTestCase$TestProcessor"/>
+    </flow>
+
+    <flow name="inlinePojoEncoding">
         <petstore:get-default-encoding usePhoneNumber="true">
             <petstore:phone-number mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
         </petstore:get-default-encoding>
@@ -32,9 +45,5 @@
 
     <flow name="argumentEncoding">
         <petstore:get-default-encoding usePhoneNumber="false"/>
-    </flow>
-
-    <flow name="overridedArgumentEncoding">
-        <petstore:get-default-encoding usePhoneNumber="false" encoding="#[vars.customEncoding]"/>
     </flow>
 </mule>

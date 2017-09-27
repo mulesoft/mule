@@ -39,7 +39,6 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -50,7 +49,6 @@ import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelPrope
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.contributor.ParameterDeclarerContributor;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -125,7 +123,6 @@ public final class ParameterModelsLoaderDelegate {
       parseExpressionSupport(extensionParameter, parameter);
       parseConfigOverride(extensionParameter, parameter);
       parseNullSafe(extensionParameter, parameter);
-      parseDefaultEncoding(extensionParameter, parameter);
       parseLayout(extensionParameter, parameter);
       addImplementingTypeModelProperty(extensionParameter, parameter);
       parseParameterDsl(extensionParameter, parameter);
@@ -151,14 +148,6 @@ public final class ParameterModelsLoaderDelegate {
   private void parseConfigOverride(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
     if (extensionParameter.getAnnotation(ConfigOverride.class).isPresent()) {
       parameter.asConfigOverride();
-    }
-  }
-
-  private void parseDefaultEncoding(ExtensionParameter extensionParameter, ParameterDeclarer parameter) {
-    // TODO: MULE-9220 - Add a syntax validator which checks that the annotated parameter is a String
-    if (extensionParameter.getAnnotation(DefaultEncoding.class).isPresent()) {
-      parameter.getDeclaration().setRequired(false);
-      parameter.withModelProperty(new DefaultEncodingModelProperty());
     }
   }
 

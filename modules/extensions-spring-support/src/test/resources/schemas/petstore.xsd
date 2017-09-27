@@ -23,7 +23,6 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionString" use="required" name="mobile"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="required" name="home"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="countryEncoding"></xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="areaCodes"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
@@ -121,7 +120,6 @@
         <xs:attribute type="mule:expressionMap" use="optional" name="birds"></xs:attribute>
         <xs:attribute type="mule:expressionList" use="optional" name="ammenities"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -538,6 +536,29 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetConfigType" substitutionGroup="mule:abstract-operator" name="get-config"></xs:element>
+  <xs:complexType name="GetConfigType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:substitutableName" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetPetsType" substitutionGroup="mule:abstract-operator" name="get-pets"></xs:element>
   <xs:complexType name="GetPetsType">
     <xs:complexContent>
@@ -712,7 +733,6 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="usePhoneNumber"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
           <xs:annotation>
             <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>

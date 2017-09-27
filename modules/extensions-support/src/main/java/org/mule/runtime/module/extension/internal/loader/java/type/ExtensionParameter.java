@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -60,7 +61,7 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
    */
   default boolean shouldBeAdvertised() {
     return !(assignableFromAny(getType().getDeclaringClass(), IMPLICIT_ARGUMENT_TYPES)
-        || (isAnnotatedWith(Config.class) || isAnnotatedWith(Connection.class)));
+        || (isAnnotatedWith(Config.class) || isAnnotatedWith(Connection.class) || isAnnotatedWith(DefaultEncoding.class)));
   }
 
   /**

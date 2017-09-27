@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,6 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockImplementingType;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -62,19 +62,19 @@ public class ComponentLocationModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void noLocationField() {
-    mockSourceType(NoLocation.class);
+    mockImplementingType(sourceModel, NoLocation.class);
     assertValid();
   }
 
   @Test
   public void oneLocationField() {
-    mockSourceType(OneLocation.class);
+    mockImplementingType(sourceModel, OneLocation.class);
     assertValid();
   }
 
   @Test
   public void twoLocationFields() {
-    mockSourceType(TwoLocation.class);
+    mockImplementingType(sourceModel, TwoLocation.class);
     validator.validate(extensionModel, reporter);
     assertThat(reporter.getErrors(), hasSize(1));
     assertThat(reporter.getErrors().get(0).getMessage(), allOf(
@@ -85,11 +85,6 @@ public class ComponentLocationModelValidatorTestCase extends AbstractMuleTestCas
   private void assertValid() {
     validator.validate(extensionModel, reporter);
     assertThat(reporter.hasErrors(), is(false));
-  }
-
-  private void mockSourceType(Class<? extends Source> sourceType) {
-    when(sourceModel.getModelProperty(ImplementingTypeModelProperty.class)).thenReturn(
-                                                                                       of(new ImplementingTypeModelProperty(sourceType)));
   }
 
   private static abstract class TestSource extends Source<Void, Void> {

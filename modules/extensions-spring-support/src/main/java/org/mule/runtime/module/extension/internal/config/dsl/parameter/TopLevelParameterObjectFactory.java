@@ -101,9 +101,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
-      if (name != null) {
-        builder.setName(name);
-      }
+      injectFields();
 
       ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
       if (resolver.isDynamic()) {
@@ -115,6 +113,13 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     }, Exception.class, exception -> {
       throw exception;
     });
+  }
+
+  private void injectFields() {
+    builder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
+    if (name != null) {
+      builder.setName(name);
+    }
   }
 
   public void setName(String name) {

@@ -57,6 +57,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String CONFIG_NAME = "config";
+  private static final String ENCODING = "UTF-8";
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel configurationModel;
@@ -88,7 +89,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Mock
   private ConnectionProviderValueResolver<Object> connectionProviderValueResolver;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
   private ResolverSet resolverSet;
@@ -108,7 +109,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
         .thenReturn(of(new ConnectivityModelProperty(Banana.class)));
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
     when(sourceModel.getSuccessCallback()).thenReturn(of(sourceCallbackModel));
-
+    when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(ENCODING);
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
     factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, muleContext);
   }

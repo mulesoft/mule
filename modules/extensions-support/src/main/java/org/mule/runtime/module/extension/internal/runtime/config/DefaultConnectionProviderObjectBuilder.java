@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectRefName;
 import static org.springframework.util.ClassUtils.getAllInterfaces;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -69,8 +69,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = super.build(result).getFirst();
-    injectRefName(providerModel, provider, ownerConfigName);
-
+    injectFields(providerModel, provider, ownerConfigName, muleContext.getConfiguration().getDefaultEncoding());
     return provider;
   }
 

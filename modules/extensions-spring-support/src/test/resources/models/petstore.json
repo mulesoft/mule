@@ -2764,6 +2764,111 @@
         },
         {
           "blocking": true,
+          "executionType": "CPU_LITE",
+          "output": {
+            "type": {
+              "format": "java",
+              "type": "@ref:org.mule.test.petstore.extension.PetStoreConnector"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "outputAttributes": {
+            "type": {
+              "format": "java",
+              "type": "Void"
+            },
+            "hasDynamicType": false,
+            "description": "",
+            "modelProperties": {}
+          },
+          "transactional": false,
+          "requiresConnection": false,
+          "supportsStreaming": false,
+          "nestedComponents": [],
+          "errors": [],
+          "stereotype": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          },
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "target",
+                  "displayModel": {
+                    "displayName": "Target Variable"
+                  },
+                  "description": "The name of a variable on which the operation\u0027s output will be placed",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "REQUIRED",
+                  "defaultValue": "#[payload]",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "tabName": "Advanced"
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "targetValue",
+                  "displayModel": {
+                    "displayName": "Target Value"
+                  },
+                  "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "Output",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "getConfig",
+          "description": "",
+          "modelProperties": {},
+          "kind": "operation"
+        },
+        {
+          "blocking": true,
           "executionType": "BLOCKING",
           "output": {
             "type": {
@@ -8306,33 +8411,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3
-              },
-              "allowedStereotypeModels": [],
-              "name": "encoding",
-              "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 4,
+                "order": 3,
                 "tabName": "Advanced"
               },
               "allowedStereotypeModels": [],
@@ -14359,22 +14438,6 @@
               "value": "SUPPORTED"
             }
           }
-        },
-        {
-          "key": {
-            "name": "encoding"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
         }
       ]
     },
@@ -14846,6 +14909,1400 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.test.petstore.extension.PetStoreConnector",
+        "classInformation": {
+          "classname": "org.mule.test.petstore.extension.PetStoreConnector",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "PetStoreConnector"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "pets",
+            "required": "true"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.List",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.util.Collection"
+                ],
+                "parent": "",
+                "genericTypes": []
+              }
+            },
+            "item": {
+              "type": "String"
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "tls"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+              "typeAlias": {
+                "value": "Tls"
+              },
+              "typeDsl": {
+                "allowInlineDefinition": true,
+                "allowTopLevelDefinition": true
+              },
+              "QName": {
+                "value": {
+                  "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                  "localPart": "context",
+                  "prefix": "tls"
+                }
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "enabledProtocols"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A comma separated list of protocols enabled for this context."
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "enabledCipherSuites"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "description": {
+                    "value": "A comma separated list of cipher suites enabled for this context."
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "trust-store"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "TrustStore",
+                    "description": {
+                      "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "path"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                        },
+                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "displayModel": {
+                            "pathModel": {
+                              "type": "FILE",
+                              "fileExtensions": [],
+                              "acceptsUrls": false
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "password"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the trust store."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "type"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
+                            }
+                          }
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The type of store used."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "algorithm"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The algorithm used by the trust store."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "insecure"
+                      },
+                      "model": {
+                        "type": "Boolean",
+                        "annotations": {
+                          "default": "false"
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "key-store"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "KeyStore",
+                    "description": {
+                      "value": "Key store configuration. The key store contains the keys of this server/client."
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "path"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                        },
+                        "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                          "displayModel": {
+                            "pathModel": {
+                              "type": "FILE",
+                              "fileExtensions": [],
+                              "acceptsUrls": false
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "type"
+                      },
+                      "model": {
+                        "type": "String",
+                        "annotations": {
+                          "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                            "displayModel": {
+                              "example": "jks, jceks, pkcs12 or other store type"
+                            }
+                          }
+                        }
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The type of store used."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "alias"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "When the key store contains many private keys, this attribute indicates the alias of the key that should be used. If not defined, the first key in the file will be used by default."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "keyPassword"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the private key."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "password"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The password used to protect the key store."
+                        },
+                        "layout": {
+                          "layoutModel": {
+                            "password": true,
+                            "text": false,
+                            "query": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "algorithm"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "The algorithm used by the key store."
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterDsl": {
+                    "allowInlineDefinition": true,
+                    "allowReferences": false
+                  },
+                  "expressionSupport": {
+                    "value": "NOT_SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "cage"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.petstore.extension.PetCage",
+              "classInformation": {
+                "classname": "org.mule.test.petstore.extension.PetCage",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "PetCage"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "birds"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.Map",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": [
+                        "java.lang.String",
+                        "java.lang.Integer"
+                      ]
+                    }
+                  },
+                  "open": {
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.lang.Integer",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "java.lang.Number",
+                        "genericTypes": []
+                      }
+                    }
+                  },
+                  "fields": []
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "ammenities"
+                },
+                "model": {
+                  "type": "Array",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.util.List",
+                      "hasDefaultConstructor": false,
+                      "isInterface": true,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.util.Collection"
+                      ],
+                      "parent": "",
+                      "genericTypes": []
+                    }
+                  },
+                  "item": {
+                    "type": "String"
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "tls"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+                    "typeAlias": {
+                      "value": "Tls"
+                    },
+                    "typeDsl": {
+                      "allowInlineDefinition": true,
+                      "allowTopLevelDefinition": true
+                    },
+                    "QName": {
+                      "value": {
+                        "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                        "localPart": "context",
+                        "prefix": "tls"
+                      }
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "enabledProtocols"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "A comma separated list of protocols enabled for this context."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "enabledCipherSuites"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "description": {
+                          "value": "A comma separated list of cipher suites enabled for this context."
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "trust-store"
+                      },
+                      "model": {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "TrustStore",
+                          "description": {
+                            "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "path"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                              },
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "pathModel": {
+                                    "type": "FILE",
+                                    "fileExtensions": [],
+                                    "acceptsUrls": false
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "password"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The password used to protect the trust store."
+                              },
+                              "layout": {
+                                "layoutModel": {
+                                  "password": true,
+                                  "text": false,
+                                  "query": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "type"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "example": "jks, jceks, pkcs12 or other store type"
+                                  }
+                                }
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The type of store used."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "algorithm"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The algorithm used by the trust store."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "insecure"
+                            },
+                            "model": {
+                              "type": "Boolean",
+                              "annotations": {
+                                "default": "false"
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "annotations": {
+                        "parameterDsl": {
+                          "allowInlineDefinition": true,
+                          "allowReferences": false
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "key-store"
+                      },
+                      "model": {
+                        "type": "Object",
+                        "annotations": {
+                          "typeId": "KeyStore",
+                          "description": {
+                            "value": "Key store configuration. The key store contains the keys of this server/client."
+                          }
+                        },
+                        "fields": [
+                          {
+                            "key": {
+                              "name": "path"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                              },
+                              "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                "displayModel": {
+                                  "pathModel": {
+                                    "type": "FILE",
+                                    "fileExtensions": [],
+                                    "acceptsUrls": false
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "type"
+                            },
+                            "model": {
+                              "type": "String",
+                              "annotations": {
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "example": "jks, jceks, pkcs12 or other store type"
+                                  }
+                                }
+                              }
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The type of store used."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "alias"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "When the key store contains many private keys, this attribute indicates the alias of the key that should be used. If not defined, the first key in the file will be used by default."
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "keyPassword"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The password used to protect the private key."
+                              },
+                              "layout": {
+                                "layoutModel": {
+                                  "password": true,
+                                  "text": false,
+                                  "query": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "password"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The password used to protect the key store."
+                              },
+                              "layout": {
+                                "layoutModel": {
+                                  "password": true,
+                                  "text": false,
+                                  "query": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "key": {
+                              "name": "algorithm"
+                            },
+                            "model": {
+                              "type": "String"
+                            },
+                            "annotations": {
+                              "description": {
+                                "value": "The algorithm used by the key store."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "annotations": {
+                        "parameterDsl": {
+                          "allowInlineDefinition": true,
+                          "allowReferences": false
+                        },
+                        "expressionSupport": {
+                          "value": "NOT_SUPPORTED"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "cages"
+          },
+          "model": {
+            "type": "Array",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.util.List",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.util.Collection"
+                ],
+                "parent": "",
+                "genericTypes": []
+              }
+            },
+            "item": {
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.petstore.extension.PetCage",
+                "classInformation": {
+                  "classname": "org.mule.test.petstore.extension.PetCage",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": []
+                },
+                "typeAlias": {
+                  "value": "PetCage"
+                }
+              },
+              "fields": [
+                {
+                  "key": {
+                    "name": "birds"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.Map",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [
+                          "java.lang.String",
+                          "java.lang.Integer"
+                        ]
+                      }
+                    },
+                    "open": {
+                      "type": "Number",
+                      "annotations": {
+                        "classInformation": {
+                          "classname": "java.lang.Integer",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "java.lang.Number",
+                          "genericTypes": []
+                        }
+                      }
+                    },
+                    "fields": []
+                  },
+                  "annotations": {
+                    "parameterPurpose": {
+                      "role": "BEHAVIOUR"
+                    },
+                    "expressionSupport": {
+                      "value": "SUPPORTED"
+                    }
+                  }
+                },
+                {
+                  "key": {
+                    "name": "ammenities"
+                  },
+                  "model": {
+                    "type": "Array",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.util.List",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.util.Collection"
+                        ],
+                        "parent": "",
+                        "genericTypes": []
+                      }
+                    },
+                    "item": {
+                      "type": "String"
+                    }
+                  },
+                  "annotations": {
+                    "parameterPurpose": {
+                      "role": "BEHAVIOUR"
+                    },
+                    "expressionSupport": {
+                      "value": "SUPPORTED"
+                    }
+                  }
+                },
+                {
+                  "key": {
+                    "name": "tls"
+                  },
+                  "model": {
+                    "type": "Object",
+                    "annotations": {
+                      "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+                      "typeAlias": {
+                        "value": "Tls"
+                      },
+                      "typeDsl": {
+                        "allowInlineDefinition": true,
+                        "allowTopLevelDefinition": true
+                      },
+                      "QName": {
+                        "value": {
+                          "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
+                          "localPart": "context",
+                          "prefix": "tls"
+                        }
+                      }
+                    },
+                    "fields": [
+                      {
+                        "key": {
+                          "name": "enabledProtocols"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "A comma separated list of protocols enabled for this context."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "enabledCipherSuites"
+                        },
+                        "model": {
+                          "type": "String"
+                        },
+                        "annotations": {
+                          "description": {
+                            "value": "A comma separated list of cipher suites enabled for this context."
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "trust-store"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "TrustStore",
+                            "description": {
+                              "value": "Trust store configuration. If used client side, the trust store contains the certificates of the trusted servers. If used server side, it contains the certificates of the trusted clients."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the trust store."
+                                },
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "pathModel": {
+                                      "type": "FILE",
+                                      "fileExtensions": [],
+                                      "acceptsUrls": false
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "password"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The password used to protect the trust store."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "type"
+                              },
+                              "model": {
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
+                                    }
+                                  }
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The type of store used."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "algorithm"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The algorithm used by the trust store."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "insecure"
+                              },
+                              "model": {
+                                "type": "Boolean",
+                                "annotations": {
+                                  "default": "false"
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "If true, no certificate validations will be performed, rendering connections vulnerable to attacks. Use at your own risk."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      },
+                      {
+                        "key": {
+                          "name": "key-store"
+                        },
+                        "model": {
+                          "type": "Object",
+                          "annotations": {
+                            "typeId": "KeyStore",
+                            "description": {
+                              "value": "Key store configuration. The key store contains the keys of this server/client."
+                            }
+                          },
+                          "fields": [
+                            {
+                              "key": {
+                                "name": "path"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The location (which will be resolved relative to the current classpath and file system, if possible) of the key store."
+                                },
+                                "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                  "displayModel": {
+                                    "pathModel": {
+                                      "type": "FILE",
+                                      "fileExtensions": [],
+                                      "acceptsUrls": false
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "type"
+                              },
+                              "model": {
+                                "type": "String",
+                                "annotations": {
+                                  "org.mule.runtime.extension.api.declaration.type.annotation.DisplayTypeAnnotation": {
+                                    "displayModel": {
+                                      "example": "jks, jceks, pkcs12 or other store type"
+                                    }
+                                  }
+                                }
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The type of store used."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "alias"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "When the key store contains many private keys, this attribute indicates the alias of the key that should be used. If not defined, the first key in the file will be used by default."
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "keyPassword"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The password used to protect the private key."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "password"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The password used to protect the key store."
+                                },
+                                "layout": {
+                                  "layoutModel": {
+                                    "password": true,
+                                    "text": false,
+                                    "query": false
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "name": "algorithm"
+                              },
+                              "model": {
+                                "type": "String"
+                              },
+                              "annotations": {
+                                "description": {
+                                  "value": "The algorithm used by the key store."
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "annotations": {
+                          "parameterDsl": {
+                            "allowInlineDefinition": true,
+                            "allowReferences": false
+                          },
+                          "expressionSupport": {
+                            "value": "NOT_SUPPORTED"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "annotations": {
+                    "parameterPurpose": {
+                      "role": "BEHAVIOUR"
+                    },
+                    "expressionSupport": {
+                      "value": "SUPPORTED"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "cashier",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.petstore.extension.ExclusiveCashier",
+              "classInformation": {
+                "classname": "org.mule.test.petstore.extension.ExclusiveCashier",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "ExclusiveCashier"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "cashierName",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "rothIRA"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "pensionPlan"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "cash"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.lang.Integer",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "java.lang.Number",
+                      "genericTypes": []
+                    }
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "debt"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.lang.Integer",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "java.lang.Number",
+                      "genericTypes": []
+                    }
+                  }
+                },
+                "annotations": {
+                  "parameterPurpose": {
+                    "role": "BEHAVIOUR"
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "parameterPurpose": {
+              "role": "BEHAVIOUR"
+            },
+            "flattened": {},
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.petstore.extension.PhoneNumber",
         "classInformation": {
           "classname": "org.mule.test.petstore.extension.PhoneNumber",
@@ -14888,22 +16345,6 @@
           "key": {
             "name": "home",
             "required": "true"
-          },
-          "model": {
-            "type": "String"
-          },
-          "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },
-        {
-          "key": {
-            "name": "countryEncoding"
           },
           "model": {
             "type": "String"

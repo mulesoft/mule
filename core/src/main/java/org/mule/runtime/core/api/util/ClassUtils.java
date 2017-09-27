@@ -9,9 +9,9 @@ package org.mule.runtime.core.api.util;
 import static org.apache.commons.collections.MapUtils.getObject;
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import com.google.common.primitives.Primitives;
@@ -277,7 +277,13 @@ public class ClassUtils {
    * @throws ClassNotFoundException if the class is not available in the class loader
    */
   public static Class loadClass(final String className, final ClassLoader classLoader) throws ClassNotFoundException {
-    return classLoader.loadClass(className);
+    Class<?> clazz;
+    try {
+      clazz = classLoader.loadClass(className);
+    } catch (ClassNotFoundException e) {
+      clazz = classLoader.loadClass(getInnerClassName(className));
+    }
+    return clazz;
   }
 
   public static <T> T getFieldValue(Object target, String fieldName, boolean recursive)

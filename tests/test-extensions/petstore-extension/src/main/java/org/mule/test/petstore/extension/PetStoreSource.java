@@ -8,7 +8,9 @@ package org.mule.test.petstore.extension;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
@@ -18,8 +20,13 @@ public class PetStoreSource extends Source<String, Object> {
   @ParameterGroup(name = "Breeder")
   private ExclusivePetBreeder breeder;
 
+  @DefaultEncoding
+  private String encoding;
+
   @Override
-  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {}
+  public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
+    sourceCallback.handle(Result.<String, Object>builder().output(encoding).build());
+  }
 
   @Override
   public void onStop() {}

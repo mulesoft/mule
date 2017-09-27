@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -82,6 +83,10 @@ public abstract class ResolverSetBasedObjectBuilder<T> implements ObjectBuilder<
   protected void populate(ResolverSetResult result, Object object) throws MuleException {
     setValues(object, result, groupValueSetters);
     setValues(object, result, singleValueSetters);
+
+    if (muleContext != null) {
+      injectDefaultEncoding(object, muleContext.getConfiguration().getDefaultEncoding());
+    }
   }
 
   private List<ValueSetter> createSingleValueSetters(Class<?> prototypeClass, ResolverSet resolverSet) {

@@ -658,7 +658,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
    */
   @Override
   public MuleConfiguration getConfiguration() {
-
     return config;
   }
 

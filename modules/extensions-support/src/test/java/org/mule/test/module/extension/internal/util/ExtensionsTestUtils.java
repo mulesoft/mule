@@ -79,6 +79,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTyp
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
@@ -385,5 +386,10 @@ public final class ExtensionsTestUtils {
                                 Class<? extends MetadataType> typeQualifier) {
     assertThat(metadataType, is(instanceOf(typeQualifier)));
     getType(metadataType).ifPresent(type -> assertThat(expectedRawType.isAssignableFrom(type), is(true)));
+  }
+
+  public static void mockImplementingType(EnrichableModel model, Class<?> type) {
+    when(model.getModelProperty(ImplementingTypeModelProperty.class))
+        .thenReturn(java.util.Optional.of(new ImplementingTypeModelProperty(type)));
   }
 }

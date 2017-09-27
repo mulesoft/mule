@@ -7,32 +7,42 @@
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 
 import java.lang.reflect.Field;
 
 /**
- * A {@link ModelProperty} intended to be used on {@link ParameterModel parameters} to signal that if a value for the parameter
- * was not provided, then the runtime should use its own default encoding.
+ * Base implementation for {@link ModelProperty} that act over a particular {@link Field}
  *
  * @since 4.0
  */
-public class DefaultEncodingModelProperty extends InjectedFieldModelProperty {
+public abstract class InjectedFieldModelProperty implements ModelProperty {
+
+  /**
+   * The {@link Field} on which the default encoding should be injected
+   */
+  private final Field field;
 
   /**
    * Creates a new instance
    *
    * @param field on which the value should be injected
    */
-  public DefaultEncodingModelProperty(Field field) {
-    super(field);
+  public InjectedFieldModelProperty(Field field) {
+    this.field = field;
   }
 
   /**
-   * {@inheritDoc}
+   * @return on which the value should be injected
+   */
+  public Field getField() {
+    return field;
+  }
+
+  /**
+   * @return {@code false}
    */
   @Override
-  public String getName() {
-    return "defaultEncoding";
+  public boolean isPublic() {
+    return false;
   }
 }
