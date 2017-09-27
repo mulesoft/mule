@@ -59,11 +59,6 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   @Override
-  public T create(File artifactFolder) throws ArtifactDescriptorCreateException {
-    return create(artifactFolder, empty());
-  }
-
-  @Override
   public T create(File artifactFolder, Optional<Properties> deploymentProperties) throws ArtifactDescriptorCreateException {
     final File artifactJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + getDescriptorFileName());
     if (!artifactJsonFile.exists()) {

@@ -56,7 +56,8 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  public ArtifactPluginDescriptor create(File pluginJarFile) throws ArtifactDescriptorCreateException {
+  public ArtifactPluginDescriptor create(File pluginJarFile, Optional<Properties> deploymentProperties)
+      throws ArtifactDescriptorCreateException {
     try {
       checkArgument(pluginJarFile.isDirectory() || pluginJarFile.getName().endsWith(".jar"),
                     "provided file is not a plugin: " + pluginJarFile.getAbsolutePath());
@@ -65,7 +66,8 @@ public class ArtifactPluginDescriptorFactory
       Optional<byte[]> jsonDescriptorContentOptional = loadFileContentFrom(pluginJarFile, mulePluginJsonPathInsideJarFile);
       return jsonDescriptorContentOptional
           .map(jsonDescriptorContent -> loadFromJsonDescriptor(pluginJarFile,
-                                                               loadModelFromJson(new String(jsonDescriptorContent)), empty()))
+                                                               loadModelFromJson(new String(jsonDescriptorContent)),
+                                                               deploymentProperties))
           .orElseThrow(() -> new ArtifactDescriptorCreateException(pluginDescriptorNotFound(pluginJarFile,
                                                                                             mulePluginJsonPathInsideJarFile)));
     } catch (ArtifactDescriptorCreateException e) {

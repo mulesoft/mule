@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.service;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
@@ -61,7 +62,7 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
         new ServiceFileBuilder(SERVICE_NAME).withServiceProviderClass(PROVIDER_CLASS_NAME);
     unzip(fooService.getArtifactFile(), getServiceFolder(SERVICE_NAME));
 
-    ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME));
+    ServiceDescriptor descriptor = serviceDescriptorFactory.create(getServiceFolder(SERVICE_NAME), empty());
     assertThat(descriptor.getName(), equalTo(SERVICE_NAME));
     assertThat(descriptor.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
     assertThat(descriptor.getRootFolder(), equalTo(getServiceFolder(SERVICE_NAME)));

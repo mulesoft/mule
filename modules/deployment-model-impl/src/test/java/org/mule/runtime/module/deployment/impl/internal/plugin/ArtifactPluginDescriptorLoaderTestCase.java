@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.util.Optional.empty;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.util.FileUtils.createFile;
@@ -65,7 +66,7 @@ public class ArtifactPluginDescriptorLoaderTestCase extends AbstractMuleTestCase
     File plugin = pluginsFolder.newFile(pluginName + ".jar");
     compress(plugin, new ZipUtils.ZipResource[] {});
     pluginDescriptorLoader.load(plugin);
-    verify(artifactPluginDescriptorFactory).create(plugin);
+    verify(artifactPluginDescriptorFactory).create(plugin, empty());
   }
 
 }

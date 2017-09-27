@@ -49,7 +49,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
   }
 
   @Override
-  public ServiceDescriptor create(File artifactFolder) throws ArtifactDescriptorCreateException {
+  public ServiceDescriptor create(File artifactFolder, Optional<Properties> properties) throws ArtifactDescriptorCreateException {
     if (!artifactFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + artifactFolder.getAbsolutePath());
     }
@@ -75,7 +75,7 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
       return descriptor;
     }
 
-    return super.create(artifactFolder);
+    return super.create(artifactFolder, properties);
   }
 
   private ClassLoaderModel createClassLoaderModel(File artifactFolder) {

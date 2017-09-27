@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -40,7 +41,7 @@ public class TestPolicyManager implements DeploymentListener {
    * Creates a new manager
    *
    * @param deploymentService service that deploys applications in the container. Non null.
-   * @param policyTemplateDescriptorFactory  creates descriptors for the policy templates. Non null
+   * @param policyTemplateDescriptorFactory creates descriptors for the policy templates. Non null
    */
   public TestPolicyManager(DeploymentService deploymentService, PolicyTemplateDescriptorFactory policyTemplateDescriptorFactory) {
     checkArgument(deploymentService != null, "deploymentService cannot be null");
@@ -63,7 +64,7 @@ public class TestPolicyManager implements DeploymentListener {
       throw new IllegalStateException("Error processing policy ZIP file: " + policyTemplate, e);
     }
 
-    final PolicyTemplateDescriptor policyTemplateDescriptor = policyTemplateDescriptorFactory.create(tempFolder);
+    final PolicyTemplateDescriptor policyTemplateDescriptor = policyTemplateDescriptorFactory.create(tempFolder, empty());
     policyTemplateDescriptors.add(policyTemplateDescriptor);
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
@@ -37,7 +38,7 @@ public class ArtifactPluginDescriptorLoader {
     checkArgument(plugin != null, "plugin zip cannot be null");
     checkArgument(plugin.getName().endsWith("jar"),
                   "plugin zip must be a zip file ending with .zip or .jar, but the file name was " + plugin.getAbsolutePath());
-    return artifactPluginDescriptorFactory.create(plugin);
+    return artifactPluginDescriptorFactory.create(plugin, empty());
   }
 
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -26,7 +27,7 @@ public class ApplicationDescriptorFactoryTestCase
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          createDescriptorLoaderRepository());
 
-    return applicationDescriptorFactory.create(getArtifact(appPath));
+    return applicationDescriptorFactory.create(getArtifact(appPath), empty());
   }
 
   @Override
@@ -60,6 +61,6 @@ public class ApplicationDescriptorFactoryTestCase
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                          createDescriptorLoaderRepository());
 
-    return applicationDescriptorFactory.create(getArtifactFolder());
+    return applicationDescriptorFactory.create(getArtifactFolder(), empty());
   }
 }
