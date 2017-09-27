@@ -45,4 +45,3 @@ public interface MessagingExceptionHandler extends ExceptionHandler, Function<Me
   }
 }
 
-

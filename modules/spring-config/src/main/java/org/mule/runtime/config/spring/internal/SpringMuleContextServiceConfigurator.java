@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SER
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
@@ -101,7 +100,6 @@ import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
-import org.mule.runtime.core.internal.connector.MuleConnectorOperationLocator;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager;
@@ -163,8 +161,8 @@ class SpringMuleContextServiceConfigurator {
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES =
       ImmutableSet.<String>builder().add(OBJECT_SECURITY_MANAGER).add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
           .add(OBJECT_MULE_STREAM_CLOSER_SERVICE).add(OBJECT_CONVERTER_RESOLVER).add(OBJECT_LOCK_FACTORY)
-          .add(OBJECT_LOCK_PROVIDER).add(OBJECT_PROCESSING_TIME_WATCHER).add(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR)
-          .add(OBJECT_EXCEPTION_LOCATION_PROVIDER).add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER).build();
+          .add(OBJECT_LOCK_PROVIDER).add(OBJECT_PROCESSING_TIME_WATCHER).add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
+          .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER).build();
 
   private static final ImmutableMap<String, String> OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME =
       ImmutableMap.<String, String>builder().put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
@@ -210,7 +208,6 @@ class SpringMuleContextServiceConfigurator {
       .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
       .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
-      .put(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, getBeanDefinition(MuleConnectorOperationLocator.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
