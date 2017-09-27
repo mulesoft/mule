@@ -8,6 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -48,13 +49,16 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.MockSettings;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
@@ -65,6 +69,9 @@ import reactor.core.publisher.Mono;
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
       withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
@@ -179,12 +186,14 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     return processor;
   }
 
-  @Test(expected = MuleRuntimeException.class)
+  @Test
   public void dynamicFlowRefDoesNotExist() throws Exception {
     doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(CoreEvent.class),
                                                     any(ComponentLocation.class));
 
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
 
