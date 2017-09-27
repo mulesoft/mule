@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -163,14 +164,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void applicationDeployFailDueToDomainNotDeployed() throws Exception {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
-<<<<<<< HEAD
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
-    when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
-=======
-    descriptor.setDomain(DOMAIN_NAME);
-    when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
->>>>>>> MULE-13546: Support deployment time configuration in Mule 4
-
+    when(applicationDescriptorFactory.create(any(), empty())).thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME));
   }

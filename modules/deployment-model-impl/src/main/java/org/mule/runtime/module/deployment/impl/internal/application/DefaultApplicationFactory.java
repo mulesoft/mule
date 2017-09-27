@@ -107,7 +107,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir);
+    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir, empty());
 
     return createArtifact(descriptor);
   }
