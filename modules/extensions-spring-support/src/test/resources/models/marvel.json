@@ -287,14 +287,7 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CUSTOM_ERROR",
-              "namespace": "MARVEL",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
+            "MARVEL:CUSTOM_ERROR"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2893,30 +2886,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "MARVEL",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "MARVEL",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "MARVEL:CONNECTIVITY",
+            "MARVEL:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4075,56 +4046,16 @@
   "messageSources": [],
   "errors": [
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MARVEL",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "MARVEL:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MARVEL:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MARVEL",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CUSTOM_ERROR",
-      "namespace": "MARVEL",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "MARVEL:CUSTOM_ERROR",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},

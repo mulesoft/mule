@@ -429,106 +429,18 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "SOAP_FAULT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "ENCODING",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "INVALID_WSDL",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "ANY",
-              "namespace": "MULE"
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "RAM",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "BAD_RESPONSE",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "MULE",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "BAD_REQUEST",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CANNOT_DISPATCH",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "RAM",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "TIMEOUT",
-              "namespace": "RAM",
-              "parent": {
-                "type": "ANY",
-                "namespace": "MULE"
-              }
-            }
+            "RAM:SOAP_FAULT",
+            "RAM:ENCODING",
+            "MULE:CONNECTIVITY",
+            "RAM:INVALID_WSDL",
+            "MULE:ANY",
+            "RAM:RETRY_EXHAUSTED",
+            "RAM:BAD_RESPONSE",
+            "MULE:RETRY_EXHAUSTED",
+            "RAM:BAD_REQUEST",
+            "RAM:CANNOT_DISPATCH",
+            "RAM:CONNECTIVITY",
+            "RAM:TIMEOUT"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1650,104 +1562,40 @@
   "messageSources": [],
   "errors": [
     {
-      "type": "SOAP_FAULT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:SOAP_FAULT",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:ENCODING",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "ANY",
-      "namespace": "MULE"
+      "error": "RAM:INVALID_WSDL",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "BAD_RESPONSE",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "BAD_REQUEST",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:BAD_RESPONSE",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "ENCODING",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:BAD_REQUEST",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "INVALID_WSDL",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:CANNOT_DISPATCH",
+      "parent": "MULE:ANY"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "RAM",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "RAM:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CANNOT_DISPATCH",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "RAM",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "TIMEOUT",
-      "namespace": "RAM",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "RAM:TIMEOUT",
+      "parent": "MULE:ANY"
     }
   ],
   "modelProperties": {},

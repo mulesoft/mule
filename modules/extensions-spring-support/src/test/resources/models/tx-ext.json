@@ -179,30 +179,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -511,30 +489,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1326,30 +1282,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1579,30 +1513,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1865,30 +1777,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2118,30 +2008,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2371,30 +2239,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TX",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TX",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TX:RETRY_EXHAUSTED",
+            "TX:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4915,48 +4761,12 @@
   "messageSources": [],
   "errors": [
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "TX",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "TX:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "TX",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "TX:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},

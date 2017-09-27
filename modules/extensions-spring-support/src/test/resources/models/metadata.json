@@ -299,30 +299,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -695,30 +673,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1084,30 +1040,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1473,30 +1407,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -1824,30 +1736,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2213,30 +2103,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2546,30 +2414,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -2867,30 +2713,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3238,30 +3062,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3552,30 +3354,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3963,30 +3743,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4352,30 +4110,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -4723,30 +4459,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5000,30 +4714,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5390,30 +5082,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -5735,30 +5405,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6168,30 +5816,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6557,30 +6183,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -6908,30 +6512,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -7253,30 +6835,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9105,30 +8665,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9408,30 +8946,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -9729,30 +9245,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -10100,30 +9594,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "METADATA",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "METADATA:CONNECTIVITY",
+            "METADATA:RETRY_EXHAUSTED"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -14375,48 +13847,12 @@
   ],
   "errors": [
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
+      "error": "METADATA:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     },
     {
-      "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "METADATA",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "METADATA",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "METADATA:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     }
   ],
   "modelProperties": {},

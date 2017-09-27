@@ -319,30 +319,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TEST-OAUTH",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TEST-OAUTH",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -593,30 +571,8 @@
           "supportsStreaming": false,
           "nestedComponents": [],
           "errors": [
-            {
-              "type": "RETRY_EXHAUSTED",
-              "namespace": "TEST-OAUTH",
-              "parent": {
-                "type": "RETRY_EXHAUSTED",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            },
-            {
-              "type": "CONNECTIVITY",
-              "namespace": "TEST-OAUTH",
-              "parent": {
-                "type": "CONNECTIVITY",
-                "namespace": "MULE",
-                "parent": {
-                  "type": "ANY",
-                  "namespace": "MULE"
-                }
-              }
-            }
+            "TEST-OAUTH:RETRY_EXHAUSTED",
+            "TEST-OAUTH:CONNECTIVITY"
           ],
           "stereotype": {
             "type": "PROCESSOR",
@@ -3484,48 +3440,12 @@
   "messageSources": [],
   "errors": [
     {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "TEST-OAUTH",
-      "parent": {
-        "type": "RETRY_EXHAUSTED",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "TEST-OAUTH:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED"
     },
     {
-      "type": "CONNECTIVITY",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "ANY",
-      "namespace": "MULE"
-    },
-    {
-      "type": "RETRY_EXHAUSTED",
-      "namespace": "MULE",
-      "parent": {
-        "type": "ANY",
-        "namespace": "MULE"
-      }
-    },
-    {
-      "type": "CONNECTIVITY",
-      "namespace": "TEST-OAUTH",
-      "parent": {
-        "type": "CONNECTIVITY",
-        "namespace": "MULE",
-        "parent": {
-          "type": "ANY",
-          "namespace": "MULE"
-        }
-      }
+      "error": "TEST-OAUTH:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY"
     }
   ],
   "modelProperties": {},
