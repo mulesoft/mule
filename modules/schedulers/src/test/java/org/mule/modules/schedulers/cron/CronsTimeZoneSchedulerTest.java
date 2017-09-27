@@ -6,19 +6,13 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import com.sun.xml.internal.ws.api.model.ExceptionType;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.api.MuleContext;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.schedule.SchedulerCreationException;
 import org.mule.tck.junit4.ApplicationContextBuilder;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 
 public class CronsTimeZoneSchedulerTest {
     final static String TIMEZONE_XML = "America/Argentina/Buenos_Aires";
@@ -29,7 +23,6 @@ public class CronsTimeZoneSchedulerTest {
     public void validTimeZoneInScheduler() throws Exception {
         ApplicationContextBuilder builder = new ApplicationContextBuilder();
         builder.setApplicationResources(new String[]{"cron-scheduler-valid-time-zone.xml"});
-        builder.build();
         MuleContext test = builder.build();
         assertThat(test.getRegistry().lookupByType(CronSchedulerFactory.class).size(), equalTo(1));
         assertThat(test.getRegistry().lookupByType(CronScheduler.class).values().iterator().next().getTimeZone().getID(), equalTo(TIMEZONE_XML));
@@ -45,8 +38,7 @@ public class CronsTimeZoneSchedulerTest {
 
         } catch (Exception e)
         {
-            assertThat(e.getCause().getMessage(), equalTo("Invalid Timezone"));
-            assertThat(e.getCause().getCause().getCause().getClass().getName(), equalTo("org.mule.api.schedule.SchedulerCreationException"));
+            assertThat(getRootCause(e).getMessage(), equalTo("Invalid Timezone"));
         }
 
     }

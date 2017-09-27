@@ -10,7 +10,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.SchedulerCreationException;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.PollingReceiverWorker;
 
