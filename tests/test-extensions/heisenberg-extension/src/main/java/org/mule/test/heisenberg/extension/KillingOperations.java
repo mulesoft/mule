@@ -7,8 +7,10 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.lang.String.format;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.KILL_WITH_GROUP;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
@@ -25,10 +27,12 @@ import java.util.stream.Collectors;
 @Stereotype(KillingStereotype.class)
 public class KillingOperations {
 
+  @MediaType(TEXT_PLAIN)
   public String killWithCustomMessage(@ParameterGroup(name = KILL_WITH_GROUP) KillParameters killParameters) {
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 
+  @MediaType(TEXT_PLAIN)
   public String killWithWeapon(Weapon weapon, WeaponType type, Weapon.WeaponAttributes attributesOfWeapon) {
     return format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
   }

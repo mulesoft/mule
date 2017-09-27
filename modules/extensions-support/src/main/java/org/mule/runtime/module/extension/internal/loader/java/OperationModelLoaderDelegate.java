@@ -140,6 +140,7 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       processBlockingOperation(supportsConfig, operationMethod, method, operation);
     }
 
+    processMimeType(operation, operationMethod);
     addExecutionType(operation, operationMethod);
     ParameterDeclarationContext declarationContext = new ParameterDeclarationContext(OPERATION, operation.getDeclaration());
     loader.getMethodParametersLoader().declare(operation, operationMethod.getParameters(), declarationContext);
@@ -150,12 +151,13 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
     operation.blocking(true);
     operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, loader.getTypeLoader()));
 
+    final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());
+
     if (isAutoPaging(operationMethod)) {
-      operation.supportsStreaming(true).withOutput().ofType(getMethodReturnType(method, loader.getTypeLoader()));
+      operation.supportsStreaming(true).withOutput().ofType(outputType);
       addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
       processPagingTx(operation, method);
     } else {
-      final MetadataType outputType = getMethodReturnType(method, loader.getTypeLoader());
       operation.withOutput().ofType(outputType);
 
       handleByteStreaming(method, operation, outputType);

@@ -8,6 +8,7 @@ package org.mule.test.metadata.extension;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.metadata.TypeResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
@@ -226,6 +228,7 @@ public class MetadataOperations {
   @Query(translator = MetadataExtensionQueryTranslator.class,
       entityResolver = MetadataExtensionEntityResolver.class,
       nativeOutputResolver = NativeQueryOutputResolver.class)
+  @MediaType(TEXT_PLAIN)
   public String returnQuery(@MetadataKeyId String query) {
     return query;
   }

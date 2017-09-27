@@ -6,12 +6,15 @@
  */
 package org.mule.test.subtypes.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.tck.message.StringAttributes;
 
+@MediaType(TEXT_PLAIN)
 public class SubtypesSource extends Source<String, StringAttributes> {
 
   @Parameter

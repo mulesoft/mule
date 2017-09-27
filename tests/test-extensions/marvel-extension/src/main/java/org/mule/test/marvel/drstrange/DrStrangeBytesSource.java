@@ -7,11 +7,13 @@
 package org.mule.test.marvel.drstrange;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -24,6 +26,7 @@ import java.io.InputStream;
 import javax.inject.Inject;
 
 @Alias("bytes-caster")
+@MediaType(TEXT_PLAIN)
 public class DrStrangeBytesSource extends Source<InputStream, Void> {
 
   @Inject

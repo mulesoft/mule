@@ -12,15 +12,12 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -96,25 +93,6 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("ON_ERROR_EXCEPTION");
     runFlow("exceptionOnCallbacksFailure");
-  }
-
-  @Test
-  @Ignore("MULE-13440")
-  public void manyNestedOperations() throws Exception {
-    CoreEvent event = runFlow("killMany");
-    String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
-        + "bye bye, Nazi dudes\n";
-
-    assertThat(((PrivilegedEvent) event).getMessageAsString(muleContext), is(expected));
-  }
-
-  @Test
-  @Ignore("MULE-13440")
-  public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception {
-    CoreEvent event = runFlow("killManyButOnlyOneProvided");
-    String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
-
-    assertThat(expected, is(((PrivilegedEvent) event).getMessageAsString(muleContext)));
   }
 
   @Test

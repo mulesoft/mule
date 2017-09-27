@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -49,6 +51,7 @@ import javax.inject.Inject;
 @Alias("ListenPayments")
 @EmitsResponse
 @Streaming
+@MediaType(TEXT_PLAIN)
 public class HeisenbergSource extends Source<String, Object> {
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";

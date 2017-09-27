@@ -74,6 +74,8 @@ final class RouterModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .withModelProperty(new ImplementingMethodModelProperty(method))
         .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass, method)));
 
+    processMimeType(router, routerMethod);
+
     List<ExtensionParameter> callbackParameters = routerMethod.getParameters().stream()
         .filter(p -> RouterCompletionCallback.class.equals(p.getType().getDeclaringClass()))
         .collect(toList());

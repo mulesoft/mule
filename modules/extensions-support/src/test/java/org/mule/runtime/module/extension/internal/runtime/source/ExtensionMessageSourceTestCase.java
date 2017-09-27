@@ -85,6 +85,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -216,6 +217,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     when(sourceModel.getName()).thenReturn(SOURCE_NAME);
     when(sourceModel.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
     when(sourceModel.getModelProperty(SourceCallbackModelProperty.class)).thenReturn(empty());
+    when(sourceModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
     setRequires(sourceModel, true, true);
     when(sourceModel.getOutput().getType()).thenReturn(TYPE_LOADER.load(String.class));
     mockExceptionEnricher(extensionModel, null);

@@ -6,11 +6,13 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -35,6 +37,7 @@ public class HeisenbergScopes implements Initialisable {
   }
 
   @Throws(HeisenbergErrorTyperProvider.class)
+  @MediaType(TEXT_PLAIN)
   public void killMany(@AllowedStereotypes({KillingStereotype.class, DrugKillingStereotype.class}) Chain killOperations,
                        CompletionCallback<String, Void> callback, String reason)
       throws Exception {
@@ -72,6 +75,7 @@ public class HeisenbergScopes implements Initialisable {
                        (error, previous) -> callback.error(new IllegalArgumentException("ON_ERROR_ERROR")));
   }
 
+  @MediaType(TEXT_PLAIN)
   public void neverFailsWrapper(@Optional Chain optionalProcessors,
                                 CompletionCallback<String, Object> callback) {
     if (optionalProcessors == null) {

@@ -12,18 +12,20 @@ import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -96,6 +98,12 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
     final DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomMimeType(dataType);
     assertThat(dataType.getMediaType().getCharset().get(), is(lastSupportedEncoding));
+  }
+
+  @Test
+  public void strictMimeType() throws Exception {
+    CoreEvent response = runFlow("strictMimeType");
+    assertThat(response.getMessage().getPayload().getDataType().getMediaType().matches(APPLICATION_JSON), is(true));
   }
 
   private void assertCustomMimeType(DataType dataType) {

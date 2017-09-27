@@ -81,7 +81,7 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .withModelProperty(new ImplementingMethodModelProperty(method))
         .withModelProperty(new ComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory<>(declaringClass,
                                                                                                        method)));
-
+    processMimeType(scope, scopeMethod);
     processNonBlockingOperation(scope, scopeMethod, false, loader.getTypeLoader());
 
     List<ExtensionParameter> processorChain =

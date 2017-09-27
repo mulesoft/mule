@@ -2842,7 +2842,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -2894,33 +2900,6 @@
               "allowedStereotypeModels": [],
               "name": "doorParam",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -3043,7 +3022,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

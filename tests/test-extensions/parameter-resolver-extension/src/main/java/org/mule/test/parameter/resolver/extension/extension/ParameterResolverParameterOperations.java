@@ -7,7 +7,9 @@
 
 package org.mule.test.parameter.resolver.extension.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
@@ -31,11 +33,13 @@ public class ParameterResolverParameterOperations {
     return door;
   }
 
+  @MediaType(TEXT_PLAIN)
   public ParameterResolver<String> stringOperation(@Optional(
       defaultValue = "this is a string") ParameterResolver<String> string) {
     return string;
   }
 
+  @MediaType(TEXT_PLAIN)
   public ParameterResolver<TypedValue<InputStream>> lazyValueOperation(@Optional ParameterResolver<TypedValue<InputStream>> lazyValue) {
     return lazyValue;
   }

@@ -6,9 +6,11 @@
  */
 package org.mule.test.vegan.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -20,6 +22,7 @@ import java.util.Map;
 
 public class VeganFidelityOperation {
 
+  @MediaType(TEXT_PLAIN)
   public String tryEat(@ParameterDsl(allowReferences = false) Object food,
                        @Optional @ParameterDsl(allowInlineDefinition = false) Map<String, Integer> menu) {
     if (food instanceof Fruit) {

@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -51,6 +52,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   protected final MuleContext muleContext;
   private final boolean returnsListOfMessages;
   private final CursorProviderFactory cursorProviderFactory;
+  private final MediaType defaultMediaType;
 
   /**
    * Creates a new instance
@@ -65,6 +67,9 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     returnsListOfMessages = componentModel instanceof HasOutputModel && returnsListOfMessages((HasOutputModel) componentModel);
     this.muleContext = muleContext;
     this.cursorProviderFactory = cursorProviderFactory;
+    defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
+        .map(MediaTypeModelProperty::getMediaType)
+        .orElse(null);
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
@@ -106,7 +111,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    */
   protected MediaType resolveMediaType(Object value, ExecutionContextAdapter<ComponentModel> operationContext) {
     Charset existingEncoding = getDefaultEncoding(muleContext);
-    MediaType mediaType = null;
+    MediaType mediaType = defaultMediaType;
     if (value instanceof Result) {
       final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
       if (optionalMediaType.isPresent()) {

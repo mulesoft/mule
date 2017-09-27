@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -35,6 +36,7 @@ import static org.mule.test.marvel.ironman.IronMan.CONFIG_NAME;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.HasExternalLibraries;
@@ -132,7 +134,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
         extensionModel.getConfigurationModel(CONFIG_NAME).get().getOperationModel("fireMissile").get();
     assertThat(operation.isBlocking(), is(false));
     assertThat(operation.getExecutionType(), is(CPU_LITE));
-    assertThat(operation.getOutput().getType(), equalTo(typeLoader.load(String.class)));
+    assertThat(operation.getOutput().getType(), instanceOf(StringType.class));
     assertThat(operation.getOutputAttributes().getType(), equalTo(typeLoader.load(void.class)));
   }
 

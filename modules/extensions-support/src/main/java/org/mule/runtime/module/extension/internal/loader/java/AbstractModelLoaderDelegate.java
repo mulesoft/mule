@@ -11,12 +11,16 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarat
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithAlias;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.type.WithParameters;
 
 import java.lang.reflect.Type;
@@ -108,5 +112,11 @@ abstract class AbstractModelLoaderDelegate {
     }
 
     return connectionParameter.getType().getDeclaringClass();
+  }
+
+  void processMimeType(HasModelProperties declarer, WithAnnotations element) {
+    element.getAnnotation(MediaType.class).ifPresent(a -> declarer.withModelProperty(
+                                                                                     new MediaTypeModelProperty(a.value(),
+                                                                                                                a.strict())));
   }
 }

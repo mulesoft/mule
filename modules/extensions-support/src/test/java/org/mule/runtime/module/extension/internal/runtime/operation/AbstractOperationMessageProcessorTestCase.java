@@ -84,6 +84,7 @@ import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -218,6 +219,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getDisplayModel()).thenReturn(empty());
+    when(operationModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
 
     mockExceptionEnricher(operationModel, exceptionHandlerFactory);
     when(exceptionHandlerFactory.createHandler()).thenReturn(new NullExceptionHandler());

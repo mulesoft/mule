@@ -7,16 +7,19 @@
 
 package org.mule.test.typed.value.extension.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 @Alias("source")
+@MediaType(TEXT_PLAIN)
 public class TypedValueSource extends Source<String, Object> {
 
   public static TypedValue<String> onSuccessValue;
