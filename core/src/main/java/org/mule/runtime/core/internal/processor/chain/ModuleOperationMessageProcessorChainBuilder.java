@@ -210,10 +210,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      * caller/publisher of the current <module/>'s invocation.
      */
     private Function<MessagingException, Publisher<? extends CoreEvent>> createErrorResumeMapper(
-                                                                                                 CoreEvent request) {
+                                                                                                 CoreEvent originalRequest) {
       return throwable -> {
-        throwable = workOutInternalError(throwable, request);
-        return Mono.from(((BaseEventContext) request.getContext()).error(throwable)).then(Mono.empty());
+        throwable = handleSubChainException(throwable, originalRequest);
+        return Mono.from(((BaseEventContext) originalRequest.getContext()).error(throwable)).then(Mono.empty());
       };
     }
 
@@ -221,8 +221,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      * Unlike other {@link MessageProcessorChain MessageProcessorChains}, modules could contain error mappings that need to be
      * considered when resolving exceptions.
      */
-    private MessagingException workOutInternalError(MessagingException messagingException, CoreEvent request) {
-      final CoreEvent.Builder builder = CoreEvent.builder(request).error(messagingException.getEvent().getError().get());
+    private MessagingException handleSubChainException(MessagingException messagingException, CoreEvent originalRequest) {
+      final CoreEvent.Builder builder = CoreEvent.builder(originalRequest).error(messagingException.getEvent().getError().get());
       List<ErrorMapping> errorMappings = getErrorMappings(this);
       if (!errorMappings.isEmpty()) {
         Error error = messagingException.getEvent().getError().get();
