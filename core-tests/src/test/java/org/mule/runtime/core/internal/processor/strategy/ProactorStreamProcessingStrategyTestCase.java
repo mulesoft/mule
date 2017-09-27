@@ -32,7 +32,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamPr
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
-import static reactor.util.concurrent.QueueSupplier.XS_BUFFER_SIZE;
+import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamProcessingStrategyFactory.ProactorStreamProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
@@ -231,8 +232,8 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     flow.initialise();
     flow.start();
     processFlow(testEvent());
-    verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
-    verify(blockingSchedulerSpy, times(1)).submit(any(Runnable.class));
+    verify(rejectingSchedulerSpy, times(11)).submit(any(Callable.class));
+    verify(blockingSchedulerSpy, times(1)).submit(any(Callable.class));
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -259,8 +260,8 @@ public class ProactorStreamProcessingStrategyTestCase extends AbstractProcessing
     flow.initialise();
     flow.start();
     processFlow(testEvent());
-    verify(rejectingSchedulerSpy, times(11)).submit(any(Runnable.class));
-    verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Runnable.class));
+    verify(rejectingSchedulerSpy, times(11)).submit(any(Callable.class));
+    verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Callable.class));
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

@@ -213,7 +213,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     reconnectionAction
         .doOnSuccess(v -> onReconnectionSuccessful())
         .doOnError(this::onReconnectionFailed)
-        .doAfterTerminate((v, e) -> reconnecting.set(false))
+        .doAfterTerminate(() -> reconnecting.set(false))
         .subscribe();
   }
 

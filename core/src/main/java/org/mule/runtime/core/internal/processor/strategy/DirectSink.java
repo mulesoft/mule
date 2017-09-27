@@ -40,7 +40,7 @@ class DirectSink implements Sink, Disposable {
                     Consumer<CoreEvent> eventConsumer) {
     DirectProcessor<CoreEvent> directProcessor = create();
     reactorSink =
-        new ReactorSink(directProcessor.serialize().connectSink(), directProcessor.transform(function).doOnError(throwable -> {
+        new ReactorSink(directProcessor.serialize().sink(), directProcessor.transform(function).doOnError(throwable -> {
         }).subscribe(), eventConsumer);
   }
 

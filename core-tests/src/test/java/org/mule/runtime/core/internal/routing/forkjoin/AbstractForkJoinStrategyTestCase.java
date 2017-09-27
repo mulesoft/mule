@@ -68,6 +68,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -304,17 +305,18 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     int processorSleep = 50;
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(pairs, processorSleep));
 
-    verify(scheduler, times(pairs)).submit(any(Runnable.class));
+    verify(scheduler, times(pairs)).submit(any(Callable.class));
   }
 
   @Test
   @Description("When executing concurrently the strategy will throw a RejectedExceptionException if the scheduler being used throws a RejectedExceptionException.")
   public void concurrentRejectedExecution() throws Throwable {
-    when(scheduler.submit(any(Runnable.class))).thenThrow(new RejectedExecutionException());
+    when(scheduler.submit(any(Callable.class))).thenThrow(new RejectedExecutionException());
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, 4, true, MAX_VALUE);
 
-    expectedException.expect(instanceOf(RejectedExecutionException.class));
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(RejectedExecutionException.class));
     invokeStrategyBlocking(strategy, testEvent(), createRoutingPairs(1));
   }
 

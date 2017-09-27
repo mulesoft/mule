@@ -89,7 +89,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient {
     Mono<Result<T, A>> resultMono = from(processor.apply(just(getInitialiserEvent(muleContext))))
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(Exceptions::unwrap)
-        .doAfterTerminate((r, t) -> disposeProcessor(processor));
+        .doAfterTerminate(() -> disposeProcessor(processor));
     return resultMono.toFuture();
   }
 

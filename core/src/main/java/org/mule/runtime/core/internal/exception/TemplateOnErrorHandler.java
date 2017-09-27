@@ -93,7 +93,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             sink.error(exception);
           }
         })
-        .doOnTerminate((result, throwable) -> fireEndNotification(event, result, throwable));
+        .doOnSuccessOrError((result, throwable) -> fireEndNotification(event, result, throwable));
   }
 
   private Consumer<MessagingException> onRoutingError() {

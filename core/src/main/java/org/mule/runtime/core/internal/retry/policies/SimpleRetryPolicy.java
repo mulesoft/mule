@@ -11,18 +11,16 @@ import static java.time.Duration.ofMillis;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.internal.retry.reactor.Retry.onlyIf;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.delay;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.retry.Retry.onlyIf;
+
 import org.mule.runtime.core.api.retry.policy.PolicyStatus;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.reactor.BackoffDelay;
-import org.mule.runtime.core.internal.retry.reactor.Retry;
-import org.mule.runtime.core.internal.retry.reactor.RetryExhaustedException;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -33,10 +31,13 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.Cancellation;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import reactor.retry.BackoffDelay;
+import reactor.retry.Retry;
+import reactor.retry.RetryExhaustedException;
 
 /**
  * Allows to configure how many times a retry should be attempted and how long to wait between retries.
@@ -154,12 +155,12 @@ public class SimpleRetryPolicy implements RetryPolicy {
     private final Scheduler delegate = Schedulers.immediate();
 
     @Override
-    public Cancellation schedule(Runnable task) {
+    public Disposable schedule(Runnable task) {
       return delegate.schedule(task);
     }
 
     @Override
-    public Cancellation schedule(Runnable task, long delay, TimeUnit unit) {
+    public Disposable schedule(Runnable task, long delay, TimeUnit unit) {
       try {
         Thread.sleep(unit.toMillis(delay));
       } catch (InterruptedException e) {
@@ -169,7 +170,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
     }
 
     @Override
-    public Cancellation schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
+    public Disposable schedulePeriodically(Runnable task, long initialDelay, long period, TimeUnit unit) {
       return delegate.schedulePeriodically(task, initialDelay, period, unit);
     }
 
@@ -191,12 +192,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
     @Override
     public void start() {
       delegate.start();
-    }
-
-    @Override
-    @Deprecated
-    public void shutdown() {
-      delegate.shutdown();
     }
 
     @Override

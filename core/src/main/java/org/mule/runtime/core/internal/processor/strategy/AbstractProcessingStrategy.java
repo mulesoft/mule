@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static reactor.core.publisher.BlockingSink.Emission.BACKPRESSURED;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
-import reactor.core.publisher.BlockingSink;
 import reactor.core.publisher.FluxSink;
 
 /**
@@ -57,13 +55,13 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
    */
   static final class ReactorSink implements Sink, Disposable {
 
-    private final BlockingSink<CoreEvent> blockingSink;
+    private final FluxSink<CoreEvent> fluxSink;
     private final reactor.core.Disposable disposable;
     private final Consumer onEventConsumer;
 
-    ReactorSink(BlockingSink<CoreEvent> blockingSink, reactor.core.Disposable disposable,
+    ReactorSink(FluxSink<CoreEvent> fluxSink, reactor.core.Disposable disposable,
                 Consumer<CoreEvent> onEventConsumer) {
-      this.blockingSink = blockingSink;
+      this.fluxSink = fluxSink;
       this.disposable = disposable;
       this.onEventConsumer = onEventConsumer;
     }
@@ -71,18 +69,25 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     @Override
     public void accept(CoreEvent event) {
       onEventConsumer.accept(event);
-      blockingSink.accept(event);
+      fluxSink.next(event);
     }
 
     @Override
     public boolean emit(CoreEvent event) {
       onEventConsumer.accept(event);
-      return blockingSink.emit(event) != BACKPRESSURED;
+      synchronized (fluxSink) {
+        if (fluxSink.requestedFromDownstream() > 0) {
+          fluxSink.next(event);
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
 
     @Override
     public void dispose() {
-      blockingSink.complete();
+      fluxSink.complete();
       disposable.dispose();
     }
 

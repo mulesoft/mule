@@ -32,10 +32,10 @@ import org.reactivestreams.Publisher;
  * {@link org.mule.runtime.core.api.source.MessageSource} which typically is a flow execution.
  *
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
- * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link CoreEvent} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an {@link CoreEvent}
- * from the policy to the next operation {@link CoreEvent} or from the next operation result to the {@link CoreEvent} that must continue
- * the execution of the policy.
+ * such scoping of variables it uses {@link PolicyStateHandler} so the last {@link CoreEvent} modified by the policy behaviour can
+ * be stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
+ * {@link CoreEvent} from the policy to the next operation {@link CoreEvent} or from the next operation result to the
+ * {@link CoreEvent} that must continue the execution of the policy.
  *
  * If a non-empty {@code sourcePolicyParametersTransformer} is passed to this class, then it will be used to convert the result of
  * the policy chain execution to the set of parameters that the success response function or the failure response function will be
@@ -79,7 +79,7 @@ public class SourcePolicyProcessor implements Processor {
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
-        .then(sourceEvent -> {
+        .flatMap(sourceEvent -> {
           String executionIdentifier = sourceEvent.getContext().getCorrelationId();
           policyStateHandler.updateNextOperation(executionIdentifier,
                                                  buildSourceExecutionWithPolicyFunction(executionIdentifier, sourceEvent));
@@ -106,7 +106,7 @@ public class SourcePolicyProcessor implements Processor {
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return from(publisher)
             .cast(PrivilegedEvent.class)
-            .then(event -> just(event)
+            .flatMap(event -> just(event)
                 .doOnNext(request -> policyStateHandler.updateState(new PolicyStateId(executionIdentifier, policy.getPolicyId()),
                                                                     request))
                 .map(request -> policyEventConverter.createEvent(request, sourceEvent))

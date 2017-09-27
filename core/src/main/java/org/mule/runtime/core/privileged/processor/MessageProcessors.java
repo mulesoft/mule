@@ -146,7 +146,7 @@ public class MessageProcessors {
       throws MuleException {
     try {
       return just(event)
-          .transform(publisher -> from(publisher).then(request -> Mono
+          .transform(publisher -> from(publisher).flatMap(request -> Mono
               .from(internalProcessWithChildContext(request, processor,
                                                     child(((BaseEventContext) event.getContext()), empty()), false))))
           .block();
@@ -156,8 +156,8 @@ public class MessageProcessors {
   }
 
   /**
-   * Process an {@link CoreEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<BaseEvent>} via which
-   * the future {@link CoreEvent} or {@link Throwable} will be published.
+   * Process an {@link CoreEvent} with a given {@link ReactiveProcessor} returning a {@link Publisher<BaseEvent>} via which the
+   * future {@link CoreEvent} or {@link Throwable} will be published.
    * <p/>
    * The {@link CoreEvent} returned by this method <b>will</b> be completed with the same {@link CoreEvent} instance and if an
    * error occurs during processing the {@link EventContext} will be completed with the error.

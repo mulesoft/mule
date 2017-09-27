@@ -50,7 +50,7 @@ public class DefaultFlowListener implements FlowListener {
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     from(((BaseEventContext) event.getContext()).getResponsePublisher())
-        .doAfterTerminate((responseEvent, t) -> onTerminate(responseEvent, t))
+        .doOnSuccessOrError((responseEvent, t) -> onTerminate(responseEvent, t))
         .subscribe();
   }
 
