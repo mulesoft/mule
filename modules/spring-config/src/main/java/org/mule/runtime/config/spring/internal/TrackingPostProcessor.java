@@ -33,7 +33,11 @@ public class TrackingPostProcessor implements BeanPostProcessor {
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     if (tracking) {
-      ifNotBlank(beanName, value -> trackingList.add(value));
+      ifNotBlank(beanName, value -> {
+        if (!trackingList.contains(value)) {
+          trackingList.add(value);
+        }
+      });
     }
     return bean;
   }
@@ -51,4 +55,7 @@ public class TrackingPostProcessor implements BeanPostProcessor {
     tracking = false;
   }
 
+  public void intersection(List<String> beanNames) {
+    trackingList.removeIf(name -> !beanNames.contains(name));
+  }
 }

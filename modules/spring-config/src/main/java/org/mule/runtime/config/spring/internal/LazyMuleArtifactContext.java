@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.internal;
 
 import static java.lang.String.format;
+import static java.util.Collections.reverse;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
@@ -40,6 +41,7 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -154,8 +156,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
   private List<String> createComponents(Optional<ComponentLocationFilter> filterOptional, Optional<Location> locationOptional) {
     checkState(filterOptional.isPresent() != locationOptional.isPresent(), "filter or location has to be passed");
 
-    List<String> alreadyCreatedApplicationComponents = trackingPostProcessor.getBeansTracked();
+    List<String> alreadyCreatedApplicationComponents = new ArrayList<>();
+    alreadyCreatedApplicationComponents.addAll(trackingPostProcessor.getBeansTracked());
+    reverse(alreadyCreatedApplicationComponents);
+
     trackingPostProcessor.startTracking();
+
     Reference<List<String>> createdComponents = new Reference<>();
     withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
       // First unregister any already initialized/started component
@@ -176,8 +182,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       // This is required to force the execution of postProcessAfterInitialization() for each created component
       applicationComponents.forEach(component -> getRegistry().lookupByName(component).get());
     });
+
     trackingPostProcessor.stopTracking();
-    return createdComponents.get();
+    List<String> createdComponentNames = createdComponents.get();
+    trackingPostProcessor.intersection(createdComponentNames);
+
+    return createdComponentNames;
   }
 
   private void unregisterBeans(List<String> beanNames) {
