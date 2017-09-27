@@ -218,7 +218,7 @@
         <muleHttpPolicyApiVersion>1.0.0-rc</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.0.0-rc</muleMavenClientApi>
         <muleMavenClientImpl>1.0.0-rc</muleMavenClientImpl>
-        <muleMavenClientTest>1.0.0-rc-SNAPSHOT</muleMavenClientTest>
+        <muleMavenClientTest>1.0.0-rc</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc</muleApiVersion>
         <muleMetadataModelVersion>1.0.0-rc</muleMetadataModelVersion>
@@ -236,12 +236,12 @@
         <muleSchedulerServiceTestVersion>1.0.0-rc-SNAPSHOT</muleSchedulerServiceTestVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.0.0-rc-SNAPSHOT</muleMetadataExtensionTestVersion>
-        <muleVeganExtensionTestVersion>4.0.0-rc-SNAPSHOT</muleVeganExtensionTestVersion>
-        <muleHeisenbergExtensionTestVersion>4.0.0-rc-SNAPSHOT</muleHeisenbergExtensionTestVersion>
-        <muleMarvelExtensionTestVersion>4.0.0-rc-SNAPSHOT</muleMarvelExtensionTestVersion>
-        <mulePetstoreExtensionTestVersion>4.0.0-rc-SNAPSHOT</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.0.0-rc-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.0.0-rc</muleMetadataExtensionTestVersion>
+        <muleVeganExtensionTestVersion>4.0.0-rc</muleVeganExtensionTestVersion>
+        <muleHeisenbergExtensionTestVersion>4.0.0-rc</muleHeisenbergExtensionTestVersion>
+        <muleMarvelExtensionTestVersion>4.0.0-rc</muleMarvelExtensionTestVersion>
+        <mulePetstoreExtensionTestVersion>4.0.0-rc</mulePetstoreExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.0.0-rc</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>2.10</dependency.plugin.version>
@@ -273,9 +273,9 @@
         <maven.surefire.plugin.version>2.19.1</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.0.0-rc-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.0.0-rc-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.0.0-rc-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.0.0-rc</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.0.0-rc</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.0.0-rc</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <mule.packager.version>3.0.0-rc-SNAPSHOT</mule.packager.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
