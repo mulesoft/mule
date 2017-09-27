@@ -14923,9 +14923,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -15233,9 +15230,6 @@
             ]
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -15308,9 +15302,6 @@
                   "fields": []
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -15342,9 +15333,6 @@
                   }
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -15652,9 +15640,6 @@
                   ]
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -15663,9 +15648,6 @@
             ]
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -15755,9 +15737,6 @@
                     "fields": []
                   },
                   "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
                     "expressionSupport": {
                       "value": "SUPPORTED"
                     }
@@ -15789,9 +15768,6 @@
                     }
                   },
                   "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
                     "expressionSupport": {
                       "value": "SUPPORTED"
                     }
@@ -16099,9 +16075,6 @@
                     ]
                   },
                   "annotations": {
-                    "parameterPurpose": {
-                      "role": "BEHAVIOUR"
-                    },
                     "expressionSupport": {
                       "value": "SUPPORTED"
                     }
@@ -16111,9 +16084,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -16151,13 +16121,14 @@
                 },
                 "model": {
                   "type": "String"
-          },
-          "annotations": {
-            "expressionSupport": {
-              "value": "SUPPORTED"
-            }
-          }
-        },{
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
                 "key": {
                   "name": "rothIRA"
                 },
@@ -16165,9 +16136,6 @@
                   "type": "String"
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -16181,9 +16149,6 @@
                   "type": "String"
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -16212,9 +16177,6 @@
                   }
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -16243,9 +16205,6 @@
                   }
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "expressionSupport": {
                     "value": "SUPPORTED"
                   }
@@ -16254,9 +16213,6 @@
             ]
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "flattened": {},
             "expressionSupport": {
               "value": "SUPPORTED"
