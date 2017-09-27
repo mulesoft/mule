@@ -149,7 +149,7 @@ public class ApplicationPolicyDeploymentTestCase extends DeploymentServiceTestCa
         assertThat(notificationListenerActionIds, hasItems(PROCESS_START, BEFORE_NEXT, AFTER_NEXT, PROCESS_END));
         return true;
       }
-      
+
     });
   }
 
