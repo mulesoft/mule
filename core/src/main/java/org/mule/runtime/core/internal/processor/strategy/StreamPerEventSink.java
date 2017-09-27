@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
@@ -48,7 +49,7 @@ public class StreamPerEventSink implements Sink {
       if (exception.get() instanceof RuntimeException) {
         throw (RuntimeException) exception.get();
       } else {
-        throw new RuntimeException(exception.get());
+        throw new MuleRuntimeException(exception.get());
       }
     }
   }
