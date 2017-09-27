@@ -2179,6 +2179,9 @@
                                                 <exclude>org.mule.connectors:mule-jms-connector</exclude>
                                                 <exclude>org.mule.connectors:mule-http-connector</exclude>
                                                 <exclude>org.mule.modules:mule-module-cors-kernel</exclude>
+
+                                                <exclude>org.mule.services:mule-service-http</exclude>
+                                                <exclude>org.mule.services:mule-service-scheduler</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
