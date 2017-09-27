@@ -111,12 +111,10 @@ public class DerbyServer extends ExternalResource implements Closeable {
   public void stop() {
     try {
       server.shutdown();
-      await().until(() -> !isRunning());
       FileUtils.deleteQuietly(new File(DERBY_HOME));
       logger.info("Stopped Derby Database server.");
     } catch (Exception e) {
-      logger.error("Failed to stop Database server.");
-      throw new RuntimeException("Failed to stop Database server: " + e.getMessage());
+      logger.error("Failed to stop Database server: " + e.getMessage());
     }
   }
 
