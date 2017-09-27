@@ -2173,8 +2173,6 @@
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <!-- Due to circular deps in tests the extensions are using SNAPSHOT version -->
-                                                <exclude>org.mule.tools.maven:mule-packager</exclude>
-
                                                 <exclude>org.mule.connectors:mule-file-connector</exclude>
                                                 <exclude>org.mule.connectors:mule-sockets-connector</exclude>
                                                 <exclude>org.mule.modules:mule-module-file-extension-common</exclude>
