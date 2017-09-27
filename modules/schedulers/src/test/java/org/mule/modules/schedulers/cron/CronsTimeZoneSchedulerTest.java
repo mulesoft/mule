@@ -6,37 +6,29 @@
  */
 package org.mule.modules.schedulers.cron;
 
+import com.sun.xml.internal.ws.api.model.ExceptionType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.schedule.SchedulerCreationException;
 import org.mule.tck.junit4.ApplicationContextBuilder;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
-import java.util.HashMap;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class CronsTimeZoneSchedulerTest
-{
-    final static String TIMEZONE_XML="America/Argentina/Buenos_Aires";
+public class CronsTimeZoneSchedulerTest {
+    final static String TIMEZONE_XML = "America/Argentina/Buenos_Aires";
 
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void validTimeZoneInScheduler() throws Exception
-    {
+    public void validTimeZoneInScheduler() throws Exception {
         ApplicationContextBuilder builder = new ApplicationContextBuilder();
-        builder.setApplicationResources(new String[] {"CronSchedulerValidTimeZone"});
+        builder.setApplicationResources(new String[]{"cron-scheduler-valid-time-zone.xml"});
         builder.build();
         MuleContext test = builder.build();
         assertThat(test.getRegistry().lookupByType(CronSchedulerFactory.class).size(), equalTo(1));
@@ -44,11 +36,18 @@ public class CronsTimeZoneSchedulerTest
     }
 
     @Test
-    public void invalidTimeZoneInScheduler() throws Exception
-    {
-        ApplicationContextBuilder builder = new ApplicationContextBuilder();
-        builder.setApplicationResources(new String[] {"cron-timezone-scheduler-config.xml"});
-        thrown.expect(LifecycleException.class);
+    public void invalidTimeZoneInScheduler() throws Exception {
+        try
+        {
+            ApplicationContextBuilder builder = new ApplicationContextBuilder();
+            builder.setApplicationResources(new String[]{"cron-timezone-scheduler-config.xml"});
+            MuleContext test = builder.build();
+
+        } catch (Exception e)
+        {
+            assertThat(e.getCause().getMessage(), equalTo("Invalid Timezone"));
+            assertThat(e.getCause().getCause().getCause().getClass().getName(), equalTo("org.mule.api.schedule.SchedulerCreationException"));
+        }
 
     }
 }

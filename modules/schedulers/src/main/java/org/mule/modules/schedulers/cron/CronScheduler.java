@@ -20,7 +20,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.schedule.SchedulerCreationException;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.polling.schedule.PollScheduler;
 
@@ -29,7 +28,14 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.quartz.*;
+import org.quartz.CronTrigger;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -88,8 +94,8 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
     /**
      * <p>
-     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that we are
-     * managing)
+     * The poll job name created in the initialization phase. (This is used to tell quartz which is the job that
+     * we are managing)
      * </p>
      */
     private String groupName;
@@ -97,6 +103,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
     public CronScheduler(String name, PollingReceiverWorker job, String cronExpression, TimeZone timeZone)
     {
         super(name, job);
+
         this.cronExpression = cronExpression;
         this.timeZone = timeZone;
     }
@@ -150,10 +157,11 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
             {
                 if (quartzScheduler.getTrigger(TriggerKey.triggerKey(getName(), groupName)) == null)
                 {
-                    CronTrigger cronTrigger = newTrigger().withIdentity(getName(), groupName)
-                                                          .forJob(jobName, groupName)
-                                                          .withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone))
-                                                          .build();
+                    CronTrigger cronTrigger = newTrigger()
+                        .withIdentity(getName(), groupName)
+                        .forJob(jobName, groupName)
+                        .withSchedule(cronSchedule(cronExpression).inTimeZone(timeZone))
+                        .build();
                     quartzScheduler.scheduleJob(cronTrigger);
                 }
                 else
@@ -213,12 +221,18 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
         }
     }
 
+
     private JobDetail jobDetail(String jobName, String groupName, PollingReceiverWorker job)
     {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(POLL_CRON_SCHEDULER_JOB, job);
-        return newJob(CronJob.class).storeDurably().withIdentity(jobName, groupName).usingJobData(jobDataMap).build();
+        return newJob(CronJob.class)
+                .storeDurably()
+                .withIdentity(jobName, groupName)
+                .usingJobData(jobDataMap)
+                .build();
     }
+
 
     private Scheduler createScheduler() throws SchedulerException
     {
@@ -233,8 +247,7 @@ public class CronScheduler extends PollScheduler<PollingReceiverWorker> implemen
 
         factoryProperties.setProperty(QUARTZ_INSTANCE_NAME_PROPERTY, context.getConfiguration().getId() + "-" + name);
         factoryProperties.setProperty(THREAD_POLL_CLASS_PROPERTY, THREAD_POLL_CLASS);
-        factoryProperties.setProperty(THREAD_POOL_COUNT_PROPERTY,
-                String.valueOf(context.getDefaultMessageReceiverThreadingProfile().getMaxThreadsActive()));
+        factoryProperties.setProperty(THREAD_POOL_COUNT_PROPERTY, String.valueOf(context.getDefaultMessageReceiverThreadingProfile().getMaxThreadsActive()));
         return factoryProperties;
     }
 
