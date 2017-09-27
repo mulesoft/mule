@@ -36,8 +36,8 @@ public class SpreadVeganismOperation {
   }
 
   @OutputResolver(output = FruitMetadataResolver.class)
-  public FarmedFood getHealthyFood(HealthyFood food) {
-    return food;
+  public FarmedFood getHealthyFood(HealthyFood healthyFood) {
+    return healthyFood;
   }
 
   public Map<String, String> addVeganProductsDescriptions(@Optional @NullSafe Map<String, String> productDescription) {

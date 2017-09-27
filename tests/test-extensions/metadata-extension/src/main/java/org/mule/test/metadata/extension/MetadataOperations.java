@@ -211,10 +211,10 @@ public class MetadataOperations {
                                                                @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Map<String, Object> mapContent) {}
 
   public void contentParameterShouldNotGenerateListChildElement(
-                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> contents) {}
+                                                                @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) List<String> contents) {}
 
   public void contentParameterShouldNotGeneratePojoChildElement(
-                                                                @TypeResolver(TestInputResolverWithoutKeyResolver.class) Bear animalContent) {}
+                                                                @Content @TypeResolver(TestInputResolverWithoutKeyResolver.class) Bear animalContent) {}
 
   @Query(translator = MetadataExtensionQueryTranslator.class,
       entityResolver = MetadataExtensionEntityResolver.class,

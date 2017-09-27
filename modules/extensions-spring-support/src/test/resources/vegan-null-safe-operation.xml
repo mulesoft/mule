@@ -28,7 +28,7 @@
     </flow>
 
     <flow name="topLevelNullSafe">
-        <vegan:get-healthy-food food="topLevelFood"/>
+        <vegan:get-healthy-food healthyFood="topLevelFood"/>
     </flow>
 
     <flow name="nullSafeOnMap">
