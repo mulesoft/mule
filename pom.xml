@@ -1736,7 +1736,7 @@
                 </plugin>
                 <plugin>
                     <groupId>org.mule.runtime.plugins</groupId>
-                    <artifactId>mule-app-plugins-maven-plugin</artifactId>
+                    <artifactId>mule-plugin-maven-plugin</artifactId>
                     <version>${mule.app.plugins.maven.plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
