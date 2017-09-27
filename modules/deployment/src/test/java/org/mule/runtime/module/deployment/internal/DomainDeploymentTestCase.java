@@ -62,7 +62,7 @@ import org.junit.Test;
 /**
  * Contains test for domain deployment
  */
-public class DomainDeploymentTestCase extends DeploymentServiceTestCase {
+public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   // Domain artifacts builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();

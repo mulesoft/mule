@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * Contains test for domain bundle deployment
  */
-public class DomainBundleDeploymentTestCase extends DeploymentServiceTestCase {
+public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public DomainBundleDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
