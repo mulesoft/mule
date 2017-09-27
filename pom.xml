@@ -2224,6 +2224,7 @@
                                                 <exclude>org.mule.weave:*</exclude>
                                                 <exclude>org.mule.services:*</exclude>
                                                 <exclude>org.mule.tools.maven:mule-packager</exclude>
+                                                <exclude>com.mulesoft.licm:licm</exclude>
                                                 <!-- Due to circular deps in tests the extensions are using SNAPSHOT version -->
                                                 <exclude>org.mule.connectors:mule-file-connector</exclude>
                                                 <exclude>org.mule.connectors:mule-sockets-connector</exclude>
