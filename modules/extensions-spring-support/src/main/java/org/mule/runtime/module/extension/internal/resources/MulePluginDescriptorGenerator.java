@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.resources;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.deployment.meta.Product.MULE_EE;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
@@ -27,6 +30,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedArtifactsCollector;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 
@@ -66,11 +70,23 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory {
     builder.withExtensionModelDescriber()
         .setId(getLoaderId(extensionModel))
         .addProperty(TYPE_PROPERTY_NAME, typeProperty.get().getType().getName())
-        // TODO(fernandezlautaro): MULE-11136 remove this property when the manifest is dropped as generating an extension model
-        // should not require version
         .addProperty("version", extensionModel.getVersion());
 
     builder.withBundleDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()));
+
+    final Optional<LicenseModelProperty> licenseModelPropertyOptional =
+        extensionModel.getModelProperty(LicenseModelProperty.class);
+    builder.setRequiredProduct(extensionModel.getCategory().equals(COMMUNITY) ? MULE : MULE_EE);
+    licenseModelPropertyOptional.ifPresent(licenseModelProperty -> {
+      builder.setRequiredProduct(licenseModelProperty.requiresEeLicense() ? MULE_EE : MULE);
+      if (licenseModelProperty.requiresEeLicense()) {
+        builder.withLicenseModel().setAllowsEvaluationLicense(licenseModelProperty.isAllowsEvaluationLicense());
+        licenseModelProperty.getRequiredEntitlement().ifPresent(requiredEntitlement -> builder.withLicenseModel()
+            .setProvider(extensionModel.getVendor())
+            .setRequiredEntitlement(requiredEntitlement));
+      }
+    });
+
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
     return of(new GeneratedResource(AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
   }

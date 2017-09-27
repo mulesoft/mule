@@ -9,9 +9,13 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.license.api.LicenseValidator;
+import org.mule.runtime.module.license.api.PluginLicenseValidationRequest;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Utility class providing useful methods when creating {@link Artifact}s.
@@ -37,6 +41,26 @@ public class ArtifactFactoryUtils {
     } else {
       return deployFile;
     }
+  }
+
+  public static void validateArtifactLicense(ClassLoader artifactClassLoader, List<ArtifactPlugin> artifactPlugins,
+                                             LicenseValidator licenseValidator) {
+    artifactPlugins.stream().forEach(artifactPlugin -> {
+      artifactPlugin.getDescriptor().getLicenseModel().ifPresent(licenseModel -> {
+        licenseModel.getRequiredEntitlement().ifPresent(entitlement -> {
+          String pluginName = artifactPlugin.getDescriptor().getName();
+          String providerName = licenseModel.getProvider();
+          licenseValidator.validatePluginLicense(PluginLicenseValidationRequest.builder()
+              .withEntitlement(entitlement)
+              .withPluginName(pluginName)
+              .withPluginProvider(providerName)
+              .withPluginVersion(artifactPlugin.getDescriptor().getBundleDescriptor().getVersion())
+              .withArtifactClassLoader(artifactClassLoader)
+              .withPluginClassLoader(artifactPlugin.getArtifactClassLoader().getClassLoader())
+              .build());
+        });
+      });
+    });
   }
 
 }

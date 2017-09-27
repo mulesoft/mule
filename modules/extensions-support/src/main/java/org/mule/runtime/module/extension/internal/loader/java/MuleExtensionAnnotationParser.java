@@ -69,6 +69,15 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
+  public static <T extends Annotation> Optional<T> getOptionalAnnotation(Class<?> annotatedType, Class<T> annotationType) {
+    try {
+      return Optional.ofNullable(annotatedType.getAnnotation(annotationType));
+    } catch (Exception e) {
+      logger.error(format("%s getting annotation from %s", e.getClass().getName(), annotatedType.getName()), e);
+      throw e;
+    }
+  }
+
   public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
                                                                          Function<Annotation, T[]> containerConsumer) {
     List<T> annotationDeclarations = ImmutableList.of();

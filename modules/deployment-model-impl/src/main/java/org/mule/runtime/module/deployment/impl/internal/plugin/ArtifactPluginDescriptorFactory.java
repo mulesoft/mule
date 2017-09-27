@@ -12,7 +12,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
@@ -85,6 +84,7 @@ public class ArtifactPluginDescriptorFactory
       loaderDescriber.addAttributes(extensionModelDescriptor.getAttributes());
       descriptor.setExtensionModelDescriptorProperty(loaderDescriber);
     });
+    artifactModel.getLicense().ifPresent(descriptor::setLicenseModel);
   }
 
   @Override

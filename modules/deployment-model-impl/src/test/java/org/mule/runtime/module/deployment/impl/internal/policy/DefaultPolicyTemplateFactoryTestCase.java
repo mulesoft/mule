@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory.createPolicyTemplateCreationErrorMessage;
+import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -28,6 +29,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.license.api.LicenseValidatorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -48,7 +50,8 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
   private final PluginDependenciesResolver pluginDependenciesResolver =
       mock(PluginDependenciesResolver.class);
   private final PolicyTemplateFactory policyTemplateFactory =
-      new DefaultPolicyTemplateFactory(classLoaderBuilderFactory, pluginDependenciesResolver);
+      new DefaultPolicyTemplateFactory(classLoaderBuilderFactory, pluginDependenciesResolver,
+                                       discoverLicenseValidator(getClass().getClassLoader()));
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

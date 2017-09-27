@@ -72,6 +72,11 @@
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-license-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
         <!-- Services APIs -->
         <dependency>
