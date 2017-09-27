@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -41,10 +39,18 @@ public class StreamPerEventSink implements Sink {
 
   @Override
   public void accept(CoreEvent event) {
+    AtomicReference<Throwable> exception = new AtomicReference<>();
     just(event)
         .doOnNext(request -> eventConsumer.accept(request))
         .transform(processor)
-        .subscribe(requestUnbounded());
+        .subscribe(null, exception::set);
+    if (exception.get() != null) {
+      if (exception.get() instanceof RuntimeException) {
+        throw (RuntimeException) exception.get();
+      } else {
+        throw new RuntimeException(exception.get());
+      }
+    }
   }
 
   @Override

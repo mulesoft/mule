@@ -138,15 +138,15 @@ public class ModuleFlowProcessingPhase
       just(templateEvent)
           .doOnNext(onMessageReceived(messageProcessContext, flowConstruct))
           // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when complete.
-          .then(request -> from(policy.process(request)))
+          .flatMap(request -> from(policy.process(request)))
           // Perform processing of result by sending success or error response and handle errors that occur.
           // Returns Publisher<Void> to signal when this is complete or if it failed.
-          .then(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct),
-                                                    policySuccess(phaseContext, flowConstruct)))
+          .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct),
+                                                       policySuccess(phaseContext, flowConstruct)))
           .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
           .doOnError(onFailure(phaseResultNotifier, terminateConsumer))
           // Complete EventContext via responseCompletion Mono once everything is done.
-          .doAfterTerminate((event, throwable) -> responseCompletion.onComplete())
+          .doAfterTerminate(() -> responseCompletion.onComplete())
           .subscribe();
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);

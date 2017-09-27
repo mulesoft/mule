@@ -85,11 +85,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   private InternalReactiveProcessor map = publisher -> from(publisher).map(in -> output);
-  private InternalReactiveProcessor ackAndStop = publisher -> from(publisher).then(in -> {
+  private InternalReactiveProcessor ackAndStop = publisher -> from(publisher).flatMap(in -> {
     ((BaseEventContext) in.getContext()).success();
     return empty();
   });
-  private InternalReactiveProcessor respondAndStop = publisher -> from(publisher).then(in -> {
+  private InternalReactiveProcessor respondAndStop = publisher -> from(publisher).flatMap(in -> {
     ((BaseEventContext) in.getContext()).success(response);
     return empty();
   });

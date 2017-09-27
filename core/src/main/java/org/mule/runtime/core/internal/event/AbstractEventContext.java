@@ -158,8 +158,7 @@ abstract class AbstractEventContext implements BaseEventContext {
             .doOnError(rethrown -> responseProcessor.onError(rethrown))
             .materialize()
             .then()
-            .subscribe();
-
+            .toProcessor();
       } else {
         responseProcessor.onError(throwable);
         return empty();

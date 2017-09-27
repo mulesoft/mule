@@ -200,14 +200,14 @@ public final class SourceAdapter implements Startable, Stoppable, Initialisable 
     @Override
     public Publisher<Void> onFailure(MessagingException exception, Map<String, Object> parameters) {
       return from(onErrorExecutor.execute(exception.getEvent(), parameters, context))
-          .doAfterTerminate((v, e) -> rollback());
+          .doAfterTerminate(() -> rollback());
     }
 
     @Override
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
       CoreEvent event = result.isRight() ? result.getRight() : result.getLeft().getEvent();
       from(onTerminateExecutor.execute(event, emptyMap(), context))
-          .doAfterTerminate((v, e) -> context.releaseConnection())
+          .doAfterTerminate(() -> context.releaseConnection())
           .subscribe();
     }
 

@@ -118,7 +118,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer, ParametersP
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
-          .then(event -> {
+          .flatMap(event -> {
             checkState(index <= parameterizedPolicies.size(), "composite policy index is greater that the number of policies.");
             if (index == parameterizedPolicies.size()) {
               return from(processNextOperation(event));

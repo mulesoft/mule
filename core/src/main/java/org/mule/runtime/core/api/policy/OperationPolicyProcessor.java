@@ -70,7 +70,7 @@ public class OperationPolicyProcessor implements Processor {
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .cast(PrivilegedEvent.class)
-        .then(operationEvent -> {
+        .flatMap(operationEvent -> {
           PolicyStateId policyStateId = new PolicyStateId(operationEvent.getContext().getCorrelationId(), policy.getPolicyId());
           Optional<CoreEvent> latestPolicyState = policyStateHandler.getLatestState(policyStateId);
           PrivilegedEvent variablesProviderEvent =
@@ -106,7 +106,7 @@ public class OperationPolicyProcessor implements Processor {
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return from(publisher)
             .cast(PrivilegedEvent.class)
-            .then(policyExecuteNextEvent -> {
+            .flatMap(policyExecuteNextEvent -> {
               PolicyStateId policyStateId = new PolicyStateId(policyExecuteNextEvent.getContext().getId(), policy.getPolicyId());
               policyStateHandler.updateState(policyStateId, policyExecuteNextEvent);
               return just(policyExecuteNextEvent)

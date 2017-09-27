@@ -102,7 +102,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link ComponentExecutor}
-   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -152,7 +152,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
           .subscribe(v -> {
           }, sink::error);
     })
-        .doOnTerminate((value, e) -> {
+        .doOnSuccessOrError((value, e) -> {
           try {
             after(context, value, executedInterceptors);
           } finally {

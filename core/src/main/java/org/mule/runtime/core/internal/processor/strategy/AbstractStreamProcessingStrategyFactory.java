@@ -13,8 +13,8 @@ import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.LITE_BLOCKING;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy.WaitStrategy.valueOf;
-import static reactor.util.concurrent.QueueSupplier.SMALL_BUFFER_SIZE;
-import static reactor.util.concurrent.QueueSupplier.isPowerOfTwo;
+import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
+import static reactor.util.concurrent.Queues.isPowerOfTwo;
 import static reactor.util.concurrent.WaitStrategy.blocking;
 import static reactor.util.concurrent.WaitStrategy.busySpin;
 import static reactor.util.concurrent.WaitStrategy.liteBlocking;
@@ -143,13 +143,14 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       WorkQueueProcessor<CoreEvent> processor =
-          WorkQueueProcessor.share(ringBufferSchedulerSupplier.get(), bufferSize, waitStrategy.getReactorWaitStrategy(), false);
+          WorkQueueProcessor.<CoreEvent>builder().executor(ringBufferSchedulerSupplier.get()).bufferSize(bufferSize)
+              .waitStrategy(waitStrategy.getReactorWaitStrategy()).autoCancel(false).build();
       List<Disposable> disposables = new ArrayList<>();
       for (int i = 0; i < (maxConcurrency < subscribers ? maxConcurrency : subscribers); i++) {
         disposables.add(processor.transform(function).subscribe());
       }
       disposables.add(() -> processor.shutdown());
-      return new ReactorSink(processor.connectSink(), () -> disposables.forEach(disposable -> disposable.dispose()),
+      return new ReactorSink(processor.sink(), () -> disposables.forEach(disposable -> disposable.dispose()),
                              createOnEventConsumer());
     }
 

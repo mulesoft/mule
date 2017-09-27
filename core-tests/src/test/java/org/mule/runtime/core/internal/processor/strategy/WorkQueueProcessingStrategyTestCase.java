@@ -17,6 +17,10 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
@@ -24,10 +28,14 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_SUBSCRIBER_COUNT;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_WAIT_STRATEGY;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.WORK_QUEUE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -36,6 +44,7 @@ import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStra
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.qameta.allure.Description;
@@ -269,6 +278,21 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     if (mode.equals(SOURCE)) {
       testBackPressure(DROP, equalTo(STREAM_ITERATIONS), equalTo(0), equalTo(STREAM_ITERATIONS));
     }
+  }
+
+  @Test
+  @Description("If IO pool is busy OVERLOAD error is thrown")
+  public void blockingRejectedExecution() throws Exception {
+    Scheduler blockingSchedulerSpy = spy(blocking);
+    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
+
+    flow = flowBuilder.get().processors(blockingProcessor)
+        .processingStrategyFactory((context, prefix) -> new WorkQueueProcessingStrategy(() -> rejectingSchedulerSpy))
+        .build();
+    flow.initialise();
+    flow.start();
+    expectRejected();
+    processFlow(testEvent());
   }
 
 }
