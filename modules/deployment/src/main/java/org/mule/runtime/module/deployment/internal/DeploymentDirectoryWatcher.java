@@ -139,6 +139,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
     try {
       if (appString == null) {
+        // Deploys all the artifact already installed
+        run();
+
         // only start the monitor thread if we launched in default mode without explicitly
         // stated applications to launch
         scheduleChangeMonitor();
@@ -219,7 +222,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     // TODO MULE-12337 migrate this to an scheduler
     artifactDirMonitorTimer = newSingleThreadScheduledExecutor(new ArtifactDeployerMonitorThreadFactory());
 
-    artifactDirMonitorTimer.scheduleWithFixedDelay(this, 0, reloadIntervalMs, MILLISECONDS);
+    artifactDirMonitorTimer.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
