@@ -302,7 +302,7 @@ public class MuleDeployment extends MuleInstallation {
     if (mule.isRunning()) {
       logger.warn("Mule Server was already running");
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
-      logger.info("Deploying domain bundles");
+      logger.info("Redeploying domain bundles");
       domainBundles.forEach((domainBundle) -> mule.deployDomainBundle(domainBundle));
       logger.info("Redeploying domains");
       domains.forEach((domain) -> redeployDomain(domain));
@@ -311,7 +311,6 @@ public class MuleDeployment extends MuleInstallation {
       logger.info("Redeployment successful");
     } else {
       libraries.forEach((library) -> mule.addLibrary(new File(library)));
-      logger.info("Deploying domain bundles");
       domainBundles.forEach((domainBundle) -> mule.deployDomainBundle(domainBundle));
       domains.forEach((domain) -> mule.deployDomain(domain));
       applications.forEach((application) -> mule.deploy(application));
