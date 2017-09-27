@@ -465,6 +465,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
           return;
         }
+        if (componentModel.getNameAttribute() != null) {
+          createdComponentModels.add(componentModel.getNameAttribute());
+        }
         beanDefinitionFactory.resolveComponentRecursively(componentModel.getParent() != null
             ? (SpringComponentModel) componentModel.getParent()
             : (SpringComponentModel) applicationModel
@@ -477,9 +480,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                     } else if (nameAttribute == null) {
                       // This may be a configuration that does not requires a name.
                       nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition().getBeanClassName());
-                      createdComponentModels.add(nameAttribute);
-                    } else {
-                      createdComponentModels.add(componentModel.getNameAttribute());
                     }
                     registry.registerBeanDefinition(nameAttribute, resolvedSpringComponentModel.getBeanDefinition());
                     postProcessBeanDefinition(componentModel, registry, nameAttribute);
