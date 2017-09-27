@@ -136,4 +136,44 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="do-login-and-plain-entire-stream-response-nesting-scopes-with-failures">
+        <parameters>
+            <parameter name="someUserParent" type="string" defaultValue="usernameX"/>
+            <parameter name="somePassParent" type="string" defaultValue="passwordX"/>
+        </parameters>
+        <body>
+            <mule:try>
+                <!-- the following request will fail due to basic authentication failure -->
+                <tns:do-login-and-leave-entire-stream-response someUser="nonExistingUser" somePass="nonExistingPass" />
+                <mule:set-payload value="it should have never reached here" />
+                <mule:error-handler>
+                    <mule:on-error-continue >
+                        <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUserParent]" somePass="#[parameters.somePassParent]" />
+                        <mule:object-to-string-transformer />
+                    </mule:on-error-continue>
+                </mule:error-handler>
+            </mule:try>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="do-login-fail-propagate-error-description">
+        <body>
+            <mule:try>
+                <mule:set-variable variableName="preError" value="variable before error" />
+                <!-- the following request will fail due to basic authentication failure -->
+                <tns:do-login-and-leave-entire-stream-response someUser="nonExistingUser" somePass="nonExistingPass" />
+                <mule:set-payload value="it should have never reached here" />
+                <mule:set-variable variableName="preError" value="variable after error, it should have never reached here" />
+                <mule:error-handler>
+                    <mule:on-error-continue >
+                        <!-- map assembly to check the response on the test -->
+                        <mule:set-payload value="#[{'errorDescription' : error.description , 'varsPreError' : vars.preError}]" />
+                    </mule:on-error-continue>
+                </mule:error-handler>
+            </mule:try>
+        </body>
+        <output type="string"/>
+    </operation>
 </module>
