@@ -53,7 +53,7 @@ import org.junit.Test;
 /**
  * Contains test for application deployment with policies on the default domain
  */
-public class ApplicationPolicyDeploymentTestCase extends DeploymentServiceTestCase {
+public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestCase {
 
 
   private static final String BAR_POLICY_ID = "barPolicy";

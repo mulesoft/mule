@@ -83,7 +83,7 @@ import org.junit.Test;
 /**
  * Contains test for application deployment on the default domain
  */
-public class ApplicationDeploymentTestCase extends DeploymentServiceTestCase {
+public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
   private static final String PRIVILEGED_EXTENSION_ARTIFACT_ID = "privilegedExtensionPlugin";
   private static final String PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID = "org.mule.test:" + PRIVILEGED_EXTENSION_ARTIFACT_ID;

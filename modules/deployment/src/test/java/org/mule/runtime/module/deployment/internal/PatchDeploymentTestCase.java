@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * Contains test for deployment of artifacts with patches
  */
-public class PatchDeploymentTestCase extends DeploymentServiceTestCase {
+public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public PatchDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);

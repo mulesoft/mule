@@ -139,7 +139,7 @@ import org.mockito.verification.VerificationMode;
  * <p>
  * Provides a set of test artifacts and resources to use on different test classes.
  */
-public abstract class DeploymentServiceTestCase extends AbstractMuleTestCase {
+public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
   private static final int DEPLOYMENT_TIMEOUT = 10000;
@@ -229,7 +229,7 @@ public abstract class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   protected static File getResourceFile(String resource) throws URISyntaxException {
-    return new File(DeploymentServiceTestCase.class.getResource(resource).toURI());
+    return new File(AbstractDeploymentTestCase.class.getResource(resource).toURI());
   }
 
   // Application plugin file builders
@@ -301,7 +301,7 @@ public abstract class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private File services;
 
-  public DeploymentServiceTestCase(boolean parallelDeployment) {
+  public AbstractDeploymentTestCase(boolean parallelDeployment) {
     this.parallelDeployment = parallelDeployment;
   }
 
