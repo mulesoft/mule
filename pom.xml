@@ -221,7 +221,7 @@
         <muleMavenClientTest>1.0.0-rc-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.0.0-rc-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.0.0-rc</muleApiVersion>
-        <muleMetadataModelVersion>1.0.0-rc-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.0.0-rc</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <muleSpringModuleTestVersion>0.9.0-SNAPSHOT</muleSpringModuleTestVersion>
