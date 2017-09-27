@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -31,6 +32,8 @@ import org.mule.runtime.module.service.ServiceRepository;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class DefaultDomainFactory implements ArtifactFactory<Domain> {
@@ -47,13 +50,14 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
   /**
    * Creates a new domain factory
    *
-   * @param domainDescriptorFactory         creates descriptors for the new domains. Non null.
-   * @param domainManager                   tracks the domains deployed on the container. Non null.
-   * @param classLoaderRepository           contains all the class loaders in the container. Non null.
-   * @param serviceRepository               repository of available services. Non null.
-   * @param pluginDependenciesResolver      resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends. Non null.
+   * @param domainDescriptorFactory creates descriptors for the new domains. Non null.
+   * @param domainManager tracks the domains deployed on the container. Non null.
+   * @param classLoaderRepository contains all the class loaders in the container. Non null.
+   * @param serviceRepository repository of available services. Non null.
+   * @param pluginDependenciesResolver resolver for the plugins on which the {@code artifactPluginDescriptor} declares it depends.
+   *        Non null.
    * @param domainClassLoaderBuilderFactory creates builders to build the classloaders for each domain. Non null.
-   * @param extensionModelLoaderManager     manager capable of resolve {@link ExtensionModel extension models}. Non null.
+   * @param extensionModelLoaderManager manager capable of resolve {@link ExtensionModel extension models}. Non null.
    */
   public DefaultDomainFactory(DomainDescriptorFactory domainDescriptorFactory,
                               DomainManager domainManager,
@@ -79,16 +83,7 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
 
   @Override
   public Domain createArtifact(File domainLocation) throws IOException {
-    String domainName = domainLocation.getName();
-    Domain domain = domainManager.getDomain(domainName);
-    if (domain != null) {
-      throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
-    }
-    if (domainName.contains(" ")) {
-      throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
-    }
-
-    return createArtitact(findDomain(domainName));
+    return createArtifact(domainLocation, empty());
   }
 
   public Domain createArtitact(DomainDescriptor descriptor) throws IOException {
@@ -115,13 +110,13 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
     return domainWrapper;
   }
 
-  private DomainDescriptor findDomain(String domainName) throws IOException {
+  private DomainDescriptor findDomain(String domainName, Optional<Properties> deploymentProperties) throws IOException {
     if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
       return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
     File domainFolder = getDomainFolder(domainName);
-    DomainDescriptor descriptor = domainDescriptorFactory.create(domainFolder);
+    DomainDescriptor descriptor = domainDescriptorFactory.create(domainFolder, deploymentProperties);
 
     return descriptor;
   }
@@ -156,5 +151,20 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
 
   public void start(DomainWrapper domainWrapper) {
     domainManager.addDomain(domainWrapper);
+  }
+
+  @Override
+  public Domain createArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
+    String domainName = domainLocation.getName();
+    Domain domain = domainManager.getDomain(domainName);
+    if (domain != null) {
+      throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
+    }
+    if (domainName.contains(" ")) {
+      throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
+    }
+
+    return createArtitact(findDomain(domainName, deploymentProperties));
+
   }
 }

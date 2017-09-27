@@ -24,6 +24,7 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -52,7 +53,8 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
     if (!artifactFolder.exists()) {
       throw new IllegalArgumentException("Service folder does not exists: " + artifactFolder.getAbsolutePath());
     }
-    // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file format
+    // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file
+    // format
     final File servicePropsFile = new File(artifactFolder, SERVICE_PROPERTIES);
     if (servicePropsFile.exists()) {
       final String serviceName = artifactFolder.getName();
@@ -90,8 +92,8 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
   }
 
   @Override
-  protected ServiceDescriptor createArtifactDescriptor(File artifactLocation, String name) {
-    return new ServiceDescriptor(name);
+  protected ServiceDescriptor createArtifactDescriptor(File artifactLocation, String name, Optional<Properties> properties) {
+    return new ServiceDescriptor(name, properties);
   }
 
   @Override

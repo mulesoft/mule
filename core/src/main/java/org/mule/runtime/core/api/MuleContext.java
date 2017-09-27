@@ -40,6 +40,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
@@ -343,5 +344,10 @@ public interface MuleContext extends Lifecycle {
    * @param extensionManager manages the extensions available on the artifact. Non null.
    */
   void setExtensionManager(ExtensionManager extensionManager);
+
+  /**
+   * @return the deployment properties.
+   */
+  Properties getDeploymentProperties();
 }
 

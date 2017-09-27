@@ -73,6 +73,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -104,6 +105,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
       new ApplicationFileBuilder("broken-app+", brokenAppFileBuilder);
   private final ApplicationFileBuilder waitAppFileBuilder =
       new ApplicationFileBuilder("wait-app").definedBy("wait-app-config.xml");
+  private final ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder = new ApplicationFileBuilder(
+                                                                                                           "dummy-app-with-props")
+                                                                                                               .definedBy("dummy-app-with-props-config.xml")
+                                                                                                               .containingClass(echoTestClassFile,
+                                                                                                                                "org/foo/EchoTest.class");;
 
   // Application plugin artifact builders
   private final ArtifactPluginFileBuilder echoPluginWithLib1 =
@@ -218,6 +224,25 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
     assertArtifactIsRegisteredAsZombie(brokenAppFileBuilder.getDeployedPath(), deploymentService.getZombieApplications());
+  }
+
+  @Test
+  public void deployAppWithDeploymentProperties() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+    startDeployment();
+    deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties);
+    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+
+    // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
+    deploymentService.redeploy(dummyAppDescriptorWithPropsFileBuilder.getId());
+    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+
+    // Redeploy with new deployment properties
+    deploymentProperties.clear();
+    deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
+    deploymentService.redeploy(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties);
+    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
   }
 
   /**

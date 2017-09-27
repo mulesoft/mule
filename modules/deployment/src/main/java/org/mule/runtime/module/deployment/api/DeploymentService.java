@@ -120,6 +120,24 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   void deployDomain(URI domainArchiveUri) throws IOException;
 
   /**
+   * Deploys a domain bundled as a zip from the given URL to the mule container
+   *
+   * @param domainArchiveUri location of the zip domain file.
+   * @param deploymentProperties the properties to override during the deployment process.
+   * @throws IOException
+   */
+  void deployDomain(URI domainArchiveUri, Properties deploymentProperties) throws IOException;
+
+
+  /**
+   * Undeploys and redeploys a domain
+   *
+   * @param domainName then name of the domain to redeploy.
+   * @param deploymentProperties the properties to override during the deployment process.
+   */
+  void redeployDomain(String domainName, Properties deploymentProperties);
+
+  /**
    * Undeploys and redeploys a domain
    *
    * @param domainName then name of the domain to redeploy

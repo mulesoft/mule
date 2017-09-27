@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.System.getProperties;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
@@ -42,6 +44,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -212,12 +215,16 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void deploy(URI appArchiveUri) throws IOException {
+    deploy(appArchiveUri, empty());
+  }
+
+  private void deploy(final URI appArchiveUri, final Optional<Properties> deploymentProperties) throws IOException {
     executeSynchronized(() -> {
       try {
         File appLocation = toFile(appArchiveUri.toURL());
         String fileName = appLocation.getName();
         if (fileName.endsWith(".jar")) {
-          applicationDeployer.deployPackagedArtifact(appArchiveUri);
+          applicationDeployer.deployPackagedArtifact(appArchiveUri, deploymentProperties);
         } else {
           if (!appLocation.getParent().equals(getAppsFolder())) {
             try {
@@ -226,7 +233,7 @@ public class MuleDeploymentService implements DeploymentService {
               throw new MuleRuntimeException(e);
             }
           }
-          applicationDeployer.deployExplodedArtifact(fileName);
+          applicationDeployer.deployExplodedArtifact(fileName, deploymentProperties);
         }
       } catch (MalformedURLException e) {
         throw new MuleRuntimeException(e);
@@ -236,25 +243,18 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void deploy(URI appArchiveUri, Properties appProperties) throws IOException {
-    throw new NotImplementedException();
+    deploy(appArchiveUri, ofNullable(appProperties));
   }
 
   @Override
   public void redeploy(String artifactName) {
-    executeSynchronized(() -> {
-      try {
-        applicationDeployer.redeploy(findApplication(artifactName));
-      } catch (DeploymentException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Failure while redeploying application: " + artifactName, e);
-        }
-      }
-    });
+    redeploy(artifactName, empty());
   }
+
 
   @Override
   public void redeploy(String artifactName, Properties appProperties) {
-    throw new NotImplementedException();
+    redeploy(artifactName, ofNullable(appProperties));
   }
 
   @Override
@@ -264,12 +264,20 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void deployDomain(URI domainArchiveUri) throws IOException {
-    executeSynchronized(() -> domainDeployer.deployPackagedArtifact(domainArchiveUri));
+    deployDomain(domainArchiveUri, empty());
+  }
+
+  private void deployDomain(URI domainArchiveUri, Optional<Properties> properties) {
+    executeSynchronized(() -> domainDeployer.deployPackagedArtifact(domainArchiveUri, properties));
   }
 
   @Override
   public void redeployDomain(String domainName) {
-    executeSynchronized(() -> domainDeployer.redeploy(findDomain(domainName)));
+    redeployDomain(domainName, empty());
+  }
+
+  private void redeployDomain(String domainName, Optional<Properties> deploymentProperties) {
+    executeSynchronized(() -> domainDeployer.redeploy(findDomain(domainName), deploymentProperties));
   }
 
   @Override
@@ -361,5 +369,27 @@ public class MuleDeploymentService implements DeploymentService {
   public static SchedulerService findSchedulerService(ServiceManager serviceManager) {
     final List<Service> services = serviceManager.getServices();
     return (SchedulerService) services.stream().filter(s -> s instanceof SchedulerService).findFirst().get();
+  }
+
+  @Override
+  public void deployDomain(URI domainArchiveUri, Properties appProperties) throws IOException {
+    deployDomain(domainArchiveUri, ofNullable(appProperties));
+  }
+
+  private void redeploy(final String artifactName, final Optional<Properties> deploymentProperties) {
+    executeSynchronized(() -> {
+      try {
+        applicationDeployer.redeploy(findApplication(artifactName), deploymentProperties);
+      } catch (DeploymentException e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Failure while redeploying application: " + artifactName, e);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void redeployDomain(String domainName, Properties deploymentProperties) {
+    redeployDomain(domainName, ofNullable(deploymentProperties));
   }
 }

@@ -71,10 +71,13 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuild
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -83,6 +86,7 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactor
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.api.TestDeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -142,6 +146,14 @@ import org.mockito.verification.VerificationMode;
 public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
+  protected static final String FLOW_PROPERTY_NAME = "flowName";
+  protected static final String COMPONENT_NAME = "componentValue";
+  protected static final String COMPONENT_CLASS =
+      "org.mule.runtime.module.deployment.internal.AbstractDeploymentTestCase$TestComponent";
+  protected static final String COMPONENT_CLASS_ON_REDEPLOY =
+      "org.mule.runtime.module.deployment.internal.AbstractDeploymentTestCase$TestComponentOnRedeploy";
+  protected static final String FLOW_PROPERTY_NAME_VALUE = "flow1";
+  protected static final String FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY = "flow2";
   private static final int DEPLOYMENT_TIMEOUT = 10000;
   protected static final String[] NONE = new String[0];
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
@@ -287,6 +299,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected DeploymentListener applicationDeploymentListener;
   protected DeploymentListener domainDeploymentListener;
   protected DeploymentListener domainBundleDeploymentListener;
+  protected TestDeploymentListener testDeploymentListener;
   protected ArtifactClassLoader containerClassLoader;
   protected TestPolicyManager policyManager;
 
@@ -328,6 +341,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     copyFileToDirectory(buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService")), services);
 
     applicationDeploymentListener = mock(DeploymentListener.class);
+    testDeploymentListener = new TestDeploymentListener();
     domainDeploymentListener = mock(DeploymentListener.class);
     domainBundleDeploymentListener = mock(DeploymentListener.class);
     moduleDiscoverer = new TestContainerModuleDiscoverer(getPrivilegedArtifactIds());
@@ -344,6 +358,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                   () -> findSchedulerService(serviceManager));
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
+    deploymentService.addDeploymentListener(testDeploymentListener);
     deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
 
     policyManager = new TestPolicyManager(deploymentService,
@@ -552,6 +567,26 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       public String describeFailure() {
         return String.format("Did not received notification '%s' for app '%s'", "onArtifactCreated", appName)
             + System.lineSeparator() + super.describeFailure();
+      }
+    });
+  }
+
+  protected void assertPropertyValue(TestDeploymentListener listener, String propertyName, String propertyValue) {
+    Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      public boolean test() {
+        DefaultRegistry registry = (DefaultRegistry) listener.getRegistry();
+        if (registry == null) {
+          return false;
+        }
+        return registry.lookupByName(propertyName).get().equals(propertyValue);
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Properties were not overriden by the deployment properties";
       }
     });
   }
@@ -1041,5 +1076,25 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
     return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+  }
+
+  protected static class TestComponent implements Initialisable {
+
+    static boolean initialised = false;
+
+    @Override
+    public void initialise() throws InitialisationException {
+      initialised = true;
+    }
+  }
+
+  protected static class TestComponentOnRedeploy implements Initialisable {
+
+    static boolean initialised = false;
+
+    @Override
+    public void initialise() throws InitialisationException {
+      initialised = true;
+    }
   }
 }

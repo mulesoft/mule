@@ -126,6 +126,7 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -232,6 +233,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   private TransformationService transformationService;
 
   private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
+
+  private Properties deploymentProperties;
 
   @Inject
   private ComponentInitialStateManager componentInitialStateManager;
@@ -1061,5 +1064,17 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
 
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
     this.errorTypeRepository = errorTypeRepository;
+  }
+
+  @Override
+  public Properties getDeploymentProperties() {
+    return deploymentProperties;
+  }
+
+  /**
+   * Sets the deployment properties so that beans as well as application properties are overridden.
+   */
+  public void setDeploymentProperties(Properties deploymentProperties) {
+    this.deploymentProperties = deploymentProperties;
   }
 }

@@ -8,6 +8,11 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+
+import java.io.File;
+import java.util.Optional;
+import java.util.Properties;
+
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
@@ -16,8 +21,6 @@ import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
-
-import java.io.File;
 
 /**
  * Creates artifact descriptor for application
@@ -29,10 +32,6 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
     super(artifactPluginDescriptorLoader, descriptorLoaderRepository);
   }
 
-  @Override
-  protected DomainDescriptor createArtifactDescriptor(File artifactLocation, String name) {
-    return new DomainDescriptor(artifactLocation.getName());
-  }
 
   @Override
   protected String getDefaultConfigurationResource() {
@@ -47,5 +46,11 @@ public class DomainDescriptorFactory extends AbstractDeployableDescriptorFactory
   @Override
   protected AbstractMuleArtifactModelJsonSerializer<MuleDomainModel> getMuleArtifactModelJsonSerializer() {
     return new MuleDomainModelJsonSerializer();
+  }
+
+  @Override
+  protected DomainDescriptor createArtifactDescriptor(File artifactLocation, String name,
+                                                      Optional<Properties> deploymentProperties) {
+    return new DomainDescriptor(artifactLocation.getName(), deploymentProperties);
   }
 }

@@ -15,6 +15,7 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.touch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -34,6 +35,7 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -54,6 +56,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Properties;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -79,6 +82,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       .definedBy("empty-domain-config.xml").deployedWith("redeployment.enabled", "false");
   private final DomainFileBuilder sharedDomainFileBuilder =
       new DomainFileBuilder("shared-domain").definedBy("shared-domain-config.xml");
+  private final DomainFileBuilder domainWithPropsFileBuilder =
+      new DomainFileBuilder("domain-with-props").definedBy("domain-with-props-config.xml");
 
   // Application artifact builders
   private final ApplicationFileBuilder dummyDomainApp1FileBuilder =
@@ -944,6 +949,37 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
     assertNoZombiePresent(deploymentService.getZombieDomains());
+  }
+
+  @Test
+  public void deployDomainWithDeploymentProperties() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
+    startDeployment();
+    deploymentService.deployDomain(domainWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties);
+    assertDeploymentSuccess(domainDeploymentListener, domainWithPropsFileBuilder.getId());
+    Domain domain = findADomain(domainWithPropsFileBuilder.getId());
+    assertNotNull(domain);
+    assertNotNull(domain.getMuleContext());
+    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"), instanceOf(TestComponent.class));
+
+    // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
+    deploymentService.redeployDomain(domainWithPropsFileBuilder.getId());
+    domain = findADomain(domainWithPropsFileBuilder.getId());
+    assertNotNull(domain);
+    assertNotNull(domain.getMuleContext());
+    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"), instanceOf(TestComponent.class));
+
+    // Redeploy with new deployment properties
+    deploymentProperties.clear();
+    deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS_ON_REDEPLOY);
+    deploymentService.redeployDomain(domainWithPropsFileBuilder.getId(), deploymentProperties);
+    domain = findADomain(domainWithPropsFileBuilder.getId());
+    assertNotNull(domain);
+    assertNotNull(domain.getMuleContext());
+    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"),
+               instanceOf(TestComponentOnRedeploy.class));
+
   }
 
   @Ignore("MULE-6926: flaky test")

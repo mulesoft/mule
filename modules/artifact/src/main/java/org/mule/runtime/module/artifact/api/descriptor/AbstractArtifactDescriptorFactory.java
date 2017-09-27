@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -30,6 +31,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Base class to create artifact descriptors
@@ -57,12 +60,18 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
 
   @Override
   public T create(File artifactFolder) throws ArtifactDescriptorCreateException {
+    return create(artifactFolder, empty());
+  }
+
+  @Override
+  public T create(File artifactFolder, Optional<Properties> deploymentProperties) throws ArtifactDescriptorCreateException {
     final File artifactJsonFile = new File(artifactFolder, MULE_ARTIFACT_FOLDER + separator + getDescriptorFileName());
     if (!artifactJsonFile.exists()) {
       throw new ArtifactDescriptorCreateException(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR + artifactJsonFile);
     }
 
-    T artifactDescriptor = loadFromJsonDescriptor(artifactFolder, loadModelFromJson(getDescriptorContent(artifactJsonFile)));
+    T artifactDescriptor =
+        loadFromJsonDescriptor(artifactFolder, loadModelFromJson(getDescriptorContent(artifactJsonFile)), deploymentProperties);
 
     return artifactDescriptor;
   }
@@ -79,8 +88,8 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
    * @param artifactModel model representing the artifact.
    * @return a descriptor matching the provided model.
    */
-  protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel) {
-    final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName());
+  protected final T loadFromJsonDescriptor(File artifactLocation, M artifactModel, Optional<Properties> deploymentProperties) {
+    final T descriptor = createArtifactDescriptor(artifactLocation, artifactModel.getName(), deploymentProperties);
     if (artifactLocation.isDirectory()) {
       descriptor.setRootFolder(artifactLocation);
     }
@@ -153,9 +162,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   /**
    * @param artifactLocation folder where the artifact is located, it can be a folder or file depending on the artifact type.
    * @param name name for the created artifact
+   * @param deploymentProperties properties provided for the deployment process.
    * @return a new descriptor of the type required by the factory.
    */
-  protected abstract T createArtifactDescriptor(File artifactLocation, String name);
+  protected abstract T createArtifactDescriptor(File artifactLocation, String name, Optional<Properties> deploymentProperties);
 
   private String getDescriptorFileName() {
     return MULE_ARTIFACT_JSON_DESCRIPTOR;

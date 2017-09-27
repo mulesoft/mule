@@ -58,6 +58,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -102,6 +104,7 @@ public class ArtifactContextBuilder {
   private List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
   private DeployableArtifact parentArtifact;
+  private Optional<Properties> properties = empty();
 
   private ArtifactContextBuilder() {}
 
@@ -136,6 +139,11 @@ public class ArtifactContextBuilder {
    */
   public ArtifactContextBuilder setArtifactType(ArtifactType artifactType) {
     this.artifactType = artifactType;
+    return this;
+  }
+
+  public ArtifactContextBuilder setProperties(Optional<Properties> properties) {
+    this.properties = properties;
     return this;
   }
 
@@ -287,9 +295,8 @@ public class ArtifactContextBuilder {
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
    *        components from the configuration will be created on demand when requested. For instance, when using
    *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the
-   *        creation of the component requested to do test connectivity, if it was not already created. when false, the
-   *        application will be created completely at startup.
+   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
+   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -330,6 +337,20 @@ public class ArtifactContextBuilder {
     checkState(serviceConfigurator != null, SERVICE_CONFIGURATOR_CANNOT_BE_NULL);
     this.serviceConfigurators.add(serviceConfigurator);
     return this;
+  }
+
+  private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
+    if (deploymentProperties == null) {
+      return properties;
+    }
+
+    Map<String, String> mergedProperties = new HashMap<String, String>();
+    mergedProperties.putAll(properties);
+    for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
+      mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
+    }
+
+    return mergedProperties;
   }
 
   /**
@@ -386,7 +407,7 @@ public class ArtifactContextBuilder {
                     .setMuleContext(muleContext)
                     .setConfigResources(configurationFiles)
                     .setArtifactDeclaration(artifactDeclaration)
-                    .setArtifactProperties(artifactProperties)
+                    .setArtifactProperties(merge(artifactProperties, muleContext.getDeploymentProperties()))
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
@@ -415,6 +436,7 @@ public class ArtifactContextBuilder {
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
         muleContextBuilder.setObjectSerializer(objectSerializer);
+        muleContextBuilder.setDeploymentProperties(properties);
 
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -17,6 +19,8 @@ import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -51,7 +55,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public Domain deployPackagedArtifact(String zip) throws DeploymentException {
-    return domainDeployer.deployPackagedArtifact(zip);
+    return deployPackagedArtifact(zip, empty());
   }
 
   @Override
@@ -61,7 +65,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public Domain deployPackagedArtifact(URI artifactAchivedUrl) {
-    return domainDeployer.deployPackagedArtifact(artifactAchivedUrl);
+    return deployPackagedArtifact(artifactAchivedUrl, empty());
   }
 
   /**
@@ -102,26 +106,7 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public void redeploy(Domain artifact) throws DeploymentException {
-    Collection<Application> domainApplications = findApplicationsAssociated(artifact);
-    for (Application domainApplication : domainApplications) {
-      applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
-    }
-    try {
-      domainDeployer.redeploy(artifact);
-    } catch (DeploymentException e) {
-      logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
-                                artifact.getArtifactName()));
-      throw e;
-    }
-    for (Application domainApplication : domainApplications) {
-      try {
-        applicationDeployer.redeploy(domainApplication);
-      } catch (Exception e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error redeploying application {}", domainApplication.getArtifactName(), e);
-        }
-      }
-    }
+    redeploy(artifact, empty());
   }
 
   @Override
@@ -141,6 +126,50 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
 
   @Override
   public void deployArtifact(Domain artifact) {
-    domainDeployer.deployArtifact(artifact);
+    domainDeployer.deployArtifact(artifact, empty());
+  }
+
+  @Override
+  public Domain deployPackagedArtifact(URI domainArchiveUri, Optional<Properties> appProperties) throws DeploymentException {
+    return domainDeployer.deployPackagedArtifact(domainArchiveUri, appProperties);
+  }
+
+  @Override
+  public Domain deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException {
+    return domainDeployer.deployPackagedArtifact(zip, deploymentProperties);
+  }
+
+  @Override
+  public void redeploy(Domain artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    Collection<Application> domainApplications = findApplicationsAssociated(artifact);
+    for (Application domainApplication : domainApplications) {
+      applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
+    }
+    try {
+      domainDeployer.redeploy(artifact, deploymentProperties);
+    } catch (DeploymentException e) {
+      logger.warn(String.format("Failure during redeployment of domain %s, domain applications deployment will be skipped",
+                                artifact.getArtifactName()));
+      throw e;
+    }
+    for (Application domainApplication : domainApplications) {
+      try {
+        applicationDeployer.redeploy(domainApplication, deploymentProperties);
+      } catch (Exception e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Error redeploying application {}", domainApplication.getArtifactName(), e);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void deployArtifact(Domain artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    domainDeployer.deployArtifact(artifact, deploymentProperties);
+  }
+
+  @Override
+  public Domain deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
+    return domainDeployer.deployExplodedArtifact(artifactDir, deploymentProperties);
   }
 }

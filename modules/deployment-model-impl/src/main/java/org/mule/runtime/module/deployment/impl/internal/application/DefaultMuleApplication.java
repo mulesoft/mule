@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
@@ -23,6 +24,8 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -61,8 +64,11 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -198,7 +204,7 @@ public class DefaultMuleApplication implements Application {
 
     try {
       ArtifactContextBuilder artifactBuilder =
-          newBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
+          newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)
               .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
@@ -207,6 +213,7 @@ public class DefaultMuleApplication implements Application {
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())
+              .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getName(), descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager);
 
       Domain domain;
@@ -230,6 +237,28 @@ public class DefaultMuleApplication implements Application {
       logger.error(null, getRootCause(e));
       throw new DeploymentInitException(createStaticMessage(getRootCauseMessage(e)), e);
     }
+  }
+
+  private Properties getProperties() {
+    if (!descriptor.getDeploymentProperties().isPresent()) {
+      return new Properties();
+    }
+
+    return descriptor.getDeploymentProperties().get();
+  }
+
+  private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
+    if (deploymentProperties == null) {
+      return properties;
+    }
+
+    Map<String, String> mergedProperties = new HashMap<String, String>();
+    mergedProperties.putAll(properties);
+    for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
+      mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
+    }
+
+    return mergedProperties;
   }
 
   @Override
