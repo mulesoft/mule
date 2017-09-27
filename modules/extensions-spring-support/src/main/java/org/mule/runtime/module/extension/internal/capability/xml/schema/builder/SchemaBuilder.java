@@ -35,7 +35,6 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.XML_NA
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -508,7 +507,7 @@ public final class SchemaBuilder {
   void declareAsParameter(MetadataType type, ExtensionType extensionType, ParameterModel parameterModel,
                           DslElementSyntax paramDsl, List<TopLevelElement> childElements) {
 
-    if (isContent(parameterModel) || isContent(type)) {
+    if (isContent(parameterModel)) {
       childElements.add(generateTextElement(paramDsl, parameterModel.getDescription(), parameterModel.isRequired()));
     } else {
       type.accept(getParameterDeclarationVisitor(extensionType, childElements, parameterModel));

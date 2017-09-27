@@ -2489,9 +2489,6 @@
             "type": "String"
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -2506,9 +2503,6 @@
             "type": "String"
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
@@ -2560,9 +2554,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "MILLISECONDS",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -2591,9 +2582,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "1000",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -2622,9 +2610,6 @@
             }
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "0",
             "expressionSupport": {
               "value": "SUPPORTED"

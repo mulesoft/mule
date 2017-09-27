@@ -3598,9 +3598,6 @@
                   }
                 },
                 "annotations": {
-                  "parameterPurpose": {
-                    "role": "BEHAVIOUR"
-                  },
                   "default": "34.0",
                   "expressionSupport": {
                     "value": "SUPPORTED"

@@ -14,6 +14,7 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;
@@ -21,7 +22,6 @@ import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.UNBOUN
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getBaseType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getParameterRole;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
@@ -505,7 +505,7 @@ final class ObjectTypeSchemaDelegate {
                                        field.isRequired(),
                                        false,
                                        getExpressionSupport(field), getDefaultValue(field).orElse(null),
-                                       getParameterRole(field), ParameterDslConfiguration.getDefaultInstance(),
+                                       BEHAVIOUR, ParameterDslConfiguration.getDefaultInstance(),
                                        null, getLayoutModel(field).orElse(null), null, emptyList(), emptySet());
   }
 

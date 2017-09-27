@@ -14483,9 +14483,6 @@
             "type": "String"
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "AMERICA",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -14500,9 +14497,6 @@
             "type": "String"
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "USA",
             "expressionSupport": {
               "value": "SUPPORTED"
@@ -14517,9 +14511,6 @@
             "type": "String"
           },
           "annotations": {
-            "parameterPurpose": {
-              "role": "BEHAVIOUR"
-            },
             "default": "SFO",
             "expressionSupport": {
               "value": "SUPPORTED"
