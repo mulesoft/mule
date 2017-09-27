@@ -24,7 +24,6 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
@@ -68,7 +67,6 @@ import org.junit.runners.Parameterized;
 import org.mockito.ArgumentMatcher;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 
@@ -97,10 +95,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     notificationFirer = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
-    when(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class))
-        .thenReturn(notificationFirer);
     mockErrorTypeLocator();
-    when(muleContext.getErrorTypeRepository().getErrorType(UNKNOWN)).thenReturn(Optional.of(mock(ErrorType.class)));
     when(muleContext.getTransformationService()).thenReturn(new DefaultTransformationService(muleContext));
   }
 

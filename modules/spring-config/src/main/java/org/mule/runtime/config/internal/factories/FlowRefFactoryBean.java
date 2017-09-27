@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -19,6 +20,8 @@ import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,15 +29,13 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.MuleArtifactContext;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import org.reactivestreams.Publisher;
@@ -94,13 +95,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
       ((Component) referencedFlow).setAnnotations(annotations);
 
       if (referencedFlow instanceof Initialisable) {
-        prepareProcessor(referencedFlow);
+        initialiseIfNeeded(referencedFlow, muleContext);
         if (referencedFlow instanceof MessageProcessorChain) {
           for (Processor processor : ((MessageProcessorChain) referencedFlow).getMessageProcessors()) {
-            prepareProcessor(processor);
+            setMuleContextIfNeeded(processor, muleContext);
           }
         }
-        initialiseIfNeeded(referencedFlow);
       }
       startIfNeeded(referencedFlow);
     }
@@ -116,12 +116,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
       }
     }
     return (Processor) applicationContext.getBean(name);
-  }
-
-  private void prepareProcessor(Processor p) {
-    if (p instanceof MuleContextAware) {
-      ((MuleContextAware) p).setMuleContext(muleContext);
-    }
   }
 
   @Override

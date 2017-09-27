@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.api.manager;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,7 +31,7 @@ public class DefaultExtensionManagerFactory implements ExtensionManagerFactory {
     ExtensionManager extensionManager = new DefaultExtensionManager();
     muleContext.setExtensionManager(extensionManager);
     try {
-      initialiseIfNeeded(extensionManager, muleContext);
+      initialiseIfNeeded(extensionManager, false, muleContext);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(createStaticMessage("Could not initialise extension manager"), e);
     }

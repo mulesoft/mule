@@ -23,6 +23,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -40,15 +41,13 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,6 +58,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import javax.inject.Inject;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -72,6 +76,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final List<Processor> processors;
   private ProcessingStrategy processingStrategy;
   private List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
+
+  @Inject
+  private ProcessorInterceptorManager processorInterceptorManager;
+
+  @Inject
   private StreamingManager streamingManager;
 
   AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
@@ -295,7 +304,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    muleContext.getProcessorInterceptorManager().getInterceptorFactories().stream().forEach(interceptorFactory -> {
+    processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
       ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
       try {
         muleContext.getInjector().inject(reactiveInterceptorAdapter);
@@ -305,12 +314,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       additionalInterceptors.add(0, reactiveInterceptorAdapter);
     });
 
-    try {
-      streamingManager = ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(StreamingManager.class);
-    } catch (RegistrationException e) {
-      throw new InitialisationException(e, this);
-    }
-    initialiseIfNeeded(getMessageProcessorsForLifecycle(), true, muleContext);
+    initialiseIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
   }
 
   @Override

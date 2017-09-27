@@ -25,7 +25,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -93,8 +92,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   public final void initialise() throws InitialisationException {
     try {
       lifecycleManager.fireInitialisePhase((phaseName, object) -> {
-        injectFlowConstructMuleContext(exceptionListener);
-        initialiseIfInitialisable(exceptionListener);
+        initialiseIfNeeded(exceptionListener, muleContext);
         validateConstruct();
         doInitialise();
       });
@@ -226,12 +224,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     }
   }
 
-  protected void injectFlowConstructMuleContext(Object candidate) {
-    if (candidate instanceof MuleContextAware) {
-      ((MuleContextAware) candidate).setMuleContext(muleContext);
-    }
-  }
-
   @Override
   public String getUniqueIdString() {
     return muleContext.getUniqueIdString();
@@ -245,10 +237,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   @Override
   public String toString() {
     return format("%s{%s}", getSimpleName(this.getClass()), getName());
-  }
-
-  protected void initialiseIfInitialisable(Object candidate) throws InitialisationException {
-    initialiseIfNeeded(candidate, true, muleContext);
   }
 
   protected void startIfStartable(Object candidate) throws MuleException {

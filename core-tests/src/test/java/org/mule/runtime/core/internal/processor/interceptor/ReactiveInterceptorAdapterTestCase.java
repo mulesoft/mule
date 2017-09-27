@@ -12,6 +12,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
@@ -90,7 +91,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 @SmallTest
@@ -100,6 +103,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   private final boolean useMockInterceptor;
   private final Processor processor;
 
+  @Inject
+  private DefaultProcessorInterceptorManager processorInterceptiorManager;
   private Flow flow;
 
   @Rule
@@ -108,6 +113,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   public ReactiveInterceptorAdapterTestCase(boolean useMockInterceptor, Processor processor) {
     this.useMockInterceptor = useMockInterceptor;
     this.processor = spy(processor);
+  }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
   }
 
   /*
@@ -1550,18 +1560,16 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   private void startFlowWithInterceptors(ProcessorInterceptor... interceptors) throws Exception {
-    for (ProcessorInterceptor interceptionHandler : interceptors) {
-      muleContext.getProcessorInterceptorManager().addInterceptorFactory(() -> interceptionHandler);
-    }
+    processorInterceptiorManager.setInterceptorFactories(of(asList(interceptors).stream()
+        .map((Function<ProcessorInterceptor, ProcessorInterceptorFactory>) interceptionHandler -> () -> interceptionHandler)
+        .collect(toList())));
 
     flow.initialise();
     flow.start();
   }
 
   private void startFlowWithInterceptorFactories(ProcessorInterceptorFactory... interceptorFactories) throws Exception {
-    for (ProcessorInterceptorFactory interceptionHandlerFactory : interceptorFactories) {
-      muleContext.getProcessorInterceptorManager().addInterceptorFactory(interceptionHandlerFactory);
-    }
+    processorInterceptiorManager.setInterceptorFactories(of(asList(interceptorFactories)));
 
     flow.initialise();
     flow.start();

@@ -13,10 +13,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
@@ -34,6 +35,8 @@ public class MessageProcessorExpressionPair extends AbstractComponent
 
   private final String expression;
   private final Processor messageProcessor;
+
+  private MuleContext muleContext;
 
   public MessageProcessorExpressionPair(String expression, Processor messageProcessor) {
     requireNonNull(expression, "expression can't be null");
@@ -60,6 +63,7 @@ public class MessageProcessorExpressionPair extends AbstractComponent
 
   @Override
   public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
     if (messageProcessor instanceof MuleContextAware) {
       ((MuleContextAware) messageProcessor).setMuleContext(context);
     }
@@ -67,7 +71,7 @@ public class MessageProcessorExpressionPair extends AbstractComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(messageProcessor);
+    initialiseIfNeeded(messageProcessor, muleContext);
   }
 
   @Override

@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.exception;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 
 import java.util.Collection;
 import java.util.Optional;

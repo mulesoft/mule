@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * Routes the event to a single<code>MessageProcessor</code> using an expression to evaluate the event being processed and find
@@ -22,12 +24,12 @@ import java.util.Optional;
  */
 public class ChoiceRouter extends AbstractSelectiveRouter {
 
-  private MuleContext muleContext;
+  private ExpressionManager expressionManager;
 
   @Override
   protected Optional<Processor> selectProcessor(CoreEvent event) {
     return getConditionalMessageProcessors().stream()
-        .filter(cmp -> muleContext.getExpressionManager().evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
+        .filter(cmp -> expressionManager.evaluateBoolean(cmp.getExpression(), event, getLocation(), false, true))
         .findFirst()
         .map(cmp -> cmp.getMessageProcessor());
   }
@@ -41,10 +43,9 @@ public class ChoiceRouter extends AbstractSelectiveRouter {
     }
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    this.muleContext = context;
+  @Inject
+  public void setExpressionManager(ExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 
 }

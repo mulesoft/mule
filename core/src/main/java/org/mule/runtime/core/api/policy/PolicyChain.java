@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.policy;
 
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -19,17 +20,17 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
+import org.reactivestreams.Publisher;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -53,8 +54,7 @@ public class PolicyChain extends AbstractComponent
   @Override
   public final void initialise() throws InitialisationException {
     processorChain = new DefaultMessageProcessorChainBuilder().chain(this.processors).build();
-    processorChain.setMuleContext(muleContext);
-    processorChain.initialise();
+    initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper =
         new PolicyNotificationHelper(muleContext.getNotificationManager(), muleContext.getConfiguration().getId(), this);
