@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -58,13 +57,13 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultMuleApplication implements Application {
 
@@ -181,10 +180,10 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void init() {
-    doInit(false);
+    doInit(false, false);
   }
 
-  private void doInit(boolean lazy) {
+  private void doInit(boolean lazy, boolean disableXmlValidations) {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Initializing app '%s'", descriptor.getName())));
     }
@@ -196,7 +195,7 @@ public class DefaultMuleApplication implements Application {
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setEnableLazyInit(lazy).setServiceRepository(serviceRepository)
+              .setEnableLazyInit(lazy).setDisableXmlValidations(disableXmlValidations).setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())
@@ -222,7 +221,12 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void lazyInit() {
-    doInit(true);
+    doInit(true, true);
+  }
+
+  @Override
+  public void lazyInit(boolean disableXmlValidations) {
+    doInit(true, disableXmlValidations);
   }
 
   protected void setArtifactContext(final ArtifactContext artifactContext) {

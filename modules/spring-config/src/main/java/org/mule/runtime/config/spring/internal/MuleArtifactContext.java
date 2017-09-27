@@ -17,6 +17,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.spring.api.dsl.model.ApplicationModel.IMPORT_ELEMENT;
@@ -33,8 +34,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -45,6 +44,7 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
 import org.mule.runtime.config.spring.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.api.dsl.model.ComponentBuildingDefinitionRegistry;
@@ -85,6 +85,17 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -108,17 +119,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -161,24 +161,25 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
    *        process.
    * @param parentConfigurationProperties
+   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders,
-                             Optional<ConfigurationProperties> parentConfigurationProperties)
+                             Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations)
       throws BeansException {
     this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
-         artifactType, pluginsClassLoaders);
+         artifactType, pluginsClassLoaders, disableXmlValidations);
   }
 
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
-                             List<ClassLoader> pluginsClassLoaders) {
+                             List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistries) muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -187,7 +188,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.artifactType = artifactType;
     this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
-    this.xmlConfigurationDocumentLoader = newXmlConfigurationDocumentLoader();
+    this.xmlConfigurationDocumentLoader = disableXmlValidations ? noValidationDocumentLoader() : schemaValidatingDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
 
     registerComponentBuildingDefinitions(serviceRegistry, MuleArtifactContext.class.getClassLoader(),
@@ -216,10 +217,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private static Optional<Set<ExtensionModel>> getExtensionModels(ExtensionManager extensionManager) {
     return ofNullable(extensionManager == null ? null
         : extensionManager.getExtensions());
-  }
-
-  protected XmlConfigurationDocumentLoader newXmlConfigurationDocumentLoader() {
-    return schemaValidatingDocumentLoader();
   }
 
   private XmlApplicationParser createApplicationParser(List<ClassLoader> pluginsClassLoaders) {

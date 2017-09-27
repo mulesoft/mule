@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 
@@ -30,7 +29,7 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[0], emptyMap(), APP, false);
+    return new SpringXmlConfigurationBuilder(new String[0], emptyMap());
   }
 
   @Test

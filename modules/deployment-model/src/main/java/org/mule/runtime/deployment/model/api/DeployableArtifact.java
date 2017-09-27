@@ -38,8 +38,16 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
 
   /**
    * Initialise the minimal resources required for this artifact to execute components.
+   * By default XML validations will not be applied when doing lazy initialization. If needed use {@link #lazyInit(boolean)}.
    */
   void lazyInit();
+
+  /**
+   * Initialise the minimal resources required for this artifact to execute components.
+   *
+   * @param disableXmlValidations {@code true} validations when parsing the XML will happen, otherwise {@code false}.
+   */
+  void lazyInit(boolean disableXmlValidations);
 
   /**
    * Starts the artifact execution
