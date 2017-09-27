@@ -6,6 +6,7 @@
  */
 package org.mule.test.functional;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,14 +15,20 @@ import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain;
 
 import java.util.Map;
 
 /**
- * Test case to ensure {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain#apply(org.reactivestreams.Publisher)}
- * does the correct handle of the chaining when working with events and context child.
+ * Test case to ensure {@link ModuleOperationProcessorChain#apply(org.reactivestreams.Publisher)}
+ * does the correct handle of the chaining when working with events and context child. It also checks if in those cases when
+ * an exception happens, {@link ModuleOperationProcessorChain#workOutInternalError(MessagingException, CoreEvent)} does handle
+ * the {@link MessagingException} correctly (setting the right {@link CoreEvent} to it).
  * <p/>
  * The idea is ensure all the streams created within a Smart Connector operation are accessible from within a <flow/>, or another
  * Smart Connector.
@@ -77,8 +84,52 @@ public class ModuleWithStreamOperationTestCase extends AbstractModuleWithHttpTes
     assertThat(resultMap.get("route 2"), is("User and pass validated"));
   }
 
+  @Test
+  public void testHttpDoLoginAndPlainEntireStreamResponseNestingScopesWithFailures() throws Exception {
+    assertFlow("testHttpDoLoginAndPlainEntireStreamResponseNestingScopesWithFailures", SUCCESS_RESPONSE);
+  }
+
+  @Test
+  public void testDoLoginFailPropagateErrorDescription() throws Exception {
+    CoreEvent muleEvent = flowRunner("testDoLoginFailPropagateErrorDescription").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
+    Map<String, String> resultMap = (Map<String, String>) muleEvent.getMessage().getPayload().getValue();
+    assertThat(resultMap.size(), is(2));
+    assertThat(resultMap.get("errorDescription"), containsString("failed: unauthorized (401)"));
+    assertThat(resultMap.get("varsPreError").trim(), is("variable before error"));
+  }
+
+  @Test
+  public void testDoLoginFailPropagateErrorDescriptionWithinFlow() throws Exception {
+    CoreEvent muleEvent = flowRunner("testDoLoginFailPropagateErrorDescriptionWithinFlow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
+    Map<String, String> resultMap = (Map<String, String>) muleEvent.getMessage().getPayload().getValue();
+    assertThat(resultMap.size(), is(2));
+    assertThat(resultMap.get("errorDescription"), containsString("failed: unauthorized (401)"));
+    assertThat(resultMap.get("varsPreError").trim(), is("variable before error"));
+  }
+
+  @Test
+  public void testHttpDoLoginAndPlainEntireStreamResponseWithinFlowLeavingStreamingOpen() throws Exception {
+    assertFlowWithStreamOpen("testHttpDoLoginAndPlainEntireStreamResponseWithinFlowLeavingStreamingOpen", SUCCESS_RESPONSE);
+  }
+
+  @Test
+  public void testHttpDoLoginAndPlainBodyStreamResponseWithinFlowLeavingStreamingOpen() throws Exception {
+    assertFlowWithStreamOpen("testHttpDoLoginAndPlainBodyStreamResponseWithinFlowLeavingStreamingOpen",
+                             USER_AND_PASS_VALIDATED_RESPONSE);
+  }
+
   private void assertFlow(String flowName, String response) throws Exception {
     CoreEvent muleEvent = flowRunner(flowName).run();
     assertThat(muleEvent.getMessage().getPayload().getValue(), is(response));
+  }
+
+  private void assertFlowWithStreamOpen(String flowName, String response) throws Exception {
+    final CoreEvent muleEvent = flowRunner(flowName).keepStreamsOpen().run();
+    final CursorStreamProvider provider = (CursorStreamProvider) muleEvent.getMessage().getPayload().getValue();
+    final CursorStream cursorStream = provider.openCursor();
+    final String realResult = IOUtils.toString(cursorStream);
+    assertThat(realResult, is(response));
   }
 }

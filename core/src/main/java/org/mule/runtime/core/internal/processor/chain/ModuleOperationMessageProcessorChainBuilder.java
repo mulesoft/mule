@@ -15,10 +15,10 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
@@ -34,6 +34,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorMapping;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -42,6 +43,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,8 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Creates a chain for any operation, where it parametrizes two type of values (parameter and property) to the inner processors
@@ -197,37 +198,46 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
-          .concatMap(request -> just(request)
-              .map(this::createEventWithParameters)
-              .transform(super::apply)
-              .map(eventResult -> processResult(request, eventResult)));
+          .concatMap(request -> from(processWithChildContext(createEventWithParameters(request), super::apply,
+                                                             ofNullable(getLocation())))
+                                                                 .onErrorResume(MessagingException.class,
+                                                                                createErrorResumeMapper(request))
+                                                                 .map(eventResult -> processResult(request, eventResult)));
+    }
+
+    /**
+     * If an exception within the <module/> is thrown, we will cut the current exception bubbling by returning the control to the
+     * caller/publisher of the current <module/>'s invocation.
+     */
+    private Function<MessagingException, Publisher<? extends CoreEvent>> createErrorResumeMapper(
+                                                                                                 CoreEvent request) {
+      return throwable -> {
+        throwable = workOutInternalError(throwable, request);
+        return Mono.from(((BaseEventContext) request.getContext()).error(throwable)).then(Mono.empty());
+      };
     }
 
     /**
      * Unlike other {@link MessageProcessorChain MessageProcessorChains}, modules could contain error mappings that need to be
      * considered when resolving exceptions.
      */
-    @Override
-    protected Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
-      return exception -> {
-        MessagingException messagingException = super.resolveMessagingException(processor).apply(exception);
-        List<ErrorMapping> errorMappings = getErrorMappings(this);
-        if (!errorMappings.isEmpty()) {
-          Error error = messagingException.getEvent().getError().get();
-          ErrorType errorType = error.getErrorType();
-          ErrorType resolvedType = errorMappings.stream()
-              .filter(m -> m.match(errorType))
-              .findFirst()
-              .map(ErrorMapping::getTarget)
-              .orElse(errorType);
-          if (!resolvedType.equals(errorType))
-            messagingException.setProcessedEvent(CoreEvent.builder(messagingException.getEvent())
-                .error(ErrorBuilder.builder(error).errorType(resolvedType).build())
-                .build());
-
+    private MessagingException workOutInternalError(MessagingException messagingException, CoreEvent request) {
+      final CoreEvent.Builder builder = CoreEvent.builder(request).error(messagingException.getEvent().getError().get());
+      List<ErrorMapping> errorMappings = getErrorMappings(this);
+      if (!errorMappings.isEmpty()) {
+        Error error = messagingException.getEvent().getError().get();
+        ErrorType errorType = error.getErrorType();
+        ErrorType resolvedType = errorMappings.stream()
+            .filter(m -> m.match(errorType))
+            .findFirst()
+            .map(ErrorMapping::getTarget)
+            .orElse(errorType);
+        if (!resolvedType.equals(errorType)) {
+          builder.error(ErrorBuilder.builder(error).errorType(resolvedType).build());
         }
-        return messagingException;
-      };
+      }
+      messagingException.setProcessedEvent(builder.build());
+      return messagingException;
     }
 
     private CoreEvent processResult(CoreEvent originalEvent, CoreEvent chainEvent) {
@@ -266,7 +276,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     }
 
     private Object getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
-      ComponentLocation headLocation = null;
+      ComponentLocation headLocation;
       final Processor head = getProcessorsToExecute().get(0);
       headLocation = ((Component) head).getLocation();
 

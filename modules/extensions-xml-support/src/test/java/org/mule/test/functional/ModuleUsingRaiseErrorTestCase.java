@@ -11,10 +11,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.RAISE_ERROR;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
@@ -57,7 +55,6 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractXmlExtensionMuleArtif
   }
 
   @Test
-  @Ignore("MULE-13609: When more than one processor is present, error mappings in smart connectors don't work")
   public void customErrorCanBeMapped() throws Exception {
     verifyResultFrom("complexMapping", "Handled");
   }

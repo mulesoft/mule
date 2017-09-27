@@ -33,4 +33,37 @@
     <flow name="testHttpDoLoginAndPlainEntireStreamResponseNestingScopes">
         <module-using-streaming:do-login-and-plain-entire-stream-response-nesting-scopes config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
     </flow>
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseNestingScopesWithFailures">
+        <module-using-streaming:do-login-and-plain-entire-stream-response-nesting-scopes-with-failures config-ref="la-plata-config" someUserParent="userLP" somePassParent="passLP" />
+    </flow>
+
+    <flow name="testDoLoginFailPropagateErrorDescription">
+        <module-using-streaming:do-login-fail-propagate-error-description config-ref="la-plata-config" />
+    </flow>
+
+    <flow name="testDoLoginFailPropagateErrorDescriptionWithinFlow">
+        <try>
+            <set-variable variableName="preError" value="variable before error" />
+            <!-- the following request will fail due to basic authentication failure -->
+            <module-using-streaming:do-login-and-plain-entire-stream-response config-ref="la-plata-config" someUser="nonExistingUser" somePass="nonExistingPass" />
+            <set-payload value="it should have never reached here" />
+            <set-variable variableName="preError" value="variable after error, it should have never reached here" />
+            <error-handler>
+                <on-error-continue >
+                    <!-- map assembly to check the response on the test -->
+                    <set-payload value="#[{'errorDescription' : error.description , 'varsPreError' : vars.preError}]" />
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+
+
+    <flow name="testHttpDoLoginAndPlainEntireStreamResponseWithinFlowLeavingStreamingOpen">
+        <module-using-streaming:do-login-and-leave-entire-stream-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
+
+    <flow name="testHttpDoLoginAndPlainBodyStreamResponseWithinFlowLeavingStreamingOpen">
+        <module-using-streaming:do-login-and-leave-stream-body-response config-ref="la-plata-config" someUser="userLP" somePass="passLP" />
+    </flow>
 </mule>

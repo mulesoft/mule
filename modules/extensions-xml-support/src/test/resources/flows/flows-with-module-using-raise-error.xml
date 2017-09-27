@@ -68,7 +68,7 @@
     </flow>
 
     <flow name="complexMapping">
-        <module-using-raise-error:fail-raise-error>
+        <module-using-raise-error:fail-raise-error custom="true">
             <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM" targetType="APP:CUSTOM"/>
         </module-using-raise-error:fail-raise-error>
         <error-handler>
