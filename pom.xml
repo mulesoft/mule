@@ -224,13 +224,13 @@
         <muleMetadataModelVersion>1.0.0-rc</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <muleSpringModuleTestVersion>0.9.0-rc-SNAPSHOT</muleSpringModuleTestVersion>
-        <muleHttpConnectorTestVersion>0.9.0-rc-SNAPSHOT</muleHttpConnectorTestVersion>
-        <muleSocketsConnectorTestVersion>0.9.0-rc-SNAPSHOT</muleSocketsConnectorTestVersion>
-        <muleFileConnectorTestVersion>0.9.0-rc-SNAPSHOT</muleFileConnectorTestVersion>
-        <muleJmsConnectorTestVersion>0.9.0-rc-SNAPSHOT</muleJmsConnectorTestVersion>
+        <muleSpringModuleTestVersion>0.9.0-SNAPSHOT</muleSpringModuleTestVersion>
+        <muleHttpConnectorTestVersion>0.9.0-SNAPSHOT</muleHttpConnectorTestVersion>
+        <muleSocketsConnectorTestVersion>0.9.0-SNAPSHOT</muleSocketsConnectorTestVersion>
+        <muleFileConnectorTestVersion>0.9.0-SNAPSHOT</muleFileConnectorTestVersion>
+        <muleJmsConnectorTestVersion>0.9.0-SNAPSHOT</muleJmsConnectorTestVersion>
 
-        <muleFileCommonsTestVersion>0.9.0-rc-SNAPSHOT</muleFileCommonsTestVersion>
+        <muleFileCommonsTestVersion>0.9.0-SNAPSHOT</muleFileCommonsTestVersion>
 
         <muleHttpServiceTestVersion>1.0.0-rc-SNAPSHOT</muleHttpServiceTestVersion>
         <muleSchedulerServiceTestVersion>1.0.0-rc-SNAPSHOT</muleSchedulerServiceTestVersion>
