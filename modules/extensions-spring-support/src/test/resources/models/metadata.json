@@ -10671,13 +10671,14 @@
                 }
               },
               "hasDynamicType": true,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
+              "defaultValue": "#[payload]",
+              "role": "PRIMARY_CONTENT",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {
@@ -10866,13 +10867,14 @@
                 "type": "@ref:org.mule.test.metadata.extension.model.animals.Bear"
               },
               "hasDynamicType": true,
-              "required": true,
+              "required": false,
               "isConfigOverride": false,
               "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
+              "defaultValue": "#[payload]",
+              "role": "PRIMARY_CONTENT",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
-                "allowsReferences": true,
+                "allowsReferences": false,
                 "allowTopLevelDefinition": false
               },
               "layoutModel": {

@@ -926,7 +926,7 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
+          <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
             <xs:complexType>
               <xs:complexContent>
                 <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
@@ -934,7 +934,7 @@
             </xs:complexType>
           </xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

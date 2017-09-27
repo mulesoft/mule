@@ -7845,7 +7845,7 @@
                 "order": 1
               },
               "allowedStereotypeModels": [],
-              "name": "food",
+              "name": "healthyFood",
               "description": "",
               "modelProperties": {}
             }

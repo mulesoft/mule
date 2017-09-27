@@ -874,19 +874,8 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="contents">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="content">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="contents"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionList" use="optional" name="contents"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -905,15 +894,8 @@
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="animal-content">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.animals.Bear"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="animal-content"></xs:element>
         </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="animalContent"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

@@ -32,6 +32,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -41,6 +42,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
@@ -55,6 +57,7 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
 
@@ -301,7 +304,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void operationNameClashesWithParameterTypeName() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(TOP_LEVEL_SINGULAR_PARAM_NAME, TopLevelTest.class);
-    when(operationModel.getName()).thenReturn(TopLevelTest.class.getName());
+    when(operationModel.getName()).thenReturn(TopLevelTest.class.getSimpleName());
     mockParameters(operationModel, topLevelOperationParam, offending);
     validate();
   }
@@ -454,6 +457,25 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void topLevelParameterClashOnSubtypeWithSameType() {
+    ParameterModel offending = getParameter(TOP_LEVEL_SINGULAR_PARAM_NAME, TopLevelTest.class);
+    mockParameters(operationModel, offending);
+    when(extensionModel.getSubTypes()).thenReturn(ImmutableSet
+        .of(new SubTypesModel(toMetadataType(ChildTest.class), ImmutableSet.of(toMetadataType(TopLevelTest.class)))));
+    validate();
+  }
+
+  @Test
+  public void topLevelParameterClashOnSubtypeWithDifferentType() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterModel offending = getParameter(TOP_LEVEL_SINGULAR_PARAM_NAME, TopLevelTest.class);
+    mockParameters(operationModel, offending);
+    when(extensionModel.getSubTypes()).thenReturn(ImmutableSet
+        .of(new SubTypesModel(toMetadataType(ChildTest.class), ImmutableSet.of(toMetadataType(TopLevelSubtype.class)))));
+    validate();
+  }
+
+  @Test
   public void notInlineDefinitionPassSuccessful() {
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, NoChildTest.class);
@@ -526,6 +548,20 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static class TopLevelTest {
 
     public TopLevelTest() {
+
+    }
+
+    private String id;
+
+    public String getId() {
+      return id;
+    }
+  }
+
+  @Alias("top-level-test")
+  private static class TopLevelSubtype {
+
+    public TopLevelSubtype() {
 
     }
 
