@@ -95,7 +95,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final ProcessingStrategy processingStrategy;
 
   private volatile boolean canProcessMessage = false;
-  private final Cache<String, EventContext> eventContextCache = CacheBuilder.newBuilder().weakValues().build();
   private Sink sink;
   private final int maxConcurrency;
 
@@ -358,11 +357,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Sink getSink() {
     return sink;
-  }
-
-  @Override
-  public Map<String, EventContext> getSerializationEventContextCache() {
-    return eventContextCache.asMap();
   }
 
   @Override

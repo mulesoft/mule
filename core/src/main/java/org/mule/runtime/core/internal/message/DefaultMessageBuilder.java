@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getInt;
 import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
 import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -39,6 +40,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -494,7 +497,7 @@ public class DefaultMessageBuilder
           Object theContent = handler.getContent();
           if (theContent instanceof Serializable) {
             contents = theContent;
-          } else {
+          } else if (currentMuleContext.get() != null) {
             try {
               DataType source = fromObject(theContent);
               Transformer transformer =
@@ -510,6 +513,8 @@ public class DefaultMessageBuilder
               logger.error(message);
               throw new IOException(message);
             }
+          } else {
+            throw new NotSerializableException(handler.getClass().getName());
           }
         } else {
           this.handler = handler;
@@ -539,7 +544,7 @@ public class DefaultMessageBuilder
           // TODO MULE-10013 remove this logic from here
           toWrite
               .put(name,
-                   new SerializedDataHandler(name, entry.getValue(), ((InternalEvent) getCurrentEvent()).getMuleContext()));
+                   new SerializedDataHandler(name, entry.getValue(), currentMuleContext.get()));
         }
       }
 
@@ -554,11 +559,15 @@ public class DefaultMessageBuilder
       } else {
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
-        byte[] valueAsByteArray = (byte[]) ((InternalEvent) getCurrentEvent()).getMuleContext().getTransformationService()
-            .internalTransform(this, DataType.BYTE_ARRAY).getPayload().getValue();
-        out.writeInt(valueAsByteArray.length);
-        new DataOutputStream(out).write(valueAsByteArray);
-        out.writeObject(DataType.BYTE_ARRAY);
+        if (currentMuleContext.get() != null) {
+          byte[] valueAsByteArray = (byte[]) currentMuleContext.get().getTransformationService()
+              .internalTransform(this, DataType.BYTE_ARRAY).getPayload().getValue();
+          out.writeInt(valueAsByteArray.length);
+          new DataOutputStream(out).write(valueAsByteArray);
+          out.writeObject(DataType.BYTE_ARRAY);
+        } else {
+          throw new NotSerializableException(typedValue.getDataType().getType().getName());
+        }
       }
     }
 

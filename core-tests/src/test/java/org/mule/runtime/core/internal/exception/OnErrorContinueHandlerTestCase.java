@@ -97,7 +97,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
+    muleEvent = InternalEvent.builder(context).message(muleMessage).build();
   }
 
   @Test
@@ -132,10 +132,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
+    CoreEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).build();
     onErrorContinueHandler
         .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(muleMessage)
-            .flow(flow)
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -158,10 +157,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
 
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).flow(flow).build();
+    CoreEvent lastEventCreated = InternalEvent.builder(context).message(muleMessage).build();
     onErrorContinueHandler
         .setMessageProcessors(asList(createFailingEventMessageProcessor(InternalEvent.builder(context).message(muleMessage)
-            .flow(flow)
             .build()),
                                      createFailingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();

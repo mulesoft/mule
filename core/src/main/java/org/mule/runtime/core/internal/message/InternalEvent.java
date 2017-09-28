@@ -37,24 +37,6 @@ public interface InternalEvent extends PrivilegedEvent {
   Map<String, ?> getInternalParameters();
 
   /**
-   * Returns the muleContext for the Mule node that this event was received in
-   *
-   * @return the muleContext for the Mule node that this event was received in
-   * @deprecated TODO MULE-10013 remove this
-   */
-  @Deprecated
-  MuleContext getMuleContext();
-
-  /**
-   * Retrieves the service for the current event
-   *
-   * @return the service for the event
-   * @deprecated TODO MULE-10013 remove this
-   */
-  @Deprecated
-  FlowConstruct getFlowConstruct();
-
-  /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
@@ -198,10 +180,6 @@ public interface InternalEvent extends PrivilegedEvent {
 
     @Override
     Builder securityContext(SecurityContext securityContext);
-
-    @Override
-    @Deprecated
-    Builder flow(FlowConstruct flow);
 
   }
 }

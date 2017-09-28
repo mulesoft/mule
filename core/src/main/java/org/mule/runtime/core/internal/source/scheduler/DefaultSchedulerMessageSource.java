@@ -136,7 +136,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private void pollWith(final Message request) {
     try {
       just(request)
-          .map(message -> InternalEvent.builder(create(flowConstruct, getLocation())).message(request).flow(flowConstruct)
+          .map(message -> InternalEvent.builder(create(flowConstruct, getLocation())).message(request)
               .build())
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), muleContext, MESSAGE_RECEIVED))

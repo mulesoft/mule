@@ -113,8 +113,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
         CoreEvent event =
-            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).flow(flowConstruct)
-                .session(session).build();
+            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).session(session).build();
         try {
           target.process(event);
         } catch (MuleException e) {

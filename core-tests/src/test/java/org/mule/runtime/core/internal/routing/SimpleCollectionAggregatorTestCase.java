@@ -70,10 +70,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     CoreEvent event1 =
         InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3)))
-            .flow(flow)
             .build();
-    CoreEvent event2 = InternalEvent.builder(executionContext).message(message2).flow(flow).build();
-    CoreEvent event3 = InternalEvent.builder(executionContext).message(message3).flow(flow).build();
+    CoreEvent event2 = InternalEvent.builder(executionContext).message(message2).build();
+    CoreEvent event3 = InternalEvent.builder(executionContext).message(message3).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
@@ -114,7 +113,6 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     CoreEvent event1 =
         InternalEvent.builder(executionContext).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 1)))
-            .flow(flow)
             .build();
 
     CoreEvent resultEvent = router.process(event1);
@@ -158,12 +156,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     CoreEvent event1 =
         InternalEvent.builder(executionContext).message(messageCollection1)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
-            .flow(flow)
             .build();
     CoreEvent event2 =
         InternalEvent.builder(executionContext).message(messageCollection2)
             .groupCorrelation(Optional.of(GroupCorrelation.of(0, 2)))
-            .flow(flow)
             .build();
 
     assertNull(router.process(event1));

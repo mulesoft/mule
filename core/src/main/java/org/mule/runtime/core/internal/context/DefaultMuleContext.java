@@ -72,6 +72,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.DefaultTransformationService;
 import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -119,6 +120,7 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.slf4j.Logger;
@@ -140,6 +142,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
    */
   public static final String LOCAL_OBJECT_STORE_MANAGER_KEY = LOCAL_OBJECT_STORE_MANAGER;
   public static final String LOCAL_QUEUE_MANAGER_KEY = "_localQueueManager";
+
+  public static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
 
   /**
    * logger used by this class
