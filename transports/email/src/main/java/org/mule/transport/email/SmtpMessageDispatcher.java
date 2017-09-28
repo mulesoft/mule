@@ -20,7 +20,6 @@ import org.mule.transport.NullPayload;
 
 import com.sun.mail.smtp.SMTPTransport;
 
-import java.net.URLDecoder;
 import java.util.Calendar;
 
 import javax.mail.Message;
@@ -36,6 +35,7 @@ import javax.mail.Transport;
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
     private volatile Transport transport;
+    private TransportConnector connector;
 
     public SmtpMessageDispatcher(OutboundEndpoint endpoint)
     {
@@ -56,11 +56,9 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             {
 
                 transport = castConnector().getSessionDetails(endpoint).newTransport();
+                connector = new DefaultTransportConnector(transport, endpoint.getEncoding());
                 EndpointURI uri = endpoint.getEndpointURI();
-                String encoding = endpoint.getEncoding();
-                String user = (uri.getUser()!=null ? URLDecoder.decode(uri.getUser(), encoding) : null);
-                String pass = (uri.getPassword()!=null ? URLDecoder.decode(uri.getPassword(), encoding) : null);
-                transport.connect(uri.getHost(), uri.getPort(),  user, pass);
+                connector.connect(uri);
             }
             catch (Exception e)
             {
@@ -111,7 +109,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return new DefaultMuleMessage(NullPayload.getInstance(), getEndpoint().getMuleContext());
     }
 
-    protected void sendMailMessage(Message message) throws MessagingException
+    protected void sendMailMessage(Message message) throws Exception
     {
         // sent date
         message.setSentDate(Calendar.getInstance().getTime());
@@ -125,7 +123,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             {
                 logger.info("Connection closed by remote server. Reconnecting.");
             }
-            transport.connect(uri.getHost(), uri.getPort(), uri.getUser(), uri.getPassword());
+            connector.connect(uri);
         }
 
         transport.sendMessage(message, message.getAllRecipients());
