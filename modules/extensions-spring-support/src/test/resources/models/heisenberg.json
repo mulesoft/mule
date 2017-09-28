@@ -5629,6 +5629,7 @@
               "optional": false
             }
           ],
+          "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "HEISENBERG",
@@ -18092,6 +18093,7 @@
           "optional": false
         }
       ],
+      "supportsConnectivityTesting": true,
       "stereotype": {
         "type": "CONNECTION",
         "namespace": "HEISENBERG",
