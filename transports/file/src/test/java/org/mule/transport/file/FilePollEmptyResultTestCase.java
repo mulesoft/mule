@@ -68,5 +68,4 @@ public class FilePollEmptyResultTestCase extends FunctionalTestCase
         }
     }
 
-
 }
