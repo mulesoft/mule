@@ -465,7 +465,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
           return;
         }
-        if (componentModel.getNameAttribute() != null) {
+        if (componentModel.getNameAttribute() != null && componentModel.isRoot()) {
           createdComponentModels.add(componentModel.getNameAttribute());
         }
         beanDefinitionFactory.resolveComponentRecursively(componentModel.getParent() != null
