@@ -40,72 +40,79 @@ public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArt
   @Test
   @Description("Verifies that an unmapped error is handled as ANY.")
   public void simpleRequest() throws Exception {
-    verify("noMapping", UNMATCHED_ERROR_MESSAGE);
+    verifySuccessExpression("noMapping", UNMATCHED_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that each error is correctly handled given an operation without mappings.")
   public void multipleMappingsDirectlyFromSmartConnector() throws Exception {
-    verify("multipleMappingsDirectlyFromSmartConnector", EXPRESSION_ERROR_MESSAGE, new Object());
-    verify("multipleMappingsDirectlyFromSmartConnector", CONNECT_ERROR_MESSAGE);
+    verifyFailingExpression("multipleMappingsDirectlyFromSmartConnector", EXPRESSION_ERROR_MESSAGE);
+    verifySuccessExpression("multipleMappingsDirectlyFromSmartConnector", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that a mapped error via wildcard is handled.")
   public void mappedRequest() throws Exception {
-    verify("simpleMapping", CONNECT_ERROR_MESSAGE);
+    verifySuccessExpression("simpleMapping", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that a mapped error via a custom matcher is handled. ")
   public void matchingMappedRequest() throws Exception {
-    verify("complexMapping", CONNECT_ERROR_MESSAGE);
+    verifySuccessExpression("complexMapping", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that an unmapped error is handled as ANY.")
   public void noMatchingMappedRequest() throws Exception {
-    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
+    verifyFailingExpression("complexMapping", UNMATCHED_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {
-    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
-    verify("multipleMappings", CONNECT_ERROR_MESSAGE);
+    verifyFailingExpression("multipleMappings", EXPRESSION_ERROR_MESSAGE);
+    verifySuccessExpression("multipleMappings", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that a mapped error via wildcard is handled through the proxy smart connector.")
   public void mappedRequestProxy() throws Exception {
-    verify("simpleMappingProxy", CONNECT_ERROR_MESSAGE);
+    verifySuccessExpression("simpleMappingProxy", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that a mapped error via a custom matcher is handled through the proxy smart connector.")
   public void matchingMappedRequestProxy() throws Exception {
-    verify("complexMappingProxy", CONNECT_ERROR_MESSAGE);
+    verifySuccessExpression("complexMappingProxy", CONNECT_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that an unmapped error is handled as ANY through the proxy smart connector.")
   public void noMatchingMappedRequestProxy() throws Exception {
-    verify("complexMappingProxy", UNMATCHED_ERROR_MESSAGE, new Object());
+    verifyFailingExpression("complexMappingProxy", UNMATCHED_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings through the proxy smart connector.")
   public void multipleMappingsRequestProxy() throws Exception {
-    verify("multipleMappingsProxy", EXPRESSION_ERROR_MESSAGE, new Object());
-    verify("multipleMappingsProxy", CONNECT_ERROR_MESSAGE);
+    verifyFailingExpression("multipleMappingsProxy", EXPRESSION_ERROR_MESSAGE);
+    verifySuccessExpression("multipleMappingsProxy", CONNECT_ERROR_MESSAGE);
   }
 
-  private void verify(String flowName, String expectedPayload) throws Exception {
-    verify(flowName, expectedPayload, emptyMap());
+  private void verifySuccessExpression(String flowName, String expectedPayload) throws Exception {
+    verify(flowName, expectedPayload, false);
   }
 
-  private void verify(String flowName, String expectedPayload, Object petNames) throws Exception {
-    assertThat(flowRunner(flowName).withVariable("names", petNames).run().getMessage(), hasPayload(that(is(expectedPayload))));
+  private void verifyFailingExpression(String flowName, String expectedPayload) throws Exception {
+    verify(flowName, expectedPayload, true);
+  }
+
+  private void verify(String flowName, String expectedPayload, boolean failExpression) throws Exception {
+    assertThat(flowRunner(flowName)
+        .withVariable("names", emptyMap())
+        .withVariable("failExpression", failExpression)
+        .run().getMessage(), hasPayload(that(is(expectedPayload))));
   }
 
 }
