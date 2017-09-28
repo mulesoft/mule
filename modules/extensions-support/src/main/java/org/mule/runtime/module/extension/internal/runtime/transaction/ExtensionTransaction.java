@@ -22,7 +22,6 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-// TODO: MULE-8946 TransactionalConnection should throw TransactionException
 public class ExtensionTransaction extends AbstractSingleResourceTransaction {
 
   private Optional<ExtensionTransactionalResource> boundResource = empty();

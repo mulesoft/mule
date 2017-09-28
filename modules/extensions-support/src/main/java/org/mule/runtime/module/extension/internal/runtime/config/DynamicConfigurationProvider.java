@@ -18,6 +18,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -106,7 +107,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * @return the resolved {@link ConfigurationInstance}
    */
   @Override
-  public ConfigurationInstance get(Object event) {
+  public ConfigurationInstance get(Event event) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
       ResolverSetResult result = resolverSet.resolve(from((CoreEvent) event));
       ResolverSetResult providerResult = null;

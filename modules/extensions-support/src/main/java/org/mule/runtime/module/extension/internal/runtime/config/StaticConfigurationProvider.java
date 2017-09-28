@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,7 +37,7 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
    * @return {@link #configuration}
    */
   @Override
-  public ConfigurationInstance get(Object muleEvent) {
+  public ConfigurationInstance get(Event muleEvent) {
     return configuration;
   }
 }
