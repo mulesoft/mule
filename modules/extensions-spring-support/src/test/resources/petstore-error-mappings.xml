@@ -49,11 +49,39 @@
         </error-handler>
     </flow>
 
-    <flow name="multipleMappings">
-        <petstore:fail petNames="#[vars.names]">
+    <flow name="complexMappingWithFailingExpression">
+        <!-- TODO MULE-13638: Partial fix until there's a way to make the calling to petstore:fail breaks differently depending on the 'petNames' parametrization -->
+        <!-- defining an expression that will always fail -->
+        <petstore:fail petNames="#[ ' ++ as Object  ]">
             <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
-            <error-mapping sourceType="EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
         </petstore:fail>
+        <error-handler>
+            <on-error-continue type="APP:MY_REQUESTER">
+                <set-payload value="Could not connect."/>
+            </on-error-continue>
+            <on-error-continue>
+                <set-payload value="Error."/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="multipleMappings">
+        <choice>
+            <!-- TODO MULE-13638: Partial fix until there's a way to make the calling to petstore:fail breaks differently depending on the 'petNames' parametrization -->
+            <when expression="#[vars.failExpression]">
+                <!-- defining an expression that will always fail -->
+                <petstore:fail petNames="#[ ' ++ as Object  ]">
+                    <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
+                    <error-mapping sourceType="EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
+                </petstore:fail>
+            </when>
+            <otherwise>
+                <petstore:fail petNames="#[vars.names]">
+                    <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
+                    <error-mapping sourceType="EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
+                </petstore:fail>
+            </otherwise>
+        </choice>
         <error-handler>
             <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>

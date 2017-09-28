@@ -8,7 +8,7 @@
     <module-using-errormapping:config name="petstoreconfig" />
 
     <flow name="noMapping">
-        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]"/>
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"/>
         <error-handler>
             <on-error-continue>
                 <set-payload value="Error."/>
@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="multipleMappingsDirectlyFromSmartConnector">
-        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]"/>
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"/>
         <error-handler>
             <on-error-continue type="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY">
                 <set-payload value="Could not connect."/>
@@ -32,7 +32,7 @@
     </flow>
 
     <flow name="simpleMapping">
-        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]">
             <error-mapping targetType="APP:MY_REQUESTER"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="complexMapping">
-        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]">
             <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
         </module-using-errormapping:fail-raise-error>
         <error-handler>
@@ -60,7 +60,7 @@
     </flow>
 
     <flow name="multipleMappings">
-        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]">
+        <module-using-errormapping:fail-raise-error config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]">
             <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
             <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
         </module-using-errormapping:fail-raise-error>
@@ -78,7 +78,7 @@
     </flow>
 
     <flow name="simpleMappingProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
                                               errorMappingTargetType="APP:MY_REQUESTER"/>
         <error-handler>
             <on-error-continue type="APP:MY_REQUESTER">
@@ -91,7 +91,7 @@
     </flow>
 
     <flow name="complexMappingProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
                                               errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"/>
         <error-handler>
             <on-error-continue type="APP:MY_REQUESTER">
@@ -104,7 +104,7 @@
     </flow>
 
     <flow name="multipleMappingsProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]"
+        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
                                               errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"
                                               secondErrorMappingTargetType="APP:MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION"/>
         <error-handler>

@@ -54,14 +54,20 @@ public class PetStoreErrorMappingsTestCase extends AbstractExtensionFunctionalTe
   @Test
   @Description("Verifies that an unmapped error is handled as ANY.")
   public void noMatchingMappedRequest() throws Exception {
-    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, new Object());
+    verifyWithFailingExpression("complexMappingWithFailingExpression", UNMATCHED_ERROR_MESSAGE);
   }
 
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {
-    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, new Object());
+    verifyWithFailingExpression("multipleMappings", EXPRESSION_ERROR_MESSAGE);
     verify("multipleMappings", CONNECT_ERROR_MESSAGE);
+  }
+
+  private void verifyWithFailingExpression(String flowName, String expectedPayload) throws Exception {
+    assertThat(flowRunner(flowName)
+        .withVariable("failExpression", true)
+        .run().getMessage(), hasPayload(that(is(expectedPayload))));
   }
 
   private void verify(String flowName, String expectedPayload) throws Exception {
