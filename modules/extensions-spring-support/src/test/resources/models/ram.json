@@ -991,7 +991,7 @@
         {
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
-          "supportsConnectivityTesting": true,
+          "supportsConnectivityTesting": false,
           "stereotype": {
             "type": "CONNECTION",
             "namespace": "RAM",

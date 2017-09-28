@@ -10,11 +10,14 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -82,12 +85,32 @@ public class ParameterPluralNameModelValidatorTestCase extends AbstractMuleTestC
     when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(invalidParameterModel.getRole()).thenReturn(BEHAVIOUR);
     when(invalidParameterModel.getLayoutModel()).thenReturn(Optional.empty());
+    when(invalidParameterModel.getExpressionSupport()).thenReturn(SUPPORTED);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidModelDueToListWithoutPluralName() {
     when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
     when(invalidParameterModel.getName()).thenReturn("thing");
+    mockParameters(operationModel, invalidParameterModel);
+    validate(extensionModel, validator);
+  }
+
+  public void isValidNameIfDoesntSupportChildElement() {
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
+    when(invalidParameterModel.getName()).thenReturn("thing");
+    when(invalidParameterModel.getDslConfiguration()).thenReturn(ParameterDslConfiguration.builder()
+        .allowsInlineDefinition(false)
+        .allowTopLevelDefinition(false)
+        .build());
+    mockParameters(operationModel, invalidParameterModel);
+    validate(extensionModel, validator);
+  }
+
+  public void isValidNameIfRequiresExpression() {
+    when(invalidParameterModel.getType()).thenReturn(toMetadataType(List.class));
+    when(invalidParameterModel.getName()).thenReturn("thing");
+    when(invalidParameterModel.getExpressionSupport()).thenReturn(REQUIRED);
     mockParameters(operationModel, invalidParameterModel);
     validate(extensionModel, validator);
   }

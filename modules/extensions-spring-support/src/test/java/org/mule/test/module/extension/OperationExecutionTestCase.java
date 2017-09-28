@@ -39,6 +39,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HealthException;
@@ -66,6 +67,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsMapContaining;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -483,6 +485,27 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
         .getPayload()
         .getValue();
     assertThat(result, is(theMessage));
+  }
+
+  @Test
+  public void operationWithAliasedParametersAsChild() throws Exception {
+    Map<String, Weapon> value =
+        (Map<String, Weapon>) flowRunner("operationWithAliasedParametersAsChild").run().getMessage().getPayload().getValue();
+    assertThat(value, is(IsMapContaining.hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
+  }
+
+  @Test
+  public void operationWithAliasedParametersAsReference() throws Exception {
+    Map<String, Weapon> value =
+        (Map<String, Weapon>) flowRunner("operationWithAliasedParametersAsChild").run().getMessage().getPayload().getValue();
+    assertThat(value, is(IsMapContaining.hasEntry(is("SomeName"), is(instanceOf(Ricin.class)))));
+  }
+
+  @Test
+  public void aliasedOperation() throws Exception {
+    ParameterResolver<String> result =
+        (ParameterResolver<String>) flowRunner("aliasedOperation").run().getMessage().getPayload().getValue();
+    assertThat(result.resolve(), is("an expression"));
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {

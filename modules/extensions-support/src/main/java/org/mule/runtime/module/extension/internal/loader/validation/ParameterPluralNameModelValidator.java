@@ -7,11 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.singularize;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -42,17 +46,21 @@ public final class ParameterPluralNameModelValidator implements ExtensionModelVa
   private void validateParameterIsPlural(final ParameterModel parameterModel,
                                          ParameterizedModel owner,
                                          ProblemsReporter problemsReporter) {
-    parameterModel.getType().accept(new MetadataTypeVisitor() {
+    if (!(owner instanceof FunctionModel || parameterModel.getExpressionSupport().equals(REQUIRED))) {
+      ParameterDslConfiguration dslConfiguration = parameterModel.getDslConfiguration();
+      if (dslConfiguration.allowsInlineDefinition() || dslConfiguration.allowTopLevelDefinition())
+        parameterModel.getType().accept(new MetadataTypeVisitor() {
 
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        if (parameterModel.getName().equals(singularize(parameterModel.getName()))) {
-          problemsReporter
-              .addError(new Problem(parameterModel,
-                                    format("Parameter '%s' in the %s '%s' is a collection and its name should be plural",
-                                           parameterModel.getName(), getComponentModelTypeName(owner), owner.getName())));
-        }
-      }
-    });
+          @Override
+          public void visitArrayType(ArrayType arrayType) {
+            if (parameterModel.getName().equals(singularize(parameterModel.getName()))) {
+              problemsReporter
+                  .addError(new Problem(parameterModel,
+                                        format("Parameter '%s' in the %s '%s' is a collection and its name should be plural",
+                                               parameterModel.getName(), getComponentModelTypeName(owner), owner.getName())));
+            }
+          }
+        });
+    }
   }
 }

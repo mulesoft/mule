@@ -44,14 +44,15 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
@@ -108,8 +109,6 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
-import com.google.common.reflect.TypeToken;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -120,6 +119,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -172,6 +172,11 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String PROCESS_INFO = "processSale";
   private static final String FAIL_TO_EXECUTE = "failToExecute";
   private static final String THROW_ERROR = "throwError";
+  public static final String ECHO_AN_OPERATION_WITH_ALIAS = "echo";
+  public static final String BY_PASS_WEAPON = "byPassWeapon";
+  public static final MetadataType WEAPON_TYPE = TYPE_LOADER.load(Weapon.class);
+  public static final MetadataType STRING_TYPE = TYPE_LOADER.load(String.class);
+  public static final MetadataType INT_TYPE = toMetadataType(int.class);
 
   @Before
   public void setUp() {
@@ -219,7 +224,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
     assertThat(configuration.getAllParameters(), hasSize(32));
-    assertParameter(configuration.getAllParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED,
+    assertParameter(configuration.getAllParameters(), "extendedProperty", "", STRING_TYPE, true, SUPPORTED,
                     null);
   }
 
@@ -383,7 +388,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     List<ParameterDeclaration> parameters = conf.getAllParameters();
     assertThat(parameters, hasSize(31));
 
-    assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
+    assertParameter(parameters, "myName", "", STRING_TYPE, false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
     assertParameter(parameters, "enemies", "", listOfString(), true, SUPPORTED, null);
     assertParameter(parameters, "money", "", toMetadataType(BigDecimal.class), true, SUPPORTED, null);
@@ -413,8 +418,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
 
     assertParameter(parameters, "initialHealth", "", toMetadataType(HealthStatus.class), false, SUPPORTED, "CANCER");
     assertParameter(parameters, "finalHealth", "", toMetadataType(HealthStatus.class), true, SUPPORTED, null);
-    assertParameter(parameters, "labAddress", "", toMetadataType(String.class), false, REQUIRED, null);
-    assertParameter(parameters, "firstEndevour", "", toMetadataType(String.class), false, NOT_SUPPORTED, null);
+    assertParameter(parameters, "labAddress", "", STRING_TYPE, false, REQUIRED, null);
+    assertParameter(parameters, "firstEndevour", "", STRING_TYPE, false, NOT_SUPPORTED, null);
     assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,
                     null);
@@ -440,7 +445,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertParameter(parameters, "weaponValueMap", "",
                     TYPE_BUILDER.objectType()
                         .with(new ClassInformationAnnotation(Map.class, asList(String.class, Weapon.class)))
-                        .openWith(TYPE_LOADER.load(Weapon.class))
+                        .openWith(WEAPON_TYPE)
                         .build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "healthProgressions", "",
@@ -460,7 +465,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(38));
+    assertThat(extensionDeclaration.getOperations(), hasSize(40));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(14));
@@ -495,6 +500,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE, "");
     assertOperation(extensionDeclaration, FAIL_TO_EXECUTE, "");
     assertOperation(extensionDeclaration, THROW_ERROR, "");
+    assertOperation(extensionDeclaration, BY_PASS_WEAPON, "");
+    assertOperation(extensionDeclaration, ECHO_AN_OPERATION_WITH_ALIAS, "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -503,9 +510,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(withOperationsDeclaration, GET_ENEMY_OPERATION);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(1));
-    assertThat(operation.getOutput().getType(), equalTo(toMetadataType(String.class)));
+    assertThat(operation.getOutput().getType(), equalTo(STRING_TYPE));
     assertThat(operation.getOutputAttributes().getType(), equalTo(toMetadataType(IntegerAttributes.class)));
-    assertParameter(operation.getAllParameters(), "index", "", toMetadataType(int.class), false, SUPPORTED, "0");
+    assertParameter(operation.getAllParameters(), "index", "", INT_TYPE, false, SUPPORTED, "0");
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -513,7 +520,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(0));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
-    assertMessageType(((ArrayType) operation.getOutput().getType()).getType(), TYPE_LOADER.load(String.class),
+    assertMessageType(((ArrayType) operation.getOutput().getType()).getType(), STRING_TYPE,
                       TYPE_LOADER.load(IntegerAttributes.class));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
@@ -522,17 +529,17 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, KILL_OPERATION);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(2));
-    assertThat(operation.getOutput().getType(), equalTo(toMetadataType(String.class)));
+    assertThat(operation.getOutput().getType(), equalTo(STRING_TYPE));
     assertThat(operation.getOutputAttributes().getType(), is(instanceOf(VoidType.class)));
-    assertParameter(operation.getAllParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
-    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "victim", "", STRING_TYPE, false, SUPPORTED, "#[payload]");
+    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", STRING_TYPE, true, SUPPORTED, null);
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, KILL_WITH_WEAPON);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(3));
-    assertParameter(operation.getAllParameters(), "weapon", "", toMetadataType(Weapon.class), true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "weapon", "", WEAPON_TYPE, true, SUPPORTED, null);
     assertParameter(operation.getAllParameters(), "type", "", toMetadataType(WeaponType.class), true, SUPPORTED, null);
     assertParameter(operation.getAllParameters(), "attributesOfWeapon", "", toMetadataType(Weapon.WeaponAttributes.class), true,
                     SUPPORTED, null);
@@ -567,8 +574,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, KILL_CUSTOM_OPERATION);
     assertThat(operation, is(notNullValue()));
     assertThat(operation.getAllParameters(), hasSize(2));
-    assertParameter(operation.getAllParameters(), "victim", "", toMetadataType(String.class), false, SUPPORTED, "#[payload]");
-    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", toMetadataType(String.class), true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "victim", "", STRING_TYPE, false, SUPPORTED, "#[payload]");
+    assertParameter(operation.getAllParameters(), "goodbyeMessage", "", STRING_TYPE, true, SUPPORTED, null);
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -584,8 +591,8 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertTransactional(operation, false);
 
     operation = getOperation(extensionDeclaration, ALIAS);
-    assertParameter(operation.getAllParameters(), "greeting", "", toMetadataType(String.class), true, SUPPORTED, null);
-    assertParameter(operation.getAllParameters(), "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
+    assertParameter(operation.getAllParameters(), "greeting", "", STRING_TYPE, true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "myName", "", STRING_TYPE, false, SUPPORTED, HEISENBERG);
     assertParameter(operation.getAllParameters(), "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);
     assertConnected(operation, false);
     assertTransactional(operation, false);
@@ -665,7 +672,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, PROCESS_WEAPON);
     assertThat(operation, is(notNullValue()));
     assertParameter(operation.getAllParameters(), "weapon", "",
-                    TYPE_LOADER.load(Weapon.class), false, SUPPORTED, null);
+                    WEAPON_TYPE, false, SUPPORTED, null);
     assertConnected(operation, false);
 
     operation = getOperation(extensionDeclaration, PROCESS_WEAPON_LIST);
@@ -678,7 +685,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     operation = getOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE);
     assertThat(operation, is(notNullValue()));
     assertParameter(operation.getAllParameters(), "weapon", "",
-                    TYPE_LOADER.load(Weapon.class), false, SUPPORTED, PAYLOAD);
+                    WEAPON_TYPE, false, SUPPORTED, PAYLOAD);
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -709,6 +716,14 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getOutput().getType(), is(instanceOf(VoidType.class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);
+
+    operation = getOperation(extensionDeclaration, BY_PASS_WEAPON);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getAllParameters(), "awesomeWeapon", "", WEAPON_TYPE, true, SUPPORTED, null);
+    assertParameter(operation.getAllParameters(), "awesomeName", "", STRING_TYPE, true, SUPPORTED, null);
+    assertThat(operation.getOutput().getType(), is(instanceOf(ObjectType.class)));
+    assertConnected(operation, false);
+    assertTransactional(operation, false);
   }
 
   private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {
@@ -719,7 +734,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     List<ParameterDeclaration> parameters = connectionProvider.getAllParameters();
     assertThat(parameters, hasSize(2));
 
-    assertParameter(parameters, "saulPhoneNumber", "", toMetadataType(String.class), false, SUPPORTED, SAUL_OFFICE_NUMBER);
+    assertParameter(parameters, "saulPhoneNumber", "", STRING_TYPE, false, SUPPORTED, SAUL_OFFICE_NUMBER);
     assertParameter(parameters, TLS_PARAMETER_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);
     ImplementingTypeModelProperty typeModelProperty =
         connectionProvider.getModelProperty(ImplementingTypeModelProperty.class).get();
@@ -734,7 +749,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     final MetadataType outputType = source.getOutput().getType();
     assertThat(outputType, is(instanceOf(ArrayType.class)));
 
-    assertMessageType(((ArrayType) outputType).getType(), TYPE_LOADER.load(String.class),
+    assertMessageType(((ArrayType) outputType).getType(), STRING_TYPE,
                       TYPE_LOADER.load(DEAOfficerAttributes.class));
     assertThat(source.getOutputAttributes().getType(), equalTo(TYPE_LOADER.load(Object.class)));
 
@@ -750,9 +765,9 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     List<ParameterDeclaration> parameters = source.getAllParameters();
     assertThat(parameters, hasSize(28));
 
-    assertParameter(parameters, SOURCE_PARAMETER, "", toMetadataType(int.class), true, NOT_SUPPORTED, null);
+    assertParameter(parameters, SOURCE_PARAMETER, "", INT_TYPE, true, NOT_SUPPORTED, null);
     assertParameter(parameters, SOURCE_CALLBACK_PARAMETER, "", toMetadataType(Long.class), false, SUPPORTED, "#[payload]");
-    assertParameter(parameters, SOURCE_REPEATED_CALLBACK_PARAMETER, "", toMetadataType(String.class), false, SUPPORTED, null);
+    assertParameter(parameters, SOURCE_REPEATED_CALLBACK_PARAMETER, "", STRING_TYPE, false, SUPPORTED, null);
     assertParameter(parameters, "methylamine", "", toMetadataType(Methylamine.class), false, SUPPORTED, null);
     ImplementingTypeModelProperty typeModelProperty = source.getModelProperty(ImplementingTypeModelProperty.class).get();
     assertThat(typeModelProperty.getType(), equalTo(type));
