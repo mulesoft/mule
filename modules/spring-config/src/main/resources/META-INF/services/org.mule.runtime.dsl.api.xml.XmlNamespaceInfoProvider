@@ -1,2 +1,2 @@
-org.mule.runtime.config.spring.internal.dsl.processor.xml.CoreXmlNamespaceInfoProvider
-org.mule.runtime.config.spring.internal.dsl.processor.xml.ModuleXmlNamespaceInfoProvider
+org.mule.runtime.config.internal.dsl.processor.xml.CoreXmlNamespaceInfoProvider
+org.mule.runtime.config.internal.dsl.processor.xml.ModuleXmlNamespaceInfoProvider

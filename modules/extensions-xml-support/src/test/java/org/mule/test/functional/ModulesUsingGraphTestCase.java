@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;

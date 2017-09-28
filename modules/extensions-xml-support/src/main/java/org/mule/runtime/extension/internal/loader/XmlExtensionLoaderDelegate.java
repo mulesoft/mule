@@ -24,9 +24,9 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_T
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
-import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
+import static org.mule.runtime.config.api.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -67,20 +67,20 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.config.spring.api.XmlConfigurationDocumentLoader;
-import org.mule.runtime.config.spring.api.dsl.model.ComponentModel;
-import org.mule.runtime.config.spring.api.dsl.processor.ConfigLine;
-import org.mule.runtime.config.spring.api.dsl.processor.xml.XmlApplicationParser;
-import org.mule.runtime.config.spring.internal.dsl.model.ComponentModelReader;
-import org.mule.runtime.config.spring.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.spring.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.config.spring.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
-import org.mule.runtime.config.spring.internal.util.NoOpXmlErrorHandler;
+import org.mule.runtime.config.api.XmlConfigurationDocumentLoader;
+import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.api.dsl.processor.ConfigLine;
+import org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationParser;
+import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
+import org.mule.runtime.config.internal.util.NoOpXmlErrorHandler;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -362,7 +362,7 @@ public final class XmlExtensionLoaderDelegate {
         new XmlApplicationParser(new SpiServiceRegistry(), singletonList(currentThread().getContextClassLoader()));
     Optional<ConfigLine> parseModule = xmlApplicationParser.parse(moduleDocument.getDocumentElement());
     if (!parseModule.isPresent()) {
-      // This happens in org.mule.runtime.config.spring.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
+      // This happens in org.mule.runtime.config.dsl.processor.xml.XmlApplicationParser.configLineFromElement()
       throw new IllegalArgumentException(format("There was an issue trying to read the stream of '%s'", resource.getFile()));
     }
     ComponentModelReader componentModelReader =

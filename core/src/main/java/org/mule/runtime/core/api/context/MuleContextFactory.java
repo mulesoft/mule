@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.core.api.context;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 
 import java.util.List;
 
@@ -20,24 +19,6 @@ import java.util.List;
  * factory are initialised but not started.
  */
 public interface MuleContextFactory {
-
-  /**
-   * Returns an existing instance of {@link MuleContext} is one exists, otherwise a new {@link MuleContext} instance is created
-   * with defaults.
-   * 
-   * @throws InitialisationException
-   * @throws ConfigurationException
-   * @see DefaultsConfigurationBuilder
-   */
-  MuleContext createMuleContext() throws InitialisationException, ConfigurationException;
-
-  /**
-   * Creates a new MuleContext using the {@link MuleContextBuilder} provided.
-   * 
-   * @throws InitialisationException
-   * @throws ConfigurationException
-   */
-  MuleContext createMuleContext(MuleContextBuilder muleContextBuilder) throws InitialisationException, ConfigurationException;
 
   /**
    * Creates a new MuleContext using the given configurationBuilder

@@ -175,7 +175,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
     ConfigurationBuilder builder = super.getBuilder();
-    assertThat(builder.getClass().getName(), is("org.mule.runtime.config.spring.internal.SpringXmlConfigurationBuilder"));
+    assertThat(builder.getClass().getName(), is("org.mule.runtime.config.internal.SpringXmlConfigurationBuilder"));
     configureSpringXmlConfigurationBuilder(builder);
     return builder;
   }
