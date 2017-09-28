@@ -8,7 +8,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.interception.ProcessorInterceptorManager;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
@@ -24,7 +24,6 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -324,9 +323,6 @@ public interface MuleContext extends Lifecycle {
    *         artifact.
    */
   ErrorTypeRepository getErrorTypeRepository();
-
-  // TODO MULE-11521 Define if this will remain here
-  ProcessorInterceptorManager getProcessorInterceptorManager();
 
   /**
    * Sets application wide instance of {@link BootstrapServiceDiscoverer}

@@ -22,8 +22,8 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_ERRO
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 
 import java.util.Collection;

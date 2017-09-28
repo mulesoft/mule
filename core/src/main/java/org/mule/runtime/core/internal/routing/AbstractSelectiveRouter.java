@@ -13,11 +13,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.ListUtils.union;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -26,7 +29,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -68,12 +70,7 @@ public abstract class AbstractSelectiveRouter extends AbstractComponent implemen
   public void initialise() throws InitialisationException {
     synchronized (conditionalMessageProcessors) {
       for (Object o : getLifecycleManagedObjects()) {
-        if (o instanceof MuleContextAware) {
-          ((MuleContextAware) o).setMuleContext(muleContext);
-        }
-        if (o instanceof Initialisable) {
-          ((Initialisable) o).initialise();
-        }
+        initialiseIfNeeded(o, muleContext);
       }
     }
     initialised.set(true);

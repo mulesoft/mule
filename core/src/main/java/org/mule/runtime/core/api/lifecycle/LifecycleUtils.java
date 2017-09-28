@@ -21,11 +21,11 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-
 import java.util.Collection;
 import java.util.Optional;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
 
 /**
  * Utility class for performing lifecycle operations on objects, as long as they implement cooresponding annotations such as
@@ -132,11 +132,7 @@ public class LifecycleUtils {
    */
   public static void initialiseIfNeeded(Collection<? extends Object> objects, MuleContext muleContext)
       throws InitialisationException {
-    try {
-      doApplyPhase(Initialisable.PHASE_NAME, objects, muleContext, null);
-    } catch (MuleException e) {
-      throw (InitialisationException) e;
-    }
+    initialiseIfNeeded(objects, true, muleContext);
   }
 
   /**

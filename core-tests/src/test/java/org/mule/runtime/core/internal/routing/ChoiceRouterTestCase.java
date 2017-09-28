@@ -44,6 +44,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     super.doSetUp();
     choiceRouter = new ChoiceRouter();
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+    choiceRouter.setExpressionManager(muleContext.getExpressionManager());
   }
 
   @Test

@@ -23,16 +23,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.function.BiFunction;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -47,9 +45,6 @@ import org.slf4j.Logger;
 public class CompositeProcessorChainRouter extends AbstractExecutableComponent implements Lifecycle {
 
   private static Logger LOGGER = getLogger(CompositeProcessorChainRouter.class);
-
-  @Inject
-  private MuleContext muleContext;
 
   private List<MessageProcessorChain> processorChains = emptyList();
 

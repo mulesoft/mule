@@ -8,22 +8,25 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
+import org.mule.runtime.api.interception.ProcessorInterceptorFactory.ProcessorInterceptorOrder;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.interception.ProcessorInterceptorManager;
+import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class DefaultProcessorInterceptorManager implements ProcessorInterceptorManager, Initialisable {
 
@@ -34,8 +37,10 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorM
   private List<String> interceptorsOrder = new ArrayList<>();
 
   @Override
-  public void setInterceptorsOrder(String... packagesOrder) {
-    interceptorsOrder = asList(packagesOrder);
+  @Inject
+  @Named(INTERCEPTORS_ORDER_REGISTRY_KEY)
+  public void setInterceptorsOrder(Optional<ProcessorInterceptorOrder> packagesOrder) {
+    interceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
   }
 
   @Override
@@ -50,9 +55,9 @@ public class DefaultProcessorInterceptorManager implements ProcessorInterceptorM
   }
 
   @Override
-  public void addInterceptorFactory(ProcessorInterceptorFactory interceptorFactory) {
-    checkNotNull(interceptorFactory, "interceptorFactory cannot be null");
-    this.interceptorFactories.add(interceptorFactory);
+  @Inject
+  public void setInterceptorFactories(Optional<List<ProcessorInterceptorFactory>> interceptorFactories) {
+    this.interceptorFactories = interceptorFactories.orElse(emptyList());
   }
 
   @Override

@@ -18,8 +18,8 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_ID
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collection;

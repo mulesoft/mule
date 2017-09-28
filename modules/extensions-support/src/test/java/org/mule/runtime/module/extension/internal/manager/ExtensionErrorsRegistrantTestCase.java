@@ -25,10 +25,13 @@ import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -38,9 +41,6 @@ import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory;
-import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -114,8 +114,8 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     builder.setPrefix(EXTENSION_PREFIX);
     XmlDslModel xmlDslModel = builder.build();
 
-    typeRepository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();
-    typeLocator = ErrorTypeLocatorFactory.createDefaultErrorTypeLocator(typeRepository);
+    typeRepository = createDefaultErrorTypeRepository();
+    typeLocator = createDefaultErrorTypeLocator(typeRepository);
 
     when(muleContext.getErrorTypeRepository()).thenReturn(typeRepository);
     when(muleContext.getErrorTypeLocator()).thenReturn(typeLocator);

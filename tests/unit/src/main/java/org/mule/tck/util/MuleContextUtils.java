@@ -24,17 +24,18 @@ import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -52,6 +53,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -62,6 +65,83 @@ import javax.inject.Inject;
  * @since 4.0
  */
 public class MuleContextUtils {
+
+  private static final class MocksInjector implements Injector {
+
+    private Map<Class, Object> objects;
+
+    private MocksInjector(Map<Class, Object> objects) {
+      this.objects = objects;
+    }
+
+    @Override
+    public <T> T inject(T object) throws MuleException {
+      for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
+        Class<?> dependencyType = field.getType();
+
+        boolean nullToOptional = false;
+        if (dependencyType.equals(Optional.class)) {
+          Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
+          if (type instanceof ParameterizedType) {
+            dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+          } else {
+            dependencyType = (Class<?>) type;
+          }
+          nullToOptional = true;
+        }
+
+        Object toInject = resolveObjectToInject(dependencyType);
+
+        try {
+          field.setAccessible(true);
+          // Avoid overriding state already set by the test
+          if (field.get(object) == null) {
+            field.set(object, nullToOptional ? of(toInject) : toInject);
+          }
+        } catch (Exception e) {
+          throw new RuntimeException(format("Could not inject dependency on field %s of type %s", field.getName(),
+                                            object.getClass().getName()),
+                                     e);
+        }
+      }
+      for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
+        if (method.getParameters().length == 1) {
+          Class<?> dependencyType = method.getParameterTypes()[0];
+
+          boolean nullToOptional = false;
+          if (dependencyType.equals(Optional.class)) {
+            Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
+            if (type instanceof ParameterizedType) {
+              dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+            } else {
+              dependencyType = (Class<?>) type;
+            }
+            nullToOptional = true;
+          }
+
+          Object toInject = resolveObjectToInject(dependencyType);
+
+          try {
+            method.invoke(object, nullToOptional ? of(toInject) : toInject);
+          } catch (Exception e) {
+            throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
+                                              object.getClass().getName()),
+                                       e);
+          }
+        }
+
+      }
+      return object;
+    }
+
+    private Object resolveObjectToInject(Class<?> dependencyType) {
+      if (objects.containsKey(dependencyType)) {
+        return objects.get(dependencyType);
+      } else {
+        return mock(dependencyType);
+      }
+    }
+  }
 
   private MuleContextUtils() {
     // No instances of this class allowed
@@ -92,84 +172,37 @@ public class MuleContextUtils {
    */
   public static MuleContextWithRegistries mockContextWithServices() {
     final MuleContextWithRegistries muleContext = mockMuleContext();
-    when(muleContext.getSchedulerService()).thenReturn(spy(new SimpleUnitTestSupportSchedulerService()));
+
+    SchedulerService schedulerService = spy(new SimpleUnitTestSupportSchedulerService());
+
+    when(muleContext.getSchedulerService()).thenReturn(schedulerService);
+
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
     when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(empty());
-    mockNotificationsHandling(muleContext.getRegistry());
+    final MuleRegistry registry = muleContext.getRegistry();
 
-    // Ensure propagation of mock MuleContexts through
-    when(muleContext.getInjector()).thenReturn(new Injector() {
+    NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
+    try {
+      when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);
 
-      @Override
-      public <T> T inject(T object) throws MuleException {
-        for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
-          Class<?> dependencyType = field.getType();
+      Map<Class, Object> injectableObjects = new HashMap<>();
 
-          boolean nullToOptional = false;
-          if (dependencyType.equals(Optional.class)) {
-            Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-            if (type instanceof ParameterizedType) {
-              dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
-            } else {
-              dependencyType = (Class<?>) type;
-            }
-            nullToOptional = true;
-          }
+      injectableObjects.put(MuleContext.class, muleContext);
+      injectableObjects.put(SchedulerService.class, schedulerService);
+      injectableObjects.put(ErrorTypeRepository.class, errorTypeRepository);
+      injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
+      injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
+      injectableObjects.put(NotificationDispatcher.class, muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+      injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
 
-          if (MuleContext.class.isAssignableFrom(dependencyType)) {
-            try {
-              field.setAccessible(true);
-              field.set(object, nullToOptional ? of(muleContext) : muleContext);
-            } catch (Exception e) {
-              throw new RuntimeException(format("Could not inject dependency on field %s of type %s", field.getName(),
-                                                object.getClass().getName()),
-                                         e);
-            }
-          }
-        }
-        for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
-          if (method.getParameters().length == 1) {
-            Class<?> dependencyType = method.getParameterTypes()[0];
-
-            boolean nullToOptional = false;
-            if (dependencyType.equals(Optional.class)) {
-              Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
-              if (type instanceof ParameterizedType) {
-                dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
-              } else {
-                dependencyType = (Class<?>) type;
-              }
-              nullToOptional = true;
-            }
-
-            if (MuleContext.class.isAssignableFrom(dependencyType)) {
-              try {
-                method.invoke(object, nullToOptional ? of(muleContext) : muleContext);
-              } catch (Exception e) {
-                throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
-                                                  object.getClass().getName()),
-                                           e);
-              }
-            }
-          }
-
-        }
-        return object;
-      }
-
-    });
+      // Ensure injection of consistent mock objects
+      when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));
+    } catch (RegistrationException e1) {
+      throw new MuleRuntimeException(e1);
+    }
 
     return muleContext;
-  }
-
-  public static void mockNotificationsHandling(final MuleRegistry registry) {
-    try {
-      when(registry.lookupObject(NotificationDispatcher.class)).thenReturn(mock(NotificationDispatcher.class));
-      when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(mock(NotificationListenerRegistry.class));
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
   }
 
   /**

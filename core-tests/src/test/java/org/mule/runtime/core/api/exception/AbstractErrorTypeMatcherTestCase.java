@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

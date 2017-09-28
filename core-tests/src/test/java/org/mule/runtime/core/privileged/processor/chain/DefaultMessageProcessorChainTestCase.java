@@ -552,8 +552,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mp1 = new AppendingInterceptingMP("1");
     AppendingInterceptingMP mp2 = new AppendingInterceptingMP("2");
     Processor chain = builder.chain(mp1, mp2).build();
-    ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((Lifecycle) chain).initialise();
+    initialiseIfNeeded(chain, muleContext);
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
     ((Lifecycle) chain).dispose();
@@ -570,8 +569,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     AppendingInterceptingMP mpa = new AppendingInterceptingMP("a");
     AppendingInterceptingMP mpb = new AppendingInterceptingMP("b");
     Processor chain = builder.chain(mp1, nestedBuilder.chain(mpa, mpb).build(), mp2).build();
-    ((MuleContextAware) chain).setMuleContext(muleContext);
-    ((Lifecycle) chain).initialise();
+    initialiseIfNeeded(chain, muleContext);
     ((Lifecycle) chain).start();
     ((Lifecycle) chain).stop();
     ((Lifecycle) chain).dispose();

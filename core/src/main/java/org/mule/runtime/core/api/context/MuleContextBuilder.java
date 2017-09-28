@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api.context;
 
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 

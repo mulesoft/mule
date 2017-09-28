@@ -49,10 +49,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.interception.ProcessorInterceptorManager;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -85,7 +85,6 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
@@ -244,7 +243,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
-  private ProcessorInterceptorManager processorInterceptorManager;
 
   // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
   // are run outside we need to set it up here.
@@ -1059,23 +1057,6 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   @Override
   public ErrorTypeRepository getErrorTypeRepository() {
     return errorTypeRepository;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ProcessorInterceptorManager getProcessorInterceptorManager() {
-    return processorInterceptorManager;
-  }
-
-  public void setProcessorInterceptorManager(ProcessorInterceptorManager processorInterceptorManager) {
-    try {
-      getRegistry().registerObject(ProcessorInterceptorManager.REGISTRY_KEY, processorInterceptorManager);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
-    this.processorInterceptorManager = processorInterceptorManager;
   }
 
   public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {

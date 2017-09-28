@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
 import static reactor.core.publisher.Mono.just;
@@ -37,7 +37,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -76,7 +75,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   private CoreEvent event;
 
-  private MuleContextWithRegistries mockMuleContext = mockMuleContext();
+  private MuleContextWithRegistries mockMuleContext = mockContextWithServices();
   @Mock
   private ErrorType mockErrorType;
   private MessagingException mockException;
@@ -174,8 +173,6 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setName("myDefault");
 
     when(mockMuleContext.getConfiguration().getDefaultErrorHandlerName()).thenReturn("myDefault");
-    when(mockMuleContext.getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(mock(NotificationDispatcher.class));
-    when(mockMuleContext.getRegistry().lookupObject(StreamingManager.class)).thenReturn(mock(StreamingManager.class));
     when(mockMuleContext.getDefaultErrorHandler(of("root"))).thenReturn(errorHandler);
     errorHandler.initialise();
 

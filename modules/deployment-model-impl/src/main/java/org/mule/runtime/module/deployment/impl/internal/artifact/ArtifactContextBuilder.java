@@ -18,13 +18,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROV
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
 
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -34,7 +35,6 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -419,9 +419,8 @@ public class ArtifactContextBuilder {
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
-          muleContextBuilder
-              .setErrorTypeRepository(ErrorTypeRepositoryFactory
-                  .createCompositeErrorTypeRepository(parentArtifact.getMuleContext().getErrorTypeRepository()));
+          muleContextBuilder.setErrorTypeRepository(createCompositeErrorTypeRepository(parentArtifact.getMuleContext()
+              .getErrorTypeRepository()));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }

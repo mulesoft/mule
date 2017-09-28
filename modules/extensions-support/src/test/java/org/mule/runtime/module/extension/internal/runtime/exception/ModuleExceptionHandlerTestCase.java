@@ -16,15 +16,16 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
-import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -47,7 +48,7 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
   @Mock
   private ExtensionModel extensionModel;
 
-  private ErrorTypeRepository typeRepository = ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository();
+  private ErrorTypeRepository typeRepository = createDefaultErrorTypeRepository();
 
   @Before
   public void setUp() {

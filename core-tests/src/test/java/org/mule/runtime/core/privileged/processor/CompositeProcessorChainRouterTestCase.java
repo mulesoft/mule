@@ -8,16 +8,17 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.interception.ProcessorInterceptorManager.PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
@@ -31,6 +32,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -39,6 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -66,7 +69,10 @@ public class CompositeProcessorChainRouterTestCase extends AbstractMuleContextTe
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(REGISTRY_KEY, componentLocator);
+    final Map<String, Object> objects = new HashMap<>();
+    objects.put(REGISTRY_KEY, componentLocator);
+    objects.put(PROCESSOR_INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(ProcessorInterceptorManager.class));
+    return objects;
   }
 
   @After

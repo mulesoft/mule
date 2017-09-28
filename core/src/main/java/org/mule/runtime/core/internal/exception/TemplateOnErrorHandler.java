@@ -24,6 +24,8 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,7 +35,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;

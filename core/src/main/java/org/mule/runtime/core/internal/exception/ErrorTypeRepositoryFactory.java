@@ -28,8 +28,9 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.VALIDATION;
+
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 
 /**
  * Factory for {@link ErrorTypeRepository}.

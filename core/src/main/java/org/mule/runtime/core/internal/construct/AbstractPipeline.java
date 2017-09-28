@@ -15,6 +15,7 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
@@ -37,8 +38,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -218,10 +219,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       });
     }
 
-    injectFlowConstructMuleContext(source);
-    injectFlowConstructMuleContext(pipeline);
-    initialiseIfInitialisable(source);
-    initialiseIfInitialisable(pipeline);
+    initialiseIfNeeded(source, muleContext);
+    initialiseIfNeeded(pipeline, muleContext);
   }
 
   /*

@@ -10,17 +10,12 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.util.MuleContextUtils.mockNotificationsHandling;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.internal.DefaultBeanDependencyResolver;
-import org.mule.runtime.config.internal.SpringLifecycleCallback;
-import org.mule.runtime.config.internal.SpringRegistry;
-import org.mule.runtime.config.internal.SpringRegistryLifecycleManager;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -44,16 +39,12 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
   @Mock
   private SpringRegistry springRegistry;
 
-  @Mock
-  private MuleContextWithRegistries muleContext;
+  private MuleContextWithRegistries muleContext = mockContextWithServices();
 
   private SpringLifecycleCallback callback;
 
   @Before
   public void before() throws RegistrationException {
-    final MuleRegistry registry = mock(MuleRegistry.class);
-    mockNotificationsHandling(registry);
-    when(muleContext.getRegistry()).thenReturn(registry);
     springRegistry = mock(SpringRegistry.class, RETURNS_DEEP_STUBS);
     springRegistryLifecycleManager =
         new SpringRegistryLifecycleManager("id", springRegistry, muleContext);
