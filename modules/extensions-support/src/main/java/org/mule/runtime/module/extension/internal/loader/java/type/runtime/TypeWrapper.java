@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.module.extension.internal.loader.java.type.FieldElement;
@@ -51,7 +52,7 @@ public class TypeWrapper implements Type {
    */
   @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
-    return Optional.ofNullable(aClass.getAnnotation(annotationClass));
+    return ofNullable(aClass.getAnnotation(annotationClass));
   }
 
   /**

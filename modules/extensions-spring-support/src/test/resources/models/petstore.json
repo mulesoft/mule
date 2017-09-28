@@ -463,15 +463,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             },
@@ -1595,7 +1595,13 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "java",
+              "format": {
+                "id": "text/plain",
+                "label": "text/plain",
+                "validMimeTypes": [
+                  "text/plain"
+                ]
+              },
               "type": "String"
             },
             "hasDynamicType": false,
@@ -1651,33 +1657,6 @@
                   "allowedStereotypeModels": [],
                   "name": "content",
                   "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "outputMimeType",
-                  "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
                 }
               ],
@@ -3557,15 +3536,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -4273,15 +4252,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -4993,15 +4972,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -5916,15 +5895,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -6632,15 +6611,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -6846,7 +6825,13 @@
           "hasResponse": false,
           "output": {
             "type": {
-              "format": "java",
+              "format": {
+                "id": "text/plain",
+                "label": "text/plain",
+                "validMimeTypes": [
+                  "text/plain"
+                ]
+              },
               "type": "String"
             },
             "hasDynamicType": false,
@@ -6950,33 +6935,6 @@
                   "allowedStereotypeModels": [],
                   "name": "failOnException",
                   "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 3,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "outputMimeType",
-                  "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
                 },
                 {
@@ -7099,7 +7057,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 3,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -7293,7 +7251,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -7363,33 +7327,6 @@
               "allowedStereotypeModels": [],
               "name": "animal",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             }
           ],
@@ -7484,7 +7421,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -7556,33 +7499,6 @@
               "allowedStereotypeModels": [],
               "name": "petNames",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             }
           ],
@@ -8147,7 +8063,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -8229,33 +8151,6 @@
               "allowedStereotypeModels": [],
               "name": "phoneNumber",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             }
           ],
@@ -8350,7 +8245,13 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -8459,33 +8360,6 @@
               "allowedStereotypeModels": [],
               "name": "pollutedStream",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             }
           ],
@@ -9525,15 +9399,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -10241,15 +10115,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -10961,15 +10835,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -11884,15 +11758,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -12600,15 +12474,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -13166,7 +13040,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -13212,33 +13092,6 @@
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
             {
               "type": {
                 "format": "java",
@@ -13359,7 +13212,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

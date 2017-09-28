@@ -6,8 +6,10 @@
  */
 package org.mule.test.vegan.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -22,6 +24,7 @@ public class SpreadVeganismOperation {
 
   public static final String ARGUMENTS_TAB = "Arguments";
 
+  @MediaType(TEXT_PLAIN)
   public String spreadTheWord(String theWord, @Config Object config) {
     return theWord;
   }

@@ -36,25 +36,6 @@
         <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE"/>
     </heisenberg:config>
 
-    <!--TODO MULE-13440-->
-    <!--<flow name="killMany">-->
-    <!--<heisenberg:kill-many reason="${killingReason}">-->
-    <!--<heisenberg:kill-operations>-->
-    <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
-    <!--<heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>-->
-    <!--<heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>-->
-    <!--</heisenberg:kill-operations>-->
-    <!--</heisenberg:kill-many>-->
-    <!--</flow>-->
-
-    <!--<flow name="killManyButOnlyOneProvided">-->
-    <!--<heisenberg:kill-many reason="${killingReason}">-->
-    <!--<heisenberg:kill-operations>-->
-    <!--<heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>-->
-    <!--</heisenberg:kill-operations>-->
-    <!--</heisenberg:kill-many>-->
-    <!--</flow>-->
-
     <flow name="executeAnything">
         <heisenberg:execute-anything>
             <try>

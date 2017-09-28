@@ -6,6 +6,7 @@
  */
 package org.mule.test.petstore.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.petstore.extension.PetstoreErrorTypeDefinition.PET_ERROR;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.security.SecurityException;
@@ -20,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -44,6 +46,7 @@ public class PetStoreOperations {
   }
 
   @Throws(PetStoreCustomErrorProvider.class)
+  @MediaType(TEXT_PLAIN)
   public String failsToReadStream(@Connection PetStoreClient connection, @Optional String content) throws MuleException {
     try {
       if (content == null) {
@@ -59,6 +62,7 @@ public class PetStoreOperations {
     return client;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String getFishFromRiverStream(@Content InputStream river, @Optional InputStream pollutedStream) {
     StringBuilder builder = new StringBuilder();
     builder.append(IOUtils.toString(river));
@@ -69,6 +73,7 @@ public class PetStoreOperations {
     return builder.toString();
   }
 
+  @MediaType(TEXT_PLAIN)
   public String describeSerializedAnimal(@ParameterDsl(allowReferences = false) Serializable animal) {
     if (animal instanceof byte[]) {
       return new String((byte[]) animal);
@@ -84,6 +89,7 @@ public class PetStoreOperations {
     return cashier;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String getDefaultEncoding(boolean usePhoneNumber, @Optional PhoneNumber phoneNumber,
                                    @DefaultEncoding String encoding) {
     return usePhoneNumber ? phoneNumber.getCountryEncoding() : encoding;

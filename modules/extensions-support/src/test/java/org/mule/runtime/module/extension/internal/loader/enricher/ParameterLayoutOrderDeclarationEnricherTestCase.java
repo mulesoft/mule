@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
+import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -26,6 +28,7 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -36,9 +39,9 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.assertLayoutModel;
-import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getNamedObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -265,6 +268,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
   }
 
 
+  @MediaType(value = ANY, strict = false)
   public static class ImplicitSourceOrder extends Source<String, Object> {
 
     @Parameter
@@ -287,6 +291,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
+  @MediaType(TEXT_PLAIN)
   public static class ExplicitSourceOrder extends Source<String, Object> {
 
     @Parameter
@@ -312,6 +317,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
+  @MediaType(value = ANY, strict = false)
   public static class MixedSourceOrder extends Source<String, Object> {
 
     @Parameter
@@ -335,6 +341,7 @@ public class ParameterLayoutOrderDeclarationEnricherTestCase {
     }
   }
 
+  @MediaType(TEXT_PLAIN)
   public static class ExplicitSourceOrderWithCallbacks extends Source<String, Object> {
 
     @Parameter

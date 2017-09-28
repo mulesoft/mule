@@ -51,4 +51,8 @@
         <heisenberg:name-as-stream config-ref="heisenberg" outputMimeType="application/json; charset=UTF-8" outputEncoding="UTF-16"/>
     </flow>
 
+    <flow name="strictMimeType">
+        <heisenberg:kill victim="Gus" goodbyeMessage="ding ding" />
+    </flow>
+
 </mule>

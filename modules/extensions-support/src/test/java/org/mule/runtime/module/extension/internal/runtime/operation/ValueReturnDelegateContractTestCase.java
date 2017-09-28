@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.empty;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,9 +17,9 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -25,8 +27,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +59,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Before
   public void before() throws MuleException {
     event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
+    when(componentModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getMuleContext()).thenReturn(muleContext);
@@ -111,6 +117,23 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes().getValue(), is(sameInstance(newAttributes)));
     assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
+  }
+
+  @Test
+  public void operationWithDefaultMimeType() throws Exception {
+    when(componentModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(Optional.of(
+                                                                                               new MediaTypeModelProperty(APPLICATION_JSON
+                                                                                                   .toRfcString(), true)));
+    delegate = createReturnDelegate();
+
+    Object value = "Hello world!";
+    CoreEvent result = delegate.asReturnValue(value, operationContext);
+
+    Message message = getOutputMessage(result);
+
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getMediaType().toRfcString(), containsString(APPLICATION_JSON.toRfcString()));
   }
 
   protected abstract ReturnDelegate createReturnDelegate();

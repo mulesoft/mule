@@ -3588,7 +3588,13 @@
           "hasResponse": false,
           "output": {
             "type": {
-              "format": "java",
+              "format": {
+                "id": "text/plain",
+                "label": "text/plain",
+                "validMimeTypes": [
+                  "text/plain"
+                ]
+              },
               "type": "String"
             },
             "hasDynamicType": false,
@@ -3648,33 +3654,6 @@
                   "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "outputMimeType",
-                  "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
                 },
                 {
@@ -3797,7 +3776,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 2,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -3983,7 +3962,13 @@
           "hasResponse": false,
           "output": {
             "type": {
-              "format": "java",
+              "format": {
+                "id": "text/plain",
+                "label": "text/plain",
+                "validMimeTypes": [
+                  "text/plain"
+                ]
+              },
               "type": "String"
             },
             "hasDynamicType": false,
@@ -4043,33 +4028,6 @@
                   "allowedStereotypeModels": [],
                   "name": "channel",
                   "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
-                    "type": "String"
-                  },
-                  "hasDynamicType": false,
-                  "required": false,
-                  "isConfigOverride": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": true,
-                    "allowsReferences": true,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2,
-                    "tabName": "Advanced"
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "outputMimeType",
-                  "description": "The mime type of the payload that this operation outputs.",
                   "modelProperties": {}
                 },
                 {
@@ -4192,7 +4150,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 2,
                     "tabName": "Redelivery"
                   },
                   "allowedStereotypeModels": [],
@@ -5950,7 +5908,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -6010,33 +5974,6 @@
               "allowedStereotypeModels": [],
               "name": "channel",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -6159,7 +6096,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -6345,7 +6282,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -6373,33 +6316,6 @@
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 5,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
             {
               "type": {
                 "format": "java",
@@ -6520,7 +6436,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6,
+                "order": 5,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -6856,7 +6772,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -6918,33 +6840,6 @@
               "allowedStereotypeModels": [],
               "name": "values",
               "description": "",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 2,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
               "modelProperties": {}
             },
             {
@@ -7067,7 +6962,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 3,
+                "order": 2,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -7128,7 +7023,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4
+                "order": 3
               },
               "allowedStereotypeModels": [],
               "name": "channels",
@@ -7154,7 +7049,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 4
               },
               "allowedStereotypeModels": [],
               "name": "anyParameter",
@@ -7328,7 +7223,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -7356,33 +7257,6 @@
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
             {
               "type": {
                 "format": "java",
@@ -7503,7 +7377,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -7766,7 +7640,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -7794,33 +7674,6 @@
       "parameterGroupModels": [
         {
           "parameters": [
-            {
-              "type": {
-                "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 3,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
             {
               "type": {
                 "format": "java",
@@ -7941,7 +7794,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 4,
+                "order": 3,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],
@@ -8202,7 +8055,13 @@
       "hasResponse": false,
       "output": {
         "type": {
-          "format": "java",
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
           "type": "String"
         },
         "hasDynamicType": false,
@@ -8412,33 +8271,6 @@
             {
               "type": {
                 "format": "java",
-                "type": "String"
-              },
-              "hasDynamicType": false,
-              "required": false,
-              "isConfigOverride": false,
-              "expressionSupport": "SUPPORTED",
-              "role": "BEHAVIOUR",
-              "dslConfiguration": {
-                "allowsInlineDefinition": true,
-                "allowsReferences": true,
-                "allowTopLevelDefinition": false
-              },
-              "layoutModel": {
-                "password": false,
-                "text": false,
-                "query": false,
-                "order": 6,
-                "tabName": "Advanced"
-              },
-              "allowedStereotypeModels": [],
-              "name": "outputMimeType",
-              "description": "The mime type of the payload that this operation outputs.",
-              "modelProperties": {}
-            },
-            {
-              "type": {
-                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy"
@@ -8556,7 +8388,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 7,
+                "order": 6,
                 "tabName": "Redelivery"
               },
               "allowedStereotypeModels": [],

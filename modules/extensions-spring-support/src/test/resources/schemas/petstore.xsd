@@ -347,11 +347,6 @@
         </xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnStart"></xs:attribute>
         <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="failOnException"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -443,11 +438,6 @@
           </xs:annotation>
         </xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="content"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -604,11 +594,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
         <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>
       </xs:extension>
@@ -620,11 +605,6 @@
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
         <xs:attribute type="xs:string" use="required" name="animal"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -657,11 +637,6 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionMap" use="optional" name="petNames"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -733,11 +708,6 @@
         </xs:sequence>
         <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="usePhoneNumber"></xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
@@ -759,11 +729,6 @@
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="river"></xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="pollutedStream"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="target">
           <xs:annotation>
             <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>

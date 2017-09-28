@@ -6,12 +6,15 @@
  */
 package org.mule.test.values.extension.source;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.test.values.extension.GroupWithValuesParameter;
 import org.mule.test.values.extension.resolver.WithRequiredParameterFromGroupValueProvider;
 
+@MediaType(TEXT_PLAIN)
 public class SourceWithRequiredParameterInsideShowInDslGroup extends AbstractSource {
 
   @OfValues(WithRequiredParameterFromGroupValueProvider.class)

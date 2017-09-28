@@ -108,6 +108,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
         .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
         .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
 
+    processMimeType(source, sourceType);
     processComponentConnectivity(source, sourceType, sourceType);
 
     resolveOutputTypes(source, sourceGenerics, sourceType);

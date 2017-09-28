@@ -9,6 +9,7 @@ package org.mule.test.marvel.drstrange;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -31,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DrStrangeOperations {
 
+  @MediaType(TEXT_PLAIN)
   public String seekStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream, int position)
       throws IOException {
     checkArgument(stream instanceof CursorStream, "Stream was not cursored");
@@ -42,6 +45,7 @@ public class DrStrangeOperations {
   }
 
   @Throws(CustomErrorProvider.class)
+  @MediaType(TEXT_PLAIN)
   public String readStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) InputStream stream) throws IOException {
     try {
       return IOUtils.toString(stream);
@@ -50,6 +54,7 @@ public class DrStrangeOperations {
     }
   }
 
+  @MediaType(TEXT_PLAIN)
   public InputStream toStream(@Config DrStrange dr, @Optional(defaultValue = PAYLOAD) String data) {
     return new ByteArrayInputStream(data.getBytes());
   }

@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
@@ -25,6 +27,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 
 import java.util.function.Supplier;
@@ -53,6 +56,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     public Builder<T, A> setSourceModel(SourceModel sourceModel) {
       product.sourceModel = sourceModel;
       product.returnsListOfMessages = returnsListOfMessages(sourceModel);
+      product.defaultMediaType = sourceModel.getModelProperty(MediaTypeModelProperty.class)
+          .map(MediaTypeModelProperty::getMediaType)
+          .orElse(ANY);
+
       return this;
     }
 
@@ -148,6 +155,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private CursorProviderFactory cursorProviderFactory;
   private TransactionConfig transactionConfig;
   private boolean returnsListOfMessages = false;
+  private MediaType defaultMediaType;
   private TransactionSourceBinder transactionSourceBinder;
 
   private DefaultSourceCallback() {}
@@ -169,7 +177,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
         + "you naughty developer");
     MessageProcessContext messageProcessContext = processContextSupplier.get();
 
-    SourceResultAdapter resultAdapter = new SourceResultAdapter(result, cursorProviderFactory, returnsListOfMessages);
+    SourceResultAdapter resultAdapter =
+        new SourceResultAdapter(result, cursorProviderFactory, defaultMediaType, returnsListOfMessages);
     Message message = of(resultAdapter);
 
     executeFlow(context, messageProcessContext, message);

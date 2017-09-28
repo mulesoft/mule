@@ -7,10 +7,12 @@
 
 package org.mule.test.typed.value.extension.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
@@ -26,6 +28,7 @@ public class TypedValueParameterOperations {
 
   public static final String THIS_IS_A_DEFAULT_STRING = "This is a default string";
 
+  @MediaType(TEXT_PLAIN)
   public TypedValue<String> typedValueOperationStringParameter(@Optional(
       defaultValue = THIS_IS_A_DEFAULT_STRING) TypedValue<String> stringValue, @Config TypedValueExtension config) {
     return stringValue;
@@ -68,6 +71,7 @@ public class TypedValueParameterOperations {
     return param;
   }
 
+  @MediaType(TEXT_PLAIN)
   public TypedValue<String> typedValueOperationWithStringContent(@Content TypedValue<String> stringDescription) {
     return stringDescription;
   }
@@ -77,6 +81,7 @@ public class TypedValueParameterOperations {
     return objectTypedValue;
   }
 
+  @MediaType(TEXT_PLAIN)
   public TypedValue<InputStream> typedValueForInputStream(@Content TypedValue<InputStream> inputStream) {
     return inputStream;
   }

@@ -6,9 +6,12 @@
  */
 package org.mule.test.values.extension.source;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.test.values.extension.GroupWithValuesParameter;
 
+@MediaType(TEXT_PLAIN)
 public class SourceWithValuesWithRequiredParameterInsideParamGroup extends AbstractSource {
 
   @ParameterGroup(name = "ValuesGroup")

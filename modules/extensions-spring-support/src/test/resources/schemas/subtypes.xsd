@@ -409,11 +409,6 @@
           </xs:element>
         </xs:sequence>
         <xs:attribute type="xs:string" use="optional" name="doorParam"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

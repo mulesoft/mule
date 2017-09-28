@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
@@ -28,6 +29,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -42,12 +44,14 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -87,9 +91,18 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
 
     when(source.getSuccessCallback()).thenReturn(empty());
     when(source.getErrorCallback()).thenReturn(empty());
-
     when(operation.getParameterGroup(DEFAULT_GROUP_NAME)).thenReturn(new ParameterGroupDeclaration(DEFAULT_GROUP_NAME));
+
     when(source.getParameterGroup(DEFAULT_GROUP_NAME)).thenReturn(new ParameterGroupDeclaration(DEFAULT_GROUP_NAME));
+
+    mockMediaType(operation, false);
+    mockMediaType(source, false);
+  }
+
+  private void mockMediaType(BaseDeclaration declaration, boolean strict) {
+    when(declaration.getModelProperty(MediaTypeModelProperty.class)).thenReturn(Optional.of(
+                                                                                            new MediaTypeModelProperty(TEXT_PLAIN,
+                                                                                                                       strict)));
   }
 
   @Test
@@ -97,6 +110,14 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
     mockOutput(operation, builder.binaryType().build());
     enricher.enrich(extensionLoadingContext);
     assertMimeTypeParams(operation);
+  }
+
+  @Test
+  public void binaryTypeOperationWithStrictMimeType() {
+    mockOutput(operation, builder.binaryType().build());
+    mockMediaType(operation, true);
+    enricher.enrich(extensionLoadingContext);
+    assertNoMimeTypeParams(operation);
   }
 
   @Test
@@ -124,12 +145,28 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
   }
 
   @Test
+  public void stringOperationWithStrictMimeType() {
+    mockOutput(operation, builder.stringType().build());
+    mockMediaType(operation, true);
+    enricher.enrich(extensionLoadingContext);
+    assertNoMimeTypeParams(operation);
+  }
+
+  @Test
   public void stringTypeSource() {
     mockOutput(source, builder.stringType().build());
     enricher.enrich(extensionLoadingContext);
     List<ParameterDeclaration> params = getGroupParameters(source);
     assertThat(params, hasSize(1));
     assertParameter(params.get(0), MIME_TYPE_PARAMETER_NAME);
+  }
+
+  @Test
+  public void stringTypeSourceWithStrictMimeType() {
+    mockOutput(source, builder.stringType().build());
+    mockMediaType(source, true);
+    enricher.enrich(extensionLoadingContext);
+    assertNoMimeTypeParams(source);
   }
 
   @Test
@@ -140,10 +177,23 @@ public class MimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleT
   }
 
   @Test
+  public void inputStreamTypeSourceWithStrictMimeType() {
+    mockOutput(source, builder.binaryType().build());
+    mockMediaType(source, true);
+    enricher.enrich(extensionLoadingContext);
+    assertNoMimeTypeParams(source);
+  }
+
+  @Test
   public void objectTypeSource() {
     mockOutput(source, builder.objectType().build());
     enricher.enrich(extensionLoadingContext);
     assertThat(getGroupParameters(source), hasSize(0));
+  }
+
+  private void assertNoMimeTypeParams(ParameterizedDeclaration<?> withParams) {
+    List<ParameterDeclaration> parameters = withParams.getParameterGroup(DEFAULT_GROUP_NAME).getParameters();
+    assertThat(parameters, hasSize(0));
   }
 
   private void assertMimeTypeParams(ParameterizedDeclaration<?> withParams) {

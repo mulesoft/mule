@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -19,22 +20,26 @@ import java.util.List;
  */
 public class SourceResultAdapter {
 
-  private final Result result;
+  private final Result<?, ?> result;
   private final CursorProviderFactory cursorProviderFactory;
   private final boolean isCollection;
+  private final MediaType defaultMediaType;
 
   /**
    * Creates a new instance
    *
-   * @param result                      the source result
+   * @param result                the source result
    * @param cursorProviderFactory the {@link CursorStreamProviderFactory} used by the source
-   * @param isCollection                whether the {@code result} represents a {@link List} of messages.
+   * @param defaultMediaType      the {@link MediaType} to set in the message if the {@code result} doesn't specify any
+   * @param isCollection          whether the {@code result} represents a {@link List} of messages.
    */
-  public SourceResultAdapter(Result result,
+  public SourceResultAdapter(Result<?, ?> result,
                              CursorProviderFactory cursorProviderFactory,
+                             MediaType defaultMediaType,
                              boolean isCollection) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
+    this.defaultMediaType = defaultMediaType;
     this.isCollection = isCollection;
   }
 
@@ -57,5 +62,9 @@ public class SourceResultAdapter {
    */
   public boolean isCollection() {
     return isCollection;
+  }
+
+  public MediaType getMediaType() {
+    return result.getMediaType().orElse(defaultMediaType);
   }
 }

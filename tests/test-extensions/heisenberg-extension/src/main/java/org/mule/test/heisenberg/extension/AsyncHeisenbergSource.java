@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
 import org.mule.runtime.api.message.Error;
@@ -13,6 +14,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
@@ -26,6 +28,7 @@ import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 @EmitsResponse
 @Streaming
 @Stereotype(AsyncSourceStereotype.class)
+@MediaType(TEXT_PLAIN)
 public class AsyncHeisenbergSource extends HeisenbergSource {
 
   public static SourceCompletionCallback completionCallback;

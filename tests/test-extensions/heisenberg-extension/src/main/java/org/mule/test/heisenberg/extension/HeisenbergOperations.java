@@ -9,6 +9,9 @@ package org.mule.test.heisenberg.extension;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -22,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -83,6 +87,7 @@ public class HeisenbergOperations implements Disposable {
   private ExtensionManager extensionManager;
 
   @Streaming
+  @MediaType(value = ANY, strict = false)
   public String sayMyName(@Config HeisenbergExtension config) {
     return config.getPersonalInfo().getName();
   }
@@ -91,6 +96,7 @@ public class HeisenbergOperations implements Disposable {
     config.setEndingHealth(HealthStatus.DEAD);
   }
 
+  @MediaType(TEXT_PLAIN)
   public Result<String, IntegerAttributes> getEnemy(@Config HeisenbergExtension config,
                                                     @Optional(defaultValue = "0") int index) {
     Charset lastSupportedEncoding = Charset.availableCharsets().values().stream().reduce((first, last) -> last).get();
@@ -114,11 +120,13 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @Stereotype(KillingStereotype.class)
+  @MediaType(APPLICATION_JSON)
   public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
     KillParameters killParameters = new KillParameters(victim, goodbyeMessage);
     return format("%s, %s", killParameters.getGoodbyeMessage(), killParameters.getVictim());
   }
 
+  @MediaType(TEXT_PLAIN)
   public String knock(KnockeableDoor knockedDoor) {
     return knockedDoor.knock();
   }
@@ -128,6 +136,7 @@ public class HeisenbergOperations implements Disposable {
     return extensionManager;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String alias(@Example(OPERATION_PARAMETER_EXAMPLE) String greeting,
                       @ParameterGroup(name = "Personal Info") PersonalInfo info) {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
@@ -151,16 +160,19 @@ public class HeisenbergOperations implements Disposable {
     return doors.stream().map(KnockeableDoor::knock).collect(toList());
   }
 
+  @MediaType(TEXT_PLAIN)
   public String callSaul(@Connection HeisenbergConnection connection) {
     return connection.callSaul();
   }
 
+  @MediaType(TEXT_PLAIN)
   public String callGusFring() throws HeisenbergException {
     throw new HeisenbergException(CALL_GUS_MESSAGE);
   }
 
   @OnException(CureCancerExceptionEnricher.class)
   @Throws(HeisenbergErrorTyperProvider.class)
+  @MediaType(TEXT_PLAIN)
   public String cureCancer() throws HealthException {
     throw new HealthException(CURE_CANCER_MESSAGE);
   }
@@ -178,15 +190,18 @@ public class HeisenbergOperations implements Disposable {
     return healthByYear;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String getSaulPhone(@Connection HeisenbergConnection connection) {
     return connection.getSaulPhoneNumber();
   }
 
+  @MediaType(TEXT_PLAIN)
   public ParameterResolver<String> resolverEcho(
                                                 @DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
     return literalExpression;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String literalEcho(Literal<String> literalExpression) {
     return literalExpression.getLiteralValue().orElse(null);
   }
@@ -235,6 +250,7 @@ public class HeisenbergOperations implements Disposable {
 
   }
 
+  @MediaType(TEXT_PLAIN)
   public String operationWithInputStreamContentParam(@ParameterGroup(name = "Test",
       showInDsl = true) InputStreamParameterGroup isGroup) {
     return IOUtils.toString(isGroup.getInputStreamContent());
@@ -244,6 +260,7 @@ public class HeisenbergOperations implements Disposable {
     throw new LinkageError();
   }
 
+  @MediaType(value = TEXT_PLAIN, strict = false)
   public InputStream nameAsStream(@Config HeisenbergExtension config) {
     return new ByteArrayInputStream(sayMyName(config).getBytes());
   }

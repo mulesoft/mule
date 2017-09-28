@@ -6,8 +6,10 @@
  */
 package org.mule.test.vegan.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.List;
@@ -29,6 +31,7 @@ public class FruitOperationsWithConfigOverride {
     return sample;
   }
 
+  @MediaType(TEXT_PLAIN)
   public String getNotOverridenParameter(@Config EasyToEatConfig config,
                                          @Optional String shouldNotOverride) {
     return shouldNotOverride;

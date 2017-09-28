@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.privileged.extension;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
+
 public class PrivilegedOperations {
 
+  @MediaType(TEXT_PLAIN)
   public String doSomething() {
     return "I did something";
   }
