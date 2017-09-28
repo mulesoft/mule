@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static java.math.BigInteger.ZERO;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MAX_ONE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_ELEMENT;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_TYPE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.MAX_ONE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_ELEMENT;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_CONNECTION_PROVIDER_TYPE;
 
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;

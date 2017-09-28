@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.TYPE_SUFFIX;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.TYPE_SUFFIX;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;

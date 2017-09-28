@@ -20,10 +20,9 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.internal.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 
@@ -45,30 +44,12 @@ public class DefaultMuleContextFactory implements MuleContextFactory {
   private List<MuleContextListener> listeners = new LinkedList<>();
 
   /**
-   * Creates a MuleContext using a ConfigurationBuilder with defaults needed for a feasible/startable MuleContext and a default
-   * MuleContextBuilder
-   */
-  @Override
-  public MuleContext createMuleContext() throws InitialisationException, ConfigurationException {
-    return createMuleContext(new DefaultsConfigurationBuilder(), MuleContextBuilder.builder(APP));
-  }
-
-  /**
    * Creates a MuleContext using a default MuleContextBuilder
    */
   @Override
   public MuleContext createMuleContext(ConfigurationBuilder... configurationBuilders)
       throws InitialisationException, ConfigurationException {
     return createMuleContext(asList(configurationBuilders), MuleContextBuilder.builder(APP));
-  }
-
-  /**
-   * Creates a MuleContext using a ConfigurationBuilder with defaults needed for a feasible/startable MuleContext
-   */
-  @Override
-  public MuleContext createMuleContext(MuleContextBuilder muleContextBuilder)
-      throws InitialisationException, ConfigurationException {
-    return createMuleContext(new DefaultsConfigurationBuilder(), muleContextBuilder);
   }
 
   /**

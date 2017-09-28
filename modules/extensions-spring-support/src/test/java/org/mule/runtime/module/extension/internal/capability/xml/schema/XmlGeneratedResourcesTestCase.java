@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.config.spring.internal.dsl.SchemaConstants.CURRENT_VERSION;
+import static org.mule.runtime.config.internal.dsl.SchemaConstants.CURRENT_VERSION;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.BUNDLE_MASK;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.SpringSchemaBundleResourceFactory.GENERATED_FILE_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
