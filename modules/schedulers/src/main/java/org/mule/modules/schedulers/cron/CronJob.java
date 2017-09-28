@@ -14,8 +14,8 @@ import org.quartz.StatefulJob;
 
 /**
  * <p>
- * {@link StatefulJob} for polling. This is always stateful as the synchronous processing strategy is defined by the
- * flow of the poll.
+ * {@link StatefulJob} for polling. This is always stateful as the synchronous processing strategy is defined by
+ * the flow of the poll.
  * </p>
  *
  * @since 3.5.0

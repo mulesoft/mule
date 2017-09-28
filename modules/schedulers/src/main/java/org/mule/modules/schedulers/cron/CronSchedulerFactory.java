@@ -64,8 +64,7 @@ public class CronSchedulerFactory extends SchedulerFactory<PollingReceiverWorker
 
         if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID)))
         {
-            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone,
-                    name, TZ_GMT_ID));
+            logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
         }
         return resolvedTimeZone;
     }
