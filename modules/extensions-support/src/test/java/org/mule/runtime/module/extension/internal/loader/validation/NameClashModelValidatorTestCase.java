@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -501,7 +502,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void contentParamtersWithSameNameAndDifferentType() {
+  public void contentParametersWithSameNameAndDifferentType() {
     exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firtParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
     when(firtParam.getRole()).thenReturn(PRIMARY_CONTENT);
@@ -509,6 +510,29 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(secondParam.getRole()).thenReturn(CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firtParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
+    validate();
+  }
+
+  @Test
+  public void contentParameterClashWithAttributeParameterWithinSameGroup() {
+    exception.expect(IllegalModelDefinitionException.class);
+    ParameterGroupModel group = mock(ParameterGroupModel.class);
+    ParameterModel contentParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
+    when(contentParam.getRole()).thenReturn(PRIMARY_CONTENT);
+
+    ParameterModel notContentParam = getParameter(CHILD_SINGULAR_PARAM_NAME, String.class);
+    when(notContentParam.getRole()).thenReturn(BEHAVIOUR);
+
+    when(group.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(group.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
+    when(group.getParameterModels()).thenReturn(asList(contentParam));
+
+    ParameterGroupModel anotherGroup = mock(ParameterGroupModel.class);
+    when(anotherGroup.getName()).thenReturn("My Group");
+    when(anotherGroup.isShowInDsl()).thenReturn(false);
+    when(anotherGroup.getParameterModels()).thenReturn(asList(notContentParam));
+
+    when(operationModel.getParameterGroupModels()).thenReturn(asList(group, anotherGroup));
     validate();
   }
 
