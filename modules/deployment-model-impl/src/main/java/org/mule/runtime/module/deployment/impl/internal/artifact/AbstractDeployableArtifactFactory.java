@@ -13,10 +13,23 @@ import org.mule.runtime.module.license.api.LicenseValidator;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Abstract class for {@link DeployableArtifact} factories.
+ * <p/>
+ * Handles license validation for the artifact plugins.
+ * 
+ * @param <T> the type of the {@link DeployableArtifact}
+ * @since 4.
+ */
 public abstract class AbstractDeployableArtifactFactory<T extends DeployableArtifact> implements ArtifactFactory<T> {
 
   private LicenseValidator licenseValidator;
 
+  /**
+   * Creates a new {@link AbstractDeployableArtifactFactory}
+   * 
+   * @param licenseValidator the license validator to use for plugins.
+   */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator) {
     this.licenseValidator = licenseValidator;
   }
@@ -28,8 +41,13 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
     return artifact;
   }
 
-
-
+  /**
+   * Creates an instance of {@link DeployableArtifact}
+   * 
+   * @param artifactDir the artifact deployment directory.
+   * @return the created artifact.
+   * @throws IOException if there was a problem reading the content of the artifact.
+   */
   protected abstract T doCreateArtifact(File artifactDir) throws IOException;
 
 

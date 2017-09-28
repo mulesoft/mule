@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.license.api;
 
+import org.mule.runtime.module.license.internal.DefaultLicenseValidator;
+
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -14,11 +16,18 @@ public interface LicenseValidatorProvider {
   static LicenseValidator discoverLicenseValidator(ClassLoader classLoader) {
     ServiceLoader<LicenseValidator> factories = ServiceLoader.load(LicenseValidator.class, classLoader);
     Iterator<LicenseValidator> iterator = factories.iterator();
-    if (!iterator.hasNext()) {
+    LicenseValidator licenseValidator = null;
+    while (iterator.hasNext()) {
+      LicenseValidator discoveredLicenseValidator = iterator.next();
+      if (licenseValidator == null || !(discoveredLicenseValidator instanceof DefaultLicenseValidator)) {
+        licenseValidator = discoveredLicenseValidator;
+      }
+    }
+    if (licenseValidator == null) {
       throw new IllegalStateException(String.format("Could not find %s service implementation through SPI",
                                                     LicenseValidator.class.getName()));
     }
-    return iterator.next();
+    return licenseValidator;
   }
 
 }

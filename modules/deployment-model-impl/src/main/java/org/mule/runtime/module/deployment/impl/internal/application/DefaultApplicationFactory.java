@@ -51,7 +51,8 @@ import java.util.Set;
 /**
  * Creates default mule applications
  */
-public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory<Application> implements ArtifactFactory<Application> {
+public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory<Application>
+    implements ArtifactFactory<Application> {
 
   private final ApplicationDescriptorFactory applicationDescriptorFactory;
   private final DomainRepository domainRepository;
@@ -98,8 +99,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   @Override
-  protected Application doCreateArtifact(File artifactDir) throws IOException
-  {
+  protected Application doCreateArtifact(File artifactDir) throws IOException {
     String appName = artifactDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);

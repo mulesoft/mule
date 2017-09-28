@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import org.mule.runtime.container.api.ModuleRepository;
@@ -49,7 +50,6 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicy
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
-import org.mule.runtime.module.license.api.LicenseValidatorProvider;
 import org.mule.runtime.module.service.DefaultServiceDiscoverer;
 import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.MuleServiceManager;
@@ -125,7 +125,7 @@ public class MuleArtifactResourcesRegistry {
     containerClassLoader =
         new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(getClass().getClassLoader());
     artifactClassLoaderManager = new DefaultClassLoaderManager();
-    LicenseValidator licenseValidator = discoverLicenseValidator(containerClassLoader.getClassLoader());
+    LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory = trackDeployableArtifactClassLoaderFactory(
