@@ -57,7 +57,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher).concatMap(event -> Mono.just(event).doOnNext(pushSubFlowFlowStackElement())
-          .transform(s -> super.apply(s)).doOnTerminate(() -> popSubFlowFlowStackElement().accept(event)));
+          .transform(s -> super.apply(s)).doOnSuccessOrError((result, throwable) -> popSubFlowFlowStackElement().accept(event)));
     }
   }
 }

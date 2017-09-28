@@ -393,7 +393,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                                                         AbstractPipeline.this))
 
           )
-          .doOnTerminate(() -> ((BaseEventContext) event.getContext()).getProcessingTime()
+          .doOnSuccessOrError((result, throwable) -> ((BaseEventContext) event.getContext()).getProcessingTime()
               .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
           .subscribe(requestUnbounded());
 
