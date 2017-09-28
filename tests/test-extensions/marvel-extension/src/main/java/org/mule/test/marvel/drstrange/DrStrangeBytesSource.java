@@ -67,7 +67,7 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
   @Override
   public void onStop() {
     if (sourceCallbackHandleTask != null) {
-      sourceCallbackHandleTask.cancel(true);
+      sourceCallbackHandleTask.cancel(false);
     }
     if (scheduler != null) {
       scheduler.stop();
