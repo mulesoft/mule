@@ -142,19 +142,19 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
   private void assertLoadedFromClassesDir(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("file", resource.getProtocol());
-    assertTrue(resource.toURI().toString().contains(appFolder.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(appFolder.toURI().toString()));
   }
 
   private void assertLoadedFromJarFile(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("jar", resource.getProtocol());
-    assertTrue(resource.toURI().toString().contains(jarFile.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(jarFile.toURI().toString()));
   }
 
   private void assertLoadedFromDomainDir(URL resource) throws URISyntaxException {
     assertNotNull(resource);
     assertEquals("file", resource.getProtocol());
-    assertTrue(resource.toURI().toString().contains(domainDir.getAbsolutePath()));
+    assertTrue(resource.toURI().toString().contains(domainDir.toURI().toString()));
   }
 
   private void assertNotLoaded(URL resource) {
