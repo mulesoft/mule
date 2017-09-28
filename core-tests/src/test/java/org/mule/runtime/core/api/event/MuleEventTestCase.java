@@ -40,6 +40,7 @@ import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -57,6 +58,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Test
   public void serialization() throws Exception {
@@ -125,15 +131,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    try {
-      currentMuleContext.set(muleContext);
-      byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
-      testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
+    currentMuleContext.set(muleContext);
+    byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
+    testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 
-      assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
-    } finally {
-      currentMuleContext.set(null);
-    }
+    assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
@@ -151,23 +153,25 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testFlowVarNamesAddImmutable() throws Exception {
     CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
+    expectedException.expect(UnsupportedOperationException.class);
     event.getVariables().keySet().add("other");
   }
 
-  public void testFlowVarNamesRemoveMutable() throws Exception {
+  @Test
+  public void testFlowVarNamesRemoveImmutable() throws Exception {
     CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
     event = CoreEvent.builder(event).addVariable("test", "val").build();
+    expectedException.expect(UnsupportedOperationException.class);
     event.getVariables().keySet().remove("test");
-    assertNull(event.getVariables().get("test").getValue());
   }
 
   @Test

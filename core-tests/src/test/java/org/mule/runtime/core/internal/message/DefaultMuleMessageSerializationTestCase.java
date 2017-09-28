@@ -9,17 +9,16 @@ package org.mule.runtime.core.internal.message;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.junit.After;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +29,11 @@ import java.util.Arrays;
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase {
 
   private static final String INNER_TEST_MESSAGE = "TestTestTestHello";
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Test
   public void testSerializablePayload() throws Exception {
@@ -48,15 +52,11 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
     final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
-    try {
-      currentMuleContext.set(muleContext);
-      InternalMessage deserializedMessage = serializationRoundtrip(message);
+    currentMuleContext.set(muleContext);
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
 
-      assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
-      assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
-    } finally {
-      currentMuleContext.set(null);
-    }
+    assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
+    assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
   }
 
   @Test
@@ -64,15 +64,11 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final Message message = InternalMessage.builder().value(stream).addOutboundProperty("foo", "bar").build();
 
-    try {
-      currentMuleContext.set(muleContext);
-      InternalMessage deserializedMessage = serializationRoundtrip(message);
-      assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());
-      byte[] payload = (byte[]) deserializedMessage.getPayload().getValue();
-      assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
-    } finally {
-      currentMuleContext.set(null);
-    }
+    currentMuleContext.set(muleContext);
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
+    assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());
+    byte[] payload = (byte[]) deserializedMessage.getPayload().getValue();
+    assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
   }
 
   private InternalMessage serializationRoundtrip(Message message) throws Exception {
