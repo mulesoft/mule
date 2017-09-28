@@ -26,9 +26,10 @@ public class FilePollEmptyResultTestCase extends FunctionalTestCase
 
     private static long TEST_TIMEOUT = 5000;
 
+    private static Throwable concurrentException;
+
     private Latch latch = new Latch();
 
-    private static Throwable concurrentException;
 
     @Override
     protected String getConfigFile()
