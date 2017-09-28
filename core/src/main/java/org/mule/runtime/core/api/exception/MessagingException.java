@@ -56,14 +56,12 @@ public class MessagingException extends EventProcessingException {
 
   public MessagingException(I18nMessage message, CoreEvent event) {
     super(message, event);
-    extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Component failingComponent) {
     super(message, event);
-    extractMuleMessage(event);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
@@ -71,14 +69,12 @@ public class MessagingException extends EventProcessingException {
 
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, event, cause);
-    extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause, Component failingComponent) {
     super(message, event, cause);
-    extractMuleMessage(event);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
@@ -86,7 +82,6 @@ public class MessagingException extends EventProcessingException {
 
   public MessagingException(CoreEvent event, Throwable cause) {
     super(event, cause);
-    extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
   }
@@ -97,14 +92,12 @@ public class MessagingException extends EventProcessingException {
     this.causeRollback = original.causedRollback();
     this.handled = original.handled();
     original.getInfo().forEach((key, value) -> addInfo(key, value));
-    extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(original.getMessage());
   }
 
   public MessagingException(CoreEvent event, Throwable cause, Component failingComponent) {
     super(event, cause);
-    extractMuleMessage(event);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
@@ -127,6 +120,7 @@ public class MessagingException extends EventProcessingException {
       }
     }
 
+    Message muleMessage = getEvent().getMessage();
     if (muleMessage != null) {
       if (MuleException.isVerboseExceptions()) {
         Object payload = muleMessage.getPayload().getValue();
@@ -162,17 +156,6 @@ public class MessagingException extends EventProcessingException {
   }
 
   /**
-   * @deprecated use {@link #getEvent().getMessage()} instead
-   */
-  @Deprecated
-  public Message getMuleMessage() {
-    if ((getEvent() != null)) {
-      return getEvent().getMessage();
-    }
-    return muleMessage;
-  }
-
-  /**
    * @return event associated with the exception
    */
   @Override
@@ -188,10 +171,8 @@ public class MessagingException extends EventProcessingException {
   public void setProcessedEvent(CoreEvent processedEvent) {
     if (processedEvent != null) {
       this.processedEvent = processedEvent;
-      extractMuleMessage(processedEvent);
     } else {
       this.processedEvent = null;
-      this.muleMessage = null;
     }
   }
 
@@ -317,10 +298,6 @@ public class MessagingException extends EventProcessingException {
    */
   public Component getFailingComponent() {
     return failingComponent;
-  }
-
-  protected void extractMuleMessage(CoreEvent event) {
-    this.muleMessage = event == null ? null : event.getMessage();
   }
 
   private void writeObject(ObjectOutputStream out) throws Exception {

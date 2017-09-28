@@ -77,7 +77,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     return process(processor, event, true);
   }
 
-  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapOperatorException) throws Exception {
+  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapEventProcessingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
@@ -90,7 +90,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
       }
     } catch (Exception exception) {
       // Do not unwrap MessagingException thrown by use of apply() with Flow for compatibility with flow.process()
-      if (unwrapOperatorException && (!(processor instanceof Flow) && exception instanceof EventProcessingException)) {
+      if (unwrapEventProcessingException && (!(processor instanceof Flow) && exception instanceof EventProcessingException)) {
         throw operatorExceptionToException((EventProcessingException) exception);
       } else {
         throw exception;

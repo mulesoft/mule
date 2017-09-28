@@ -319,6 +319,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public Consumer<CoreEvent> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
+        //TODO: Review whether this should be a fully processed ME
         throw propagate(new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage()));
       }
     };

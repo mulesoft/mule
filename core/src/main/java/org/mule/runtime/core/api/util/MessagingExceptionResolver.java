@@ -155,7 +155,7 @@ public class MessagingExceptionResolver {
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
-    if (isOperatorExceptionWithError(e)) {
+    if (isEventProcessingExceptionWithError(e)) {
       return ((EventProcessingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
     } else {
       Optional<ComponentIdentifier> componentIdentifier = getComponentIdentifier(failing);
@@ -163,7 +163,7 @@ public class MessagingExceptionResolver {
     }
   }
 
-  private boolean isOperatorExceptionWithError(Throwable cause) {
+  private boolean isEventProcessingExceptionWithError(Throwable cause) {
     return cause instanceof EventProcessingException && ((EventProcessingException) cause).getEvent().getError().isPresent();
   }
 

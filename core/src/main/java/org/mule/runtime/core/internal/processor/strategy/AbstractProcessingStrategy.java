@@ -39,6 +39,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
   protected Consumer<CoreEvent> createOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
+        // TODO: This should be resolved
         ((BaseEventContext) event.getContext()).error(new MessagingException(event,
                                                                              new DefaultMuleException(createStaticMessage(TRANSACTIONAL_ERROR_MESSAGE))));
       }

@@ -17,12 +17,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -33,21 +33,17 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.EventProcessingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.MessagingExceptionResolver;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,6 +57,8 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -129,6 +127,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #2 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
+        .doOnNext(event -> currentMuleContext.set(muleContext))
         .doOnNext(event -> setCurrentEvent(event))
         .cast(CoreEvent.class)
         .transform(next));
@@ -184,6 +183,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // scheduling such as RejectedExecutionException's can be handled cleanly
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
+        .doOnEach(signal -> currentMuleContext.set(null))
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(((BaseEventContext) event.getContext())
                            .error(resolveException((Component) processor, event, throwable)))
