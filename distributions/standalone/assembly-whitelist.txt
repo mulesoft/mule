@@ -346,7 +346,7 @@
 /mule-standalone-${productVersion}/lib/opt/joni-2.1.9.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-1.7.27.jar
-/mule-standalone-${productVersion}/lib/opt/jsch-0.1.54.jar
+/mule-standalone-${productVersion}/lib/opt/jsch-1.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.8.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-validator-2.2.8.jar
