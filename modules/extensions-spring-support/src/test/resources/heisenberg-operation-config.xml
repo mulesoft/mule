@@ -267,4 +267,22 @@
             </heisenberg:test>
         </heisenberg:operation-with-input-stream-content-param>
     </flow>
+
+    <flow name="operationWithAliasedParametersAsChild">
+        <heisenberg:by-pass-weapon awesomeName="SomeName">
+            <heisenberg:awesome-weapon>
+                <heisenberg:ricin microgramsPerKilo="22">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:awesome-weapon>
+        </heisenberg:by-pass-weapon>
+    </flow>
+
+    <flow name="operationWithAliasedParametersAsReference">
+        <heisenberg:by-pass-weapon awesomeName="SomeName" awesomeWeapon="ricin-weapon"/>
+    </flow>
+
+    <flow name="aliasedOperation">
+        <heisenberg:echo literalExpression="#['an expression']"/>
+    </flow>
 </mule>

@@ -7,20 +7,23 @@
 
 package org.mule.test.function.extension;
 
+import static com.google.common.collect.Lists.partition;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-
-import com.google.common.collect.ImmutableMap;
-
-import java.io.InputStream;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathFactory;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import org.w3c.dom.Document;
 
 public class GlobalWeaveFunction implements Initialisable {
@@ -68,6 +71,11 @@ public class GlobalWeaveFunction implements Initialisable {
       e.printStackTrace();
       return null;
     }
+  }
+
+  @Alias("partition")
+  public List<List<Object>> aliasedFunction(List<Object> listToSplit, int groupSize) {
+    return partition(listToSplit, groupSize);
   }
 
   private QName asQname(String name) {

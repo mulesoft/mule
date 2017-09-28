@@ -10,22 +10,22 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
+import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.api.meta.model.display.LayoutModel;
+import org.mule.runtime.api.meta.model.display.LayoutModel.LayoutModelBuilder;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.display.LayoutModel.LayoutModelBuilder;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
-import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +92,12 @@ public final class MuleExtensionAnnotationParser {
   public static List<String> getParamNames(Method method) {
     ImmutableList.Builder<String> paramNames = ImmutableList.builder();
     for (java.lang.reflect.Parameter parameter : method.getParameters()) {
-      paramNames.add(parameter.getName());
+      Alias alias = parameter.getAnnotation(Alias.class);
+      if (alias != null) {
+        paramNames.add(alias.value());
+      } else {
+        paramNames.add(parameter.getName());
+      }
     }
 
     return paramNames.build();

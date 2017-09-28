@@ -8,14 +8,17 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.tck.core.streaming.SimpleByteBufferManager;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -99,6 +102,16 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
             .run().getMessage().getPayload().getValue();
     assertThat(value, instanceOf(NodeList.class));
     assertThat(((NodeList) value).getLength(), is(7));
+  }
+
+  @Test
+  public void executeAliasedFunctionName() throws Exception {
+    TypedValue<List<List<Object>>> result = expressionManager.evaluate("Fn::partition([1,2,3,4,5,6,7,8], 3)");
+    List<List<Object>> value = result.getValue();
+    assertThat(value, hasSize(3));
+    assertThat(value.get(0), hasSize(3));
+    assertThat(value.get(1), hasSize(3));
+    assertThat(value.get(2), hasSize(2));
   }
 
   private InputStream getDocumentStream() {

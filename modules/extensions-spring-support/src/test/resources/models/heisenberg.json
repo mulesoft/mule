@@ -925,15 +925,15 @@
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 4
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "expiration-policy",
                     "prefix": "mule"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 4
                 }
               }
             }
@@ -1747,15 +1747,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -2014,15 +2014,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-object-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -2226,15 +2226,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -2453,15 +2453,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-object-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -2665,15 +2665,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -3322,15 +3322,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-object-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -3534,15 +3534,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -3796,15 +3796,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -4286,15 +4286,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-byte-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -4587,15 +4587,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-object-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -4799,15 +4799,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -5062,15 +5062,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-byte-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -5378,15 +5378,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-object-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -5590,15 +5590,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -5987,15 +5987,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -6171,15 +6171,15 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -7459,15 +7459,15 @@
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-redelivery-policy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 },
@@ -7645,15 +7645,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-byte-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -7795,15 +7795,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -9078,15 +9078,15 @@
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-redelivery-policy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 },
@@ -9264,15 +9264,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-byte-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -9414,15 +9414,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -10727,15 +10727,15 @@
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 1
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-redelivery-policy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 1
                     }
                   }
                 },
@@ -10913,15 +10913,15 @@
                   "name": "streamingStrategy",
                   "description": "Configure if repeatable streams should be used and their behaviour",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 2
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-byte-streaming-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 2
                     }
                   }
                 }
@@ -11063,15 +11063,15 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                      "sequence": 3
-                    },
                     "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
+                    },
+                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                      "sequence": 3
                     }
                   }
                 }
@@ -11791,6 +11791,202 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
+          "format": "java",
+          "type": "Object",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.Map",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [
+                "java.lang.String",
+                "org.mule.test.heisenberg.extension.model.Weapon"
+              ]
+            }
+          },
+          "open": {
+            "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+          },
+          "fields": []
+        },
+        "hasDynamicType": true,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "@ref:org.mule.test.heisenberg.extension.model.Weapon"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "awesomeWeapon",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2
+              },
+              "allowedStereotypeModels": [],
+              "name": "awesomeName",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "byPassWeapon",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
           "format": {
             "id": "text/plain",
             "label": "text/plain",
@@ -12015,6 +12211,165 @@
         }
       ],
       "name": "cureCancer",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": {
+            "id": "text/plain",
+            "label": "text/plain",
+            "validMimeTypes": [
+              "text/plain"
+            ]
+          },
+          "type": "String"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "heisenberg-empire",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": true,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "name": "literalExpression",
+              "displayModel": {
+                "displayName": "Custom overrided display name"
+              },
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "echo",
       "description": "",
       "modelProperties": {},
       "kind": "operation"
@@ -18451,15 +18806,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }
@@ -18635,15 +18990,15 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 3
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
                     "prefix": "mule"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
                 }
               }
             }
@@ -18914,15 +19269,15 @@
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 1
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-redelivery-policy",
                     "prefix": "mule"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 1
                 }
               }
             }
@@ -19064,15 +19419,15 @@
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
-                  "sequence": 3
-                },
                 "org.mule.runtime.extension.internal.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-reconnection-strategy",
                     "prefix": "mule"
                   }
+                },
+                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                  "sequence": 3
                 }
               }
             }

@@ -13,10 +13,12 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -54,6 +56,8 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
+import javax.inject.Inject;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -61,7 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -248,6 +252,18 @@ public class HeisenbergOperations implements Disposable {
   @Ignore
   public void ignoredOperation() {
 
+  }
+
+  @OutputResolver(output = HeisenbergOutputResolver.class)
+  public Map<String, Weapon> byPassWeapon(@Alias("awesomeWeapon") Weapon weapon, @Alias("awesomeName") String name) {
+    return ImmutableMap.of(name, weapon);
+  }
+
+  @Alias("echo")
+  @MediaType(TEXT_PLAIN)
+  public ParameterResolver<String> resolverEchoWithAlias(
+                                                         @DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
+    return literalExpression;
   }
 
   @MediaType(TEXT_PLAIN)
