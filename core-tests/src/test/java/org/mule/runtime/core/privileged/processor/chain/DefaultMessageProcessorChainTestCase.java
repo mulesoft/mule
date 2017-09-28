@@ -475,7 +475,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
             .build();
     nested.setMuleContext(muleContext);
     builder.chain(getAppendingMP("1"), event -> nested.process(InternalEvent.builder(event)
-        .message(event.getMessage()).flow(flow).build()), getAppendingMP("2"));
+        .message(event.getMessage()).build()), getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload().getValue());
   }
 

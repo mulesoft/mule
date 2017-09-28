@@ -155,7 +155,6 @@ public class MuleExtensionUtils {
       }
     };
     return InternalEvent.builder(create(flowConstruct, fromSingleComponent("InitializerEvent"))).message(of(null))
-        .flow(flowConstruct)
         .build();
   }
 

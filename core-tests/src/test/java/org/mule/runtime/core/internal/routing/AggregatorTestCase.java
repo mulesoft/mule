@@ -63,9 +63,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     Message message2 = Message.of("test event B");
     Message message3 = Message.of("test event C");
 
-    CoreEvent event1 = InternalEvent.builder(context).message(message1).flow(flow).session(session).build();
-    CoreEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
-    CoreEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
+    CoreEvent event1 = InternalEvent.builder(context).message(message1).session(session).build();
+    CoreEvent event2 = InternalEvent.builder(context).message(message2).session(session).build();
+    CoreEvent event3 = InternalEvent.builder(context).message(message3).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

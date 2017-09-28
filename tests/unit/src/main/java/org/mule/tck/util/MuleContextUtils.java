@@ -222,7 +222,7 @@ public class MuleContextUtils {
    */
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
-    return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).flow(flowConstruct);
+    return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
 }

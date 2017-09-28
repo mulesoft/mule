@@ -70,13 +70,13 @@ public class ExceptionTestCase extends AbstractELTestCase {
     Message message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               InternalEvent.builder(context).message(message).flow(flowConstruct).build(),
+                               InternalEvent.builder(context).message(message).build(),
                                new IllegalAccessException());
     when(mockError.getCause()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }
 
   private PrivilegedEvent createEvent() throws Exception {
-    return PrivilegedEvent.builder(context).message(of("")).flow(flowConstruct).error(mockError).build();
+    return PrivilegedEvent.builder(context).message(of("")).error(mockError).build();
   }
 }

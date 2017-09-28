@@ -264,7 +264,6 @@ public class ModuleFlowProcessingPhase
         .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
                         NullExceptionHandler.getInstance()))
         .message(message)
-        .flow(flowConstruct)
         .build();
 
     if (message.getPayload().getValue() instanceof SourceResultAdapter) {

@@ -70,7 +70,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Map<String, TypedValue<?>> moduleParameters = new HashMap<>();
   private Map<String, Object> internalParameters = new HashMap<>();
   private Error error;
-  private FlowConstruct flow;
   private Optional<GroupCorrelation> groupCorrelation = empty();
   private String legacyCorrelationId;
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
@@ -90,7 +89,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = event.getContext();
     this.originalEvent = event;
     this.message = event.getMessage();
-    this.flow = event.getFlowConstruct();
     this.groupCorrelation = event.getGroupCorrelation() != null ? event.getGroupCorrelation() : empty();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.flowCallStack = event.getFlowCallStack().clone();
@@ -224,13 +222,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
-  public DefaultEventBuilder flow(FlowConstruct flow) {
-    this.flow = flow;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public DefaultEventBuilder replyToHandler(ReplyToHandler replyToHandler) {
     this.replyToHandler = replyToHandler;
     this.modified = true;
@@ -274,7 +265,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       requireNonNull(message);
 
       return new InternalEventImplementation(context, message, flowVariables, moduleProperties, moduleParameters,
-                                             internalParameters, flow, session, securityContext, replyToDestination,
+                                             internalParameters, session, securityContext, replyToDestination,
                                              replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -291,8 +282,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
    * <code>EventImplementation</code> represents any data event occurring in the Mule environment. All data sent or received
    * within the Mule environment will be passed between components as an MuleEvent.
    * <p>
-   * The {@link CoreEvent} holds some data and provides helper methods for obtaining the data in a format that the receiving
-   * Mule component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
+   * The {@link CoreEvent} holds some data and provides helper methods for obtaining the data in a format that the receiving Mule
+   * component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
    * components.
    */
   public static class InternalEventImplementation implements InternalEvent, DeserializationPostInitialisable {
@@ -306,8 +297,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private Message message;
     private final MuleSession session;
     private SecurityContext securityContext;
-    // TODO MULE-10013 make this final
-    private transient FlowConstruct flowConstruct;
 
     private final ReplyToHandler replyToHandler;
 
@@ -325,21 +314,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final String legacyCorrelationId;
     private final Error error;
 
-    // Used in deserialization to obtain instance of flowConstruct via registry lookup.
-    private String flowName;
-
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
                                         Map<String, TypedValue<?>> properties, Map<String, TypedValue<?>> parameters,
-                                        Map<String, ?> internalParameters, FlowConstruct flowConstruct, MuleSession session,
-                                        SecurityContext securityContext, Object replyToDestination, ReplyToHandler replyToHandler,
-                                        FlowCallStack flowCallStack, Optional<GroupCorrelation> groupCorrelation, Error error,
+                                        Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
+                                        Object replyToDestination, ReplyToHandler replyToHandler, FlowCallStack flowCallStack,
+                                        Optional<GroupCorrelation> groupCorrelation, Error error,
                                         String legacyCorrelationId, boolean notificationsEnabled) {
       this.context = context;
-      this.flowConstruct = flowConstruct;
-      if (flowConstruct != null) {
-        this.flowName = flowConstruct.getName();
-      }
       this.session = session;
       this.securityContext = securityContext;
       this.message = message;
@@ -451,11 +433,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       return session;
     }
 
-    @Override
-    public FlowConstruct getFlowConstruct() {
-      return flowConstruct;
-    }
-
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current MuleContext.
@@ -480,22 +457,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         }
 
       }
-      if (flowName != null) {
-        flowConstruct = ((MuleContextWithRegistries) muleContext).getRegistry().lookupFlowConstruct(flowName);
-        // If flow construct is a Pipeline and has a EventContext instance cache, then reestablish the event context here with
-        // that instance in order to conserve non-serializable subscribers which in turn reference callbacks. Otherwise use the
-        // serialized version with no subscribers.
-        if (flowConstruct instanceof Pipeline) {
-          BaseEventContext cachedValue =
-              (BaseEventContext) ((Pipeline) flowConstruct).getSerializationEventContextCache().remove(context.getId());
-          context = cachedValue != null ? cachedValue : context;
-        }
-      }
-    }
-
-    @Override
-    public MuleContext getMuleContext() {
-      return flowConstruct.getMuleContext();
     }
 
     @Override
@@ -515,9 +476,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private void writeObject(ObjectOutputStream out) throws IOException {
       // TODO MULE-10013 remove this logic from here
       out.defaultWriteObject();
-      if (flowName != null && flowConstruct instanceof Pipeline) {
-        ((Pipeline) flowConstruct).getSerializationEventContextCache().put(context.getId(), context);
-      }
       for (Map.Entry<String, TypedValue<?>> entry : variables.entrySet()) {
         Object value = entry.getValue();
         if (value != null && !(value instanceof Serializable)) {

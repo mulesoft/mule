@@ -37,14 +37,4 @@ public interface Pipeline extends FlowConstruct, ProcessingDescriptor {
    */
   int getMaxConcurrency();
 
-  /**
-   * Map of current {@link EventContext} instances for {@link CoreEvent}'s that have been serialized. Entries will be removed
-   * on deserialization or in the last resort purged through garbage collection when there are no longer any hard references to
-   * the {@link EventContext} left. {@link EventContext}'s for {@link CoreEvent}'s that are not serialized will never be added
-   * to this cache.
-   *
-   * @return map of event context keyed by their id as obtained from {@link EventContext#getId()}
-   */
-  Map<String, EventContext> getSerializationEventContextCache();
-
 }

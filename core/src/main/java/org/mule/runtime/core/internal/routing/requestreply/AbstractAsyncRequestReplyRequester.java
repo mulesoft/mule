@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPE
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOutWaitingForId;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -372,7 +373,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     MultipleRequestReplierEvent multipleEvent = (MultipleRequestReplierEvent) store.retrieve(correlationId);
     PrivilegedEvent event = multipleEvent.getEvent();
     // TODO MULE-10302 remove this.
-    if (((InternalEvent) event).getMuleContext() == null) {
+    if (currentMuleContext.get() == null) {
       try {
         DeserializationPostInitialisable.Implementation.init(event, muleContext);
       } catch (Exception e) {

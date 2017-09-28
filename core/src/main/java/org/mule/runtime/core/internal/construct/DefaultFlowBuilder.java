@@ -254,10 +254,8 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     private PrivilegedEvent createMuleEventForCurrentFlow(PrivilegedEvent event) {
-      // TODO MULE-10013
-      // Create new event for current flow with current flowConstruct, replyToHandler etc.
+      // Create new event with replyToHandler etc.
       event = InternalEvent.builder(event)
-          .flow(this)
           // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
           // referenced flows. If it is passed on they two replyTo responses are sent.
           .replyToHandler(null)
@@ -269,10 +267,8 @@ public class DefaultFlowBuilder implements Builder {
     private PrivilegedEvent createReturnEventForParentFlowConstruct(PrivilegedEvent result, InternalEvent original) {
       if (result != null) {
         Optional<Error> errorOptional = result.getError();
-        // TODO MULE-10013
-        // Create new event with original FlowConstruct, ReplyToHandler and synchronous
+        // Create new event with ReplyToHandler and synchronous
         result = InternalEvent.builder(result)
-            .flow(original.getFlowConstruct())
             .replyToHandler(original.getReplyToHandler())
             .replyToDestination(original.getReplyToDestination())
             .error(errorOptional.orElse(null)).build();

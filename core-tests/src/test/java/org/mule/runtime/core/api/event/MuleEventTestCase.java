@@ -10,7 +10,6 @@ import static java.time.Duration.ofMillis;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
@@ -20,10 +19,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.from;
 
@@ -31,14 +28,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.api.security.SecurityContext;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -46,6 +40,7 @@ import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -63,6 +58,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @After
+  public void teardown() {
+    currentMuleContext.set(null);
+  }
 
   @Test
   public void serialization() throws Exception {
@@ -131,7 +131,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    setCurrentEvent(testEvent);
+    currentMuleContext.set(muleContext);
     byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
 
@@ -153,23 +153,25 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testFlowVarNamesAddImmutable() throws Exception {
     CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
+    expectedException.expect(UnsupportedOperationException.class);
     event.getVariables().keySet().add("other");
   }
 
-  public void testFlowVarNamesRemoveMutable() throws Exception {
+  @Test
+  public void testFlowVarNamesRemoveImmutable() throws Exception {
     CoreEvent event = eventBuilder(muleContext)
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
     event = CoreEvent.builder(event).addVariable("test", "val").build();
+    expectedException.expect(UnsupportedOperationException.class);
     event.getVariables().keySet().remove("test");
-    assertNull(event.getVariables().get("test").getValue());
   }
 
   @Test
@@ -211,44 +213,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage(startsWith(TIMEOUT_ILLEGAL_ARGUMENT_EXCEPTION_MESSAGE));
     from(((BaseEventContext) before.getContext()).getResponsePublisher()).block(ofMillis(BLOCK_TIMEOUT));
-  }
-
-  @Test
-  public void eventContextSerializationEventContextGarbageCollected() throws Exception {
-
-    Flow flow = getTestFlow(muleContext);
-    CoreEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null)).flow(flow).build();
-    String beforeId = before.getContext().getId();
-
-    byte[] bytes = org.apache.commons.lang3.SerializationUtils.serialize(before);
-    before = null;
-    System.gc();
-
-    // The event is never deserialized but it is cleaned up by garbage collection due to WeakReference
-    assertThat(flow.getSerializationEventContextCache().get(beforeId), is(nullValue()));
-  }
-
-  @Test
-  public void eventContextSerializationPublisherConserved() throws Exception {
-    CoreEvent result = testEvent();
-    CoreEvent before = this.<PrivilegedEvent.Builder>getEventBuilder().message(of(null))
-        .flow(createAndRegisterFlow(muleContext, "forSerialization", componentLocator)).build();
-
-    CoreEvent after =
-        (CoreEvent) SerializationUtils.deserialize(org.apache.commons.lang3.SerializationUtils.serialize(before),
-                                                   muleContext);
-
-    ((BaseEventContext) after.getContext()).success(result);
-
-    assertThat(before.getContext().getId(), equalTo(after.getContext().getId()));
-
-    // Publisher is conserved after serialization so attempting to obtain result via before event is successful.
-    assertThat(from(((BaseEventContext) before.getContext()).getResponsePublisher()).block(), equalTo(result));
-
-    // Cache entry is removed on deserialization
-    assertThat(((Pipeline) ((InternalEvent) before).getFlowConstruct()).getSerializationEventContextCache()
-        .get(before.getContext().getId()), is(nullValue()));
-
   }
 
   @Test

@@ -233,15 +233,6 @@ public interface PrivilegedEvent extends CoreEvent {
     Builder session(MuleSession session);
 
     /**
-     *
-     * @param flow
-     * @return the builder instance
-     * @deprecated TODO MULE-10013 remove this
-     */
-    @Deprecated
-    Builder flow(FlowConstruct flow);
-
-    /**
      * Build a new {@link PrivilegedEvent} based on the state configured in the {@link Builder}.
      *
      * @return new {@link PrivilegedEvent} instance.

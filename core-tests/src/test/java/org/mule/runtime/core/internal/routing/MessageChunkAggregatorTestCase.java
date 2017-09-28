@@ -60,10 +60,10 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     BaseEventContext context = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     CoreEvent event1 =
-        InternalEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3))).flow(flow)
+        InternalEvent.builder(context).message(message1).groupCorrelation(Optional.of(GroupCorrelation.of(0, 3)))
             .session(session).build();
-    CoreEvent event2 = InternalEvent.builder(context).message(message2).flow(flow).session(session).build();
-    CoreEvent event3 = InternalEvent.builder(context).message(message3).flow(flow).session(session).build();
+    CoreEvent event2 = InternalEvent.builder(context).message(message2).session(session).build();
+    CoreEvent event3 = InternalEvent.builder(context).message(message3).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
