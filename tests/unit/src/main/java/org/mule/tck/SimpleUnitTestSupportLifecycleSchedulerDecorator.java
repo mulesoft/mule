@@ -15,7 +15,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -34,7 +34,7 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   private SimpleUnitTestSupportSchedulerService ownerService;
   private boolean stopped;
 
-  private Collection<ScheduledFuture> recurrentTasks = new HashSet<>();
+  private Collection<ScheduledFuture> recurrentTasks = new LinkedList<>();
 
   public SimpleUnitTestSupportLifecycleSchedulerDecorator(String name, Scheduler decorated,
                                                           SimpleUnitTestSupportSchedulerService ownerService) {
