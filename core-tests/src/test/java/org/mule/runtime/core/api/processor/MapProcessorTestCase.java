@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleFatalException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -99,7 +100,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void mapStreamBlockingGetExceptionThrown() throws Throwable {
-    thrown.expect(is(instanceOf(MessagingException.class)));
+    thrown.expect(is(instanceOf(EventProcessingException.class)));
     thrown.expectCause(is(exception));
     CoreEvent result;
     try {
@@ -135,7 +136,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
     } catch (Exception e) {
       Throwable problem = unwrap(e);
 
-      assertThat(problem, is(instanceOf(MessagingException.class)));
+      assertThat(problem, is(instanceOf(EventProcessingException.class)));
       assertThat(problem.getCause(), is(instanceOf(MuleFatalException.class)));
       assertThat(problem.getCause().getCause(), is(error));
     }
@@ -146,7 +147,7 @@ public class MapProcessorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void mapStreamSubscribeErrorThrown() throws Exception {
     just(event).transform(testProcessorThrowsError).onErrorResume(throwable -> {
-      assertThat(throwable, is(instanceOf(MessagingException.class)));
+      assertThat(throwable, is(instanceOf(EventProcessingException.class)));
       assertThat(throwable.getCause(), is(instanceOf(MuleFatalException.class)));
       assertThat(throwable.getCause().getCause(), is(error));
 

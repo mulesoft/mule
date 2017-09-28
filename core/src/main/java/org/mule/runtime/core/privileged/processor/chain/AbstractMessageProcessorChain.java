@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -35,6 +34,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -124,12 +124,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #1 Update MessagingException with failing processor if required, create Error and set error context.
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
-        .onErrorMap(MessagingException.class, resolveMessagingException(processor)));
+        .onErrorMap(EventProcessingException.class, oe -> resolveException((Component) processor, oe.getEvent(), oe)));
 
     // #2 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
-        .doOnNext(event -> currentMuleContext.set(muleContext))
         .doOnNext(event -> setCurrentEvent(event))
         .cast(CoreEvent.class)
         .transform(next));
@@ -185,7 +184,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // scheduling such as RejectedExecutionException's can be handled cleanly
     interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
         .transform(next)
-        .doOnEach(signal -> currentMuleContext.set(null))
         .onErrorResume(RejectedExecutionException.class,
                        throwable -> Mono.from(((BaseEventContext) event.getContext())
                            .error(resolveException((Component) processor, event, throwable)))
@@ -199,9 +197,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return interceptors;
   }
 
-  private MessagingException resolveException(Component processor, CoreEvent event, Throwable throwable) {
+  private MessagingException resolveException(Component processor, CoreEvent event, Throwable oe) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
-    return exceptionResolver.resolve(new MessagingException(event, throwable, processor), muleContext);
+    return exceptionResolver.resolve(new MessagingException(event, oe.getCause(), processor), muleContext);
+  }
+
+  private MessagingException resolveException(Component processor, CoreEvent event, EventProcessingException oe) {
+    if (oe instanceof MessagingException) {
+      return (MessagingException) oe;
+    } else {
+      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
+      return exceptionResolver.resolve(new MessagingException(event, oe.getCause(), processor), muleContext);
+    }
   }
 
   private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {

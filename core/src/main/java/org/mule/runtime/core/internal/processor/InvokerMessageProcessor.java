@@ -16,8 +16,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithParam
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.processor.util.InvokerMessageProcessorUtil.splitArgumentsExpression;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,7 +27,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -38,8 +37,6 @@ import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.privileged.util.TemplateParser.PatternInfo;
 
-import org.slf4j.Logger;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +46,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
@@ -147,25 +146,21 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
         resultEvent = createResultEvent(event, result);
       }
     } catch (Exception e) {
-      throw new MessagingException(failedToInvoke(object.toString()), event, e, this);
+      throw new DefaultMuleException(failedToInvoke(object.toString()), e);
     }
     return resultEvent;
   }
 
-  protected Object[] evaluateArguments(CoreEvent event, List<?> argumentTemplates) throws MessagingException {
+  protected Object[] evaluateArguments(CoreEvent event, List<?> argumentTemplates) throws TransformerException {
     int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
     Object[] args = new Object[argSize];
-    try {
-      for (int i = 0; i < args.length; i++) {
-        Object argumentTemplate = argumentTemplates.get(i);
-        if (argumentTemplate != null) {
-          args[i] = transformArgument(evaluateExpressionCandidate(argumentTemplate, event), argumentTypes[i]);
-        }
+    for (int i = 0; i < args.length; i++) {
+      Object argumentTemplate = argumentTemplates.get(i);
+      if (argumentTemplate != null) {
+        args[i] = transformArgument(evaluateExpressionCandidate(argumentTemplate, event), argumentTypes[i]);
       }
-      return args;
-    } catch (TransformerException e) {
-      throw new MessagingException(event, e, this);
     }
+    return args;
   }
 
   @SuppressWarnings("unchecked")
