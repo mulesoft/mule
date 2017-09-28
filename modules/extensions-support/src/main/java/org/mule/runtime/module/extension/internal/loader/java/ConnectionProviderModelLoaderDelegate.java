@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -97,6 +98,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractModelLoaderDel
     parseOAuthGrantType(providerType, providerDeclarer);
 
     providerDeclarer.withConnectionManagementType(managementType);
+    providerDeclarer.supportsConnectivityTesting(!NoConnectivityTest.class.isAssignableFrom(providerType.getDeclaringClass()));
     connectionProviderDeclarers.put(providerClass, providerDeclarer);
     ParameterDeclarationContext context = new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration());
     loader.getFieldParametersLoader().declare(providerDeclarer, providerType.getParameters(), context);

@@ -86,7 +86,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
       group.addParameter(newParameter(ENCODING_PARAMETER_NAME, "The encoding of the payload that this operation outputs."));
     }
 
-    private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group, MediaType defaultMediaType) {
+    private void declareOutputMimeTypeParameter(ParameterGroupDeclaration group) {
       group.addParameter(newParameter(MIME_TYPE_PARAMETER_NAME, "The mime type of the payload that this operation outputs."));
     }
 
@@ -110,7 +110,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
           }
 
           if (!property.isStrict()) {
-            declareOutputMimeTypeParameter(declaration.getParameterGroup(DEFAULT_GROUP_NAME), property.getMediaType());
+            declareOutputMimeTypeParameter(declaration.getParameterGroup(DEFAULT_GROUP_NAME));
           }
 
           replaceOutputType(declaration, property, format -> BaseTypeBuilder.create(format).stringType().build());
@@ -129,7 +129,7 @@ public final class MimeTypeParametersDeclarationEnricher implements DeclarationE
 
           if (!property.isStrict()) {
             ParameterGroupDeclaration group = declaration.getParameterGroup(DEFAULT_GROUP_NAME);
-            declareOutputMimeTypeParameter(group, property.getMediaType());
+            declareOutputMimeTypeParameter(group);
             declareOutputEncodingParameter(group);
           }
 

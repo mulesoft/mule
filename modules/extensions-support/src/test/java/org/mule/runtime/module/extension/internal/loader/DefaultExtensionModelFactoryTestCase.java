@@ -231,6 +231,26 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     assertThat(stereotypeModel.getParent().isPresent(), is(false));
   }
 
+  @Test
+  public void untesteableConnetionProvider() throws Exception {
+    ExtensionModel extensionModel = createExtension(VeganExtension.class);
+    ConnectionProviderModel connectionProviderModel = extensionModel.getConfigurationModel(APPLE)
+        .map(c -> c.getConnectionProviders().get(0))
+        .get();
+
+    assertThat(connectionProviderModel.supportsConnectivityTesting(), is(false));
+  }
+
+  @Test
+  public void testeableConnectionProvider() throws Exception {
+    ExtensionModel extensionModel = createExtension(VeganExtension.class);
+    ConnectionProviderModel connectionProviderModel = extensionModel.getConfigurationModel(BANANA)
+        .map(c -> c.getConnectionProviders().get(0))
+        .get();
+
+    assertThat(connectionProviderModel.supportsConnectivityTesting(), is(true));
+  }
+
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
     assertThat(streamingParameter.getType(), equalTo(new StreamingStrategyTypeBuilder().getByteStreamingStrategyType()));
     assertThat(streamingParameter.isRequired(), is(false));

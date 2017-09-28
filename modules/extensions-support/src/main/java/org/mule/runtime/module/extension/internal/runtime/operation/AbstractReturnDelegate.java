@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
@@ -15,6 +16,8 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -69,7 +72,16 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     this.cursorProviderFactory = cursorProviderFactory;
     defaultMediaType = componentModel.getModelProperty(MediaTypeModelProperty.class)
         .map(MediaTypeModelProperty::getMediaType)
-        .orElse(null);
+        .orElseGet(() -> {
+          if (componentModel instanceof HasOutputModel) {
+            MetadataType output = ((HasOutputModel) componentModel).getOutput().getType();
+            return JAVA.equals(output.getMetadataFormat()) && output instanceof ObjectType
+                ? MediaType.APPLICATION_JAVA
+                : ANY;
+          }
+
+          return ANY;
+        });
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {

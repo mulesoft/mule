@@ -43,7 +43,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.NoConnectivityTest;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 
 import org.slf4j.Logger;
 
