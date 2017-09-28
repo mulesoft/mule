@@ -62,7 +62,8 @@ public class SoapServiceProviderDeclarer {
         .describedAs(description)
         .withModelProperty(new ConnectionTypeModelProperty(ForwardingSoapClient.class))
         .withModelProperty(new ImplementingTypeModelProperty(provider.getDeclaringClass()))
-        .withConnectionManagementType(POOLING);
+        .withConnectionManagementType(POOLING)
+        .supportsConnectivityTesting(false);
 
     ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerDeclarer.getDeclaration());
     parametersLoader.declare(providerDeclarer, provider.getParameters(), context);
