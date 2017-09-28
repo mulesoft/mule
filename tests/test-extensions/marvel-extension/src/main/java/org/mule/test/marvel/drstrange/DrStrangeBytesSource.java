@@ -8,6 +8,7 @@ package org.mule.test.marvel.drstrange;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -22,6 +23,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
 
@@ -32,6 +34,7 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
   @Inject
   private SchedulerService schedulerService;
   private Scheduler scheduler;
+  private ScheduledFuture sourceCallbackHandleTask;
 
   @Parameter
   private long castFrequencyInMillis;
@@ -49,7 +52,7 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
   @Override
   public void onStart(SourceCallback<InputStream, Void> sourceCallback) throws MuleException {
     scheduler = schedulerService.cpuLightScheduler();
-    scheduler.scheduleAtFixedRate(() -> sourceCallback.handle(Result.<InputStream, Void>builder()
+    sourceCallbackHandleTask = scheduler.scheduleAtFixedRate(() -> sourceCallback.handle(Result.<InputStream, Void>builder()
         .output(new ByteArrayInputStream(getSpellBytes(spell)))
         .build()), 0, castFrequencyInMillis, MILLISECONDS);
   }
@@ -63,6 +66,9 @@ public class DrStrangeBytesSource extends Source<InputStream, Void> {
 
   @Override
   public void onStop() {
+    if (sourceCallbackHandleTask != null) {
+      sourceCallbackHandleTask.cancel(true);
+    }
     if (scheduler != null) {
       scheduler.stop();
     }

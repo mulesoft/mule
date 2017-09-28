@@ -12,7 +12,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 
+import org.slf4j.Logger;
+
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -22,8 +25,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.slf4j.Logger;
-
 public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Scheduler {
 
   private static final Logger LOGGER = getLogger(SimpleUnitTestSupportLifecycleSchedulerDecorator.class);
@@ -32,6 +33,8 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   private Scheduler decorated;
   private SimpleUnitTestSupportSchedulerService ownerService;
   private boolean stopped;
+
+  private Collection<ScheduledFuture> recurrentTasks = new HashSet<>();
 
   public SimpleUnitTestSupportLifecycleSchedulerDecorator(String name, Scheduler decorated,
                                                           SimpleUnitTestSupportSchedulerService ownerService) {
@@ -43,6 +46,14 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public void stop() {
+    List<ScheduledFuture> stillaCtiveRecurrentTasks = recurrentTasks.stream()
+        .filter(recurrentTask -> !(recurrentTask.isDone() || recurrentTask.isCancelled())).collect(toList());
+    if (!stillaCtiveRecurrentTasks.isEmpty()) {
+      LOGGER.warn("Scheduler '" + name + "' stopped while it still has active recurrent tasks:"
+          + stillaCtiveRecurrentTasks.toString());
+    }
+    stillaCtiveRecurrentTasks.forEach(recurrentTask -> recurrentTask.cancel(true));
+
     this.stopped = true;
     decorated.stop();
     ownerService.stoppedScheduler(this);
@@ -65,22 +76,30 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-    return decorated.scheduleAtFixedRate(wrap(command), initialDelay, period, unit);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleAtFixedRate(wrap(command), initialDelay, period, unit);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-    return decorated.scheduleWithFixedDelay(wrap(command), initialDelay, delay, unit);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleWithFixedDelay(wrap(command), initialDelay, delay, unit);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
-    return decorated.scheduleWithCronExpression(wrap(command), cronExpression);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleWithCronExpression(wrap(command), cronExpression);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
-    return decorated.scheduleWithCronExpression(wrap(command), cronExpression, timeZone);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleWithCronExpression(wrap(command), cronExpression, timeZone);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override

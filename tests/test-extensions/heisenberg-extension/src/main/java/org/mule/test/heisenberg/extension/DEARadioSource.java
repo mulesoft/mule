@@ -7,6 +7,7 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -20,6 +21,7 @@ import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
 
@@ -36,6 +38,7 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
   private SchedulerConfig baseConfig;
 
   private Scheduler executor;
+  private ScheduledFuture sourceCallbakHandleTask;
 
   private Random random = new Random();
 
@@ -44,11 +47,14 @@ public class DEARadioSource extends Source<List<Result<String, DEAOfficerAttribu
       throws MuleException {
 
     executor = schedulerService.cpuLightScheduler(baseConfig.withShutdownTimeout(500, MILLISECONDS));
-    executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult()), 0, 500, MILLISECONDS);
+    sourceCallbakHandleTask = executor.scheduleAtFixedRate(() -> sourceCallback.handle(makeResult()), 0, 500, MILLISECONDS);
   }
 
   @Override
   public void onStop() {
+    if (sourceCallbakHandleTask != null) {
+      sourceCallbakHandleTask.cancel(false);
+    }
     if (executor != null) {
       executor.stop();
     }
