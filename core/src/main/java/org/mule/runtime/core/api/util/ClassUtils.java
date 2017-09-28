@@ -547,8 +547,7 @@ public class ClassUtils {
     if (clazz == null) {
       return null;
     }
-    String name = clazz.getName();
-    return name.substring(name.lastIndexOf(".") + 1);
+    return clazz.getSimpleName();
   }
 
   /**
