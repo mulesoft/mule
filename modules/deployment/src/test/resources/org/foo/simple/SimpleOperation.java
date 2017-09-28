@@ -7,12 +7,15 @@
 
 package org.foo.hello;
 
+import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 
 public class SimpleOperation {
 
   public SimpleOperation() {}
 
+  @MediaType(value = TEXT_PLAIN, strict = false)
   public String printMessage(@Config SimpleExtension config) {
     System.out.println("Simple extension says: " + config.getMessage());
     return config.getMessage();
