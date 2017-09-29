@@ -18,23 +18,20 @@ import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-
-import org.reactivestreams.Publisher;
 
 import com.eaio.uuid.UUID;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
@@ -79,7 +76,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       try {
         return processRequest(event);
       } catch (MuleException e) {
-        throw propagate(new MessagingException(event, e));
+        throw propagate(e);
       }
     });
     flux = from(flux.transform(next));
@@ -87,7 +84,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       try {
         return processResponse(event);
       } catch (MuleException e) {
-        throw propagate(new MessagingException(event, e));
+        throw propagate(e);
       }
     });
   }

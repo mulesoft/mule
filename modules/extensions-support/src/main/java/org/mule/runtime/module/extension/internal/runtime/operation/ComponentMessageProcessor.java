@@ -28,25 +28,24 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromCallable;
-
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
@@ -62,14 +61,13 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -168,7 +166,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           // create the MessagingException in ReactorCompletionCallback where Mono.error is used but we don't have a reference
           // to the processor there.
           return doProcess(operationEvent, operationContext)
-              .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, this));
+              .onErrorMap(e -> !(e instanceof EventProcessingException), e -> new EventProcessingException(event, e));
         };
       }
       if (getLocation() != null) {

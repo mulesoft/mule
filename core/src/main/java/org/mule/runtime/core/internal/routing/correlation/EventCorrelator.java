@@ -128,8 +128,7 @@ public class EventCorrelator implements Startable, Stoppable {
         addProcessedGroup(groupId);
       }
     } catch (ObjectStoreException e) {
-      // TODO improve this
-      throw new MessagingException(null, e);
+      throw new DefaultMuleException(e);
     }
   }
 

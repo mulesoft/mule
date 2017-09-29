@@ -15,22 +15,19 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.message.InternalEvent;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
 
 import java.util.Collection;
 import java.util.Map;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -80,7 +77,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     return process(processor, event, true);
   }
 
-  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
+  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapEventProcessingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
@@ -93,15 +90,15 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
       }
     } catch (Exception exception) {
       // Do not unwrap MessagingException thrown by use of apply() with Flow for compatibility with flow.process()
-      if (unwrapMessagingException && (!(processor instanceof Flow) && exception instanceof MessagingException)) {
-        throw messagingExceptionToException((MessagingException) exception);
+      if (unwrapEventProcessingException && (!(processor instanceof Flow) && exception instanceof EventProcessingException)) {
+        throw operatorExceptionToException((EventProcessingException) exception);
       } else {
         throw exception;
       }
     }
   }
 
-  private Exception messagingExceptionToException(MessagingException msgException) {
+  private Exception operatorExceptionToException(EventProcessingException msgException) {
     // unwrap MessagingException to ensure same exception is thrown by blocking and non-blocking processing
     return (msgException.getCause() instanceof Exception) ? (Exception) msgException.getCause()
         : new RuntimeException(msgException.getCause());
@@ -109,7 +106,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   public enum Mode {
     /**
-     * Test using {@link Processor#process(InternalEvent)} blocking API.
+     * Test using {@link Processor#process(CoreEvent)} blocking API.
      */
     BLOCKING,
     /**

@@ -12,24 +12,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private InvokerMessageProcessor invoker;
 
@@ -144,13 +147,8 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod2");
     invoker.setArgumentExpressionsString("#[mel:'1']");
     invoker.initialise();
-    try {
-      invoker.process(testEvent());
-      fail("Exception expected");
-    } catch (Exception e) {
-      assertEquals(MessagingException.class, e.getClass());
-      assertEquals(TransformerException.class, e.getCause().getClass());
-    }
+    expectedException.expect(TransformerException.class);
+    invoker.process(testEvent());
   }
 
   @Test

@@ -32,7 +32,6 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,17 +41,12 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.StringBufferInputStream;
 import java.util.List;
@@ -61,6 +55,10 @@ import java.util.Map;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(ROUTERS)
 @Story(SCATTER_GATHER)
@@ -215,7 +213,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
-    expectedException.expect(instanceOf(MessagingException.class));
+    expectedException.expect(instanceOf(EventProcessingException.class));
     expectedException.expectCause(instanceOf(MuleRuntimeException.class));
     router.process(CoreEvent.builder(testEvent()).message(Message.of(new StringBufferInputStream(TEST_PAYLOAD))).build());
   }

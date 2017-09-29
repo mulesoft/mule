@@ -8,9 +8,8 @@ package org.mule.module.artifact.classloader;
 
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 
 import org.slf4j.Logger;
 import reactor.core.publisher.Hooks;
@@ -35,8 +34,11 @@ public class ErrorHooksConfiguration {
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
       if (signal instanceof CoreEvent) {
-        return throwable instanceof MessagingException ? throwable
-            : new MessagingException((CoreEvent) signal, throwable);
+        if (throwable instanceof EventProcessingException) {
+          return throwable;
+        } else {
+          return new EventProcessingException((CoreEvent) signal, throwable);
+        }
       } else {
         return throwable;
       }

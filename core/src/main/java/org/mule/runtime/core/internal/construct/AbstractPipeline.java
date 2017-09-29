@@ -24,9 +24,7 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.empty;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
-
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -62,17 +60,12 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.reactivestreams.Publisher;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -326,8 +319,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public Consumer<CoreEvent> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
-        throw propagate(new MessagingException(event,
-                                               new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage())));
+        //TODO: Review whether this should be a fully processed ME
+        throw propagate(new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage()));
       }
     };
   }

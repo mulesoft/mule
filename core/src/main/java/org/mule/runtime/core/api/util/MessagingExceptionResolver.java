@@ -29,6 +29,7 @@ import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.api.exception.ErrorMapping;
@@ -154,16 +155,16 @@ public class MessagingExceptionResolver {
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
-    if (isMessagingExceptionWithError(e)) {
-      return ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
+    if (isEventProcessingExceptionWithError(e)) {
+      return ((EventProcessingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
     } else {
       Optional<ComponentIdentifier> componentIdentifier = getComponentIdentifier(failing);
       return componentIdentifier.map(ci -> locator.lookupComponentErrorType(ci, e)).orElse(locator.lookupErrorType(e));
     }
   }
 
-  private boolean isMessagingExceptionWithError(Throwable cause) {
-    return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
+  private boolean isEventProcessingExceptionWithError(Throwable cause) {
+    return cause instanceof EventProcessingException && ((EventProcessingException) cause).getEvent().getError().isPresent();
   }
 
   private MessagingException enrich(MessagingException me, Component failing, CoreEvent event, MuleContext context) {

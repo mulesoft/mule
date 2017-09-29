@@ -17,20 +17,20 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
@@ -39,14 +39,14 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Optional;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import java.util.Optional;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
@@ -193,7 +193,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyError() throws Exception {
-    thrown.expect((is(instanceOf(MessagingException.class))));
+    thrown.expect((is(instanceOf(EventProcessingException.class))));
     thrown.expectCause(is(exception));
     try {
       processToApply(input, error);
@@ -330,7 +330,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processError() throws Exception {
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
+    thrown.expectCause((is(instanceOf(EventProcessingException.class))));
     thrown.expectCause(hasCause(is(exception)));
     try {
       from(MessageProcessors.process(input, error)).block();

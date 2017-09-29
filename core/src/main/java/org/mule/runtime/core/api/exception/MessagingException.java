@@ -10,16 +10,13 @@ package org.mule.runtime.core.api.exception;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.abbreviate;
 import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCauseHierarchy;
-
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 
 import java.io.IOException;
@@ -31,10 +28,11 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * <code>MessagingException</code> is a general message exception thrown when errors specific to Message processing occur..
+ * Represents a processed failure during execution. This means that the associated {@link CoreEvent} should contain an
+ * {@link org.mule.runtime.api.message.Error} and that this exception should not be processed again since everything is in place
+ * for error handling execution.
  */
-
-public class MessagingException extends MuleException {
+public class MessagingException extends EventProcessingException {
 
   public static final String PAYLOAD_INFO_KEY = "Payload";
   public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
@@ -49,11 +47,6 @@ public class MessagingException extends MuleException {
    */
   protected transient Message muleMessage;
 
-  /**
-   * The MuleEvent being processed when the error occurred
-   */
-  protected final transient CoreEvent event;
-
   protected transient CoreEvent processedEvent;
 
   private boolean causeRollback;
@@ -61,100 +54,53 @@ public class MessagingException extends MuleException {
   private boolean inErrorHandler;
   private transient Component failingComponent;
 
-  /**
-   * @deprecated use MessagingException(Message, MuleEvent)
-   */
-  @Deprecated
-  public MessagingException(I18nMessage message, Message muleMessage, MuleContext context) {
-    super(message);
-    this.muleMessage = muleMessage;
-    this.event = null;
-    storeErrorTypeInfo();
-    setMessage(generateMessage(message, context));
-  }
-
   public MessagingException(I18nMessage message, CoreEvent event) {
-    super(message);
-    this.event = event;
-    extractMuleMessage(event);
+    super(message, event);
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Component failingComponent) {
-    super(message);
-    this.event = event;
-    extractMuleMessage(event);
+    super(message, event);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
-  /**
-   * @deprecated use MessagingException(Message, MuleEvent, Throwable)
-   */
-  @Deprecated
-  public MessagingException(I18nMessage message, Message muleMessage, MuleContext context, Throwable cause) {
-    super(message, getCause(cause));
-    this.muleMessage = muleMessage;
-    this.event = null;
-    storeErrorTypeInfo();
-    setMessage(generateMessage(message, context));
-  }
-
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause) {
-    super(message, getCause(cause));
-    this.event = getEvent(event, cause);
-    extractMuleMessage(event);
+    super(message, event, cause);
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause, Component failingComponent) {
-    super(message, getCause(cause));
-    this.event = getEvent(event, cause);
-    extractMuleMessage(event);
+    super(message, event, cause);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(CoreEvent event, Throwable cause) {
-    super(getCause(cause));
-    this.event = getEvent(event, cause);
-    extractMuleMessage(event);
+    super(event, cause);
     storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
   public MessagingException(CoreEvent event, MessagingException original) {
-    super(original.getI18nMessage(), getCause(original.getCause()));
-    this.event = getEvent(event, original.getCause());
+    super(original.getI18nMessage(), event, original.getCause());
     this.failingComponent = original.getFailingComponent();
     this.causeRollback = original.causedRollback();
     this.handled = original.handled();
     original.getInfo().forEach((key, value) -> addInfo(key, value));
-    extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(original.getMessage());
   }
 
   public MessagingException(CoreEvent event, Throwable cause, Component failingComponent) {
-    super(getCause(cause));
-    this.event = getEvent(event, cause);
-    extractMuleMessage(event);
+    super(event, cause);
     this.failingComponent = failingComponent;
     storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
-  }
-
-  private CoreEvent getEvent(CoreEvent event, Throwable cause) {
-    return cause instanceof TypedException ? eventWithError(event, cause) : event;
-  }
-
-  private CoreEvent eventWithError(CoreEvent event, Throwable cause) {
-    return CoreEvent.builder(event)
-        .error(ErrorBuilder.builder(cause.getCause()).errorType(((TypedException) cause).getErrorType()).build()).build();
   }
 
   private void storeErrorTypeInfo() {
@@ -174,6 +120,7 @@ public class MessagingException extends MuleException {
       }
     }
 
+    Message muleMessage = getEvent().getMessage();
     if (muleMessage != null) {
       if (MuleException.isVerboseExceptions()) {
         Object payload = muleMessage.getPayload().getValue();
@@ -209,19 +156,9 @@ public class MessagingException extends MuleException {
   }
 
   /**
-   * @deprecated use {@link #getEvent().getMessage()} instead
-   */
-  @Deprecated
-  public Message getMuleMessage() {
-    if ((getEvent() != null)) {
-      return getEvent().getMessage();
-    }
-    return muleMessage;
-  }
-
-  /**
    * @return event associated with the exception
    */
+  @Override
   public CoreEvent getEvent() {
     return processedEvent != null ? processedEvent : event;
   }
@@ -234,10 +171,8 @@ public class MessagingException extends MuleException {
   public void setProcessedEvent(CoreEvent processedEvent) {
     if (processedEvent != null) {
       this.processedEvent = processedEvent;
-      extractMuleMessage(processedEvent);
     } else {
       this.processedEvent = null;
-      this.muleMessage = null;
     }
   }
 
@@ -365,10 +300,6 @@ public class MessagingException extends MuleException {
     return failingComponent;
   }
 
-  protected void extractMuleMessage(CoreEvent event) {
-    this.muleMessage = event == null ? null : event.getMessage();
-  }
-
   private void writeObject(ObjectOutputStream out) throws Exception {
     out.defaultWriteObject();
     if (this.failingComponent instanceof Serializable) {
@@ -377,10 +308,6 @@ public class MessagingException extends MuleException {
     } else {
       out.writeBoolean(false);
     }
-  }
-
-  protected static Throwable getCause(Throwable cause) {
-    return cause instanceof TypedException ? cause.getCause() : cause;
   }
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
