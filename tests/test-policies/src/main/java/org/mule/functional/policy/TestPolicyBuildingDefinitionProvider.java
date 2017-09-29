@@ -10,6 +10,7 @@ package org.mule.functional.policy;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.policy.DefaultPolicyInstance;
@@ -56,6 +57,9 @@ public class TestPolicyBuildingDefinitionProvider implements ComponentBuildingDe
 
     definitions.add(baseDefinition.withIdentifier("execute-next")
         .withTypeDefinition(fromType(PolicyNextActionMessageProcessor.class)).build());
+
+    definitions.add(baseDefinition.withIdentifier("custom-processor")
+        .withTypeDefinition(fromConfigurationAttribute("class")).build());
 
     return definitions;
   }

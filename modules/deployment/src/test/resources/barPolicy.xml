@@ -7,7 +7,7 @@
 
     <test-policy:proxy>
         <test-policy:operation>
-            <custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor" />
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor" />
             <test-policy:execute-next/>
         </test-policy:operation>
     </test-policy:proxy>

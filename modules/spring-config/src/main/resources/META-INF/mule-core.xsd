@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/core"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/core"
+            attributeFormDefault="unqualified"
+            elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule-core-common.xsd"/>
+
+    <xsd:complexType name="flowType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:group ref="messageSource" minOccurs="0" maxOccurs="1"/>
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor"/>
+                    </xsd:choice>
+                    <xsd:choice minOccurs="0" maxOccurs="1">
+                        <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this flow construct.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialState" default="started">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial state of the flow. Usually a flow is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped").
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:union>
+                            <xsd:simpleType>
+                                <xsd:restriction base="propertyPlaceholderType"/>
+                            </xsd:simpleType>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="started"/>
+                                    <xsd:enumeration value="stopped"/>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:union>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="maxConcurrency">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize for performance when processing messages.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="substitutableInt"/>
+                    </xsd:simpleType>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+</xsd:schema>

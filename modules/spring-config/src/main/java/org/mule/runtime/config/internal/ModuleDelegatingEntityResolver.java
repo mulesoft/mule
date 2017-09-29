@@ -18,13 +18,6 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.xml.DelegatingEntityResolver;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +26,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.xml.DelegatingEntityResolver;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Custom implementation of resolver for schemas where it will delegate to our custom resolver, then if not found will try to
@@ -91,6 +91,16 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       LOGGER.debug(format("Looking schema for public identifier(publicId): '%s', system identifier(systemId): '%s'",
                           publicId == null ? "" : publicId,
                           systemId));
+    }
+
+    Boolean useDeprecated = springEntityResolver
+        .resolveEntity(publicId, "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd") != null;
+    if (systemId.equals("http://www.mulesoft.org/schema/mule/core/current/mule.xsd")) {
+      if (useDeprecated) {
+        systemId = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
+      } else {
+        systemId = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
+      }
     }
 
     InputSource inputSource;

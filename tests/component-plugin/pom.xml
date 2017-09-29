@@ -66,5 +66,11 @@
             <artifactId>uuid</artifactId>
             <version>3.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-core-deprecated-schema-plugin</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
     </dependencies>
 </project>
