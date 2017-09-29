@@ -14,7 +14,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -64,7 +63,6 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void alwaysFailsWrapperFailure() throws Exception {
-    expectedException.expect(instanceOf(MessagingException.class));
     // Exceptions are converted in the extension's exception enricher
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("ON_ERROR_ERROR");
@@ -73,7 +71,6 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void alwaysFailsWrapperSuccess() throws Exception {
-    expectedException.expect(instanceOf(MessagingException.class));
     // Exceptions are converted in the extension's exception enricher
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("ON_SUCCESS_ERROR");
