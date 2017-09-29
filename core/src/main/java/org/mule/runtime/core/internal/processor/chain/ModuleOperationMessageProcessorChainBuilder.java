@@ -263,18 +263,8 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
       builder.message(builder().nullValue().build());
       addVariables(event, builder, properties);
       addVariables(event, builder, parameters);
-      //      builder.variables(evaluateParameters(event, parameters));
-      //      builder.variables(evaluateParameters(event, properties));
       return builder.build();
     }
-
-    //    private Map<String, Object> evaluateParameters(CoreEvent event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
-    //      return unevaluatedMap.entrySet().stream()
-    //          .collect(toMap(Map.Entry::getKey,
-    //                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
-    //                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-    //                             : entry.getValue().getFirst()));
-    //    }
 
     private void addVariables(CoreEvent event, CoreEvent.Builder builder,
                               Map<String, Pair<String, MetadataType>> unevaluatedMap) {
@@ -287,10 +277,6 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
             builder.addVariable(entry.getKey(), value);
 
           });
-      //          .collect(toMap(Map.Entry::getKey,
-      //                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
-      //                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-      //                             : entry.getValue().getFirst()));
     }
 
     private Object getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {
