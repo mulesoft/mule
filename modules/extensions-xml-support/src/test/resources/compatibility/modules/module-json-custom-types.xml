@@ -32,7 +32,7 @@
             <parameter name="aParameter" type="Type2"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="string"/>
     </operation>

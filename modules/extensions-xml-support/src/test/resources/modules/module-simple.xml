@@ -20,7 +20,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -30,7 +30,7 @@
             <parameter name="value" type="string" defaultValue="15"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -40,7 +40,7 @@
             <parameter name="value" type="string" use="OPTIONAL" defaultValue="15"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -65,7 +65,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value ++ ' from module']"/>
+            <mule:set-payload value="#[vars.value ++ ' from module']"/>
         </body>
         <output type="string"/>
     </operation>
@@ -76,7 +76,7 @@
             <parameter name="value2" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value1 ++ parameters.value2]"/>
+            <mule:set-payload value="#[vars.value1 ++ vars.value2]"/>
         </body>
         <output type="string"/>
         <output-attributes type="string"/>
@@ -84,7 +84,7 @@
 
     <operation name="set-payload-using-undefined-param">
         <body>
-            <mule:set-payload value="#[parameters.value1]"/>
+            <mule:set-payload value="#[vars.value1]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -96,7 +96,7 @@
         <body>
             <mule:set-payload value="a value"/>
             <!-- will override payload with the null 'value1' parameter-->
-            <mule:set-payload value="#[parameters.value1]"/>
+            <mule:set-payload value="#[vars.value1]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -106,8 +106,8 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>

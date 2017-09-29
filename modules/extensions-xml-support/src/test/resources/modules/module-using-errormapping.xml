@@ -28,17 +28,17 @@
         <body>
             <mule:choice>
                 <!-- TODO MULE-13638: Partial fix until there's a way to make the calling to petstore:fail breaks differently depending on the 'petNames' parametrization -->
-                <mule:when expression="#[parameters.failExpression]">
+                <mule:when expression="#[vars.failExpression]">
                     <!-- defining an expression that will always fail -->
                     <petstore:fail petNames="#[ ' ++ as Object  ]">
-                        <mule:error-mapping targetType="#[parameters.errorMappingTargetType]" sourceType="#[parameters.errorMappingSourceType]"/>
-                        <mule:error-mapping targetType="#[parameters.secondErrorMappingTargetType]" sourceType="#[parameters.secondErrorMappingSourceType]"/>
+                        <mule:error-mapping targetType="#[vars.errorMappingTargetType]" sourceType="#[vars.errorMappingSourceType]"/>
+                        <mule:error-mapping targetType="#[vars.secondErrorMappingTargetType]" sourceType="#[vars.secondErrorMappingSourceType]"/>
                     </petstore:fail>
                 </mule:when>
                 <mule:otherwise>
-                    <petstore:fail petNames="#[parameters.petNames]">
-                        <mule:error-mapping targetType="#[parameters.errorMappingTargetType]" sourceType="#[parameters.errorMappingSourceType]"/>
-                        <mule:error-mapping targetType="#[parameters.secondErrorMappingTargetType]" sourceType="#[parameters.secondErrorMappingSourceType]"/>
+                    <petstore:fail petNames="#[vars.petNames]">
+                        <mule:error-mapping targetType="#[vars.errorMappingTargetType]" sourceType="#[vars.errorMappingSourceType]"/>
+                        <mule:error-mapping targetType="#[vars.secondErrorMappingTargetType]" sourceType="#[vars.secondErrorMappingSourceType]"/>
                     </petstore:fail>
                 </mule:otherwise>
             </mule:choice>
@@ -54,14 +54,14 @@
         <body>
             <mule:choice>
                 <!-- TODO MULE-13638: Partial fix until there's a way to make the calling to petstore:fail breaks differently depending on the 'petNames' parametrization -->
-                <mule:when expression="#[parameters.failExpression]">
+                <mule:when expression="#[vars.failExpression]">
                     <!-- defining an expression that will always fail -->
                     <petstore:fail petNames="#[ ' ++ as Object  ]">
                         <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
                     </petstore:fail>
                 </mule:when>
                 <mule:otherwise>
-                    <petstore:fail petNames="#[parameters.petNames]">
+                    <petstore:fail petNames="#[vars.petNames]">
                         <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
                     </petstore:fail>
                 </mule:otherwise>

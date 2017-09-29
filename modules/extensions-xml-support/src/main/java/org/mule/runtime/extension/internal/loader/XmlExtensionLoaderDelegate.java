@@ -608,8 +608,9 @@ public final class XmlExtensionLoaderDelegate {
       throw new MuleRuntimeException(createStaticMessage(format("There are [%d] global elements that can be potentially used for test connection when it should be just one. Mark any of them with the attribute [%s=\"true\"], offended global elements are: [%s]",
                                                                 testConnectionComponentModels.size(),
                                                                 MODULE_CONNECTION_MARKER_ATTRIBUTE,
-                                                                testConnectionComponentModels.stream().map(
-                                                                                                           ComponentModel::getNameAttribute)
+                                                                testConnectionComponentModels.stream()
+                                                                    .map(ComponentModel::getNameAttribute)
+                                                                    .sorted()
                                                                     .collect(Collectors.joining(", ")))));
     }
     testConnectionGlobalElement = testConnectionComponentModels.stream().findFirst();

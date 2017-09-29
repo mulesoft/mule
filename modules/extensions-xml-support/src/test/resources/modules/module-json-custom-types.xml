@@ -12,7 +12,7 @@
             <parameter name="value" type="Type1"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="Type2"/>
     </operation>
@@ -22,7 +22,7 @@
             <parameter name="aParameter" type="Type1"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -32,7 +32,7 @@
             <parameter name="aParameter" type="Type2"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="string"/>
     </operation>

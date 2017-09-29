@@ -12,8 +12,8 @@
     <property name="somePassConfig" type="string" defaultValue="some-password"/>
     <property name="port" type="string"/>
 
-    <module-global-element-proxy:config name="another-proxy-config" port="#[properties.port]" >
-        <module-global-element-proxy:connection someUserConfig="#[properties.someUserConfig]" somePassConfig="#[properties.somePassConfig]" />
+    <module-global-element-proxy:config name="another-proxy-config" port="#[vars.port]" >
+        <module-global-element-proxy:connection someUserConfig="#[vars.someUserConfig]" somePassConfig="#[vars.somePassConfig]" />
     </module-global-element-proxy:config>
 
     <operation name="do-login">
@@ -22,7 +22,7 @@
             <parameter name="somePass" type="string" defaultValue="passwordX"/>
         </parameters>
         <body>
-            <module-global-element-proxy:do-login config-ref="another-proxy-config" someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+            <module-global-element-proxy:do-login config-ref="another-proxy-config" someUser="#[vars.someUser]" somePass="#[vars.somePass]" />
         </body>
         <output type="string"/>
     </operation>

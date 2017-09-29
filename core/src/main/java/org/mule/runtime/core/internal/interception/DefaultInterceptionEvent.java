@@ -55,16 +55,6 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   }
 
   @Override
-  public Map<String, TypedValue<?>> getProperties() {
-    return interceptedInput.getProperties();
-  }
-
-  @Override
-  public Map<String, TypedValue<?>> getParameters() {
-    return interceptedInput.getParameters();
-  }
-
-  @Override
   public Optional<Error> getError() {
     return interceptedInput.getError();
   }

@@ -13,17 +13,17 @@
 
 
     <http:request-config name="first-config" basePath="/basic-auth/" xmlns:connection="true">
-        <http:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+        <http:request-connection host="localhost" protocol="HTTP" port="#[vars.port]">
             <http:authentication>
-                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+                <http:basic-authentication username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
             </http:authentication>
         </http:request-connection>
     </http:request-config>
 
     <http:request-config name="second-config" basePath="/basic-auth/" xmlns:connection="true">
-        <http:request-connection host="localhost" protocol="HTTP" port="#[properties.port]">
+        <http:request-connection host="localhost" protocol="HTTP" port="#[vars.port]">
             <http:authentication>
-                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+                <http:basic-authentication username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
             </http:authentication>
         </http:request-connection>
     </http:request-config>

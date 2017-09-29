@@ -19,7 +19,7 @@
         </parameters>
         <body>
             <mule:set-variable variableName="collected" value="" />
-            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+            <mule:foreach collection="#[(1 to vars.amount) as Array]">
                 <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
                 <tns:foreach-op2 op1Parameter="#[payload]"/>
             </mule:foreach>
@@ -34,9 +34,9 @@
         </parameters>
         <body>
             <mule:set-variable variableName="collected" value="" />
-            <mule:foreach collection="#[(1 to parameters.amount) as Array]">
+            <mule:foreach collection="#[(1 to vars.amount) as Array]">
                 <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
-                <mule:foreach collection="#[(parameters.amount to 1) as Array]">
+                <mule:foreach collection="#[(vars.amount to 1) as Array]">
                     <mule:set-variable variableName="collected" value="#[vars.collected ++ payload]" />
                     <tns:foreach-op1 op1Parameter="#[payload]"/>
                 </mule:foreach>

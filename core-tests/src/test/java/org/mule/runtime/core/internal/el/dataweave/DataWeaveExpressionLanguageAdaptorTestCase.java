@@ -39,9 +39,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.DATA_TYPE;
 import static org.mule.runtime.api.el.BindingContextUtils.ERROR;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
-import static org.mule.runtime.api.el.BindingContextUtils.PARAMETERS;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
-import static org.mule.runtime.api.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
@@ -53,7 +51,13 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -78,25 +82,13 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.weave.v2.model.structure.QualifiedName;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-
+import javax.xml.namespace.QName;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.namespace.QName;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -307,38 +299,6 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build())
         .getValue(),
                is(flowName));
-  }
-
-  @Test
-  public void propertiesBindings() throws Exception {
-    CoreEvent event = getEventWithError(empty());
-    String var1 = "var1";
-    String var2 = "var2";
-    TypedValue varValue = new TypedValue<>(null, OBJECT);
-    final HashMap<String, TypedValue<?>> properties = new HashMap<>();
-    properties.put(var1, varValue);
-    properties.put(var2, varValue);
-    when(event.getProperties()).thenReturn(properties);
-    TypedValue result = expressionLanguage.evaluate(PROPERTIES, event, BindingContext.builder().build());
-    assertThat(result.getValue(), is(instanceOf(Map.class)));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
-  }
-
-  @Test
-  public void parametersBindings() throws Exception {
-    CoreEvent event = getEventWithError(empty());
-    String var1 = "var1";
-    String var2 = "var2";
-    TypedValue varValue = new TypedValue<>(null, OBJECT);
-    final HashMap<String, TypedValue<?>> parameters = new HashMap<>();
-    parameters.put(var1, varValue);
-    parameters.put(var2, varValue);
-    when(event.getParameters()).thenReturn(parameters);
-    TypedValue result = expressionLanguage.evaluate(PARAMETERS, event, BindingContext.builder().build());
-    assertThat(result.getValue(), is(instanceOf(Map.class)));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var1, varValue));
-    assertThat((Map<String, TypedValue>) result.getValue(), hasEntry(var2, varValue));
   }
 
   @Test

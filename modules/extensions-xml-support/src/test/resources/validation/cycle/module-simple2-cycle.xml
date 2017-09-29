@@ -15,7 +15,7 @@
             <parameter name="op1Parameter" type="string"/>
         </parameters>
         <body>
-            <tns:internal-op2 op2Parameter="#['{op1 breadcrum, we need to go deeper..' ++ parameters.op1Parameter ++ '}']"/>
+            <tns:internal-op2 op2Parameter="#['{op1 breadcrum, we need to go deeper..' ++ vars.op1Parameter ++ '}']"/>
         </body>
         <output type="string"/>
     </operation>
@@ -25,7 +25,7 @@
             <parameter name="op2Parameter" type="string"/>
         </parameters>
         <body>
-            <tns:internal-op3 op3Parameter="#['{op2 breadcrum, we need to go deeper..' ++ parameters.op2Parameter ++ '}']"/>
+            <tns:internal-op3 op3Parameter="#['{op2 breadcrum, we need to go deeper..' ++ vars.op2Parameter ++ '}']"/>
         </body>
         <output type="string"/>
     </operation>
@@ -35,7 +35,7 @@
             <parameter name="op3Parameter" type="string"/>
         </parameters>
         <body>
-            <tns:internal-op1 op1Parameter="#['{op3 breadcrum, we need to go deeper..' ++ parameters.op3Parameter ++ '}']"/>
+            <tns:internal-op1 op1Parameter="#['{op3 breadcrum, we need to go deeper..' ++ vars.op3Parameter ++ '}']"/>
         </body>
         <output type="string"/>
     </operation>

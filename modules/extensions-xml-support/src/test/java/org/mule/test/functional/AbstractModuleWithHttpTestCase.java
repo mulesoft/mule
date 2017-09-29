@@ -29,7 +29,7 @@ import java.io.IOException;
 
 public abstract class AbstractModuleWithHttpTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
-  static final String MODULE_GLOBAL_ELEMENT_XML = "modules/module-global-element.xml";
+  protected static final String MODULE_GLOBAL_ELEMENT_XML = "modules/module-global-element.xml";
   static final String MODULE_GLOBAL_ELEMENT_PROXY_XML = "modules/nested/module-global-element-proxy.xml";
   static final String MODULE_GLOBAL_ELEMENT_ANOTHER_PROXY_XML = "modules/nested/module-global-element-another-proxy.xml";
   static final String USER_AND_PASS_VALIDATED_RESPONSE = "\"User and pass validated\"";
