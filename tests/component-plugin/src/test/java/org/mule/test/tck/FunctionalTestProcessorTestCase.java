@@ -6,13 +6,17 @@
  */
 package org.mule.test.tck;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.functional.api.exception.FunctionalTestException.EXCEPTION_MESSAGE;
-
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -24,7 +28,8 @@ import org.junit.rules.ExpectedException;
 
 public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
 
-  FunctionalTestProcessor ftc;
+  private FunctionalTestProcessor ftc;
+  private CoreEvent mockEvent = mock(CoreEvent.class, RETURNS_DEEP_STUBS);
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -33,6 +38,7 @@ public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
   public void initFunctionaTestComponent() {
     ftc = new FunctionalTestProcessor();
     ftc.setThrowException(true);
+    when(mockEvent.getError()).thenReturn(empty());
   }
 
   @Test
@@ -68,6 +74,6 @@ public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
       expected.expectMessage(startsWith(expectedMessage));
     }
 
-    ftc.process(null);
+    ftc.process(mockEvent);
   }
 }
