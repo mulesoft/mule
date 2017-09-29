@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,14 +31,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the base class for exception strategies which contains several helper methods. However, you should probably inherit
@@ -102,7 +103,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       if (ex.getCause() != null && getCause(ex) instanceof SecurityException) {
         fireNotification(new SecurityNotification((SecurityException) getCause(ex), SECURITY_AUTHENTICATION_FAILED));
       } else {
-        fireNotification(new ExceptionNotification(createInfo(event, ex, null), getLocation()));
+        Component component = null;
+        if (ex instanceof MessagingException) {
+          component = ((MessagingException) ex).getFailingComponent();
+        }
+        fireNotification(new ExceptionNotification(createInfo(event, ex, component), getLocation()));
       }
     }
   }
