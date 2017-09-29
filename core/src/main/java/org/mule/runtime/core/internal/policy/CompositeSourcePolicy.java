@@ -151,7 +151,8 @@ public class CompositeSourcePolicy extends
           Supplier<Map<String, Object>> responseParameters =
               () -> getParametersTransformer().map(parametersTransformer -> concatMaps(originalFailureResponseParameters,
                                                                                        parametersTransformer
-                                                                                           .fromMessageToErrorResponseParameters(of(null))))
+                                                                                           .fromMessageToErrorResponseParameters(e
+                                                                                               .getEvent().getMessage())))
                   .orElse(originalFailureResponseParameters);
           return just(left(new SourcePolicyFailureResult(e, responseParameters)));
         });
