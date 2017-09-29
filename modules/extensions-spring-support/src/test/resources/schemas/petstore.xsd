@@ -73,12 +73,20 @@
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="aquarium">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.Aquarium"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
           <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
           <xs:attribute type="mule:expressionList" use="optional" name="cages"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="aquarium"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
           <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
@@ -131,6 +139,15 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="org.mule.test.petstore.extension.Aquarium">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="optional" name="frogName"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="fishName"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" default="50" name="ticketPrice"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="connection">
     <xs:complexType>
       <xs:complexContent>

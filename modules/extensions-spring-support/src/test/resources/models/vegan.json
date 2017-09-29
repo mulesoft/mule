@@ -9896,6 +9896,13 @@
           },
           "annotations": {
             "flattened": {},
+            "exclusiveOptionals": {
+              "exclusiveParameterNames": [
+                "saltMiligrams",
+                "saltReplacementName"
+              ],
+              "isOneRequired": false
+            },
             "expressionSupport": {
               "value": "SUPPORTED"
             }
