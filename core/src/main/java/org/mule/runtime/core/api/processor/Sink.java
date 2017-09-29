@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.function.Consumer;
 

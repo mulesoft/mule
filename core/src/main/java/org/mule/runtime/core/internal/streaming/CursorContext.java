@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.streaming;
 
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 /**
  * Groups a {@link CursorProvider} with information about its context
