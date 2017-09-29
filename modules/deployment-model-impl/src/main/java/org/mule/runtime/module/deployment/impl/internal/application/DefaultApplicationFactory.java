@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
@@ -116,12 +117,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
-    Domain domain = domainRepository.getDomain(descriptor.getDomain());
-
-    if (domain == null) {
-      throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
-                                                               descriptor.getDomain(), descriptor.getName())));
-    }
+    Domain domain = getApplicationDomain(descriptor);
 
     List<ArtifactPluginDescriptor> applicationPluginDescriptors =
         getArtifactPluginDescriptors(domain.getDescriptor().getPlugins(), descriptor);
@@ -157,6 +153,26 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);
+  }
+
+  private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
+    Optional<BundleDescriptor> domainDescriptor = descriptor.getDomainDescriptor();
+
+    Domain domain;
+    if (domainDescriptor.isPresent()) {
+      domain = domainRepository.getDomain(domainDescriptor.get().getArtifactFileName());
+    } else {
+
+      domain = domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
+    }
+
+    if (domain == null) {
+      throw new DeploymentException(createStaticMessage(format("Domain '%s' "
+                                                                 + "has to be deployed in order to deploy Application '%s'",
+                                                               domainDescriptor.isPresent()? domainDescriptor.get().getArtifactId() : DEFAULT_DOMAIN_NAME, descriptor.getName())));
+    }
+
+    return domain;
   }
 
   private List<ArtifactPluginDescriptor> getArtifactPluginDescriptors(Set<ArtifactPluginDescriptor> plugins,

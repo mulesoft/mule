@@ -16,7 +16,7 @@ import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
+import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
@@ -45,20 +45,20 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
   /**
    * Creates a new builder
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    */
-  public ApplicationFileBuilder(String id) {
-    super(id);
+  public ApplicationFileBuilder(String artifactId) {
+    super(artifactId);
   }
 
   /**
    * Creates a new builder
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    * @param upperCaseInExtension whether the extension is in uppercase
    */
-  public ApplicationFileBuilder(String id, boolean upperCaseInExtension) {
-    super(id, upperCaseInExtension);
+  public ApplicationFileBuilder(String artifactId, boolean upperCaseInExtension) {
+    super(artifactId, upperCaseInExtension);
   }
 
 
@@ -143,20 +143,17 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
 
     Object redeploymentEnabled = deployProperties.get(PROPERTY_REDEPLOYMENT_ENABLED);
     Object configResources = deployProperties.get(PROPERTY_CONFIG_RESOURCES);
-    File applicationDescriptor = createApplicationJsonDescriptorFile(
-                                                                     ofNullable(((String) deployProperties
-                                                                         .get(PROPERTY_DOMAIN))),
-                                                                     redeploymentEnabled == null
-                                                                         ? empty()
-                                                                         : ofNullable(Boolean
-                                                                             .valueOf((String) redeploymentEnabled)),
+    File applicationDescriptor = createApplicationJsonDescriptorFile(redeploymentEnabled == null
+        ? empty()
+        : ofNullable(Boolean
+            .valueOf((String) redeploymentEnabled)),
                                                                      Optional.ofNullable((String) configResources),
                                                                      ofNullable((String) properties.get(EXPORTED_RESOURCES)));
     customResources.add(new ZipResource(applicationDescriptor.getAbsolutePath(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION));
     return customResources;
   }
 
-  private File createApplicationJsonDescriptorFile(Optional<String> domain, Optional<Boolean> redeploymentEnabled,
+  private File createApplicationJsonDescriptorFile(Optional<Boolean> redeploymentEnabled,
                                                    Optional<String> configResources, Optional<String> exportedResources) {
     File applicationDescriptor = new File(getTempFolder(), getArtifactId() + "application.json");
     applicationDescriptor.deleteOnExit();
@@ -166,7 +163,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
         .setName(getArtifactId())
         .setMinMuleVersion("4.0.0")
         .setRequiredProduct(MULE);
-    domain.ifPresent(muleApplicationModelBuilder::setDomain);
+    //domain.ifPresent(muleApplicationModelBuilder::setDomain);
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");
@@ -186,5 +183,10 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
       throw new MuleRuntimeException(e);
     }
     return applicationDescriptor;
+  }
+
+  @Override
+  public String getClassifier() {
+    return MULE_APPLICATION_CLASSIFIER;
   }
 }

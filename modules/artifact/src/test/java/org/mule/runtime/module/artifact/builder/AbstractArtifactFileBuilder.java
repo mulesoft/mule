@@ -8,8 +8,10 @@
 package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.io.File.separator;
 import static java.util.Optional.empty;
 import static org.apache.commons.io.FileUtils.write;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,8 +43,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     extends AbstractDependencyFileBuilder<T>
     implements TestArtifactDescriptor {
 
-  private final String fileName;
-  private final String id;
+  private final boolean upperCaseInExtension;
   private File artifactFile;
   protected List<ZipResource> resources = new LinkedList<>();
   protected boolean corrupted;
@@ -50,23 +51,22 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   /**
    * Creates a new builder
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    * @param upperCaseInExtension whether the extension is in uppercase
    */
-  public AbstractArtifactFileBuilder(String id, boolean upperCaseInExtension) {
-    super(id);
-    checkArgument(!isEmpty(id), "ID cannot be empty");
-    this.id = id;
-    this.fileName = upperCaseInExtension ? (id + getFileExtension().toUpperCase()) : (id + getFileExtension().toLowerCase());
+  public AbstractArtifactFileBuilder(String artifactId, boolean upperCaseInExtension) {
+    super(artifactId);
+    this.upperCaseInExtension = upperCaseInExtension;
+    checkArgument(!isEmpty(artifactId), "ID cannot be empty");
   }
 
   /**
    * Creates a new builder
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    */
-  public AbstractArtifactFileBuilder(String id) {
-    this(id, false);
+  public AbstractArtifactFileBuilder(String artifactId) {
+    this(artifactId, false);
   }
 
   /**
@@ -84,7 +84,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    * @param source instance used as template to build the new one. Non null.
    */
   public AbstractArtifactFileBuilder(T source) {
-    this(source.getId(), source);
+    this(source.getArtifactId(), source);
   }
 
   /**
@@ -156,28 +156,34 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
 
   @Override
   public String getId() {
-    return id;
+    return getBaseName(getArtifactFileName());
   }
 
   @Override
   public String getZipPath() {
-    return "/" + fileName;
+    if (artifactFile == null) {
+      throw new IllegalStateException("Must generate the artifact file before invoking this method");
+    }
+    return separator + artifactFile.getName();
   }
 
   @Override
   public String getDeployedPath() {
+    if (artifactFile == null) {
+      throw new IllegalStateException("Must generate the artifact file before invoking this method");
+    }
     if (corrupted) {
-      return fileName;
+      return artifactFile.getName();
     } else {
-      return id;
+      return getBaseName(artifactFile.getName());
     }
   }
 
   @Override
   public File getArtifactFile() {
     if (artifactFile == null) {
-      checkArgument(!isEmpty(fileName), "Filename cannot be empty");
 
+      String fileName = getArtifactFileName();
       final File tempFile = new File(getTempFolder(), fileName);
       tempFile.deleteOnExit();
 
@@ -194,6 +200,21 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     }
 
     return artifactFile;
+  }
+
+  private String getArtifactFileName() {
+    String fileName = getArtifactId();
+    String artifactNameSeparator = "-";
+    if (getVersion() != null) {
+      fileName = fileName + artifactNameSeparator + getVersion();
+    }
+
+    if (getClassifier() != null) {
+      fileName = fileName + artifactNameSeparator + getClassifier();
+    }
+
+    fileName = fileName + ((upperCaseInExtension) ? getFileExtension().toUpperCase() : getFileExtension().toLowerCase());
+    return fileName;
   }
 
   protected final void checkImmutable() {

@@ -83,7 +83,6 @@ public class BundleDependency {
     }
 
     public Builder setBundleUri(URI bundleUri) {
-      validateIsNotNull(bundleUri, "Bundle URI cannot be null");
       this.bundleDependency.bundleUri = bundleUri;
       return this;
     }

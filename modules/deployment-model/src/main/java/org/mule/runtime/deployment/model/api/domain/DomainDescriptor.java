@@ -19,6 +19,7 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_DOMAIN_NAME = "default";
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-domain-config.xml";
+  public static final String MULE_DOMAIN_CLASSIFIER = "mule-domain";
 
   /**
    * Creates a new domain descriptor

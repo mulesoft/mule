@@ -31,8 +31,8 @@ public class PolicyFileBuilder extends DeployableFileBuilder<PolicyFileBuilder> 
 
   private MulePolicyModel mulePolicyModel;
 
-  public PolicyFileBuilder(String id) {
-    super(id);
+  public PolicyFileBuilder(String artifactId) {
+    super(artifactId);
   }
 
   @Override

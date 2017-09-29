@@ -7,11 +7,12 @@
  */
 package org.mule.runtime.deployment.model.api.application;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.google.common.collect.ImmutableList;
 
@@ -19,19 +20,20 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String REPOSITORY_FOLDER = "repository";
-  public static final String PROPERTY_DOMAIN = "domain";
+  public static final String MULE_APPLICATION_CLASSIFIER = "mule-application";
 
   private String encoding;
-  private String domain = DEFAULT_DOMAIN_NAME;
   private Map<String, String> appProperties = new HashMap<String, String>();
   private File logConfigFile;
   private ArtifactDeclaration artifactDeclaration;
+  private Optional<BundleDescriptor> domainDescriptor;
 
   /**
    * Creates a new application descriptor
@@ -58,13 +60,26 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
     this.appProperties = appProperties;
   }
 
-  public String getDomain() {
-    return domain;
-  }
+  /**
+   * @return the optional descriptor of the domain on wich the application is deployed into
+   */
+  public Optional<BundleDescriptor> getDomainDescriptor() {
+    if (domainDescriptor == null) {
+      synchronized (this) {
+        if (domainDescriptor == null) {
+          Optional<BundleDependency> domain =
+              getClassLoaderModel().getDependencies().stream().filter(d -> d.getDescriptor().getClassifier().isPresent()
+                  ? d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER) : false).findFirst();
+          if (domain.isPresent()) {
+            domainDescriptor = ofNullable(domain.get().getDescriptor());
+          } else {
+            domainDescriptor = Optional.empty();
+          }
+        }
+      }
+    }
 
-  public void setDomain(String domain) {
-    checkArgument(!isEmpty(domain), "Domain name cannot be empty");
-    this.domain = domain;
+    return domainDescriptor;
   }
 
   public void setLogConfigFile(File logConfigFile) {

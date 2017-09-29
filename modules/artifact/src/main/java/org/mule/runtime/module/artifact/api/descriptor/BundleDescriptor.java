@@ -24,6 +24,7 @@ public class BundleDescriptor {
   private String version;
   private String type = "jar";
   private Optional<String> classifier = empty();
+  private String artifactFileName;
 
   private BundleDescriptor() {}
 
@@ -89,6 +90,31 @@ public class BundleDescriptor {
         ", type='" + type + '\'' +
         ", classifier=" + classifier +
         '}';
+  }
+
+  /**
+   * @return the file name that corresponds to the artifact described by this instance
+   */
+  public String getArtifactFileName() {
+    if (artifactFileName == null) {
+      synchronized (this) {
+        if (artifactFileName == null) {
+          String fileName = artifactId;
+
+          if (getVersion() != null) {
+            fileName = fileName + "-" + getVersion();
+          }
+
+          if (classifier.isPresent()) {
+            fileName = fileName + "-" + classifier.get();
+          }
+
+          artifactFileName = fileName;
+        }
+      }
+    }
+
+    return artifactFileName;
   }
 
   /**

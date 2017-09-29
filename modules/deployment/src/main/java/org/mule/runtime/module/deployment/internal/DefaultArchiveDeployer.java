@@ -141,7 +141,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployPackagedArtifact(URI artifactAchivedUri) throws DeploymentException {
-
     try {
       File artifactLocation = installArtifact(artifactAchivedUri);
 
@@ -178,7 +177,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   private void undeployArtifactIfItsAPatch(T artifact) {
     if (artifact.getDescriptor().getBundleDescriptor() == null) {
-      return;
+      throw new IllegalStateException("Artifact bundle descriptor is NULL");
     }
     Optional<T> foundMatchingArtifact = artifacts.stream()
         .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
