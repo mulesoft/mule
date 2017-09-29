@@ -17,7 +17,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.util.Iterator;
@@ -60,7 +59,6 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
 
   @Test
   public void pagedOperationException() throws Exception {
-    expectedException.expect(MessagingException.class);
     expectedException.expectCause(is(instanceOf(ConnectionException.class)));
 
     getCursor("failingPagedOperation").next();

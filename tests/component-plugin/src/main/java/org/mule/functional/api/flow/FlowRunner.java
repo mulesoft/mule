@@ -8,7 +8,6 @@ package org.mule.functional.api.flow;
 
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -17,7 +16,7 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
@@ -221,15 +220,15 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * Runs the specified flow with the provided event and configuration expecting a failure. Will fail if there's no failure
    * running the flow.
    *
-   * @return the message exception return by the flow
+   * @return the processing exception return by the flow
    * @throws Exception
    */
-  public MessagingException runExpectingException() throws Exception {
+  public EventProcessingException runExpectingException() throws Exception {
     try {
       runNoVerify();
       fail("Flow executed successfully. Expecting exception");
       return null;
-    } catch (MessagingException e) {
+    } catch (EventProcessingException e) {
       verify(getFlowConstructName());
       return e;
     }

@@ -9,7 +9,6 @@ package org.mule.test.module.extension.connector;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Rule;
@@ -35,28 +34,24 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
 
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperation() throws Exception {
-    exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(ConnectionException.class)));
     runFlow("fail-operation-with-connection-exception");
   }
 
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTime() throws Exception {
-    exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(ConnectionException.class)));
     runFlow("fail-connection-validation");
   }
 
   @Test
   public void retryPolicyNotExecutedDueToNotConnectionExceptionWithException() throws Exception {
-    exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(Throwable.class)));
     runFlow("fail-operation-with-not-handled-exception");
   }
 
   @Test
   public void retryPolicyNotExecutedDueToNotConnectionExceptionWithThrowable() throws Throwable {
-    exception.expect(MessagingException.class);
     exception.expectCause(is(instanceOf(Throwable.class)));
     runFlow("fail-operation-with-not-handled-throwable");
   }

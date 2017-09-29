@@ -37,7 +37,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -251,7 +250,6 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
-    expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
     runFlow("knockWithNullDoor");
   }
