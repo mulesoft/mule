@@ -19,6 +19,7 @@ import java.util.Optional;
  */
 public class BundleDescriptor {
 
+  private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
   private String artifactId;
   private String version;
@@ -102,11 +103,11 @@ public class BundleDescriptor {
           String fileName = artifactId;
 
           if (getVersion() != null) {
-            fileName = fileName + "-" + getVersion();
+            fileName = fileName + STRINGARTIFACT_FILENAME_SEPARATOR + getVersion();
           }
 
           if (classifier.isPresent()) {
-            fileName = fileName + "-" + classifier.get();
+            fileName = fileName + STRINGARTIFACT_FILENAME_SEPARATOR + classifier.get();
           }
 
           artifactFileName = fileName;

@@ -163,7 +163,6 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
         .setName(getArtifactId())
         .setMinMuleVersion("4.0.0")
         .setRequiredProduct(MULE);
-    //domain.ifPresent(muleApplicationModelBuilder::setDomain);
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");
