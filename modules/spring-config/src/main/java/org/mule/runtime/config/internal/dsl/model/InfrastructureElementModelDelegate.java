@@ -32,12 +32,13 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_I
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import com.google.common.collect.ImmutableSet;
@@ -153,8 +154,8 @@ class InfrastructureElementModelDelegate {
 
               @Override
               public void visitObjectValue(ParameterObjectValue objectValue) {
-                if (!(TLS_KEY_STORE_ELEMENT_IDENTIFIER.equals(name) || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name))){
-                  if (LOGGER.isDebugEnabled()){
+                if (!(TLS_KEY_STORE_ELEMENT_IDENTIFIER.equals(name) || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name))) {
+                  if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug(format("Skipping unknown parameter with name [%s] for TLSContext", name));
                   }
                   return;
