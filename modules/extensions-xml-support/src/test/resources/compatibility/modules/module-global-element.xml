@@ -20,9 +20,9 @@
     <property name="protocolConfig" type="string" defaultValue="HTTP"/>
 
     <http:request-config name="simple-config" basePath="/basic-auth/">
-        <http:request-connection host="localhost" protocol="#[vars.protocolConfig]" port="#[vars.port]">
+        <http:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
             <http:authentication>
-                <http:basic-authentication username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
+                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
             </http:authentication>
         </http:request-connection>
     </http:request-config>
@@ -35,10 +35,10 @@
         <body>
             <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <http:uri-params>
-                    #[{"aUser" : vars.someUser, "aPass" : vars.somePass}]
+                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
                 </http:uri-params>
             </http:request>
-            <mule:set-payload value="#['success with basic-authentication for user: ' ++ vars.someUser]"/>
+            <mule:set-payload value="#['success with basic-authentication for user: ' ++ parameters.someUser]"/>
         </body>
         <output type="string"/>
     </operation>

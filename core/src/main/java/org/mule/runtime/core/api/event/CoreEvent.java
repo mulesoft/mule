@@ -143,64 +143,6 @@ public interface CoreEvent extends Serializable, Event {
     Builder removeVariable(String key);
 
     /**
-     * Set a map of properties to be consumed within a
-     * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
-     * <p>
-     * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these properties will be
-     * feed to it in a new and isolated {@link CoreEvent}, so that we can guarantee that for each invocation there's a real variable
-     * scoping for them.
-     *
-     * @param properties properties to be set.
-     * @return the builder instance
-     * @see #parameters(Map)
-     */
-    Builder properties(Map<String, ?> properties);
-
-    /**
-     * Set a map of parameters to be consumed within a
-     * {@link ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain}.
-     * <p>
-     * For every module's <operation/> being consumed in a Mule Application, when being macro expanded, these parameters will be
-     * feed to it in a new and isolated {@link CoreEvent}, so that we can guarantee that for each invocation there's a real variable
-     * scoping for them.
-     *
-     * @param parameters parameters to be set.
-     * @return the builder instance
-     * @see #properties(Map)
-     */
-    Builder parameters(Map<String, ?> parameters);
-
-    /**
-     * Add a parameter.
-     *
-     * @param key the key of the parameter to add.
-     * @param value the value of the variable to add. {@code null} values are supported.
-     * @return the builder instance.
-     */
-    Builder addParameter(String key, Object value);
-
-    /**
-     * Add a parameter.
-     *
-     * @param key the key of the parameter to add.
-     * @param value the value of the parameter to add. {@code null} values are supported.
-     * @param dataType additional metadata about the {@code value} type.
-     * @return the builder instance
-     */
-    Builder addParameter(String key, Object value, DataType dataType);
-
-    /**
-     * Remove a parameter.
-     * <p>
-     *
-     * @see #parameters(Map)
-     *
-     * @param key the parameter key.
-     * @return the builder instance
-     */
-    Builder removeParameter(String key);
-
-    /**
      * Sets the group correlation information to the produced event.
      *
      * @param groupCorrelation the object containing the group correlation information to set on the produced event

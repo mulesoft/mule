@@ -24,28 +24,28 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[vars.value ++ ' from module']"/>
+            <mule:set-payload value="#[parameters.value ++ ' from module']"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-config-param-value">
         <body>
-            <mule:set-payload value="#[vars.configParam]"/>
+            <mule:set-payload value="#[properties.configParam]"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-config-default-param-value">
         <body>
-            <mule:set-payload value="#[vars.defaultConfigParam]"/>
+            <mule:set-payload value="#[properties.defaultConfigParam]"/>
         </body>
         <output type="string"/>
     </operation>
 
     <operation name="set-payload-config-default-property-use-optional">
         <body>
-            <mule:set-payload value="#[vars.defaultConfigPropertyUseOptional]"/>
+            <mule:set-payload value="#[properties.defaultConfigPropertyUseOptional]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -55,7 +55,7 @@
             <parameter name="value1" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[vars.value1 ++ ' ' ++ vars.configParam]"/>
+            <mule:set-payload value="#[parameters.value1 ++ ' ' ++ properties.configParam]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -64,7 +64,7 @@
         <body>
             <mule:set-payload value="a value"/>
             <!-- will override payload with the null 'optionalProperty' parameter-->
-            <mule:set-payload value="#[vars.optionalProperty]"/>
+            <mule:set-payload value="#[properties.optionalProperty]"/>
         </body>
         <output type="string"/>
     </operation>

@@ -17,9 +17,9 @@
     <property name="filenamePattern" type="string"/>
 
     <file:config name="file">
-        <file:connection workingDir="#[properties.workingDir]"/>
+        <file:connection workingDir="#[vars.workingDir]"/>
     </file:config>
-    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[vars.filenamePattern]" />
 
     <operation name="list">
         <parameters>
@@ -27,7 +27,7 @@
         </parameters>
         <body>
             <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
-            <tns:internal-list myPath="#[parameters.path]" />
+            <tns:internal-list myPath="#[vars.path]" />
         </body>
         <output type="string"/>
     </operation>
@@ -43,7 +43,7 @@
             <parameter name="myPath" type="string"/>
         </parameters>
         <body>
-            <file:list directoryPath="#[parameters.myPath]" config-ref="file" matcher="globalMatcher"/>
+            <file:list directoryPath="#[vars.myPath]" config-ref="file" matcher="globalMatcher"/>
         </body>
         <output type="string"/>
     </operation>

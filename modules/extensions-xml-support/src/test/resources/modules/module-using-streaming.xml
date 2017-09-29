@@ -18,9 +18,9 @@
     <property name="protocolConfig" type="string" defaultValue="HTTP"/>
 
     <http:request-config name="simple-config" basePath="/basic-auth/">
-        <http:request-connection host="localhost" protocol="#[properties.protocolConfig]" port="#[properties.port]">
+        <http:request-connection host="localhost" protocol="#[vars.protocolConfig]" port="#[vars.port]">
             <http:authentication>
-                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+                <http:basic-authentication username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
             </http:authentication>
         </http:request-connection>
     </http:request-config>
@@ -33,7 +33,7 @@
         <body>
             <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <http:uri-params>
-                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                    #[{"aUser" : vars.someUser, "aPass" : vars.somePass}]
                 </http:uri-params>
             </http:request>
             <mule:object-to-string-transformer />
@@ -49,7 +49,7 @@
         <body>
             <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <http:uri-params>
-                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                    #[{"aUser" : vars.someUser, "aPass" : vars.somePass}]
                 </http:uri-params>
             </http:request>
         </body>
@@ -64,7 +64,7 @@
         <body>
             <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <http:uri-params>
-                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                    #[{"aUser" : vars.someUser, "aPass" : vars.somePass}]
                 </http:uri-params>
             </http:request>
             <mule:set-payload value="#[payload.response]" />
@@ -81,7 +81,7 @@
         <body>
             <http:request config-ref="simple-config" method="GET" path="/{aUser}/{aPass}">
                 <http:uri-params>
-                    #[{"aUser" : parameters.someUser, "aPass" : parameters.somePass}]
+                    #[{"aUser" : vars.someUser, "aPass" : vars.somePass}]
                 </http:uri-params>
             </http:request>
             <mule:set-payload value="#[payload.response]" />
@@ -95,7 +95,7 @@
             <parameter name="somePass" type="string" defaultValue="passwordX"/>
         </parameters>
         <body>
-            <tns:do-login-and-plain-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+            <tns:do-login-and-plain-entire-stream-response someUser="#[vars.someUser]" somePass="#[vars.somePass]" />
         </body>
         <output type="string"/>
     </operation>
@@ -112,7 +112,7 @@
                     <mule:choice>
                         <mule:when expression="#[true]">
                             <mule:try>
-                                <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                                <tns:do-login-and-leave-entire-stream-response someUser="#[vars.someUser]" somePass="#[vars.somePass]" />
                             </mule:try>
                         </mule:when>
                     </mule:choice>
@@ -120,14 +120,14 @@
                 </mule:route>
                 <mule:route>
                     <mule:set-variable variableName="collected" value="" />
-                    <mule:foreach collection="#[(1 to parameters.amount) as Array]">
-                        <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                    <mule:foreach collection="#[(1 to vars.amount) as Array]">
+                        <tns:do-login-and-leave-entire-stream-response someUser="#[vars.someUser]" somePass="#[vars.somePass]" />
                         <mule:set-variable variableName="collected" value="#[output application/java --- 'index ' ++ vars.counter ++ ':[' ++  payload.response ++ '] ' ++ vars.collected]" />
                     </mule:foreach>
                     <mule:set-payload value="#[vars.collected]"/>
                 </mule:route>
                 <mule:route>
-                    <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUser]" somePass="#[parameters.somePass]" />
+                    <tns:do-login-and-leave-entire-stream-response someUser="#[vars.someUser]" somePass="#[vars.somePass]" />
                 </mule:route>
             </mule:scatter-gather>
 
@@ -149,7 +149,7 @@
                 <mule:set-payload value="it should have never reached here" />
                 <mule:error-handler>
                     <mule:on-error-continue >
-                        <tns:do-login-and-leave-entire-stream-response someUser="#[parameters.someUserParent]" somePass="#[parameters.somePassParent]" />
+                        <tns:do-login-and-leave-entire-stream-response someUser="#[vars.someUserParent]" somePass="#[vars.somePassParent]" />
                         <mule:object-to-string-transformer />
                     </mule:on-error-continue>
                 </mule:error-handler>

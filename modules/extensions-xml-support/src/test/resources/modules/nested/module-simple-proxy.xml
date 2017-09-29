@@ -19,7 +19,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <simple-prefix:set-payload-param-value value="#[parameters.value]"/>
+            <simple-prefix:set-payload-param-value value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -62,7 +62,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <simple-prefix:set-payload-param-value-appender value="#[parameters.value]"/>
+            <simple-prefix:set-payload-param-value-appender value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -73,7 +73,7 @@
             <parameter name="value2" type="string"/>
         </parameters>
         <body>
-            <simple-prefix:set-payload-concat-params-values value1="#[parameters.value1]" value2="#[parameters.value2]"/>
+            <simple-prefix:set-payload-concat-params-values value1="#[vars.value1]" value2="#[vars.value2]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -100,7 +100,7 @@
             <parameter name="value" type="string"/>
         </parameters>
         <body>
-            <simple-prefix:set-payload-using-param-value-more-than-once value="#[parameters.value]"/>
+            <simple-prefix:set-payload-using-param-value-more-than-once value="#[vars.value]"/>
         </body>
         <output type="string"/>
     </operation>

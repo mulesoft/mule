@@ -17,7 +17,6 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,14 +28,11 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -47,7 +43,6 @@ import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +61,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private BaseEventContext context;
   private Message message;
   private Map<String, TypedValue<?>> flowVariables = new HashMap<>();
-  private Map<String, TypedValue<?>> moduleProperties = new HashMap<>();
-  private Map<String, TypedValue<?>> moduleParameters = new HashMap<>();
   private Map<String, Object> internalParameters = new HashMap<>();
   private Error error;
   private Optional<GroupCorrelation> groupCorrelation = empty();
@@ -100,8 +93,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.flowVariables.putAll(event.getVariables());
-    this.moduleProperties.putAll(event.getProperties());
-    this.moduleParameters.putAll(event.getParameters());
     this.internalParameters.putAll(event.getInternalParameters());
   }
 
@@ -147,33 +138,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
-  public DefaultEventBuilder properties(Map<String, ?> properties) {
-    copyFromTo(properties, this.moduleProperties);
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder parameters(Map<String, ?> parameters) {
-    copyFromTo(parameters, this.moduleParameters);
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder addParameter(String key, Object value) {
-    moduleParameters.put(key, new TypedValue<>(value, DataType.fromObject(value)));
-    this.modified = true;
-    return this;
-
-  }
-
-  @Override
-  public DefaultEventBuilder addParameter(String key, Object value, DataType dataType) {
-    moduleParameters.put(key, new TypedValue<>(value, dataType));
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public DefaultEventBuilder internalParameters(Map<String, ?> internalParameters) {
     this.internalParameters.clear();
     this.internalParameters.putAll(internalParameters);
@@ -191,12 +155,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   @Override
   public DefaultEventBuilder removeInternalParameter(String key) {
     this.modified = internalParameters.remove(key) != null || modified;
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder removeParameter(String key) {
-    this.modified = moduleParameters.remove(key) != null || modified;
     return this;
   }
 
@@ -264,7 +222,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     } else {
       requireNonNull(message);
 
-      return new InternalEventImplementation(context, message, flowVariables, moduleProperties, moduleParameters,
+      return new InternalEventImplementation(context, message, flowVariables,
                                              internalParameters, session, securityContext, replyToDestination,
                                              replyToHandler, flowCallStack, groupCorrelation, error, legacyCorrelationId,
                                              notificationsEnabled);
@@ -306,8 +264,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CopyOnWriteCaseInsensitiveMap<String, TypedValue<?>> variables = new CopyOnWriteCaseInsensitiveMap<>();
-    private final Map<String, TypedValue<?>> properties;
-    private final Map<String, TypedValue<?>> parameters;
     private final Map<String, ?> internalParameters;
 
     private FlowCallStack flowCallStack = new DefaultFlowCallStack();
@@ -316,7 +272,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     // Use this constructor from the builder
     private InternalEventImplementation(BaseEventContext context, Message message, Map<String, TypedValue<?>> variables,
-                                        Map<String, TypedValue<?>> properties, Map<String, TypedValue<?>> parameters,
                                         Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
                                         Object replyToDestination, ReplyToHandler replyToHandler, FlowCallStack flowCallStack,
                                         Optional<GroupCorrelation> groupCorrelation, Error error,
@@ -326,8 +281,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.securityContext = securityContext;
       this.message = message;
       variables.forEach((s, value) -> this.variables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
-      this.properties = properties;
-      this.parameters = parameters;
       this.internalParameters = internalParameters;
 
       this.replyToHandler = replyToHandler;
@@ -491,18 +444,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public Map<String, TypedValue<?>> getProperties() {
-      return unmodifiableMap(properties);
-    }
-
-    @Override
     public Map<String, TypedValue<?>> getVariables() {
       return unmodifiableMap(variables);
-    }
-
-    @Override
-    public Map<String, TypedValue<?>> getParameters() {
-      return unmodifiableMap(parameters);
     }
 
     @Override

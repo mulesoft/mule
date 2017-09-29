@@ -10,7 +10,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMappings;
@@ -262,17 +261,36 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private CoreEvent createEventWithParameters(CoreEvent event) {
       CoreEvent.Builder builder = CoreEvent.builder(event.getContext());
       builder.message(builder().nullValue().build());
-      builder.parameters(evaluateParameters(event, parameters));
-      builder.properties(evaluateParameters(event, properties));
+      addVariables(event, builder, properties);
+      addVariables(event, builder, parameters);
+      //      builder.variables(evaluateParameters(event, parameters));
+      //      builder.variables(evaluateParameters(event, properties));
       return builder.build();
     }
 
-    private Map<String, Object> evaluateParameters(CoreEvent event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
-      return unevaluatedMap.entrySet().stream()
-          .collect(toMap(Map.Entry::getKey,
-                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
-                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
-                             : entry.getValue().getFirst()));
+    //    private Map<String, Object> evaluateParameters(CoreEvent event, Map<String, Pair<String, MetadataType>> unevaluatedMap) {
+    //      return unevaluatedMap.entrySet().stream()
+    //          .collect(toMap(Map.Entry::getKey,
+    //                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
+    //                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
+    //                             : entry.getValue().getFirst()));
+    //    }
+
+    private void addVariables(CoreEvent event, CoreEvent.Builder builder,
+                              Map<String, Pair<String, MetadataType>> unevaluatedMap) {
+      unevaluatedMap.entrySet().stream()
+          .forEach(entry -> {
+            final Object value = expressionManager.isExpression(entry.getValue().getFirst())
+                ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
+                : entry.getValue().getFirst();
+
+            builder.addVariable(entry.getKey(), value);
+
+          });
+      //          .collect(toMap(Map.Entry::getKey,
+      //                         entry -> expressionManager.isExpression(entry.getValue().getFirst())
+      //                             ? getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond())
+      //                             : entry.getValue().getFirst()));
     }
 
     private Object getEvaluatedValue(CoreEvent event, String value, MetadataType metadataType) {

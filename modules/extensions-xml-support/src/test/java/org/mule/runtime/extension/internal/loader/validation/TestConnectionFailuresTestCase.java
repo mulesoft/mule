@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -68,7 +67,7 @@ public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
 
   @Test
   public void multipleGlobalElementsWithTestConnectionAndNotEvenOneDefinedHttpAndFile() {
-    setExpectedMessage("http-global-element", "file-global-element");
+    setExpectedMessage("file-global-element", "http-global-element");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection-http-file.xml",
                           new HashSet<>(Arrays.asList(getHttpExtension(), getFileExtension())));
   }

@@ -17,7 +17,7 @@
             <parameter name="aParameter" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="string" doc:description="Documentation for the output [op-declares-output]"/>
     </operation>
@@ -27,7 +27,7 @@
             <parameter name="aParameter" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output-attributes type="number" doc:description="Documentation for the output-attribute [op-declares-attributes]"/>
     </operation>
@@ -37,7 +37,7 @@
             <parameter name="aParameter" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="any" doc:description="Documentation for the output [op-declares-output-and-attributes]"/>
         <output-attributes type="boolean" doc:description="Documentation for the output-attribute [op-declares-output-and-attributes]"/>
@@ -48,7 +48,7 @@
             <parameter name="aParameter" type="string"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
     </operation>
 </module>

@@ -9,14 +9,12 @@ package org.mule.runtime.core.internal.message;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
+import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -156,21 +154,6 @@ public interface InternalEvent extends PrivilegedEvent {
 
     @Override
     Builder removeVariable(String key);
-
-    @Override
-    Builder properties(Map<String, ?> properties);
-
-    @Override
-    Builder parameters(Map<String, ?> parameters);
-
-    @Override
-    Builder addParameter(String key, Object value);
-
-    @Override
-    Builder addParameter(String key, Object value, DataType dataType);
-
-    @Override
-    Builder removeParameter(String key);
 
     @Override
     Builder groupCorrelation(Optional<GroupCorrelation> groupCorrelation);

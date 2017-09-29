@@ -11,16 +11,16 @@
     <property name="filenamePattern" type="string"/>
 
     <file:config name="file">
-        <file:connection workingDir="#[properties.workingDir]"/>
+        <file:connection workingDir="#[vars.workingDir]"/>
     </file:config>
-    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[vars.filenamePattern]" />
 
     <operation name="list">
         <parameters>
             <parameter name="path" type="string"/>
         </parameters>
         <body>
-            <file:list directoryPath="#[parameters.path]" config-ref="file" matcher="globalMatcher"/>
+            <file:list directoryPath="#[vars.path]" config-ref="file" matcher="globalMatcher"/>
         </body>
         <output type="string"/>
     </operation>

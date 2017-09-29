@@ -13,7 +13,7 @@
             <parameter name="description" type="string" defaultValue="A bad error occurred."/>
         </parameters>
         <body>
-            <mule:raise-error type="#[parameters.errorToRaise]" description="#[parameters.description]"/>
+            <mule:raise-error type="#[vars.errorToRaise]" description="#[vars.description]"/>
         </body>
         <output type="string"/>
     </operation>
@@ -24,7 +24,7 @@
         </parameters>
         <body>
             <mule:choice>
-                <mule:when expression="#[parameters.custom]">
+                <mule:when expression="#[vars.custom]">
                     <mule:raise-error type="SC:SMART_CONNECTOR_CUSTOM" description="A custom error occurred."/>
                 </mule:when>
                 <mule:otherwise>

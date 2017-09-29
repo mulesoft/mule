@@ -56,8 +56,6 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
     CoreEvent event = builder.message(inputEvent.getMessage())
         .error(inputEvent.getError().orElse(null))
         .variables(inputEvent.getVariables())
-        .parameters(inputEvent.getParameters())
-        .properties(inputEvent.getProperties())
         .build();
     return from(MessageProcessors.process(event, getExecutableFunction()))
         .onErrorMap(throwable -> {
@@ -81,8 +79,6 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
-          .parameters(event.getParameters())
-          .properties(event.getProperties())
           .build();
     }
     return from(MessageProcessors.process(internalEvent, getExecutableFunction()))

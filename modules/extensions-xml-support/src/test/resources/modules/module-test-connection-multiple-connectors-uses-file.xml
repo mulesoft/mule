@@ -16,15 +16,15 @@
     <http:request-config name="http-config" basePath="/basic-auth/">
         <http:request-connection host="localhost" protocol="HTTP" port="80">
             <http:authentication>
-                <http:basic-authentication username="#[properties.someUserConfig]" password="#[properties.somePassConfig]"/>
+                <http:basic-authentication username="#[vars.someUserConfig]" password="#[vars.somePassConfig]"/>
             </http:authentication>
         </http:request-connection>
     </http:request-config>
 
     <!--Notice the following global element does have the xmlns:connection -->
     <file:config name="file-config" xmlns:connection="true">
-        <file:connection workingDir="#[properties.workingDir]"/>
+        <file:connection workingDir="#[vars.workingDir]"/>
     </file:config>
-    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[properties.filenamePattern]" />
+    <file:matcher name="globalMatcher" directories="REQUIRE" filenamePattern="#[vars.filenamePattern]" />
 
 </module>

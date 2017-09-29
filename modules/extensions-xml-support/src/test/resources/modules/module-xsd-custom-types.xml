@@ -14,7 +14,7 @@
             <parameter name="value2" type="XsdType3::Root"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.value]"/>
+            <mule:set-payload value="#[vars.value]"/>
         </body>
         <output type="XsdType2::{http://uri}Root0"/>
     </operation>
@@ -24,7 +24,7 @@
             <parameter name="aParameter" type="XsdType1::{http://validationnamespace.raml.org}User"/>
         </parameters>
         <body>
-            <mule:set-payload value="#[parameters.aParameter as String]"/>
+            <mule:set-payload value="#[vars.aParameter as String]"/>
         </body>
         <output type="string"/>
     </operation>

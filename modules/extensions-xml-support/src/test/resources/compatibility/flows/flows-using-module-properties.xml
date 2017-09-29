@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:module-properties="http://www.mulesoft.org/schema/mule/module-properties"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/module-properties http://www.mulesoft.org/schema/mule/module-properties/current/mule-module-properties.xsd">
+
+    <module-properties:config name="instantiatedConfig"  configParam="some config-value-parameter" />
+
+    <flow name="testSetPayloadHardcodedFromModuleFlow">
+        <module-properties:set-payload-hardcoded-value config-ref="instantiatedConfig" />
+    </flow>
+
+    <flow name="testSetPayloadParamFromModuleFlow">
+        <module-properties:set-payload-param-value config-ref="instantiatedConfig" value="new payload"/>
+    </flow>
+
+    <flow name="testSetPayloadConfigParamFlow">
+        <module-properties:set-payload-config-param-value config-ref="instantiatedConfig" />
+    </flow>
+
+    <flow name="testSetPayloadConfigDefaultParamFlow">
+        <module-properties:set-payload-config-default-param-value config-ref="instantiatedConfig" />
+    </flow>
+
+    <flow name="testSetPayloadConfigDefaultPropertyUseOptionalFlow">
+        <module-properties:set-payload-config-default-property-use-optional config-ref="instantiatedConfig" />
+    </flow>
+
+    <flow name="testSetPayloadAddParamAndPropertyValues">
+        <module-properties:set-payload-add-param-and-property-values config-ref="instantiatedConfig" value1="a parameter value"/>
+    </flow>
+
+    <flow name="testSetPayloadConfigOptionalProperty">
+        <module-properties:set-payload-config-optional-property config-ref="instantiatedConfig"/>
+    </flow>
+</mule>
