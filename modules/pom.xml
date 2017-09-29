@@ -28,6 +28,7 @@
         <module>extensions-xml-support</module>
         <module>global-config</module>
         <module>launcher</module>
+        <module>license-api</module>
         <module>logging</module>
         <module>http-api</module>
         <module>http-policy-api</module>

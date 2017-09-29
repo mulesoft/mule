@@ -222,6 +222,20 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="requiredEntitlement" type="xsd:string" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The required entitlement in the customer module license.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="allowsEvaluationLicense" type="xsd:boolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If the module can be run with an evaluation license.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <!-- DSL XML attributes -->
                 <xsd:attribute name="namespace" use="optional">
                     <xsd:annotation>

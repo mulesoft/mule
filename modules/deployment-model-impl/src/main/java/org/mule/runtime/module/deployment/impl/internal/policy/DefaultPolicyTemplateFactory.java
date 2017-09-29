@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -24,6 +25,7 @@ import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResol
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
+import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
+  private final LicenseValidator licenseValidator;
 
   /**
    * Creates a new factory
@@ -47,11 +50,13 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
    *        policy templates. Non null.
    */
   public DefaultPolicyTemplateFactory(PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
-                                      PluginDependenciesResolver pluginDependenciesResolver) {
+                                      PluginDependenciesResolver pluginDependenciesResolver,
+                                      LicenseValidator licenseValidator) {
     checkArgument(policyTemplateClassLoaderBuilderFactory != null, "policyTemplateClassLoaderBuilderFactory cannot be null");
 
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
+    this.licenseValidator = licenseValidator;
   }
 
   @Override
@@ -74,6 +79,8 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     application.getRegionClassLoader().addClassLoader(policyClassLoader, NULL_CLASSLOADER_FILTER);
 
     List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(policyClassLoader, artifactPluginDescriptors);
+
+    validateArtifactLicense(policyClassLoader.getClassLoader(), artifactPlugins, licenseValidator);
 
     DefaultPolicyTemplate policy =
         new DefaultPolicyTemplate(policyClassLoader.getArtifactId(), descriptor, policyClassLoader, artifactPlugins);

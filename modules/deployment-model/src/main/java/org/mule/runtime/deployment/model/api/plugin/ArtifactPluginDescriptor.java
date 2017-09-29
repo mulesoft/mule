@@ -8,8 +8,11 @@ package org.mule.runtime.deployment.model.api.plugin;
 
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import org.mule.runtime.api.deployment.meta.LicenseModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   public static final String MULE_PLUGIN_POM = "pom.xml";
 
   private Optional<LoaderDescriber> extensionModelDescriptorProperty = empty();
+  private Optional<LicenseModel> licenseModel = empty();
 
   /**
    * Creates a new artifact plugin descriptor
@@ -54,5 +58,20 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
    */
   public void setExtensionModelDescriptorProperty(LoaderDescriber extensionModelLoaderDescriber) {
     this.extensionModelDescriptorProperty = ofNullable(extensionModelLoaderDescriber);
+  }
+
+  /**
+   * @return the license requirements for this plugin. Empty if there are not license requirements.
+   */
+  public Optional<LicenseModel> getLicenseModel() {
+    return licenseModel;
+  }
+
+  /**
+   * @param licenseModel the license requirements for this plugin.
+   */
+  public void setLicenseModel(LicenseModel licenseModel) {
+    Preconditions.checkNotNull(licenseModel, "licenseModel cannot be null");
+    this.licenseModel = of(licenseModel);
   }
 }

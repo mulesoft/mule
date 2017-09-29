@@ -27,6 +27,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
@@ -35,6 +36,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInst
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
 
@@ -49,7 +51,8 @@ import java.util.Set;
 /**
  * Creates default mule applications
  */
-public class DefaultApplicationFactory implements ArtifactFactory<Application> {
+public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory<Application>
+    implements ArtifactFactory<Application> {
 
   private final ApplicationDescriptorFactory applicationDescriptorFactory;
   private final DomainRepository domainRepository;
@@ -60,6 +63,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
+  private final LicenseValidator licenseValidator;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    ApplicationDescriptorFactory applicationDescriptorFactory,
@@ -69,7 +73,9 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
                                    ClassLoaderRepository classLoaderRepository,
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
-                                   ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader) {
+                                   ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
+                                   LicenseValidator licenseValidator) {
+    super(licenseValidator);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -89,16 +95,17 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.artifactPluginDescriptorLoader = artifactPluginDescriptorLoader;
+    this.licenseValidator = licenseValidator;
   }
 
   @Override
-  public Application createArtifact(File appDir) throws IOException {
-    String appName = appDir.getName();
+  protected Application doCreateArtifact(File artifactDir) throws IOException {
+    String appName = artifactDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appDir);
+    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir);
 
     return createArtifact(descriptor);
   }
@@ -136,7 +143,8 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     MuleApplicationPolicyProvider applicationPolicyProvider =
         new MuleApplicationPolicyProvider(
                                           new DefaultPolicyTemplateFactory(policyTemplateClassLoaderBuilderFactory,
-                                                                           pluginDependenciesResolver),
+                                                                           pluginDependenciesResolver,
+                                                                           licenseValidator),
                                           new DefaultPolicyInstanceProviderFactory(
                                                                                    serviceRepository,
                                                                                    classLoaderRepository,
