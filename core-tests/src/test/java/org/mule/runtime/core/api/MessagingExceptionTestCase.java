@@ -33,6 +33,7 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -83,7 +84,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   private FlowConstruct flowConstruct;
 
   @Mock
-  private DefaultTransformationService transformationService;
+  private TransformationService transformationService;
 
   @Mock
   private ComponentLocation mockComponentLocation;
@@ -343,7 +344,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
     Message muleMessage = of(payload);
 
-    when(transformationService.internalTransform(muleMessage, DataType.STRING)).thenReturn(of(value));
+    when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(of(value));
     when(testEvent.getMessage()).thenReturn(muleMessage);
     MessagingException e = new MessagingException(createStaticMessage(message), testEvent);
 
@@ -363,7 +364,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
     assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), containsString(ByteArrayInputStream.class.getName() + "@"));
 
-    verify(transformationService, never()).internalTransform(muleMessage, DataType.STRING);
+    verify(transformationService, never()).transform(muleMessage, DataType.STRING);
   }
 
   @Test
@@ -377,7 +378,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
     Message muleMessage = of(payload);
 
-    when(transformationService.internalTransform(muleMessage, DataType.STRING))
+    when(transformationService.transform(muleMessage, DataType.STRING))
         .thenThrow(new TransformerException(createStaticMessage("exception thrown")));
     when(testEvent.getMessage()).thenReturn(muleMessage);
     MessagingException e = new MessagingException(createStaticMessage(message), testEvent);
@@ -399,7 +400,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), nullValue());
 
     verify(muleMessage, never()).getPayload();
-    verify(transformationService, never()).internalTransform(muleMessage, DataType.STRING);
+    verify(transformationService, never()).transform(muleMessage, DataType.STRING);
   }
 
   private static final class FailAnswer implements Answer<String> {

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -25,7 +25,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   private final MetadataType metadataType;
 
   @Inject
-  private DefaultTransformationService transformationService;
+  private TransformationService transformationService;
 
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
@@ -55,7 +55,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
     return true;
   }
 
-  public void setTransformationService(DefaultTransformationService transformationService) {
+  public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
   }
 

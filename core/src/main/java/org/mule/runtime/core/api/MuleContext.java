@@ -17,6 +17,7 @@ import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreManager;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -276,20 +277,20 @@ public interface MuleContext extends Lifecycle {
   Collection<ExceptionContextProvider> getExceptionContextProviders();
 
   /**
-   * Gets application wide instance of {@link DefaultTransformationService} used for applying
+   * Gets application wide instance of an implementation of {@link TransformationService} used for applying
    * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link Message} and for obtaining different representations
    * of the message payload.
    *
    * @return transformation service
    */
-  DefaultTransformationService getTransformationService();
+  TransformationService getTransformationService();
 
   /**
-   * Sets application wide instance of {@link DefaultTransformationService}
+   * Sets application wide instance of an implementation of {@link TransformationService}
    *
    * @param transformationService transformation service instance
    */
-  void setTransformationService(DefaultTransformationService transformationService);
+  void setTransformationService(TransformationService transformationService);
 
   /**
    * @return {@link BootstrapServiceDiscoverer} used to bootstrap this {@link MuleContext}

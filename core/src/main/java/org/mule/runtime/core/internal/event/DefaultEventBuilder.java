@@ -382,7 +382,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
         throw new MessageTransformerException(objectIsNull("outputType"), null, message);
       }
 
-      Message transformedMessage = muleContext.getTransformationService().internalTransform(message, outputType);
+      Message transformedMessage = muleContext.getTransformationService().transform(message, outputType);
       if (message.getPayload().getDataType().isStreamType()) {
         setMessage(transformedMessage);
       }
@@ -407,7 +407,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
       try {
         Message transformedMessage = muleContext.getTransformationService()
-            .internalTransform(message, DataType.builder().type(String.class).charset(encoding).build());
+            .transform(message, DataType.builder().type(String.class).charset(encoding).build());
         if (message.getPayload().getDataType().isStreamType()) {
           setMessage(transformedMessage);
         }

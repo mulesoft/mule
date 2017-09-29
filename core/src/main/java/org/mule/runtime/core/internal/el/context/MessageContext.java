@@ -86,7 +86,7 @@ public class MessageContext {
    * @throws MessageTransformerException if there is an error during transformation
    */
   public Object payloadAs(DataType dataType) throws MessageTransformerException {
-    eventBuilder.message(muleContext.getTransformationService().internalTransform(event.getMessage(), dataType));
+    eventBuilder.message(muleContext.getTransformationService().transform(event.getMessage(), dataType));
     event = eventBuilder.build();
     return event.getMessage().getPayload().getValue();
   }
