@@ -62,6 +62,7 @@ public class ArtifactFactoryUtils {
               .withPluginName(pluginName)
               .withPluginProvider(providerName)
               .withPluginVersion(artifactPlugin.getDescriptor().getBundleDescriptor().getVersion())
+              .withAllowsEvaluation(licenseModel.isAllowsEvaluation())
               .withArtifactClassLoader(artifactClassLoader)
               .withPluginClassLoader(artifactPlugin.getArtifactClassLoader().getClassLoader())
               .build());

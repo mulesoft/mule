@@ -9,6 +9,7 @@ package org.mule.runtime.module.license.api;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Rule;
@@ -23,7 +24,7 @@ public class LicenseValidationProviderTestCase extends AbstractMuleTestCase {
   @Test
   public void anyPluginValidationFails() {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    LicenseValidator licenseValidator = LicenseValidatorProvider.discoverLicenseValidator(classLoader);
+    LicenseValidator licenseValidator = discoverLicenseValidator(classLoader);
     assertThat(licenseValidator, notNullValue());
     expectedException.expect(IllegalStateException.class);
     expectedException.expectMessage("Mule Runtime CE cannot run a licensed connector");

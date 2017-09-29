@@ -89,7 +89,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
 
   @Override
   protected Application doCreateArtifact(File artifactDir) throws IOException {
-    Application app = super.createArtifact(artifactDir);
+    Application app = super.doCreateArtifact(artifactDir);
 
     TestApplicationWrapper testApplicationWrapper = new TestApplicationWrapper(app);
     testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);

@@ -17,6 +17,7 @@ public class PluginLicenseValidationRequest {
   private final String pluginVersion;
   private final String pluginProvider;
   private final String pluginName;
+  private final boolean allowsEvaluation;
   private final ClassLoader artifactClassLoader;
   private final ClassLoader pluginClassLoader;
 
@@ -27,15 +28,18 @@ public class PluginLicenseValidationRequest {
    * @param pluginVersion the plugin version
    * @param pluginProvider the plugin provider name
    * @param pluginName the plugin name
+   * @param allowsEvaluation true if the plugin allows running with an evaluation license, false otherwise
    * @param artifactClassLoader the class loader of the artifact that holds the customer license
    * @param pluginClassLoader the plugin class loader that holds the provider license key
    */
   private PluginLicenseValidationRequest(String entitlement, String pluginVersion, String pluginProvider, String pluginName,
+                                         boolean allowsEvaluation,
                                          ClassLoader artifactClassLoader, ClassLoader pluginClassLoader) {
     this.entitlement = entitlement;
     this.pluginVersion = pluginVersion;
     this.pluginProvider = pluginProvider;
     this.pluginName = pluginName;
+    this.allowsEvaluation = allowsEvaluation;
     this.artifactClassLoader = artifactClassLoader;
     this.pluginClassLoader = pluginClassLoader;
   }
@@ -69,6 +73,13 @@ public class PluginLicenseValidationRequest {
   }
 
   /**
+   * @return true if the plugin allows running with an evaluation license, false otherwise
+   */
+  public boolean isAllowsEvaluation() {
+    return allowsEvaluation;
+  }
+
+  /**
    * @return the classloader of the artifact in which the customer license is expected
    */
   public ClassLoader getArtifactClassLoader() {
@@ -95,6 +106,7 @@ public class PluginLicenseValidationRequest {
     private String pluginName;
     private String pluginProvider;
     private String entitlement;
+    private boolean allowsEvaluation;
     private ClassLoader artifactClassLoader;
     private ClassLoader pluginClassLoader;
 
@@ -137,6 +149,15 @@ public class PluginLicenseValidationRequest {
     }
 
     /**
+     * @param allowsEvaluation the entitlement to validate within the license
+     * @return the builder
+     */
+    public Builder withAllowsEvaluation(boolean allowsEvaluation) {
+      this.allowsEvaluation = allowsEvaluation;
+      return this;
+    }
+
+    /**
      * @param classLoader the classloader of the artifact in which the customer license is expected
      * @return the builder
      */
@@ -158,8 +179,8 @@ public class PluginLicenseValidationRequest {
      * @return a new {@link PluginLicenseValidationRequest} with the provided information.
      */
     public PluginLicenseValidationRequest build() {
-      return new PluginLicenseValidationRequest(entitlement, pluginVersion, pluginProvider, pluginName, artifactClassLoader,
-                                                pluginClassLoader);
+      return new PluginLicenseValidationRequest(entitlement, pluginVersion, pluginProvider, pluginName,
+                                                allowsEvaluation, artifactClassLoader, pluginClassLoader);
     }
   }
 }
