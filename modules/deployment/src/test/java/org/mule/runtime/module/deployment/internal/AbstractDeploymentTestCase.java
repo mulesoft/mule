@@ -44,7 +44,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
@@ -62,6 +61,7 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -1000,8 +1000,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
-        .addProperty(EXPORTED_RESOURCES,
-                     asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
         .setId(MULE_LOADER_ID).build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.HelloExtension")
@@ -1017,8 +1015,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .addProperty(EXPORTED_RESOURCES,
-                     asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.HelloExtension")

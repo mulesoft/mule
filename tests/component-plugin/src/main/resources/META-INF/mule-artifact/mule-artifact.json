@@ -14,9 +14,8 @@
         "org.mule.functional.api.registry"
       ],
       "exportedResources": [
-        "META-INF/spring.schemas",
-        "META-INF/mule-test.xsd",
-        "META-INF/mule-core-deprecated.xsd"
+        "META-INF/mule.schemas",
+        "META-INF/mule-test.xsd"
       ]
     }
   },

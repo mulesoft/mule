@@ -46,9 +46,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
   private final Set<ExtensionModel> extensions;
-  private final EntityResolver springEntityResolver;
   private final EntityResolver muleEntityResolver;
-  private Map<String, String> customSchemaMappings;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
   private Optional<ExtensionSchemaGenerator> extensionSchemaFactory;
   private Map<String, Boolean> checkedEntities; // It saves already checked entities so that if the resolution already failed
@@ -58,12 +56,11 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
    * Returns an instance of {@link ModuleDelegatingEntityResolver}
    *
    * @param extensions fallback set to dynamically generate schemas from {@link ExtensionModel} if the current
-   *                   {@link #muleEntityResolver} and {@link #springEntityResolver} delegates return null when resolving the entity.
+   *                   {@link #muleEntityResolver} delegates return null when resolving the entity.
    */
   public ModuleDelegatingEntityResolver(Set<ExtensionModel> extensions) {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     this.muleEntityResolver = new MuleCustomEntityResolver(classLoader);
-    this.springEntityResolver = new DelegatingEntityResolver(classLoader);
     this.extensions = extensions;
     this.checkedEntities = new HashMap<>();
 
@@ -93,7 +90,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
                           systemId));
     }
 
-    Boolean useDeprecated = springEntityResolver
+    Boolean useDeprecated = muleEntityResolver
         .resolveEntity(publicId, "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd") != null;
     if (systemId.equals("http://www.mulesoft.org/schema/mule/core/current/mule.xsd")) {
       if (useDeprecated) {
@@ -107,9 +104,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     inputSource = muleEntityResolver.resolveEntity(publicId, systemId);
     if (inputSource == null) {
       inputSource = generateFromExtensions(publicId, systemId);
-    }
-    if (inputSource == null) {
-      inputSource = springEntityResolver.resolveEntity(publicId, systemId);
     }
     if (inputSource == null) {
       if (checkedEntities.get(systemId) != null) {

@@ -35,18 +35,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.graph.Exclusion;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -63,6 +51,18 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates the {@link ArtifactUrlClassification} based on the Maven dependencies declared by the rootArtifact using Eclipse
@@ -448,8 +448,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                    pluginClassifiedNode.getUrls(), rootArtifactRemoteRepositories);
         pluginClassifiedNode.setUrls(urls);
       }
-
-      extensionPluginMetadataGenerator.generateDslResources();
     }
     return toPluginUrlClassification(pluginsClassified.values());
   }

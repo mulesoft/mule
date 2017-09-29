@@ -13,9 +13,6 @@
     <exportedResources>
         <resource>/META-INF/</resource>
         <resource>/META-INF/extension-manifest.xml</resource>
-        <resource>/META-INF/mule-heisenberg.xsd</resource>
-        <resource>/META-INF/spring.handlers</resource>
-        <resource>/META-INF/spring.schemas</resource>
     </exportedResources>
     <describer>
         <id>java</id>

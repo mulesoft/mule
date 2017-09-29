@@ -8,7 +8,7 @@
       "exportedPackages": [
       ],
       "exportedResources": [
-        "META-INF/spring.schemas",
+        "META-INF/mule.schemas",
         "META-INF/mule-core-deprecated.xsd"
       ]
     }
