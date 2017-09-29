@@ -25,7 +25,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -65,7 +65,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   private final FlowConstructLifecycleManager lifecycleManager;
   private final String name;
-  private final MessagingExceptionHandler exceptionListener;
+  private final FlowExceptionHandler exceptionListener;
   private volatile FlowConstructStatistics statistics;
 
   /**
@@ -73,7 +73,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
    */
   private final String initialState;
 
-  public AbstractFlowConstruct(String name, MuleContext muleContext, Optional<MessagingExceptionHandler> exceptionListener,
+  public AbstractFlowConstruct(String name, MuleContext muleContext, Optional<FlowExceptionHandler> exceptionListener,
                                String initialState, FlowConstructStatistics statistics) {
     this.muleContext = muleContext;
     this.name = name;
@@ -164,7 +164,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   }
 
   @Override
-  public MessagingExceptionHandler getExceptionListener() {
+  public FlowExceptionHandler getExceptionListener() {
     return exceptionListener;
   }
 

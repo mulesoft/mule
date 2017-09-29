@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 
@@ -22,6 +23,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -30,15 +32,16 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.api.exception.MuleFatalException;
-import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory;
 import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -58,7 +61,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   private Component processor = mock(Component.class);
   private CoreEvent event;
-  private MuleContext context = mock(MuleContext.class);
+  private MuleContext context = mock(MuleContext.class, withSettings().extraInterfaces(PrivilegedMuleContext.class));
   private FlowCallStack flowCallStack = mock(FlowCallStack.class);
   private Message message = mock(Message.class);
   private ComponentIdentifier ci = mock(ComponentIdentifier.class);
@@ -85,7 +88,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(message.getAttributes()).thenReturn(new TypedValue<>(null, DataType.STRING));
     event = spy(getEventBuilder().message(message).build());
 
-    when(context.getErrorTypeLocator()).thenReturn(locator);
+    when(((PrivilegedMuleContext) context).getErrorTypeLocator()).thenReturn(locator);
   }
 
   @Test
@@ -185,7 +188,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
         .defaultExceptionMapper(ExceptionMapper.builder().build())
         .defaultError(UNKNOWN)
         .build();
-    when(context.getErrorTypeLocator()).thenReturn(locator);
+    when(((PrivilegedMuleContext) context).getErrorTypeLocator()).thenReturn(locator);
     MessagingException me = newMessagingException(CONNECTION_EXCEPTION, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, context);

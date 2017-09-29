@@ -29,13 +29,14 @@ import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import org.slf4j.Logger;
@@ -164,7 +165,8 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
-        new ReactiveInterceptionAction(interceptionEvent, next, component, muleContext.getErrorTypeLocator());
+        new ReactiveInterceptionAction(interceptionEvent, next, component,
+                                       ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,

@@ -13,7 +13,6 @@ import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -32,11 +31,13 @@ import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -44,9 +45,9 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -105,7 +106,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
 
-    final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+    final MuleContext muleContext = mockMuleContext();
     when(muleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
     event = mock(CoreEvent.class);
@@ -131,7 +132,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     initialiseIfNeeded(moduleFlowProcessingPhase, muleContext);
 
     flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
-    final MessagingExceptionHandler exceptionHandler = mock(MessagingExceptionHandler.class);
+    final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
         .thenAnswer(invocationOnMock -> error(invocationOnMock.getArgumentAt(0, MessagingException.class)));
@@ -140,6 +141,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     context = mock(MessageProcessContext.class);
     final MessageSource source = mock(MessageSource.class);
     when(source.getRootContainerName()).thenReturn("root");
+    when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
     when(context.getMessageSource()).thenReturn(source);
     when(context.getTransactionConfig()).thenReturn(empty());
     when(muleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(of(flow));

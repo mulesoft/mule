@@ -32,17 +32,17 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ProcessorInterceptorManager;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
@@ -231,10 +231,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     };
   }
 
-  private Consumer<MessagingException> errorNotification(Processor processor) {
+  private Consumer<Exception> errorNotification(Processor processor) {
     return exception -> {
-      if (((PrivilegedEvent) exception.getEvent()).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), exception.getEvent(), processor, exception,
+      if (exception instanceof MessagingException
+          && ((PrivilegedEvent) ((MessagingException) exception).getEvent()).isNotificationsEnabled()) {
+        fireNotification(muleContext.getNotificationManager(), ((MessagingException) exception).getEvent(), processor,
+                         (MessagingException) exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };

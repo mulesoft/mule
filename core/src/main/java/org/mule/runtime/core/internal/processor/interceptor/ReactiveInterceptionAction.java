@@ -8,7 +8,7 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorFromFailingProcessor;
+import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorFromFailingProcessor;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
 
@@ -18,12 +18,12 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import org.slf4j.Logger;
 

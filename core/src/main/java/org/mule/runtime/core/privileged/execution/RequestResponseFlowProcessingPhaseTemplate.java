@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.privileged.execution;
 
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.ResponseDispatchException;
 
 /**
@@ -33,5 +33,5 @@ public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessi
    * @param messagingException exception thrown during the flow execution.
    * @throws MuleException exception thrown when processing the message to send the response.
    */
-  void sendFailureResponseToClient(MessagingException messagingException) throws MuleException;
+  void sendFailureResponseToClient(EventProcessingException messagingException) throws MuleException;
 }

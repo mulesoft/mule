@@ -25,7 +25,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
@@ -53,7 +53,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;
-  private MessagingExceptionHandler messagingExceptionHandler;
+  private FlowExceptionHandler messagingExceptionHandler;
   private List<Processor> processors;
 
   @Override
@@ -97,11 +97,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   }
 
   /**
-   * Configures the {@link MessagingExceptionHandler} that should be used to handle any errors that occur in this scope.
+   * Configures the {@link FlowExceptionHandler} that should be used to handle any errors that occur in this scope.
    *
-   * @param exceptionListener the {@link MessagingExceptionHandler} to be used.
+   * @param exceptionListener the {@link FlowExceptionHandler} to be used.
    */
-  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
+  public void setExceptionListener(FlowExceptionHandler exceptionListener) {
     this.messagingExceptionHandler = exceptionListener;
   }
 

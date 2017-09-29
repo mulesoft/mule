@@ -7,9 +7,9 @@
 package org.mule.runtime.core.privileged.execution;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Optional;
 import java.util.concurrent.Executor;

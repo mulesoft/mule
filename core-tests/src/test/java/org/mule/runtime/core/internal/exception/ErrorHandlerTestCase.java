@@ -35,8 +35,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -181,7 +180,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     assertThat(errorHandler.getExceptionListeners().get(1), is(mockTestExceptionStrategy1));
     MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
     assertThat(injected, is(instanceOf(MessagingExceptionStrategyAcceptorDelegate.class)));
-    MessagingExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
+    FlowExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
     assertThat(defaultHandler, is(instanceOf(ErrorHandler.class)));
     assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasSize(2));
     assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnCriticalErrorHandler.class)));
@@ -201,8 +200,10 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     }
 
     @Override
-    public CoreEvent handleException(MessagingException exception, CoreEvent event) {
-      exception.setHandled(true);
+    public CoreEvent handleException(Exception exception, CoreEvent event) {
+      if (exception instanceof MessagingException) {
+        ((MessagingException) exception).setHandled(true);
+      }
       return event;
     }
   }

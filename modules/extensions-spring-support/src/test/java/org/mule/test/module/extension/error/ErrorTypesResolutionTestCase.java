@@ -10,17 +10,18 @@ package org.mule.test.module.extension.error;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.core.api.exception.EventProcessingException;
+
+import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.util.Map;
-
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.Map;
 
 public class ErrorTypesResolutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -64,8 +65,8 @@ public class ErrorTypesResolutionTestCase extends AbstractExtensionFunctionalTes
 
   @Test
   public void exceptionInfo() throws Exception {
-    EventProcessingException epe = flowRunner("withUnderlyingConnectorError").runExpectingException();
-    Map<String, Object> info = epe.getInfo();
+    Exception epe = flowRunner("withUnderlyingConnectorError").runExpectingException();
+    Map<String, Object> info = ((MuleException) epe).getInfo();
     assertThat(info.get("Element").toString(), containsString("withUnderlyingConnectorError/processors/0"));
   }
 }

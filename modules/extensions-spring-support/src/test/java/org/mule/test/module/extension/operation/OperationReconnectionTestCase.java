@@ -8,9 +8,8 @@ package org.mule.test.module.extension.operation;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-import org.mule.runtime.core.api.exception.MessagingException;
+
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.Villain;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -36,14 +35,12 @@ public class OperationReconnectionTestCase extends AbstractExtensionFunctionalTe
   @Test
   public void defaultReconnection() throws Exception {
     final Villain villain = new Villain();
-    try {
-      flowRunner("defaultReconnection").withPayload(villain).run();
-      fail("Should have failed");
-    } catch (MessagingException e) {
-      assertThat(villain.isAlive(), is(true));
-      IronMan stark = getIronMan();
-      assertThat(stark.getMissilesFired(), is(1));
-    }
+
+    flowRunner("defaultReconnection").withPayload(villain).runExpectingException();
+
+    assertThat(villain.isAlive(), is(true));
+    IronMan stark = getIronMan();
+    assertThat(stark.getMissilesFired(), is(1));
   }
 
   private IronMan getIronMan() throws Exception {

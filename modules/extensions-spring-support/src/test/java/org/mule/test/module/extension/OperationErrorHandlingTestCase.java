@@ -11,19 +11,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.functional.junit4.rules.ExpectedError.none;
+import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 
-import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.exception.MuleFatalException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import org.junit.Rule;
@@ -49,16 +48,10 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void heisenbergThrowsMessagingExceptionWithEventAndFailingProcessorPopulated() throws Exception {
-    Processor operation = ((Pipeline) getFlowConstruct("cureCancer")).getProcessors().get(0);
-    // Use good old try/catch because ExpectedError and ExpectedException rules don't like each other and it doesn't make sense to
-    // put this test method elsewhere.
-    try {
-      flowRunner("cureCancer").run();
-      fail();
-    } catch (MessagingException messagingException) {
-      assertThat(messagingException.getFailingComponent(), is(operation));
-      assertThat(messagingException.getEvent(), notNullValue());
-    }
+    expectedError.expectEvent(notNullValue(CoreEvent.class));
+    expectedError.expectFailingComponent(is(locator
+        .find(Location.builder().globalName("cureCancer").addProcessorsPart().addIndexPart(0).build()).get()));
+    flowRunner("cureCancer").run();
   }
 
   @Test

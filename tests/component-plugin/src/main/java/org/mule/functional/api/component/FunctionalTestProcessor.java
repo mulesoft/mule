@@ -23,6 +23,7 @@ import org.mule.functional.api.notification.FunctionalTestNotificationListener;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -33,11 +34,10 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 
 import org.apache.commons.lang3.StringUtils;
@@ -155,7 +155,15 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
       }
       return doProcess(event);
     } catch (Throwable t) {
-      throw new MessagingException(event, t, this);
+      if (t instanceof MuleException) {
+        throw (MuleException) t;
+      } else if (t instanceof RuntimeException) {
+        throw (RuntimeException) t;
+      } else if (t instanceof Error) {
+        throw (Error) t;
+      } else {
+        throw new DefaultMuleException(t);
+      }
     }
   }
 

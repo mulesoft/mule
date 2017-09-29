@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
+import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 
 import java.util.function.Consumer;
 
@@ -31,7 +31,7 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback {
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param completionCallback the callback used to send the failure response
    * @param event the related {@link CoreEvent}
    * @param errorResponseCallback a {@link Consumer} which acts as a callback for the {@link CoreEvent} which results

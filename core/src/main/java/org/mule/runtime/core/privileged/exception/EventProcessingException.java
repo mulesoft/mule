@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.privileged.exception;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -41,6 +42,13 @@ public class EventProcessingException extends MuleException {
 
   public CoreEvent getEvent() {
     return event;
+  }
+
+  /**
+   * @return the Mule component that causes the failure if known, {@code null} otherwise.
+   */
+  public Component getFailingComponent() {
+    return null;
   }
 
   private static Throwable getCause(Throwable cause) {

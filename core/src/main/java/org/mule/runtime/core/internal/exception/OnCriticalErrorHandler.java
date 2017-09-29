@@ -8,17 +8,17 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
-import java.util.Optional;
-
 import org.reactivestreams.Publisher;
+
+import java.util.Optional;
 
 /**
  * Handler that only accepts CRITICAL errors, logging them before propagating them. This handler is added before any others in all
@@ -42,13 +42,13 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   }
 
   @Override
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
     logException(exception);
     return event;
   }
 
   @Override
-  public Publisher<CoreEvent> apply(MessagingException exception) {
+  public Publisher<CoreEvent> apply(Exception exception) {
     logException(exception);
     return error(exception);
   }

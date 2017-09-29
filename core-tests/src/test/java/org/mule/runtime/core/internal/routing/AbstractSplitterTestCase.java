@@ -16,8 +16,8 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

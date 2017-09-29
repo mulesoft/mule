@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.functional.junit4.rules;
+package org.mule.functional.api.exception;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static java.lang.String.format;
@@ -13,21 +13,24 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.base.Joiner;
 import org.hamcrest.Matcher;
 import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+
+import com.google.common.base.Joiner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JUnit rule for Mule errors
@@ -39,6 +42,9 @@ public class ExpectedError implements TestRule {
   private Matcher<String> messageMatcher;
   private ErrorTypeMatcher errorTypeMatcher;
   private Matcher<? extends Throwable> causeMatcher;
+  private Matcher<? extends CoreEvent> eventMatcher;
+  private Matcher<? extends Component> failingComponentMatcher;
+  private Matcher<? extends Message> errorMessageMatcher;
   private List<Matcher> matchers;
 
   /**
@@ -52,6 +58,8 @@ public class ExpectedError implements TestRule {
     messageMatcher = null;
     errorTypeMatcher = null;
     causeMatcher = null;
+    eventMatcher = null;
+    errorMessageMatcher = null;
     matchers = new ArrayList<>();
   }
 
@@ -87,7 +95,16 @@ public class ExpectedError implements TestRule {
   public ExpectedError expectErrorType(String namespace, String errorType) {
     this.errorTypeMatcher = errorType(namespace, errorType);
     return this;
+  }
 
+  public ExpectedError expectErrorType(Matcher<String> namespaceMatcher, Matcher<String> errorTypeMatcher) {
+    this.errorTypeMatcher = errorType(namespaceMatcher, errorTypeMatcher);
+    return this;
+  }
+
+  public ExpectedError expectErrorType(ErrorTypeMatcher matcher) {
+    this.errorTypeMatcher = matcher;
+    return this;
   }
 
   public ExpectedError expectCause(Matcher<? extends Throwable> expectedCause) {
@@ -95,8 +112,24 @@ public class ExpectedError implements TestRule {
     return this;
   }
 
+  public ExpectedError expectEvent(Matcher<? extends CoreEvent> eventMatcher) {
+    this.eventMatcher = eventMatcher;
+    return this;
+  }
+
+  public ExpectedError expectFailingComponent(Matcher<? extends Component> failingComponentMatcher) {
+    this.failingComponentMatcher = failingComponentMatcher;
+    return this;
+  }
+
+  public ExpectedError expectErrorMessage(Matcher<? extends Message> errorEventMatcher) {
+    this.errorMessageMatcher = errorEventMatcher;
+    return this;
+  }
+
   private boolean expectsThrowable() {
-    return errorTypeMatcher != null || causeMatcher != null || messageMatcher != null;
+    return errorTypeMatcher != null || causeMatcher != null || eventMatcher != null || failingComponentMatcher != null
+        || errorMessageMatcher != null || messageMatcher != null;
   }
 
   private void failDueToMissingException() {
@@ -121,7 +154,7 @@ public class ExpectedError implements TestRule {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("MessagingException matcher with:\n");
+    builder.append("EventProcessingException matcher with:\n");
 
     if (errorTypeMatcher != null) {
       builder.append(format("* An error: %s\n", errorTypeMatcher));
@@ -133,6 +166,18 @@ public class ExpectedError implements TestRule {
 
     if (messageMatcher != null) {
       builder.append(format("* A message: %s\n", messageMatcher));
+    }
+
+    if (eventMatcher != null) {
+      builder.append(format("* An event: %s\n", eventMatcher));
+    }
+
+    if (failingComponentMatcher != null) {
+      builder.append(format("* A failingComponent: %s\n", failingComponentMatcher));
+    }
+
+    if (errorMessageMatcher != null) {
+      builder.append(format("* An error Message: %s\n", errorMessageMatcher));
     }
 
     return builder.toString();
@@ -151,7 +196,7 @@ public class ExpectedError implements TestRule {
       try {
         statement.evaluate();
 
-      } catch (MessagingException exception) {
+      } catch (EventProcessingException exception) {
         if (!expectsThrowable()) {
           failDueToUnexpectedException(exception);
         }
@@ -172,6 +217,18 @@ public class ExpectedError implements TestRule {
 
         if (messageMatcher != null && !messageMatcher.matches(error.getDescription())) {
           matchers.add(messageMatcher);
+        }
+
+        if (failingComponentMatcher != null && !failingComponentMatcher.matches(exception.getFailingComponent())) {
+          matchers.add(failingComponentMatcher);
+        }
+
+        if (eventMatcher != null && !eventMatcher.matches(event)) {
+          matchers.add(eventMatcher);
+        }
+
+        if (errorMessageMatcher != null && !errorMessageMatcher.matches(error.getErrorMessage())) {
+          matchers.add(errorMessageMatcher);
         }
 
         if (!matchers.isEmpty()) {

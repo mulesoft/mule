@@ -7,9 +7,8 @@
 package org.mule.runtime.core.privileged.execution;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
@@ -56,15 +55,6 @@ public interface FlowProcessingPhaseTemplate extends MessageProcessTemplate {
    * @param muleEvent
    */
   void afterSuccessfulProcessingFlow(CoreEvent muleEvent) throws MuleException;
-
-
-  /**
-   * Call when the processing of the message through the flow fails. This method will always be called when the flow execution
-   * failed.
-   *
-   * @param messagingException
-   */
-  void afterFailureProcessingFlow(MessagingException messagingException) throws MuleException;
 
   /**
    * Call when the processing of the message through the flow fails in an exception strategy

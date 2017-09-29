@@ -10,7 +10,7 @@ package org.mule.runtime.core.api.construct;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -82,7 +82,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
      * @param exceptionListener exception listener to use on the flow. Non null.
      * @return same builder instance
      */
-    Builder messagingExceptionHandler(MessagingExceptionHandler exceptionListener);
+    Builder messagingExceptionHandler(FlowExceptionHandler exceptionListener);
 
     /**
      * Configures the factory used to create processing strategies on the created flow.

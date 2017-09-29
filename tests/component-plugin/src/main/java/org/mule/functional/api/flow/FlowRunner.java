@@ -6,8 +6,10 @@
  */
 package org.mule.functional.api.flow;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -16,13 +18,17 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
+import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.processor.FlowAssert;
+
+import org.hamcrest.Matcher;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -223,7 +229,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
    * @return the processing exception return by the flow
    * @throws Exception
    */
-  public EventProcessingException runExpectingException() throws Exception {
+  public Exception runExpectingException() throws Exception {
     try {
       runNoVerify();
       fail("Flow executed successfully. Expecting exception");
@@ -231,6 +237,88 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> implements Dispo
     } catch (EventProcessingException e) {
       verify(getFlowConstructName());
       return e;
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure with an error type that matches the
+   * given {@code matcher}.
+   * <p>
+   * Will fail if there's no failure running the flow.
+   */
+  public void runExpectingException(ErrorTypeMatcher matcher) throws Exception {
+    try {
+      runNoVerify();
+      fail("Flow executed successfully. Expecting exception");
+    } catch (EventProcessingException e) {
+      verify(getFlowConstructName());
+      assertThat(e.getEvent().getError().get().getErrorType(), matcher);
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure with a cause that matches the given
+   * {@code matcher}.
+   * <p>
+   * Will fail if there's no failure running the flow.
+   */
+  public void runExpectingException(Matcher<Throwable> causeMatcher) throws Exception {
+    try {
+      runNoVerify();
+      fail("Flow executed successfully. Expecting exception");
+    } catch (EventProcessingException e) {
+      verify(getFlowConstructName());
+      assertThat(e.getEvent().getError().get().getCause(), causeMatcher);
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure with an {@link CoreEvent} that matches
+   * the given {@code errorEventMatcher}.
+   * <p>
+   * Will fail if there's no failure running the flow.
+   */
+  public void runExpectingException(EventMatcher errorEventMatcher) throws Exception {
+    try {
+      runNoVerify();
+      fail("Flow executed successfully. Expecting exception");
+    } catch (EventProcessingException e) {
+      verify(getFlowConstructName());
+      assertThat(e.getEvent(), errorEventMatcher);
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure with an {@link CoreEvent} that matches
+   * the given {@code errorEventMatcher}.
+   * <p>
+   * Will fail if there's no failure running the flow.
+   */
+  public void runExpectingException(ErrorTypeMatcher matcher, Matcher<CoreEvent> errorEventMatcher) throws Exception {
+    try {
+      runNoVerify();
+      fail("Flow executed successfully. Expecting exception");
+    } catch (EventProcessingException e) {
+      verify(getFlowConstructName());
+      assertThat(e.getEvent().getError().get().getErrorType(), matcher);
+      assertThat(e.getEvent(), errorEventMatcher);
+    }
+  }
+
+  /**
+   * Runs the specified flow with the provided event and configuration expecting a failure with an {@link CoreEvent} that matches
+   * the given {@code errorEventMatcher}.
+   * <p>
+   * Will fail if there's no failure running the flow.
+   */
+  public void runExpectingException(Matcher<Throwable> causeMatcher, Matcher<CoreEvent> errorEventMatcher) throws Exception {
+    try {
+      runNoVerify();
+      fail("Flow executed successfully. Expecting exception");
+    } catch (EventProcessingException e) {
+      verify(getFlowConstructName());
+      assertThat(e.getEvent().getError().get().getCause(), causeMatcher);
+      assertThat(e.getEvent(), errorEventMatcher);
     }
   }
 

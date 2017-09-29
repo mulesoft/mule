@@ -104,7 +104,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
 import org.mule.runtime.core.api.retry.RetryNotifier;
@@ -299,7 +299,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(ErrorHandler.class))
         .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build())
         .withSetterParameterDefinition("exceptionListeners",
-                                       fromChildCollectionConfiguration(MessagingExceptionHandler.class).build())
+                                       fromChildCollectionConfiguration(FlowExceptionHandler.class).build())
         .asPrototype()
         .build());
     componentBuildingDefinitions
@@ -376,7 +376,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("messageSource", fromChildConfiguration(MessageSource.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(EXCEPTION_LISTENER_ATTRIBUTE,
-                                           fromChildConfiguration(MessagingExceptionHandler.class).build())
+                                           fromChildConfiguration(FlowExceptionHandler.class).build())
             .withSetterParameterDefinition("maxConcurrency", fromSimpleParameter("maxConcurrency").build())
             .build());
 
@@ -427,7 +427,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(TRY).withTypeDefinition(fromType(TryScope.class))
             .withObjectFactoryType(TryProcessorFactoryBean.class)
-            .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
+            .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(FlowExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).withDefaultValue(ACTION_INDIFFERENT_STRING)
                 .build())

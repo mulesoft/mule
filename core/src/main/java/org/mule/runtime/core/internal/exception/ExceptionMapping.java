@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
@@ -12,7 +12,7 @@ import org.mule.runtime.api.message.ErrorType;
 
 /**
  * Mapping between a {@link Exception} type and an {@link ErrorType}.
- * 
+ *
  * @since 4.0
  */
 public class ExceptionMapping implements Comparable<ExceptionMapping> {
@@ -22,11 +22,11 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
 
   /**
    * Creates a new {@link ExceptionMapping} instance.
-   * 
+   *
    * @param exceptionType exception type to related to the error type.
    * @param errorType error type associated with the exception type.
    */
-  ExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {
+  public ExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {
     checkState(exceptionType != null, "exceptionType type cannot be null");
     checkState(errorType != null, "error type cannot be null");
     this.exceptionType = exceptionType;

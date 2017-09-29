@@ -7,10 +7,10 @@
 package org.mule.runtime.core.privileged.exception;
 
 import org.mule.runtime.core.privileged.event.Acceptor;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 
 /**
  * MessagingExceptionHandlers that will only be executed if accepts to manage MuleEvent
  */
-public interface MessagingExceptionHandlerAcceptor extends MessagingExceptionHandler, Acceptor {
+public interface MessagingExceptionHandlerAcceptor extends FlowExceptionHandler, Acceptor {
 }

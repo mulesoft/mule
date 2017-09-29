@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
@@ -22,6 +22,10 @@ import org.mule.test.module.extension.config.PetStoreConnectionTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,10 +33,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCase {
@@ -94,10 +94,8 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
     try {
       getClient();
       fail("was expecting pool to be exhausted when using config: " + name);
-    } catch (MessagingException e) {
-      assertThat(e.getCause(), is(instanceOf(ConnectionException.class)));
     } catch (Exception e) {
-      fail("a connection exception was expected");
+      assertThat(e.getCause(), is(instanceOf(ConnectionException.class)));
     }
 
     connectionLatch.release();

@@ -21,8 +21,8 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

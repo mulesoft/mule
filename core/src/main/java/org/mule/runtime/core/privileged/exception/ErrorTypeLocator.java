@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.privileged.exception;
 
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -13,6 +13,8 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.exception.ExceptionMapper;
+
 import org.apache.commons.collections.map.HashedMap;
 import java.util.Map;
 import java.util.Optional;

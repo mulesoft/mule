@@ -21,14 +21,14 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -197,18 +197,18 @@ public class MessageProcessors {
    * Process a {@link ReactiveProcessor} using a child {@link EventContext}. This is useful if it is necessary to perform
    * processing in a scope and handle an empty result or error locally rather than complete the response for the whole Flow.
    * <p>
-   * The {@link MessagingExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to
-   * handle any errors that occur.
+   * The {@link FlowExceptionHandler} configured on {@link MessageProcessorChain} or {@link FlowConstruct} will be used to handle
+   * any errors that occur.
    *
    * @param event the event to process.
    * @param processor the processor to process.
    * @param componentLocation
-   * @param exceptionHandler used to handle {@link MessagingException}'s.
+   * @param exceptionHandler used to handle {@link Exception}'s.
    * @return the future result of processing processor.
    */
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation,
-                                                             MessagingExceptionHandler exceptionHandler) {
+                                                             FlowExceptionHandler exceptionHandler) {
     return internalProcessWithChildContext(event, processor,
                                            child(((BaseEventContext) event.getContext()), componentLocation,
                                                  exceptionHandler),

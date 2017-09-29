@@ -17,13 +17,13 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -39,14 +39,14 @@ import org.mule.runtime.soap.api.message.SoapRequest;
 import org.mule.runtime.soap.api.message.SoapRequestBuilder;
 import org.mule.runtime.soap.api.message.SoapResponse;
 
+import org.reactivestreams.Publisher;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
-
-import org.reactivestreams.Publisher;
 
 /**
  * {@link ComponentExecutor} implementation that executes SOAP operations using a provided {@link SoapClient}.
@@ -77,7 +77,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
       SoapRequest request = getRequest(context, customHeaders);
       SoapResponse response = connection.getSoapClient(serviceId).consume(request);
       return justOrEmpty(response.getAsResult(streamingHelperArgumentResolver.resolve(context)));
-    } catch (MessageTransformerException | TransformerException | MessagingException e) {
+    } catch (MessageTransformerException | TransformerException e) {
       return error(e);
     } catch (Exception e) {
       return error(soapExceptionEnricher.enrich(e));
@@ -90,7 +90,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
    * Builds a Soap Request with the execution context to be sent using the {@link SoapClient}.
    */
   private SoapRequest getRequest(ExecutionContext<OperationModel> context, Map<String, String> fixedHeaders)
-      throws MessageTransformerException, MessagingException, TransformerException {
+      throws MessageTransformerException, TransformerException {
     SoapRequestBuilder builder = SoapRequest.builder().operation(getOperation(context));
     builder.soapHeaders(fixedHeaders);
 
@@ -139,7 +139,7 @@ public final class SoapOperationExecutor implements ComponentExecutor<OperationM
   }
 
   private Map<String, SoapAttachment> toSoapAttachments(Map<String, TypedValue<?>> attachments)
-      throws MessageTransformerException, MessagingException, TransformerException {
+      throws MessageTransformerException, TransformerException {
     Map<String, SoapAttachment> soapAttachmentMap = new HashMap<>();
 
     for (Map.Entry<String, TypedValue<?>> attachment : attachments.entrySet()) {

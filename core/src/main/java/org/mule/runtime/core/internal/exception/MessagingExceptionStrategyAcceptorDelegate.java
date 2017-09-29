@@ -6,27 +6,26 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import org.reactivestreams.Publisher;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Allows to use {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} as
+ * Allows to use {@link org.mule.runtime.core.api.exception.FlowExceptionHandler} as
  * {@link MessagingExceptionHandlerAcceptor}.
  */
-public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<MessagingExceptionHandler>
+public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObjectOwner<FlowExceptionHandler>
     implements MessagingExceptionHandlerAcceptor {
 
-  private MessagingExceptionHandler delegate;
+  private FlowExceptionHandler delegate;
 
-  public MessagingExceptionStrategyAcceptorDelegate(MessagingExceptionHandler messagingExceptionHandler) {
+  public MessagingExceptionStrategyAcceptorDelegate(FlowExceptionHandler messagingExceptionHandler) {
     this.delegate = messagingExceptionHandler;
   }
 
@@ -47,21 +46,21 @@ public class MessagingExceptionStrategyAcceptorDelegate extends AbstractMuleObje
   }
 
   @Override
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
     return delegate.handleException(exception, event);
   }
 
   @Override
-  public Publisher<CoreEvent> apply(MessagingException exception) {
+  public Publisher<CoreEvent> apply(Exception exception) {
     return delegate.apply(exception);
   }
 
   @Override
-  protected List<MessagingExceptionHandler> getOwnedObjects() {
+  protected List<FlowExceptionHandler> getOwnedObjects() {
     return Arrays.asList(delegate);
   }
 
-  public MessagingExceptionHandler getExceptionListener() {
+  public FlowExceptionHandler getExceptionListener() {
     return this.delegate;
   }
 }

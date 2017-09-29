@@ -15,9 +15,9 @@ import static reactor.core.publisher.Mono.when;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ import java.util.List;
 abstract class AbstractEventContext implements BaseEventContext {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
-  protected static final MessagingExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
+  protected static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
   private transient MonoProcessor<CoreEvent> beforeResponseProcessor;
   private transient MonoProcessor<CoreEvent> responseProcessor;
@@ -44,17 +44,17 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient Disposable completionSubscriberDisposable;
   private transient final List<BaseEventContext> childContexts = new LinkedList<>();
   private transient Mono<Void> completionCallback = empty();
-  private transient MessagingExceptionHandler exceptionHandler;
+  private transient FlowExceptionHandler exceptionHandler;
 
   public AbstractEventContext() {
     this(NULL_EXCEPTION_HANDLER, empty());
   }
 
-  public AbstractEventContext(MessagingExceptionHandler exceptionHandler) {
+  public AbstractEventContext(FlowExceptionHandler exceptionHandler) {
     this(exceptionHandler, empty());
   }
 
-  public AbstractEventContext(MessagingExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
+  public AbstractEventContext(FlowExceptionHandler exceptionHandler, Publisher<Void> completionCallback) {
     this.completionCallback = from(completionCallback);
     this.exceptionHandler = exceptionHandler;
     initCompletionProcessor();
@@ -181,7 +181,7 @@ abstract class AbstractEventContext implements BaseEventContext {
     return completionProcessor;
   }
 
-  protected MessagingExceptionHandler getExceptionHandler() {
+  protected FlowExceptionHandler getExceptionHandler() {
     return exceptionHandler;
   }
 }

@@ -17,12 +17,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.io.Serializable;
 import java.time.OffsetTime;
@@ -66,7 +66,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @return a new child context
    */
   public static BaseEventContext child(BaseEventContext parent, Optional<ComponentLocation> componentLocation,
-                                       MessagingExceptionHandler exceptionHandler) {
+                                       FlowExceptionHandler exceptionHandler) {
     BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler);
     if (parent instanceof AbstractEventContext) {
       ((AbstractEventContext) parent).addChildContext(child);
@@ -158,7 +158,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @param exceptionHandler the exception handler that will deal with an error context
    */
   public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
-                             Publisher<Void> externalCompletionPublisher, MessagingExceptionHandler exceptionHandler) {
+                             Publisher<Void> externalCompletionPublisher, FlowExceptionHandler exceptionHandler) {
     super(exceptionHandler, externalCompletionPublisher);
     this.id = id;
     this.serverId = serverId;
@@ -182,7 +182,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final String id;
 
     private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              MessagingExceptionHandler messagingExceptionHandler) {
+                              FlowExceptionHandler messagingExceptionHandler) {
       super(messagingExceptionHandler, Mono.empty());
       this.parent = parent;
       this.componentLocation = componentLocation;

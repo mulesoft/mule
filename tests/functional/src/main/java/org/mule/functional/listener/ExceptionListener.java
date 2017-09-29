@@ -12,10 +12,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.util.concurrent.Latch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class ExceptionListener {
 
   public ExceptionListener assertExpectedException(final Class<? extends Throwable> expectedExceptionType) {
     for (ExceptionNotification exceptionNotification : exceptionNotifications) {
-      if (exceptionNotification.getException().getClass().isAssignableFrom(expectedExceptionType)) {
+      if (expectedExceptionType.isAssignableFrom(exceptionNotification.getException().getClass())) {
         return this;
       }
     }

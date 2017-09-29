@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -59,7 +59,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
   private void validateDefaultErrorHandler() {
     String defaultErrorHandler = config.getDefaultErrorHandlerName();
     if (defaultErrorHandler != null) {
-      MessagingExceptionHandler messagingExceptionHandler = registry.<MessagingExceptionHandler>lookupByName(defaultErrorHandler)
+      FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
           .orElseThrow(() -> new MuleRuntimeException(CoreMessages.createStaticMessage(String
               .format("No global error handler defined with name '%s'.", defaultErrorHandler))));
       if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {

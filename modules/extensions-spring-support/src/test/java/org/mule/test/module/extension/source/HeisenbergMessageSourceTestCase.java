@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
@@ -35,25 +35,24 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
-
 import org.hamcrest.Matcher;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -173,10 +172,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
 
-    MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
-    Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
-                      containsString("sourceWithInvalidSuccessAndErrorParameters/source"));
-    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
+    MuleException me = (MuleException) unwrap(optionalError.get().getCause());
+    assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
+               containsString("sourceWithInvalidSuccessAndErrorParameters/source"));
+    assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
   }
 
   @Test
@@ -209,10 +208,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(optionalError, is(not(empty())));
     assertThat(optionalError.get().getErrorType(), is(errorType(SOURCE_ERROR_RESPONSE_GENERATE)));
 
-    MessagingException me = (MessagingException) unwrap(optionalError.get().getCause());
-    Assert.assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
-                      containsString("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt/source"));
-    Assert.assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
+    MuleException me = (MuleException) unwrap(optionalError.get().getCause());
+    assertThat((String) me.getInfo().get(INFO_LOCATION_KEY),
+               containsString("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt/source"));
+    assertThat((String) me.getInfo().get(INFO_SOURCE_XML_KEY), containsString("heisenberg:success-info"));
   }
 
   @Test

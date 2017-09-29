@@ -15,12 +15,12 @@ import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.io.IOException;
 
 public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
 
@@ -51,7 +51,7 @@ public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
   @Test
   public void customExceptionWithoutText() throws Exception {
     ftc.setExceptionToThrow(IOException.class);
-    checkExceptionThrown(IOException.class, null);
+    checkWrappedExceptionThrown(IOException.class, null);
   }
 
   @Test
@@ -59,10 +59,34 @@ public class FunctionalTestProcessorTestCase extends AbstractMuleTestCase {
     String exceptionText = "BOOM";
     ftc.setExceptionToThrow(IOException.class);
     ftc.setExceptionText(exceptionText);
-    checkExceptionThrown(IOException.class, exceptionText);
+    checkWrappedExceptionThrown(IOException.class, exceptionText);
+  }
+
+  @Test
+  public void customRuntimeExceptionWithoutText() throws Exception {
+    ftc.setExceptionToThrow(NullPointerException.class);
+    checkExceptionThrown(NullPointerException.class, null);
+  }
+
+  @Test
+  public void customRuntimeExceptionWithCustomText() throws Exception {
+    String exceptionText = "BOOM";
+    ftc.setExceptionToThrow(NullPointerException.class);
+    ftc.setExceptionText(exceptionText);
+    checkExceptionThrown(NullPointerException.class, exceptionText);
   }
 
   private void checkExceptionThrown(Class<? extends Exception> exceptionClass, String expectedMessage) throws MuleException {
+    expected.expect(instanceOf(exceptionClass));
+    if (expectedMessage != null) {
+      expected.expectMessage(startsWith(expectedMessage));
+    }
+
+    ftc.process(null);
+  }
+
+  private void checkWrappedExceptionThrown(Class<? extends Exception> exceptionClass, String expectedMessage)
+      throws MuleException {
     expected.expectCause(instanceOf(exceptionClass));
     if (expectedMessage != null) {
       expected.expectMessage(startsWith(expectedMessage));

@@ -10,10 +10,9 @@ import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 
-public class MessagingExceptionHandlerToSystemAdapter implements MessagingExceptionHandler {
+public class MessagingExceptionHandlerToSystemAdapter implements FlowExceptionHandler {
 
   private MuleContext muleContext;
 
@@ -23,7 +22,7 @@ public class MessagingExceptionHandlerToSystemAdapter implements MessagingExcept
   }
 
   @Override
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
     muleContext.getExceptionListener().handleException(exception);
     return event;
   }

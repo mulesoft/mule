@@ -25,10 +25,10 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

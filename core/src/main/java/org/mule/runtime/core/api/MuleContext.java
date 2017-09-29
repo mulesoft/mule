@@ -24,8 +24,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -216,7 +215,7 @@ public interface MuleContext extends Lifecycle {
    * @return default exception strategy. If no default error handler was configured it returns one with a catch all
    *         <on-error-propagate> element.
    */
-  MessagingExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName);
+  FlowExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName);
 
   /**
    * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource
@@ -313,11 +312,6 @@ public interface MuleContext extends Lifecycle {
    * @since 4.0
    */
   String getId();
-
-  /**
-   * @return a locator for discovering {@link org.mule.runtime.api.message.ErrorType}s related to exceptions and components.
-   */
-  ErrorTypeLocator getErrorTypeLocator();
 
   /**
    * @return an error type repository to get access to the {@link org.mule.runtime.api.message.ErrorType} instances of this

@@ -41,19 +41,20 @@ import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 
 import org.hamcrest.Description;
@@ -107,7 +108,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     when(typeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
     when(typeLocator.<String, Throwable>lookupComponentErrorType(any(ComponentIdentifier.class), any(Throwable.class)))
         .thenReturn(errorType);
-    when(muleContext.getErrorTypeLocator()).thenReturn(typeLocator);
+    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
   }
 
   public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {

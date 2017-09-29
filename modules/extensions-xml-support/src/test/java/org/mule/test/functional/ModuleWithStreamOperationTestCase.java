@@ -10,19 +10,21 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.test.allure.AllureConstants.XmlSdk.Streaming.STREAMING;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Test;
+import static org.mule.test.allure.AllureConstants.XmlSdk.Streaming.STREAMING;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain;
 
+import org.junit.Test;
+
 import java.util.Map;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 /**
  * Test case to ensure {@link ModuleOperationProcessorChain#apply(org.reactivestreams.Publisher)}
