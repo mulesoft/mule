@@ -53,7 +53,7 @@ public class CheckAnnotatedTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testElementTypes() throws Exception {
-    schema = createDOM(this.getClass().getClassLoader().getResourceAsStream("META-INF/mule.xsd"));
+    schema = createDOM(this.getClass().getClassLoader().getResourceAsStream("META-INF/mule-core-common.xsd"));
     top = schema.getDocumentElement();
     Element muleRootElements = findElement(top, "group", "muleRootElements");
     assertNotNull(muleRootElements);
@@ -68,7 +68,9 @@ public class CheckAnnotatedTestCase extends AbstractMuleTestCase {
    */
   private void checkElementTypeIsAnnotated(Element elm) {
     Element type = getType(elm);
-    checkTypeIsAnnotated(type);
+    if (type != null) {
+      checkTypeIsAnnotated(type);
+    }
   }
 
   /**
