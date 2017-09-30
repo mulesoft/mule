@@ -139,8 +139,10 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   }
 
   private ClassLoaderModel createClassLoaderModelWithDomain() {
-    BundleDescriptor domainDescriptor = new BundleDescriptor.Builder().setArtifactId(DOMAIN_NAME).setGroupId("test").setVersion("1.0.0").setClassifier(MULE_DOMAIN_CLASSIFIER).build();
-    Set<BundleDependency> domainDependency = Collections.singleton(new BundleDependency.Builder().setDescriptor(domainDescriptor).build());
+    BundleDescriptor domainDescriptor = new BundleDescriptor.Builder().setArtifactId(DOMAIN_NAME).setGroupId("test")
+        .setVersion("1.0.0").setClassifier(MULE_DOMAIN_CLASSIFIER).build();
+    Set<BundleDependency> domainDependency =
+        Collections.singleton(new BundleDependency.Builder().setDescriptor(domainDescriptor).build());
     return new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(domainDependency).build();
   }
 

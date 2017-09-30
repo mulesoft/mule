@@ -168,8 +168,10 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
     if (domain == null) {
       throw new DeploymentException(createStaticMessage(format("Domain '%s' "
-                                                                 + "has to be deployed in order to deploy Application '%s'",
-                                                               domainDescriptor.isPresent()? domainDescriptor.get().getArtifactId() : DEFAULT_DOMAIN_NAME, descriptor.getName())));
+          + "has to be deployed in order to deploy Application '%s'",
+                                                               domainDescriptor.isPresent()
+                                                                   ? domainDescriptor.get().getArtifactId() : DEFAULT_DOMAIN_NAME,
+                                                               descriptor.getName())));
     }
 
     return domain;
