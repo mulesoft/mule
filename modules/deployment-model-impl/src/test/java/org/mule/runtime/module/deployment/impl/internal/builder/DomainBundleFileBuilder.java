@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class DomainBundleFileBuilder extends AbstractArtifactFileBuilder<DomainBundleFileBuilder> {
 
+  private static final String MULE_DOMAIN_BUNDLE_CLASSIFIER = "domain-bundle";
   private final File domainFile;
   private final List<File> applications = new LinkedList<>();
 
@@ -98,5 +99,10 @@ public class DomainBundleFileBuilder extends AbstractArtifactFileBuilder<DomainB
   @Override
   protected String getFileExtension() {
     return ".zip";
+  }
+
+  @Override
+  public String getClassifier() {
+    return MULE_DOMAIN_BUNDLE_CLASSIFIER;
   }
 }

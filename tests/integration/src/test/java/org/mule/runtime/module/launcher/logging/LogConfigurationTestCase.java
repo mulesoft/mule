@@ -96,14 +96,14 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   public void honorLog4jConfigFileForAppInDomain() throws Exception {
     muleServer.start();
 
-    File domainFile = new DomainFileBuilder(DOMAIN_NAME)
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder(DOMAIN_NAME)
         .definedBy("log/empty-domain-with-log4j/empty-domain-config.xml")
-        .containingResource("log/empty-domain-with-log4j/log4j2-test.xml", "log4j2-test.xml")
-        .getArtifactFile();
-    muleServer.deployDomainFile(domainFile);
+        .containingResource("log/empty-domain-with-log4j/log4j2-test.xml", "log4j2-test.xml");
+    muleServer.deployDomainFile(domainFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(APP_NAME)
-        .definedBy("log/empty-config.xml").deployedWith("domain", "domain");
+        .definedBy("log/empty-config.xml").deployedWith("domain", "domain")
+        .dependingOn(domainFileBuilder);
     muleServer.deploy(applicationFileBuilder.getArtifactFile().toURI().toURL(), APP_NAME);
     ensureArtifactAppender("ConsoleForDomain", ConsoleAppender.class);
   }

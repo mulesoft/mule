@@ -8,7 +8,6 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.reset;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.PROPERTY_DOMAIN;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainBundleFileBuilder;
@@ -28,7 +27,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void deploysDomainBundle() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+        .dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -36,7 +35,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
@@ -47,7 +46,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void failsToDeployDomainBundleWithCorruptedDomain() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+        .dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(new DomainFileBuilder("dummy-domain")).containing(applicationFileBuilder);
 
@@ -55,7 +54,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentFailure(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentFailure(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDeploymentFailure(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
   }
@@ -70,7 +69,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentFailure(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentFailure(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainFileBuilder.getId()}, true);
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
@@ -79,8 +78,8 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void redeploysDomainBundle() throws Exception {
-    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+    ApplicationFileBuilder applicationFileBuilder =
+        new ApplicationFileBuilder(dummyAppDescriptorFileBuilder).dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -88,7 +87,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
@@ -98,7 +97,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
@@ -108,9 +107,9 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleCausesUndeployOfRemovedApps() throws Exception {
     ApplicationFileBuilder applicationFileBuilder1 = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+        .dependingOn(dummyDomainFileBuilder);
     ApplicationFileBuilder applicationFileBuilder2 =
-        new ApplicationFileBuilder(emptyAppFileBuilder).deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+        new ApplicationFileBuilder(emptyAppFileBuilder).dependingOn(dummyDomainFileBuilder);
 
     DomainBundleFileBuilder domainBundleFileBuilder = new DomainBundleFileBuilder(dummyDomainFileBuilder)
         .containing(applicationFileBuilder1).containing(applicationFileBuilder2);
@@ -119,7 +118,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder1.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder2.getId());
@@ -131,7 +130,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
     domainBundleFileBuilder = new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder1);
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertUndeploymentSuccess(applicationDeploymentListener, applicationFileBuilder1.getId());
@@ -142,7 +141,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void redeploysDomainBundleWithBrokenDomain() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder(dummyAppDescriptorFileBuilder)
-        .deployedWith(PROPERTY_DOMAIN, "dummy-domain");
+        .dependingOn(dummyDomainFileBuilder);
     DomainBundleFileBuilder domainBundleFileBuilder =
         new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
 
@@ -150,7 +149,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
 
     startDeployment();
 
-    assertDeploymentSuccess(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
@@ -162,7 +161,7 @@ public class DomainBundleDeploymentTestCase extends AbstractDeploymentTestCase {
     domainBundleFileBuilder = new DomainBundleFileBuilder(dummyDomainFileBuilder).containing(applicationFileBuilder);
     addDomainBundleFromBuilder(domainBundleFileBuilder);
 
-    assertDeploymentFailure(domainBundleDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDeploymentFailure(domainBundleDeploymentListener, domainBundleFileBuilder.getId());
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentFailure(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());

@@ -10,6 +10,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
@@ -37,20 +38,20 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
   private boolean useHeavyPackage = true;
 
-  public DeployableFileBuilder(String id, boolean upperCaseInExtension) {
-    super(id, upperCaseInExtension);
+  public DeployableFileBuilder(String artifactId, boolean upperCaseInExtension) {
+    super(artifactId, upperCaseInExtension);
   }
 
-  public DeployableFileBuilder(String id) {
-    super(id);
+  public DeployableFileBuilder(String artifactId) {
+    super(artifactId);
   }
 
   public DeployableFileBuilder(T source) {
     super(source);
   }
 
-  public DeployableFileBuilder(String id, T source) {
-    super(id, source);
+  public DeployableFileBuilder(String artifactId, T source) {
+    super(artifactId, source);
   }
 
   /**
@@ -79,10 +80,15 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     if (useHeavyPackage) {
       for (AbstractDependencyFileBuilder dependencyFileBuilder : getAllCompileDependencies()) {
+        if (MULE_DOMAIN_CLASSIFIER.equals(dependencyFileBuilder.getClassifier())) {
+          continue;
+        }
+
         customResources.add(new ZipUtils.ZipResource(dependencyFileBuilder.getArtifactFile().getAbsolutePath(),
                                                      Paths.get(REPOSITORY_FOLDER,
                                                                dependencyFileBuilder.getArtifactFileRepositoryPath())
                                                          .toString()));
+
 
         if (MULE_PLUGIN_CLASSIFIER.equals(dependencyFileBuilder.getClassifier())) {
           File pluginClassLoaderModel = createClassLoaderModelJsonFile(dependencyFileBuilder);

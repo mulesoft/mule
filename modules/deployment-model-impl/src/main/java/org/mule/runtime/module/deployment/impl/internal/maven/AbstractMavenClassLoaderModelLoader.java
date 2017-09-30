@@ -253,7 +253,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
           dependencies.stream().filter(mavenClientDependency -> !mavenClientDependency.getScope().equals(PROVIDED))
               .map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
       loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies);
-      classLoaderModelBuilder.dependingOn(bundleDependencies);
+      Set<BundleDependency> allBundleDependencies =
+          dependencies.stream().map(mavenClientDependency -> convertBundleDependency(mavenClientDependency)).collect(toSet());
+      classLoaderModelBuilder.dependingOn(allBundleDependencies);
       return classLoaderModelBuilder.build();
     } finally {
       deleteQuietly(temporaryDirectory);

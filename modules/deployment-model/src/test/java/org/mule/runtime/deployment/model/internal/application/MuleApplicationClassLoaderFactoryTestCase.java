@@ -71,7 +71,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
     when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
     descriptor = new ApplicationDescriptor(APP_NAME);
-    descriptor.setDomain(DOMAIN_NAME);
   }
 
   @After

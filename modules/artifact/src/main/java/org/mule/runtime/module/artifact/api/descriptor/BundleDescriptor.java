@@ -19,11 +19,13 @@ import java.util.Optional;
  */
 public class BundleDescriptor {
 
+  private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
   private String artifactId;
   private String version;
   private String type = "jar";
   private Optional<String> classifier = empty();
+  private String artifactFileName;
 
   private BundleDescriptor() {}
 
@@ -89,6 +91,31 @@ public class BundleDescriptor {
         ", type='" + type + '\'' +
         ", classifier=" + classifier +
         '}';
+  }
+
+  /**
+   * @return the file name that corresponds to the artifact described by this instance
+   */
+  public String getArtifactFileName() {
+    if (artifactFileName == null) {
+      synchronized (this) {
+        if (artifactFileName == null) {
+          String fileName = artifactId;
+
+          if (getVersion() != null) {
+            fileName = fileName + STRINGARTIFACT_FILENAME_SEPARATOR + getVersion();
+          }
+
+          if (classifier.isPresent()) {
+            fileName = fileName + STRINGARTIFACT_FILENAME_SEPARATOR + classifier.get();
+          }
+
+          artifactFileName = fileName;
+        }
+      }
+    }
+
+    return artifactFileName;
   }
 
   /**

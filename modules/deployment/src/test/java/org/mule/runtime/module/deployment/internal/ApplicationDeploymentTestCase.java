@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.io.File.separator;
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -254,13 +255,13 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedAppFromBuilder(brokenAppFileBuilder);
 
-    assertDeploymentFailure(applicationDeploymentListener, "broken-app");
+    assertDeploymentFailure(applicationDeploymentListener, brokenAppFileBuilder.getId());
 
-    assertAppsDir(new String[] {"broken-app.jar"}, NONE, true);
+    assertAppsDir(new String[] {brokenAppFileBuilder.getDeployedPath()}, NONE, true);
 
     assertApplicationAnchorFileDoesNotExists(brokenAppFileBuilder.getId());
 
-    assertArtifactIsRegisteredAsZombie("broken-app.jar", deploymentService.getZombieApplications());
+    assertArtifactIsRegisteredAsZombie(brokenAppFileBuilder.getId(), deploymentService.getZombieApplications());
   }
 
   @Test
@@ -639,10 +640,10 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(badConfigAppFileBuilder);
     startDeployment();
 
-    assertDeploymentFailure(applicationDeploymentListener, appName);
-    assertAppsDir(new String[] {}, new String[] {appName}, true);
+    assertDeploymentFailure(applicationDeploymentListener, badConfigAppFileBuilder.getId());
+    assertAppsDir(new String[] {}, new String[] {badConfigAppFileBuilder.getId()}, true);
 
-    assertArtifactIsRegisteredAsZombie(appName, deploymentService.getZombieApplications());
+    assertArtifactIsRegisteredAsZombie(badConfigAppFileBuilder.getId(), deploymentService.getZombieApplications());
 
     final Application app = findApp(badConfigAppFileBuilder.getId(), 1);
     assertStatus(app, ApplicationStatus.DEPLOYMENT_FAILED);
@@ -651,7 +652,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     reset(applicationDeploymentListener);
     deleteDirectory(new File(appsDir, app.getArtifactName()));
     assertAppFolderIsDeleted(appName);
-    assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, appName);
+    assertAtLeastOneUndeploymentSuccess(applicationDeploymentListener, badConfigAppFileBuilder.getId());
     assertNoZombiePresent(deploymentService.getZombieApplications());
   }
 
@@ -781,7 +782,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
     Map<String, Object> startupOptions = new HashMap<>();
-    startupOptions.put("app", "empty-app:empty-app:empty-app");
+    String appName = "empty-app-1.0.0-mule-application";
+    startupOptions.put("app", format("%s:%s:%s", appName, appName, appName));
     StartupContext.get().setStartupOptions(startupOptions);
 
     startDeployment();

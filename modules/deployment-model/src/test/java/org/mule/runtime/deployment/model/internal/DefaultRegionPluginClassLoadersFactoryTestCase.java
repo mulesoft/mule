@@ -37,6 +37,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
   public void createsDependantPlugins() throws Exception {
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
                                                                                                                    PLUGIN1_BUNDLE_DESCRIPTOR)
+        .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
         .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());
@@ -184,6 +186,7 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
     BundleDependency pluginDependency = new BundleDependency.Builder().setScope(BundleScope.COMPILE).setDescriptor(
                                                                                                                    PLUGIN1_BUNDLE_DESCRIPTOR)
+        .setBundleUri(new File("test").toURI())
         .build();
     plugin2Descriptor
         .setClassLoaderModel(new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(singleton(pluginDependency)).build());

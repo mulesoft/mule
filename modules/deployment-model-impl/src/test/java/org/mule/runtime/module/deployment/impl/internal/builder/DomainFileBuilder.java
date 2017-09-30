@@ -16,14 +16,14 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.deployment.meta.Product;
 import org.mule.runtime.api.deployment.persistence.MuleDomainModelJsonSerializer;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -44,10 +44,10 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
   /**
    * Creates a new builder
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    */
-  public DomainFileBuilder(String id) {
-    super(id);
+  public DomainFileBuilder(String artifactId) {
+    super(artifactId);
   }
 
 
@@ -63,11 +63,16 @@ public class DomainFileBuilder extends DeployableFileBuilder<DomainFileBuilder> 
   /**
    * Create a new builder from another instance and different ID.
    *
-   * @param id artifact identifier. Non empty.
+   * @param artifactId artifact identifier. Non empty.
    * @param source instance used as template to build the new one. Non null.
    */
-  public DomainFileBuilder(String id, DomainFileBuilder source) {
-    super(id, source);
+  public DomainFileBuilder(String artifactId, DomainFileBuilder source) {
+    super(artifactId, source);
+  }
+
+  @Override
+  public String getClassifier() {
+    return MULE_DOMAIN_CLASSIFIER;
   }
 
   @Override

@@ -107,11 +107,11 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
-    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
                                                       getResourceFile("/barPolicy.xml"), emptyList()));
 
@@ -134,7 +134,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     PolicyNotificationListener<PolicyNotification> notificationListener =
         notification -> notificationListenerActionIds.add(notification.getAction().getActionId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), singletonList(notificationListener)));
@@ -173,7 +173,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     try {
-      policyManager.addPolicy(applicationFileBuilder.getId(), brokenPolicyFileBuilder.getId(),
+      policyManager.addPolicy(applicationFileBuilder.getId(), brokenPolicyFileBuilder.getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap(),
                                                         getResourceFile("/brokenPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
@@ -198,7 +198,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
@@ -220,7 +220,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
                                                       getResourceFile("/fooPolicy.xml"), emptyList()));
@@ -246,7 +246,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -267,7 +267,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -286,7 +286,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getId(),
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
@@ -306,7 +306,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     try {
-      policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getId(),
+      policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                         getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");

@@ -14,11 +14,13 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Contains test for deployment of artifacts with patches
  */
+@Ignore("MULE-13648: patching has to be reviewed")
 public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public PatchDeploymentTestCase(boolean parallelDeployment) {
