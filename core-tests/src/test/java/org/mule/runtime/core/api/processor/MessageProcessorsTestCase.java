@@ -70,7 +70,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
         .setNotificationFirer(((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     exceptionHandler.initialise();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
-    eventContext = create(flow, TEST_CONNECTOR_LOCATION);
+    eventContext = (BaseEventContext) create(flow, TEST_CONNECTOR_LOCATION);
     input = builder(eventContext).message(of(TEST_MESSAGE)).build();
     output = builder(eventContext).message(of(TEST_MESSAGE)).build();
     response = builder(eventContext).message(of(TEST_MESSAGE)).build();

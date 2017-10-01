@@ -315,7 +315,7 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected BaseEventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
+    protected EventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
       return create(this, getLocation(), null, externalCompletionPublisher);
     }
 

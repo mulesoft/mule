@@ -24,6 +24,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -78,7 +79,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private Flow flow;
 
-  private BaseEventContext context;
+  private EventContext context;
 
   private OnErrorContinueHandler onErrorContinueHandler;
 

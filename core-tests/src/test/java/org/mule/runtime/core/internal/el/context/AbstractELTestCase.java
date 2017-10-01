@@ -18,11 +18,11 @@ import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,7 +40,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   protected ExtendedExpressionLanguageAdaptor expressionLanguage;
   protected Flow flowConstruct;
-  protected BaseEventContext context;
+  protected EventContext context;
 
   public AbstractELTestCase(String mvelOptimizer) {
     OptimizerFactory.setDefaultOptimizer(mvelOptimizer);

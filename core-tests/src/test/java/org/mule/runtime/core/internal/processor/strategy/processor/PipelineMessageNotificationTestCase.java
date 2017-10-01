@@ -29,6 +29,7 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedServerNotification;
@@ -39,7 +40,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -78,7 +78,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   private TestPipeline pipeline;
   private final String pipelineName = "testPipeline";
 
-  private BaseEventContext context;
+  private EventContext context;
 
   @Rule
   public ExpectedException thrown = none();

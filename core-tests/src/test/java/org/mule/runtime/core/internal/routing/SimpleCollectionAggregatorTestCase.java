@@ -21,9 +21,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -62,7 +62,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    BaseEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    EventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = Message.of("test event A");
     Message message2 = Message.of("test event B");
@@ -108,7 +108,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    BaseEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    EventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
     Message message1 = of("test event A");
 
     CoreEvent event1 =
@@ -138,7 +138,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(router, true, muleContext);
 
-    BaseEventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
+    EventContext executionContext = create(flow, TEST_CONNECTOR_LOCATION, "foo");
 
     Message message1 = of("test event A");
     Message message2 = of("test event B");

@@ -17,12 +17,12 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -47,7 +47,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Message muleMessage = of("test-data");
   private Flow flow;
-  private BaseEventContext messageContext;
+  private EventContext messageContext;
   private PrivilegedEvent muleEvent;
 
   @Before

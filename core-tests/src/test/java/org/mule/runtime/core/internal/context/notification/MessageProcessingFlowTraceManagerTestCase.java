@@ -25,6 +25,7 @@ import static org.mule.runtime.core.internal.context.notification.MessageProcess
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -80,7 +81,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   }
 
   private MessageProcessingFlowTraceManager manager;
-  private BaseEventContext messageContext;
+  private EventContext messageContext;
 
   private FlowConstruct rootFlowConstruct;
   private FlowConstruct nestedFlowConstruct;
