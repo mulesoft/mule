@@ -10,7 +10,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -24,7 +24,7 @@ public interface EventContextFactory {
    * @param location the location of the component that received the first message for this context.
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location) {
-    return BaseEventContext.create(flow, location, null);
+    return create(flow, location, null);
   }
 
   /**
@@ -35,7 +35,7 @@ public interface EventContextFactory {
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
-    return BaseEventContext.create(flow, location, correlationId, Mono.empty());
+    return create(flow, location, correlationId, Mono.empty());
   }
 
   /**
@@ -47,7 +47,7 @@ public interface EventContextFactory {
    */
   static EventContext create(String id, String serverId, ComponentLocation location,
                                  MessagingExceptionHandler exceptionHandler) {
-    return BaseEventContext.create(id, serverId, location, null, exceptionHandler);
+    return create(id, serverId, location, null, exceptionHandler);
   }
 
   /**
@@ -60,7 +60,7 @@ public interface EventContextFactory {
    */
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
                                  MessagingExceptionHandler exceptionHandler) {
-    return BaseEventContext.create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
+    return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
   }
 
   /**
@@ -74,7 +74,7 @@ public interface EventContextFactory {
    */
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
                                  Publisher<Void> externalCompletionPublisher) {
-    return BaseEventContext.create(flow,location,correlationId,externalCompletionPublisher);
+    return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
   }
 
   /**
@@ -89,7 +89,6 @@ public interface EventContextFactory {
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
                                  Publisher<Void> externalCompletionPublisher,
                                  MessagingExceptionHandler exceptionHandler) {
-    return BaseEventContext.create(id,serverId,location,correlationId,externalCompletionPublisher,exceptionHandler);
+    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
   }
-
 }
