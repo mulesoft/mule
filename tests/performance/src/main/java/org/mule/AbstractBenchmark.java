@@ -9,7 +9,7 @@ package org.mule;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.core.privileged.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;

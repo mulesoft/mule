@@ -7,7 +7,7 @@
 package org.mule;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.privileged.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;

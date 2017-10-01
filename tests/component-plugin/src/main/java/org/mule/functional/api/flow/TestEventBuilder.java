@@ -8,7 +8,7 @@ package org.mule.functional.api.flow;
 
 import static java.util.Optional.ofNullable;
 import static org.mockito.Mockito.spy;
-import static org.mule.runtime.core.privileged.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
 import org.mule.runtime.api.event.EventContext;
