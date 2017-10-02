@@ -30,7 +30,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher.match;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
@@ -88,12 +87,8 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
-import org.mule.runtime.extension.internal.loader.catalog.loader.common.XmlMatcher;
-import org.mule.runtime.extension.internal.loader.catalog.loader.xml.TypesCatalogXmlLoader;
-import org.mule.runtime.extension.internal.loader.catalog.model.TypesCatalog;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -205,8 +200,6 @@ public final class XmlExtensionLoaderDelegate {
   private final String modulePath;
   private final boolean validateXml;
   private final Optional<String> declarationPath;
-  // TODO MULE-13214: typesCatalog could be removed once MULE-13214 is done
-  private Optional<TypesCatalog> typesCatalog;
   private TypeResolver typeResolver;
   private Map<String, DeclarationOperation> declarationMap;
 
@@ -247,26 +240,13 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   /**
-   * Custom types might not exist for the current module, that's why it's handled with {@link Optional}
-   *
-   * @throws Exception
+   * Custom types might not exist for the current module, that's why it's handled with {@link #getEmptyTypeResolver()}.
    */
-  private void loadCustomTypes() throws Exception {
-    typesCatalog = empty();
-
+  private void loadCustomTypes() {
     final String customTypes = getCustomTypeFilename();
     final URL resourceCustomType = getResource(customTypes);
     if (resourceCustomType != null) {
-      final Element typesDocument = TypesCatalogXmlLoader.parseRootElement(resourceCustomType);
-      final Optional<XmlMatcher> match = match(typesDocument, TypesCatalogXmlLoader.ELEM_MULE);
-      if (match.isPresent()) {
-        // TODO MULE-13214: then could be removed once MULE-13214 is done
-        TypesCatalogXmlLoader typesCatalogXmlLoader = new TypesCatalogXmlLoader();
-        typesCatalog = of(typesCatalogXmlLoader.load(resourceCustomType));
-        typeResolver = getEmptyTypeResolver();
-      } else {
-        typeResolver = TypeResolver.createFrom(resourceCustomType, currentThread().getContextClassLoader());
-      }
+      typeResolver = TypeResolver.createFrom(resourceCustomType, currentThread().getContextClassLoader());
     } else {
       typeResolver = getEmptyTypeResolver();
     }
@@ -822,11 +802,6 @@ public final class XmlExtensionLoaderDelegate {
     try {
       metadataType = typeResolver.resolveType(receivedType);
     } catch (TypeResolverException e) {
-      // TODO MULE-13214: could be removed once MULE-13214 is done, as when fails fetching the type, then retries with the old
-      // model
-      if (typesCatalog.isPresent()) {
-        metadataType = typesCatalog.get().resolveType(receivedType);
-      }
       if (!metadataType.isPresent()) {
         throw new IllegalParameterModelDefinitionException(format("The type obtained [%s] cannot be resolved", receivedType), e);
       }

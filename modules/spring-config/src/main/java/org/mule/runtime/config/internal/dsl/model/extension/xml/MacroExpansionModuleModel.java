@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.el.BindingContextUtils.PROPERTIES;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
@@ -321,13 +320,9 @@ public class MacroExpansionModuleModel {
   private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
     final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
         .filter(entry -> !isExpression(entry.getValue()))
-        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), PROPERTIES),
+        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                                   Map.Entry::getValue));
 
-    literalsParameters.putAll(propertiesMap.entrySet().stream()
-        .filter(entry -> !isExpression(entry.getValue()))
-        .collect(Collectors.toMap(e -> getReplaceableExpression(e.getKey(), VARS),
-                                  Map.Entry::getValue)));
     literalsParameters.putAll(
                               parametersMap.entrySet().stream()
                                   .filter(entry -> !isExpression(entry.getValue()))
