@@ -54,11 +54,11 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase
     {
         ComponentStatistics stats = new ComponentStatistics();
         stats.addExecutionBranchTime(true, 25L, 25L);
-        assertValues(stats, 1L, 25L, 25L, 25L, 0L);
+        assertValues(stats, 1L, 25L, 25L, 25L, 25L);
         stats.addExecutionBranchTime(false, 25L, 50L);
-        assertValues(stats, 1L, 50L, 50L, 50L, 0L);
+        assertValues(stats, 1L, 50L, 50L, 50L, 25L);
         stats.addCompleteExecutionTime(50L);
-        assertValues(stats, 1L, 50L, 50L, 50L, 50L);
+        assertValues(stats, 1L, 50L, 50L, 50L, 25L);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase
         stats.addCompleteExecutionTime(2L);
         stats.addExecutionBranchTime(true, 3L, 3L);
         stats.addCompleteExecutionTime(3L);
-        assertValues(stats, 2L, 5L, 2L, 3L, 2L);
+        assertValues(stats, 2L, 5L, 2L, 3L, 1L);
     }
 
     @Test
@@ -140,10 +140,10 @@ public class ComponentStatisticsTestCase extends AbstractMuleTestCase
         // branch
         // reset and then collect
         stats.addExecutionBranchTime(true, 100L, 100L);
-        assertValues(stats, 1L, 100L, 100L, 100L, 0L);
+        assertValues(stats, 1L, 100L, 100L, 100L, 100L);
         // reset and then collect
         stats.addExecutionBranchTime(true, 200L, 200L);
-        assertValues(stats, 1L, 200L, 200L, 200L, 0L);
+        assertValues(stats, 1L, 200L, 200L, 200L, 200L);
         // currently doesn't reset
         stats.addCompleteExecutionTime(200L);
         assertValues(stats, 1L, 200L, 200L, 200L, 200L);
