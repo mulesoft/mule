@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.event;
+package org.mule.runtime.core.privileged.event;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
@@ -123,80 +124,5 @@ public interface BaseEventContext extends EventContext {
    * @return publisher that completes when this {@link BaseEventContext} and all child context have completed.
    */
   Publisher<Void> getCompletionPublisher();
-
-  /**
-   * Builds a new execution context with the given parameters.
-   *
-   * @param flow the flow that processes events of this context.
-   * @param location the location of the component that received the first message for this context.
-   */
-  static BaseEventContext create(FlowConstruct flow, ComponentLocation location) {
-    return create(flow, location, null);
-  }
-
-  /**
-   * Builds a new execution context with the given parameters and an empty publisher.
-   *
-   * @param flow the flow that processes events of this context.
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link BaseEventContext#getCorrelationId()}.
-   */
-  static BaseEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
-    return create(flow, location, correlationId, Mono.empty());
-  }
-
-  /**
-   * Builds a new execution context with the given parameters.
-   *  @param id the unique id for this event context.
-   * @param serverId the id of the running mule server
-   * @param location the location of the component that received the first message for this context.
-   * @param exceptionHandler the exception handler that will deal with an error context
-   */
-  static BaseEventContext create(String id, String serverId, ComponentLocation location,
-                                 MessagingExceptionHandler exceptionHandler) {
-    return create(id, serverId, location, null, exceptionHandler);
-  }
-
-  /**
-   * Builds a new execution context with the given parameters and an empty publisher.
-   *  @param id the unique id for this event context.
-   * @param serverId the id of the running mule server
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link BaseEventContext#getCorrelationId()}.
-   * @param exceptionHandler the exception handler that will deal with an error context
-   */
-  static BaseEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                                 MessagingExceptionHandler exceptionHandler) {
-    return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
-  }
-
-  /**
-   * Builds a new execution context with the given parameters.
-   *
-   * @param flow the flow that processes events of this context.
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link BaseEventContext#getCorrelationId()}.
-   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link BaseEventContext} to depend on completion of source.
-   */
-  static BaseEventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
-                                 Publisher<Void> externalCompletionPublisher) {
-    return new DefaultEventContext(flow, location, correlationId, externalCompletionPublisher);
-  }
-
-  /**
-   * Builds a new execution context with the given parameters.
-   *  @param id the unique id for this event context.
-   * @param location the location of the component that received the first message for this context.
-   * @param correlationId See {@link BaseEventContext#getCorrelationId()}.
-   * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
-   *        {@link BaseEventContext} to depend on completion of source.
-   * @param exceptionHandler the exception handler that will deal with an error context
-   */
-  static BaseEventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                                 Publisher<Void> externalCompletionPublisher,
-                                 MessagingExceptionHandler exceptionHandler) {
-    return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
-  }
 
 }

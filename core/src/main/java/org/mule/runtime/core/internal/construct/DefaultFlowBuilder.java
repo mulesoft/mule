@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
-import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -315,7 +315,7 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected BaseEventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
+    protected EventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
       return create(this, getLocation(), null, externalCompletionPublisher);
     }
 

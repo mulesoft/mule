@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -28,9 +28,10 @@ import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -78,29 +79,29 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public static List<Object[]> data() {
     return asList(new Object[][] {
         {
-            (CheckedSupplier<BaseEventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
-            (CheckedFunction<MonoProcessor<Void>, BaseEventContext>) externalCompletion -> create(getTestFlow(muleContext),
-                                                                                                  TEST_CONNECTOR_LOCATION,
-                                                                                                  null,
-                                                                                                  externalCompletion),
-            (CheckedFunction<ComponentLocation, BaseEventContext>) location -> create(getTestFlow(muleContext), location)
+            (CheckedSupplier<EventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
+            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
+                                                                                              TEST_CONNECTOR_LOCATION,
+                                                                                              null,
+                                                                                              externalCompletion),
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
         },
         {
-            (CheckedSupplier<BaseEventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
-                                                             TEST_CONNECTOR_LOCATION, NullExceptionHandler.getInstance()),
-            (CheckedFunction<MonoProcessor<Void>, BaseEventContext>) externalCompletion -> create("id",
-                                                                                                  DefaultEventContextTestCase.class
-                                                                                                      .getName(),
-                                                                                                  TEST_CONNECTOR_LOCATION,
-                                                                                                  null,
-                                                                                                  externalCompletion,
-                                                                                                  NullExceptionHandler
-                                                                                                      .getInstance()),
-            (CheckedFunction<ComponentLocation, BaseEventContext>) location -> create("id",
-                                                                                      DefaultEventContextTestCase.class
-                                                                                          .getName(),
-                                                                                      location,
-                                                                                      NullExceptionHandler.getInstance())
+            (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
+                                                         TEST_CONNECTOR_LOCATION, NullExceptionHandler.getInstance()),
+            (CheckedFunction<MonoProcessor<Void>, EventContext>) externalCompletion -> create("id",
+                                                                                              DefaultEventContextTestCase.class
+                                                                                                  .getName(),
+                                                                                              TEST_CONNECTOR_LOCATION,
+                                                                                              null,
+                                                                                              externalCompletion,
+                                                                                              NullExceptionHandler
+                                                                                                  .getInstance()),
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",
+                                                                                  DefaultEventContextTestCase.class
+                                                                                      .getName(),
+                                                                                  location,
+                                                                                  NullExceptionHandler.getInstance())
         }
     });
   }

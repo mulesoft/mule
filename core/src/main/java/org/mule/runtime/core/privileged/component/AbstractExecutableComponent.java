@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.event.BaseEventContext.create;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -25,7 +25,7 @@ import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -92,7 +92,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .toFuture();
   }
 
-  protected BaseEventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
+  protected EventContext createEventContext(Publisher<Void> externalCompletionPublisher) {
     return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletionPublisher,
                   NullExceptionHandler.getInstance());
   }

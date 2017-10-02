@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.util.rx;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;

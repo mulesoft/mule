@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.Serializable;
 import java.util.Map;
