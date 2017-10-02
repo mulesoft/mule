@@ -62,15 +62,6 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
     this.urls = urls;
     this.classLoader = new URLClassLoader(urls, null);
     this.testContainerModuleRepository = new DefaultModuleRepository(new TestContainerModuleDiscoverer(classLoader));
-    //this.testContainerModuleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(classLoader)) {
-    //
-    //  @Override
-    //  protected List<MuleModule> discoverModules() {
-    //    List<MuleModule> muleModules = super.discoverModules();
-    //    muleModules.add(TestModuleDiscoverer.getTestModule());
-    //    return muleModules;
-    //  }
-    //};
   }
 
   /**
