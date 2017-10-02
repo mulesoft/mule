@@ -36,7 +36,8 @@ public class ConnectionManagerConfigurationBuilder implements ConfigurationBuild
     checkNotNull(parentArtifact, "'parentArtifact' can't be null");
 
     muleContextConfigurer = muleContext -> {
-      ConnectionManagerAdapter parentConnectionManager = lookupObject(parentArtifact.getMuleContext(), OBJECT_CONNECTION_MANAGER);
+      ConnectionManagerAdapter parentConnectionManager =
+          lookupObject(parentArtifact.getRegistry().lookupByType(MuleContext.class).get(), OBJECT_CONNECTION_MANAGER);
       if (parentConnectionManager != null) {
         ConnectionManager connectionManager =
             new CompositeConnectionManager(new DefaultConnectionManager(muleContext), parentConnectionManager);

@@ -11,7 +11,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.Artifact;
@@ -37,8 +36,8 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   void init();
 
   /**
-   * Initialise the minimal resources required for this artifact to execute components.
-   * By default XML validations will not be applied when doing lazy initialization. If needed use {@link #lazyInit(boolean)}.
+   * Initialise the minimal resources required for this artifact to execute components. By default XML validations will not be
+   * applied when doing lazy initialization. If needed use {@link #lazyInit(boolean)}.
    */
   void lazyInit();
 
@@ -71,11 +70,6 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   void dispose();
 
   /**
-   * @return MuleContext created from the artifact configurations files.
-   */
-  MuleContext getMuleContext();
-
-  /**
    * @return the registry of the artifact.
    */
   Registry getRegistry();
@@ -91,8 +85,8 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   ConnectivityTestingService getConnectivityTestingService();
 
   /**
-   * @return the {@link MetadataService} which can resolve the metadata of the components inside
-   * the current {@link DeployableArtifact}
+   * @return the {@link MetadataService} which can resolve the metadata of the components inside the current
+   *         {@link DeployableArtifact}
    * @see MetadataService
    */
   MetadataService getMetadataService();

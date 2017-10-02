@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.policy.CompositeArtifactExtensionManager;
@@ -33,7 +35,8 @@ public class CompositeArtifactExtensionManagerFactoryTestCase extends AbstractMu
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
     ExtensionManager applicationExtensionManager = mock(ExtensionManager.class);
-    when(application.getMuleContext().getExtensionManager()).thenReturn(applicationExtensionManager);
+    when(application.getRegistry().lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER))
+        .thenReturn(of(applicationExtensionManager));
 
     ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
 

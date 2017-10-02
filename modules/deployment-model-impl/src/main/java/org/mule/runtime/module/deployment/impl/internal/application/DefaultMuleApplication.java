@@ -215,7 +215,7 @@ public class DefaultMuleApplication implements Application {
       } else {
         domain = domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
       }
-      if (domain.getMuleContext() != null) {
+      if (domain.getRegistry() != null) {
         artifactBuilder.serParenArtifact(domain);
       }
       if (muleContextListener != null) {
@@ -279,11 +279,6 @@ public class DefaultMuleApplication implements Application {
     }
 
     status = ApplicationStatus.DEPLOYMENT_FAILED;
-  }
-
-  @Override
-  public MuleContext getMuleContext() {
-    return artifactContext != null ? artifactContext.getMuleContext() : null;
   }
 
   @Override

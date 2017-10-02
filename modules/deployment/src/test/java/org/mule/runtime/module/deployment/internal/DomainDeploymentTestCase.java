@@ -212,7 +212,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
+    assertNotNull(domain.getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 
@@ -268,7 +268,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(dummyDomainBundleFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
+    assertNotNull(domain.getRegistry());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
@@ -333,7 +333,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     final Domain domain = findADomain(emptyDomainFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
+    assertNotNull(domain.getRegistry());
     assertDomainAnchorFileExists(emptyDomainFileBuilder.getId());
   }
 

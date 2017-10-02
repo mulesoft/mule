@@ -7,18 +7,11 @@
 package org.mule.runtime.deployment.model.api.application;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.RegionOwnerArtifact;
 
 public interface Application extends DeployableArtifact<ApplicationDescriptor>, RegionOwnerArtifact {
-
-  /**
-   * @return the artifact {@link MuleContext}
-   */
-  @Override
-  MuleContext getMuleContext();
 
   /**
    * @return the registry of the artifact.

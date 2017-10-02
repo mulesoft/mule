@@ -88,11 +88,6 @@ public class DefaultMuleDomain implements Domain {
   }
 
   @Override
-  public MuleContext getMuleContext() {
-    return artifactContext != null ? artifactContext.getMuleContext() : null;
-  }
-
-  @Override
   public Registry getRegistry() {
     return artifactContext != null ? artifactContext.getRegistry() : null;
   }

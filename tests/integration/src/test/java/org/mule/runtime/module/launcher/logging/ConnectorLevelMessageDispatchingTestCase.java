@@ -63,7 +63,7 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
 
   private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl)
       throws IOException, TimeoutException, RegistrationException {
-    MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
+    MuleContext applicationContext = fakeMuleServer.findApplication(appName).getRegistry().lookupByType(MuleContext.class).get();
 
     final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<>();
     FlowExecutionListener flowExecutionListener =

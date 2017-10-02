@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -29,7 +30,8 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
 
   /**
    * Creates a new factory
-   *  @param parentArtifact application on which the policies are applied. Non null.
+   * 
+   * @param parentArtifact application on which the policies are applied. Non null.
    * @param extensionModelLoaderRepository {@link ExtensionModelLoaderRepository} with the available extension loaders. Non null.
    * @param artifactPlugins artifact plugins deployed inside the artifact. Non null.
    * @param extensionManagerFactory creates the {@link ExtensionManager} for the artifact. Non null
@@ -48,7 +50,8 @@ public class CompositeArtifactExtensionManagerFactory extends ArtifactExtensionM
   public ExtensionManager create(MuleContext muleContext) {
     ExtensionManager policyExtensionManager = super.create(muleContext);
 
-    ExtensionManager applicationExtensionManager = parentArtifact.getMuleContext().getExtensionManager();
+    ExtensionManager applicationExtensionManager =
+        parentArtifact.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get();
 
     return new CompositeArtifactExtensionManager(applicationExtensionManager, policyExtensionManager);
   }

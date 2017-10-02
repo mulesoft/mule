@@ -143,7 +143,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   private LoggerContext getContext(final String appName) throws Exception {
     return withAppClassLoader(appName, () -> {
       Application app = muleServer.findApplication(appName);
-      ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+      ClassLoader classLoader = app.getArtifactClassLoader().getClassLoader();
       return (LoggerContext) LogManager.getContext(classLoader, false);
     });
   }
@@ -151,7 +151,7 @@ public class LogConfigurationTestCase extends AbstractFakeMuleServerTestCase {
   private <T> T withAppClassLoader(String appName, Callable<T> closure) throws Exception {
     Application app = muleServer.findApplication(appName);
     ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
-    ClassLoader classLoader = app.getMuleContext().getExecutionClassLoader();
+    ClassLoader classLoader = app.getArtifactClassLoader().getClassLoader();
     Thread.currentThread().setContextClassLoader(classLoader);
     try {
       return closure.call();
