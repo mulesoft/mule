@@ -147,6 +147,32 @@
             {
               "type": {
                 "format": "java",
+                "type": "@ref:org.mule.test.petstore.extension.Aquarium"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": true,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5
+              },
+              "allowedStereotypeModels": [],
+              "name": "aquarium",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -622,7 +648,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 5
+                "order": 6
               },
               "allowedStereotypeModels": [],
               "name": "cashierName",
@@ -648,7 +674,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 6
+                "order": 7
               },
               "allowedStereotypeModels": [],
               "name": "rothIRA",
@@ -674,7 +700,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 7
+                "order": 8
               },
               "allowedStereotypeModels": [],
               "name": "pensionPlan",
@@ -715,7 +741,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 8
+                "order": 9
               },
               "allowedStereotypeModels": [],
               "name": "cash",
@@ -756,7 +782,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 9
+                "order": 10
               },
               "allowedStereotypeModels": [],
               "name": "debt",
@@ -13500,6 +13526,125 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.test.petstore.extension.Aquarium",
+        "classInformation": {
+          "classname": "org.mule.test.petstore.extension.Aquarium",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": []
+        },
+        "typeAlias": {
+          "value": "Aquarium"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "pond",
+            "required": "true"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.petstore.extension.Pond",
+              "classInformation": {
+                "classname": "org.mule.test.petstore.extension.Pond",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "Pond"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "frogName"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "fishName"
+                },
+                "model": {
+                  "type": "String"
+                },
+                "annotations": {
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
+            "flattened": {},
+            "exclusiveOptionals": {
+              "exclusiveParameterNames": [
+                "frogName",
+                "fishName"
+              ],
+              "isOneRequired": true
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "ticketPrice"
+          },
+          "model": {
+            "type": "Number",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.lang.Integer",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.lang.Comparable"
+                ],
+                "parent": "java.lang.Number",
+                "genericTypes": []
+              }
+            }
+          },
+          "annotations": {
+            "default": "50",
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.petstore.extension.ExclusiveCashier",
         "classInformation": {
           "classname": "org.mule.test.petstore.extension.ExclusiveCashier",
@@ -15876,6 +16021,143 @@
           },
           "annotations": {
             "flattened": {},
+            "exclusiveOptionals": {
+              "exclusiveParameterNames": [
+                "rothIRA",
+                "pensionPlan",
+                "cash",
+                "debt"
+              ],
+              "isOneRequired": false
+            },
+            "expressionSupport": {
+              "value": "SUPPORTED"
+            }
+          }
+        },
+        {
+          "key": {
+            "name": "aquarium"
+          },
+          "model": {
+            "type": "Object",
+            "annotations": {
+              "typeId": "org.mule.test.petstore.extension.Aquarium",
+              "classInformation": {
+                "classname": "org.mule.test.petstore.extension.Aquarium",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": []
+              },
+              "typeAlias": {
+                "value": "Aquarium"
+              }
+            },
+            "fields": [
+              {
+                "key": {
+                  "name": "pond",
+                  "required": "true"
+                },
+                "model": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "org.mule.test.petstore.extension.Pond",
+                    "classInformation": {
+                      "classname": "org.mule.test.petstore.extension.Pond",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [],
+                      "parent": "",
+                      "genericTypes": []
+                    },
+                    "typeAlias": {
+                      "value": "Pond"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "frogName"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "expressionSupport": {
+                          "value": "SUPPORTED"
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "fishName"
+                      },
+                      "model": {
+                        "type": "String"
+                      },
+                      "annotations": {
+                        "expressionSupport": {
+                          "value": "SUPPORTED"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "annotations": {
+                  "flattened": {},
+                  "exclusiveOptionals": {
+                    "exclusiveParameterNames": [
+                      "frogName",
+                      "fishName"
+                    ],
+                    "isOneRequired": true
+                  },
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              },
+              {
+                "key": {
+                  "name": "ticketPrice"
+                },
+                "model": {
+                  "type": "Number",
+                  "annotations": {
+                    "classInformation": {
+                      "classname": "java.lang.Integer",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "java.lang.Number",
+                      "genericTypes": []
+                    }
+                  }
+                },
+                "annotations": {
+                  "default": "50",
+                  "expressionSupport": {
+                    "value": "SUPPORTED"
+                  }
+                }
+              }
+            ]
+          },
+          "annotations": {
             "expressionSupport": {
               "value": "SUPPORTED"
             }

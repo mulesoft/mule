@@ -32,8 +32,8 @@ import java.util.Map;
  */
 public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
 
-  private final Class<T> prototypeClass;
-  private final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
+  protected final Class<T> prototypeClass;
+  protected final Map<Field, ValueResolver<Object>> resolvers = new HashMap<>();
   private String name = null;
   private String encoding = null;
 

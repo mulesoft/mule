@@ -29,6 +29,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.ConfigOverrideTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
@@ -50,6 +52,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
 
 import com.google.common.base.Joiner;
 
@@ -231,6 +234,16 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         .collect(toList());
   }
 
+  private DefaultObjectBuilder getParameterGroupObjectBuilder(ObjectFieldType groupField) {
+    Class<Object> type = getType(groupField.getValue());
+    if (groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).isPresent()) {
+      return new ExclusiveParameterGroupObjectBuilder(type,
+                                                      groupField.getAnnotation(ExclusiveOptionalsTypeAnnotation.class).get());
+    }
+
+    return new DefaultObjectBuilder(type);
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -242,12 +255,11 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
         .forEach(groupField -> {
           if (!(groupField.getValue() instanceof ObjectType)) {
             return;
-
           }
 
           final ObjectType groupType = (ObjectType) groupField.getValue();
           final Field objectField = getField(objectClass, getLocalPart(groupField));
-          DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder(getType(groupField.getValue()));
+          DefaultObjectBuilder groupBuilder = getParameterGroupObjectBuilder(groupField);
           builder.addPropertyResolver(objectField.getName(), new ObjectBuilderValueResolver<>(groupBuilder, muleContext));
 
           resolveParameters(groupType, groupBuilder);

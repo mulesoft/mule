@@ -52,6 +52,10 @@ public class PetStoreConnector {
   @ParameterGroup(name = "Cashier")
   private ExclusiveCashier cashier;
 
+  @Parameter
+  @Optional
+  private Aquarium aquarium;
+
   @DefaultEncoding
   String encoding;
 
@@ -85,5 +89,9 @@ public class PetStoreConnector {
 
   public List<PetCage> getCages() {
     return cages;
+  }
+
+  public Aquarium getAquarium() {
+    return aquarium;
   }
 }
