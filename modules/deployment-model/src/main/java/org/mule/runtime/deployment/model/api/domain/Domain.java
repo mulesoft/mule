@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.application.Application;
 
@@ -22,10 +21,5 @@ public interface Domain extends DeployableArtifact<DomainDescriptor> {
    * @return true if this domain has shared mule components, false if it doesn't
    */
   boolean containsSharedResources();
-
-  /**
-   * @return the MuleContext created with the domain resources. It can return null if it doesn't contains shared resources
-   */
-  MuleContext getMuleContext();
 
 }

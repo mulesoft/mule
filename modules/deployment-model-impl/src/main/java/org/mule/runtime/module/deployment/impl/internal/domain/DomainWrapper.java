@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 
 import java.io.IOException;
 
@@ -28,11 +27,6 @@ public class DomainWrapper extends DeployableArtifactWrapper<Domain, DomainDescr
   @Override
   public boolean containsSharedResources() {
     return getDelegate().containsSharedResources();
-  }
-
-  @Override
-  public MuleContext getMuleContext() {
-    return getDelegate().getMuleContext();
   }
 
   @Override

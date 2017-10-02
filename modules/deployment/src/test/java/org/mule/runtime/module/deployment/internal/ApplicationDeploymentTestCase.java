@@ -54,6 +54,9 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleFatalException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -143,7 +146,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
 
     // Checks that the configuration's ID was properly configured
-    assertThat(app.getMuleContext().getConfiguration().getId(), equalTo(dummyAppDescriptorFileBuilder.getId()));
+    assertThat(app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION).get().getId(),
+               equalTo(dummyAppDescriptorFileBuilder.getId()));
   }
 
   @Test
@@ -155,7 +159,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
     final Application app = findApp(emptyAppFileBuilder.getId(), 1);
-    assertThat(app.getMuleContext().getExtensionManager(), is(notNullValue()));
+    assertThat(app.getRegistry().<ExtensionManager>lookupByName(MuleProperties.OBJECT_EXTENSION_MANAGER).get(),
+               is(notNullValue()));
   }
 
   @Test
@@ -403,7 +408,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     String appId = incompleteAppFileBuilder.getId();
     assertArtifactIsRegisteredAsZombie(appId, deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(appId).getMuleContext(), nullValue());
+    assertThat(deploymentService.findApplication(appId).getRegistry(), nullValue());
   }
 
   @Test
@@ -419,7 +424,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     // Maintains app dir created
     assertAppsDir(NONE, new String[] {incompleteAppFileBuilder.getId()}, true);
     assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
-    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getMuleContext(), nullValue());
+    assertThat(deploymentService.findApplication(incompleteAppFileBuilder.getId()).getRegistry(), nullValue());
   }
 
   @Test

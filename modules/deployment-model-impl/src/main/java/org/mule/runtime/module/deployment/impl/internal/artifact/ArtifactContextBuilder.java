@@ -287,9 +287,8 @@ public class ArtifactContextBuilder {
    * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact
    *        components from the configuration will be created on demand when requested. For instance, when using
    *        {@link ArtifactContext#getConnectivityTestingService()} and then invoking
-   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the
-   *        creation of the component requested to do test connectivity, if it was not already created. when false, the
-   *        application will be created completely at startup.
+   *        {@link ConnectivityTestingService#testConnection(Location)} will cause the creation of the component requested to do
+   *        test connectivity, if it was not already created. when false, the application will be created completely at startup.
    * @return the builder
    */
   public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
@@ -392,7 +391,8 @@ public class ArtifactContextBuilder {
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators);
             if (parentArtifact != null) {
-              artifactContextConfigurationBuilder.setParentContext(parentArtifact.getMuleContext());
+              artifactContextConfigurationBuilder
+                  .setParentContext(parentArtifact.getRegistry().lookupByType(MuleContext.class).get());
             }
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
@@ -419,7 +419,8 @@ public class ArtifactContextBuilder {
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
-          muleContextBuilder.setErrorTypeRepository(createCompositeErrorTypeRepository(parentArtifact.getMuleContext()
+          muleContextBuilder.setErrorTypeRepository(createCompositeErrorTypeRepository(parentArtifact.getRegistry()
+              .lookupByType(MuleContext.class).get()
               .getErrorTypeRepository()));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());

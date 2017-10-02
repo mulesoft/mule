@@ -42,6 +42,19 @@ import java.util.Optional;
 
 import javax.transaction.TransactionManager;
 
+/**
+ * @deprecated {@link MuleContext} interface will be replaced in future major version of mule.
+ *             <p/>
+ *             For customizing an application or domain in mule you can use the {@link CustomizationService} which can be accessed
+ *             by registering a deployment listener in a server plugin.
+ *             <p/>
+ *             For accessing application or domain services like {@link #getTransformationService()} or
+ *             {@link #getErrorTypeRepository()} etc. you can use JSR330 annotations for dependency injection. In case you need to
+ *             access dynamically to objects within the application/domain you can inject
+ *             {@link org.mule.runtime.api.artifact.Registry} or if you want to access configuration elements you can use
+ *             {@link ConfigurationComponentLocator}.
+ */
+@Deprecated
 public interface MuleContext extends Lifecycle {
 
   /**

@@ -38,11 +38,6 @@ public class TestDomainWrapper implements Domain {
   }
 
   @Override
-  public MuleContext getMuleContext() {
-    return delegate.getMuleContext();
-  }
-
-  @Override
   public Registry getRegistry() {
     return delegate.getRegistry();
   }

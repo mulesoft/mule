@@ -49,11 +49,6 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     return delegate.getArtifactClassLoader();
   }
 
-  @Override
-  public MuleContext getMuleContext() {
-    return delegate.getMuleContext();
-  }
-
   public Registry getRegistry() {
     return delegate.getRegistry();
   }
