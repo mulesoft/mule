@@ -458,13 +458,6 @@ class MuleExtensionModelDeclarer {
     onError.withChain();
 
     onError.onDefaultParameterGroup()
-        .withOptionalParameter("name")
-        .withExpressionSupport(NOT_SUPPORTED)
-        .ofType(typeLoader.load(String.class))
-        .describedAs("The expression that will be evaluated to determine if this exception strategy should be executed. "
-            + "This should always be a boolean expression.");
-
-    onError.onDefaultParameterGroup()
         .withOptionalParameter("when")
         .ofType(typeLoader.load(String.class))
         .describedAs("The expression that will be evaluated to determine if this exception strategy should be executed. "

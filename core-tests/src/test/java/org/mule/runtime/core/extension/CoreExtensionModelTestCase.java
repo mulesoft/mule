@@ -441,30 +441,24 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   void verifyOnError(NestedRouteModel route) {
     List<ParameterModel> allParameterModels = route.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(5));
+    assertThat(allParameterModels, hasSize(4));
 
-    ParameterModel name = allParameterModels.get(0);
-    assertThat(name.getName(), is("name"));
-    assertThat(name.getType(), is(instanceOf(DefaultStringType.class)));
-    assertThat(name.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(name.isRequired(), is(false));
-
-    ParameterModel when = allParameterModels.get(1);
+    ParameterModel when = allParameterModels.get(0);
     assertThat(when.getName(), is("when"));
     assertThat(when.getType(), is(instanceOf(DefaultStringType.class)));
     assertThat(when.getExpressionSupport(), is(SUPPORTED));
     assertThat(when.isRequired(), is(false));
 
-    ParameterModel type = allParameterModels.get(2);
+    ParameterModel type = allParameterModels.get(1);
     assertErrorType(type, "type");
 
-    ParameterModel log = allParameterModels.get(3);
+    ParameterModel log = allParameterModels.get(2);
     assertThat(log.getName(), is("logException"));
     assertThat(log.getType(), is(instanceOf(DefaultBooleanType.class)));
     assertThat(log.getExpressionSupport(), is(SUPPORTED));
     assertThat(log.isRequired(), is(false));
 
-    ParameterModel notifications = allParameterModels.get(4);
+    ParameterModel notifications = allParameterModels.get(3);
     assertThat(notifications.getName(), is("enableNotifications"));
     assertThat(notifications.getType(), is(instanceOf(DefaultBooleanType.class)));
     assertThat(notifications.getExpressionSupport(), is(NOT_SUPPORTED));

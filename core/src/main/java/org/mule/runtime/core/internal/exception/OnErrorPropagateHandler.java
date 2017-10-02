@@ -28,20 +28,6 @@ import java.util.function.Function;
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
-  private Integer maxRedeliveryAttempts;
-
-  public void setMaxRedeliveryAttempts(Integer maxRedeliveryAttempts) {
-    this.maxRedeliveryAttempts = maxRedeliveryAttempts;
-  }
-
-  public Integer getMaxRedeliveryAttempts() {
-    return maxRedeliveryAttempts;
-  }
-
-  public boolean hasMaxRedeliveryAttempts() {
-    return this.maxRedeliveryAttempts != null;
-  }
-
   @Override
   public boolean acceptsAll() {
     return errorTypeMatcher == null && when == null;
