@@ -58,10 +58,6 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   public void localTxDoesntSupportMultipleResources() throws Exception {
     flowRunner("localTxDoesntSupportMultipleResources").runExpectingException(allOf(instanceOf(TransactionException.class),
                                                                                     hasMessage(containsString("the current transaction doesn't support it and could not be bound"))));
-    // Error error = exception.getEvent().getError().get();
-    // assertThat(error.getDescription(),
-    // is(containsString("the current transaction doesn't support it and could not be bound")));
-    // assertThat(error.getCause(), is(instanceOf(TransactionException.class)));
   }
 
   @Test
