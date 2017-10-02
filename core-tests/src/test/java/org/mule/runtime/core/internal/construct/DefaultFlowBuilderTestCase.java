@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -90,7 +90,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     ProcessingStrategyFactory processingStrategyFactory = mock(ProcessingStrategyFactory.class);
     ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
     when(processingStrategyFactory.create(any(), any())).thenReturn(processingStrategy);
-    MessagingExceptionHandler exceptionListener = mock(MessagingExceptionHandler.class);
+    FlowExceptionHandler exceptionListener = mock(FlowExceptionHandler.class);
 
     Flow flow = flowBuilder.processors(messageProcessors).source(messageSource)
         .processingStrategyFactory(processingStrategyFactory).messagingExceptionHandler(exceptionListener).build();
@@ -135,7 +135,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   public void cannotChangeExceptionListenerAfterFlowBuilt() throws Exception {
     flowBuilder.build();
     expectedException.expect(IllegalStateException.class);
-    flowBuilder.messagingExceptionHandler(mock(MessagingExceptionHandler.class));
+    flowBuilder.messagingExceptionHandler(mock(FlowExceptionHandler.class));
   }
 
   @Test

@@ -20,8 +20,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
@@ -55,7 +54,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
+    if (!(exception instanceof MessagingException)) {
+      exception = new MessagingException(event, exception);
+    }
+
     event = addExceptionPayload(exception, event);
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
@@ -66,12 +69,14 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Publisher<CoreEvent> apply(MessagingException exception) {
-    CoreEvent event = addExceptionPayload(exception, exception.getEvent());
-    exception.setProcessedEvent(event);
-    for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
-      if (exceptionListener.accept(event)) {
-        return exceptionListener.apply(exception);
+  public Publisher<CoreEvent> apply(Exception exception) {
+    if (exception instanceof MessagingException) {
+      CoreEvent event = addExceptionPayload(exception, ((MessagingException) exception).getEvent());
+      ((MessagingException) exception).setProcessedEvent(event);
+      for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
+        if (exceptionListener.accept(event)) {
+          return exceptionListener.apply(exception);
+        }
       }
     }
     return error(new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE)));
@@ -92,7 +97,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     return true;
   }
 
-  private CoreEvent addExceptionPayload(MessagingException exception, CoreEvent event) {
+  private CoreEvent addExceptionPayload(Exception exception, CoreEvent event) {
     return CoreEvent.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
@@ -105,7 +110,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private void addDefaultErrorHandlerIfRequired() throws InitialisationException {
     if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
       String defaultErrorHandlerName = getMuleContext().getConfiguration().getDefaultErrorHandlerName();
-      MessagingExceptionHandler defaultErrorHandler;
+      FlowExceptionHandler defaultErrorHandler;
       if (defaultErrorHandlerName != null && defaultErrorHandlerName.equals(name)) {
         logger
             .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");

@@ -25,9 +25,9 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory.ReactorProcessingStrategy;
 import org.mule.tck.testmodels.mule.TestTransaction;
 

@@ -15,6 +15,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -44,6 +45,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
@@ -148,7 +150,9 @@ public class MuleContextUtils {
   }
 
   public static MuleContextWithRegistries mockMuleContext() {
-    final MuleContextWithRegistries muleContext = mock(MuleContextWithRegistries.class, RETURNS_DEEP_STUBS);
+    final MuleContextWithRegistries muleContext =
+        mock(MuleContextWithRegistries.class,
+             withSettings().defaultAnswer(RETURNS_DEEP_STUBS).extraInterfaces(PrivilegedMuleContext.class));
     when(muleContext.getUniqueIdString()).thenReturn(UUID.getUUID());
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new OnErrorPropagateHandler());
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);

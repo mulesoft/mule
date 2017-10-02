@@ -13,8 +13,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.operation.FlowListener;
 
 import org.reactivestreams.Publisher;

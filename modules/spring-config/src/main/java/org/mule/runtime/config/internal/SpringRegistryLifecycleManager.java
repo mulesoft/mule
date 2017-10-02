@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleObject;
@@ -93,7 +93,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
       setIgnoredObjectTypes(new Class[] {ExtensionManager.class, SpringRegistry.class, SpringRegistryBootstrap.class,
           Component.class, MessageSource.class, InterceptingMessageProcessor.class, AbstractMessageProcessorOwner.class,
-          MessagingExceptionHandler.class, AbstractAsyncRequestReplyRequester.class, OutboundRouter.class,
+          FlowExceptionHandler.class, AbstractAsyncRequestReplyRequester.class, OutboundRouter.class,
           MessageProcessorChain.class, MuleContext.class, Service.class});
     }
 

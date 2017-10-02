@@ -5,34 +5,35 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.util;
+package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getComponentIdentifier;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.api.util.ExceptionUtils.isUnknownMuleError;
+import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.api.exception.ErrorMapping;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class MessagingExceptionResolver {
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
    */
   public MessagingException resolve(final MessagingException me, MuleContext context) {
-    ErrorTypeLocator locator = context.getErrorTypeLocator();
+    ErrorTypeLocator locator = ((PrivilegedMuleContext) context).getErrorTypeLocator();
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
 
     if (!rootCause.isPresent()) {
@@ -137,7 +138,8 @@ public class MessagingExceptionResolver {
   }
 
   private MessagingException updateCurrent(MessagingException me, Component processor, MuleContext context) {
-    CoreEvent errorEvent = createErrorEvent(me.getEvent(), processor, me, context.getErrorTypeLocator());
+    CoreEvent errorEvent =
+        createErrorEvent(me.getEvent(), processor, me, ((PrivilegedMuleContext) context).getErrorTypeLocator());
     Component failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
     MessagingException updated =
         me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)

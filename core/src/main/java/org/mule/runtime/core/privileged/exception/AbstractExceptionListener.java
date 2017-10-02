@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.privileged.exception;
 
 import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -194,13 +195,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   protected void rollback(Exception ex) {
-    if (TransactionCoordination.getInstance().getTransaction() != null) {
-      TransactionCoordination.getInstance().rollbackCurrentTransaction();
-    }
-    if (ex instanceof MessagingException) {
-      MessagingException messagingException = (MessagingException) ex;
-      messagingException.setCauseRollback(true);
-    }
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   public void setNotificationFirer(NotificationDispatcher notificationFirer) {

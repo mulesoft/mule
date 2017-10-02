@@ -6,21 +6,15 @@
  */
 package org.mule.runtime.core.privileged.event;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
 
 import org.reactivestreams.Publisher;
 
 import java.util.Optional;
-
-import reactor.core.publisher.Mono;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and

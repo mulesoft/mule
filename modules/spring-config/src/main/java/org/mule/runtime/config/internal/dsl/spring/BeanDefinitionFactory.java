@@ -36,9 +36,9 @@ import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.MAP
 import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.runtime.core.api.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.Component;
@@ -51,12 +51,12 @@ import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.core.api.exception.ErrorMapping;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;

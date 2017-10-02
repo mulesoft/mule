@@ -24,7 +24,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
@@ -145,7 +145,7 @@ public class MuleExtensionUtils {
       }
 
       @Override
-      public MessagingExceptionHandler getExceptionListener() {
+      public FlowExceptionHandler getExceptionListener() {
         return null;
       }
 

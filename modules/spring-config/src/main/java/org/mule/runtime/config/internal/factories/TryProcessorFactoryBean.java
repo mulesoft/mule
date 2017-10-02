@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.processor.TryScope;
@@ -32,7 +32,7 @@ import java.util.List;
 public class TryProcessorFactoryBean extends AbstractComponent implements FactoryBean {
 
   protected List messageProcessors;
-  protected MessagingExceptionHandler exceptionListener;
+  protected FlowExceptionHandler exceptionListener;
   protected String transactionalAction;
   private TransactionType transactionType;
 
@@ -72,7 +72,7 @@ public class TryProcessorFactoryBean extends AbstractComponent implements Factor
     return false;
   }
 
-  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
+  public void setExceptionListener(FlowExceptionHandler exceptionListener) {
     this.exceptionListener = exceptionListener;
   }
 

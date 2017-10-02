@@ -19,7 +19,6 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

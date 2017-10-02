@@ -9,10 +9,11 @@ package org.mule.runtime.core.api.event;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,7 +52,7 @@ public interface EventContextFactory {
    * @param exceptionHandler the exception handler that will deal with an error context
    */
   static EventContext create(String id, String serverId, ComponentLocation location,
-                             MessagingExceptionHandler exceptionHandler) {
+                             FlowExceptionHandler exceptionHandler) {
     return create(id, serverId, location, null, exceptionHandler);
   }
 
@@ -64,7 +65,7 @@ public interface EventContextFactory {
    * @param exceptionHandler the exception handler that will deal with an error context
    */
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
-                             MessagingExceptionHandler exceptionHandler) {
+                             FlowExceptionHandler exceptionHandler) {
     return create(id, serverId, location, correlationId, Mono.empty(), exceptionHandler);
   }
 
@@ -93,7 +94,7 @@ public interface EventContextFactory {
    */
   static EventContext create(String id, String serverId, ComponentLocation location, String correlationId,
                              Publisher<Void> externalCompletionPublisher,
-                             MessagingExceptionHandler exceptionHandler) {
+                             FlowExceptionHandler exceptionHandler) {
     return new DefaultEventContext(id, serverId, location, correlationId, externalCompletionPublisher, exceptionHandler);
   }
 }

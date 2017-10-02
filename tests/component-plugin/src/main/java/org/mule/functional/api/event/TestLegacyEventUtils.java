@@ -10,7 +10,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
@@ -27,7 +27,7 @@ public final class TestLegacyEventUtils {
     // Nothing to do
   }
 
-  public static final MessagingExceptionHandler HANDLER = NullExceptionHandler.getInstance();
+  public static final FlowExceptionHandler HANDLER = NullExceptionHandler.getInstance();
 
   /**
    * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
@@ -40,10 +40,10 @@ public final class TestLegacyEventUtils {
   }
 
   /**
-   * @return the {@link MessagingExceptionHandler} to be applied if an exception is unhandled during the processing of the given
+   * @return the {@link FlowExceptionHandler} to be applied if an exception is unhandled during the processing of the given
    *         event.
    */
-  public static MessagingExceptionHandler getEffectiveExceptionHandler(CoreEvent event) {
+  public static FlowExceptionHandler getEffectiveExceptionHandler(CoreEvent event) {
     Field exceptionHandlerField;
     try {
       exceptionHandlerField = event.getContext().getClass().getSuperclass().getDeclaredField("exceptionHandler");
@@ -55,11 +55,11 @@ public final class TestLegacyEventUtils {
     try {
       BaseEventContext eventContext = (BaseEventContext) event.getContext();
 
-      MessagingExceptionHandler effectiveMessagingExceptionHandler =
-          (MessagingExceptionHandler) exceptionHandlerField.get(eventContext);
+      FlowExceptionHandler effectiveMessagingExceptionHandler =
+          (FlowExceptionHandler) exceptionHandlerField.get(eventContext);
       while (eventContext.getParentContext().isPresent() && effectiveMessagingExceptionHandler == HANDLER) {
         eventContext = eventContext.getParentContext().get();
-        effectiveMessagingExceptionHandler = (MessagingExceptionHandler) exceptionHandlerField.get(eventContext);
+        effectiveMessagingExceptionHandler = (FlowExceptionHandler) exceptionHandlerField.get(eventContext);
       }
 
       return effectiveMessagingExceptionHandler;

@@ -16,8 +16,8 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

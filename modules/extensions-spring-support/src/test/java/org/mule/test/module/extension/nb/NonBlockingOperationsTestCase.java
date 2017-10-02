@@ -10,16 +10,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
 import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+
+import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
-import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
@@ -28,13 +28,11 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
 
 public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Rule
-  public ExpectedException expectedException = none();
+  public ExpectedError expectedException = none();
 
   @Override
   protected String getConfigFile() {
@@ -48,17 +46,9 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
   @Test
   public void failingNonBlockingConnectedOperation() throws Exception {
-    Processor operation = ((Pipeline) getFlowConstruct("fireMissile")).getProcessors().get(1);
-
-    expectedException.expect(instanceOf(MessagingException.class));
-    expectedException.expect(new ArgumentMatcher<Object>() {
-
-      @Override
-      public boolean matches(Object o) {
-        return ((MessagingException) o).getFailingComponent() == operation;
-      }
-    });
-    expectedException.expectMessage(MISSILE_PROOF);
+    expectedException.expectFailingComponent(is(locator
+        .find(Location.builder().globalName("fireMissile").addProcessorsPart().addIndexPart(1).build()).get()));
+    expectedException.expectMessage(is(MISSILE_PROOF));
     expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
     Villain villain = new MissileProofVillain();

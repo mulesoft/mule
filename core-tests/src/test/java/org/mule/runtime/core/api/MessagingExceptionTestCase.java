@@ -24,7 +24,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.api.exception.MessagingException.PAYLOAD_INFO_KEY;
+import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -37,8 +37,8 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.tck.SerializationTestUtils;

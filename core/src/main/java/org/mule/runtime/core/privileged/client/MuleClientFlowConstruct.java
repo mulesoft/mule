@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -46,8 +46,8 @@ public class MuleClientFlowConstruct extends AbstractComponent implements FlowCo
   }
 
   @Override
-  public MessagingExceptionHandler getExceptionListener() {
-    final MessagingExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler(empty());
+  public FlowExceptionHandler getExceptionListener() {
+    final FlowExceptionHandler exceptionListener = muleContext.getDefaultErrorHandler(empty());
     try {
       initialiseIfNeeded(exceptionListener, true, muleContext);
     } catch (InitialisationException e) {

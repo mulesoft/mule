@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -78,7 +79,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   public void initialise() throws InitialisationException {
     extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
     extensionErrorsRegistrant =
-        new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(), muleContext.getErrorTypeLocator());
+        new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(),
+                                      ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
     extensionActivator = new ExtensionActivator(extensionErrorsRegistrant, muleContext);
   }
 

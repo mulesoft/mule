@@ -30,20 +30,20 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.api.exception.AbstractExceptionListener;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class DefaultFlowBuilder implements Builder {
 
   private MessageSource source;
   private List<Processor> processors = emptyList();
-  private MessagingExceptionHandler exceptionListener;
+  private FlowExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private String initialState = INITIAL_STATE_STARTED;
   private int maxConcurrency = DEFAULT_MAX_CONCURRENCY;
@@ -139,7 +139,7 @@ public class DefaultFlowBuilder implements Builder {
    * @return same builder instance
    */
   @Override
-  public Builder messagingExceptionHandler(MessagingExceptionHandler exceptionListener) {
+  public Builder messagingExceptionHandler(FlowExceptionHandler exceptionListener) {
     checkImmutable();
     this.exceptionListener = exceptionListener;
     return this;
@@ -213,7 +213,7 @@ public class DefaultFlowBuilder implements Builder {
     private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
 
     protected DefaultFlow(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
-                          Optional<MessagingExceptionHandler> exceptionListener,
+                          Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           int maxConcurrency, FlowConstructStatistics flowConstructStatistics) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,

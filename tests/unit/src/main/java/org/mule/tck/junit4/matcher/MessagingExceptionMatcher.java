@@ -6,7 +6,7 @@
  */
 package org.mule.tck.junit4.matcher;
 
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

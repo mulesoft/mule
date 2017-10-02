@@ -10,7 +10,7 @@ import static org.mule.runtime.core.internal.processor.strategy.DirectProcessing
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -27,7 +27,7 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
    * @return The exception listener that will be used to handle exceptions that may be thrown at different points during the
    *         message flow defined by this construct.
    */
-  MessagingExceptionHandler getExceptionListener();
+  FlowExceptionHandler getExceptionListener();
 
   /**
    * @return The statistics holder used by this flow construct to keep track of its activity.

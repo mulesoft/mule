@@ -7,22 +7,21 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Provides a exception strategy for testing purposes.
  */
-public class TestExceptionStrategy implements MessagingExceptionHandler, SystemExceptionHandler {
+public class TestExceptionStrategy implements FlowExceptionHandler, SystemExceptionHandler {
 
   /**
    * logger used by this class
@@ -73,14 +72,17 @@ public class TestExceptionStrategy implements MessagingExceptionHandler, SystemE
     return event;
   }
 
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  @Override
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
     return handleException(exception, event, null);
   }
 
+  @Override
   public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
     handleException(exception, null, rollbackMethod);
   }
 
+  @Override
   public void handleException(Exception exception) {
     handleException(exception, null, null);
   }

@@ -12,20 +12,25 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.test.runner.RunnerDelegateTo;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 import java.util.Collection;
 
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestCase {
+
+  @Rule
+  public ExpectedError expected = ExpectedError.none();
 
   @Parameterized.Parameter
   public String configFile;
@@ -107,14 +112,10 @@ public class ModuleWithGlobalElementTestCase extends AbstractModuleWithHttpTestC
 
   @Test
   public void testHttpDontLoginThrowsException() throws Exception {
-    try {
-      flowRunner("testHttpDontLogin").run();
-      fail("Should not have reach here");
-    } catch (MessagingException me) {
-      Throwable cause = me.getEvent().getError().get().getCause();
-      assertThat(cause, instanceOf(ResponseValidatorTypedException.class));
-      assertThat(cause.getMessage(), containsString("failed: unauthorized (401)"));
-    }
+    expected.expectCause(instanceOf(ResponseValidatorTypedException.class));
+    expected.expectMessage(containsString("failed: unauthorized (401)"));
+
+    flowRunner("testHttpDontLogin").run();
   }
 
   @Test

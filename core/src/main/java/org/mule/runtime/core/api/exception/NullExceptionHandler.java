@@ -9,31 +9,33 @@ package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
- * Null {@link MessagingExceptionHandler} which can be used to configure a {@link MessageProcessorChain} to not handle errors.
+ * Null {@link FlowExceptionHandler} which can be used to configure a {@link MessageProcessorChain} to not handle errors.
  *
  * @since 4.0
  */
-public final class NullExceptionHandler implements MessagingExceptionHandler {
+public final class NullExceptionHandler implements FlowExceptionHandler {
 
   private static final NullExceptionHandler INSTANCE = new NullExceptionHandler();
 
   private NullExceptionHandler() {}
 
-  public static MessagingExceptionHandler getInstance() {
+  public static FlowExceptionHandler getInstance() {
     return INSTANCE;
   }
 
   @Override
-  public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  public CoreEvent handleException(Exception exception, CoreEvent event) {
     throw new RuntimeException(exception);
   }
 
   @Override
-  public Publisher<CoreEvent> apply(MessagingException exception) {
+  public Publisher<CoreEvent> apply(Exception exception) {
     return Mono.error(exception);
   }
 }

@@ -47,12 +47,13 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.core.internal.config.StartupContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
@@ -66,6 +67,10 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.tck.util.CompilerUtils;
 
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -76,10 +81,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -1514,9 +1515,10 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     try {
       executeApplicationFlow("main");
       fail("Expected to fail as there should be a missing class");
-    } catch (MessagingException e) {
-      assertThat(e.getCause(), instanceOf(NoClassDefFoundError.class));
-      assertThat(e.getCause().getMessage(), containsString("org/foo/EchoTest"));
+    } catch (Exception e) {
+      assertThat(e.getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
   }
 

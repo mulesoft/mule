@@ -20,14 +20,14 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -67,7 +67,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   protected CoreEvent mockEvent;
   @Mock
-  protected MessagingExceptionHandler mockMessagingExceptionHandler;
+  protected FlowExceptionHandler mockMessagingExceptionHandler;
 
   @Before
   public void prepareEvent() throws RegistrationException {

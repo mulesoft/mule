@@ -10,10 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -67,12 +66,8 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
 
   @Test
   public void listenError() throws Exception {
-    try {
-      flowRunner("listenAndFail").run();
-      fail("Flow should have failed");
-    } catch (MessagingException e) {
-      check(() -> assertThat(config.getExceptionCount(), is(1)));
-    }
+    flowRunner("listenAndFail").runExpectingException();
+    check(() -> assertThat(config.getExceptionCount(), is(1)));
   }
 
   private void check(Runnable probe) {

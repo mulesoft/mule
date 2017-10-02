@@ -19,9 +19,9 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.api.util.ExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -32,6 +32,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -46,21 +47,26 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
@@ -68,9 +74,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 
@@ -251,7 +254,7 @@ public class ModuleFlowProcessingPhase
                                                                                ModuleFlowProcessingPhaseTemplate template) {
     return eventOrException -> template.afterPhaseExecution(eventOrException.mapLeft(messagingException -> {
       messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
-                                                            muleContext.getErrorTypeLocator()));
+                                                            ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()));
       return messagingException;
     }));
   }
@@ -324,9 +327,9 @@ public class ModuleFlowProcessingPhase
 
     private final ModuleFlowProcessingPhaseTemplate template;
     private final CoreEvent templateEvent;
-    private final MessagingExceptionHandler messagingExceptionHandler;
+    private final FlowExceptionHandler messagingExceptionHandler;
 
-    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, MessagingExceptionHandler messagingExceptionHandler,
+    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, FlowExceptionHandler messagingExceptionHandler,
                          CoreEvent templateEvent) {
       this.template = template;
       this.templateEvent = templateEvent;

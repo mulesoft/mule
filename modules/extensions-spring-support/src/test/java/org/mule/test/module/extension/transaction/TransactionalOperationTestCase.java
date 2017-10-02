@@ -12,19 +12,20 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.api.message.Error;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
 
+import org.junit.Test;
+
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.junit.Test;
 
 public class TransactionalOperationTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -55,11 +56,8 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void localTxDoesntSupportMultipleResources() throws Exception {
-    EventProcessingException exception = flowRunner("localTxDoesntSupportMultipleResources").runExpectingException();
-    Error error = exception.getEvent().getError().get();
-    assertThat(error.getDescription(),
-               is(containsString("the current transaction doesn't support it and could not be bound")));
-    assertThat(error.getCause(), is(instanceOf(TransactionException.class)));
+    flowRunner("localTxDoesntSupportMultipleResources").runExpectingException(allOf(instanceOf(TransactionException.class),
+                                                                                    hasMessage(containsString("the current transaction doesn't support it and could not be bound"))));
   }
 
   @Test

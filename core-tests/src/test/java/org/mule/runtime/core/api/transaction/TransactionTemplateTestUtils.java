@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.transaction;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.mockito.Answers;
 import org.mockito.Mockito;

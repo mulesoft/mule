@@ -54,7 +54,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -69,6 +68,8 @@ import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQue
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -137,7 +138,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000L);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
+    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(errorTypeLocator);
     when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
     when(errorTypeLocator.lookupErrorType((Exception) any())).thenReturn(errorType);
     flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();

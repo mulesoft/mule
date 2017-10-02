@@ -40,12 +40,11 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,6 +53,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -118,8 +119,9 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
     typeLocator = createDefaultErrorTypeLocator(typeRepository);
 
     when(muleContext.getErrorTypeRepository()).thenReturn(typeRepository);
-    when(muleContext.getErrorTypeLocator()).thenReturn(typeLocator);
-    errorsRegistrant = new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(), muleContext.getErrorTypeLocator());
+    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
+    errorsRegistrant = new ExtensionErrorsRegistrant(muleContext.getErrorTypeRepository(),
+                                                     ((PrivilegedMuleContext) muleContext).getErrorTypeLocator());
 
     when(extensionModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
     when(extensionModel.getXmlDslModel()).thenReturn(xmlDslModel);

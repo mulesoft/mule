@@ -29,30 +29,29 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.AbstractExceptionListener;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.requestreply.ReplyToPropertyRequestReplyReplier;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
@@ -67,7 +66,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected ErrorTypeMatcher errorTypeMatcher = null;
 
   @Override
-  final public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+  final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
       return from(applyInternal(exception, event)).block();
     } catch (Throwable throwable) {
@@ -76,21 +75,25 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public Publisher<CoreEvent> apply(final MessagingException exception) {
-    return applyInternal(exception, exception.getEvent());
+  public Publisher<CoreEvent> apply(final Exception exception) {
+    return applyInternal(exception, ((MessagingException) exception).getEvent());
   }
 
-  private Publisher<CoreEvent> applyInternal(final MessagingException exception, CoreEvent event) {
+  private Publisher<CoreEvent> applyInternal(final Exception exception, CoreEvent event) {
     return just(event)
         .map(beforeRouting(exception))
         .flatMapMany(route(exception)).last()
         .map(afterRouting(exception))
         .doOnError(MessagingException.class, onRoutingError())
         .<CoreEvent>handle((result, sink) -> {
-          if (exception.handled()) {
-            sink.next(result);
+          if (exception instanceof MessagingException) {
+            if (((MessagingException) exception).handled()) {
+              sink.next(result);
+            } else {
+              ((MessagingException) exception).setProcessedEvent(result);
+              sink.error(exception);
+            }
           } else {
-            exception.setProcessedEvent(result);
             sink.error(exception);
           }
         })
@@ -118,7 +121,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
                                                             getLocation(), PROCESS_END));
   }
 
-  protected Function<CoreEvent, Publisher<CoreEvent>> route(MessagingException exception) {
+  protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
     return event -> {
       if (getMessageProcessors().isEmpty()) {
         return just(event);
@@ -229,7 +232,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
   }
 
-  protected Function<CoreEvent, CoreEvent> afterRouting(MessagingException exception) {
+  protected Function<CoreEvent, CoreEvent> afterRouting(Exception exception) {
     return event -> {
       if (event != null) {
         event = processReplyTo(event, exception);
@@ -239,7 +242,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     };
   }
 
-  protected Function<CoreEvent, CoreEvent> beforeRouting(MessagingException exception) {
+  protected Function<CoreEvent, CoreEvent> beforeRouting(Exception exception) {
     return event -> {
       notificationFirer.dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
                                                               getLocation(), PROCESS_START));
@@ -247,7 +250,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       logException(exception, event);
       processStatistics();
       // Reset this flag to apply situation where a error-handler exception is handled in a parent error-handler.
-      exception.setInErrorHandler(false);
+      if (exception instanceof MessagingException) {
+        ((MessagingException) exception).setInErrorHandler(false);
+      }
       markExceptionAsHandledIfRequired(exception);
       return event;
     };

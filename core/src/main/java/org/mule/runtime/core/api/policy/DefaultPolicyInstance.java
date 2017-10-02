@@ -13,26 +13,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 
-import java.util.Optional;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import java.util.Optional;
 
 
 //TODO MULE-10963 - Remove FlowConstruct implementation once MPs don't depend on FlowConstructAware anymore.
@@ -67,16 +67,16 @@ public class DefaultPolicyInstance extends AbstractComponent
   }
 
   @Override
-  public MessagingExceptionHandler getExceptionListener() {
-    return new MessagingExceptionHandler() {
+  public FlowExceptionHandler getExceptionListener() {
+    return new FlowExceptionHandler() {
 
       @Override
-      public CoreEvent handleException(MessagingException exception, CoreEvent event) {
+      public CoreEvent handleException(Exception exception, CoreEvent event) {
         return null;
       }
 
       @Override
-      public Publisher<CoreEvent> apply(MessagingException exception) {
+      public Publisher<CoreEvent> apply(Exception exception) {
         return error(exception);
       }
     };

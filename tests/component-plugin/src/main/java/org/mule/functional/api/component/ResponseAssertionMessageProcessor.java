@@ -24,7 +24,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -79,7 +78,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       try {
         return processRequest(event);
       } catch (MuleException e) {
-        throw propagate(new MessagingException(event, e));
+        throw propagate(e);
       }
     });
     flux = from(flux.transform(next));
@@ -87,7 +86,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       try {
         return processResponse(event);
       } catch (MuleException e) {
-        throw propagate(new MessagingException(event, e));
+        throw propagate(e);
       }
     });
   }

@@ -7,18 +7,16 @@
 package org.mule.runtime.core.internal.exception;
 
 import static reactor.core.publisher.Mono.just;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.processor.Processor;
+
+import org.reactivestreams.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -31,11 +29,6 @@ import org.reactivestreams.Publisher;
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private Integer maxRedeliveryAttempts;
-
-  @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    super.doInitialise(muleContext);
-  }
 
   public void setMaxRedeliveryAttempts(Integer maxRedeliveryAttempts) {
     this.maxRedeliveryAttempts = maxRedeliveryAttempts;
@@ -55,7 +48,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<CoreEvent, CoreEvent> beforeRouting(MessagingException exception) {
+  protected Function<CoreEvent, CoreEvent> beforeRouting(Exception exception) {
     return event -> {
       event = super.beforeRouting(exception).apply(event);
       if (!isRedeliveryExhausted(exception)) {
@@ -75,7 +68,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected Function<CoreEvent, Publisher<CoreEvent>> route(MessagingException exception) {
+  protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
     if (isRedeliveryExhausted(exception)) {
       logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
     } else {

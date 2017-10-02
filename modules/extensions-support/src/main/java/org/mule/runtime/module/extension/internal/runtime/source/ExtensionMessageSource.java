@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,7 +35,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -44,8 +44,10 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -59,13 +61,14 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
+import org.slf4j.Logger;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -359,7 +362,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       @Override
       public ErrorTypeLocator getErrorTypeLocator() {
-        return muleContext.getErrorTypeLocator();
+        return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
       }
     };
   }

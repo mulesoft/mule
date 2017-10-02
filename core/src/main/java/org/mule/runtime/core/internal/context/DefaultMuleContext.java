@@ -84,9 +84,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.ErrorTypeLocator;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -108,6 +106,7 @@ import org.mule.runtime.core.internal.connector.DefaultSchedulerController;
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.Registry;
@@ -119,8 +118,10 @@ import org.mule.runtime.core.internal.util.splash.ApplicationStartupSplashScreen
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
 import org.slf4j.Logger;
 
@@ -133,7 +134,7 @@ import javax.transaction.TransactionManager;
 
 import reactor.core.publisher.Hooks;
 
-public class DefaultMuleContext implements MuleContextWithRegistries {
+public class DefaultMuleContext implements MuleContextWithRegistries, PrivilegedMuleContext {
 
   /**
    * TODO: Remove these constants. These constants only make sense until we have a reliable solution for durable persistence in
@@ -827,8 +828,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries {
   }
 
   @Override
-  public MessagingExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName) {
-    MessagingExceptionHandler defaultErrorHandler;
+  public FlowExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName) {
+    FlowExceptionHandler defaultErrorHandler;
     if (config.getDefaultErrorHandlerName() != null) {
       defaultErrorHandler = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
       if (defaultErrorHandler == null) {

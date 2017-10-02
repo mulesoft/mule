@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -34,7 +34,7 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   private String initialState;
   private MessageSource messageSource;
   private List<Processor> messageProcessors;
-  private MessagingExceptionHandler exceptionListener;
+  private FlowExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private Integer maxConcurrency;
 
@@ -123,12 +123,12 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   }
 
 
-  public MessagingExceptionHandler getExceptionListener() {
+  public FlowExceptionHandler getExceptionListener() {
     return exceptionListener;
   }
 
 
-  public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
+  public void setExceptionListener(FlowExceptionHandler exceptionListener) {
     this.exceptionListener = exceptionListener;
   }
 

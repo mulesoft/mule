@@ -15,7 +15,7 @@ public interface Acceptor {
 
   /**
    * @param event {@link CoreEvent} to route through exception handler
-   * @return true if this {@link org.mule.runtime.core.api.exception.MessagingExceptionHandler} should handler exception false
+   * @return true if this {@link org.mule.runtime.core.api.exception.FlowExceptionHandler} should handler exception false
    *         otherwise
    */
   boolean accept(CoreEvent event);

@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.execution;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 /**
  * Commits any pending transaction.

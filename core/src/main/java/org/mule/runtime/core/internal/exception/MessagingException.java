@@ -5,11 +5,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api.exception;
+package org.mule.runtime.core.internal.exception;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.abbreviate;
 import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCauseHierarchy;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -18,14 +19,15 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors specific to Message processing occur..
@@ -48,7 +50,6 @@ public class MessagingException extends EventProcessingException {
 
   protected transient CoreEvent processedEvent;
 
-  private boolean causeRollback;
   private boolean handled;
   private boolean inErrorHandler;
   private transient Component failingComponent;
@@ -93,7 +94,6 @@ public class MessagingException extends EventProcessingException {
   public MessagingException(CoreEvent event, MessagingException original) {
     super(original.getI18nMessage(), event, original.getCause());
     this.failingComponent = original.getFailingComponent();
-    this.causeRollback = original.causedRollback();
     this.handled = original.handled();
     original.getInfo().forEach((key, value) -> addInfo(key, value));
     extractMuleMessage(event);
@@ -174,6 +174,7 @@ public class MessagingException extends EventProcessingException {
   /**
    * @return event associated with the exception
    */
+  @Override
   public CoreEvent getEvent() {
     return processedEvent != null ? processedEvent : event;
   }
@@ -256,26 +257,7 @@ public class MessagingException extends EventProcessingException {
   }
 
   /**
-   * Signals if the exception cause rollback of any current transaction if any or if the message source should rollback incoming
-   * message
-   *
-   * @return true if exception cause rollback, false otherwise
-   */
-  public boolean causedRollback() {
-    return causeRollback;
-  }
-
-  /**
-   * Marks exception as rollback cause. Useful for message sources that can provide some rollback mechanism.
-   *
-   * @param causeRollback
-   */
-  public void setCauseRollback(boolean causeRollback) {
-    this.causeRollback = causeRollback;
-  }
-
-  /**
-   * Marks an exception as handled so it won't be re-throwed
+   * Marks an exception as handled so it won't be re-thrown
    *
    * @param handled true if the exception must be mark as handled, false otherwise
    */
@@ -313,6 +295,7 @@ public class MessagingException extends EventProcessingException {
   /**
    * @return the Mule component that causes the failure
    */
+  @Override
   public Component getFailingComponent() {
     return failingComponent;
   }

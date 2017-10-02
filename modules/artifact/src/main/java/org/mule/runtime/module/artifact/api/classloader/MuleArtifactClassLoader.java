@@ -148,7 +148,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
    */
   private void configureErrorHooks() {
-    if (getURLs().length == 0 || !isReactorLoaded(this)) {
+    if (getURLs().length == 0 || !isReactorLoaded(this) || !isPrivilegedApiAccessible(this)) {
       return;
     }
 
@@ -169,6 +169,20 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       return reactorHooks.getClassLoader().equals(cl);
     } catch (ClassNotFoundException e) {
       // ignore, we don't care if the plugin does not include reactor-core
+    }
+
+    return false;
+  }
+
+  /**
+   * Needs to be static because it must be mocked before construction.
+   */
+  private static Boolean isPrivilegedApiAccessible(MuleArtifactClassLoader cl) {
+    try {
+      Class eventProcessingException = cl.loadClass("org.mule.runtime.core.privileged.exception.EventProcessingException");
+      return eventProcessingException.getClassLoader().equals(cl);
+    } catch (ClassNotFoundException e) {
+      // ignore, we don't care if the plugin does not have privileged access
     }
 
     return false;

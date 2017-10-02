@@ -13,6 +13,7 @@ import static org.mockito.Matchers.any;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -20,15 +21,15 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Map;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
@@ -54,6 +55,7 @@ public class ErrorHooksConfigurationTestCase extends AbstractMuleTestCase {
   @Test
   public void invokesErrorHooksConfiguration() throws Exception {
     when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(true);
+    when(MuleArtifactClassLoader.class, "isPrivilegedApiAccessible", any(MuleArtifactClassLoader.class)).thenReturn(true);
 
     TestArtifactClassLoader classLoader = new TestArtifactClassLoader();
     assertThat(externalSetupText, is("called"));

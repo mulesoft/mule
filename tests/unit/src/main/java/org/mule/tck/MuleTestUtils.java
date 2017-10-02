@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
@@ -187,11 +187,11 @@ public final class MuleTestUtils {
    * @return the list of configured exception listeners
    * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
    */
-  public static List<MessagingExceptionHandler> getExceptionListeners(MessagingExceptionHandler exceptionHandler) {
+  public static List<FlowExceptionHandler> getExceptionListeners(FlowExceptionHandler exceptionHandler) {
     try {
       Method getExceptionListenersMethod = exceptionHandler.getClass().getMethod("getExceptionListeners");
       Object exceptionListeners = getExceptionListenersMethod.invoke(exceptionHandler);
-      return (List<MessagingExceptionHandler>) exceptionListeners;
+      return (List<FlowExceptionHandler>) exceptionListeners;
     } catch (Exception e) {
       throw new IllegalStateException("Cannot obtain exception listener for flow");
     }
