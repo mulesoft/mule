@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.artifact;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
+import static org.mule.runtime.module.service.internal.artifact.ServiceDescriptor.SERVICE_PROPERTIES;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
