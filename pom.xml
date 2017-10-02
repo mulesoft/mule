@@ -198,7 +198,8 @@
         <jschVersion>1.0.0</jschVersion>
         <jsonSchemaValidatorVersion>2.2.8</jsonSchemaValidatorVersion>
         <junitVersion>4.12</junitVersion>
-        <jythonVersion>2.7.1b3</jythonVersion>
+        <jythonVersion>2.7.1</jythonVersion>
+        <jrubyVersion>9.1.13.0</jrubyVersion>
         <log4jVersion>2.8.2</log4jVersion>
         <disruptorVersion>3.3.0</disruptorVersion>
         <maven.buildnumber.plugin.version>1.1</maven.buildnumber.plugin.version>
