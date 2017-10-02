@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ import reactor.core.publisher.Hooks;
  * @since 4.0
  */
 // TODO MULE-13679 Remove this
-public class ErrorHooksConfiguration {
+public class ErrorHooksInternalConfiguration {
 
   private static Logger logger;
 
@@ -37,8 +37,8 @@ public class ErrorHooksConfiguration {
       throwable = unwrap(throwable);
       // Only apply hook for Event signals.
       if (signal instanceof CoreEvent) {
-        return throwable instanceof EventProcessingException ? throwable
-            : new EventProcessingException((CoreEvent) signal, throwable);
+        return throwable instanceof MessagingException ? throwable
+            : new MessagingException((CoreEvent) signal, throwable);
       } else {
         return throwable;
       }
@@ -51,9 +51,9 @@ public class ErrorHooksConfiguration {
 
   private static void logError(String message) {
     if (logger == null) {
-      synchronized (ErrorHooksConfiguration.class) {
+      synchronized (ErrorHooksInternalConfiguration.class) {
         if (logger == null) {
-          logger = getLogger(ErrorHooksConfiguration.class);
+          logger = getLogger(ErrorHooksInternalConfiguration.class);
         }
       }
     }
