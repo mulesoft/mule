@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
@@ -62,7 +61,7 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     this.urls = urls;
     this.classLoader = new URLClassLoader(urls, null);
-    this.testContainerModuleRepository = new DefaultModuleRepository(new ContainerModuleDiscoverer(classLoader));
+    this.testContainerModuleRepository = new DefaultModuleRepository(new TestContainerModuleDiscoverer(classLoader));
   }
 
   /**

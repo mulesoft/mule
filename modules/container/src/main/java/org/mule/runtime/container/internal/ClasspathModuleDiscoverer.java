@@ -54,7 +54,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     Set<String> moduleNames = new HashSet<>();
 
     try {
-      for (Properties moduleProperties : discoverProperties(classLoader, MODULE_PROPERTIES)) {
+      for (Properties moduleProperties : discoverProperties(classLoader, getModulePropertiesFileName())) {
         final MuleModule module = createModule(moduleProperties);
 
         if (moduleNames.contains(module.getName())) {
@@ -69,6 +69,10 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     }
 
     return modules;
+  }
+
+  protected String getModulePropertiesFileName() {
+    return MODULE_PROPERTIES;
   }
 
   private MuleModule createModule(Properties moduleProperties) {

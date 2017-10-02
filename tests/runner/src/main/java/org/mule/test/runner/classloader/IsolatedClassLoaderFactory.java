@@ -26,7 +26,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
-import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
@@ -53,8 +52,6 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -68,6 +65,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -119,9 +118,9 @@ public class IsolatedClassLoaderFactory {
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
     DefaultModuleRepository moduleRepository =
-        new DefaultModuleRepository(new TestContainerModuleDiscoverer(extraPrivilegedArtifacts,
-                                                                      new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class
-                                                                          .getClassLoader())));
+        new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
+                                                             new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
+                                                                 .getClassLoader())));
 
     try (final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactsUrlClassification.getContainerUrls().toArray(new URL[0]),

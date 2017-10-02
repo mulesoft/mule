@@ -19,7 +19,7 @@ public interface ModuleDiscoverer {
   /**
    * Discovers available mule modules.
    *
-   * @return a non null {@linl List} containing all {@link MuleModule} found in the container.
+   * @return a non null {@link List} containing all {@link MuleModule} found in the container.
    */
   List<MuleModule> discover();
 }

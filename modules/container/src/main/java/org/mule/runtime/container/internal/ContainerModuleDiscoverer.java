@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.container.api.MuleModule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,8 +30,14 @@ public class ContainerModuleDiscoverer implements ModuleDiscoverer {
    */
   public ContainerModuleDiscoverer(ClassLoader containerClassLoader) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    moduleDiscoverer =
-        new CompositeModuleDiscoverer(new JreModuleDiscoverer(), new ClasspathModuleDiscoverer(containerClassLoader));
+    moduleDiscoverer = new CompositeModuleDiscoverer(getModuleDiscoverers(containerClassLoader).toArray(new ModuleDiscoverer[0]));
+  }
+
+  protected List<ModuleDiscoverer> getModuleDiscoverers(ClassLoader containerClassLoader) {
+    List<ModuleDiscoverer> result = new ArrayList<>();
+    result.add(new JreModuleDiscoverer());
+    result.add(new ClasspathModuleDiscoverer(containerClassLoader));
+    return result;
   }
 
   @Override
