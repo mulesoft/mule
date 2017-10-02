@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static java.util.Optional.empty;
 import static java.io.File.createTempFile;
 import static java.io.File.separator;
 import static java.lang.Thread.currentThread;
@@ -128,7 +129,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException.expectMessage(allOf(containsString(ARTIFACT_DESCRIPTOR_DOES_NOT_EXISTS_ERROR),
                                           containsString(MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION)));
-    descriptorFactory.create(tempFolder);
+    descriptorFactory.create(tempFolder, empty());
   }
 
   @Test
@@ -148,7 +149,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     PolicyTemplateDescriptorFactory descriptorFactory =
         new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
-    PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder);
+    PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
     assertThat(desc.getClassLoaderModel().getUrls().length, equalTo(2));
     assertThat(toFile(desc.getClassLoaderModel().getUrls()[0]).getPath(), equalTo(tempFolder.toString()));
@@ -173,7 +174,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     PolicyTemplateDescriptorFactory descriptorFactory =
         new PolicyTemplateDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository);
-    PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder);
+    PolicyTemplateDescriptor desc = descriptorFactory.create(tempFolder, empty());
 
     assertThat(desc.getBundleDescriptor().getArtifactId(), equalTo(POLICY_NAME));
     assertThat(desc.getBundleDescriptor().getGroupId(), equalTo(POLICY_GROUP_ID));
@@ -213,10 +214,10 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     final ArtifactPluginDescriptor expectedPluginDescriptor2 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor2.getName()).thenReturn("plugin2");
     when(expectedPluginDescriptor2.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
-    when(pluginDescriptorFactory.create(any())).thenReturn(expectedPluginDescriptor1)
+    when(pluginDescriptorFactory.create(any(), empty())).thenReturn(expectedPluginDescriptor1)
         .thenReturn(expectedPluginDescriptor2);
 
-    PolicyTemplateDescriptor descriptor = policyTemplateDescriptorFactory.create(tempFolder);
+    PolicyTemplateDescriptor descriptor = policyTemplateDescriptorFactory.create(tempFolder, empty());
 
     Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
     assertThat(plugins.size(), equalTo(2));
@@ -242,7 +243,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
         .expectMessage(invalidClassLoaderModelIdError(tempFolder, mulePolicyModelBuilder.getClassLoaderModelDescriptorLoader()));
-    descriptorFactory.create(tempFolder);
+    descriptorFactory.create(tempFolder, empty());
   }
 
   @Test
@@ -263,7 +264,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException
         .expectMessage(invalidBundleDescriptorLoaderIdError(tempFolder, mulePolicyModelBuilder.getBundleDescriptorLoader()));
-    descriptorFactory.create(tempFolder);
+    descriptorFactory.create(tempFolder, empty());
   }
 
   private MuleArtifactLoaderDescriptor createPolicyBundleDescriptorLoader(String bundleDescriptorLoaderId) {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -93,7 +94,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void doNotFailIfNoAppsFolderPresent() throws Exception {
-    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
+    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty())).thenReturn(mockDomain);
     DomainArchiveDeployer domainArchiveDeployer =
         new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
     assertThat(domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH), is(mockDomain));

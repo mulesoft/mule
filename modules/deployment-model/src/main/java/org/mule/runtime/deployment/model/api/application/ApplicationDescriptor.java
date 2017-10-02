@@ -15,13 +15,17 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.google.common.collect.ImmutableList;
+import static java.util.Optional.empty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.Properties;
 
 public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
@@ -41,7 +45,11 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
    * @param name application name. Non empty.
    */
   public ApplicationDescriptor(String name) {
-    super(name);
+    super(name, empty());
+  }
+
+  public ApplicationDescriptor(String name, Optional<Properties> properties) {
+    super(name, properties);
   }
 
   public String getEncoding() {

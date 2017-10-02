@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:core="http://www.mulesoft.org/schema/mule/core"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:test="http://www.mulesoft.org/schema/mule/test"
+             xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+	<core:global-property name="componentValue" value="componentValue"/>
+	
+    <core:object name="component" class="${componentValue}" />
+
+
+</mule-domain>

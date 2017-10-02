@@ -29,6 +29,8 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -95,7 +97,8 @@ public class PolicyTemplateDescriptorFactory
   }
 
   @Override
-  protected PolicyTemplateDescriptor createArtifactDescriptor(File artifactLocation, String name) {
-    return new PolicyTemplateDescriptor(name);
+  protected PolicyTemplateDescriptor createArtifactDescriptor(File artifactLocation, String name,
+                                                              Optional<Properties> deploymentProperties) {
+    return new PolicyTemplateDescriptor(name, deploymentProperties);
   }
 }

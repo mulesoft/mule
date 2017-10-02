@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.Artifact;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 
 /**
  * Deploys a file based artifact into the mule container.
@@ -20,8 +21,6 @@ import java.util.Map;
  * @param <T> type of the artifact to deploy
  */
 public interface ArchiveDeployer<T extends Artifact> {
-
-  T deployPackagedArtifact(String zip) throws DeploymentException;
 
   T deployExplodedArtifact(String artifactDir) throws DeploymentException;
 
@@ -35,6 +34,10 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   T deployPackagedArtifact(URI artifactAchivedUri);
 
+  T deployPackagedArtifact(URI domainArchiveUrl, Optional<Properties> deploymentProperties) throws DeploymentException;
+
+  T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException;
+
   void undeployArtifact(String artifactId);
 
   File getDeploymentDirectory();
@@ -43,6 +46,8 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void redeploy(T artifact) throws DeploymentException;
 
+  void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
+
   Map<String, Map<URI, Long>> getArtifactsZombieMap();
 
   void setArtifactFactory(ArtifactFactory<T> artifactFactory);
@@ -50,4 +55,10 @@ public interface ArchiveDeployer<T extends Artifact> {
   void undeployArtifactWithoutUninstall(T artifact);
 
   void deployArtifact(T artifact) throws DeploymentException;
+
+  void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
+
+  T deployPackagedArtifact(String zip) throws DeploymentException;
+
+  T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties);
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+import static java.util.Optional.empty;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
@@ -33,6 +34,8 @@ import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Creates a {@link DefaultApplicationFactory} that returns {@link TestApplicationWrapper} instances in order to simulate errors
@@ -88,8 +91,13 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   }
 
   @Override
-  protected Application doCreateArtifact(File artifactDir) throws IOException {
-    Application app = super.doCreateArtifact(artifactDir);
+  protected Application doCreateArtifact(File appLocation) throws IOException {
+    return createArtifact(appLocation, empty());
+  }
+
+  @Override
+  public Application createArtifact(File appLocation, Optional<Properties> appProperties) throws IOException {
+    Application app = super.createArtifact(appLocation, appProperties);
 
     TestApplicationWrapper testApplicationWrapper = new TestApplicationWrapper(app);
     testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);

@@ -10,6 +10,8 @@ import org.mule.runtime.module.artifact.api.Artifact;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Generic Factory for an {@link Artifact}.
@@ -28,5 +30,14 @@ public interface ArtifactFactory<T extends Artifact> {
    * @return the directory of the Artifact. Usually this directory contains the Artifact resources
    */
   File getArtifactDir();
+
+  /**
+   * Creates an Artifact
+   *
+   * @param artifactDir directory where the artifact is located
+   * @param deploymentProperties deployment properties for configuration management
+   * @return the newly created Artifact
+   */
+  T createArtifact(File artifactLocation, Optional<Properties> deploymentProperties) throws IOException;
 
 }

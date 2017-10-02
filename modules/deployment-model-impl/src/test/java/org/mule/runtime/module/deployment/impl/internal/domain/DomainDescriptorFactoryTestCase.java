@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -26,7 +27,7 @@ public class DomainDescriptorFactoryTestCase
         new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                     createDescriptorLoaderRepository());
 
-    return DomainDescriptorFactory.create(getArtifact(domainPath));
+    return DomainDescriptorFactory.create(getArtifact(domainPath), empty());
   }
 
   @Override
@@ -60,6 +61,6 @@ public class DomainDescriptorFactoryTestCase
         new DomainDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory()),
                                     createDescriptorLoaderRepository());
 
-    return artifactDescriptorFactory.create(getArtifactFolder());
+    return artifactDescriptorFactory.create(getArtifactFolder(), empty());
   }
 }

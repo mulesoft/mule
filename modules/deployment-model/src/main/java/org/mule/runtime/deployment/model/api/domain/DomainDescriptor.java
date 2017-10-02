@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.deployment.model.api.domain;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.List;
 
 /**
  * Represents the description of a domain.
@@ -28,6 +30,16 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
    */
   public DomainDescriptor(String name) {
     super(name);
+  }
+
+  /**
+   * Creates a new domain descriptor
+   *
+   * @param name domain name. Non empty.
+   * @param deploymentProperties deploymentProperties
+   */
+  public DomainDescriptor(String name, Optional<Properties> deploymentProperties) {
+    super(name, deploymentProperties);
   }
 
   @Override

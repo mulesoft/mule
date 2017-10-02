@@ -8,11 +8,18 @@
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -25,10 +32,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateE
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Creates {@link ArtifactPluginDescriptor} instances
@@ -53,7 +56,8 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  public ArtifactPluginDescriptor create(File pluginJarFile) throws ArtifactDescriptorCreateException {
+  public ArtifactPluginDescriptor create(File pluginJarFile, Optional<Properties> deploymentProperties)
+      throws ArtifactDescriptorCreateException {
     try {
       checkArgument(pluginJarFile.isDirectory() || pluginJarFile.getName().endsWith(".jar"),
                     "provided file is not a plugin: " + pluginJarFile.getAbsolutePath());
@@ -62,7 +66,8 @@ public class ArtifactPluginDescriptorFactory
       Optional<byte[]> jsonDescriptorContentOptional = loadFileContentFrom(pluginJarFile, mulePluginJsonPathInsideJarFile);
       return jsonDescriptorContentOptional
           .map(jsonDescriptorContent -> loadFromJsonDescriptor(pluginJarFile,
-                                                               loadModelFromJson(new String(jsonDescriptorContent))))
+                                                               loadModelFromJson(new String(jsonDescriptorContent)),
+                                                               deploymentProperties))
           .orElseThrow(() -> new ArtifactDescriptorCreateException(pluginDescriptorNotFound(pluginJarFile,
                                                                                             mulePluginJsonPathInsideJarFile)));
     } catch (ArtifactDescriptorCreateException e) {
@@ -88,8 +93,9 @@ public class ArtifactPluginDescriptorFactory
   }
 
   @Override
-  protected ArtifactPluginDescriptor createArtifactDescriptor(File artifactLocation, String name) {
-    return new ArtifactPluginDescriptor(name);
+  protected ArtifactPluginDescriptor createArtifactDescriptor(File artifactLocation, String name,
+                                                              Optional<Properties> deploymentProperties) {
+    return new ArtifactPluginDescriptor(name, deploymentProperties);
   }
 
   private static String pluginDescriptorNotFound(File pluginFile, String mulePluginJsonPathInsideJarFile) {
@@ -100,4 +106,5 @@ public class ArtifactPluginDescriptorFactory
   protected AbstractMuleArtifactModelJsonSerializer<MulePluginModel> getMuleArtifactModelJsonSerializer() {
     return new MulePluginModelJsonSerializer();
   }
+
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.deployment.model.internal.plugin;
 
+import static java.util.Optional.empty;
 import static java.lang.String.format;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
@@ -149,7 +150,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                     throw new PluginResolutionError(format("Bundle URL should have been resolved for %s.",
                                                            dependency.getDescriptor()));
                   }
-                  ArtifactPluginDescriptor artifactPluginDescriptor = artifactDescriptorFactory.create(mulePluginLocation);
+                  ArtifactPluginDescriptor artifactPluginDescriptor =
+                      artifactDescriptorFactory.create(mulePluginLocation, empty());
                   artifactPluginDescriptor.setBundleDescriptor(dependency.getDescriptor());
                   foundDependencies.add(artifactPluginDescriptor);
                   visited.add(dependency.getDescriptor());

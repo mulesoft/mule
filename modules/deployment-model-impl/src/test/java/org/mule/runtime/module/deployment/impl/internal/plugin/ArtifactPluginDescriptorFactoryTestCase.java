@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.util.Optional.empty;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -125,7 +126,8 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .tempFolder(pluginsTempFolder.newFolder())
         .describedBy(mulePluginModel);
 
-    final ArtifactPluginDescriptor artifactPluginDescriptor = descriptorFactory.create(pluginFileBuilder.getArtifactFile());
+    final ArtifactPluginDescriptor artifactPluginDescriptor =
+        descriptorFactory.create(pluginFileBuilder.getArtifactFile(), empty());
     assertThat(artifactPluginDescriptor.getName(), equalTo(pluginName));
     assertThat(artifactPluginDescriptor.getBundleDescriptor().getArtifactId(), equalTo(pluginName));
   }
@@ -139,7 +141,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
 
     expectedException.expect(ArtifactDescriptorCreateException.class);
     expectedException.expectMessage(containsString(MULE_ARTIFACT_JSON_DESCRIPTOR));
-    descriptorFactory.create(pluginJarLocation);
+    descriptorFactory.create(pluginJarLocation, empty());
   }
 
   @Test
@@ -160,7 +162,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         .expectMessage(invalidClassLoaderModelIdError(pluginJarLocation,
                                                       pluginModelBuilder.getClassLoaderModelDescriptorLoader()));
 
-    descriptorFactory.create(pluginJarLocation);
+    descriptorFactory.create(pluginJarLocation, empty());
   }
 
   @Test
@@ -179,7 +181,7 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     expectedException
         .expectMessage(invalidBundleDescriptorLoaderIdError(pluginJarLocation, pluginModelBuilder.getBundleDescriptorLoader()));
 
-    descriptorFactory.create(pluginJarLocation);
+    descriptorFactory.create(pluginJarLocation, empty());
   }
 
   private MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String bundleDescriptorLoaderId) {

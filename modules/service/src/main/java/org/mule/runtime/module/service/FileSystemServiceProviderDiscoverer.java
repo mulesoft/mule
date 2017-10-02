@@ -8,6 +8,7 @@
 package org.mule.runtime.module.service;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -82,7 +83,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
         throw new ServiceResolutionError("Error processing service ZIP file", e);
       }
 
-      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder);
+      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder, empty());
       foundServices.add(serviceDescriptor);
     }
     return foundServices;
@@ -99,7 +100,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
         throw new ServiceResolutionError("Error processing service JAR file", e);
       }
 
-      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder);
+      final ServiceDescriptor serviceDescriptor = serviceDescriptorFactory.create(tempFolder, empty());
       foundServices.add(serviceDescriptor);
     }
     return foundServices;

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -44,8 +45,9 @@ public class ApplicationDescriptorFactory
   }
 
   @Override
-  protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name) {
-    return new ApplicationDescriptor(artifactLocation.getName());
+  protected ApplicationDescriptor createArtifactDescriptor(File artifactLocation, String name,
+                                                           Optional<Properties> deploymentProperties) {
+    return new ApplicationDescriptor(artifactLocation.getName(), deploymentProperties);
   }
 
   @Override
@@ -89,4 +91,5 @@ public class ApplicationDescriptorFactory
     }
     desc.setAppProperties(m);
   }
+
 }

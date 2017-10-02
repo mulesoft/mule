@@ -9,6 +9,10 @@ package org.mule.runtime.module.service;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import java.util.Optional;
+import java.util.Properties;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -28,6 +32,15 @@ public class ServiceDescriptor extends ArtifactDescriptor {
    */
   public ServiceDescriptor(String name) {
     super(name);
+  }
+
+  /**
+   * Creates a new service descriptor
+   *
+   * @param name service name. Non empty.
+   */
+  public ServiceDescriptor(String name, Optional<Properties> properties) {
+    super(name, properties);
   }
 
   public String getServiceProviderClassName() {

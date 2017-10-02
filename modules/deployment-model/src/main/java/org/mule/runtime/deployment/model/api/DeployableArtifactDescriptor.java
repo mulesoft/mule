@@ -7,13 +7,16 @@
 package org.mule.runtime.deployment.model.api;
 
 import static java.util.Collections.emptyList;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
+
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * Describes an artifact that is deployable on the container
@@ -36,6 +39,11 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
    */
   public DeployableArtifactDescriptor(String name) {
     super(name);
+    configResources = getDefaultConfigResources();
+  }
+
+  public DeployableArtifactDescriptor(String name, Optional<Properties> properties) {
+    super(name, properties);
     configResources = getDefaultConfigResources();
   }
 

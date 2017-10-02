@@ -58,6 +58,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -102,6 +104,7 @@ public class ArtifactContextBuilder {
   private List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
   private DeployableArtifact parentArtifact;
+  private Optional<Properties> properties = empty();
 
   private ArtifactContextBuilder() {}
 
@@ -136,6 +139,11 @@ public class ArtifactContextBuilder {
    */
   public ArtifactContextBuilder setArtifactType(ArtifactType artifactType) {
     this.artifactType = artifactType;
+    return this;
+  }
+
+  public ArtifactContextBuilder setProperties(Optional<Properties> properties) {
+    this.properties = properties;
     return this;
   }
 
@@ -331,6 +339,20 @@ public class ArtifactContextBuilder {
     return this;
   }
 
+  private Map<String, String> merge(Map<String, String> properties, Properties deploymentProperties) {
+    if (deploymentProperties == null) {
+      return properties;
+    }
+
+    Map<String, String> mergedProperties = new HashMap<String, String>();
+    mergedProperties.putAll(properties);
+    for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
+      mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
+    }
+
+    return mergedProperties;
+  }
+
   /**
    * @return the {@code MuleContext} created with the provided configuration
    * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
@@ -385,7 +407,7 @@ public class ArtifactContextBuilder {
                     .setMuleContext(muleContext)
                     .setConfigResources(configurationFiles)
                     .setArtifactDeclaration(artifactDeclaration)
-                    .setArtifactProperties(artifactProperties)
+                    .setArtifactProperties(merge(artifactProperties, muleContext.getDeploymentProperties()))
                     .setArtifactType(artifactType)
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
@@ -415,6 +437,7 @@ public class ArtifactContextBuilder {
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
         muleContextBuilder.setObjectSerializer(objectSerializer);
+        muleContextBuilder.setDeploymentProperties(properties);
 
         if (parentArtifact != null) {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));

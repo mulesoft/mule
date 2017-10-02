@@ -9,20 +9,15 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
-import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +28,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,27 +80,12 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployPackagedArtifact(String zip) throws DeploymentException {
-    URI uri;
-    File artifactZip;
-    try {
-      final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
-      artifactZip = new File(artifactDir, zip);
-      uri = artifactZip.toURI();
-      return deployPackagedArtifact(uri, artifactName);
-    } catch (DeploymentException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new DeploymentException(createStaticMessage("Failed to deploy from zip: " + zip), e);
-    }
+    return deployPackagedArtifact(zip, empty());
   }
 
   @Override
   public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
-    if (!isUpdatedZombieArtifact(artifactDir)) {
-      return null;
-    }
-
-    return deployExplodedApp(artifactDir);
+    return deployExplodedArtifact(artifactDir, empty());
   }
 
   @Override
@@ -141,38 +130,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public T deployPackagedArtifact(URI artifactAchivedUri) throws DeploymentException {
-    try {
-      File artifactLocation = installArtifact(artifactAchivedUri);
-
-      T artifact;
-      try {
-        artifact = createArtifact(artifactLocation);
-        undeployArtifactIfItsAPatch(artifact);
-        trackArtifact(artifact);
-      } catch (Throwable t) {
-        String artifactName = artifactLocation.getName();
-
-        // error text has been created by the deployer already
-        logDeploymentFailure(t, artifactName);
-
-        addZombieFile(artifactName, artifactLocation);
-
-        deploymentListener.onDeploymentFailure(artifactName, t);
-
-        throw t;
-      }
-
-      deployArtifact(artifact);
-      return artifact;
-    } catch (Throwable t) {
-      if (t instanceof DeploymentException) {
-        // re-throw
-        throw ((DeploymentException) t);
-      }
-
-      final String msg = "Failed to deploy from URI: " + artifactAchivedUri;
-      throw new DeploymentException(createStaticMessage(msg), t);
-    }
+    return deployPackagedArtifact(artifactAchivedUri, empty());
   }
 
   private void undeployArtifactIfItsAPatch(T artifact) {
@@ -263,7 +221,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     this.deploymentListener = deploymentListener;
   }
 
-  private T deployPackagedArtifact(final URI artifactUri, String artifactName) throws IOException {
+  private T deployPackagedArtifact(final URI artifactUri, String artifactName, Optional<Properties> deploymentProperties)
+      throws IOException {
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactName);
     if (zombieArtifact != null) {
       if (zombieArtifact.isFor(artifactUri) && !zombieArtifact.updatedZombieApp()) {
@@ -279,19 +238,19 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       undeployArtifact(artifactName);
     }
 
-    T deployedAtifact = deployPackagedArtifact(artifactUri);
+    T deployedAtifact = deployPackagedArtifact(artifactUri, deploymentProperties);
     deploymentTemplate.postRedeploy(deployedAtifact);
     return deployedAtifact;
   }
 
-  private T deployExplodedApp(String addedApp) throws DeploymentException {
+  private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
     if (logger.isInfoEnabled()) {
       logger.info("================== New Exploded Artifact: " + addedApp);
     }
 
     T artifact;
     try {
-      artifact = createArtifact(new File(getMuleAppsDir(), addedApp));
+      artifact = createArtifact(new File(getMuleAppsDir(), addedApp), deploymentProperties);
 
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);
@@ -320,31 +279,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
   @Override
   public void deployArtifact(T artifact) throws DeploymentException {
-    try {
-      // add to the list of known artifacts first to avoid deployment loop on failure
-      trackArtifact(artifact);
-
-      deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact);
-
-      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-      artifactZombieMap.remove(artifact.getArtifactName());
-    } catch (Throwable t) {
-      // error text has been created by the deployer already
-      String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
-      logger.error(msg, t);
-
-      addZombieApp(artifact);
-
-      deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-      if (t instanceof DeploymentException) {
-        throw (DeploymentException) t;
-      } else {
-        msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(createStaticMessage(msg), t);
-      }
-    }
+    deployArtifact(artifact, empty());
   }
 
   private void addZombieApp(DeployableArtifact artifact) {
@@ -428,50 +363,15 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     return artifactArchiveInstaller.installArtifact(uri);
   }
 
-  private T createArtifact(File artifactLocation) throws IOException {
-    T artifact = artifactFactory.createArtifact(artifactLocation);
+  private T createArtifact(File artifactLocation, Optional<Properties> appProperties) throws IOException {
+    T artifact = artifactFactory.createArtifact(artifactLocation, appProperties);
     artifact.setMuleContextListener(muleContextListenerFactory.create(artifact.getArtifactName()));
     return artifact;
   }
 
   @Override
   public void redeploy(T artifact) throws DeploymentException {
-    if (logger.isInfoEnabled()) {
-      logger.info(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
-    }
-
-    deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-    try {
-      deployer.undeploy(artifact);
-      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-    } catch (Throwable e) {
-      // TODO make the exception better
-      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
-    }
-
-    deploymentListener.onDeploymentStart(artifact.getArtifactName());
-    try {
-      artifact = createArtifact(artifact.getLocation());
-      trackArtifact(artifact);
-
-      deployer.deploy(artifact);
-      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
-      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
-    } catch (Throwable t) {
-      try {
-        logDeploymentFailure(t, artifact.getArtifactName());
-        addZombieApp(artifact);
-        if (t instanceof DeploymentException) {
-          throw (DeploymentException) t;
-        }
-        String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(createStaticMessage(msg), t);
-      } finally {
-        deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
-      }
-    }
-
-    artifactZombieMap.remove(artifact.getArtifactName());
+    redeploy(artifact, empty());
   }
 
   private static boolean allResourcesExist(File[] resourceFiles) {
@@ -503,5 +403,136 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       return allResourcesExist(initialResourceFiles.keySet().toArray(new File[initialResourceFiles.size()]));
     }
 
+  }
+
+  @Override
+  public T deployPackagedArtifact(String zip, Optional<Properties> deploymentProperties) throws DeploymentException {
+    URI uri;
+    File artifactZip;
+    try {
+      final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
+      artifactZip = new File(artifactDir, zip);
+      uri = artifactZip.toURI();
+      return deployPackagedArtifact(uri, artifactName, deploymentProperties);
+    } catch (DeploymentException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new DeploymentException(createStaticMessage("Failed to deploy from zip: " + zip), e);
+    }
+  }
+
+  @Override
+  public void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    if (logger.isInfoEnabled()) {
+      logger.info(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
+    }
+
+    deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+    try {
+      deployer.undeploy(artifact);
+      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+    } catch (Throwable e) {
+      // TODO make the exception better
+      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+    }
+
+    deploymentListener.onDeploymentStart(artifact.getArtifactName());
+    try {
+      artifact = createArtifact(artifact.getLocation(),
+                                ofNullable(resolveDeploymentProperties(artifact.getArtifactName(), deploymentProperties)));
+      trackArtifact(artifact);
+
+      deployer.deploy(artifact);
+      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+    } catch (Throwable t) {
+      try {
+        logDeploymentFailure(t, artifact.getArtifactName());
+        addZombieApp(artifact);
+        if (t instanceof DeploymentException) {
+          throw (DeploymentException) t;
+        }
+        String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        throw new DeploymentException(createStaticMessage(msg), t);
+      } finally {
+        deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+      }
+    }
+
+    artifactZombieMap.remove(artifact.getArtifactName());
+  }
+
+  @Override
+  public void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException {
+    try {
+      // add to the list of known artifacts first to avoid deployment loop on failure
+      trackArtifact(artifact);
+
+      deploymentListener.onDeploymentStart(artifact.getArtifactName());
+      deployer.deploy(artifact);
+
+      artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
+      deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
+      artifactZombieMap.remove(artifact.getArtifactName());
+    } catch (Throwable t) {
+      // error text has been created by the deployer already
+      String msg = miniSplash(format("Failed to deploy artifact '%s', see below", artifact.getArtifactName()));
+      logger.error(msg, t);
+
+      addZombieApp(artifact);
+
+      deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
+      if (t instanceof DeploymentException) {
+        throw (DeploymentException) t;
+      } else {
+        msg = "Failed to deploy artifact: " + artifact.getArtifactName();
+        throw new DeploymentException(createStaticMessage(msg), t);
+      }
+    }
+  }
+
+  @Override
+  public T deployPackagedArtifact(URI artifactAchivedUri, Optional<Properties> appProperties) throws DeploymentException {
+    try {
+      File artifactLocation = installArtifact(artifactAchivedUri);
+
+      T artifact;
+      try {
+        artifact = createArtifact(artifactLocation, appProperties);
+        undeployArtifactIfItsAPatch(artifact);
+        trackArtifact(artifact);
+      } catch (Throwable t) {
+        String artifactName = artifactLocation.getName();
+
+        // error text has been created by the deployer already
+        logDeploymentFailure(t, artifactName);
+
+        addZombieFile(artifactName, artifactLocation);
+
+        deploymentListener.onDeploymentFailure(artifactName, t);
+
+        throw t;
+      }
+
+      deployArtifact(artifact);
+      return artifact;
+    } catch (Throwable t) {
+      if (t instanceof DeploymentException) {
+        // re-throw
+        throw ((DeploymentException) t);
+      }
+
+      final String msg = "Failed to deploy from URI: " + artifactAchivedUri;
+      throw new DeploymentException(createStaticMessage(msg), t);
+    }
+  }
+
+  @Override
+  public T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties) {
+    if (!isUpdatedZombieArtifact(artifactDir)) {
+      return null;
+    }
+
+    return deployExplodedApp(artifactDir, deploymentProperties);
   }
 }
