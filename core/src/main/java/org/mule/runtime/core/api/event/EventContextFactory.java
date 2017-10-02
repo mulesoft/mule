@@ -15,6 +15,11 @@ import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
+/**
+ * Factory interface for creating a new {@link EventContext}
+ *
+ * @since 4.0
+ */
 public interface EventContextFactory {
 
   /**
@@ -40,7 +45,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters.
-   *  @param id the unique id for this event context.
+   * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param exceptionHandler the exception handler that will deal with an error context
@@ -52,7 +57,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters and an empty publisher.
-   *  @param id the unique id for this event context.
+   * @param id the unique id for this event context.
    * @param serverId the id of the running mule server
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
@@ -79,7 +84,7 @@ public interface EventContextFactory {
 
   /**
    * Builds a new execution context with the given parameters.
-   *  @param id the unique id for this event context.
+   * @param id the unique id for this event context.
    * @param location the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    * @param externalCompletionPublisher void publisher that completes when source completes enabling completion of
