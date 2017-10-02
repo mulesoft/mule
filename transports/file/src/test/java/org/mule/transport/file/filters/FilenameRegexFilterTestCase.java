@@ -21,6 +21,21 @@ public class FilenameRegexFilterTestCase extends AbstractMuleTestCase
 {
 
     @Test
+    public void testTrimRegexFilter()
+    {
+        FilenameRegexFilter filter = new FilenameRegexFilter();
+        filter.setPattern("Complete-(.*).csv,       Complete-(.*).txt,Complete-(.*).ext, Complete-(.*).mp3");
+        String fileName1 = "Complete-1.txt";
+        String fileName2 = "Complete-11212321.ext";
+        String fileName3 = "Complete-11212321.ex";
+        String fileName4 = "Complete-11212321.mp3";
+        assertThat(filter.accept(fileName1), equalTo(true));
+        assertThat(filter.accept(fileName2), equalTo(true));
+        assertThat(filter.accept(fileName3), equalTo(false));
+        assertThat(filter.accept(fileName4), equalTo(true));
+    }
+    
+    @Test
     public void testFilenameRegexFilter()
     {
         FilenameRegexFilter filter = new FilenameRegexFilter();

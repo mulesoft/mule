@@ -79,11 +79,11 @@ public class FilenameRegexFilter extends FilenameWildcardFilter
                 if (!isCaseSensitive())
                 {
                     /* Add insensitive option if set in the configuration. */
-                    compiledPatterns[i] = Pattern.compile(patterns[i], Pattern.CASE_INSENSITIVE);
+                    compiledPatterns[i] = Pattern.compile(patterns[i].trim(), Pattern.CASE_INSENSITIVE);
                 }
                 else
                 {
-                    compiledPatterns[i] = Pattern.compile(patterns[i]);
+                    compiledPatterns[i] = Pattern.compile(patterns[i].trim());
                 }
             }
         }
