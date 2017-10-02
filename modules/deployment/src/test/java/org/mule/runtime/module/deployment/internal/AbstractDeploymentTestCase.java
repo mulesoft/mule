@@ -108,7 +108,7 @@ import org.mule.tck.probe.file.FileExists;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
-import org.mule.test.runner.classloader.TestContainerModuleDiscoverer;
+import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,7 +164,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   private DefaultClassLoaderManager artifactClassLoaderManager;
   protected ModuleRepository moduleRepository;
-  private TestContainerModuleDiscoverer moduleDiscoverer;
+  private TestModuleDiscoverer moduleDiscoverer;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Object[]> parameters() {
@@ -330,7 +330,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
     domainBundleDeploymentListener = mock(DeploymentListener.class);
-    moduleDiscoverer = new TestContainerModuleDiscoverer(getPrivilegedArtifactIds());
+    moduleDiscoverer = new TestModuleDiscoverer(getPrivilegedArtifactIds());
     moduleRepository = new DefaultModuleRepository(moduleDiscoverer);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry =
         new MuleArtifactResourcesRegistry.Builder().moduleRepository(moduleRepository).build();
