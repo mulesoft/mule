@@ -14,9 +14,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
@@ -31,6 +33,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -57,6 +60,12 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
+import org.hamcrest.Matchers;
+import org.hamcrest.collection.IsMapContaining;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,12 +73,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsMapContaining;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -250,7 +253,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException.expect(hasRootCause(instanceOf(IllegalArgumentException.class)));
     runFlow("knockWithNullDoor");
   }
 
@@ -274,7 +277,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   public void operationWithInlineListParameter() throws Exception {
     List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload(EMPTY_STRING)
         .withVariable("victim", "Saul").run().getMessage().getPayload().getValue();
-    assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
+    assertThat(response, contains(knock("Inline Skyler"), knock("Saul")));
   }
 
   @Test
