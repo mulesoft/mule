@@ -6,9 +6,17 @@
  */
 package org.mule.runtime.extension.internal.loader.validation;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.RAISE_ERROR_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,8 +24,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -68,6 +76,44 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   public void wrongNamingForXmlThrowsException() {
     exception.expectMessage("property with spaces");
     getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
+  }
+
+  @Test
+  public void emptyTypeInRaiseErrorThrowsException() {
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        RAISE_ERROR_IDENTIFIER.toString(),
+                                                        TYPE_RAISE_ERROR_ATTRIBUTE,
+                                                        "fail-raise-error")),
+                                  containsString(format(
+                                                        RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        RAISE_ERROR_IDENTIFIER.toString(),
+                                                        TYPE_RAISE_ERROR_ATTRIBUTE,
+                                                        "fail-raise-error-nested"))));
+    getExtensionModelFrom("validation/module-using-raise-error-empty-type.xml");
+  }
+
+  @Test
+  public void wrongTypeInRaiseErrorNestedThrowsException() {
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE,
+                                                        RAISE_ERROR_IDENTIFIER.toString(),
+                                                        TYPE_RAISE_ERROR_ATTRIBUTE,
+                                                        CORE_ERROR_NS,
+                                                        "MODULE-USING-RAISE-ERROR",
+                                                        "WRONG-PREFIX",
+                                                        "fail-raise-error")),
+                                  containsString(format(
+                                                        RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE,
+                                                        RAISE_ERROR_IDENTIFIER.toString(),
+                                                        TYPE_RAISE_ERROR_ATTRIBUTE,
+                                                        CORE_ERROR_NS,
+                                                        "MODULE-USING-RAISE-ERROR",
+                                                        "WRONG-PREFIX",
+                                                        "fail-raise-error-nested"))));
+    getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml");
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

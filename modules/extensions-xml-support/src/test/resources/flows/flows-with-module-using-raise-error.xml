@@ -20,7 +20,7 @@
     <flow name="complex">
         <module-using-raise-error:fail-raise-error custom="true"/>
         <error-handler>
-            <on-error-continue type="SC:SMART_CONNECTOR_CUSTOM">
+            <on-error-continue type="MODULE-USING-RAISE-ERROR:SMART_CONNECTOR_CUSTOM">
                 <set-payload value="#['Custom error: ' ++ error.description]"/>
             </on-error-continue>
             <on-error-continue>
@@ -42,9 +42,9 @@
     </flow>
 
     <flow name="complexProxy">
-        <module-using-raise-error:fail-proxy errorToRaise="SC:CUSTOM" description="#['Something went wrong.']"/>
+        <module-using-raise-error:fail-proxy errorToRaise="MODULE-USING-RAISE-ERROR:CUSTOM" description="#['Something went wrong.']"/>
         <error-handler>
-            <on-error-continue type="SC:CUSTOM">
+            <on-error-continue type="MODULE-USING-RAISE-ERROR:CUSTOM">
                 <set-payload value="#['Custom error: ' ++ error.description]"/>
             </on-error-continue>
             <on-error-continue>
@@ -69,7 +69,7 @@
 
     <flow name="complexMapping">
         <module-using-raise-error:fail-raise-error custom="true">
-            <error-mapping sourceType="SC:SMART_CONNECTOR_CUSTOM" targetType="APP:CUSTOM"/>
+            <error-mapping sourceType="MODULE-USING-RAISE-ERROR:SMART_CONNECTOR_CUSTOM" targetType="APP:CUSTOM"/>
         </module-using-raise-error:fail-raise-error>
         <error-handler>
             <on-error-continue type="APP:CUSTOM">

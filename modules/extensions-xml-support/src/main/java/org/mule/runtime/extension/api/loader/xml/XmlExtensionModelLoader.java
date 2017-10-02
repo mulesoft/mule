@@ -7,12 +7,17 @@
 package org.mule.runtime.extension.api.loader.xml;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
+import org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,6 +27,9 @@ import java.util.Optional;
  * @since 4.0
  */
 public class XmlExtensionModelLoader extends ExtensionModelLoader {
+
+  private final List<ExtensionModelValidator> customValidators = unmodifiableList(singletonList(
+                                                                                                new RaiseErrorValidator()));
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.
@@ -60,5 +68,13 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
     final Optional<String> declarationPath = context.getParameter(RESOURCE_DECLARATION);
     final XmlExtensionLoaderDelegate delegate = new XmlExtensionLoaderDelegate(modulePath, validateXml, declarationPath);
     delegate.declare(context);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
+    context.addCustomValidators(customValidators);
   }
 }

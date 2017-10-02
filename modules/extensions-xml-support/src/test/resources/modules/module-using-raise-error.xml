@@ -25,7 +25,7 @@
         <body>
             <mule:choice>
                 <mule:when expression="#[vars.custom]">
-                    <mule:raise-error type="SC:SMART_CONNECTOR_CUSTOM" description="A custom error occurred."/>
+                    <mule:raise-error type="MODULE-USING-RAISE-ERROR:SMART_CONNECTOR_CUSTOM" description="A custom error occurred."/>
                 </mule:when>
                 <mule:otherwise>
                     <mule:raise-error type="CONNECTIVITY" description="#['A module error ' ++ 'occurred.']"/>
