@@ -18,7 +18,7 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderMan
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.service.ServiceManager;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;

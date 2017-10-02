@@ -17,7 +17,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
-import org.mule.runtime.extension.internal.property.QNameModelProperty;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 import com.google.common.collect.ImmutableMap;
 
 import javax.xml.namespace.QName;

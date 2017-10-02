@@ -20,7 +20,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModelLoader;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
-import org.mule.runtime.module.service.LibFolderClassLoaderModelLoader;
+import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderModelLoader;
 
 import java.io.File;
 import java.util.Map;

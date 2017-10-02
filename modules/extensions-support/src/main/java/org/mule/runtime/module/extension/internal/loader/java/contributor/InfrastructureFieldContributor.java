@@ -14,7 +14,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.module.extension.internal.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 
 /**
  * {@link ParameterDeclarerContributor} implementation which given a {@link ExtensionParameter} which their type

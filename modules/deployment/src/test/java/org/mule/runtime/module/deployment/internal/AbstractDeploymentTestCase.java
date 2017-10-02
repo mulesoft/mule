@@ -98,7 +98,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.service.ServiceManager;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

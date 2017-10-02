@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
@@ -26,10 +25,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
-import org.mule.runtime.module.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.service.MuleServiceManager;
-import org.mule.runtime.module.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.service.ReflectionServiceResolver;
+import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.test.runner.ArtifactClassLoaderRunner;
 import org.mule.test.runner.ContainerClassLoaderAware;
 import org.mule.test.runner.PluginClassLoadersAware;
@@ -39,15 +36,15 @@ import org.mule.test.runner.api.ClassPathClassifier;
 import org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
 import org.mule.test.runner.api.IsolatedServiceProviderDiscoverer;
 
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 
 /**
  * Base class for running {@link FunctionalTestCase} with class loader isolation using {@link ArtifactClassLoaderRunner}, a JUnit
@@ -99,7 +96,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static List<ArtifactClassLoader> pluginClassLoaders;
   private static List<ArtifactClassLoader> serviceClassLoaders;
   private static ClassLoader containerClassLoader;
-  private static MuleServiceManager serviceRepository;
+  private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
 
@@ -200,8 +197,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   private static void createServiceManager() {
     serviceRepository =
-        new MuleServiceManager(new DefaultServiceDiscoverer(new IsolatedServiceProviderDiscoverer(serviceClassLoaders),
-                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        ServiceManager.create(ServiceDiscoverer.create(new IsolatedServiceProviderDiscoverer(serviceClassLoaders)));
     try {
       serviceRepository.start();
     } catch (MuleException e) {

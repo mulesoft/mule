@@ -9,8 +9,8 @@ package org.mule.service.foo;
 
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.service.test.EchoService;
-import org.mule.runtime.service.test.FooService;
+import org.mule.runtime.service.test.api.EchoService;
+import org.mule.runtime.service.test.api.FooService;
 
 import java.util.Collections;
 import java.util.List;

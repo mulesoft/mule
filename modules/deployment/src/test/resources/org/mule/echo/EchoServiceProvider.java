@@ -9,7 +9,7 @@ package org.mule.echo;
 
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.service.test.EchoService;
+import org.mule.runtime.service.test.api.EchoService;
 
 import java.util.Collections;
 import java.util.List;

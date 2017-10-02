@@ -39,7 +39,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateCla
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.license.api.LicenseValidator;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;

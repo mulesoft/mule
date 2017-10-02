@@ -33,7 +33,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.mule.runtime.module.service.ServiceManager;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 
 import java.io.File;
 import java.io.IOException;
