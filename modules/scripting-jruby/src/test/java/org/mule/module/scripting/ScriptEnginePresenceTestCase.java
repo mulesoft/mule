@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
@@ -38,7 +40,7 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                                             {"jruby", "rb", "JSR 223 JRuby Engine", "1.7.27"}
+                {"jruby", "rb", "JSR 223 JRuby Engine", "9.1.13.0", "1.+ 2"}
         });
     }
 
@@ -53,6 +55,9 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
 
     @Parameter(3)
     public String version;
+
+    @Parameter(4)
+    public String scriptCode;
 
     private ScriptEngineManager scriptEngineManager;
 
@@ -102,5 +107,13 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
     public void findEngineByExtension() throws Exception
     {
         assertThat(scriptEngineManager.getEngineByExtension(extension), notNullValue());
+    }
+
+    @Test
+    public void runTestScript() throws Exception {
+        ScriptEngine engine = scriptEngineManager.getEngineByName(engineName);
+        Bindings bindings = engine.createBindings();
+
+        engine.eval(scriptCode, bindings);
     }
 }
