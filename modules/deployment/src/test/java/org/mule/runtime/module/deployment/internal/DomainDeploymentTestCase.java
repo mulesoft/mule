@@ -960,15 +960,15 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainWithPropsFileBuilder.getId());
     Domain domain = findADomain(domainWithPropsFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
-    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"), instanceOf(TestComponent.class));
+    assertNotNull(domain.getRegistry());
+    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponent.class));
 
     // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
     deploymentService.redeployDomain(domainWithPropsFileBuilder.getId());
     domain = findADomain(domainWithPropsFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
-    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"), instanceOf(TestComponent.class));
+    assertNotNull(domain.getRegistry());
+    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponent.class));
 
     // Redeploy with new deployment properties
     deploymentProperties.clear();
@@ -976,9 +976,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     deploymentService.redeployDomain(domainWithPropsFileBuilder.getId(), deploymentProperties);
     domain = findADomain(domainWithPropsFileBuilder.getId());
     assertNotNull(domain);
-    assertNotNull(domain.getMuleContext());
-    assertThat(((DefaultMuleContext) domain.getMuleContext()).getRegistry().get("component"),
-               instanceOf(TestComponentOnRedeploy.class));
+    assertNotNull(domain.getRegistry());
+    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponentOnRedeploy.class));
 
   }
 
