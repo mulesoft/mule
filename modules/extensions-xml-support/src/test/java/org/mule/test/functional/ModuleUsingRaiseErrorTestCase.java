@@ -12,7 +12,6 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.RAISE_ERROR;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -20,7 +19,6 @@ import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(RAISE_ERROR)
-@Ignore("MULE-13679")
 public class ModuleUsingRaiseErrorTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override

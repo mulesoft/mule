@@ -122,8 +122,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #1 Update MessagingException with failing processor if required, create Error and set error context.
     interceptors.add((processor, next) -> stream -> from(stream)
-        .transform(next)
-        .onErrorMap(MessagingException.class, resolveMessagingException(processor)));
+        .concatMap(event -> just(event)
+            .transform(next)
+            .onErrorMap(MessagingException.class, resolveMessagingException(processor))
+            .onErrorMap(t -> !(t instanceof MessagingException),
+                        t -> resolveException((Component) processor, event, t))));
 
     // #2 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -179,21 +182,25 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #7 Apply processor interceptors.
     interceptors.addAll(0, additionalInterceptors);
 
-
     // #8 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
-    // scheduling such as RejectedExecutionException's can be handled cleanly
-    interceptors.add((processor, next) -> stream -> from(stream).concatMap(event -> just(event)
-        .transform(next)
-        .doOnEach(signal -> currentMuleContext.set(null))
-        .onErrorResume(RejectedExecutionException.class,
-                       throwable -> Mono.from(((BaseEventContext) event.getContext())
-                           .error(resolveException((Component) processor, event, throwable)))
-                           .then(Mono.empty()))
-        .onErrorResume(MessagingException.class,
-                       throwable -> {
-                         throwable = resolveMessagingException(processor).apply(throwable);
-                         return Mono.from(((BaseEventContext) event.getContext()).error(throwable)).then(Mono.empty());
-                       })));
+    // scheduling such as RejectedExecutionException's can be handled cleanly.
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .concatMap(event -> just(event)
+            .transform(next)
+            .doOnEach(signal -> currentMuleContext.set(null))
+            .onErrorResume(RejectedExecutionException.class,
+                           throwable -> Mono.from(((BaseEventContext) event.getContext())
+                               .error(resolveException((Component) processor, event, throwable)))
+                               .then(Mono.empty()))
+            // If we already got a MessagingException, avoid wrapping it again
+            .onErrorResume(MessagingException.class,
+                           throwable -> {
+                             throwable = resolveMessagingException(processor).apply(throwable);
+                             return Mono.from(((BaseEventContext) event.getContext()).error(throwable)).then(Mono.empty());
+                           })
+            .onErrorResume(throwable -> Mono
+                .from(((BaseEventContext) event.getContext()).error(resolveException((Component) processor, event, throwable)))
+                .then(Mono.empty()))));
 
     return interceptors;
   }
