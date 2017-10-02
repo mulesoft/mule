@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -27,20 +28,25 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Delegate to be used by a {@link DeclarationBasedElementModelFactory} in order to resolve the {@link DslElementModel} of an
@@ -49,6 +55,8 @@ import java.util.Set;
  * @since 4.0
  */
 class InfrastructureElementModelDelegate {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureElementModelDelegate.class);
 
   private final Set<String> eeStreamingStrategies =
       ImmutableSet.of(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS);
@@ -146,6 +154,13 @@ class InfrastructureElementModelDelegate {
 
               @Override
               public void visitObjectValue(ParameterObjectValue objectValue) {
+                if (!(TLS_KEY_STORE_ELEMENT_IDENTIFIER.equals(name) || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name))) {
+                  if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(format("Skipping unknown parameter with name [%s] for TLSContext", name));
+                  }
+                  return;
+                }
+
                 ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                     .withIdentifier(builder()
                         .namespace(TLS_PREFIX)
@@ -235,7 +250,6 @@ class InfrastructureElementModelDelegate {
                               namespace);
   }
 
-  //TODO: MULE-13339
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
                                          ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName, String customNamespace) {
