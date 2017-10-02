@@ -11,10 +11,6 @@
     <name>JSR-223 Scripting - JRuby</name>
     <description>Adds JRuby as a scripting language for Mule Scripting Module</description>
 
-    <properties>
-        <jffi.version>1.2.10</jffi.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -59,29 +55,18 @@
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-core</artifactId>
-            <version>1.7.27</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.jnr</groupId>
-                    <artifactId>jnr-ffi</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${jrubyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.jruby</groupId>
             <artifactId>jruby-stdlib</artifactId>
-            <version>1.7.27</version>
+            <version>${jrubyVersion}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.jruby.joni</groupId>
-            <artifactId>joni</artifactId>
-            <version>2.1.9</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-netdb</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -92,7 +77,7 @@
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-enxio</artifactId>
-            <version>0.9</version>
+            <version>0.16</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -108,7 +93,7 @@
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-unixsocket</artifactId>
-            <version>0.8</version>
+            <version>0.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -119,7 +104,7 @@
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-posix</artifactId>
-            <version>3.0.27</version>
+            <version>3.0.41</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.github.jnr</groupId>
@@ -128,62 +113,55 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jruby.extras</groupId>
-            <artifactId>bytelist</artifactId>
-            <version>1.0.11</version>
+            <groupId>com.github.jnr</groupId>
+            <artifactId>jnr-constants</artifactId>
+            <version>0.9.9</version>
         </dependency>
         <dependency>
             <groupId>com.github.jnr</groupId>
-            <artifactId>jnr-constants</artifactId>
-            <version>0.9.0</version>
+            <artifactId>jffi</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jnr</groupId>
+            <artifactId>jffi</artifactId>
+            <version>1.2.16</version>
+            <classifier>native</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby.joni</groupId>
+            <artifactId>joni</artifactId>
+            <version>2.1.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jruby.extras</groupId>
+            <artifactId>bytelist</artifactId>
+            <version>1.0.15</version>
         </dependency>
         <dependency>
             <groupId>org.jruby.jcodings</groupId>
             <artifactId>jcodings</artifactId>
-            <version>1.0.16</version>
+            <version>1.0.18</version>
         </dependency>
         <dependency>
-            <groupId>com.github.jnr</groupId>
-            <artifactId>jnr-ffi</artifactId>
-            <version>2.0.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-analysis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-util</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-tree</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.jruby</groupId>
+            <artifactId>dirgra</artifactId>
+            <version>0.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.jnr</groupId>
-            <artifactId>jffi</artifactId>
-            <version>${jffi.version}</version>
+            <groupId>com.headius</groupId>
+            <artifactId>invokebinder</artifactId>
+            <version>1.7</version>
         </dependency>
         <dependency>
-            <groupId>com.github.jnr</groupId>
-            <artifactId>jffi</artifactId>
-            <version>${jffi.version}</version>
-            <classifier>native</classifier>
+            <groupId>com.headius</groupId>
+            <artifactId>options</artifactId>
+            <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.15</version>
+            <groupId>com.headius</groupId>
+            <artifactId>unsafe-fences</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -191,25 +169,9 @@
             <version>1.1.3</version>
         </dependency>
         <dependency>
-            <groupId>com.headius</groupId>
-            <artifactId>invokebinder</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.headius</groupId>
-            <artifactId>options</artifactId>
-            <version>1.3</version>
-        </dependency>
-        <dependency>
             <groupId>com.martiansoftware</groupId>
             <artifactId>nailgun-server</artifactId>
             <version>0.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>yecht</artifactId>
-            <version>1.1</version>
-            <classifier>jruby</classifier>
         </dependency>
     
         <!-- Test dependencies -->
