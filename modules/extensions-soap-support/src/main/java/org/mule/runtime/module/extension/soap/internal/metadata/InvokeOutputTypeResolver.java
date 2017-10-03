@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.soap.internal.metadata;
 
-import static org.mule.runtime.extension.internal.soap.metadata.SoapOutputTypeBuilder.buildOutputType;
+import static org.mule.runtime.extension.api.soap.metadata.SoapOutputTypeBuilder.buildOutputType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;

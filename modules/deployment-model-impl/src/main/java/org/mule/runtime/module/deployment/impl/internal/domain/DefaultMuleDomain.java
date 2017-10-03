@@ -21,13 +21,6 @@ import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,7 +28,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -48,7 +40,14 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

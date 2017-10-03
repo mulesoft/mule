@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;

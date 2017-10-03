@@ -16,8 +16,8 @@ import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.service.ServiceProviderDiscoverer;
-import org.mule.runtime.module.service.ServiceResolutionError;
+import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
+import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 
 import java.util.LinkedList;
 import java.util.List;

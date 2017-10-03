@@ -23,7 +23,7 @@ import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 import org.junit.Before;
 import org.junit.Test;
 

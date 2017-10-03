@@ -183,14 +183,14 @@
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "expiration-policy",
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 4
                 }
               }
@@ -1203,14 +1203,14 @@
               "name": "streamingStrategy",
               "description": "Configure if repeatable streams should be used and their behaviour",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-byte-streaming-strategy",
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 2
                 }
               }
@@ -3338,14 +3338,14 @@
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-redelivery-policy",
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 1
                 }
               }
@@ -3488,14 +3488,14 @@
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-reconnection-strategy",
                     "prefix": "mule"
                   }
                 },
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 }
               }

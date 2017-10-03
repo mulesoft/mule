@@ -1,1 +1,1 @@
-org.mule.functional.policy.TestPolicyXmlNamespaceInfoProvider
+org.mule.functional.policy.api.TestPolicyXmlNamespaceInfoProvider

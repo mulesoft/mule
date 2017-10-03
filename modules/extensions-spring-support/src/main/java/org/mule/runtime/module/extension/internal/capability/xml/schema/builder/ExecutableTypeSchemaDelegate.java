@@ -34,7 +34,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.internal.property.QNameModelProperty;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;

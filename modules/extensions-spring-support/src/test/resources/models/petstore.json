@@ -489,10 +489,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -602,10 +602,10 @@
               "name": "expirationPolicy",
               "description": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 4
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "expiration-policy",
@@ -1057,10 +1057,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -1324,10 +1324,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -1591,10 +1591,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -1891,10 +1891,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -2248,10 +2248,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -2603,10 +2603,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -3019,10 +3019,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -3563,10 +3563,10 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 8
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
@@ -3747,10 +3747,10 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
@@ -4280,10 +4280,10 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 8
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
@@ -4464,10 +4464,10 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
@@ -5001,10 +5001,10 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 8
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
@@ -5185,10 +5185,10 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
@@ -5392,10 +5392,10 @@
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 5
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "pooling-profile",
@@ -5925,10 +5925,10 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 8
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
@@ -6109,10 +6109,10 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
@@ -6642,10 +6642,10 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 8
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
@@ -6826,10 +6826,10 @@
                   "name": "reconnection",
                   "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "reconnection",
@@ -7095,10 +7095,10 @@
                   "name": "redeliveryPolicy",
                   "description": "Defines a policy for processing the redelivery of the same message",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 1
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-redelivery-policy",
@@ -7245,10 +7245,10 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     },
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
@@ -9431,10 +9431,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -9615,10 +9615,10 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
@@ -10148,10 +10148,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -10332,10 +10332,10 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
@@ -10869,10 +10869,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -11053,10 +11053,10 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
@@ -11260,10 +11260,10 @@
               "name": "poolingProfile",
               "description": "Characteristics of the connection pool",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 5
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "pooling-profile",
@@ -11793,10 +11793,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -11977,10 +11977,10 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
@@ -12510,10 +12510,10 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 8
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
@@ -12694,10 +12694,10 @@
               "name": "reconnection",
               "description": "When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn\u0027t pass after exhausting the associated reconnection strategy",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "reconnection",
@@ -12897,10 +12897,10 @@
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 1
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-redelivery-policy",
@@ -13047,10 +13047,10 @@
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-reconnection-strategy",
@@ -13255,10 +13255,10 @@
               "name": "redeliveryPolicy",
               "description": "Defines a policy for processing the redelivery of the same message",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 1
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-redelivery-policy",
@@ -13480,10 +13480,10 @@
               "name": "reconnectionStrategy",
               "description": "A retry strategy in case of connectivity errors",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                   "sequence": 3
                 },
-                "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                     "localPart": "abstract-reconnection-strategy",

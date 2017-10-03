@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;

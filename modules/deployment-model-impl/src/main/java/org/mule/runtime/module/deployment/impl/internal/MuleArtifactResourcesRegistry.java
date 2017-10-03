@@ -50,13 +50,13 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicy
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
-import org.mule.runtime.module.service.DefaultServiceDiscoverer;
-import org.mule.runtime.module.service.FileSystemServiceProviderDiscoverer;
-import org.mule.runtime.module.service.MuleServiceManager;
-import org.mule.runtime.module.service.ReflectionServiceProviderResolutionHelper;
-import org.mule.runtime.module.service.ReflectionServiceResolver;
-import org.mule.runtime.module.service.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.ServiceDescriptor;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
+import org.mule.runtime.module.service.internal.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptor;
+import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceProviderResolutionHelper;
+import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -71,7 +71,7 @@ public class MuleArtifactResourcesRegistry {
   private final DefaultApplicationFactory applicationFactory;
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
   private final ArtifactClassLoader containerClassLoader;
-  private final MuleServiceManager serviceManager;
+  private final ServiceManager serviceManager;
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ArtifactClassLoaderFactory<ArtifactPluginDescriptor> artifactPluginClassLoaderFactory;
   private final DefaultClassLoaderManager artifactClassLoaderManager;
@@ -152,11 +152,11 @@ public class MuleArtifactResourcesRegistry {
                                             pluginClassLoadersFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
-        new MuleServiceManager(new DefaultServiceDiscoverer(
-                                                            new FileSystemServiceProviderDiscoverer(containerClassLoader,
-                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
-                                                                                                    descriptorLoaderRepository),
-                                                            new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
+        ServiceManager.create(new DefaultServiceDiscoverer(
+                                                           new FileSystemServiceProviderDiscoverer(containerClassLoader,
+                                                                                                   trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
+                                                                                                   descriptorLoaderRepository),
+                                                           new ReflectionServiceResolver(new ReflectionServiceProviderResolutionHelper())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
     domainFactory =
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,
@@ -231,7 +231,7 @@ public class MuleArtifactResourcesRegistry {
   /**
    * @return the manager of container services that must be included in each artifact
    */
-  public MuleServiceManager getServiceManager() {
+  public ServiceManager getServiceManager() {
     return serviceManager;
   }
 

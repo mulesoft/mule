@@ -39,7 +39,7 @@ import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionMa
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
-import org.mule.runtime.module.service.ServiceManager;
+import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.tck.probe.PollingProber;

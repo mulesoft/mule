@@ -7,8 +7,8 @@
 
 package org.mule.service.foo;
 
-import org.mule.runtime.service.test.EchoService;
-import org.mule.runtime.service.test.FooService;
+import org.mule.runtime.service.test.api.EchoService;
+import org.mule.runtime.service.test.api.FooService;
 
 import javax.inject.Inject;
 

@@ -24,7 +24,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;

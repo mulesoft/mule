@@ -367,7 +367,7 @@
                   "name": "service",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -397,7 +397,7 @@
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2
                     }
                   }
@@ -921,14 +921,14 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     }
                   }
@@ -961,7 +961,7 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 4
                     }
                   }
@@ -1156,14 +1156,14 @@
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "pooling-profile",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 5
                     }
                   }
@@ -1312,14 +1312,14 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     }
                   }
@@ -1352,7 +1352,7 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 4
                     }
                   }
@@ -1547,14 +1547,14 @@
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "pooling-profile",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 5
                     }
                   }
@@ -1799,14 +1799,14 @@
                   "name": "reconnectionStrategy",
                   "description": "A retry strategy in case of connectivity errors",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "abstract-reconnection-strategy",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 3
                     }
                   }
@@ -1839,7 +1839,7 @@
                   "name": "disableValidation",
                   "description": "Disables connection validation",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 4
                     }
                   }
@@ -2034,14 +2034,14 @@
                   "name": "poolingProfile",
                   "description": "Characteristics of the connection pool",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.QNameModelProperty": {
+                    "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
                         "localPart": "pooling-profile",
                         "prefix": "mule"
                       }
                     },
-                    "org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty": {
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
                       "sequence": 5
                     }
                   }

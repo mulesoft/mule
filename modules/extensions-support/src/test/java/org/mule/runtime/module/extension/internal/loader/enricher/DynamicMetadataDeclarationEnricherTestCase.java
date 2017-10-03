@@ -28,7 +28,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaModelLoaderDelegate;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;

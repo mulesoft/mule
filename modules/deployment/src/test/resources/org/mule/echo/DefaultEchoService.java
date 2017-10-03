@@ -10,7 +10,7 @@ package org.mule.echo;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.service.test.EchoService;
+import org.mule.runtime.service.test.api.EchoService;
 
 public class DefaultEchoService implements EchoService, Startable, Stoppable {
     public DefaultEchoService() {

@@ -60,7 +60,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.net.URL;

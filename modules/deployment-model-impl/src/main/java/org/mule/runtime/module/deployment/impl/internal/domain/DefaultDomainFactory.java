@@ -27,7 +27,7 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
-import org.mule.runtime.module.service.ServiceRepository;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;

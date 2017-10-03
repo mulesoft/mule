@@ -10,7 +10,7 @@ package org.foo.hello;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.service.test.FooService;
+import org.mule.runtime.service.test.api.FooService;
 
 import javax.inject.Inject;
 

@@ -83,7 +83,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.extension.internal.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.RouteComponentParser;
 import org.mule.runtime.module.extension.internal.config.dsl.object.CharsetValueResolverParsingDelegate;
 import org.mule.runtime.module.extension.internal.config.dsl.object.DefaultObjectParsingDelegate;

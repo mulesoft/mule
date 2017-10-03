@@ -81,7 +81,7 @@ import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;

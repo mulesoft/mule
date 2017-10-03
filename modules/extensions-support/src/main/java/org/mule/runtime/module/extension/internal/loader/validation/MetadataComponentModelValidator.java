@@ -45,7 +45,7 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.io.Serializable;
