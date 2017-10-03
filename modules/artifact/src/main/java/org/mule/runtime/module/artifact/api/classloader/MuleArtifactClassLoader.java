@@ -61,8 +61,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-
-    configureErrorHooks();
   }
 
   @Override
@@ -137,81 +135,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
     this.resourceReleaserClassLocation = resourceReleaserClassLocation;
-  }
-
-  private static String getErrorHooksClassLocation() {
-    return "/org/mule/module/artifact/classloader/ErrorHooksConfiguration.class";
-  }
-
-  private static String getErrorHooksInternalClassLocation() {
-    return "/org/mule/module/artifact/classloader/ErrorHooksInternalConfiguration.class";
-  }
-
-  /**
-   * Setup reactor-core error hooks, these are required for plugins that end up executing reactive streams.
-   * For instance, compatibility plugin which inherits from transformers that call {@code block()}.
-   */
-  private void configureErrorHooks() {
-    if (getURLs().length == 0 || !isReactorLoaded(this)) {
-      return;
-    }
-
-    // TODO MULE-13679 Remove these hooks
-    try {
-      if (isInternalAccessible(this)) {
-        createCustomInstance(getErrorHooksInternalClassLocation());
-      }
-      if (isPrivilegedApiAccessible(this)) {
-        createCustomInstance(getErrorHooksClassLocation());
-      } else {
-        //
-      }
-    } catch (Exception e) {
-      LOGGER.error("Cannot configure error hooks", e);
-    }
-  }
-
-  /**
-   * Checks if reactor-core is available, only used outside in unit tests.
-   * Needs to be static because it must be mocked before construction.
-   */
-  private static Boolean isReactorLoaded(MuleArtifactClassLoader cl) {
-    try {
-      Class reactorHooks = cl.loadClass("reactor.core.publisher.Hooks");
-      return reactorHooks.getClassLoader().equals(cl);
-    } catch (ClassNotFoundException e) {
-      // ignore, we don't care if the plugin does not include reactor-core
-    }
-
-    return false;
-  }
-
-  /**
-   * Needs to be static because it must be mocked before construction.
-   */
-  private static Boolean isInternalAccessible(MuleArtifactClassLoader cl) {
-    try {
-      Class eventProcessingException = cl.loadClass("org.mule.runtime.core.internal.exception.MessagingException");
-      return eventProcessingException.getClassLoader().equals(cl);
-    } catch (ClassNotFoundException e) {
-      // ignore, we don't care if the plugin does not have privileged access
-    }
-
-    return false;
-  }
-
-  /**
-   * Needs to be static because it must be mocked before construction.
-   */
-  private static Boolean isPrivilegedApiAccessible(MuleArtifactClassLoader cl) {
-    try {
-      Class eventProcessingException = cl.loadClass("org.mule.runtime.core.privileged.exception.EventProcessingException");
-      return eventProcessingException.getClassLoader().equals(cl);
-    } catch (ClassNotFoundException e) {
-      // ignore, we don't care if the plugin does not have privileged access
-    }
-
-    return false;
   }
 
   @Override

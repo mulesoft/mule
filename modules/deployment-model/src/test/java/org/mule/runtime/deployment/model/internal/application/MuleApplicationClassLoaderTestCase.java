@@ -14,13 +14,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -32,12 +31,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,6 +39,12 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
@@ -100,7 +99,6 @@ public class MuleApplicationClassLoaderTestCase extends AbstractMuleTestCase {
     FileUtils.stringToFile(new File(domainDir, RESOURCE_JUST_IN_DOMAIN).getAbsolutePath(), "Some text");
 
     mockStatic(MuleArtifactClassLoader.class);
-    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
 
     // Create app class loader
     domainCL =

@@ -10,12 +10,11 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -25,11 +24,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +31,11 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
@@ -54,7 +53,6 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     mockStatic(MuleArtifactClassLoader.class);
-    when(MuleArtifactClassLoader.class, "isReactorLoaded", any(MuleArtifactClassLoader.class)).thenReturn(false);
   }
 
   @Test

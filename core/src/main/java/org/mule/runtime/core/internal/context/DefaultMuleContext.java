@@ -248,6 +248,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
 
+  // TODO MULE-13679 Remove these hooks
   // If this runs inside a Mule classloader it's automatically loaded, but in unit tests that
   // are run outside we need to set it up here.
   static {
