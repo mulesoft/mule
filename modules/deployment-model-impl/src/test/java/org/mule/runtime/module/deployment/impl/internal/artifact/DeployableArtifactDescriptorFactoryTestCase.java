@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
@@ -49,6 +50,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends DeployableArtifactDescriptor, B extends DeployableFileBuilder>
@@ -79,6 +81,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Before
   public void setUp() throws Exception {
@@ -224,6 +229,13 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .forEach(bundleDependency -> {
           assertThat(asList(classLoaderModel.getUrls()), not(hasItem(bundleDependency.getBundleUri())));
         });
+  }
+
+  @Test
+  public void descriptorWithNoRevisionVersion() throws Exception {
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
+    createArtifactDescriptor(getArtifactRootFolder() + "no-revision-artifact");
   }
 
   protected abstract String getArtifactRootFolder();

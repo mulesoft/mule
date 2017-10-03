@@ -59,6 +59,17 @@ public class MuleProcessController {
     getController().deploy(path);
   }
 
+  /**
+   * Triggers a redeploy of the application but touching the application descriptor file.
+   * <p/>
+   * Clients should expect this method to return before the redeploy actually being done.
+   *
+   * @param application the application to redeploy
+   */
+  public void redeploy(String application) {
+    getController().redeploy(application);
+  }
+
   public boolean isDeployed(String appName) {
     return getController().isDeployed(appName);
   }

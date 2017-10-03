@@ -43,8 +43,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 
 /**
- * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext.
- * TODO MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
+ * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
+ * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
@@ -154,8 +154,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   private ObjectSerializer defaultObjectSerializer;
 
   /**
-   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all
-   * {@link Flow flows} which doesn't specify otherwise
+   * The {@link ProcessingStrategyFactory factory} of the default {@link ProcessingStrategy} to be used by all {@link Flow flows}
+   * which doesn't specify otherwise
    *
    * @since 3.7.0
    */
@@ -171,6 +171,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   private DynamicConfigExpiration dynamicConfigExpiration =
       DynamicConfigExpiration.getDefault();
+  private String dataFolderName;
 
   public DefaultMuleConfiguration() {
     this(false);
@@ -205,17 +206,20 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  private void updateWorkingDirectory() {
     if (containerMode) {
       final String muleBase = getMuleBase().map(File::getAbsolutePath).orElse(null);
       // in container mode the id is the app name, have each app isolate its work dir
       if (!isStandalone()) {
         // fallback to current dir as a parent
-        this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+        this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getDataFolderName());
       } else {
-        this.workingDirectory = String.format("%s/%s/%s", muleBase.trim(), getWorkingDirectory(), getId());
+        this.workingDirectory = String.format("%s/%s/%s", muleBase.trim(), getWorkingDirectory(), getDataFolderName());
       }
     } else if (isStandalone()) {
-      this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+      this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getDataFolderName());
     }
   }
 
@@ -598,6 +602,21 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   public void setDefaultObjectSerializer(ObjectSerializer defaultObjectSerializer) {
     this.defaultObjectSerializer = defaultObjectSerializer;
+  }
+
+  /**
+   * @return the name of the folder associated to this artifact to use for storing artifact related data
+   */
+  public String getDataFolderName() {
+    return dataFolderName != null ? dataFolderName : getId();
+  }
+
+  /**
+   * @param dataFolderName the name of the folder associated to this artifact to use for storing artifact related data
+   */
+  public void setDataFolderName(String dataFolderName) {
+    this.dataFolderName = dataFolderName;
+    updateWorkingDirectory();
   }
 
   public void addExtensions(List<ConfigurationExtension> extensions) {

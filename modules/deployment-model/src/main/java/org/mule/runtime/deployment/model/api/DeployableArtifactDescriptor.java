@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.deployment.model.api;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
 import java.io.File;
@@ -15,8 +16,10 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 /**
  * Describes an artifact that is deployable on the container
@@ -89,6 +92,19 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
    */
   public void setPlugins(Set<ArtifactPluginDescriptor> plugins) {
     this.plugins = plugins;
+  }
+
+  /**
+   * @return the artifact data storage folder name
+   */
+  public String getDataFolderName() {
+    BundleDescriptor bundleDescriptor = getBundleDescriptor();
+    if (bundleDescriptor == null) {
+      return getArtifactLocation().getName();
+    }
+    MuleVersion artifactVersion = new MuleVersion(bundleDescriptor.getVersion());
+    return format("%s-%s-%s.%s", bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(), artifactVersion.getMajor(),
+                  artifactVersion.getMinor());
   }
 
   /**

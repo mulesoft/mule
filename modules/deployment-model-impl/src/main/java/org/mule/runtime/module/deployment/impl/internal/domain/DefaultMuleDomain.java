@@ -146,6 +146,7 @@ public class DefaultMuleDomain implements Domain {
 
     try {
       ArtifactContextBuilder artifactBuilder = newBuilder().setArtifactName(getArtifactName())
+          .setDataFolderName(getDescriptor().getDataFolderName())
           .setArtifactPlugins(artifactPlugins)
           .setExecutionClassloader(deploymentClassLoader.getClassLoader())
           .setArtifactInstallationDirectory(new File(getMuleDomainsDir(), getArtifactName()))
@@ -154,7 +155,8 @@ public class DefaultMuleDomain implements Domain {
           .setEnableLazyInit(lazy)
           .setDisableXmlValidations(disableXmlValidations)
           .setClassLoaderRepository(classLoaderRepository)
-          .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getName(), descriptor.getDeploymentProperties())))
+          .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
+                                                                descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository);
 
       if (!descriptor.getConfigResources().isEmpty()) {

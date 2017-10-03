@@ -7,6 +7,7 @@
  */
 package org.mule.runtime.deployment.model.api.application;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -15,10 +16,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.google.common.collect.ImmutableList;
-import static java.util.Optional.empty;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
 import java.io.File;
 import java.util.HashMap;

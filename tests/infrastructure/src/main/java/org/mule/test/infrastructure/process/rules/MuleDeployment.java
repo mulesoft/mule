@@ -59,21 +59,31 @@ import org.slf4j.LoggerFactory;
  * </pre>
  *
  * <table>
- *   <tr>
- *     <td><b>System Property</b></td><td><b>Default Value</b></td><td><b>Description</b></td>
- *   </tr>
- *   <tr>
- *     <td>mule.test.deleteOnExit</td><td>true</td><td>When false, keeps the used Mule Server under target/server/TEST_NAME</td>
- *   </tr>
- *   <tr>
- *     <td>mule.test.stopOnExit</td><td>true</td><td>When false, keeps the used Mule Server running</td>
- *   </tr>
- *   <tr>
- *     <td>mule.test.deployment.timeout</td><td>60000</td><td>Timeout for starting Mule (in milliseconds)</td>
- *   </tr>
- *   <tr>
- *     <td>mule.test.debug</td><td>false</td><td>Mule server wait for remote debugger attachment.</td>
- *   </tr>
+ * <tr>
+ * <td><b>System Property</b></td>
+ * <td><b>Default Value</b></td>
+ * <td><b>Description</b></td>
+ * </tr>
+ * <tr>
+ * <td>mule.test.deleteOnExit</td>
+ * <td>true</td>
+ * <td>When false, keeps the used Mule Server under target/server/TEST_NAME</td>
+ * </tr>
+ * <tr>
+ * <td>mule.test.stopOnExit</td>
+ * <td>true</td>
+ * <td>When false, keeps the used Mule Server running</td>
+ * </tr>
+ * <tr>
+ * <td>mule.test.deployment.timeout</td>
+ * <td>60000</td>
+ * <td>Timeout for starting Mule (in milliseconds)</td>
+ * </tr>
+ * <tr>
+ * <td>mule.test.debug</td>
+ * <td>false</td>
+ * <td>Mule server wait for remote debugger attachment.</td>
+ * </tr>
  * </table>
  */
 public class MuleDeployment extends MuleInstallation {
@@ -144,7 +154,8 @@ public class MuleDeployment extends MuleInstallation {
     }
 
     /**
-     * Specifies a system property to be passed in the command line when starting Mule that needs to be resolved in the before() of the MuleDeployment rule.
+     * Specifies a system property to be passed in the command line when starting Mule that needs to be resolved in the before()
+     * of the MuleDeployment rule.
      *
      * @param property
      * @param propertySupplier
@@ -167,8 +178,8 @@ public class MuleDeployment extends MuleInstallation {
     }
 
     /**
-     * Specifies parameters to be passed in the command line when starting Mule.
-     * As opposed to a property, a parameter is something that will be passed "as-is" and not in a key-value pair format.
+     * Specifies parameters to be passed in the command line when starting Mule. As opposed to a property, a parameter is
+     * something that will be passed "as-is" and not in a key-value pair format.
      *
      * @param parameters
      * @return
@@ -421,6 +432,7 @@ public class MuleDeployment extends MuleInstallation {
 
   /***
    * Utility method to generate System properties attachment for the Allure report
+   * 
    * @return a formatted String of the Mule system properties of the given instance.
    */
   @Attachment(value = "Properties")
@@ -430,6 +442,7 @@ public class MuleDeployment extends MuleInstallation {
 
   /***
    * Utility method to generate Runtime server log attachment for the Allure report
+   * 
    * @return a ByteArray representation of the log.
    */
   @Attachment(value = "Server log ", type = "text/plain", fileExtension = ".log")
@@ -444,6 +457,7 @@ public class MuleDeployment extends MuleInstallation {
 
   /***
    * Utility method to generate Application log attachment for the Allure report
+   * 
    * @param appName the application name
    * @return a ByteArray representation of the log.
    */
@@ -455,5 +469,12 @@ public class MuleDeployment extends MuleInstallation {
 
     }
     return null;
+  }
+
+  /**
+   * @return the mule instance controller.
+   */
+  public MuleProcessController getMuleProcessController() {
+    return mule;
   }
 }

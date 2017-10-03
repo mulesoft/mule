@@ -134,9 +134,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private void undeployArtifactIfItsAPatch(T artifact) {
-    if (artifact.getDescriptor().getBundleDescriptor() == null) {
-      throw new IllegalStateException("Artifact bundle descriptor is NULL");
-    }
     Optional<T> foundMatchingArtifact = artifacts.stream()
         .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
         .filter(deployedArtifact -> {
@@ -152,7 +149,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           }
           return false;
         }).findAny();
-    foundMatchingArtifact.ifPresent(deployer::undeploy);
+    foundMatchingArtifact.ifPresent(this::undeploy);
   }
 
   private File installArtifact(URI artifactAchivedUri) throws IOException {
@@ -439,7 +436,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     deploymentListener.onDeploymentStart(artifact.getArtifactName());
     try {
       artifact = createArtifact(artifact.getLocation(),
-                                ofNullable(resolveDeploymentProperties(artifact.getArtifactName(), deploymentProperties)));
+                                ofNullable(resolveDeploymentProperties(artifact.getDescriptor().getDataFolderName(),
+                                                                       deploymentProperties)));
       trackArtifact(artifact);
 
       deployer.deploy(artifact);

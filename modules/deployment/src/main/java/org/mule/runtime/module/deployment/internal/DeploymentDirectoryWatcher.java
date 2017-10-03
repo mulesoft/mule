@@ -28,6 +28,7 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.Artifact;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
@@ -513,32 +514,37 @@ public class DeploymentDirectoryWatcher implements Runnable {
     public boolean isArtifactResourceUpdated(T artifact) {
       ArtifactResourcesTimestamp<T> applicationResourcesTimestamp =
           artifactConfigResourcesTimestaps.get(artifact.getArtifactName());
-      return !applicationResourcesTimestamp.resourcesHaveSameTimestamp(artifact);
+      return !applicationResourcesTimestamp.resourcesHaveSameTimestamp();
     }
   }
 
   private static class ArtifactResourcesTimestamp<T extends Artifact> {
 
-    private final Map<String, Long> timestampsPerResource = new HashMap<String, Long>();
+    private final Map<String, Long> timestampsPerResource = new HashMap<>();
 
     public ArtifactResourcesTimestamp(final Artifact artifact) {
       for (File configResourceFile : artifact.getResourceFiles()) {
         timestampsPerResource.put(configResourceFile.getAbsolutePath(), configResourceFile.lastModified());
       }
+      File descriptorFile =
+          new File(((DeployableArtifactDescriptor) artifact.getDescriptor()).getArtifactLocation(),
+                   ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+      if (descriptorFile.exists()) {
+        timestampsPerResource.put(descriptorFile.getAbsolutePath(), descriptorFile.lastModified());
+      }
     }
 
-    public boolean resourcesHaveSameTimestamp(final T artifact) {
-      boolean resourcesHaveSameTimestamp = true;
-      for (File configResourceFile : artifact.getResourceFiles()) {
-        long originalTimestamp = timestampsPerResource.get(configResourceFile.getAbsolutePath());
-        long currentTimestamp = configResourceFile.lastModified();
-
+    public boolean resourcesHaveSameTimestamp() {
+      return !timestampsPerResource.entrySet().stream().filter(entry -> {
+        File trackedFile = new File(entry.getKey());
+        long originalTimestamp = entry.getValue();
+        long currentTimestamp = trackedFile.lastModified();
         if (originalTimestamp != currentTimestamp) {
-          timestampsPerResource.put(configResourceFile.getAbsolutePath(), currentTimestamp);
-          resourcesHaveSameTimestamp = false;
+          timestampsPerResource.put(entry.getKey(), currentTimestamp);
+          return true;
         }
-      }
-      return resourcesHaveSameTimestamp;
+        return false;
+      }).findAny().isPresent();
     }
   }
 }
