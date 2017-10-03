@@ -38,8 +38,6 @@ public class PollingReceiverWorker implements Work
     @Override
     public void run()
     {
-        // Make sure we start with a clean slate.
-        RequestContext.clear();
         if (receiver.isStarted())
         {
             running = true;
@@ -69,6 +67,7 @@ public class PollingReceiverWorker implements Work
             }
             finally
             {
+                RequestContext.clear();
                 running = false;
             }
         }
