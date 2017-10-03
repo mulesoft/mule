@@ -58,7 +58,7 @@ public class PollingReceiverWorkerTestCase extends AbstractMuleTestCase
     @Test
     public void requestContextIsCleanAfterPolling() throws Exception
     {
-        AbstractPollingMessageReceiver messageReceiver = mockRequestContextSettingInPollingReceiver(createPollingMessageReceiver(false));
+        AbstractPollingMessageReceiver messageReceiver = mockRequestContextUseInPollingReceiver(createPollingMessageReceiver(false));
 
         PollingReceiverWorker pollingReceiverWorker = new PollingReceiverWorker(messageReceiver);
 
@@ -79,7 +79,7 @@ public class PollingReceiverWorkerTestCase extends AbstractMuleTestCase
         return messageReceiver;
     }
 
-    private AbstractPollingMessageReceiver mockRequestContextSettingInPollingReceiver(AbstractPollingMessageReceiver pollingMessageReceiver) throws Exception
+    private AbstractPollingMessageReceiver mockRequestContextUseInPollingReceiver(AbstractPollingMessageReceiver pollingMessageReceiver) throws Exception
     {
         doAnswer(new Answer<Void>()
         {
