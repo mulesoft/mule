@@ -26,12 +26,7 @@ public class PolicyEventConverter {
    * @return the created event
    */
   public PrivilegedEvent createEvent(PrivilegedEvent event, PrivilegedEvent variablesProviderEvent) {
-    PrivilegedEvent.Builder eventBuilder =
-        PrivilegedEvent.builder(variablesProviderEvent.getContext())
-            .message(event.getMessage())
-            .session(event.getSession());
-    eventBuilder.variables(variablesProviderEvent.getVariables());
-    return eventBuilder.build();
+    return PrivilegedEvent.builder(event).variables(variablesProviderEvent.getVariables()).build();
   }
 
 }
