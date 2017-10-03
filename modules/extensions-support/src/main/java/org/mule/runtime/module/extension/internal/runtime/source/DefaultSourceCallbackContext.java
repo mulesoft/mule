@@ -153,7 +153,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
 
   private I18nMessage createWrongConnectionMessage(Object connection) {
     return createStaticMessage(format("Internal Error. The transacted source [%s] from the Extension [%s] tried to bind an " +
-        "connection of type [%s] which is not a current connection. ", sourceCallback.getOwningSourceName(),
+        "connection of type [%s] which is not a connection created by this extension. ", sourceCallback.getOwningSourceName(),
                                       sourceCallback.getOwningExtensionName(), connection.getClass().getName()));
   }
 }
