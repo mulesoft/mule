@@ -57,12 +57,12 @@
                 <mule:when expression="#[vars.failExpression]">
                     <!-- defining an expression that will always fail -->
                     <petstore:fail petNames="#[ ' ++ as Object  ]">
-                        <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
+                        <mule:error-mapping targetType="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_EXPRESSION" sourceType="EXPRESSION"/>
                     </petstore:fail>
                 </mule:when>
                 <mule:otherwise>
                     <petstore:fail petNames="#[vars.petNames]">
-                        <mule:error-mapping targetType="SC:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
+                        <mule:error-mapping targetType="MODULE-USING-ERRORMAPPING:SMART_CONNECTOR_CUSTOM_ERROR_CONNECTIVITY" sourceType="CONNECTIVITY"/>
                     </petstore:fail>
                 </mule:otherwise>
             </mule:choice>

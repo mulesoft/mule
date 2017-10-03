@@ -95,7 +95,7 @@ public class BeanDefinitionFactory {
   public static final String SPRING_SINGLETON_OBJECT = "singleton";
   public static final String SOURCE_TYPE = "sourceType";
   public static final String TARGET_TYPE = "targetType";
-  private static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
+  public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
