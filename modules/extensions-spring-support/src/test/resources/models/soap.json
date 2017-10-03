@@ -367,7 +367,7 @@
                   "name": "service",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -397,7 +397,7 @@
                   "name": "operation",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2
                     }
                   }

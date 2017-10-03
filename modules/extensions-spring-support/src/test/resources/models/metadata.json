@@ -338,7 +338,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -708,7 +708,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -1075,7 +1075,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -1771,7 +1771,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -2449,7 +2449,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -2748,7 +2748,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -3097,7 +3097,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -3400,7 +3400,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -3778,7 +3778,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -4145,7 +4145,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -4494,7 +4494,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -4750,7 +4750,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -5117,7 +5117,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -5440,7 +5440,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -5851,7 +5851,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -6547,7 +6547,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -6870,7 +6870,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -7696,7 +7696,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -8234,7 +8234,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -8700,7 +8700,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -8981,7 +8981,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -9280,7 +9280,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -9689,7 +9689,7 @@
                   "name": "continent",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -9720,7 +9720,7 @@
                   "name": "country",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2
                     }
                   }
@@ -9754,7 +9754,7 @@
                   },
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 3
                     }
                   }
@@ -10293,7 +10293,7 @@
                   "name": "type",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                    "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1
                     }
                   }
@@ -11002,7 +11002,7 @@
               "name": "query",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -11201,7 +11201,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -11395,7 +11395,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -11717,7 +11717,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -12016,7 +12016,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -12359,7 +12359,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -12561,7 +12561,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -12669,7 +12669,7 @@
               "name": "type",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -12833,7 +12833,7 @@
               "name": "query",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -13586,7 +13586,7 @@
               "name": "continent",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1
                 }
               }
@@ -13617,7 +13617,7 @@
               "name": "country",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 2
                 }
               }
@@ -13651,7 +13651,7 @@
               },
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.internal.property.MetadataKeyPartModelProperty": {
+                "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 3
                 }
               }
