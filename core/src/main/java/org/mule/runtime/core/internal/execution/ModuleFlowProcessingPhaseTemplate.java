@@ -27,7 +27,7 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
   /**
    * @return a {@link Message} created from the original message
    */
-  Message getMessage() throws MuleException;
+  Message getMessage();
 
   /**
    * Routes the {@link CoreEvent} through the processors chain
