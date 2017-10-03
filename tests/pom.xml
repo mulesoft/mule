@@ -24,6 +24,7 @@
         <module>infrastructure</module>
         <module>performance</module>
         <module>test-extensions</module>
+        <module>test-plugins</module>
         <module>test-policies</module>
         <module>test-services</module>
         <module>runner</module>

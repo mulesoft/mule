@@ -1,12 +1,14 @@
 {
-  "name": "Database",
+  "name": "dependant-plugin",
   "minMuleVersion": "4.0.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
-      "exportedPackages": [],
-      "exportedResources": []
+      "exportedPackages": [
+      ],
+      "exportedResources": [
+      ]
     }
   },
   "bundleDescriptorLoader": {

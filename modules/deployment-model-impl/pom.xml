@@ -198,6 +198,26 @@
             <version>${maven.compat.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-empty-plugin</artifactId>
+            <classifier>mule-plugin</classifier>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-dependant-plugin</artifactId>
+            <classifier>mule-plugin</classifier>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-test</artifactId>
+            <version>${muleMavenClientTest}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -10,12 +10,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-sockets-connector</artifactId>
-            <version>${muleSocketsConnectorTestVersion}</version>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-empty-plugin</artifactId>
+            <version>${mule.project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
-
-
 </project>
