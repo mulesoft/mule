@@ -59,9 +59,7 @@ public class PollingReceiverWorkerTestCase extends AbstractMuleTestCase
     public void requestContextIsCleanAfterPolling() throws Exception
     {
         AbstractPollingMessageReceiver messageReceiver = mockRequestContextUseInPollingReceiver(createPollingMessageReceiver(false));
-
         PollingReceiverWorker pollingReceiverWorker = new PollingReceiverWorker(messageReceiver);
-
         pollingReceiverWorker.run();
 
         assertThat(RequestContext.getEvent(), is(nullValue()));
