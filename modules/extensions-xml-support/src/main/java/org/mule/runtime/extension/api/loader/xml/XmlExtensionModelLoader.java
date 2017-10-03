@@ -15,7 +15,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
-import org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator;
+import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(singletonList(
-                                                                                                new RaiseErrorValidator()));
+                                                                                                new CorrectPrefixesValidator()));
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.

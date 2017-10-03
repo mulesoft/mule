@@ -7,30 +7,40 @@
 package org.mule.runtime.extension.internal.loader.validation;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
+import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE;
-import static org.mule.runtime.extension.internal.loader.validator.RaiseErrorValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
+import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
+import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+import com.google.common.collect.ImmutableSet;
 import org.apache.maven.model.validation.ModelValidator;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
+import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests the defaults {@link ModelValidator}s provided by the {@link ExtensionModelFactory}
@@ -82,12 +92,12 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   public void emptyTypeInRaiseErrorThrowsException() {
     exception.expectMessage(allOf(
                                   containsString(format(
-                                                        RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        EMPTY_TYPE_FORMAT_MESSAGE,
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         "fail-raise-error")),
                                   containsString(format(
-                                                        RAISE_ERROR_EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        EMPTY_TYPE_FORMAT_MESSAGE,
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         "fail-raise-error-nested"))));
@@ -98,7 +108,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
   public void wrongTypeInRaiseErrorNestedThrowsException() {
     exception.expectMessage(allOf(
                                   containsString(format(
-                                                        RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE,
+                                                        WRONG_VALUE_FORMAT_MESSAGE,
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         CORE_ERROR_NS,
@@ -106,7 +116,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
                                                         "WRONG-PREFIX",
                                                         "fail-raise-error")),
                                   containsString(format(
-                                                        RAISE_ERROR_WRONG_TYPE_VALUE_FORMAT_MESSAGE,
+                                                        WRONG_VALUE_FORMAT_MESSAGE,
                                                         RAISE_ERROR_IDENTIFIER.toString(),
                                                         TYPE_RAISE_ERROR_ATTRIBUTE,
                                                         CORE_ERROR_NS,
@@ -116,10 +126,65 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
     getExtensionModelFrom("validation/module-using-raise-error-wrong-type.xml");
   }
 
+  @Test
+  public void emptyTargetTypeInErrorMappingThrowsException() {
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        ERROR_MAPPING_IDENTIFIER.toString(),
+                                                        TARGET_TYPE,
+                                                        "fail-raise-error")),
+                                  containsString(format(
+                                                        EMPTY_TYPE_FORMAT_MESSAGE,
+                                                        ERROR_MAPPING_IDENTIFIER.toString(),
+                                                        TARGET_TYPE,
+                                                        "fail-raise-error-nested"))));
+    getExtensionModelFrom("validation/module-using-errormapping-empty-targetType.xml", getDependencyExtensions());
+  }
+
+  @Test
+  public void wrongTargetTypeInErrorMappingNestedThrowsException() {
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        WRONG_VALUE_FORMAT_MESSAGE,
+                                                        ERROR_MAPPING_IDENTIFIER.toString(),
+                                                        TARGET_TYPE,
+                                                        CORE_ERROR_NS,
+                                                        "MODULE-USING-ERRORMAPPING",
+                                                        "WRONG-PREFIX",
+                                                        "fail-raise-error")),
+                                  containsString(format(
+                                                        WRONG_VALUE_FORMAT_MESSAGE,
+                                                        ERROR_MAPPING_IDENTIFIER.toString(),
+                                                        TARGET_TYPE,
+                                                        CORE_ERROR_NS,
+                                                        "MODULE-USING-ERRORMAPPING",
+                                                        "WRONG-PREFIX",
+                                                        "fail-raise-error-nested"))));
+    getExtensionModelFrom("validation/module-using-errormapping-wrong-targetType.xml", getDependencyExtensions());
+  }
+
   private ExtensionModel getExtensionModelFrom(String modulePath) {
+    return getExtensionModelFrom(modulePath, emptySet());
+  }
+
+  private ExtensionModel getExtensionModelFrom(String modulePath, Set<ExtensionModel> extensions) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(RESOURCE_XML, modulePath);
-    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(emptySet()), parameters);
+    return new XmlExtensionModelLoader().loadExtensionModel(getClass().getClassLoader(), getDefault(extensions), parameters);
+  }
+
+  private Set<ExtensionModel> getDependencyExtensions() {
+    ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
+    return ImmutableSet.<ExtensionModel>builder().add(petstore).build();
+  }
+
+  private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
+    DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+    Map<String, Object> ctx = new HashMap<>();
+    ctx.put(TYPE_PROPERTY_NAME, extension.getName());
+    ctx.put(VERSION, "1.0.0-SNAPSHOT");
+    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 
 }
