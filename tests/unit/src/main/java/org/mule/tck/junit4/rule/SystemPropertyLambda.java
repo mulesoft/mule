@@ -22,6 +22,9 @@ public class SystemPropertyLambda extends SystemProperty {
 
   @Override
   public String getValue() {
-    return propertySupplier.get();
+    if (!initialized) {
+      value = propertySupplier.get();
+    }
+    return super.getValue();
   }
 }
