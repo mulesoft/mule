@@ -19,12 +19,7 @@
         "org.mule.test.heisenberg.extension",
         "org.mule.test.heisenberg.extension.model"
       ],
-      "exportedResources": [
-        "/META-INF/",
-        "/META-INF/mule-heisenberg.xsd",
-        "/META-INF/spring.handlers",
-        "/META-INF/spring.schemas"
-      ]
+      "exportedResources": []
     }
   },
   "bundleDescriptorLoader": {

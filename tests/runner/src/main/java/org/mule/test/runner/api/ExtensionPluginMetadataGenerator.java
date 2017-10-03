@@ -208,23 +208,6 @@ class ExtensionPluginMetadataGenerator {
   }
 
   /**
-   * Generates DSL resources for the plugins where extension manifest were generated. This method should be called after all
-   * extensions manifest where generated.
-   * <p>
-   * <pre>
-   *   spring.schemas
-   *   spring.handlers
-   *   extension.xsd
-   * </pre>
-   * <p/>
-   * These files are going to be generated for each extension registered here.
-   */
-  public void generateDslResources() {
-    extensionGeneratorEntries.forEach(entry -> extensionsInfrastructure.generateDslResources(entry.getResourcesFolder(),
-                                                                                             entry.getExtensionModel()));
-  }
-
-  /**
    * Entry class for generating resources for an Extension.
    */
   class ExtensionGeneratorEntry {

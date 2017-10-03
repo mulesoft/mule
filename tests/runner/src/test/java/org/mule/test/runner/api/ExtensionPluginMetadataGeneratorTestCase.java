@@ -24,17 +24,17 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import com.google.common.io.PatternFilenameFilter;
+
+import java.io.File;
+import java.util.Optional;
+
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.google.common.io.PatternFilenameFilter;
-
-import java.io.File;
-import java.util.Optional;
 
 public class ExtensionPluginMetadataGeneratorTestCase extends AbstractMuleTestCase {
 
@@ -83,13 +83,12 @@ public class ExtensionPluginMetadataGeneratorTestCase extends AbstractMuleTestCa
         generator.generateExtensionResources(heisenbergPlugin, HeisenbergExtension.class, depResolver, emptyList());
     File petStorePluginFolder =
         generator.generateExtensionResources(petStorePlugin, PetStoreConnector.class, depResolver, emptyList());
-    generator.generateDslResources();
 
-    assertThat(listFiles(heisenbergPluginFolder, "heisenberg.xsd"), arrayWithSize(1));
+    assertThat(listFiles(heisenbergPluginFolder, "heisenberg.xsd"), arrayWithSize(0));
     assertThat(listFiles(heisenbergPluginFolder, "petstore.xsd"), arrayWithSize(0));
 
     assertThat(listFiles(petStorePluginFolder, "heisenberg.xsd"), arrayWithSize(0));
-    assertThat(listFiles(petStorePluginFolder, "petstore.xsd"), arrayWithSize(1));
+    assertThat(listFiles(petStorePluginFolder, "petstore.xsd"), arrayWithSize(0));
   }
 
   private String[] listFiles(File pluginResourcesFolder, String pattern) {

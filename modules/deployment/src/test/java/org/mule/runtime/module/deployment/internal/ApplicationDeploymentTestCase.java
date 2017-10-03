@@ -1231,8 +1231,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     ArtifactPluginFileBuilder invalidPrivilegedPlugin =
         new ArtifactPluginFileBuilder("invalidPrivilegedPlugin")
             .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
-            .configuredWith(EXPORTED_RESOURCE_PROPERTY,
-                            "/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+            .configuredWith(EXPORTED_RESOURCE_PROPERTY, "/");
 
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("invalidPrivilegedPluginApp")
         .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG).dependingOn(invalidPrivilegedPlugin);
@@ -1729,8 +1728,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
-        .addProperty(EXPORTED_RESOURCES,
-                     asList("/,  META-INF/mule-privileged.xsd, META-INF/spring.handlers, META-INF/spring.schemas"))
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.PrivilegedExtension")

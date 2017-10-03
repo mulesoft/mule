@@ -11,9 +11,9 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.collectRelativeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -62,11 +62,6 @@ final public class ExportedArtifactsCollector {
    * @return The {@link Set} of default resource paths that the extension should export
    */
   public Set<String> getExportedResources() {
-    // TODO: remove at Kraan's notice
-    addMetaInfResource("");
-
-    collectXmlSupportResources();
-
     return exportedResources.build();
   }
 
@@ -99,17 +94,6 @@ final public class ExportedArtifactsCollector {
     privilegedArtifacts.addAll(extensionModel.getPrivilegedArtifacts());
 
     return privilegedArtifacts;
-  }
-
-
-  private void collectXmlSupportResources() {
-    XmlDslModel languageModel = extensionModel.getXmlDslModel();
-
-    addMetaInfResource(languageModel.getXsdFileName());
-    addMetaInfResource("spring.handlers");
-    addMetaInfResource("spring.schemas");
-
-    exportedResources.addAll(extensionModel.getResources());
   }
 
   private void addMetaInfResource(String resource) {
