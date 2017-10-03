@@ -21,6 +21,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.test.MavenTestUtils.getMavenProjectVersion;
+import static org.mule.maven.client.test.MavenTestUtils.mavenPomFinder;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -47,12 +49,19 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends DeployableArtifactDescriptor, B extends DeployableFileBuilder>
     extends AbstractMuleTestCase {
+
+  private static final String MULE_PROJECT_VERSION =
+      getMavenProjectVersion(mavenPomFinder(DeployableArtifactDescriptorFactoryTestCase.class));
+
+  @ClassRule
+  public static SystemProperty muleVersionProperty = new SystemProperty("mule.project.version", MULE_PROJECT_VERSION);
 
   private static File echoTestJarFile;
 
@@ -217,7 +226,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
 
     assertThat(classLoaderModel.getDependencies().size(), is(2));
-    assertThat(classLoaderModel.getDependencies(), hasItems(httpPluginDependencyMatcher(), httpSocketsDependencyMatcher()));
+    assertThat(classLoaderModel.getDependencies(), hasItems(dependantPluginDependencyMatcher(), emptyPluginDependencyMatcher()));
 
     assertThat(classLoaderModel.getUrls().length, is(1));
     classLoaderModel.getDependencies().stream()
@@ -286,22 +295,22 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         return bundleDependency.getScope().equals(COMPILE) &&
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
-            bundleDependency.getDescriptor().getArtifactId().equals("mule-sockets-connector") &&
-            bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getArtifactId().equals("test-empty-plugin") &&
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
+            bundleDependency.getDescriptor().getVersion().equals(MULE_PROJECT_VERSION);
       }
     };
   }
 
-  private Matcher<BundleDependency> httpPluginDependencyMatcher() {
-    return createConnectorMatcher("mule-http-connector");
+  private Matcher<BundleDependency> dependantPluginDependencyMatcher() {
+    return createPluginMatcher("test-dependant-plugin");
   }
 
-  private Matcher<BundleDependency> httpSocketsDependencyMatcher() {
-    return createConnectorMatcher("mule-sockets-connector");
+  private Matcher<BundleDependency> emptyPluginDependencyMatcher() {
+    return createPluginMatcher("test-empty-plugin");
   }
 
-  private Matcher<BundleDependency> createConnectorMatcher(String artifactId) {
+  private Matcher<BundleDependency> createPluginMatcher(String artifactId) {
     return new BaseMatcher<BundleDependency>() {
 
       @Override
@@ -320,8 +329,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
             bundleDependency.getDescriptor().getClassifier().isPresent() &&
             bundleDependency.getDescriptor().getClassifier().get().equals(MULE_PLUGIN_CLASSIFIER) &&
             bundleDependency.getDescriptor().getArtifactId().equals(artifactId) &&
-            bundleDependency.getDescriptor().getGroupId().equals("org.mule.connectors") &&
-            bundleDependency.getDescriptor().getVersion().equals("1.0.0-SNAPSHOT");
+            bundleDependency.getDescriptor().getGroupId().equals("org.mule.tests") &&
+            bundleDependency.getDescriptor().getVersion().equals("4.0.0-SNAPSHOT");
       }
     };
   }

@@ -10,9 +10,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-http-connector</artifactId>
-            <version>${muleHttpConnectorTestVersion}</version>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-dependant-plugin</artifactId>
+            <version>${mule.project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>
