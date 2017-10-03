@@ -13,9 +13,10 @@ import org.junit.rules.ExternalResource;
  */
 public class SystemProperty extends ExternalResource {
 
+  protected boolean initialized;
+  protected String value;
+
   private final String name;
-  private String value;
-  private boolean initialized;
   private String oldValue;
 
   public SystemProperty(String name) {
