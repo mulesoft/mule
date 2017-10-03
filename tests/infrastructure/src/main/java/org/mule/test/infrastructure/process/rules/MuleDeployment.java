@@ -472,7 +472,7 @@ public class MuleDeployment extends MuleInstallation {
   }
 
   /**
-   * @return the mule instance controller.
+   * @return the Mule instance controller.
    */
   public MuleProcessController getMuleProcessController() {
     return mule;

@@ -54,6 +54,13 @@ public interface AllureConstants {
       String EMBEDDED = "Embedded";
 
     }
+
+    interface RedeploymentStory {
+
+      String APPLICATION_REDEPLOYMENT = "Application Redeployment";
+      String APPLICATION_PATCHING = "Application Redeployment";
+
+    }
   }
 
   interface EmailFeature {
@@ -211,6 +218,9 @@ public interface AllureConstants {
     String OS_EXTENSION = "ObjectStore Extension";
 
     interface ObjectStoreStory {
+
+      String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
+
     }
 
   }
@@ -276,6 +286,9 @@ public interface AllureConstants {
     String VM_EXTENSION = "VM Extension";
 
     interface VMStory {
+
+      String PERSISTENT_DATA_REDEPLOYMENT = "Persistent data redeployment";
+
     }
 
   }

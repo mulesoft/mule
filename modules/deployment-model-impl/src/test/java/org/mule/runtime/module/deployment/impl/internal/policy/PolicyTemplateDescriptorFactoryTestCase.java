@@ -77,7 +77,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   private static final String POLICY_NAME = "testPolicy";
   private static final String JAR_FILE_NAME = "test.jar";
-  private static final String POLICY_VERSION = "1.0";
+  private static final String POLICY_VERSION = "1.0.0";
   private static final String POLICY_GROUP_ID = "org.mule.test";
   private static final String POLICY_CLASSIFIER = "mule-policy";
   private static final String POLICY_ARTIFACT_TYPE = "zip";

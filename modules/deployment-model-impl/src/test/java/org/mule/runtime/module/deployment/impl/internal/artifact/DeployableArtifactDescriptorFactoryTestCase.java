@@ -234,7 +234,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void descriptorWithNoRevisionVersion() throws Exception {
     expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
+    expectedException
+        .expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
     createArtifactDescriptor(getArtifactRootFolder() + "no-revision-artifact");
   }
 

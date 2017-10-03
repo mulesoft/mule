@@ -124,6 +124,10 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                          descriptor.getName(), descriptor.getRequiredProduct().name(),
                                                          runtimeProduct.name()));
     }
+    validateVersion(descriptor);
+  }
+
+  protected void validateVersion(T descriptor) {
     String bundleDescriptorVersion = descriptor.getBundleDescriptor().getVersion();
     checkState(bundleDescriptorVersion != null,
                format("No version specified in the bundle descriptor of the artifact %s", descriptor.getName()));
