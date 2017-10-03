@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.transformer.graph;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.graph.DirectedMultigraph;
@@ -39,6 +42,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
     }
 
     DataType returnDataType = converter.getReturnDataType();
+
     if (!containsVertex(returnDataType)) {
       addVertex(returnDataType);
     }
@@ -66,6 +70,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
     DataType returnDataType = converter.getReturnDataType();
 
     for (DataType sourceDataType : converter.getSourceDataTypes()) {
+
       Set<TransformationEdge> allEdges = getAllEdges(sourceDataType, returnDataType);
 
       for (TransformationEdge edge : allEdges) {
@@ -89,4 +94,32 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
 
     registeredConverters.remove(converter);
   }
+
+
+
+  //Checks the graph and returns vertexes that are compatible with the one given
+  List<DataType> getSuperVertexes(DataType vertex) {
+    //Use the parent's method to check if the actual vertex exists
+    if (super.containsVertex(vertex)) {
+      return asList(vertex);
+    }
+    return vertexSet().stream().filter((graphVertex) -> graphVertex.isCompatibleWith(vertex)).collect(toList());
+  }
+
+  //Checks the graph and returns vertexes which vertex is compatible with.
+  List<DataType> getSubVertexes(DataType vertex) {
+    if (super.containsVertex(vertex)) {
+      return asList(vertex);
+    }
+    return vertexSet().stream().filter(vertex::isCompatibleWith).collect(toList());
+  }
+
+  boolean containsVertexOrSuper(DataType vertex) {
+    return !getSuperVertexes(vertex).isEmpty();
+  }
+
+  boolean containsVertexOrSub(DataType vertex) {
+    return !getSubVertexes(vertex).isEmpty();
+  }
+
 }

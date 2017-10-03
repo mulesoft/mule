@@ -158,7 +158,7 @@
         <typed-value:typed-value-for-input-stream>
             <typed-value:input-stream>
                 #[output application/json
-                 ---
+                ---
                 {
                 a : "json value"
                 }]
@@ -182,4 +182,5 @@
         </typed-value:mixed-typed-values>
 
     </flow>
+
 </mule>

@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.util.Objects;
+
 /**
  * Implementation of {@link MapDataType}.
  *
@@ -64,29 +66,15 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
     DefaultMapDataType that = (DefaultMapDataType) o;
 
-    if (!getKeyDataType().equals(that.getKeyDataType())) {
-      return false;
-    }
-    if (!getValueDataType().equals(that.getValueDataType())) {
-      return false;
-    }
-
-    // TODO MULE-9987 Fix this
-    if ((mimeType != null ? !mimeType.matches(that.mimeType) : that.mimeType != null) && !MediaType.ANY.matches(that.mimeType)
-        && !MediaType.ANY.matches(this.mimeType)) {
-      return false;
-    }
-
-    return getType().equals(that.getType());
+    return Objects.equals(this.getKeyDataType(), that.getKeyDataType()) &&
+        Objects.equals(this.getValueDataType(), that.getValueDataType()) &&
+        Objects.equals(this.getType(), that.getType()) &&
+        Objects.equals(this.getMediaType(), that.getMediaType());
   }
 
   @Override
   public int hashCode() {
-    int result = getType().hashCode();
-    result = 31 * result + getKeyDataType().hashCode();
-    result = 31 * result + getValueDataType().hashCode();
-    result = 31 * result + (getMediaType() != null ? getMediaType().hashCode() : 0);
-    return result;
+    return Objects.hash(getType(), getKeyDataType(), getValueDataType(), getMediaType());
   }
 
   @Override

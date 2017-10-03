@@ -66,7 +66,7 @@ public class GlobalBindingContextProviderTestCase extends AbstractMuleContextTes
   public void function() {
     TypedValue result = muleContext.getExpressionManager().evaluate("repeat('oa', 3)");
     assertThat(result.getValue(), is("oaoaoa"));
-    assertThat(result.getDataType(), is(STRING));
+    assertThat(STRING.isCompatibleWith(result.getDataType()), is(true));
   }
 
   private class TestGlobalBindingContextProvider implements GlobalBindingContextProvider {

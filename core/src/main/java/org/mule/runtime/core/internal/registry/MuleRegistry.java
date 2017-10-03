@@ -10,6 +10,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -52,6 +53,11 @@ public interface MuleRegistry extends LifecycleRegistry {
   /**
    * This method will return a list of {@link org.mule.runtime.core.api.transformer.Transformer} objects that accept the given
    * input and return the given output type of object
+   *
+   * All {@link Transformer}s found will have a source that is compatible with {@param source}
+   * (since if a transformer can transform a super type, it should be able to transform any type that extends it)
+   * and a target such that {@param target} isCompatibleWith() the {@link Transformer}'s one
+   * (since if we want a transformer that returns an specific type, it should return exactly that type or any type that extends it.)
    *
    * @param source The desired input type for the transformer
    * @param result the desired output type for the transformer

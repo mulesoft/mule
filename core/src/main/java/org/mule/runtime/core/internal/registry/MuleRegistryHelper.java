@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.metadata.DataType.builder;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction.ADDED;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,6 +27,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import com.google.common.collect.ImmutableList;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -133,6 +136,12 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    */
   @Override
   public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException {
+    //To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
+    //and only find transformers with a targetType the same as or a super class of the expected one.
+    //The same could be done for the source but since if the source expected by the transformer is more generic that
+    //the provided, it will be found.
+    result = builder(result).mediaType(ANY).charset((Charset) null).build();
+
     final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
     Transformer cachedTransformer = (Transformer) exactTransformerCache.get(dataTypePairHash);
     if (cachedTransformer != null) {

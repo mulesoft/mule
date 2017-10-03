@@ -58,4 +58,5 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
     assertNotNull(result);
     assertEquals(t1, result);
   }
+
 }

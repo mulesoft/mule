@@ -16,8 +16,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.internal.transformer.graph.CompositeConverterFilter;
-import org.mule.runtime.core.internal.transformer.graph.ConverterFilter;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
@@ -28,10 +26,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 @SmallTest
-public class CompositeConverterFilterTestCase {
-
-  private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-  private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
+public class CompositeConverterFilterTestCase extends AbstractTransformationGraphTestCase {
 
   @Test
   public void filtersEmptyList() throws ResolverException {

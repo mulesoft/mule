@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static java.util.Objects.hash;
+import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -23,8 +25,10 @@ import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.xml.transform.stream.StreamSource;
@@ -151,7 +155,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     if (returnType == null) {
       synchronized (this) {
         if (returnType == null) {
-          returnType = DataType.builder().charset(getDefaultEncoding(muleContext)).build();
+          returnType = builder().charset(getDefaultEncoding(muleContext)).build();
         }
       }
     }
@@ -315,5 +319,26 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(getReturnDataType(), getSourceDataTypes().hashCode(), isIgnoreBadInput(), isAllowNullReturn(), isAcceptNull());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof AbstractTransformer)) {
+      return false;
+    }
+
+    AbstractTransformer that = (AbstractTransformer) obj;
+
+    return getReturnDataType().equals(that.getReturnDataType()) && getSourceDataTypes().equals(that.getSourceDataTypes())
+        && Objects.equals(isIgnoreBadInput(), that.isIgnoreBadInput())
+        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn()) && Objects.equals(isAcceptNull(), that.isAcceptNull());
   }
 }

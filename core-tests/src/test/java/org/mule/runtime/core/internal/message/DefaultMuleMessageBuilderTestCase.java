@@ -137,7 +137,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     Message messageCopy = InternalMessage.builder(createTestMessage()).value(true).attributesValue(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
-    assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
+    assertThat(BOOLEAN.isCompatibleWith(messageCopy.getPayload().getDataType()), is(true));
     assertThat(messageCopy.getAttributes().getValue(), is(BASE_ATTRIBUTES));
     assertThat(messageCopy.getAttributes().getDataType(), is(BASE_ATTRIBUTES_DATATYPE));
   }
