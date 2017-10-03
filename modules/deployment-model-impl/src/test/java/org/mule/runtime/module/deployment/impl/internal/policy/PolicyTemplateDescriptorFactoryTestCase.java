@@ -214,7 +214,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     final ArtifactPluginDescriptor expectedPluginDescriptor2 = mock(ArtifactPluginDescriptor.class);
     when(expectedPluginDescriptor2.getName()).thenReturn("plugin2");
     when(expectedPluginDescriptor2.getClassLoaderModel()).thenReturn(NULL_CLASSLOADER_MODEL);
-    when(pluginDescriptorFactory.create(any(), empty())).thenReturn(expectedPluginDescriptor1)
+    when(pluginDescriptorFactory.create(any(), any())).thenReturn(expectedPluginDescriptor1)
         .thenReturn(expectedPluginDescriptor2);
 
     PolicyTemplateDescriptor descriptor = policyTemplateDescriptorFactory.create(tempFolder, empty());
