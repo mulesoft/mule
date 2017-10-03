@@ -274,26 +274,19 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     AttributeDefinition messageProcessorListAttributeDefinition =
         fromChildCollectionConfiguration(Processor.class).build();
-    ComponentBuildingDefinition.Builder exceptionStrategyBaseBuilder =
-        baseDefinition.withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
-            .withSetterParameterDefinition("globalName", fromSimpleParameter(NAME).build());
+    ComponentBuildingDefinition.Builder onErrorBaseBuilder = baseDefinition
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
+        .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
+        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(EXCEPTION_STRATEGY).withTypeDefinition(fromType(Object.class))
             .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build()).build());
-    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.withIdentifier(ON_ERROR_CONTINUE)
+    componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_CONTINUE)
         .withTypeDefinition(fromType(OnErrorContinueHandler.class))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
-        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
         .asPrototype().build());
-    componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
+    componentBuildingDefinitions.add(onErrorBaseBuilder.withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
-        .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
-        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
         .asPrototype().build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ERROR_HANDLER)
         .withTypeDefinition(fromType(ErrorHandler.class))
