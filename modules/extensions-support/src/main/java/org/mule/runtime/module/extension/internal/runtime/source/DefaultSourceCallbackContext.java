@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
@@ -65,7 +68,9 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
     this.connection = connection;
 
     if (sourceCallback.getTransactionConfig().isTransacted() && connection instanceof TransactionalConnection) {
-      ConnectionHandler<Object> connectionHandler = sourceCallback.getSourceConnectionManager().getConnectionHandler(connection);
+      ConnectionHandler<Object> connectionHandler = sourceCallback.getSourceConnectionManager().getConnectionHandler(connection)
+          .orElseThrow(() -> new TransactionException(createWrongConnectionMessage(connection)));
+
       sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
                                                                     sourceCallback.getConfigurationInstance(),
                                                                     connectionHandler);
@@ -144,5 +149,11 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   @Override
   public <T, A> SourceCallback<T, A> getSourceCallback() {
     return sourceCallback;
+  }
+
+  private I18nMessage createWrongConnectionMessage(Object connection) {
+    return createStaticMessage(format("Internal Error. The transacted source [%s] from the Extension [%s] tried to bind an " +
+        "connection of type [%s] which is not a current connection. ", sourceCallback.getOwningSourceName(),
+                                      sourceCallback.getOwningExtensionName(), connection.getClass().getName()));
   }
 }
