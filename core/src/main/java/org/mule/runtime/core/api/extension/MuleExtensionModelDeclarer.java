@@ -56,6 +56,7 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructurePara
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -90,6 +91,8 @@ import com.google.gson.reflect.TypeToken;
 class MuleExtensionModelDeclarer {
 
   final ErrorModel anyError = newError(ANY).build();
+  final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
+  final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
 
@@ -138,7 +141,6 @@ class MuleExtensionModelDeclarer {
     return extensionDeclarer;
   }
 
-
   private void declareScheduler(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     SourceDeclarer scheduler = extensionDeclarer.withMessageSource("scheduler")
         .hasResponse(false)
@@ -168,10 +170,9 @@ class MuleExtensionModelDeclarer {
   private void declareIdempotentValidator(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer validator = extensionDeclarer
         .withOperation("idempotentMessageValidator")
-        .describedAs(
-                     "Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
-                         + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
-                         + "attribute. Otherwise, a 'FILTERED' error is generated.");
+        .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
+            + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
+            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.");
 
     validator.withOutput().ofType(typeLoader.load(void.class));
     validator.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -227,10 +228,10 @@ class MuleExtensionModelDeclarer {
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
 
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
-        .describedAs(
-                     "Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow "
-                         + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
-                         + "referenced flow and will therefore use its exception strategy etc.");
+        .describedAs("Allows a \u0027flow\u0027 to be referenced such that the message processing will continue in the referenced flow "
+            + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
+            + "referenced flow and will therefore use its exception strategy etc.")
+        .withErrorModel(routingError);
 
     flowRef.withOutput().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
     flowRef.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).anyType().build());
@@ -244,10 +245,9 @@ class MuleExtensionModelDeclarer {
 
   private void declareLogger(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer logger = extensionDeclarer.withOperation("logger")
-        .describedAs(
-                     "Performs logging using an expression that determines what should be logged. By default the current messages is logged "
-                         + "using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
-                         + "the level and category can both be configured to suit your needs. message is specified then the current message is used.");
+        .describedAs("Performs logging using an expression that determines what should be logged. By default the current messages is logged "
+            + "using the DEBUG level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
+            + "the level and category can both be configured to suit your needs. message is specified then the current message is used.");
 
     logger.withOutput().ofType(typeLoader.load(void.class));
     logger.withOutputAttributes().ofType(typeLoader.load(void.class));
@@ -296,9 +296,8 @@ class MuleExtensionModelDeclarer {
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
 
     OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
-        .describedAs(
-                     "The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
-                         + " generating a message for each element.");
+        .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
+            + " generating a message for each element.");
 
     forEach.withChain();
 
@@ -339,7 +338,8 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
         .describedAs("Sends the message to the first message processor whose condition has been satisfied. "
             + "If no conditions were satisfied, sends to the configured default message processor if configured, "
-            + "or throws an exception if not configured.");
+            + "or throws an exception if not configured.")
+        .withErrorModel(routingError);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
     when.withChain();
@@ -371,7 +371,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer scatterGather = extensionDeclarer.withConstruct("scatterGather")
-        .describedAs("Sends the same message to multiple message processors in parallel.");
+        .describedAs("Sends the same message to multiple message processors in parallel.")
+        .withErrorModel(compositeRoutingError);
 
     scatterGather.withRoute("route").withMinOccurs(2).withChain();
 
@@ -438,9 +439,8 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer errorHandler = extensionDeclarer.withConstruct("errorHandler")
         .withStereotype(ERROR_HANDLER)
         .allowingTopLevelDefinition()
-        .describedAs(
-                     "Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
-                         + " If there's no match, then a default error handler will be executed.");
+        .describedAs("Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
+            + " If there's no match, then a default error handler will be executed.");
 
     NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
         .describedAs(
@@ -492,7 +492,6 @@ class MuleExtensionModelDeclarer {
   private void declareErrors(ExtensionDeclarer extensionDeclarer) {
 
     final ErrorModel criticalError = newError(CRITICAL).build();
-    final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
     final ErrorModel securityError = newError(SECURITY).withParent(anyError).build();
     final ErrorModel sourceError = newError(SOURCE).withParent(anyError).build();
     final ErrorModel sourceResponseError = newError(SOURCE_RESPONSE).withParent(anyError).build();
@@ -510,8 +509,7 @@ class MuleExtensionModelDeclarer {
     extensionDeclarer.withErrorModel(newError(UNKNOWN).withParent(anyError).build());
 
     extensionDeclarer.withErrorModel(routingError);
-    extensionDeclarer.withErrorModel(newError(COMPOSITE_ROUTING).withParent(routingError).build());
-
+    extensionDeclarer.withErrorModel(compositeRoutingError);
 
     extensionDeclarer.withErrorModel(validationError);
     extensionDeclarer.withErrorModel(duplicateMessageError);

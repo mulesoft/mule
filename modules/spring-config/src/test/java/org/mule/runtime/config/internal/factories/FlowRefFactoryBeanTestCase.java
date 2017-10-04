@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.factories;
+package org.mule.runtime.config.internal.factories;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -32,10 +32,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -46,14 +46,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -62,6 +61,9 @@ import org.junit.rules.ExpectedException;
 import org.mockito.MockSettings;
 import org.reactivestreams.Publisher;
 import org.springframework.context.ApplicationContext;
+
+import java.util.Arrays;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -189,7 +191,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleContextTestCase {
     doReturn("other").when(expressionManager).parse(eq(DYNAMIC_NON_EXISTANT), any(CoreEvent.class),
                                                     any(ComponentLocation.class));
 
-    expectedException.expectCause(instanceOf(MuleRuntimeException.class));
+    expectedException.expectCause(instanceOf(RoutePathNotFoundException.class));
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
 

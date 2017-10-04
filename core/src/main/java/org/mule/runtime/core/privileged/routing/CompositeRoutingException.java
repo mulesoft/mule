@@ -18,8 +18,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
+import org.mule.runtime.core.privileged.processor.Router;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -29,7 +29,7 @@ import java.util.Map.Entry;
  * exception implements {@link ComposedErrorException} so that a composite {@link Error} is created and also implements
  * {@link ErrorMessageAwareException} to provide an error message using {@link RoutingResult} that provides access to all route
  * results for use in error handlers.
- * 
+ *
  * @since 3.5.0
  * @see RoutingResult
  */
@@ -43,7 +43,7 @@ public class CompositeRoutingException extends MuleException implements Composed
 
   /**
    * Constructs a new {@link CompositeRoutingException}
-   * 
+   *
    * @param routingResult routing result object containing the results from all routes.
    */
   public CompositeRoutingException(RoutingResult routingResult) {
