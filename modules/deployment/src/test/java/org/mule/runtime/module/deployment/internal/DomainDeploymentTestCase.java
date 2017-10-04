@@ -15,7 +15,6 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.touch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -35,7 +34,6 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -52,6 +50,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -952,33 +951,27 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void deployDomainWithDeploymentProperties() throws Exception {
+  public void deployAndRedeployDomainWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
     startDeployment();
-    deploymentService.deployDomain(domainWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties);
-    assertDeploymentSuccess(domainDeploymentListener, domainWithPropsFileBuilder.getId());
-    Domain domain = findADomain(domainWithPropsFileBuilder.getId());
-    assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
-    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponent.class));
+    deployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getArtifactFile().toURI(),
+                                      deploymentProperties,
+                                      (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP).get() instanceof TestComponent);
+
 
     // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
-    deploymentService.redeployDomain(domainWithPropsFileBuilder.getId());
-    domain = findADomain(domainWithPropsFileBuilder.getId());
-    assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
-    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponent.class));
+    redeployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getId(), null,
+                                        (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP)
+                                            .get() instanceof TestComponent);
+
 
     // Redeploy with new deployment properties
     deploymentProperties.clear();
     deploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS_ON_REDEPLOY);
-    deploymentService.redeployDomain(domainWithPropsFileBuilder.getId(), deploymentProperties);
-    domain = findADomain(domainWithPropsFileBuilder.getId());
-    assertNotNull(domain);
-    assertNotNull(domain.getRegistry());
-    assertThat(domain.getRegistry().lookupByName("component").get(), instanceOf(TestComponentOnRedeploy.class));
-
+    redeployAndVerifyPropertyInRegistry(domainWithPropsFileBuilder.getId(), deploymentProperties,
+                                        (registry) -> registry.lookupByName(COMPONENT_NAME_IN_APP)
+                                            .get() instanceof TestComponentOnRedeploy);
   }
 
   @Ignore("MULE-6926: flaky test")
@@ -1397,5 +1390,19 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     Action verifyAnchorFileExists = () -> assertDomainAnchorFileExists(waitDomainFileBuilder.getId());
     deploysArtifactAndVerifyAnchorFileCreatedWhenDeploymentEnds(deployArtifactAction, verifyAnchorFileDoesNotExists,
                                                                 verifyDeploymentSuccessful, verifyAnchorFileExists);
+  }
+
+  @Override
+  protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
+    deploymentService.deployDomain(uri, deploymentProperties);
+  }
+
+  @Override
+  protected void redeployId(String id, Properties deploymentProperties) throws IOException {
+    if (deploymentProperties == null) {
+      deploymentService.redeployDomain(id);
+    } else {
+      deploymentService.redeployDomain(id, deploymentProperties);
+    }
   }
 }

@@ -123,9 +123,11 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.junit.After;
@@ -148,6 +150,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final int FILE_TIMESTAMP_PRECISION_MILLIS = 1000;
   protected static final String FLOW_PROPERTY_NAME = "flowName";
   protected static final String COMPONENT_NAME = "componentValue";
+  protected static final String COMPONENT_NAME_IN_APP = "component";
   protected static final String COMPONENT_CLASS =
       "org.mule.runtime.module.deployment.internal.AbstractDeploymentTestCase$TestComponent";
   protected static final String COMPONENT_CLASS_ON_REDEPLOY =
@@ -359,6 +362,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     deploymentService.addDeploymentListener(applicationDeploymentListener);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
     deploymentService.addDeploymentListener(testDeploymentListener);
+    deploymentService.addDomainDeploymentListener(testDeploymentListener);
     deploymentService.addDomainBundleDeploymentListener(domainBundleDeploymentListener);
 
     policyManager = new TestPolicyManager(deploymentService,
@@ -571,7 +575,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     });
   }
 
-  protected void assertPropertyValue(TestDeploymentListener listener, String propertyName, String propertyValue) {
+  protected void assertConditionOnRegistry(TestDeploymentListener listener, Function<DefaultRegistry, Boolean> verifier) {
     Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
     prober.check(new JUnitProbe() {
 
@@ -581,7 +585,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         if (registry == null) {
           return false;
         }
-        return registry.lookupByName(propertyName).get().equals(propertyValue);
+        return verifier.apply(registry);
       }
 
       @Override
@@ -1091,6 +1095,42 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     @Override
     public void initialise() throws InitialisationException {
       initialised = true;
+    }
+  }
+
+  protected void redeployAndVerifyPropertyInRegistry(String id, Properties deploymentProperties,
+                                                     Function<DefaultRegistry, Boolean> verifier)
+      throws IOException {
+    try {
+      deploymentService.getLock().lock();
+      redeployId(id, deploymentProperties);
+    } finally {
+      deploymentService.getLock().unlock();
+    }
+    assertConditionOnRegistry(testDeploymentListener, verifier);
+  }
+
+  protected void deployAndVerifyPropertyInRegistry(URI uri, Properties deploymentProperties,
+                                                   Function<DefaultRegistry, Boolean> verifier)
+      throws IOException {
+    try {
+      deploymentService.getLock().lock();
+      deployURI(uri, deploymentProperties);
+    } finally {
+      deploymentService.getLock().unlock();
+    }
+    assertConditionOnRegistry(testDeploymentListener, verifier);
+  }
+
+  protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
+    deploymentService.deploy(uri, deploymentProperties);
+  }
+
+  protected void redeployId(String id, Properties deploymentProperties) throws IOException {
+    if (deploymentProperties == null) {
+      deploymentService.redeploy(id);
+    } else {
+      deploymentService.redeploy(id, deploymentProperties);
     }
   }
 }
