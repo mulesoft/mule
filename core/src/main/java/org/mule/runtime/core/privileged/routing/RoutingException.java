@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.privileged.routing;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToRouterViaEndpoint;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * <code>RoutingException</code> is a base class for all routing exceptions. Routing exceptions are only thrown for
@@ -50,7 +51,7 @@ public class RoutingException extends MuleException {
   }
 
   private static I18nMessage generateMessage(I18nMessage message, Processor target) {
-    I18nMessage m = CoreMessages.failedToRouterViaEndpoint(target);
+    I18nMessage m = failedToRouterViaEndpoint(target);
     if (message != null) {
       message.setNextMessage(m);
       return message;

@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -36,11 +36,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -72,20 +74,22 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
   @Override
   public Processor doGetObject() throws Exception {
     if (refName.isEmpty()) {
-      throw new MuleRuntimeException(objectIsNull("flow reference is empty"));
+      throw new IllegalArgumentException("flow-ref name is empty");
     }
 
     return new FlowRefMessageProcessor();
   }
 
-  protected Processor getReferencedFlow(String name) throws MuleException {
+  protected Processor getReferencedFlow(String name, FlowRefMessageProcessor flowRefMessageProcessor) throws MuleException {
     if (name == null) {
-      throw new MuleRuntimeException(objectIsNull(name));
+      throw new RoutePathNotFoundException(createStaticMessage("flow-ref name expression returned 'null'"),
+                                           flowRefMessageProcessor);
     }
 
     Processor referencedFlow = getReferencedProcessor(name);
     if (referencedFlow == null) {
-      throw new MuleRuntimeException(objectIsNull(name));
+      throw new RoutePathNotFoundException(createStaticMessage("No flow/sub-flow with name '%s' found", name),
+                                           flowRefMessageProcessor);
     }
 
     // for subflows, we create a new one so it must be initialised manually
@@ -111,8 +115,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
   private Processor getReferencedProcessor(String name) {
     if (applicationContext instanceof MuleArtifactContext) {
       MuleArtifactContext muleArtifactContext = (MuleArtifactContext) applicationContext;
-      if (muleArtifactContext.getBeanFactory().getBeanDefinition(name).isPrototype()) {
-        muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerName());
+
+      try {
+        if (muleArtifactContext.getBeanFactory().getBeanDefinition(name).isPrototype()) {
+          muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerName());
+        }
+      } catch (NoSuchBeanDefinitionException e) {
+        // Null is handled by the caller method
+        return null;
       }
     }
     return (Processor) applicationContext.getBean(name);
@@ -141,7 +151,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
 
             @Override
             public Processor load(String key) throws Exception {
-              return getReferencedFlow(key);
+              return getReferencedFlow(key, FlowRefMessageProcessor.this);
             }
           });
 
@@ -190,6 +200,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor>
       } catch (UncheckedExecutionException e) {
         if (e.getCause() instanceof MuleRuntimeException) {
           throw (MuleRuntimeException) e.getCause();
+        } else if (e.getCause() instanceof MuleException) {
+          throw (MuleException) e.getCause();
         } else {
           throw e;
         }
