@@ -9,9 +9,9 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.deployment.meta.Product.getProductByName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.MuleVersion.NO_REVISION;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductName;
@@ -124,6 +124,17 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                          descriptor.getName(), descriptor.getRequiredProduct().name(),
                                                          runtimeProduct.name()));
     }
+    validateVersion(descriptor);
+  }
+
+  protected void validateVersion(T descriptor) {
+    String bundleDescriptorVersion = descriptor.getBundleDescriptor().getVersion();
+    checkState(bundleDescriptorVersion != null,
+               format("No version specified in the bundle descriptor of the artifact %s", descriptor.getName()));
+    MuleVersion artifactVersion = new MuleVersion(bundleDescriptorVersion);
+    checkState(artifactVersion.getRevision() != NO_REVISION,
+               format("Artifact %s version %s must contain a revision number. The version format must be x.y.z and the z part is missing",
+                      descriptor.getName(), artifactVersion));
   }
 
   /**

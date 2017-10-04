@@ -78,6 +78,13 @@ public class ServiceDescriptorFactory extends AbstractArtifactDescriptorFactory<
     return super.create(artifactFolder, properties);
   }
 
+  @Override
+  protected void validateVersion(ServiceDescriptor descriptor) {
+    if (descriptor.getBundleDescriptor() != null) {
+      super.validateVersion(descriptor);
+    }
+  }
+
   private ClassLoaderModel createClassLoaderModel(File artifactFolder) {
     try {
       return new LibFolderClassLoaderModelLoader().load(artifactFolder, emptyMap(), ArtifactType.SERVICE);

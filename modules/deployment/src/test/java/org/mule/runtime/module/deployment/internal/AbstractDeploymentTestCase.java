@@ -228,11 +228,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     helloExtensionV1JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
-        .compile("mule-module-hello-1.0.jar", "1.0");
+        .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
-        .compile("mule-module-hello-2.0.jar", "2.0");
+        .compile("mule-module-hello-2.0.0.jar", "2.0.0");
 
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
 
@@ -815,7 +815,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       File deployFolder = new File(destFile.getAbsolutePath().replace(JAR_FILE_SUFFIX, ""));
       if (deployFolder.exists()) {
         // Delete META-INF folder so maven file do not get duplicated during redeployment testing.
-        deleteDirectory(new File(deployFolder, "META-INF"));
+        deleteDirectory(new File(deployFolder, Paths.get("META-INF", "maven").toString()));
       }
       tempFile.renameTo(destFile);
       assertThat("File does not exists: " + destFile.getAbsolutePath(), destFile.exists(), is(true));
@@ -1003,7 +1003,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
                                                                              String bundleDescriptorLoaderId) {
-    return createBundleDescriptorLoader(artifactId, classifier, bundleDescriptorLoaderId, "1.0");
+    return createBundleDescriptorLoader(artifactId, classifier, bundleDescriptorLoaderId, "1.0.0");
   }
 
   protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
@@ -1033,13 +1033,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0"));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.HelloExtension")
-        .addProperty("version", "2.0");
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0")
+        .addProperty("version", "2.0.0");
+    return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
@@ -1048,13 +1048,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.HelloExtension")
-        .addProperty("version", "1.0");
-    return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }

@@ -205,6 +205,7 @@ public class DefaultMuleApplication implements Application {
     try {
       ArtifactContextBuilder artifactBuilder =
           newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)
+              .setDataFolderName(descriptor.getDataFolderName())
               .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getConfigResources().toArray(new String[descriptor.getConfigResources().size()]))
               .setDefaultEncoding(descriptor.getEncoding())
@@ -213,7 +214,8 @@ public class DefaultMuleApplication implements Application {
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
               .setArtifactDeclaration(descriptor.getArtifactDeclaration())
-              .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getName(), descriptor.getDeploymentProperties())))
+              .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
+                                                                    descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager);
 
       Domain domain;
@@ -252,7 +254,7 @@ public class DefaultMuleApplication implements Application {
       return properties;
     }
 
-    Map<String, String> mergedProperties = new HashMap<String, String>();
+    Map<String, String> mergedProperties = new HashMap<>();
     mergedProperties.putAll(properties);
     for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
       mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());

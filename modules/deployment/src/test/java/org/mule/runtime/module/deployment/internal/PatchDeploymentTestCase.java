@@ -20,7 +20,6 @@ import org.junit.Test;
 /**
  * Contains test for deployment of artifacts with patches
  */
-@Ignore("MULE-13648: patching has to be reviewed")
 public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
 
   public PatchDeploymentTestCase(boolean parallelDeployment) {
@@ -35,6 +34,29 @@ public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
   @Test
   public void sameApplicationMinorVersionWithLowerBugFixVersionCausesRedeploy() throws Exception {
     testApplicationWithSameMinorVersionCausesRedeploy("1.0.1", "1.0.0");
+  }
+
+  @Test
+  public void sameAppMajorVersionButDifferentMinorVersion() throws Exception {
+    ApplicationFileBuilder deployedApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.0.0");
+
+    addPackedAppFromBuilder(deployedApp);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, deployedApp.getId());
+
+    reset(applicationDeploymentListener);
+
+    ApplicationFileBuilder newMinorVersionApp = new ApplicationFileBuilder("app")
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .definedBy("dummy-app-config.xml").withVersion("1.1.0");
+
+    addPackedAppFromBuilder(newMinorVersionApp);
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, newMinorVersionApp.getId());
+    assertThat(deploymentService.getApplications(), hasSize(2));
+    assertAppsDir(NONE, new String[] {deployedApp.getId(), newMinorVersionApp.getId()}, true);
   }
 
   private void testApplicationWithSameMinorVersionCausesRedeploy(String deployedVersion, String patchedVersion) throws Exception {
@@ -62,12 +84,33 @@ public class PatchDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void sameDomainMinorVersionWithGreaterBugFixVersionCausesRedeploy() throws Exception {
-    testDomainWithSameMinorVersionCausesRedeploy("2.4.2", "2.5.5");
+    testDomainWithSameMinorVersionCausesRedeploy("2.4.2", "2.4.7");
   }
 
   @Test
   public void sameDomainMinorVersionWithLowerBugFixVersionCausesRedeploy() throws Exception {
     testDomainWithSameMinorVersionCausesRedeploy("2.4.5", "2.4.2");
+  }
+
+  @Test
+  public void sameDomainMajorVersionButDifferentMinorVersion() throws Exception {
+    DomainFileBuilder deployedDomain = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion("2.0.0");
+
+    addPackedDomainFromBuilder(deployedDomain);
+
+    startDeployment();
+    assertDeploymentSuccess(domainDeploymentListener, deployedDomain.getId());
+
+    reset(domainDeploymentListener);
+
+    DomainFileBuilder newMinorVersionDomain = new DomainFileBuilder("domain")
+        .definedBy("empty-domain-config.xml").withVersion("2.4.4");
+
+    addPackedDomainFromBuilder(newMinorVersionDomain);
+    assertDeploymentSuccess(domainDeploymentListener, newMinorVersionDomain.getId());
+    assertThat(deploymentService.getDomains(), hasSize(3));
+    assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, deployedDomain.getId(), newMinorVersionDomain.getId()}, true);
   }
 
   private void testDomainWithSameMinorVersionCausesRedeploy(String deployedVersion, String patchedVersion) throws Exception {

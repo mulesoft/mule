@@ -18,6 +18,8 @@ import static org.apache.commons.io.FileUtils.forceDelete;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -174,12 +176,29 @@ public class Controller {
   }
 
   public void undeploy(String application) {
-    if (!new File(appsDir, application + ANCHOR_SUFFIX).exists()) {
-      throw new MuleControllerException("Couldn't undeploy application [" + application + "]. Application is not deployed");
-    }
+    validateApplicationExists(application);
     if (!new File(appsDir, application + ANCHOR_SUFFIX).delete()) {
       throw new MuleControllerException("Couldn't undeploy application [" + application + "]");
     }
+  }
+
+  private void validateApplicationExists(String application) {
+    if (!new File(appsDir, application + ANCHOR_SUFFIX).exists()) {
+      throw new MuleControllerException("Couldn't undeploy application [" + application + "]. Application is not deployed");
+    }
+  }
+
+  /**
+   * Triggers a redeploy of the application but touching the application descriptor file.
+   * <p/>
+   * Clients should expect this method to return before the redeploy actually being done.
+   *
+   * @param application the application to redeploy
+   */
+  public void redeploy(String application) {
+    validateApplicationExists(application);
+    File descriptor = new File(new File(appsDir, application), ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION);
+    descriptor.setLastModified(System.currentTimeMillis());
   }
 
   public void undeployDomain(String domain) {

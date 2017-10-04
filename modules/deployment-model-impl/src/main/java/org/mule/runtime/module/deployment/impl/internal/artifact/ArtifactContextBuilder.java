@@ -28,6 +28,7 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
@@ -104,6 +105,7 @@ public class ArtifactContextBuilder {
   private ExtensionManagerFactory extensionManagerFactory;
   private DeployableArtifact parentArtifact;
   private Optional<Properties> properties = empty();
+  private String dataFolderName;
 
   private ArtifactContextBuilder() {}
 
@@ -143,6 +145,15 @@ public class ArtifactContextBuilder {
 
   public ArtifactContextBuilder setProperties(Optional<Properties> properties) {
     this.properties = properties;
+    return this;
+  }
+
+  /**
+   * @param folderName the folder name to use to store data in the file system related to the application.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setDataFolderName(String folderName) {
+    this.dataFolderName = folderName;
     return this;
   }
 
@@ -417,6 +428,7 @@ public class ArtifactContextBuilder {
             }
             artifactContext
                 .set(artifactConfigurationProcessor.createArtifactContext(artifactContextConfigurationBuilder.build()));
+            ((DefaultMuleConfiguration) muleContext.getConfiguration()).setDataFolderName(dataFolderName);
           }
 
           @Override

@@ -747,9 +747,9 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   public void deploysPackedAppsInOrderWhenAppArgumentIsUsed() throws Exception {
     assumeThat(parallelDeployment, is(false));
 
-    ApplicationFileBuilder app1 = createEmptyApp().withVersion("1.0");
-    ApplicationFileBuilder app2 = createEmptyApp().withVersion("2.0");
-    ApplicationFileBuilder app3 = createEmptyApp().withVersion("3.0");
+    ApplicationFileBuilder app1 = createEmptyApp().withVersion("1.0.0");
+    ApplicationFileBuilder app2 = createEmptyApp().withVersion("2.0.0");
+    ApplicationFileBuilder app3 = createEmptyApp().withVersion("3.0.0");
 
     addPackedAppFromBuilder(app1, "1.jar");
     addPackedAppFromBuilder(app2, "2.jar");
@@ -1725,7 +1725,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(PRIVILEGED_EXTENSION_ARTIFACT_ID).setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader(PRIVILEGED_EXTENSION_ARTIFACT_ID, MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID)
         .build());
