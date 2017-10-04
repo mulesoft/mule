@@ -21,6 +21,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultValidationResult;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -47,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
@@ -154,6 +156,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public TypedValue evaluate(String expression, DataType outputType, BindingContext context) {
     return evaluate(expression, outputType, context, null);
+  }
+
+  @Override
+  public TypedValue<?> evaluateLogExpression(String expression, BindingContext context) throws ExpressionExecutionException {
+    // TODO MULE-13715 - Logger component does not support parse in DW
+    throw new NotImplementedException("temporary until MULE-13715 is done");
   }
 
   @Override
