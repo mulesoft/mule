@@ -136,6 +136,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   private void undeployArtifactIfItsAPatch(T artifact) {
     Optional<T> foundMatchingArtifact = artifacts.stream()
         .filter(deployedArtifact -> deployedArtifact.getDescriptor().getBundleDescriptor() != null)
+        .filter(deployedArtifact -> !artifactZombieMap.containsKey(artifact.getArtifactName()))
         .filter(deployedArtifact -> {
           BundleDescriptor deployedBundleDescriptor = deployedArtifact.getDescriptor().getBundleDescriptor();
           BundleDescriptor artifactBundleDescriptor = artifact.getDescriptor().getBundleDescriptor();

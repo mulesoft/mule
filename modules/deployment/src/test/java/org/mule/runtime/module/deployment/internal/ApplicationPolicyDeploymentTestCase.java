@@ -83,7 +83,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     simpleExtensionJarFile =
         new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
                                                         getResourceFile("/org/foo/simple/SimpleOperation.java"))
-            .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0");
+            .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
   }
 
   public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment) {
@@ -318,14 +318,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("simpleExtensionPlugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader("simpleExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_RESOURCES,
                      asList("/,  META-INF/mule-simple.xsd, META-INF/spring.handlers, META-INF/spring.schemas"))
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.hello.SimpleExtension")
-        .addProperty("version", "1.0");
+        .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("simpleExtensionPlugin")
         .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
         .describedBy(mulePluginModelBuilder.build());
