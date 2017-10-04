@@ -209,24 +209,4 @@ public class ModulesConsumingMimeTypeTestCase extends AbstractXmlExtensionMuleAr
       closeQuietly(inputStream);
     }
   }
-
-  //  private void compareXML(String expected, String actual) throws Exception {
-  //    setNormalizeWhitespace(true);
-  //    setIgnoreWhitespace(true);
-  //    setIgnoreComments(true);
-  //    setIgnoreAttributeOrder(false);
-  //
-  //    Diff diff = XMLUnit.compareXML(expected, actual);
-  //    if (!(diff.similar() && diff.identical())) {
-  //      DetailedDiff detDiff = new DetailedDiff(diff);
-  //      @SuppressWarnings("rawtypes")
-  //      List differences = detDiff.getAllDifferences();
-  //      StringBuilder diffLines = new StringBuilder();
-  //      for (Object object : differences) {
-  //        Difference difference = (Difference) object;
-  //        diffLines.append(difference.toString() + '\n');
-  //      }
-  //      throw new IllegalArgumentException("Actual XML differs from expected: \n" + diffLines.toString());
-  //    }
-  //  }
 }
