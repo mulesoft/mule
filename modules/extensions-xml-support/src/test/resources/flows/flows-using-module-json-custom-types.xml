@@ -23,4 +23,13 @@
         <modulejson:is-jsontype2 aParameter="#[{ 'firstName': 'Dardo', 'lastName': 'Rocha', 'age': 83}]" />
     </flow>
 
+    <flow name="testHardcodedType1Flow">
+        <modulejson:get-hardcoded-type1/>
+    </flow>
+
+    <flow name="testHardcodedType1AndExtractFieldsInVarsFlow">
+        <modulejson:get-hardcoded-type1/>
+        <set-variable variableName="extracted-street_type" value="#[payload.street_type]" />
+        <set-variable variableName="extracted-street_name" value="#[payload.street_name]" />
+    </flow>
 </mule>

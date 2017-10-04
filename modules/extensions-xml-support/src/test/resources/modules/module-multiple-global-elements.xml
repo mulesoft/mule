@@ -24,4 +24,25 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="read">
+        <parameters>
+            <parameter name="path" type="string"/>
+        </parameters>
+        <body>
+            <file:read path="#[vars.path]" config-ref="file" />
+        </body>
+        <output type="binary"/>
+    </operation>
+
+    <operation name="read-forcing-mimetype">
+        <parameters>
+            <parameter name="path" type="string"/>
+            <parameter name="forcedMimeType" type="string" defaultValue="*/*"/>
+        </parameters>
+        <body>
+            <file:read path="#[vars.path]" config-ref="file" outputMimeType="#[vars.forcedMimeType]" />
+        </body>
+        <output type="binary"/>
+    </operation>
 </module>

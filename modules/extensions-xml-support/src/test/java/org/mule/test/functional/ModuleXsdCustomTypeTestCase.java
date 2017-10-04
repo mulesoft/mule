@@ -10,17 +10,18 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
-
-import org.mule.runtime.core.api.event.CoreEvent;
-
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import com.google.common.collect.ImmutableMap;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.mule.runtime.core.api.event.CoreEvent;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,16 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
       + "  <userId>somename-id</userId>"
       + "</User>";
 
+  //the order matters when describing a , and ImmutableMap guarantees it
+  private static final ImmutableMap<String, Object> USER_DATA = ImmutableMap.<String, Object>builder()
+      .put("name", "somename")
+      .put("kind", "somekind")
+      .put("weight", 100)
+      .put("email", "somename@domain.com")
+      .put("userId", "somename-id")
+      .build();
+  private static final Map<String, Object> EXPECTED_XSDTYPE_1 = ImmutableMap.of("User", USER_DATA);
+
   @Override
   protected String getModulePath() {
     return "modules/module-xsd-custom-types.xml";
@@ -56,16 +67,7 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
 
   @Test
   public void testSendingXsdType1FromMap() throws Exception {
-    //the order matters, that's why we need a sorted Map to describe the User
-    final LinkedHashMap<String, Object> user = new LinkedHashMap<>();
-    user.put("name", "somename");
-    user.put("kind", "somekind");
-    user.put("weight", 100);
-    user.put("email", "somename@domain.com");
-    user.put("userId", "somename-id");
-    final Map<String, Object> payload = new HashMap<>();
-    payload.put("User", user);
-    final CoreEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(payload).run();
+    final CoreEvent muleEvent = flowRunner("testIsXsdType1FromPayloadFlow").withPayload(EXPECTED_XSDTYPE_1).run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE);
   }
 
@@ -79,6 +81,25 @@ public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifac
   public void testIsXsdType1WithNamespaceFromExpression() throws Exception {
     final CoreEvent muleEvent = flowRunner("testIsXsdType1WithNamespaceFromExpressionFlow").run();
     compareXML((String) muleEvent.getMessage().getPayload().getValue(), XML_TYPE1_SAMPLE_WITH_NAMESPACE);
+  }
+
+  @Test
+  public void testHardcodedXsdType1Flow() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testHardcodedXsdType1Flow").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), instanceOf(Map.class));
+    for (Map.Entry<String, Object> entry : EXPECTED_XSDTYPE_1.entrySet()) {
+      assertThat((Map<String, Object>) muleEvent.getMessage().getPayload().getValue(),
+                 hasEntry(entry.getKey(), entry.getValue()));
+    }
+  }
+
+  @Test
+  public void testHardcodedXsdType1AndExtractFieldsInVarsFlow() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testHardcodedXsdType1AndExtractFieldsInVarsFlow").run();
+    for (Map.Entry<String, Object> entry : USER_DATA.entrySet()) {
+      assertThat(muleEvent.getVariables().containsKey("extracted-user-" + entry.getKey()), is(true));
+      assertThat(muleEvent.getVariables().get("extracted-user-" + entry.getKey()).getValue(), is(entry.getValue()));
+    }
   }
 
   private void compareXML(String expected, String actual) throws Exception {

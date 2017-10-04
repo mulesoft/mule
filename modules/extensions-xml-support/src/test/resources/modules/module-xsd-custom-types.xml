@@ -28,4 +28,11 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="get-hardcoded-xsdtype1">
+        <body>
+            <mule:set-payload value="#[ns val http://validationnamespace.raml.org --- { val#User: { val#name: 'somename', val#kind: 'somekind', val#weight: 100, val#email: 'somename@domain.com', val#userId: 'somename-id' } }]" />
+        </body>
+        <output type="XsdType1::{http://validationnamespace.raml.org}User"/>
+    </operation>
 </module>
