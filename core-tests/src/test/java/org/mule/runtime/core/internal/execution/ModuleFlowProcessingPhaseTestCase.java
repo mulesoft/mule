@@ -19,10 +19,12 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -42,18 +44,21 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -97,6 +102,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private Function<CoreEvent, Map<String, Object>> failingParameterFunction = event -> {
     throw mockException;
   };
+  private PolicyManager policyManager;
 
   @Parameters
   public static Collection<Object> data() {
@@ -106,13 +112,17 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
 
-    final MuleContext muleContext = mockMuleContext();
+    final PrivilegedMuleContext muleContext = (PrivilegedMuleContext) mockMuleContext();
     when(muleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
+    ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
+    when(errorTypeLocator.lookupErrorType(any(Throwable.class)))
+        .thenReturn(ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build());
+    when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
 
     event = mock(CoreEvent.class);
     mockException = mock(RuntimeException.class);
 
-    final PolicyManager policyManager = mock(PolicyManager.class);
+    policyManager = mock(PolicyManager.class);
     sourcePolicy = mock(SourcePolicy.class);
     when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
     successResult = mock(SourcePolicySuccessResult.class);
@@ -330,6 +340,21 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template).sendFailureResponseToClient(any(), any());
     verify(template)
         .afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
+    verify(notifier, never()).phaseSuccessfully();
+    verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+  }
+
+  @Test
+  public void failurePolicyManager() throws Exception {
+    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(Processor.class),
+                                                  any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
+    when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
+
+    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(template, never()).sendResponseToClient(any(), any());
+    verify(template).sendFailureResponseToClient(any(), any());
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
   }

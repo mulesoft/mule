@@ -59,6 +59,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
@@ -130,27 +131,36 @@ public class ModuleFlowProcessingPhase
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
       final CoreEvent templateEvent = createEvent(template, sourceLocation, responseCompletion, flowConstruct);
 
-      FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct.getExceptionListener(), templateEvent);
-      flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
-      final SourcePolicy policy =
-          policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
-      final PhaseContext phaseContext = new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
+      try {
+        FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct.getExceptionListener(), templateEvent);
+        flowExecutionProcessor.setAnnotations(flowConstruct.getAnnotations());
+        final SourcePolicy policy =
+            policyManager.createSourcePolicyInstance(messageSource, templateEvent, flowExecutionProcessor, template);
+        final PhaseContext phaseContext =
+            new PhaseContext(template, messageProcessContext, phaseResultNotifier, terminateConsumer);
 
-      just(templateEvent)
-          .doOnNext(onMessageReceived(messageProcessContext, flowConstruct))
-          // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when complete.
-          .flatMap(request -> from(policy.process(request)))
-          // Perform processing of result by sending success or error response and handle errors that occur.
-          // Returns Publisher<Void> to signal when this is complete or if it failed.
-          .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct),
-                                                       policySuccess(phaseContext, flowConstruct)))
-          .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
-          .doOnError(onFailure(phaseResultNotifier, terminateConsumer))
-          // Complete EventContext via responseCompletion Mono once everything is done.
-          .doAfterTerminate(() -> responseCompletion.onComplete())
-          .subscribe();
-    } catch (Exception e) {
-      phaseResultNotifier.phaseFailure(e);
+        just(templateEvent)
+            .doOnNext(onMessageReceived(messageProcessContext, flowConstruct))
+            // Process policy and in turn flow emitting Either<SourcePolicyFailureResult,SourcePolicySuccessResult>> when
+            // complete.
+            .flatMap(request -> from(policy.process(request)))
+            // Perform processing of result by sending success or error response and handle errors that occur.
+            // Returns Publisher<Void> to signal when this is complete or if it failed.
+            .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct),
+                                                         policySuccess(phaseContext, flowConstruct)))
+            .doOnSuccess(aVoid -> phaseResultNotifier.phaseSuccessfully())
+            .doOnError(onFailure(phaseResultNotifier, terminateConsumer))
+            // Complete EventContext via responseCompletion Mono once everything is done.
+            .doAfterTerminate(() -> responseCompletion.onComplete())
+            .subscribe();
+      } catch (Exception e) {
+        from(template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())
+            .resolve(new MessagingException(templateEvent, e), muleContext),
+                                                  template.getFailedExecutionResponseParametersFunction().apply(templateEvent)))
+                                                      .doOnTerminate(() -> phaseResultNotifier.phaseFailure(e)).subscribe();
+      }
+    } catch (Exception t) {
+      phaseResultNotifier.phaseFailure(t);
     }
   }
 
@@ -260,8 +270,7 @@ public class ModuleFlowProcessingPhase
   }
 
   private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, ComponentLocation sourceLocation,
-                                Publisher<Void> responseCompletion, FlowConstruct flowConstruct)
-      throws MuleException {
+                                Publisher<Void> responseCompletion, FlowConstruct flowConstruct) {
     Message message = template.getMessage();
     CoreEvent templateEvent = InternalEvent
         .builder(create(flowConstruct.getUniqueIdString(), flowConstruct.getServerId(), sourceLocation, null, responseCompletion,
