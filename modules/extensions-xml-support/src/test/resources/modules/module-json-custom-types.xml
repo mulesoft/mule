@@ -36,4 +36,11 @@
         </body>
         <output type="string"/>
     </operation>
+
+    <operation name="get-hardcoded-type1">
+        <body>
+            <mule:set-payload value="#[{ 'street_type': 'Avenue', 'street_name': 'calle 7'}]" />
+        </body>
+        <output type="Type1"/>
+    </operation>
 </module>

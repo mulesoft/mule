@@ -17,4 +17,17 @@
     <flow name="testIsXsdType1WithNamespaceFromExpressionFlow">
         <modulexsd:is-xsdtype1 aParameter="#[ns val http://validationnamespace.raml.org --- { val#User: { val#name: 'somename', val#kind: 'somekind', val#weight: 100, val#email: 'somename@domain.com', val#userId: 'somename-id' } }]" />
     </flow>
+
+    <flow name="testHardcodedXsdType1Flow">
+        <modulexsd:get-hardcoded-xsdtype1/>
+    </flow>
+
+    <flow name="testHardcodedXsdType1AndExtractFieldsInVarsFlow">
+        <modulexsd:get-hardcoded-xsdtype1/>
+        <set-variable variableName="extracted-user-name" value="#[payload.User.name]" />
+        <set-variable variableName="extracted-user-kind" value="#[payload.User.kind]" />
+        <set-variable variableName="extracted-user-weight" value="#[payload.User.weight]" />
+        <set-variable variableName="extracted-user-email" value="#[payload.User.email]" />
+        <set-variable variableName="extracted-user-userId" value="#[payload.User.userId]" />
+    </flow>
 </mule>
