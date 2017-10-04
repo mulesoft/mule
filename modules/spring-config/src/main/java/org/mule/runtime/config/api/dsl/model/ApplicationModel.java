@@ -86,13 +86,12 @@ import java.util.function.Consumer;
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
  * configuration option.
  * <p/>
- * This model is represented by a set of {@link org.mule.runtime.config.api.dsl.model.ComponentModel}. Each
- * {@code ComponentModel} holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact
- * configuration.
+ * This model is represented by a set of {@link org.mule.runtime.config.api.dsl.model.ComponentModel}. Each {@code ComponentModel}
+ * holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact configuration.
  * <p/>
  * Once the set of {@code ComponentModel} gets created from the application
- * {@link org.mule.runtime.config.api.dsl.processor.ConfigFile}s the {@code ApplicationModel} executes a set of common
- * validations dictated by the configuration semantics.
+ * {@link org.mule.runtime.config.api.dsl.processor.ConfigFile}s the {@code ApplicationModel} executes a set of common validations
+ * dictated by the configuration semantics.
  *
  * @since 4.0
  */
@@ -345,8 +344,12 @@ public class ApplicationModel {
                                                     Map<String, String> deploymentProperties) {
 
     SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
+    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
+        createProviderFromGlobalProperties(artifactConfig);
     DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(empty(), systemPropertiesConfigurationProvider);
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(empty(),
+                                                                                                 globalPropertiesConfigurationAttributeProvider)),
+                                                   systemPropertiesConfigurationProvider);
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
     FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
@@ -377,8 +380,6 @@ public class ApplicationModel {
                                                                                             configurationAttributesProvider));
 
     }
-    ConfigurationPropertiesProvider globalPropertiesConfigurationAttributeProvider =
-        createProviderFromGlobalProperties(artifactConfig);
     DefaultConfigurationPropertiesResolver globalPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(parentConfigurationPropertiesResolver,
                                                    globalPropertiesConfigurationAttributeProvider);
