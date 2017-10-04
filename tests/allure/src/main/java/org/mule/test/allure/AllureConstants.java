@@ -453,6 +453,8 @@ public interface AllureConstants {
 
       String COMPONENT_CONFIGURATION_YAML_STORY = "Component configuration properties with YAML story";
 
+      String COMPONENT_CONFIGURATION_ERROR_SCEANRIOS = "Component configuration properties error scenarios";
+
     }
 
   }
