@@ -13,11 +13,22 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleAppsDir;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,14 +43,6 @@ import java.util.Properties;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
-import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.deployment.model.api.DeployableArtifact;
-import org.mule.runtime.deployment.model.api.DeploymentException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
-import org.mule.runtime.module.deployment.impl.internal.artifact.MuleContextListenerFactory;
-import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +153,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           }
           return false;
         }).findAny();
-    foundMatchingArtifact.ifPresent(this::undeploy);
+    foundMatchingArtifact.ifPresent(this::undeployArtifactWithoutRemovingData);
   }
 
   private File installArtifact(URI artifactAchivedUri) throws IOException {
@@ -327,7 +330,15 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     artifacts.remove(previousArtifact);
   }
 
+  private void undeployArtifactWithoutRemovingData(T artifact) {
+    undeployArtifact(artifact, false);
+  }
+
   private void undeploy(T artifact) {
+    this.undeployArtifact(artifact, true);
+  }
+
+  private void undeployArtifact(T artifact, boolean removeData) {
     logRequestToUndeployArtifact(artifact);
     try {
       deploymentListener.onUndeploymentStart(artifact.getArtifactName());
@@ -335,13 +346,20 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       artifacts.remove(artifact);
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
-
+      if (removeData) {
+        final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
+        deleteDirectory(dataFolder);
+      }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
       logArtifactUndeployed(artifact);
     } catch (RuntimeException e) {
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
       throw e;
+    } catch (IOException e) {
+      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+      throw new DeploymentException(I18nMessageFactory
+          .createStaticMessage("Failed undeploying artifact " + artifact.getArtifactName()), e);
     }
   }
 

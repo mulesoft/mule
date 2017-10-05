@@ -111,8 +111,8 @@ public class MuleFoldersUtil {
     return new File(getAppsFolder(), appName);
   }
 
-  public static File getAppTempFolder(String appName) {
-    return new File(new File(getExecutionFolder(), appName), "temp");
+  public static File getAppDataFolder(String appDataFolder) {
+    return new File(getExecutionFolder(), appDataFolder);
   }
 
   /**
