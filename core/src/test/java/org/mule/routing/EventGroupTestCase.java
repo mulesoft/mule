@@ -6,15 +6,19 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.PartitionableObjectStore;
@@ -34,7 +38,7 @@ import org.junit.Test;
 public class EventGroupTestCase extends AbstractMuleContextTestCase
 {
 
-    private PartitionableObjectStore<MuleEvent> objectStore;
+    private PartitionableObjectStore<WrapperOrderEvent> objectStore;
 
     @Before
     public void before() throws RegistrationException
@@ -242,6 +246,32 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertEquals("value3", result.getSession().getProperty("key3"));
         assertEquals("value4", result.getSession().getProperty("key4"));
     }
+
+
+    @Test
+    public void arrivalOrderEvents() throws Exception
+    {
+        EventGroup eventGroup = new EventGroup(UUID.getUUID(),muleContext);
+        eventGroup.initEventsStore(objectStore);
+
+        MuleEvent event1 = getTestEvent("foo1");
+        MuleEvent event2 = getTestEvent("foo2");
+        MuleEvent event3 = getTestEvent("foo3");
+
+        eventGroup.addEvent(event1);
+        eventGroup.addEvent(event2);
+        eventGroup.addEvent(event3);
+
+        MuleEvent result = eventGroup.getMessageCollectionEvent();
+        DefaultMessageCollection messageCollection = (DefaultMessageCollection) result.getMessage();
+        MuleMessage messages [] =  messageCollection.getMessagesAsArray();
+
+        assertThat(messages.length, is(3));
+        assertThat(messages[0].getPayloadAsString(), is("foo1"));
+        assertThat(messages[1].getPayloadAsString(), is("foo2"));
+        assertThat(messages[2].getPayloadAsString(), is("foo3"));
+    }
+
     private static class MyEventGroup extends EventGroup
     {
         private static final long serialVersionUID = 1L;
