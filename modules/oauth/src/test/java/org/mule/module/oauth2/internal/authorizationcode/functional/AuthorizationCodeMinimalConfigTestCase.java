@@ -6,8 +6,11 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode.functional;
 
+import org.mule.api.construct.FlowConstruct;
 import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
 import org.mule.module.oauth2.internal.OAuthConstants;
+
+import static org.junit.Assert.fail;
 
 import org.apache.http.client.fluent.Request;
 import org.junit.Ignore;
@@ -40,4 +43,16 @@ public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizatio
                 .assertRefreshTokenIs(REFRESH_TOKEN);
     }
 
+    @Test
+    public void listenerFlowCreated()
+    {
+        for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs())
+        {
+            if(flowConstruct.getName().startsWith("OAuthRedirectUrlFlow"))
+            {
+                return;
+            }
+        }
+        fail("A listener for the redirectUrl was NOT created");
+    }
 }
