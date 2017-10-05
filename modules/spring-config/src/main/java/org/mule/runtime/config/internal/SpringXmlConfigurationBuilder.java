@@ -45,12 +45,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private ArtifactDeclaration artifactDeclaration = new ArtifactDeclaration();
   private boolean enableLazyInit = false;
   private boolean disableXmlValidations = false;
-  protected boolean useDefaultConfigResource = true;
-  protected boolean useMinimalConfigResource = false;
 
   private SpringRegistry registry;
 
-  private ApplicationContext domainContext;
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private ArtifactType artifactType;
@@ -128,10 +125,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private MuleArtifactContext createApplicationContext(MuleContext muleContext) throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
     OptionalObjectsController parentObjectController = null;
-    ApplicationContext parentApplicationContext = parentContext != null ? parentContext : domainContext;
 
-    if (parentApplicationContext instanceof MuleArtifactContext) {
-      parentObjectController = ((MuleArtifactContext) parentApplicationContext).getOptionalObjectsController();
+    if (parentContext instanceof MuleArtifactContext) {
+      parentObjectController = ((MuleArtifactContext) parentContext).getOptionalObjectsController();
     }
 
     if (parentObjectController != null) {
@@ -160,29 +156,22 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                    resolveParentConfigurationProperties(), disableXmlValidations);
   }
 
-  protected ConfigResource[] resolveArtifactConfigResources() {
+  private ConfigResource[] resolveArtifactConfigResources() {
     return artifactConfigResources;
   }
 
-  protected Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
-    ApplicationContext parentApplicationContext = parentContext != null ? parentContext : domainContext;
-
+  private Optional<ConfigurationProperties> resolveParentConfigurationProperties() {
     Optional<ConfigurationProperties> parentConfigurationProperties = empty();
-    if (parentApplicationContext != null) {
-      parentConfigurationProperties = of(parentApplicationContext.getBean(ConfigurationProperties.class));
+    if (parentContext != null) {
+      parentConfigurationProperties = of(parentContext.getBean(ConfigurationProperties.class));
     }
 
     return parentConfigurationProperties;
   }
 
   private void createSpringRegistry(MuleContext muleContext, ApplicationContext applicationContext) throws Exception {
-    if (parentContext != null && domainContext != null) {
-      throw new IllegalStateException("An application with a web xml context and domain resources is not supported");
-    }
     if (parentContext != null) {
       createRegistryWithParentContext(muleContext, applicationContext, parentContext);
-    } else if (domainContext != null) {
-      createRegistryWithParentContext(muleContext, applicationContext, domainContext);
     } else {
       registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver());
     }
@@ -214,28 +203,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
   }
 
-  public void setUseDefaultConfigResource(boolean useDefaultConfigResource) {
-    this.useDefaultConfigResource = useDefaultConfigResource;
-  }
-
   public ArtifactContext createArtifactContext() {
     return new SpringArtifactContext(muleArtifactContext);
   }
 
-  public void setUseMinimalConfigResource(boolean useMinimalConfigResource) {
-    this.useMinimalConfigResource = useMinimalConfigResource;
-  }
-
-  protected ApplicationContext getParentContext() {
-    return parentContext;
-  }
-
-  public void setParentContext(ApplicationContext parentContext) {
-    this.parentContext = parentContext;
-  }
-
   @Override
   public void setParentContext(MuleContext domainContext) {
-    this.domainContext = ((MuleContextWithRegistries) domainContext).getRegistry().get("springApplicationContext");
+    this.parentContext = ((MuleContextWithRegistries) domainContext).getRegistry().get("springApplicationContext");
   }
 }

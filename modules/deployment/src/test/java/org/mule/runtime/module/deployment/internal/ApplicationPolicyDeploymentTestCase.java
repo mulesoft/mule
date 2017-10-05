@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -21,6 +22,9 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
@@ -45,6 +49,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -313,6 +318,46 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     }
   }
 
+  @Test
+  public void injectsObjectsFromApplicationIntoPolicies() throws Exception {
+    final ArtifactPluginFileBuilder bootstrapPluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
+        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES)
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
+        .configuredWith(EXPORTED_RESOURCE_PROPERTY, BOOTSTRAP_PROPERTIES);
+
+    PolicyFileBuilder fooPolicyFileBuilder = createInjectedPolicy();
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-simple-extension-config.xml",
+                                                                                           createSingleExtensionPlugin(),
+                                                                                           bootstrapPluginFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  private PolicyFileBuilder createInjectedPolicy() throws URISyntaxException {
+    ArtifactPluginFileBuilder injectedExtension = createInjectedHelloExtensionPluginFileBuilder();
+
+    return new PolicyFileBuilder(FOO_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION)
+        .setName(FOO_POLICY_NAME)
+        .setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader(FOO_POLICY_NAME, MULE_POLICY_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
+        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
+        .build())
+        .dependingOn(injectedExtension);
+  }
+
   private ArtifactPluginFileBuilder createSingleExtensionPlugin() {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("simpleExtensionPlugin").setRequiredProduct(MULE)
@@ -326,5 +371,27 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     return new ArtifactPluginFileBuilder("simpleExtensionPlugin")
         .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
         .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private ArtifactPluginFileBuilder createInjectedHelloExtensionPluginFileBuilder() throws URISyntaxException {
+    File injectedHelloExtensionJarFile =
+        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/injected/InjectedHelloExtension.java"),
+                                                        getResourceFile("/org/foo/injected/InjectedHelloOperation.java"))
+            .compile("mule-module-hello-1.0.jar", "1.0");
+
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES,
+                     asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.injected.InjectedHelloExtension")
+        .addProperty("version", "1.0");
+    return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0")
+        .dependingOn(new JarFileBuilder("helloExtensionV1", injectedHelloExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
   }
 }

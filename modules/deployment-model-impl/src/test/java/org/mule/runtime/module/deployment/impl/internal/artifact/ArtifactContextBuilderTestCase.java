@@ -92,7 +92,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   public void buildUsingDomainAndParentArtifact() throws Exception {
     expectedException.expectMessage(ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     newBuilder().setArtifactType(DOMAIN)
-        .setExecutionClassloader(Thread.currentThread().getContextClassLoader()).serParenArtifact(mock(DeployableArtifact.class))
+        .setExecutionClassloader(Thread.currentThread().getContextClassLoader()).setParentArtifact(mock(DeployableArtifact.class))
         .setClassLoaderRepository(mock(ClassLoaderRepository.class))
         .build();
   }

@@ -225,7 +225,7 @@ public class DefaultMuleApplication implements Application {
         domain = domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
       }
       if (domain.getRegistry() != null) {
-        artifactBuilder.serParenArtifact(domain);
+        artifactBuilder.setParentArtifact(domain);
       }
       if (muleContextListener != null) {
         artifactBuilder.setMuleContextListener(muleContextListener);
