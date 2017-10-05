@@ -14,6 +14,8 @@ http\://www.mulesoft.org/schema/mule/http/3.7/mule-http.xsd=META-INF/mule-http.x
 http\://www.mulesoft.org/schema/mule/https/3.7/mule-https.xsd=META-INF/mule-https.xsd
 http\://www.mulesoft.org/schema/mule/http/3.8/mule-http.xsd=META-INF/mule-http.xsd
 http\://www.mulesoft.org/schema/mule/https/3.8/mule-https.xsd=META-INF/mule-https.xsd
+http\://www.mulesoft.org/schema/mule/http/3.9/mule-http.xsd=META-INF/mule-http.xsd
+http\://www.mulesoft.org/schema/mule/https/3.9/mule-https.xsd=META-INF/mule-https.xsd
 http\://www.mulesoft.org/schema/mule/http/current/mule-http.xsd=META-INF/mule-http.xsd
 http\://www.mulesoft.org/schema/mule/https/current/mule-https.xsd=META-INF/mule-https.xsd
 

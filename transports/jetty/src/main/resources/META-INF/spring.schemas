@@ -14,5 +14,7 @@ http\://www.mulesoft.org/schema/mule/jetty/3.7/mule-jetty.xsd=META-INF/mule-jett
 http\://www.mulesoft.org/schema/mule/jetty-ssl/3.7/mule-jetty-ssl.xsd=META-INF/mule-jetty-ssl.xsd
 http\://www.mulesoft.org/schema/mule/jetty/3.8/mule-jetty.xsd=META-INF/mule-jetty.xsd
 http\://www.mulesoft.org/schema/mule/jetty-ssl/3.8/mule-jetty-ssl.xsd=META-INF/mule-jetty-ssl.xsd
+http\://www.mulesoft.org/schema/mule/jetty/3.9/mule-jetty.xsd=META-INF/mule-jetty.xsd
+http\://www.mulesoft.org/schema/mule/jetty-ssl/3.9/mule-jetty-ssl.xsd=META-INF/mule-jetty-ssl.xsd
 http\://www.mulesoft.org/schema/mule/jetty/current/mule-jetty.xsd=META-INF/mule-jetty.xsd
 http\://www.mulesoft.org/schema/mule/jetty-ssl/current/mule-jetty-ssl.xsd=META-INF/mule-jetty-ssl.xsd

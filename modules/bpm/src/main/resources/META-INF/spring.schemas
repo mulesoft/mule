@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/bpm/3.5/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.6/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.7/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/3.8/mule-bpm.xsd=META-INF/mule-bpm.xsd
+http\://www.mulesoft.org/schema/mule/bpm/3.9/mule-bpm.xsd=META-INF/mule-bpm.xsd
 http\://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd=META-INF/mule-bpm.xsd
