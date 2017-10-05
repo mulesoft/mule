@@ -1,4 +1,5 @@
 http\://www.mulesoft.org/schema/mule/oauth2/3.6/mule-oauth2.xsd=META-INF/mule-oauth2.xsd
 http\://www.mulesoft.org/schema/mule/oauth2/3.7/mule-oauth2.xsd=META-INF/mule-oauth2.xsd
 http\://www.mulesoft.org/schema/mule/oauth2/3.8/mule-oauth2.xsd=META-INF/mule-oauth2.xsd
+http\://www.mulesoft.org/schema/mule/oauth2/3.9/mule-oauth2.xsd=META-INF/mule-oauth2.xsd
 http\://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd=META-INF/mule-oauth2.xsd

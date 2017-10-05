@@ -12,7 +12,7 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"
                 schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.9/mule.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>This module enables Mule to use the JBoss transaction manager (previously Arjuna) to configure [XA transactions|Transaction Management#XA Transactions]. Developers can configure one Transaction Manger per Mule instance. For more information, see [JBoss Transactions|http://www.jboss.org/jbosstm/].

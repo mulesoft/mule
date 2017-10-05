@@ -9,9 +9,9 @@
             
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.9/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
-                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.8/mule-schemadoc.xsd"/>
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.9/mule-schemadoc.xsd"/>
     
     <xsd:annotation>
         <xsd:documentation>

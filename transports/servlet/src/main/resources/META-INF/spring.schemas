@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/servlet/3.5/mule-servlet.xsd=META-INF/mule-
 http\://www.mulesoft.org/schema/mule/servlet/3.6/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/3.7/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/3.8/mule-servlet.xsd=META-INF/mule-servlet.xsd
+http\://www.mulesoft.org/schema/mule/servlet/3.9/mule-servlet.xsd=META-INF/mule-servlet.xsd
 http\://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd=META-INF/mule-servlet.xsd

@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/axis/3.5/mule-axis.xsd=META-INF/mule-axis.x
 http\://www.mulesoft.org/schema/mule/axis/3.6/mule-axis.xsd=META-INF/mule-axis.xsd
 http\://www.mulesoft.org/schema/mule/axis/3.7/mule-axis.xsd=META-INF/mule-axis.xsd
 http\://www.mulesoft.org/schema/mule/axis/3.8/mule-axis.xsd=META-INF/mule-axis.xsd
+http\://www.mulesoft.org/schema/mule/axis/3.9/mule-axis.xsd=META-INF/mule-axis.xsd
 http\://www.mulesoft.org/schema/mule/axis/current/mule-axis.xsd=META-INF/mule-axis.xsd
