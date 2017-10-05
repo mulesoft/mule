@@ -32,7 +32,7 @@ public class AuthorizationCodeOutOfBrowserRedirectTestCase extends AbstractAutho
     }
 
     @Test
-    public void listenerNotCreated()
+    public void listenerFlowNotCreated()
     {
         for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs())
         {
