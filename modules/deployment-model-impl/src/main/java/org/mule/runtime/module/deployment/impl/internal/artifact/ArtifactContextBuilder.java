@@ -182,7 +182,7 @@ public class ArtifactContextBuilder {
    * @param parentArtifact artifact parent of the one being created.
    * @return the builder
    */
-  public ArtifactContextBuilder serParenArtifact(DeployableArtifact parentArtifact) {
+  public ArtifactContextBuilder setParentArtifact(DeployableArtifact parentArtifact) {
     this.parentArtifact = parentArtifact;
     return this;
   }
