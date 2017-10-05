@@ -12,6 +12,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static java.lang.String.format;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.module.http.api.HttpConstants;
@@ -65,7 +66,12 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
     @Rule
     public SystemProperty oauthServerPortNumber = new SystemProperty("oauth.server.port", String.valueOf(oauthServerPort.getNumber()));
     @Rule
-    public SystemProperty redirectUrl = new SystemProperty("redirect.url", String.format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber()));
+    public SystemProperty redirectUrl = new SystemProperty("redirect.url", getRedirectUrl());
+
+    protected String getRedirectUrl()
+    {
+        return format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber());
+    }
 
     protected String getProtocol()
     {

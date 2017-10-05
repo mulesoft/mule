@@ -108,26 +108,30 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
 
     protected void createListenerForRedirectUrl() throws MuleException
     {
-        try
+        if(!getOauthConfig().getRedirectionUrl().startsWith("urn:"))
         {
-            final String flowName = "OAuthRedirectUrlFlow" + getOauthConfig().getRedirectionUrl();
-            final Flow redirectUrlFlow = DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
-            final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext())
-                    .setUrl(new URL(getOauthConfig().getRedirectionUrl()))
-                    .setFlow(redirectUrlFlow);
-            if (getOauthConfig().getTlsContext() != null)
+            try
             {
-                httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
+                final String flowName = "OAuthRedirectUrlFlow" + getOauthConfig().getRedirectionUrl();
+                final Flow redirectUrlFlow = DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
+                final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext())
+                        .setUrl(new URL(getOauthConfig().getRedirectionUrl()))
+                        .setFlow(redirectUrlFlow);
+                if (getOauthConfig().getTlsContext() != null)
+                {
+                    httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
+                }
+                this.redirectUrlListener = httpListenerBuilder.build();
+                this.redirectUrlListener.initialise();
+                this.redirectUrlListener.start();
             }
-            this.redirectUrlListener = httpListenerBuilder.build();
-            this.redirectUrlListener.initialise();
-            this.redirectUrlListener.start();
+            catch (MalformedURLException e)
+            {
+                logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getRedirectionUrl());
+                throw new DefaultMuleException(e);
+            }
         }
-        catch (MalformedURLException e)
-        {
-            logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getRedirectionUrl());
-            throw new DefaultMuleException(e);
-        }
+        
     }
 
     protected abstract MessageProcessor createRedirectUrlProcessor();
