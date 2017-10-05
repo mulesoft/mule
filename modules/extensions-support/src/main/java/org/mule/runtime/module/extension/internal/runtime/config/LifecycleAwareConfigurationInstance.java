@@ -10,48 +10,48 @@ import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.internal.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.internal.config.ConfigurationInstanceNotification;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.core.internal.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
+import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
-import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
-
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
@@ -140,6 +140,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   public synchronized void initialise() throws InitialisationException {
     if (!initialized) {
       initialized = true;
+      testConnectivityLock = lockFactory.createLock(this.getClass().getName() + "-testConnectivity-" + getName());
       try {
         initStats();
         doInitialise();
@@ -163,7 +164,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   public synchronized void start() throws MuleException {
     if (!started) {
       started = true;
-      testConnectivityLock = lockFactory.createLock(this.getClass().getName() + "-testConnectivity-" + getName());
       if (connectionProvider.isPresent()) {
         startIfNeeded(connectionProvider);
         if (!connectionManager.hasBinding(value)) {

@@ -75,6 +75,7 @@ public abstract class AbstractInterceptableContractTestCase<T extends AbstractIn
 
   @Test
   public void interceptorsStopped() throws Exception {
+    interceptable.initialise();
     interceptable.start();
     interceptable.stop();
     verify((Stoppable) interceptor1).stop();

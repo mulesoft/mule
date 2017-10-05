@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -102,15 +104,13 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   protected RetryPolicyTemplate retryPolicyTemplate;
 
-  private String name;
   protected Optional<ConnectionProvider> connectionProvider;
 
   public LifecycleAwareConfigurationInstanceTestCase(String name, ConnectionProvider connectionProvider) {
-    this.name = name;
-    this.connectionProvider = Optional.ofNullable(connectionProvider);
+    this.connectionProvider = ofNullable(connectionProvider);
   }
 
-  private TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
+  private TestTimeSupplier timeSupplier = new TestTimeSupplier(currentTimeMillis());
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
@@ -227,6 +227,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void testConnectivityUponStart() throws Exception {
+    interceptable.initialise();
     if (connectionProvider.isPresent()) {
       valueStarted();
       verify(connectionManager).testConnectivity(interceptable);
@@ -240,6 +241,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
       when(connectionManager.testConnectivity(interceptable))
           .thenReturn(failure(connectionException.getMessage(), connectionException));
 
+      interceptable.initialise();
       try {
         interceptable.start();
         fail("Was expecting connectivity testing to fail");
@@ -252,6 +254,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStopped() throws Exception {
+    interceptable.initialise();
     interceptable.start();
     interceptable.stop();
     verify((Stoppable) value).stop();
@@ -262,6 +265,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionUnbound() throws Exception {
+    interceptable.initialise();
     interceptable.start();
     interceptable.stop();
     if (connectionProvider.isPresent()) {
@@ -286,6 +290,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
     MuleMetadataService muleMetadataManager =
         ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(MuleMetadataService.class);
     muleMetadataManager.getMetadataCache(NAME);
+    interceptable.initialise();
     interceptable.start();
     interceptable.stop();
     new PollingProber(1000, 100).check(new JUnitLambdaProbe(() -> muleMetadataManager.getMetadataCaches().entrySet().isEmpty()));
