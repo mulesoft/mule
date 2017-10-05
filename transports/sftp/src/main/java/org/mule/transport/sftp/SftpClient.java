@@ -711,7 +711,7 @@ public class SftpClient
 
     private boolean fileAlreadyExists(String destDir, String filename) throws IOException
     {
-        logger.warn("listing files for: " + destDir + "/" + filename);
+        logger.info("listing files for: " + destDir + "/" + filename);
         String[] files = listFiles(destDir);
         for (String file : files)
         {
