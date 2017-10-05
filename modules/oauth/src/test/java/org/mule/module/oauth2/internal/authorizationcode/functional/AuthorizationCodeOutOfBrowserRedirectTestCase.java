@@ -6,6 +6,16 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode.functional;
 
+import static org.junit.Assert.fail;
+
+import java.util.Collection;
+
+import org.hamcrest.core.IsCollectionContaining;
+import org.mule.api.construct.FlowConstruct;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 public class AuthorizationCodeOutOfBrowserRedirectTestCase extends AbstractAuthorizationCodeBasicTestCase
 {
 
@@ -21,4 +31,15 @@ public class AuthorizationCodeOutOfBrowserRedirectTestCase extends AbstractAutho
         return "authorization-code/authorization-code-minimal-config.xml";
     }
 
+    @Test
+    public void listenerNotCreated()
+    {
+        for (FlowConstruct flowConstruct : muleContext.getRegistry().lookupFlowConstructs())
+        {
+            if(flowConstruct.getName().startsWith("OAuthRedirectUrlFlow"))
+            {
+                fail("A listener for the redirectUrl was created");
+            }
+        }
+    }
 }
