@@ -207,7 +207,7 @@ public class ComponentStatistics implements Statistics
                 maxExecutionTime = effectiveTotal;
             }
 
-            if(minExecutionTime == 0||effectiveTotal < minExecutionTime)
+            if(minExecutionTime == 0 || effectiveTotal < minExecutionTime)
             {
                 minExecutionTime = effectiveTotal;
             }
