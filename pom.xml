@@ -1799,7 +1799,7 @@
                 <executions>
                     <execution>
                         <id>analyze</id>
-                        <phase>verify</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>analyze</goal>
                         </goals>
