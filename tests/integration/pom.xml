@@ -11,6 +11,9 @@
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+
+        <!-- MULE-13644: This should be removed when the ticket is fixed because it causes a circular dependency. -->
+        <muleHttpServiceTestVersion>1.0.0-SNAPSHOT</muleHttpServiceTestVersion>
     </properties>
     
     <dependencies>

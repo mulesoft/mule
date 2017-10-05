@@ -181,13 +181,6 @@
         </dependency>
         <!-- Dependencies required for testing. They may be required to be in the local repository by test cases-->
         <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-http-connector</artifactId>
-            <version>${muleHttpConnectorTestVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <scope>test</scope>
