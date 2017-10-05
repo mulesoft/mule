@@ -52,10 +52,9 @@ public class CronSchedulerFactory extends SchedulerFactory<PollingReceiverWorker
     {
         TimeZone resolvedTimeZone = timeZone == null || timeZone.equals("") ? Calendar.getInstance().getTimeZone()
                 : getTimeZone(timeZone);
-        if(timeZone!=null) {
-            if ((!timeZone.equals(TZ_GMT_ID) && resolvedTimeZone.getID().equals(TZ_GMT_ID))) {
-                throw new SchedulerCreationException("Invalid Timezone");
-            }
+        if(timeZone!=null && !timeZone.equals(TZ_GMT_ID) && resolvedTimeZone.getID().equals(TZ_GMT_ID))
+        {
+            throw new SchedulerCreationException("Invalid Timezone");
         }
         else
         {

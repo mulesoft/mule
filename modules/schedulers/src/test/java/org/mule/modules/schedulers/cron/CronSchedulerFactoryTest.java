@@ -25,13 +25,9 @@ public class CronSchedulerFactoryTest
     {
         CronSchedulerFactory factory = new CronSchedulerFactory();
         factory.setExpression("my expression");
-
         Scheduler scheduler = factory.create("name", new PollingReceiverWorker(receiver));
-
         assertTrue(scheduler instanceof CronScheduler);
         assertEquals("my expression", ((CronScheduler) scheduler).getCronExpression());
     }
-
-
 
 }
