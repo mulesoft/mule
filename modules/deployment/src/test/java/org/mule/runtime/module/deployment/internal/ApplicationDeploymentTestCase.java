@@ -1723,6 +1723,31 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
   }
 
+  @Test
+  public void undeploysAppRemovesTemporaryData() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+
+    File appTemporaryFolder = new File(app.getRegistry().<MuleConfiguration>lookupByName(MuleProperties.OBJECT_MULE_CONFIGURATION)
+        .get().getWorkingDirectory());
+
+    // As this app has a plugin, the tmp directory must exist
+    assertThat(appTemporaryFolder.exists(), is(true));
+
+    // Remove the anchor file so undeployment starts
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.getId()));
+
+    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertStatus(app, DESTROYED);
+
+    // Check the tmp directory was effectively removed
+    assertThat(appTemporaryFolder.exists(), is(false));
+  }
+
   private ArtifactPluginFileBuilder createPrivilegedExtensionPlugin() {
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName(PRIVILEGED_EXTENSION_ARTIFACT_ID).setRequiredProduct(MULE)

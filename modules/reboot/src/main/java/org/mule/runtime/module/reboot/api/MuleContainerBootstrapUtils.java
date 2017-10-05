@@ -96,13 +96,6 @@ public final class MuleContainerBootstrapUtils {
     return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
   }
 
-  /**
-   * @return null if running embedded, otherwise the $MULE_HOME/tmp dir reference
-   */
-  public static File getMuleTmpDir() {
-    return isStandalone() ? new File(getMuleBase(), MULE_TMP_FILENAME) : null;
-  }
-
   public static File getMuleLocalJarFile() {
     return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
   }
