@@ -30,6 +30,10 @@ public class MockExpressionLanguage implements ExpressionLanguage {
     throw new UnsupportedOperationException();
   }
 
+  public TypedValue<?> evaluateLogExpression(String expression, BindingContext context) throws ExpressionExecutionException {
+    throw new UnsupportedOperationException();
+  }
+
   public ValidationResult validate(String expression) {
     throw new UnsupportedOperationException();
   }
