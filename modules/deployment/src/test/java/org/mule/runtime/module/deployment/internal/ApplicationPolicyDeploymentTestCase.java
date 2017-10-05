@@ -382,7 +382,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION).setName("helloExtensionPlugin").setRequiredProduct(MULE)
         .withBundleDescriptorLoader(createBundleDescriptorLoader("helloExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0"));
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .addProperty(EXPORTED_RESOURCES,
                      asList("/", "META-INF/mule-hello.xsd", "META-INF/spring.handlers", "META-INF/spring.schemas"))
