@@ -233,22 +233,24 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void deployAppWithDeploymentProperties() throws Exception {
+  public void deployAndRedeployAppWithDeploymentProperties() throws Exception {
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
     startDeployment();
-    deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties);
-    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
+                                      (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                          .equals(FLOW_PROPERTY_NAME_VALUE));
 
     // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
-    deploymentService.redeploy(dummyAppDescriptorWithPropsFileBuilder.getId());
-    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+    redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder
+        .getId(), null, (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get().equals(FLOW_PROPERTY_NAME_VALUE));
 
     // Redeploy with new deployment properties
     deploymentProperties.clear();
     deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
-    deploymentService.redeploy(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties);
-    assertPropertyValue(testDeploymentListener, FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
+    redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties,
+                                        (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                            .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
   }
 
   /**
