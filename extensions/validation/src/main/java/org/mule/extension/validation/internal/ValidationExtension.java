@@ -45,9 +45,9 @@ import java.util.Locale;
  *
  * @since 3.7.0
  */
-@Extension(name = "validation", description = "Mule Validation Extension", version = "3.8")
+@Extension(name = "validation", description = "Mule Validation Extension", version = "3.9")
 @Operations({CommonValidationOperations.class, CustomValidatorOperation.class, ValidationStrategies.class, NumberValidationOperation.class})
-@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.8")
+@Xml(schemaLocation = "http://www.mulesoft.org/schema/mule/validation", namespace = "validation", schemaVersion = "3.9")
 @Extensible(alias = "validator-message-processor")
 public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware
 {

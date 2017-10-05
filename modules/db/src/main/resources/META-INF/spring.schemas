@@ -2,4 +2,5 @@ http\://www.mulesoft.org/schema/mule/db/3.5/mule-db.xsd=META-INF/mule-db.xsd
 http\://www.mulesoft.org/schema/mule/db/3.6/mule-db.xsd=META-INF/mule-db.xsd
 http\://www.mulesoft.org/schema/mule/db/3.7/mule-db.xsd=META-INF/mule-db.xsd
 http\://www.mulesoft.org/schema/mule/db/3.8/mule-db.xsd=META-INF/mule-db.xsd
+http\://www.mulesoft.org/schema/mule/db/3.9/mule-db.xsd=META-INF/mule-db.xsd
 http\://www.mulesoft.org/schema/mule/db/current/mule-db.xsd=META-INF/mule-db.xsd

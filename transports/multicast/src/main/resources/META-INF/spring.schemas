@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/multicast/3.5/mule-multicast.xsd=META-INF/m
 http\://www.mulesoft.org/schema/mule/multicast/3.6/mule-multicast.xsd=META-INF/mule-multicast.xsd
 http\://www.mulesoft.org/schema/mule/multicast/3.7/mule-multicast.xsd=META-INF/mule-multicast.xsd
 http\://www.mulesoft.org/schema/mule/multicast/3.8/mule-multicast.xsd=META-INF/mule-multicast.xsd
+http\://www.mulesoft.org/schema/mule/multicast/3.9/mule-multicast.xsd=META-INF/mule-multicast.xsd
 http\://www.mulesoft.org/schema/mule/multicast/current/mule-multicast.xsd=META-INF/mule-multicast.xsd

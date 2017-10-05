@@ -14,5 +14,7 @@ http\://www.mulesoft.org/schema/mule/jnp/3.7/mule-jnp.xsd=META-INF/mule-jnp.xsd
 http\://www.mulesoft.org/schema/mule/rmi/3.7/mule-rmi.xsd=META-INF/mule-rmi.xsd
 http\://www.mulesoft.org/schema/mule/jnp/3.8/mule-jnp.xsd=META-INF/mule-jnp.xsd
 http\://www.mulesoft.org/schema/mule/rmi/3.8/mule-rmi.xsd=META-INF/mule-rmi.xsd
+http\://www.mulesoft.org/schema/mule/jnp/3.9/mule-jnp.xsd=META-INF/mule-jnp.xsd
+http\://www.mulesoft.org/schema/mule/rmi/3.9/mule-rmi.xsd=META-INF/mule-rmi.xsd
 http\://www.mulesoft.org/schema/mule/jnp/current/mule-jnp.xsd=META-INF/mule-jnp.xsd
 http\://www.mulesoft.org/schema/mule/rmi/current/mule-rmi.xsd=META-INF/mule-rmi.xsd
