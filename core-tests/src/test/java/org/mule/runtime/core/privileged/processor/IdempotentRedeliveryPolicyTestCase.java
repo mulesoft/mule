@@ -45,12 +45,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +52,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
@@ -100,8 +100,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     MuleLockFactory muleLockFactory = new MuleLockFactory();
     muleLockFactory.setLockProvider(new SingleServerLockProvider());
     muleLockFactory.initialise();
-    when(mockMuleContext.getLockFactory()).thenReturn(muleLockFactory);
-    when(mockMuleContext.getObjectStoreManager()).thenReturn(mockObjectStoreManager);
     when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8);
     final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
     when(mockObjectStoreManager.getObjectStore(anyString())).thenReturn(inMemoryObjectStore);
@@ -115,6 +113,9 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     irp.setMuleContext(mockMuleContext);
     irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setListener(mockFailingMessageProcessor);
+
+    irp.setLockFactory(muleLockFactory);
+    irp.setObjectStoreManager(mockObjectStoreManager);
   }
 
   @Test

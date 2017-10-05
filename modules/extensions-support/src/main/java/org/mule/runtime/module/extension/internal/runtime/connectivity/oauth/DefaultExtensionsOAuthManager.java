@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -29,8 +30,10 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
@@ -66,6 +69,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Default implementation of {@Link ExtensionsOAuthManager}
@@ -79,6 +83,13 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private LockFactory lockFactory;
+
+  @Inject
+  @Named(OBJECT_STORE_MANAGER)
+  private ObjectStoreManager objectStoreManager;
 
   @Inject
   private MuleExpressionLanguage expressionEvaluator;
@@ -193,7 +204,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
 
   private AuthorizationCodeOAuthDancer createDancer(OAuthConfig config) throws MuleException {
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
-        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> muleContext.getLockFactory().createLock(lockId),
+        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockId -> lockFactory.createLock(lockId),
                                                                    new LazyObjectStoreToMapAdapter(
                                                                                                    getObjectStoreSupplier(config)),
                                                                    expressionEvaluator);
@@ -280,7 +291,7 @@ public class DefaultExtensionsOAuthManager implements Initialisable, Startable, 
           .map(OAuthObjectStoreConfig::getObjectStoreName)
           .orElse(BASE_PERSISTENT_OBJECT_STORE_KEY);
 
-      return muleContext.getObjectStoreManager().getObjectStore(storeName);
+      return objectStoreManager.getObjectStore(storeName);
     };
   }
 

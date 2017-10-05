@@ -9,6 +9,7 @@ package org.mule.runtime.core.privileged.processor;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -23,15 +24,15 @@ import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.util.store.ObjectStorePartition;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
@@ -54,12 +58,15 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  private LockFactory lockFactory;
+  private ObjectStoreManager objectStoreManager;
+  private ExtendedExpressionManager expressionManager;
+
   private boolean useSecureHash;
   private String messageDigestAlgorithm;
   private String idExpression;
   private ObjectStore<AtomicInteger> store;
   private ObjectStore<AtomicInteger> privateStore;
-  private LockFactory lockFactory;
   private String idrId;
 
   @Override
@@ -72,12 +79,12 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
     }
     if (!useSecureHash && messageDigestAlgorithm != null) {
-      throw new InitialisationException(CoreMessages.initialisationFailure(String
-          .format("The message digest algorithm '%s' was specified when a secure hash will not be used", messageDigestAlgorithm)),
+      throw new InitialisationException(initialisationFailure(format("The message digest algorithm '%s' was specified when a secure hash will not be used",
+                                                                     messageDigestAlgorithm)),
                                         this);
     }
     if (!useSecureHash && idExpression == null) {
-      throw new InitialisationException(CoreMessages.initialisationFailure("No method for identifying messages was specified"),
+      throw new InitialisationException(initialisationFailure("No method for identifying messages was specified"),
                                         this);
     }
     if (useSecureHash) {
@@ -95,7 +102,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     }
 
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
-    lockFactory = muleContext.getLockFactory();
     if (store != null && privateStore != null) {
       throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
@@ -115,7 +121,6 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private Supplier<ObjectStore> internalObjectStoreSupplier() {
     return () -> {
-      ObjectStoreManager objectStoreManager = muleContext.getObjectStoreManager();
       return objectStoreManager.createObjectStore(getLocation().getRootContainerName() + "." + getClass().getName(),
                                                   ObjectStoreSettings.builder()
                                                       .persistent(false)
@@ -242,7 +247,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] digestedBytes = md.digest(bytes);
       return (String) byteArrayToHexString.transform(digestedBytes);
     } else {
-      return muleContext.getExpressionManager().parse(idExpression, event, getLocation());
+      return expressionManager.parse(idExpression, event, getLocation());
     }
   }
 
@@ -278,6 +283,21 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     this.privateStore = store;
   }
 
+  @Inject
+  public void setLockFactory(LockFactory lockFactory) {
+    this.lockFactory = lockFactory;
+  }
+
+  @Inject
+  @Named(OBJECT_STORE_MANAGER)
+  public void setObjectStoreManager(ObjectStoreManager objectStoreManager) {
+    this.objectStoreManager = objectStoreManager;
+  }
+
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
+  }
 
 }
 
