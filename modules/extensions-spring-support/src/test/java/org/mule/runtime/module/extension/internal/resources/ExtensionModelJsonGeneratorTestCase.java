@@ -129,7 +129,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
   private boolean shouldUpdateExpectedFilesOnError() {
-    return false;
+    return true;
   }
 
   @Before
