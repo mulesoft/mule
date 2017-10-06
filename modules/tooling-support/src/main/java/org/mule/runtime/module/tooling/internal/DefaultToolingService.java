@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static java.util.Optional.empty;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.tooling.api.ToolingService;
@@ -43,7 +44,7 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Application createApplication(File applicationLocation) throws IOException {
-    Application application = applicationFactory.createArtifact(applicationLocation);
+    Application application = applicationFactory.createArtifact(applicationLocation, empty());
     application.install();
     application.lazyInit();
     application.start();

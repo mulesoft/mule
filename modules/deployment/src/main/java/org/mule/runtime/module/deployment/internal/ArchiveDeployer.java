@@ -22,8 +22,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory
  */
 public interface ArchiveDeployer<T extends Artifact> {
 
-  T deployExplodedArtifact(String artifactDir) throws DeploymentException;
-
   /**
    * Indicates if a previously failed artifact (zombie) configuration was updated on the file system.
    *
@@ -31,8 +29,6 @@ public interface ArchiveDeployer<T extends Artifact> {
    * @return true if the zombie artifact was updated, false it the artifact is not a zombie or it was not updated.
    */
   boolean isUpdatedZombieArtifact(String artifactName);
-
-  T deployPackagedArtifact(URI artifactAchivedUri);
 
   T deployPackagedArtifact(URI domainArchiveUrl, Optional<Properties> deploymentProperties) throws DeploymentException;
 
@@ -44,8 +40,6 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void setDeploymentListener(CompositeDeploymentListener deploymentListener);
 
-  void redeploy(T artifact) throws DeploymentException;
-
   void redeploy(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
 
   Map<String, Map<URI, Long>> getArtifactsZombieMap();
@@ -54,11 +48,7 @@ public interface ArchiveDeployer<T extends Artifact> {
 
   void undeployArtifactWithoutUninstall(T artifact);
 
-  void deployArtifact(T artifact) throws DeploymentException;
-
   void deployArtifact(T artifact, Optional<Properties> deploymentProperties) throws DeploymentException;
-
-  T deployPackagedArtifact(String zip) throws DeploymentException;
 
   T deployExplodedArtifact(String artifactDir, Optional<Properties> deploymentProperties);
 }

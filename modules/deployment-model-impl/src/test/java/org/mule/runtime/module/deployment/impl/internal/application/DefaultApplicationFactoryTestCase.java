@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -122,7 +123,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     pluginClassLoaders.add(artifactClassLoader);
     when(applicationArtifactClassLoader.getArtifactPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
-    final Application application = applicationFactory.createArtifact(new File(APP_NAME));
+    final Application application = applicationFactory.createArtifact(new File(APP_NAME), empty());
 
     assertThat(application.getDomain(), is(domain));
     assertThat(application.getArtifactClassLoader(), is(applicationArtifactClassLoader));
@@ -166,6 +167,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
-    applicationFactory.createArtifact(new File(APP_NAME));
+    applicationFactory.createArtifact(new File(APP_NAME), empty());
   }
 }

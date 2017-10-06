@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -50,7 +52,7 @@ public final class DomainDeploymentTemplate implements ArtifactDeploymentTemplat
       for (Application domainApplication : domainApplications) {
         applicationDeployer.preTrackArtifact(domainApplication);
         if (applicationDeployer.isUpdatedZombieArtifact(domainApplication.getArtifactName())) {
-          applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName());
+          applicationDeployer.deployExplodedArtifact(domainApplication.getArtifactName(), empty());
         }
       }
     }

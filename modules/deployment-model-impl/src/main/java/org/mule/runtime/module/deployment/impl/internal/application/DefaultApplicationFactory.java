@@ -101,13 +101,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   @Override
-  protected Application doCreateArtifact(File artifactDir) throws IOException {
+  protected Application doCreateArtifact(File artifactDir, Optional<Properties> properties) throws IOException {
     String appName = artifactDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir, empty());
+    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir, properties);
 
     return createArtifact(descriptor);
   }
@@ -249,17 +249,4 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                                                        .findFirst().get()))
         .collect(toList());
   }
-
-  @Override
-  public Application createArtifact(File appDir, Optional<Properties> appProperties) throws IOException {
-    String appName = appDir.getName();
-    if (appName.contains(" ")) {
-      throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
-    }
-
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appDir, appProperties);
-
-    return createArtifact(descriptor);
-  }
-
 }

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -137,9 +138,9 @@ public class DomainBundleArchiveDeployer {
     deployedApps.add(applicationName);
     Application application = findApplication(applicationName);
     if (application != null) {
-      applicationDeployer.redeploy(application);
+      applicationDeployer.redeploy(application, empty());
     } else {
-      applicationDeployer.deployPackagedArtifact(new File(applicationsFolder, applicationArtifact).toURI());
+      applicationDeployer.deployPackagedArtifact(new File(applicationsFolder, applicationArtifact).toURI(), empty());
     }
   }
 
@@ -159,7 +160,7 @@ public class DomainBundleArchiveDeployer {
       unzip(domainFile, domain.getLocation());
     }
 
-    domainDeployer.deployPackagedArtifact(domainFile.toURI());
+    domainDeployer.deployPackagedArtifact(domainFile.toURI(), empty());
   }
 
   private File unzipDomainBundle(File bundleFile) throws IOException {

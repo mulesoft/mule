@@ -82,16 +82,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   @Override
-  public T deployPackagedArtifact(String zip) throws DeploymentException {
-    return deployPackagedArtifact(zip, empty());
-  }
-
-  @Override
-  public T deployExplodedArtifact(String artifactDir) throws DeploymentException {
-    return deployExplodedArtifact(artifactDir, empty());
-  }
-
-  @Override
   public boolean isUpdatedZombieArtifact(String artifactName) {
     @SuppressWarnings("rawtypes")
     Collection<String> deployedAppNames = collect(artifacts, new BeanToPropertyValueTransformer(ARTIFACT_NAME_PROPERTY));
@@ -129,11 +119,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   @Override
   public File getDeploymentDirectory() {
     return artifactFactory.getArtifactDir();
-  }
-
-  @Override
-  public T deployPackagedArtifact(URI artifactAchivedUri) throws DeploymentException {
-    return deployPackagedArtifact(artifactAchivedUri, empty());
   }
 
   private void undeployArtifactIfItsAPatch(T artifact) {
@@ -274,13 +259,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       }
     }
 
-    deployArtifact(artifact);
+    deployArtifact(artifact, deploymentProperties);
     return artifact;
-  }
-
-  @Override
-  public void deployArtifact(T artifact) throws DeploymentException {
-    deployArtifact(artifact, empty());
   }
 
   private void addZombieApp(DeployableArtifact artifact) {
@@ -383,11 +363,6 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
     T artifact = artifactFactory.createArtifact(artifactLocation, appProperties);
     artifact.setMuleContextListener(muleContextListenerFactory.create(artifact.getArtifactName()));
     return artifact;
-  }
-
-  @Override
-  public void redeploy(T artifact) throws DeploymentException {
-    redeploy(artifact, empty());
   }
 
   private static boolean allResourcesExist(File[] resourceFiles) {
@@ -531,7 +506,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw t;
       }
 
-      deployArtifact(artifact);
+      deployArtifact(artifact, appProperties);
       return artifact;
     } catch (Throwable t) {
       if (t instanceof DeploymentException) {
