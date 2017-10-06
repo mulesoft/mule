@@ -25,6 +25,7 @@ import org.mule.api.store.ObjectStoreNotAvaliableException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.routing.WrapperOrderEvent;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -437,6 +438,10 @@ public class PersistentObjectStorePartition<T extends Serializable>
             if (storedValue.getValue() instanceof DeserializationPostInitialisable)
             {
                 DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
+            }
+            if (storedValue.getValue() instanceof WrapperOrderEvent)
+            {
+                DeserializationPostInitialisable.Implementation.init(((WrapperOrderEvent) storedValue.getValue()).getEvent(), muleContext);
             }
             return storedValue;
         }
