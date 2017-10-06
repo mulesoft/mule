@@ -41,7 +41,7 @@ public class ComponentLocatorCreatePostProcessor implements BeanPostProcessor {
 
   @Override
   public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
-    // We check for instanceof AnnotatedObject because this method may be called for spring objects
+    // We check for instanceof Component because this method may be called for spring objects
     if (!(o instanceof FactoryBean) && o instanceof Component && ((Component) o).getLocation() != null) {
       componentLocator.addComponent((Component) o);
     }

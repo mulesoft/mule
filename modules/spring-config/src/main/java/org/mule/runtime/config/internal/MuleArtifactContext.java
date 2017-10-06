@@ -147,7 +147,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
-  private SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
+  protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
   private List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
 
   /**

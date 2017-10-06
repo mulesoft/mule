@@ -49,10 +49,21 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    * This method is used in addition to {@link #addComponent(Component)} when the parser knows a certain location exists but the
    * component in that location is not available (i.e.: is lazy)
    *
-   * @param component the component to be added
+   * @param location the component to be added
    */
   public void addComponentLocation(ComponentLocation location) {
     this.componentLocations.add(location);
+  }
+
+  public void removeComponent(Location location) {
+    this.componentsMap.remove(location.toString());
+  }
+
+  public void removeComponentLocation(ComponentLocation rootLocation) {
+    List<ComponentLocation> locationsToRemove = this.findAllLocations().stream()
+        .filter(componentLocation -> rootLocation.getRootContainerName().equals(componentLocation.getRootContainerName()))
+        .collect(toList());
+    locationsToRemove.stream().forEach(locationToRemove -> this.componentLocations.remove(locationToRemove));
   }
 
   /**
