@@ -40,6 +40,7 @@ public class GraphTransformerResolver implements TransformerResolver
     public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
     {
         String cacheKey = getDataTypeSourceResultPairHash(source, result);
+        List<Converter> converters;
 
         readWriteLock.readLock().lock();
         try
@@ -48,13 +49,13 @@ public class GraphTransformerResolver implements TransformerResolver
             {
                 return (Converter) cache.get(cacheKey);
             }
+
+            converters = converterFilter.filter(lookupStrategyTransformation.lookupConverters(source, result), source, result);
         }
         finally
         {
             readWriteLock.readLock().unlock();
         }
-
-        List<Converter> converters = converterFilter.filter(lookupStrategyTransformation.lookupConverters(source, result), source, result);
 
         if (converters.size() > 1)
         {

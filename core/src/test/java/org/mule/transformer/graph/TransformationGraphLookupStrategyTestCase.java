@@ -69,6 +69,20 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
     }
 
     @Test
+    public void findsDirectTransformationWhileChangingGraph() throws Exception
+    {
+        Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+        graph.addConverter(inputStreamToXml);
+
+        
+        List<Converter> converters = lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, XML_DATA_TYPE);
+
+        assertEquals(1, converters.size());
+        assertEquals(inputStreamToXml, converters.get(0));
+    }
+
+
+    @Test
     public void findsMultipleDirectTransformations() throws Exception
     {
         Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();

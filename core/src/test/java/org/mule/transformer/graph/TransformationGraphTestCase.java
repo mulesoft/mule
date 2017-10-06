@@ -12,7 +12,7 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
+import org.mule.api.registry.ResolverException;
 import org.mule.api.transformer.Converter;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
@@ -20,8 +20,16 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.transformer.builder.MockConverterBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -280,6 +288,91 @@ public class TransformationGraphTestCase extends AbstractMuleTestCase
         assertFalse(graph.containsEdge(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE));
         assertFalse(graph.containsEdge(JSON_DATA_TYPE, INPUT_STREAM_DATA_TYPE));
     }
+
+    @Test
+    public void modifyGraphWhileResolvingTransformer() throws ResolverException, InterruptedException
+    {
+        final Converter xmlToJson = new MockConverterBuilder().from(XML_DATA_TYPE).to(JSON_DATA_TYPE).build();
+        final Converter inputStreamToXml = new MockConverterBuilder().from(INPUT_STREAM_DATA_TYPE).to(XML_DATA_TYPE).build();
+
+        final TransformationGraph graph = new TransformationGraph();
+        final TransformationGraphLookupStrategy lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
+
+        Runnable addTransformer = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                graph.addConverter(xmlToJson);
+                graph.addConverter(inputStreamToXml);
+            }
+        };
+        Runnable resolveTransformer = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                lookupStrategyTransformation.lookupConverters(INPUT_STREAM_DATA_TYPE, JSON_DATA_TYPE);
+            }
+        };
+
+        List<Runnable> runnables = new ArrayList<>();
+        for (int i = 0 ; i < 50 ; i++)
+        {
+            runnables.add(addTransformer);
+            runnables.add(resolveTransformer);
+        }
+
+        assertConcurrent("Modify transformers while resolving it", runnables, 20);
+    }
+
+    public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException
+    {
+        final int numThreads = runnables.size();
+        final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
+        final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
+        try
+        {
+            final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numThreads);
+            final CountDownLatch afterInitBlocker = new CountDownLatch(1);
+            final CountDownLatch allDone = new CountDownLatch(numThreads);
+            for (final Runnable submittedTestRunnable : runnables)
+            {
+                threadPool.submit(new Runnable()
+                {
+                    public void run()
+                    {
+                        allExecutorThreadsReady.countDown();
+                        try
+                        {
+                            afterInitBlocker.await();
+                            submittedTestRunnable.run();
+                        }
+                        catch (final Throwable e)
+                        {
+                            exceptions.add(e);
+                        }
+                        finally
+                        {
+                            allDone.countDown();
+                        }
+                    }
+                });
+            }
+            // wait until all threads are ready
+            Assert
+                .assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent", allExecutorThreadsReady.await(runnables.size() * 10, TimeUnit.MILLISECONDS));
+            // start all test runners
+            afterInitBlocker.countDown();
+            Assert.assertTrue(message + " timeout! More than" + maxTimeoutSeconds + "seconds", allDone.await(maxTimeoutSeconds, TimeUnit.HOURS));
+        }
+        finally
+        {
+            threadPool.shutdownNow();
+        }
+        Assert.assertTrue(message + "failed with exception(s)" + exceptions, exceptions.isEmpty());
+    }
+
 
 
     private void assertContainsTransformer(Set<TransformationEdge> transformationEdges, Transformer transformer)
