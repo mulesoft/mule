@@ -87,6 +87,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
+import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.w3c.dom.Document;
 
@@ -441,6 +442,7 @@ public final class XmlExtensionLoaderDelegate {
     validateProperties(configurationProperties, connectionProperties);
 
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || !globalElementsComponentModel.isEmpty()) {
+      declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       configurationDeclarer.withModelProperty(new GlobalElementComponentModelModelProperty(globalElementsComponentModel));
       configurationProperties.stream().forEach(param -> extractProperty(configurationDeclarer, param));
