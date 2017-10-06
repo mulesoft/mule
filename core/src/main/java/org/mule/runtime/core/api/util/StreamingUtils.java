@@ -8,20 +8,24 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.object.ListCursorIteratorProvider;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -38,7 +42,7 @@ public final class StreamingUtils {
    * Closing the opened cursor, handling exceptions and return values are all taken care of by this utility method.
    *
    * @param event an {@link CoreEvent}
-   * @param f the function to execute
+   * @param f     the function to execute
    * @return the output {@link CoreEvent}
    * @throws MuleException
    */
@@ -92,9 +96,9 @@ public final class StreamingUtils {
    * If the {@code cursorProviderFactory} accepts the given {@code value}, then the result of invoking
    * {@link CursorProviderFactory#of(CoreEvent, Object)} is returned. Otherwise, the original {@code value} is.
    *
-   * @param value a value which may be a repeatable streaming resource
+   * @param value                 a value which may be a repeatable streaming resource
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
-   * @param event the event on which the {@code value} was generated
+   * @param event                 the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
    */
   public static Object streamingContent(Object value, CursorProviderFactory cursorProviderFactory, CoreEvent event) {
@@ -124,6 +128,43 @@ public final class StreamingUtils {
     }
   }
 
+  /**
+   * Returns a {@link CursorIteratorProvider} which is backed by the given {@code items}.
+   * <p>
+   * Notice that since the {@code items} data is already fully loaded into memory, this kind of
+   * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
+   * bridge the given data with the {@link CursorIteratorProvider} abstraction. Possible use cases are
+   * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
+   * doing something wrong.
+   * <p>
+   * Also consider that because the data is already in memory, the cursors will never buffer into disk.
+   *
+   * @param items the items which back the returned provider
+   * @param <T>   the generic type of the provider's items
+   * @return a new {@link CursorIteratorProvider}
+   */
+  public static <T> CursorIteratorProvider asCursorProvider(List<T> items) {
+    return new ListCursorIteratorProvider(items);
+  }
+
+  /**
+   * Returns a {@link CursorStreamProvider} which is backed by the given {@code bytes}.
+   * <p>
+   * Notice that since the {@code bytes} data is already fully loaded into memory, this kind of
+   * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
+   * bridge the given data with the {@link CursorStreamProvider} abstraction. Possible use cases are
+   * mainly deserialization and testing. <b>Think twice</b> before using this method. Most likely you're
+   * doing something wrong.
+   * <p>
+   * Also consider that because the data is already in memory, the cursors will never buffer into disk.
+   *
+   * @param bytes the byte array which backs the returned provider
+   * @return a new {@link CursorStreamProvider}
+   */
+  public static CursorStreamProvider asCursorProvider(byte[] bytes) {
+    return new ByteArrayCursorStreamProvider(bytes);
+  }
+
   private static CoreEvent replacePayload(CoreEvent event, Object newPayload) {
     return CoreEvent.builder(event)
         .message(Message.builder(event.getMessage())
@@ -144,8 +185,8 @@ public final class StreamingUtils {
   /**
    * Updates the value a given {@link TypedValue} instance by replacing it with a {@link CursorProvider}.
    *
-   * @param value the typed value to update
-   * @param event the current event
+   * @param value            the typed value to update
+   * @param event            the current event
    * @param streamingManager the streaming manager
    * @return updated {@link TypedValue instance}
    */
