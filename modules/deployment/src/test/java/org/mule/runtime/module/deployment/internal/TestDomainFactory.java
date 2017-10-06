@@ -31,6 +31,8 @@ import org.mule.runtime.module.service.api.manager.ServiceRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 public class TestDomainFactory extends DefaultDomainFactory {
 
@@ -74,8 +76,8 @@ public class TestDomainFactory extends DefaultDomainFactory {
   }
 
   @Override
-  public Domain createArtifact(File artifactLocation) throws IOException {
-    TestDomainWrapper testDomainWrapper = new TestDomainWrapper(super.createArtifact(artifactLocation));
+  public Domain createArtifact(File artifactLocation, Optional<Properties> properties) throws IOException {
+    TestDomainWrapper testDomainWrapper = new TestDomainWrapper(super.createArtifact(artifactLocation, properties));
     if (this.failOnStop) {
       testDomainWrapper.setFailOnStop();
     }

@@ -81,11 +81,6 @@ public class DefaultDomainFactory implements ArtifactFactory<Domain> {
     this.extensionModelLoaderManager = extensionModelLoaderManager;
   }
 
-  @Override
-  public Domain createArtifact(File domainLocation) throws IOException {
-    return createArtifact(domainLocation, empty());
-  }
-
   public Domain createArtitact(DomainDescriptor descriptor) throws IOException {
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = descriptor.getPlugins().stream().collect(Collectors.toList());
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =

@@ -86,10 +86,10 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void returnNullIfDeploymentReturnsNull() {
-    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(null);
+    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty())).thenReturn(null);
     DomainArchiveDeployer domainArchiveDeployer =
         new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
-    assertThat(domainArchiveDeployer.deployPackagedArtifact("someZipFile"), nullValue());
+    assertThat(domainArchiveDeployer.deployPackagedArtifact("someZipFile", empty()), nullValue());
   }
 
   @Test
@@ -97,13 +97,13 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
     when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty())).thenReturn(mockDomain);
     DomainArchiveDeployer domainArchiveDeployer =
         new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
-    assertThat(domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH), is(mockDomain));
+    assertThat(domainArchiveDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty()), is(mockDomain));
   }
 
   @Test
   public void undeployDomainWithNoApps() throws Exception {
     when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
-    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
+    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty())).thenReturn(mockDomain);
     when(mockDeploymentService.findDomainApplications(DOMAIN_NAME)).thenReturn(Arrays.asList(new Application[0]));
     DomainArchiveDeployer domainArchiveDeployer =
         new DomainArchiveDeployer(mockDomainDeployer, mockApplicationDeployer, mockDeploymentService);
@@ -114,7 +114,7 @@ public class DomainArchiveDeployerTestCase extends AbstractMuleTestCase {
   @Test
   public void undeployDomainApps() throws Exception {
     when(mockDeploymentService.findDomain(DOMAIN_NAME)).thenReturn(mockDomain);
-    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH)).thenReturn(mockDomain);
+    when(mockDomainDeployer.deployPackagedArtifact(DOMAIN_ZIP_PATH, empty())).thenReturn(mockDomain);
     when(mockDeploymentService.findDomainApplications(DOMAIN_NAME))
         .thenReturn(Arrays.asList(new Application[] {mockApplication1, mockApplication2}));
     DomainArchiveDeployer domainArchiveDeployer =

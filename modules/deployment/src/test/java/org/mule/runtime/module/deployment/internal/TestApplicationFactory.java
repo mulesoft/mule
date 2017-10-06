@@ -91,11 +91,6 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   }
 
   @Override
-  protected Application doCreateArtifact(File appLocation) throws IOException {
-    return createArtifact(appLocation, empty());
-  }
-
-  @Override
   public Application createArtifact(File appLocation, Optional<Properties> appProperties) throws IOException {
     Application app = super.createArtifact(appLocation, appProperties);
 

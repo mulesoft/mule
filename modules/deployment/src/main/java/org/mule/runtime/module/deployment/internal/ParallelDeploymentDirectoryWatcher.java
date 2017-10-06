@@ -8,6 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -52,7 +53,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
     for (final String zip : zips) {
       tasks.add(() -> {
         try {
-          applicationArchiveDeployer.deployPackagedArtifact(zip);
+          applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
         } catch (Exception e) {
           // Ignore and continue
         }
@@ -72,7 +73,7 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
       if (applicationArchiveDeployer.isUpdatedZombieArtifact(addedApp)) {
         tasks.add(() -> {
           try {
-            applicationArchiveDeployer.deployExplodedArtifact(addedApp);
+            applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
           } catch (Exception e) {
             // Ignore and continue
           }

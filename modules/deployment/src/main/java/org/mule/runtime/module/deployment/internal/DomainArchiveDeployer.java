@@ -53,21 +53,6 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
     return true;
   }
 
-  @Override
-  public Domain deployPackagedArtifact(String zip) throws DeploymentException {
-    return deployPackagedArtifact(zip, empty());
-  }
-
-  @Override
-  public Domain deployExplodedArtifact(String artifactDir) throws DeploymentException {
-    return domainDeployer.deployExplodedArtifact(artifactDir);
-  }
-
-  @Override
-  public Domain deployPackagedArtifact(URI artifactAchivedUrl) {
-    return deployPackagedArtifact(artifactAchivedUrl, empty());
-  }
-
   /**
    * Undeploys a domain.
    * <p/>
@@ -105,11 +90,6 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   }
 
   @Override
-  public void redeploy(Domain artifact) throws DeploymentException {
-    redeploy(artifact, empty());
-  }
-
-  @Override
   public Map<String, Map<URI, Long>> getArtifactsZombieMap() {
     return domainDeployer.getArtifactsZombieMap();
   }
@@ -122,11 +102,6 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain> {
   @Override
   public void undeployArtifactWithoutUninstall(Domain artifact) {
     throw new NotImplementedException("undeploy without uninstall is not supported for domains");
-  }
-
-  @Override
-  public void deployArtifact(Domain artifact) {
-    domainDeployer.deployArtifact(artifact, empty());
   }
 
   @Override

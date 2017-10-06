@@ -7,11 +7,15 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
+import static java.util.Optional.empty;
+
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Abstract class for {@link DeployableArtifact} factories.
@@ -35,8 +39,8 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   }
 
   @Override
-  public final T createArtifact(File artifactDir) throws IOException {
-    T artifact = doCreateArtifact(artifactDir);
+  public T createArtifact(File artifactDir, Optional<Properties> properties) throws IOException {
+    T artifact = doCreateArtifact(artifactDir, properties);
     validateArtifactLicense(artifact.getArtifactClassLoader().getClassLoader(), artifact.getArtifactPlugins(), licenseValidator);
     return artifact;
   }
@@ -45,10 +49,11 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * Creates an instance of {@link DeployableArtifact}
    * 
    * @param artifactDir the artifact deployment directory.
+   * @param properties deployment properties
    * @return the created artifact.
    * @throws IOException if there was a problem reading the content of the artifact.
    */
-  protected abstract T doCreateArtifact(File artifactDir) throws IOException;
+  protected abstract T doCreateArtifact(File artifactDir, Optional<Properties> properties) throws IOException;
 
 
 }

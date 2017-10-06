@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -65,7 +66,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 
-    Domain domain = domainFactory.createArtifact(new File(DEFAULT_DOMAIN_NAME));
+    Domain domain = domainFactory.createArtifact(new File(DEFAULT_DOMAIN_NAME), empty());
     assertThat(domain.getArtifactName(), is(DEFAULT_DOMAIN_NAME));
     assertThat(domain.getDescriptor(), instanceOf(EmptyDomainDescriptor.class));
     assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));
@@ -91,7 +92,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     when(domainClassLoaderBuilderMock.build()).thenReturn(domainArtifactClassLoader);
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 
-    Domain domain = domainFactory.createArtifact(new File(domainName));
+    Domain domain = domainFactory.createArtifact(new File(domainName), empty());
 
     assertThat(domain.getArtifactName(), is(domainName));
     assertThat(domain.getDescriptor(), is(descriptor));

@@ -19,14 +19,6 @@ import java.util.Properties;
 public interface ArtifactFactory<T extends Artifact> {
 
   /**
-   * Creates an Artifact
-   *
-   * @param artifactDir directory where the artifact is located
-   * @return the newly created Artifact
-   */
-  T createArtifact(File artifactDir) throws IOException;
-
-  /**
    * @return the directory of the Artifact. Usually this directory contains the Artifact resources
    */
   File getArtifactDir();
