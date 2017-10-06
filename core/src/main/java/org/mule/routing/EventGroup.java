@@ -233,7 +233,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
             if (sortByArrival)
             {
-                WrapperOrderEvent [] wrapperEventArray = new WrapperOrderEvent[keys.size()];
+                WrapperOrderEvent[] wrapperEventArray = new WrapperOrderEvent[keys.size()];
 
                 for (int i = 0; i < keys.size(); i++)
                 {
@@ -242,7 +242,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
                 Arrays.sort(wrapperEventArray, new ArrivalOrderEventComparator());
 
-                for(int i = 0 ; i < wrapperEventArray.length ; i ++)
+                for (int i = 0; i < wrapperEventArray.length; i++)
                 {
                     eventArray[i] = wrapperEventArray[i].event;
                 }

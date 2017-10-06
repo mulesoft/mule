@@ -8,12 +8,14 @@
 package org.mule.routing;
 
 import org.mule.api.MuleEvent;
+
 import java.io.Serializable;
 
 public class WrapperOrderEvent implements Serializable
 {
-    final MuleEvent event ;
-    final int arrivalOrder ;
+
+    final MuleEvent event;
+    final int arrivalOrder;
 
     public WrapperOrderEvent(MuleEvent event, int arrivalOrder)
     {
