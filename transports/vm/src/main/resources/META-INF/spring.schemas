@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/vm/3.5/mule-vm.xsd=META-INF/mule-vm.xsd
 http\://www.mulesoft.org/schema/mule/vm/3.6/mule-vm.xsd=META-INF/mule-vm.xsd
 http\://www.mulesoft.org/schema/mule/vm/3.7/mule-vm.xsd=META-INF/mule-vm.xsd
 http\://www.mulesoft.org/schema/mule/vm/3.8/mule-vm.xsd=META-INF/mule-vm.xsd
+http\://www.mulesoft.org/schema/mule/vm/3.9/mule-vm.xsd=META-INF/mule-vm.xsd
 http\://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd=META-INF/mule-vm.xsd

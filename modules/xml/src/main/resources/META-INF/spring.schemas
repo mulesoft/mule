@@ -6,4 +6,5 @@ http\://www.mulesoft.org/schema/mule/xml/3.5/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/3.6/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/3.7/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/3.8/mule-xml.xsd=META-INF/mule-xml.xsd
+http\://www.mulesoft.org/schema/mule/xml/3.9/mule-xml.xsd=META-INF/mule-xml.xsd
 http\://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd=META-INF/mule-xml.xsd

@@ -8,7 +8,7 @@
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.8/mule.xsd" />
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.9/mule.xsd" />
 
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
     <xsd:complexType name="securityManagerType">
