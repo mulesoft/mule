@@ -7,7 +7,7 @@
 package org.mule.runtime.extension.api.loader.xml;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
+import org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +29,8 @@ import java.util.Optional;
  */
 public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
-  private final List<ExtensionModelValidator> customValidators = unmodifiableList(singletonList(
-                                                                                                new CorrectPrefixesValidator()));
+  private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
+                                                                                         new CorrectXmlNamesValidator()));
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.

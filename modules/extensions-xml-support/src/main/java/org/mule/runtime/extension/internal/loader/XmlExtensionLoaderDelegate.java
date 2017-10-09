@@ -107,7 +107,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -148,7 +147,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String ATTRIBUTE_USE = "use";
   private static final String NAMESPACE_SEPARATOR = ":";
 
-  private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
+  //  private static final Pattern VALID_XML_NAME = Pattern.compile("[A-Za-z]+[a-zA-Z0-9\\-_]*");
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final String MODULE_CONNECTION_MARKER_ATTRIBUTE = "xmlns:connection";
@@ -608,7 +607,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private void extractOperationExtension(HasOperationDeclarer declarer, ComponentModel operationModel,
                                          DirectedGraph<String, DefaultEdge> directedGraph, XmlDslModel xmlDslModel) {
-    String operationName = assertValidName(operationModel.getNameAttribute());
+    String operationName = operationModel.getNameAttribute();
     OperationDeclarer operationDeclarer = declarer.withOperation(operationName);
     ComponentModel bodyComponentModel = operationModel.getInnerComponents()
         .stream()
@@ -671,15 +670,6 @@ public final class XmlExtensionLoaderDelegate {
                                                                               childMPComponentModel.getInnerComponents()));
       }
     });
-  }
-
-  // TODO MULE-12619: until the internals of ExtensionModel doesn't validate or corrects the name, this is the custom validation
-  private String assertValidName(String name) {
-    if (!VALID_XML_NAME.matcher(name).matches()) {
-      throw new IllegalModelDefinitionException(format("The name being used '%s' is not XML valid, it must start with a letter and can be followed by any letter, number or -, _. ",
-                                                       name));
-    }
-    return name;
   }
 
   private void extractOperationParameters(OperationDeclarer operationDeclarer, ComponentModel componentModel) {
@@ -760,7 +750,7 @@ public final class XmlExtensionLoaderDelegate {
    * @return the {@link ParameterDeclarer}, being created as required or optional with a default value if applies.
    */
   private ParameterDeclarer getParameterDeclarer(ParameterizedDeclarer parameterizedDeclarer, Map<String, String> parameters) {
-    final String parameterName = assertValidName(parameters.get(PARAMETER_NAME));
+    final String parameterName = parameters.get(PARAMETER_NAME);
     final String parameterDefaultValue = parameters.get(PARAMETER_DEFAULT_VALUE);
     final UseEnum use = UseEnum.valueOf(parameters.get(ATTRIBUTE_USE));
     if (UseEnum.REQUIRED.equals(use) && isNotBlank(parameterDefaultValue)) {

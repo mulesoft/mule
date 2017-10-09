@@ -31,4 +31,10 @@ public class ModuleCapitalizedNameTestCase extends AbstractXmlExtensionMuleArtif
     assertThat(muleEvent.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 
+  @Test
+  public void testUnderscoreSetPayloadWithParameter() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testUnderscoreSetPayloadWithParameter").run();
+    assertThat(muleEvent.getMessage().getPayload().getValue(), is("underscore property value, underscore parameter value"));
+  }
+
 }
