@@ -76,6 +76,27 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="displayName" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Display name of the operation. It can be any string. When empty, it will default to an auto generated one from the name attribute.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="summary" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A very brief overview about this operation.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="example" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An example about the content of this operation.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
