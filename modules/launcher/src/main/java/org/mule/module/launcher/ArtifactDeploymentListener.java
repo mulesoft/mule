@@ -7,7 +7,7 @@
 package org.mule.module.launcher;
 
 /**
- * Marker interface for deployment events from all Mule Artifacts.
+ * Defines a listener for deployment events for all Mule artifacts.
  */
 public interface ArtifactDeploymentListener extends DeploymentListener
 {
