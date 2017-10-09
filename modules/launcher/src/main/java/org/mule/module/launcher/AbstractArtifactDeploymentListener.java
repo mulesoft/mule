@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
+import org.mule.config.bootstrap.ArtifactType;
 
 /**
  * Default implementation of {@link ArtifactDeploymentListener}).
@@ -17,37 +18,37 @@ public class AbstractArtifactDeploymentListener implements ArtifactDeploymentLis
 {
 
     @Override
-    public void onDeploymentStart(String artifactName)
+    public void onDeploymentStart(String artifactName, ArtifactType type)
     {
         //No-op default
     }
 
     @Override
-    public void onDeploymentSuccess(String artifactName)
+    public void onDeploymentSuccess(String artifactName, ArtifactType type)
     {
         //No-op default
     }
 
     @Override
-    public void onDeploymentFailure(String artifactName, Throwable cause)
+    public void onDeploymentFailure(String artifactName, ArtifactType type, Throwable cause)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentStart(String artifactName)
+    public void onUndeploymentStart(String artifactName, ArtifactType type)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentSuccess(String artifactName)
+    public void onUndeploymentSuccess(String artifactName, ArtifactType type)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentFailure(String artifactName, Throwable cause)
+    public void onUndeploymentFailure(String artifactName, ArtifactType type, Throwable cause)
     {
         //No-op default
     }
@@ -69,5 +70,4 @@ public class AbstractArtifactDeploymentListener implements ArtifactDeploymentLis
     {
         //No-op default
     }
-
 }

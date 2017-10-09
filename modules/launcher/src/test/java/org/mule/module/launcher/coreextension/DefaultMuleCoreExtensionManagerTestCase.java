@@ -19,6 +19,7 @@ import org.mule.module.launcher.AbstractArtifactDeploymentListener;
 import org.mule.module.launcher.AbstractDeploymentListener;
 import org.mule.module.launcher.AbstractDomainDeploymentListener;
 import org.mule.module.launcher.ArtifactDeploymentListener;
+import org.mule.module.launcher.ArtifactDeploymentListenerAdapter;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
@@ -71,37 +72,37 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     @Test
     public void initializesApplicationDeploymentListenerCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestDeploymentListenerExtension.class), never(), times(1));
+        assertDeploymentListener(mock(TestDeploymentListenerExtension.class), never(), times(1));
     }
 
     @Test
     public void initializesAbstractDeploymentListenerSubclassCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestSubclassAbstractDeployment.class), never(), times(1));
+        assertDeploymentListener(mock(TestSubclassAbstractDeployment.class), never(), times(1));
     }
 
     @Test
     public void initializesDomainDeploymentListenerCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestDomainDeploymentListenerExtension.class), times(1), never());
+        assertDeploymentListener(mock(TestDomainDeploymentListenerExtension.class), times(1), never());
     }
 
     @Test
     public void initializesAbstractDomainDeploymentSubclassListenerCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestSubclassAbstractDomainDeployment.class), times(1), never());
+        assertDeploymentListener(mock(TestSubclassAbstractDomainDeployment.class), times(1), never());
     }
 
     @Test
     public void initializesArtifactDeploymentListenerCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestArtifactDeploymentListenerExtension.class), times(1), times(1));
+        assertArtifactDeploymentListener(mock(TestArtifactDeploymentListenerExtension.class));
     }
 
     @Test
     public void initializesAbstractArtifactDeploymentListenerSubclassCoreExtension() throws Exception
     {
-        assertArtifactDeploymentListener(mock(TestSubclassAbstractArtifactDeployment.class), times(1), times(1));
+        assertArtifactDeploymentListener(mock(TestSubclassAbstractArtifactDeployment.class));
     }
 
     @Test
@@ -263,7 +264,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
     }
 
-    private void assertArtifactDeploymentListener (Object extension, VerificationMode addedToDomainDeploymentListener, VerificationMode addedToApplicationDeploymentListener) throws Exception
+    private void assertDeploymentListener (Object extension, VerificationMode addedToDomainDeploymentListener, VerificationMode addedToApplicationDeploymentListener) throws Exception
     {
         List<MuleCoreExtension> extensions = new LinkedList<>();
         extensions.add((MuleCoreExtension) extension);
@@ -277,6 +278,23 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
         verify(deploymentService, addedToDomainDeploymentListener).addDomainDeploymentListener((DeploymentListener) extension);
         verify(deploymentService, addedToApplicationDeploymentListener).addDeploymentListener((DeploymentListener) extension);
+    }
+
+    private void assertArtifactDeploymentListener (ArtifactDeploymentListener extension) throws Exception
+    {
+        List<MuleCoreExtension> extensions = new LinkedList<>();
+        extensions.add((MuleCoreExtension) extension);
+
+        when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+        when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+        DeploymentService deploymentService = mock(DeploymentService.class);
+
+        TestMuleCoreExtensionManager testCoreExtensionManager = new TestMuleCoreExtensionManager(coreExtensionDiscoverer, coreExtensionDependencyResolver);
+        testCoreExtensionManager.setDeploymentService(deploymentService);
+        testCoreExtensionManager.initialise();
+
+        verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.adapter.getAdaptedDomainDeploymentListener());
+        verify(deploymentService).addDeploymentListener(testCoreExtensionManager.adapter.getAdaptedApplicationDeploymentListener());
     }
 
     public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
@@ -323,6 +341,23 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     public interface TestCoreExtensionsAwareExtension extends MuleCoreExtension, CoreExtensionsAware
     {
 
+    }
+
+    private class TestMuleCoreExtensionManager extends DefaultMuleCoreExtensionManager
+    {
+        ArtifactDeploymentListenerAdapter adapter ;
+
+        public TestMuleCoreExtensionManager(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
+        {
+            super(coreExtensionDiscoverer, coreExtensionDependencyResolver);
+        }
+
+        @Override
+        protected ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
+        {
+            adapter = super.getArtifactDeploymentListenerAdapter(artifactDeploymentListener);
+            return adapter;
+        }
     }
 
 }
