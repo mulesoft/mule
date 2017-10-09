@@ -12,10 +12,21 @@
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
     <property name="a-property" type="string"/>
+    <property name="_theUnderscoreProperty" type="string"/>
 
     <operation name="set-payload-hardcoded-value">
         <body>
             <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
+    <operation name="_underscore-set-payload-with-parameter">
+        <parameters>
+            <parameter name="_theUnderscore" type="string"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars['_theUnderscoreProperty'] ++ ', ' ++ vars['_theUnderscore']]"/>
         </body>
         <output type="string"/>
     </operation>

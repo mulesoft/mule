@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.EMPTY_TYPE_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.TYPE_RAISE_ERROR_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator.WRONG_VALUE_FORMAT_MESSAGE;
+import static org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator.WRONG_XML_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import com.google.common.collect.ImmutableSet;
@@ -84,7 +85,16 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void wrongNamingForXmlThrowsException() {
-    exception.expectMessage("property with spaces");
+    exception.expectMessage(allOf(
+                                  containsString(format(
+                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
+                                                        "operation with spaces")),
+                                  containsString(format(
+                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
+                                                        "parameters with spaces")),
+                                  containsString(format(
+                                                        WRONG_XML_NAME_FORMAT_MESSAGE,
+                                                        "property with spaces"))));
     getExtensionModelFrom("validation/module-not-xml-valid-names.xml");
   }
 

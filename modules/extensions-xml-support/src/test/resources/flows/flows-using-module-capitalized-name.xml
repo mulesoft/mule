@@ -6,10 +6,14 @@
       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/capitalized http://www.mulesoft.org/schema/mule/capitalized/current/mule-capitalizedwithspacesinthename.xsd">
 
-    <capitalizedededede:config name="a-name" a-property="a value"/>
+    <capitalizedededede:config name="a-name" a-property="a value" _theUnderscoreProperty="underscore property value"/>
 
     <flow name="testSetPayloadHardcodedFlow">
         <capitalizedededede:set-payload-hardcoded-value config-ref="a-name"/>
+    </flow>
+
+    <flow name="testUnderscoreSetPayloadWithParameter">
+        <capitalizedededede:_underscore-set-payload-with-parameter config-ref="a-name" _theUnderscore="underscore parameter value"/>
     </flow>
 
 </mule>
