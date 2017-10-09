@@ -282,15 +282,13 @@ public class ComponentBuildingDefinition<T> {
      * @return a copy of {@code this} builder
      */
     public Builder<T> withObjectFactoryType(Class<? extends ObjectFactory<T>> objectFactoryType) {
-      if (ObjectFactory.class.isAssignableFrom(objectFactoryType)) {
-        if (Initialisable.class.isAssignableFrom(objectFactoryType) ||
-            Startable.class.isAssignableFrom(objectFactoryType) ||
-            Stoppable.class.isAssignableFrom(objectFactoryType) ||
-            Disposable.class.isAssignableFrom(objectFactoryType)) {
-          throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
-              .format("Class %s is an ObjectFactory so it cannot implement lifecycle methods",
-                      objectFactoryType.getCanonicalName())));
-        }
+      if (Initialisable.class.isAssignableFrom(objectFactoryType) ||
+          Startable.class.isAssignableFrom(objectFactoryType) ||
+          Stoppable.class.isAssignableFrom(objectFactoryType) ||
+          Disposable.class.isAssignableFrom(objectFactoryType)) {
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
+            .format("Class %s is an ObjectFactory so it cannot implement lifecycle methods",
+                    objectFactoryType.getCanonicalName())));
       }
       Builder<T> next = copy();
       next.definition.objectFactoryType = objectFactoryType;
