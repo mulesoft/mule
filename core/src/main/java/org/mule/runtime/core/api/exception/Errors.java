@@ -34,6 +34,7 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMAT
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
@@ -73,8 +74,7 @@ public abstract class Errors {
     public static final String DUPLICATE_MESSAGE_ERROR_IDENTIFIER = "DUPLICATE_MESSAGE";
 
     /**
-     * Indicates that the retry policy, of a certain component, to execute some action, eg: connectivity, delivery has been
-     * exhausted
+     * Indicates that the max attempts to reprocess a message from a source have been exhausted
      */
     public static final String REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER = "REDELIVERY_EXHAUSTED";
 
