@@ -8,6 +8,11 @@ package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
 
+/**
+ * Default implementation of {@link DomainDeploymentListener}).
+ * Extending this abstract class, it is possible to implement the DomainDeploymentListener interface
+ * without having to override all methods.
+ */
 public class AbstractDomainDeploymentListener implements DomainDeploymentListener
 {
 

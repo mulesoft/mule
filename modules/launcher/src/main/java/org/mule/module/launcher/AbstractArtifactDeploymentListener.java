@@ -8,6 +8,11 @@ package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
 
+/**
+ * Default implementation of {@link ArtifactDeploymentListener}).
+ * Extending this abstract class, it is possible to implement the ArtifactDeploymentListener interface
+ * without having to override all methods.
+ */
 public class AbstractArtifactDeploymentListener implements ArtifactDeploymentListener
 {
 
