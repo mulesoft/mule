@@ -6,9 +6,6 @@
  */
 package org.mule.tests.parsers.api;
 
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -16,7 +13,7 @@ import java.util.LinkedList;
 
 import javax.inject.Inject;
 
-public class TestObjectFactory extends AbstractComponentFactory<TestObject> implements Lifecycle {
+public class TestObjectFactory extends AbstractComponentFactory<TestObject> {
 
   private LinkedList<String> lifecycleActions = new LinkedList<>();
   private LinkedList<String> createdObjectLifecycleActions = new LinkedList<>();
@@ -30,26 +27,6 @@ public class TestObjectFactory extends AbstractComponentFactory<TestObject> impl
       injectionDoneBeforeGetObject = true;
     }
     return new TestObject(createdObjectLifecycleActions, this);
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    lifecycleActions.addLast("stop");
-  }
-
-  @Override
-  public void dispose() {
-    lifecycleActions.addLast("dispose");
-  }
-
-  @Override
-  public void start() throws MuleException {
-    lifecycleActions.addLast("start");
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    lifecycleActions.addLast("initialise");
   }
 
   public LinkedList<String> getLifecycleActions() {

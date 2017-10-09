@@ -100,9 +100,6 @@ public abstract class AbstractRegistry implements Registry {
       throw new InitialisationException(e, this);
     }
     try {
-      // TODO: this is a workaround for MULE-13531
-      injectServiceImpls();
-
       fireLifecycle(Initialisable.PHASE_NAME);
     } catch (InitialisationException e) {
       throw e;
@@ -112,28 +109,6 @@ public abstract class AbstractRegistry implements Registry {
       }
       throw new InitialisationException(e, this);
     }
-  }
-
-  private void injectServiceImpls() throws InitialisationException {
-    DefaultCustomizationService customizationService = (DefaultCustomizationService) muleContext.getCustomizationService();
-
-    ArrayList<Object> services = new ArrayList<>();
-    services.addAll(filterServiceImpls(customizationService.getDefaultServices().values()));
-    services.addAll(filterServiceImpls(customizationService.getCustomServices().values()));
-
-    for (Object s : services) {
-      try {
-        muleContext.getInjector().inject(s);
-      } catch (MuleException e) {
-        throw new InitialisationException(e, this);
-      }
-    }
-  }
-
-  private Collection<Object> filterServiceImpls(Collection<CustomService> services) {
-    return services.stream()
-        .filter(x -> x.getServiceImpl().isPresent())
-        .map(x -> x.getServiceImpl().get()).collect(Collectors.toList());
   }
 
   protected boolean isInitialised() {

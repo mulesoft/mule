@@ -7,22 +7,16 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
@@ -39,10 +33,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-// TODO: MULE-13219: Should not need to implement lifecycle
-public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements Lifecycle {
-
-  private static final Logger LOGGER = getLogger(TopLevelParameterObjectFactory.class);
+public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFactory<Object> implements ObjectTypeProvider {
 
   private DefaultObjectBuilder builder;
   private Class<?> objectClass;
@@ -65,34 +56,6 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   }
 
   @Override
-  public void initialise() throws InitialisationException {
-    if (staticProduct != null) {
-      initialiseIfNeeded(staticProduct, true, muleContext);
-    }
-  }
-
-  @Override
-  public void start() throws MuleException {
-    if (staticProduct != null) {
-      startIfNeeded(staticProduct);
-    }
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    if (staticProduct != null) {
-      stopIfNeeded(staticProduct);
-    }
-  }
-
-  @Override
-  public void dispose() {
-    if (staticProduct != null) {
-      disposeIfNeeded(staticProduct, LOGGER);
-    }
-  }
-
-  @Override
   public Object doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
       // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
@@ -109,6 +72,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
       }
 
       staticProduct = resolver.resolve(from(getInitialiserEvent(muleContext)));
+      muleContext.getInjector().inject(staticProduct);
       return staticProduct;
     }, Exception.class, exception -> {
       throw exception;
@@ -124,5 +88,10 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @Override
+  public Class<?> getObjectType() {
+    return objectClass;
   }
 }

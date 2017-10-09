@@ -7,20 +7,14 @@
 package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -33,12 +27,11 @@ import org.springframework.beans.factory.FactoryBean;
  * @param <T>
  * @since 3.7.0
  */
-public class ConstantFactoryBean<T> extends AbstractComponent implements FactoryBean<T>, MuleContextAware, Lifecycle {
+public class ConstantFactoryBean<T> extends AbstractComponent implements FactoryBean<T> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConstantFactoryBean.class);
-
-  private final T value;
+  @Inject
   private MuleContext muleContext;
+  private final T value;
 
   public ConstantFactoryBean(T value) {
     checkArgument(value != null, "value cannot be null");
@@ -50,6 +43,7 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
     if (value instanceof Component) {
       ((Component) value).setAnnotations(getAnnotations());
     }
+    muleContext.getInjector().inject(value);
     return value;
   }
 
@@ -63,28 +57,7 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
     return value.getClass();
   }
 
-  @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    initialiseIfNeeded(value, true, muleContext);
-  }
-
-  @Override
-  public void start() throws MuleException {
-    startIfNeeded(value);
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    stopIfNeeded(value);
-  }
-
-  @Override
-  public void dispose() {
-    disposeIfNeeded(value, LOGGER);
   }
 }

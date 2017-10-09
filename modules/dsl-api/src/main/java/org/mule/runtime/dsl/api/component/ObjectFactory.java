@@ -22,14 +22,17 @@ import org.mule.runtime.api.component.Component;
  * ObjectFactories do not support any lifecycle method but the object created through {@code getObject} may implement lifecycle
  * interfaces.
  *
- * @param <T> the type of the object to be created.
+ * @param <T> the type of the object to be created. The type parameter will be used to find out if the object implements
+ *        interfaces related to mule like lifecycle interfaces. If the type could not be known in advance and can only be know at
+ *        runtime then implement {@link ObjectTypeProvider} to inform the actual type.
  *
  * @since 4.0
  */
 public interface ObjectFactory<T> extends Component {
 
   /**
-   * @return the domain object
+   * @return the created object
+   * 
    * @throws Exception any failure that may occur building the object
    */
   T getObject() throws Exception;
