@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +108,12 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     }
     if (inputSource == null) {
       if (checkedEntities.get(systemId) != null) {
-        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
+        String loadedExtensions = String.join(", ", extensions.stream().map(e -> e.getName()).collect(Collectors.toList()));
+        String namespaceNotFound =
+            publicId == null ? format("Can't resolve %s", systemId) : format("Can't resolve %s (%s)", publicId, systemId);
+        String message = format("%s, An extension might be missing from the dependencies (currently loaded: %s)",
+                                namespaceNotFound, loadedExtensions);
+        throw new MuleRuntimeException(createStaticMessage(message));
       } else {
         checkedEntities.put(systemId, true);
       }
