@@ -15,6 +15,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -22,14 +23,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SplitterIteratorTestCase extends AbstractMuleTestCase {
@@ -38,15 +38,13 @@ public class SplitterIteratorTestCase extends AbstractMuleTestCase {
   private MuleContext muleContext = mock(MuleContext.class);
   private ExtendedExpressionManager expressionManager = mock(ExtendedExpressionManager.class);
   private final List<TypedValue<?>> integers = createListOfIntegers();
-  private final ExpressionConfig expressionConfig = mock(ExpressionConfig.class);
-  private final Splitter splitter = new Splitter(expressionConfig, null);
+  private final Splitter splitter = new Splitter("fullExpression", null);
   private final FlowCallStack flowCallStack = mock(FlowCallStack.class);
 
   @Before
   public void setUp() throws Exception {
     splitter.setMuleContext(muleContext);
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-    when(expressionConfig.getFullExpression()).thenReturn("fullExpression");
     when(expressionManager.split(any(String.class), any(CoreEvent.class), any(BindingContext.class)))
         .thenReturn(integers.iterator());
     muleEvent = testEvent();

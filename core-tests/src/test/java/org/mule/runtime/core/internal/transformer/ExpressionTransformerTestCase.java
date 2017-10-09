@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.transformer.expression.ExpressionArgument;
 import org.mule.runtime.core.internal.transformer.expression.ExpressionTransformer;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     ExpressionTransformer transformer = new ExpressionTransformer();
     transformer.setMuleContext(muleContext);
 
-    ExpressionArgument argument = new ExpressionArgument("test", new ExpressionConfig("mel:payload is org.MyClass"), false);
+    ExpressionArgument argument = new ExpressionArgument("test", "mel:payload is org.MyClass", false);
     argument.setMuleContext(muleContext);
     transformer.addArgument(argument);
 
@@ -50,10 +49,9 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     ExpressionTransformer transformer = new ExpressionTransformer();
     transformer.setMuleContext(muleContext);
     transformer.setReturnSourceIfNull(true);
-    ExpressionConfig config = new ExpressionConfig("null");
 
     // MVL doesn't return NullPayload but rather null. So 'optional' needs to be true.
-    ExpressionArgument argument = new ExpressionArgument("test", config, true);
+    ExpressionArgument argument = new ExpressionArgument("test", "null", true);
     argument.setMuleContext(muleContext);
     transformer.addArgument(argument);
 

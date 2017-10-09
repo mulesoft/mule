@@ -50,7 +50,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer {
       }
 
       if (!argument.isOptional() && results[i] == null) {
-        throw new MessageTransformerException(expressionReturnedNull(argument.getExpressionConfig().getExpression()), this,
+        throw new MessageTransformerException(expressionReturnedNull(argument.getExpression()), this,
                                               event.getMessage());
       }
 
