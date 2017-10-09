@@ -15,7 +15,7 @@
         <petstore:source failOnStart="true" config-ref="petstore-config">
             <reconnect count="1" frequency="0"/>
         </petstore:source>
-        <set-payload value="#[mel:payload]"/>
+        <set-payload value="#[payload]"/>
     </flow>
 
     <flow name="source-fail-with-connection-exception" initialState="stopped">

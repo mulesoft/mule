@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
@@ -225,7 +226,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
                                                    Map<StereotypeDefinition, StereotypeModel> stereotypesCache) {
       return stereotypesCache.computeIfAbsent(stereotypeDefinition, definition -> {
 
-        if (!isBlank(stereotypeDefinition.getNamespace()) && !namespace.equals(stereotypeDefinition.getNamespace())) {
+        if (!isValidStereotype(stereotypeDefinition, namespace)) {
           throw new IllegalModelDefinitionException(format(
                                                            "Stereotype '%s' defines namespace '%s' which doesn't match extension stereotype '%s'. No extension can define "
                                                                + "stereotypes on namespaces other than its own",
@@ -244,6 +245,14 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
         return builder.build();
       });
+    }
+
+    private static boolean isValidStereotype(StereotypeDefinition stereotypeDefinition, String namespace) {
+      if (isBlank(stereotypeDefinition.getNamespace())) {
+        return true;
+      }
+
+      return namespace.equals(stereotypeDefinition.getNamespace()) || NAMESPACE.equals(stereotypeDefinition.getNamespace());
     }
 
     protected StereotypeResolver(T annotatedElement,

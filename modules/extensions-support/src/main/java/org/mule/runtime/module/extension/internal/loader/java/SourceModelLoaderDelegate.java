@@ -105,6 +105,7 @@ final class SourceModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     source
         .hasResponse(sourceType.isAnnotatedWith(EmitsResponse.class))
+        .requiresConnection(connectionParameter.isPresent())
         .withModelProperty(new SourceFactoryModelProperty(new DefaultSourceFactory(sourceType.getDeclaringClass())))
         .withModelProperty(new ImplementingTypeModelProperty(sourceType.getDeclaringClass()));
 

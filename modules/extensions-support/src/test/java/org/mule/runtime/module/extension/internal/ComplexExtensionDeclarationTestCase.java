@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal;
 
 import static java.util.Collections.emptySet;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -27,7 +26,6 @@ import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.REQU
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.STATIC_RESOURCE_OPERATION_NAME;
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VENDOR;
 import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VERSION;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -44,7 +42,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer;
-import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
@@ -109,7 +106,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertType(source.getOutputAttributes().getType(), Serializable.class, ObjectType.class);
 
     List<ParameterModel> parameters = source.getAllParameterModels();
-    assertThat(parameters, hasSize(3));
+    assertThat(parameters, hasSize(2));
 
     ParameterModel parameter = parameters.get(0);
     assertStreamingStrategyParameter(parameter);
@@ -118,10 +115,6 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
     assertThat(parameter.getName(), is(PORT));
     assertThat(parameter.isRequired(), is(false));
     assertType(parameter.getType(), Integer.class, NumberType.class);
-
-    parameter = parameters.get(2);
-    assertThat(parameter.getName(), is(RECONNECTION_STRATEGY_PARAMETER_NAME));
-    assertThat(parameter.getType(), equalTo(new ReconnectionStrategyTypeBuilder().buildReconnectionStrategyType()));
   }
 
   @Test
