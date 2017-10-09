@@ -107,7 +107,10 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     }
     if (inputSource == null) {
       if (checkedEntities.get(systemId) != null) {
-        throw new MuleRuntimeException(createStaticMessage("Can't resolve %s %s", publicId == null ? "" : publicId, systemId));
+        String namespaceNotFound =
+            publicId == null ? format("Can't resolve %s", systemId) : format("Can't resolve %s (%s)", publicId, systemId);
+        String message = format("%s, A dependency or plugin might be missing", namespaceNotFound);
+        throw new MuleRuntimeException(createStaticMessage(message));
       } else {
         checkedEntities.put(systemId, true);
       }

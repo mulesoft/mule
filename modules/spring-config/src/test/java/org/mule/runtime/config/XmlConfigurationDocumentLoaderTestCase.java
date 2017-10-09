@@ -30,7 +30,6 @@ import java.util.List;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.hamcrest.core.StringContains;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -67,7 +66,7 @@ public class XmlConfigurationDocumentLoaderTestCase extends AbstractMuleTestCase
     } catch (MuleRuntimeException e) {
       // We want to be sure that the line and column are properly picked up
       assertThat(getStackTrace(e),
-                 containsString("Can't resolve  http://www.mulesoft.org/schema/mule/co"));
+                 containsString("Can't resolve http://www.mulesoft.org/schema/mule/co"));
     }
   }
 
