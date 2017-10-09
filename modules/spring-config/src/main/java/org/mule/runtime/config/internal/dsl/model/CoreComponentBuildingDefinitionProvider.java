@@ -61,8 +61,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_ID
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.notification.AbstractServerNotification;
+import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.api.dsl.ConfigurableInstanceFactory;
@@ -101,9 +104,7 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
@@ -114,13 +115,9 @@ import org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.source.polling.CronScheduler;
-import org.mule.runtime.core.internal.source.polling.FixedFrequencyScheduler;
-import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.el.ExpressionLanguageComponent;
@@ -163,6 +160,9 @@ import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
+import org.mule.runtime.core.internal.source.polling.CronScheduler;
+import org.mule.runtime.core.internal.source.polling.FixedFrequencyScheduler;
+import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
 import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
@@ -180,12 +180,12 @@ import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
+import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
@@ -987,7 +987,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return parameters -> {
       String name = (String) parameters.get("propertyName");
       ExpressionArgument expressionArgument =
-          new ExpressionArgument(name, new ExpressionConfig((String) parameters.get("expression")),
+          new ExpressionArgument(name, (String) parameters.get("expression"),
                                  parseBoolean((String) ofNullable(parameters.get("optional")).orElse("false")));
       expressionArgument.setMuleContext((MuleContext) parameters.get("muleContext"));
       return expressionArgument;
@@ -1014,7 +1014,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         throw new MuleRuntimeException(createStaticMessage("Expression transformer do not support expression attribute or return-data child element at the same time."));
       }
       if (expression != null) {
-        arguments = asList(new ExpressionArgument("single", new ExpressionConfig(expression), false));
+        arguments = asList(new ExpressionArgument("single", expression, false));
       }
       abstractExpressionTransformer.setArguments(arguments);
       return abstractExpressionTransformer;

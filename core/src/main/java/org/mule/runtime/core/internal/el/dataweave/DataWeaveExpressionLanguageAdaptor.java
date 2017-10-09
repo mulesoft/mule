@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.FLOW;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
@@ -205,9 +207,16 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   private String sanitize(String expression) {
-    String sanitizedExpression = expression.startsWith(DEFAULT_EXPRESSION_PREFIX)
-        ? expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length())
-        : expression;
+    String sanitizedExpression;
+    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
+        throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'", expression)));
+      }
+      sanitizedExpression =
+          expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length());
+    } else {
+      sanitizedExpression = expression;
+    }
 
     if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)
         // Handle DW functions that start with dw:: without removing dw:

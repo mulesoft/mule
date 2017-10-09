@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer.expression;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
@@ -17,7 +18,6 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
 
 import javax.inject.Inject;
 
@@ -26,7 +26,7 @@ import javax.inject.Inject;
  */
 public class ExpressionArgument extends AbstractComponent {
 
-  private ExpressionConfig expressionConfig = new ExpressionConfig();
+  private String expression;
   private String name;
   private boolean optional;
   private Class<?> returnClass;
@@ -39,12 +39,12 @@ public class ExpressionArgument extends AbstractComponent {
     super();
   }
 
-  public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional) {
-    this(name, expressionConfig, optional, null);
+  public ExpressionArgument(String name, String expression, boolean optional) {
+    this(name, expression, optional, null);
   }
 
-  public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, Class<?> returnClass) {
-    this.expressionConfig = expressionConfig;
+  public ExpressionArgument(String name, String expression, boolean optional, Class<?> returnClass) {
+    this.expression = expression;
     this.name = name;
     this.optional = optional;
     this.returnClass = returnClass;
@@ -58,14 +58,6 @@ public class ExpressionArgument extends AbstractComponent {
     this.name = name;
   }
 
-  public ExpressionConfig getExpressionConfig() {
-    return expressionConfig;
-  }
-
-  public void setExpressionConfig(ExpressionConfig expressionConfig) {
-    this.expressionConfig = expressionConfig;
-  }
-
   public boolean isOptional() {
     return optional;
   }
@@ -74,12 +66,10 @@ public class ExpressionArgument extends AbstractComponent {
     this.optional = optional;
   }
 
-  protected String getFullExpression() {
-    return expressionConfig.getFullExpression();
-  }
-
   protected void validate() {
-    expressionConfig.validate();
+    if (expression == null) {
+      throw new IllegalArgumentException(objectIsNull("expression").getMessage());
+    }
   }
 
   /**
@@ -124,11 +114,11 @@ public class ExpressionArgument extends AbstractComponent {
   }
 
   public String getExpression() {
-    return expressionConfig.getExpression();
+    return expression;
   }
 
   public void setExpression(String expression) {
-    expressionConfig.setExpression(expression);
+    this.expression = expression;
   }
 
   public Class<?> getReturnClass() {

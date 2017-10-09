@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.internal.exception.TemplateOnErrorHandler.createErrorType;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.privileged.event.Acceptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.internal.routing.outbound.AbstractMessageSequenceSplitter;
-import org.mule.runtime.core.privileged.expression.ExpressionConfig;
+import org.mule.runtime.core.privileged.event.Acceptor;
+import org.mule.runtime.core.privileged.processor.Router;
 
 /**
  * Splits a message that has a Collection, Iterable, MessageSequence or Iterator payload or an expression that resolves to some of
@@ -25,7 +26,7 @@ import org.mule.runtime.core.privileged.expression.ExpressionConfig;
  */
 public class Splitter extends AbstractMessageSequenceSplitter implements Initialisable, Router {
 
-  private ExpressionConfig config = new ExpressionConfig("#[payload]");
+  private String expression = "#[payload]";
   private SplittingStrategy<CoreEvent, MessageSequence<?>> strategy;
   private String filterOnErrorType = null;
 
@@ -33,8 +34,8 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
     // Used by spring
   }
 
-  public Splitter(ExpressionConfig config, String filterOnErrorType) {
-    this.config = config;
+  public Splitter(String expression, String filterOnErrorType) {
+    this.expression = expression;
     this.filterOnErrorType = filterOnErrorType;
   }
 
@@ -45,9 +46,11 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
 
   @Override
   public void initialise() throws InitialisationException {
-    config.validate();
+    if (expression == null) {
+      throw new IllegalArgumentException(objectIsNull("expression").getMessage());
+    }
     strategy = new EventToMessageSequenceSplittingStrategy(new ExpressionSplittingStrategy(muleContext.getExpressionManager(),
-                                                                                           config.getFullExpression()));
+                                                                                           expression));
     filterOnErrorTypeAcceptor =
         createFilterOnErrorTypeAcceptor(createErrorType(muleContext.getErrorTypeRepository(), filterOnErrorType));
   }
@@ -68,7 +71,7 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
   }
 
   public void setExpression(String expression) {
-    this.config.setExpression(expression);
+    this.expression = expression;
   }
 
   /**
@@ -76,7 +79,7 @@ public class Splitter extends AbstractMessageSequenceSplitter implements Initial
    * collection, rather than propagating the error.
    * <p>
    * This is useful to use validations inside this component.
-   * 
+   *
    * @param filterOnErrorType A comma separated list of error types that should be handled by filtering the split part.
    */
   public void setFilterOnErrorType(String filterOnErrorType) {

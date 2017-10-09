@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
@@ -35,10 +36,10 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -370,7 +371,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
 
   private static String removeExpressionMarker(String expression) {
     if (expression == null) {
-      throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
+      throw new IllegalArgumentException(objectIsNull("expression").getMessage());
     }
     if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
       expression = expression.substring(2, expression.length() - 1);

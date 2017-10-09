@@ -51,17 +51,12 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -82,13 +77,24 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.weave.v2.model.structure.QualifiedName;
 
-import javax.xml.namespace.QName;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
@@ -409,6 +415,15 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     assertThat(entry.get("key"), instanceOf(QualifiedName.class));
     assertThat(((QualifiedName) entry.get("key")).name(), equalTo(key));
     assertThat(entry.get("value"), equalTo(value));
+  }
+
+  @Test
+  public void unbalancedBrackets() throws MuleException {
+    CoreEvent event = eventBuilder(muleContext).message(Message.of(TEST_PAYLOAD)).build();
+
+    expectedEx.expect(ExpressionExecutionException.class);
+    expectedEx.expectMessage(containsString("Unbalanced brackets in expression"));
+    expressionLanguage.evaluate("#[unbalanced", event, BindingContext.builder().build());
   }
 
   private CoreEvent getEventWithError(Optional<Error> error) {
