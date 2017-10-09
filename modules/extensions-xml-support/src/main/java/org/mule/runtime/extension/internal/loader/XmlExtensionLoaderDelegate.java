@@ -621,6 +621,7 @@ public final class XmlExtensionLoaderDelegate {
 
     operationDeclarer.withModelProperty(new OperationComponentModelModelProperty(operationModel, bodyComponentModel));
     operationDeclarer.describedAs(getDescription(operationModel));
+    operationDeclarer.getDeclaration().setDisplayModel(getDisplayModel(operationModel));
     extractOperationParameters(operationDeclarer, operationModel);
     extractOutputType(operationDeclarer.withOutput(), OPERATION_OUTPUT_IDENTIFIER, operationModel,
                       getDeclarationOutputFor(operationName));
@@ -710,19 +711,23 @@ public final class XmlExtensionLoaderDelegate {
     layoutModelBuilder.order(getOrder(parameters.get(ORDER_ATTRIBUTE)));
     layoutModelBuilder.tabName(getTab(parameters.get(TAB_ATTRIBUTE)));
 
-    final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    displayModelBuilder.displayName(parameters.get(DISPLAY_NAME_ATTRIBUTE));
-    displayModelBuilder.summary(parameters.get(SUMMARY_ATTRIBUTE));
-    displayModelBuilder.example(parameters.get(EXAMPLE_ATTRIBUTE));
-
+    final DisplayModel displayModel = getDisplayModel(param);
     MetadataType parameterType = extractType(receivedInputType);
 
     ParameterDeclarer parameterDeclarer = getParameterDeclarer(parameterizedDeclarer, parameters);
     parameterDeclarer.describedAs(getDescription(param))
         .withLayout(layoutModelBuilder.build())
-        .withDisplayModel(displayModelBuilder.build())
+        .withDisplayModel(displayModel)
         .withRole(role)
         .ofType(parameterType);
+  }
+
+  private DisplayModel getDisplayModel(ComponentModel componentModel) {
+    final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
+    displayModelBuilder.displayName(componentModel.getParameters().get(DISPLAY_NAME_ATTRIBUTE));
+    displayModelBuilder.summary(componentModel.getParameters().get(SUMMARY_ATTRIBUTE));
+    displayModelBuilder.example(componentModel.getParameters().get(EXAMPLE_ATTRIBUTE));
+    return displayModelBuilder.build();
   }
 
   private String getTab(String tab) {
