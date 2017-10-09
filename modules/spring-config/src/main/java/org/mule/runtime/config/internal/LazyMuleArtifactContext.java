@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -206,6 +207,15 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       });
     }
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
+    // Refresh componentLocator
+    removeFromComponentLocator(beanNames);
+  }
+
+  private void removeFromComponentLocator(List<String> locations) {
+    locations.forEach(location -> {
+      componentLocator.removeComponentLocation(DefaultComponentLocation.fromSingleComponent(location));
+      componentLocator.removeComponent(Location.builderFromStringRepresentation(location).build());
+    });
   }
 
 }
