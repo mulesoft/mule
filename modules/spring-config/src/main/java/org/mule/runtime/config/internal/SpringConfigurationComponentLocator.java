@@ -55,10 +55,20 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
     this.componentLocations.add(location);
   }
 
+  /**
+   * Removes a component from the locator
+   *
+   * @param location the location of the component to be removed
+   */
   public void removeComponent(Location location) {
     this.componentsMap.remove(location.toString());
   }
 
+  /**
+   * Removes a {@Link ComponentLocation}, and all that have the same root container mame
+   *
+   * @param rootLocation the rootLocation that will be removed.
+   */
   public void removeComponentLocation(ComponentLocation rootLocation) {
     List<ComponentLocation> locationsToRemove = this.findAllLocations().stream()
         .filter(componentLocation -> rootLocation.getRootContainerName().equals(componentLocation.getRootContainerName()))
