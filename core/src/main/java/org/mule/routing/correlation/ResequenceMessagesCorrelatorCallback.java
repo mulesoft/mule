@@ -42,7 +42,8 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     /**
      * This method is invoked if the shouldAggregate method is called and returns
      * true. Once this method returns an aggregated message, the event group is
-     * removed from the router.
+     * removed from the router. It returns null in case no events need to be
+     * aggregated.
      * 
      * @param events the event group for this request
      * @return an aggregated message
@@ -54,15 +55,24 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         MuleEvent[] results;
+        
+
         try
         {
-            results = (events == null) ? new MuleEvent[0] : events.toArray(false);
+            if (events == null || events.size() == 0)
+            {
+                return null;
+            }
+
+            results = events.toArray(false);
         }
         catch (ObjectStoreException e)
         {
             throw new AggregationException(events, null, e);
         }
+        
         Arrays.sort(results, eventComparator);
+        
         // This is a bit of a hack since we return a collection of events on one
         // message
         for (int i = 0; i < results.length; i++)

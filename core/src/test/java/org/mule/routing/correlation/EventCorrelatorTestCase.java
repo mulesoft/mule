@@ -6,6 +6,7 @@
  */
 package org.mule.routing.correlation;
 
+import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.times;
@@ -179,6 +180,28 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         Mockito.verify(mockEventGroup, Mockito.times(1)).getMessageCollectionEvent();
     }
 
+
+    /**
+     * This test just verifies that in case a non expired event group is prompted
+     * to expire, and no events are left to process (so it gets a null event from
+     * the event to aggregate), the group expiry is handled without raising
+     * an exception.
+     * 
+     * @throws Exception exception in case it fails.
+     */
+    @Test
+    public void handleGroupExpiryWhenThereAreNoEventsToProcess() throws Exception
+    {
+        when(mockProcessedGroups.contains(1L)).thenReturn(true);
+        when(mockEventGroup.getGroupId()).thenReturn(1L);
+        when(mockEventGroup.getCreated()).thenReturn(currentTimeMillis());
+        when(mockEventCorrelatorCallback.aggregateEvents(mockEventGroup)).thenReturn(null);
+        EventCorrelator eventCorrelator = new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
+                "prefix", mockProcessedGroups);
+        eventCorrelator.setFailOnTimeout(false);
+        eventCorrelator.handleGroupExpiry(mockEventGroup);
+    }
+    
     private EventCorrelator createEventCorrelator() throws Exception
     {
         when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
