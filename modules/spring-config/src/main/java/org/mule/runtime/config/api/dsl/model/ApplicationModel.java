@@ -33,11 +33,6 @@ import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoes
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.ClassUtils;
-
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
@@ -71,7 +66,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.w3c.dom.Node;
@@ -342,9 +336,6 @@ public class ApplicationModel {
       expandModules(extensionModels);
     }
     resolveComponentTypes();
-    executeOnEveryMuleComponentTree(componentModel -> {
-
-    });
     executeOnEveryMuleComponentTree(new ComponentLocationVisitor());
   }
 
