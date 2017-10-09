@@ -15,8 +15,13 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -277,6 +282,14 @@ public class ComponentBuildingDefinition<T> {
      * @return a copy of {@code this} builder
      */
     public Builder<T> withObjectFactoryType(Class<? extends ObjectFactory<T>> objectFactoryType) {
+      if (Initialisable.class.isAssignableFrom(objectFactoryType) ||
+          Startable.class.isAssignableFrom(objectFactoryType) ||
+          Stoppable.class.isAssignableFrom(objectFactoryType) ||
+          Disposable.class.isAssignableFrom(objectFactoryType)) {
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
+            .format("Class %s is an ObjectFactory so it cannot implement lifecycle methods",
+                    objectFactoryType.getCanonicalName())));
+      }
       Builder<T> next = copy();
       next.definition.objectFactoryType = objectFactoryType;
       return next;
@@ -299,8 +312,8 @@ public class ComponentBuildingDefinition<T> {
     /**
      * Makes a deep copy of the builder so it's current configuration can be reused.
      *
-     * This is called automatically on each method to make sure users don't accidentally modify
-     * the original when intending to refactor common cases.
+     * This is called automatically on each method to make sure users don't accidentally modify the original when intending to
+     * refactor common cases.
      *
      * @return a {@code Builder} copy.
      */

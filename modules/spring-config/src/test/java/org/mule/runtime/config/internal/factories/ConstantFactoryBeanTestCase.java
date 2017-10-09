@@ -12,12 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -34,13 +28,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase {
 
-  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class})
+  @Mock(extraInterfaces = {MuleContextAware.class})
   private Object value;
   private ConstantFactoryBean<Object> factoryBean;
+  private MuleContext muleContext = mock(MuleContext.class);
+  private Injector injector = mock(Injector.class);
 
   @Before
   public void before() throws Exception {
     factoryBean = new ConstantFactoryBean<>(value);
+    when(muleContext.getInjector()).thenReturn(injector);
+    factoryBean.setMuleContext(muleContext);
   }
 
   @Test
@@ -59,29 +57,9 @@ public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void initialise() throws Exception {
-    MuleContext muleContext = mock(MuleContext.class);
-    Injector injector = mock(Injector.class);
-    when(muleContext.getInjector()).thenReturn(injector);
-
-    factoryBean.setMuleContext(muleContext);
-    factoryBean.initialise();
-
-    verify((Initialisable) value).initialise();
-    verify((MuleContextAware) value).setMuleContext(muleContext);
+  public void injection() throws Exception {
+    factoryBean.getObject();
     verify(injector).inject(value);
-  }
-
-  @Test
-  public void stop() throws MuleException {
-    factoryBean.stop();
-    verify((Stoppable) value).stop();
-  }
-
-  @Test
-  public void dispose() throws Exception {
-    factoryBean.dispose();
-    verify((Disposable) value).dispose();
   }
 
 }

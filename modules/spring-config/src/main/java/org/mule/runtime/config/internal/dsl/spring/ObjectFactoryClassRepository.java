@@ -12,6 +12,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
+import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 
 import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.cglib.proxy.Callback;
@@ -101,7 +102,7 @@ public class ObjectFactoryClassRepository {
           if (method.getName().equals("isSingleton")) {
             return !componentBuildingDefinition.isPrototype();
           }
-          if (method.getName().equals("getObjectType")) {
+          if (method.getName().equals("getObjectType") && !ObjectTypeProvider.class.isAssignableFrom(obj.getClass())) {
             return createdObjectType;
           }
           if (method.getName().equals("getObject")) {
