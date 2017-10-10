@@ -184,7 +184,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(schedulerModel.getOutputAttributes().hasDynamicType(), is(false));
 
     final List<ParameterModel> paramModels = schedulerModel.getAllParameterModels();
-    assertThat(paramModels, hasSize(2));
+    assertThat(paramModels, hasSize(1));
     assertSchedulingStrategy(paramModels.get(0));
   }
 
