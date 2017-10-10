@@ -20,15 +20,8 @@ public class ArtifactDeploymentListenerAdapter
 
     private DeploymentListener adaptedDomainDeploymentListener;
     private DeploymentListener adaptedApplicationDeploymentListener;
-    private ArtifactDeploymentListener artifactDeploymentListener;
 
     public ArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
-    {
-        this.artifactDeploymentListener = artifactDeploymentListener;
-        adapt();
-    }
-
-    private void adapt()
     {
         adaptedDomainDeploymentListener = new AdaptedDeploymentListener(artifactDeploymentListener, DOMAIN);
         adaptedApplicationDeploymentListener = new AdaptedDeploymentListener(artifactDeploymentListener, APP);
