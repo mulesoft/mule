@@ -6,58 +6,40 @@
  */
 package org.mule.modules.schedulers.cron;
 
-import static java.util.TimeZone.getTimeZone;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import org.mule.api.schedule.Scheduler;
-import org.mule.api.schedule.Schedulers;
-import org.mule.tck.junit4.FunctionalTestCase;
-
-import java.util.Collection;
-
 import org.junit.Test;
+import org.mule.api.MuleContext;
+import org.mule.tck.junit4.ApplicationContextBuilder;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 
-public class CronsTimeZoneSchedulerTest extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigFile()
-    {
-        return "cron-timezone-scheduler-config.xml";
+public class CronsTimeZoneSchedulerTest {
+    final static String TIMEZONE_XML = "America/Argentina/Buenos_Aires";
+
+
+
+    @Test
+    public void validTimeZoneInScheduler() throws Exception {
+        ApplicationContextBuilder builder = new ApplicationContextBuilder();
+        builder.setApplicationResources(new String[]{"cron-scheduler-valid-time-zone.xml"});
+        MuleContext test = builder.build();
+        assertThat(test.getRegistry().lookupByType(CronSchedulerFactory.class).size(), equalTo(1));
+        assertThat(test.getRegistry().lookupByType(CronScheduler.class).values().iterator().next().getTimeZone().getID(), equalTo(TIMEZONE_XML));
     }
 
     @Test
-    public void timeZoneInScheduler() throws Exception
-    {
-        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowConstructPollingSchedulers("pollWithTimeZone"));
-        
-        assertThat(schedulers, hasSize(1));
-        for (Scheduler scheduler : schedulers)
+    public void invalidTimeZoneInScheduler() throws Exception {
+        try
         {
-            assertThat(scheduler, instanceOf(CronScheduler.class));
-            // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
-            // check its there would be very complex.
-            assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("America/Argentina/Buenos_Aires")));
-        }
-    }
+            ApplicationContextBuilder builder = new ApplicationContextBuilder();
+            builder.setApplicationResources(new String[]{"cron-timezone-scheduler-config.xml"});
+            MuleContext test = builder.build();
 
-    @Test
-    public void invalidTimeZoneInScheduler() throws Exception
-    {
-        Collection<Scheduler> schedulers = muleContext.getRegistry().lookupScheduler(
-                Schedulers.flowConstructPollingSchedulers("pollWithInvalidTimeZone"));
-
-        assertThat(schedulers, hasSize(1));
-        for (Scheduler scheduler : schedulers)
+        } catch (Exception e)
         {
-            assertThat(scheduler, instanceOf(CronScheduler.class));
-            // Just can assert that the tx in the config gets to the mule scheduler. To instrospect the quatz object to
-            // check its there would be very complex.
-            assertThat(((CronScheduler) scheduler).getTimeZone(), is(getTimeZone("GMT")));
+            assertThat(getRootCause(e).getMessage(), equalTo("Invalid Timezone"));
         }
+
     }
 }
