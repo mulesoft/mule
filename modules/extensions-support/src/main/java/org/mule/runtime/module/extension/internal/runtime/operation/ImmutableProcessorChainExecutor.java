@@ -18,6 +18,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -25,6 +26,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -33,7 +35,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
+public class ImmutableProcessorChainExecutor implements Chain, Initialisable, HasMessageProcessors {
 
   /**
    * Processor that will be executed upon calling process
@@ -130,4 +132,8 @@ public class ImmutableProcessorChainExecutor implements Chain, Initialisable {
     initialiseIfNeeded(chain);
   }
 
+  @Override
+  public List<Processor> getMessageProcessors() {
+    return chain.getMessageProcessors();
+  }
 }

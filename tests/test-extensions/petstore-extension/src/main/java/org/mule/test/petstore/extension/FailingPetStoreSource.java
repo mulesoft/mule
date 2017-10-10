@@ -11,9 +11,11 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -28,6 +30,9 @@ public class FailingPetStoreSource extends Source<String, Object> {
 
   @Config
   PetStoreConnector config;
+
+  @Connection
+  private ConnectionProvider<PetStoreClient> connectionProvider;
 
   @Parameter
   @Optional(defaultValue = "false")
