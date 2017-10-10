@@ -446,10 +446,10 @@ public class EventCorrelator implements Startable, Stoppable, Disposable
                 {
                     MuleEvent newEvent = callback.aggregateEvents(group);
                     group.clear();
-                    newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
 
-                    if (!expiredAndDispatchedGroups.contains((Serializable) group.getGroupId()))
+                    if (newEvent != null && !expiredAndDispatchedGroups.contains((Serializable) group.getGroupId()))
                     {
+                        newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
                         // TODO which use cases would need a sync reply event
                         // returned?
                         if (timeoutMessageProcessor != null)
