@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
 
 /**
- * Adapts a {@link DeploymentListener} to an {@link ArtifactDeploymentListener}.
+ * Adapts an {@link ArtifactDeploymentListener} to work as a {@link DeploymentListener}.
  */
 public class ArtifactDeploymentListenerAdapter
 {
@@ -25,20 +25,21 @@ public class ArtifactDeploymentListenerAdapter
     public ArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
     {
         this.artifactDeploymentListener = artifactDeploymentListener;
+        adapt();
     }
 
-    public void adapt()
+    private void adapt()
     {
         adaptedDomainDeploymentListener = new AdaptedDeploymentListener(artifactDeploymentListener, DOMAIN);
         adaptedApplicationDeploymentListener = new AdaptedDeploymentListener(artifactDeploymentListener, APP);
     }
 
-    public DeploymentListener getAdaptedDomainDeploymentListener()
+    public DeploymentListener getDomainDeploymentListener()
     {
         return adaptedDomainDeploymentListener;
     }
 
-    public DeploymentListener getAdaptedApplicationDeploymentListener()
+    public DeploymentListener getApplicationDeploymentListener()
     {
         return adaptedApplicationDeploymentListener;
     }
@@ -58,37 +59,37 @@ public class ArtifactDeploymentListenerAdapter
         @Override
         public void onDeploymentStart(String artifactName)
         {
-            artifactDeploymentListener.onDeploymentStart(artifactName, artifactType);
+            artifactDeploymentListener.onDeploymentStart(artifactType, artifactName);
         }
 
         @Override
         public void onDeploymentSuccess(String artifactName)
         {
-            artifactDeploymentListener.onDeploymentSuccess(artifactName, artifactType);
+            artifactDeploymentListener.onDeploymentSuccess(artifactType, artifactName);
         }
 
         @Override
         public void onDeploymentFailure(String artifactName, Throwable cause)
         {
-            artifactDeploymentListener.onDeploymentFailure(artifactName, artifactType, cause);
+            artifactDeploymentListener.onDeploymentFailure(artifactType, artifactName, cause);
         }
 
         @Override
         public void onUndeploymentStart(String artifactName)
         {
-            artifactDeploymentListener.onUndeploymentStart(artifactName, artifactType);
+            artifactDeploymentListener.onUndeploymentStart(artifactType, artifactName);
         }
 
         @Override
         public void onUndeploymentSuccess(String artifactName)
         {
-            artifactDeploymentListener.onUndeploymentSuccess(artifactName, artifactType);
+            artifactDeploymentListener.onUndeploymentSuccess(artifactType, artifactName);
         }
 
         @Override
         public void onUndeploymentFailure(String artifactName, Throwable cause)
         {
-            artifactDeploymentListener.onUndeploymentFailure(artifactName, artifactType, cause);
+            artifactDeploymentListener.onUndeploymentFailure(artifactType, artifactName, cause);
         }
 
         @Override

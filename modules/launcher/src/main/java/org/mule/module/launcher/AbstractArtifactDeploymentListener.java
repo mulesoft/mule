@@ -14,41 +14,41 @@ import org.mule.config.bootstrap.ArtifactType;
  * Extending this abstract class, it is possible to implement the ArtifactDeploymentListener interface
  * without having to override all methods.
  */
-public class AbstractArtifactDeploymentListener implements ArtifactDeploymentListener
+public abstract class AbstractArtifactDeploymentListener implements ArtifactDeploymentListener
 {
 
     @Override
-    public void onDeploymentStart(String artifactName, ArtifactType type)
+    public void onDeploymentStart(ArtifactType type, String artifactName)
     {
         //No-op default
     }
 
     @Override
-    public void onDeploymentSuccess(String artifactName, ArtifactType type)
+    public void onDeploymentSuccess(ArtifactType type, String artifactName)
     {
         //No-op default
     }
 
     @Override
-    public void onDeploymentFailure(String artifactName, ArtifactType type, Throwable cause)
+    public void onDeploymentFailure(ArtifactType type, String artifactName, Throwable cause)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentStart(String artifactName, ArtifactType type)
+    public void onUndeploymentStart(ArtifactType type, String artifactName)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentSuccess(String artifactName, ArtifactType type)
+    public void onUndeploymentSuccess(ArtifactType type, String artifactName)
     {
         //No-op default
     }
 
     @Override
-    public void onUndeploymentFailure(String artifactName, ArtifactType type, Throwable cause)
+    public void onUndeploymentFailure(ArtifactType type, String artifactName, Throwable cause)
     {
         //No-op default
     }

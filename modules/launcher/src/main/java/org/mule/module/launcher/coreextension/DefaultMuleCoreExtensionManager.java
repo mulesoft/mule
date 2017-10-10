@@ -16,7 +16,6 @@ import org.mule.module.launcher.ArtifactDeploymentListenerAdapter;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.DomainDeploymentListener;
 import org.mule.module.launcher.PluginClassLoaderManager;
 import org.mule.module.launcher.PluginClassLoaderManagerAware;
 
@@ -127,22 +126,16 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
             }
 
-            if (extension instanceof DeploymentListener && !(extension instanceof DomainDeploymentListener))
+            if (extension instanceof DeploymentListener)
             {
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
-            }
-
-            if (extension instanceof DomainDeploymentListener)
-            {
-                deploymentService.addDomainDeploymentListener((DeploymentListener) extension);
             }
 
             if (extension instanceof ArtifactDeploymentListener)
             {
                 ArtifactDeploymentListenerAdapter adapter = getArtifactDeploymentListenerAdapter((ArtifactDeploymentListener) extension);
-                adapter.adapt();
-                deploymentService.addDeploymentListener(adapter.getAdaptedApplicationDeploymentListener());
-                deploymentService.addDomainDeploymentListener(adapter.getAdaptedDomainDeploymentListener());
+                deploymentService.addDeploymentListener(adapter.getApplicationDeploymentListener());
+                deploymentService.addDomainDeploymentListener(adapter.getDomainDeploymentListener());
             }
 
             if (extension instanceof PluginClassLoaderManagerAware)
@@ -170,6 +163,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     {
         this.pluginClassLoaderManager = pluginClassLoaderManager;
     }
+
 
     protected ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener)
     {

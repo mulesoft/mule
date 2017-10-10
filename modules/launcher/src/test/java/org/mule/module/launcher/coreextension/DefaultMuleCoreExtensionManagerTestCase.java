@@ -17,13 +17,11 @@ import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.module.launcher.AbstractArtifactDeploymentListener;
 import org.mule.module.launcher.AbstractDeploymentListener;
-import org.mule.module.launcher.AbstractDomainDeploymentListener;
 import org.mule.module.launcher.ArtifactDeploymentListener;
 import org.mule.module.launcher.ArtifactDeploymentListenerAdapter;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
-import org.mule.module.launcher.DomainDeploymentListener;
 import org.mule.module.launcher.PluginClassLoaderManager;
 import org.mule.module.launcher.PluginClassLoaderManagerAware;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -79,18 +77,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     public void initializesAbstractDeploymentListenerSubclassCoreExtension() throws Exception
     {
         assertDeploymentListener(mock(TestSubclassAbstractDeployment.class), never(), times(1));
-    }
-
-    @Test
-    public void initializesDomainDeploymentListenerCoreExtension() throws Exception
-    {
-        assertDeploymentListener(mock(TestDomainDeploymentListenerExtension.class), times(1), never());
-    }
-
-    @Test
-    public void initializesAbstractDomainDeploymentSubclassListenerCoreExtension() throws Exception
-    {
-        assertDeploymentListener(mock(TestSubclassAbstractDomainDeployment.class), times(1), never());
     }
 
     @Test
@@ -293,8 +279,8 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         testCoreExtensionManager.setDeploymentService(deploymentService);
         testCoreExtensionManager.initialise();
 
-        verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.adapter.getAdaptedDomainDeploymentListener());
-        verify(deploymentService).addDeploymentListener(testCoreExtensionManager.adapter.getAdaptedApplicationDeploymentListener());
+        verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.adapter.getDomainDeploymentListener());
+        verify(deploymentService).addDeploymentListener(testCoreExtensionManager.adapter.getApplicationDeploymentListener());
     }
 
     public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
@@ -303,12 +289,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     }
 
     public interface TestDeploymentListenerExtension extends MuleCoreExtension, DeploymentListener
-    {
-
-    }
-
-
-    public interface TestDomainDeploymentListenerExtension extends MuleCoreExtension, DomainDeploymentListener
     {
 
     }
@@ -324,11 +304,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     }
 
     public abstract class TestSubclassAbstractDeployment extends AbstractDeploymentListener implements MuleCoreExtension
-    {
-
-    }
-
-    public abstract class TestSubclassAbstractDomainDeployment extends AbstractDomainDeploymentListener implements MuleCoreExtension
     {
 
     }

@@ -14,6 +14,7 @@ import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
@@ -24,7 +25,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ArtifactDeploymentListenerAdapterTestCase
+public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestCase
 {
 
     private static final String ARTIFACT_NAME = "artifactName";
@@ -46,9 +47,8 @@ public class ArtifactDeploymentListenerAdapterTestCase
     @Test
     public void adapt() throws Exception
     {
-        adapter.adapt();
-        DeploymentListener applicationDeploymentListener = adapter.getAdaptedApplicationDeploymentListener();
-        DeploymentListener domainDeploymentListener = adapter.getAdaptedDomainDeploymentListener();
+        DeploymentListener applicationDeploymentListener = adapter.getApplicationDeploymentListener();
+        DeploymentListener domainDeploymentListener = adapter.getDomainDeploymentListener();
         assertDeploymentListenerInvocations(applicationDeploymentListener, APP);
         assertDeploymentListenerInvocations(domainDeploymentListener, DOMAIN);
     }
@@ -56,17 +56,17 @@ public class ArtifactDeploymentListenerAdapterTestCase
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)
     {
         deploymentListener.onDeploymentStart(ARTIFACT_NAME);
-        verify(listener).onDeploymentStart(ARTIFACT_NAME, artifactType);
+        verify(listener).onDeploymentStart(artifactType, ARTIFACT_NAME);
         deploymentListener.onDeploymentFailure(ARTIFACT_NAME, null);
-        verify(listener).onDeploymentFailure(ARTIFACT_NAME, artifactType, null);
+        verify(listener).onDeploymentFailure(artifactType, ARTIFACT_NAME, null);
         deploymentListener.onDeploymentSuccess(ARTIFACT_NAME);
-        verify(listener).onDeploymentSuccess(ARTIFACT_NAME, artifactType);
+        verify(listener).onDeploymentSuccess(artifactType, ARTIFACT_NAME);
         deploymentListener.onUndeploymentStart(ARTIFACT_NAME);
-        verify(listener).onUndeploymentStart(ARTIFACT_NAME, artifactType);
+        verify(listener).onUndeploymentStart(artifactType, ARTIFACT_NAME);
         deploymentListener.onUndeploymentFailure(ARTIFACT_NAME, null);
-        verify(listener).onUndeploymentFailure(ARTIFACT_NAME, artifactType, null);
+        verify(listener).onUndeploymentFailure(artifactType, ARTIFACT_NAME, null);
         deploymentListener.onUndeploymentSuccess(ARTIFACT_NAME);
-        verify(listener).onUndeploymentSuccess(ARTIFACT_NAME, artifactType);
+        verify(listener).onUndeploymentSuccess(artifactType, ARTIFACT_NAME);
         deploymentListener.onMuleContextCreated(ARTIFACT_NAME, context);
         verify(listener).onMuleContextCreated(ARTIFACT_NAME, context);
         deploymentListener.onMuleContextConfigured(ARTIFACT_NAME, context);
