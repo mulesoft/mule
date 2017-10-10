@@ -55,25 +55,35 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
 
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)
     {
-        deploymentListener.onDeploymentStart(ARTIFACT_NAME);
-        verify(listener).onDeploymentStart(artifactType, ARTIFACT_NAME);
-        deploymentListener.onDeploymentFailure(ARTIFACT_NAME, null);
-        verify(listener).onDeploymentFailure(artifactType, ARTIFACT_NAME, null);
-        deploymentListener.onDeploymentSuccess(ARTIFACT_NAME);
-        verify(listener).onDeploymentSuccess(artifactType, ARTIFACT_NAME);
-        deploymentListener.onUndeploymentStart(ARTIFACT_NAME);
-        verify(listener).onUndeploymentStart(artifactType, ARTIFACT_NAME);
-        deploymentListener.onUndeploymentFailure(ARTIFACT_NAME, null);
-        verify(listener).onUndeploymentFailure(artifactType, ARTIFACT_NAME, null);
-        deploymentListener.onUndeploymentSuccess(ARTIFACT_NAME);
-        verify(listener).onUndeploymentSuccess(artifactType, ARTIFACT_NAME);
-        deploymentListener.onMuleContextCreated(ARTIFACT_NAME, context);
-        verify(listener).onMuleContextCreated(ARTIFACT_NAME, context);
-        deploymentListener.onMuleContextConfigured(ARTIFACT_NAME, context);
-        verify(listener).onMuleContextConfigured(ARTIFACT_NAME, context);
-        deploymentListener.onMuleContextInitialised(ARTIFACT_NAME, context);
-        verify(listener).onMuleContextInitialised(ARTIFACT_NAME, context);
+        notifyDeploymentEvents(deploymentListener);
+        verifyArtifactDeploymentListenerExecutions(artifactType);
         reset(listener);
+    }
+
+    private void notifyDeploymentEvents(DeploymentListener deploymentListener)
+    {
+        deploymentListener.onDeploymentStart(ARTIFACT_NAME);
+        deploymentListener.onDeploymentFailure(ARTIFACT_NAME, null);
+        deploymentListener.onDeploymentSuccess(ARTIFACT_NAME);
+        deploymentListener.onUndeploymentStart(ARTIFACT_NAME);
+        deploymentListener.onUndeploymentFailure(ARTIFACT_NAME, null);
+        deploymentListener.onUndeploymentSuccess(ARTIFACT_NAME);
+        deploymentListener.onMuleContextCreated(ARTIFACT_NAME, context);
+        deploymentListener.onMuleContextConfigured(ARTIFACT_NAME, context);
+        deploymentListener.onMuleContextInitialised(ARTIFACT_NAME, context);
+    }
+
+    private void verifyArtifactDeploymentListenerExecutions (ArtifactType artifactType)
+    {
+        verify(listener).onDeploymentStart(artifactType, ARTIFACT_NAME);
+        verify(listener).onDeploymentFailure(artifactType, ARTIFACT_NAME, null);
+        verify(listener).onDeploymentSuccess(artifactType, ARTIFACT_NAME);
+        verify(listener).onUndeploymentStart(artifactType, ARTIFACT_NAME);
+        verify(listener).onUndeploymentFailure(artifactType, ARTIFACT_NAME, null);
+        verify(listener).onUndeploymentSuccess(artifactType, ARTIFACT_NAME);
+        verify(listener).onMuleContextCreated(ARTIFACT_NAME, context);
+        verify(listener).onMuleContextConfigured(ARTIFACT_NAME, context);
+        verify(listener).onMuleContextInitialised(ARTIFACT_NAME, context);
     }
 
 }

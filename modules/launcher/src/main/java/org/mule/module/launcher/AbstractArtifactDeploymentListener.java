@@ -11,7 +11,8 @@ import org.mule.config.bootstrap.ArtifactType;
 
 /**
  * Default implementation of {@link ArtifactDeploymentListener}).
- * Extending this abstract class, it is possible to implement the ArtifactDeploymentListener interface
+ * Method implementations are no-op.
+ * Use it for implementing the ArtifactDeploymentListener interface
  * without having to override all methods.
  */
 public abstract class AbstractArtifactDeploymentListener implements ArtifactDeploymentListener

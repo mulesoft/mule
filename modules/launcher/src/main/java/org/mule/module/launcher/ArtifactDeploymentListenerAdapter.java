@@ -44,7 +44,7 @@ public class ArtifactDeploymentListenerAdapter
         return adaptedApplicationDeploymentListener;
     }
 
-    private class AdaptedDeploymentListener implements DeploymentListener
+    private static class AdaptedDeploymentListener implements DeploymentListener
     {
 
         private final ArtifactDeploymentListener artifactDeploymentListener;
