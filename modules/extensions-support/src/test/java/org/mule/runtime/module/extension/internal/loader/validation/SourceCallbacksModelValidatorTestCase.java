@@ -19,20 +19,20 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.internal.loader.validator.SourceCallbacksModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.List;
-import java.util.Optional;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -74,7 +74,8 @@ public class SourceCallbacksModelValidatorTestCase extends AbstractMuleTestCase 
     when(onTerminateCallback.getAllParameterModels()).thenReturn(singletonList(invalidParameter));
     validator.validate(extensionModel, problemsReporter);
 
-    assertProblemContaining("'On Terminate Callbacks' can only receive parameters of the following types");
+    assertProblemContaining("@OnTerminate callback method can only receive parameters of the following types: "
+        + "'SourceResult' and 'SourceCallbackContext'");
   }
 
   @Test
@@ -91,7 +92,7 @@ public class SourceCallbacksModelValidatorTestCase extends AbstractMuleTestCase 
     when(sourceModel.getSuccessCallback()).thenReturn(of(onSuccessCallback));
     validator.validate(extensionModel, problemsReporter);
 
-    assertProblemContaining("Terminate Callback should also be defined");
+    assertOnTerminateRequired();
   }
 
   @Test
@@ -101,7 +102,11 @@ public class SourceCallbacksModelValidatorTestCase extends AbstractMuleTestCase 
     when(onErrorCallback.getAllParameterModels()).thenReturn(singletonList(invalidParameter));
     validator.validate(extensionModel, problemsReporter);
 
-    assertProblemContaining("Terminate Callback should also be defined");
+    assertOnTerminateRequired();
+  }
+
+  private void assertOnTerminateRequired() {
+    assertProblemContaining(String.format("another method annotated with @%s is required", OnTerminate.class.getSimpleName()));
   }
 
   @Test

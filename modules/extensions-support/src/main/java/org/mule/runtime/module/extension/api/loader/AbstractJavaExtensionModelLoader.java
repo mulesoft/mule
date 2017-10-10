@@ -58,6 +58,7 @@ import org.mule.runtime.module.extension.internal.loader.validation.ParameterGro
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ParameterTypeModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.PrivilegedApiValidator;
+import org.mule.runtime.module.extension.internal.loader.validation.SourceCallbacksModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validation.ValueProviderModelValidator;
 
 import java.util.Collection;
@@ -77,6 +78,7 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
                                                                                          new NullSafeModelValidator(),
                                                                                          new OperationReturnTypeModelValidator(),
                                                                                          new OperationParametersTypeModelValidator(),
+                                                                                         new SourceCallbacksModelValidator(),
                                                                                          new PagedOperationModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new ParameterTypeModelValidator(),
