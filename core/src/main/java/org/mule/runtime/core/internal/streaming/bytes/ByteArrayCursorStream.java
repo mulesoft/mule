@@ -42,7 +42,7 @@ public class ByteArrayCursorStream extends AbstractCursorStream {
     if (position >= content.length) {
       return -1;
     }
-    
+
     int value = unsigned(content[position]);
     this.position++;
 
