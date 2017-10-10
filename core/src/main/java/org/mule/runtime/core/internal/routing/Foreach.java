@@ -64,7 +64,7 @@ import reactor.core.publisher.Flux;
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
-  static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
+  public static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
