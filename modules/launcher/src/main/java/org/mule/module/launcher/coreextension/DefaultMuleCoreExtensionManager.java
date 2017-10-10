@@ -127,7 +127,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
             }
 
-            if (extension instanceof DeploymentListener && ! (extension instanceof DomainDeploymentListener) && ! (extension instanceof ArtifactDeploymentListener))
+            if (extension instanceof DeploymentListener && !(extension instanceof DomainDeploymentListener))
             {
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
             }
