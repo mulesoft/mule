@@ -44,7 +44,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.o
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -109,6 +108,8 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import com.google.common.reflect.TypeToken;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -119,7 +120,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.google.common.reflect.TypeToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -152,7 +152,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   private static final String FAILING_PAGED_OPERATION = "failingPagedOperation";
   private static final String CONNECTION_PAGED_OPERATION = "pagedOperationUsingConnection";
   private static final String DIE = "die";
-  private static final String KILL_MANY = "killMany";
   private static final String LAUNDER_MONEY = "launder";
   private static final String INJECTED_EXTENSION_MANAGER = "getInjectedExtensionManager";
   private static final String ALIAS = "alias";
@@ -465,7 +464,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(40));
+    assertThat(extensionDeclaration.getOperations(), hasSize(39));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(14));
@@ -480,7 +479,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, KILL_WITH_MULTIPLES_WEAPONS, "");
     assertOperation(extensionDeclaration, KILL_WITH_MULTIPLE_WILDCARD_WEAPONS, "");
     assertOperation(withOperationsDeclaration, DIE, "");
-    assertOperation(extensionDeclaration, KILL_MANY, "");
     assertOperation(withOperationsDeclaration, LAUNDER_MONEY, "");
     assertOperation(extensionDeclaration, INJECTED_EXTENSION_MANAGER, "");
     assertOperation(extensionDeclaration, ALIAS, "");

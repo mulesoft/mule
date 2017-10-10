@@ -10,16 +10,12 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereotypes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.test.heisenberg.extension.stereotypes.DrugKillingStereotype;
-import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 
 import java.util.Map;
 
@@ -34,14 +30,6 @@ public class HeisenbergScopes implements Initialisable {
 
   public int getCounter() {
     return initialiasedCounter;
-  }
-
-  @Throws(HeisenbergErrorTyperProvider.class)
-  @MediaType(TEXT_PLAIN)
-  public void killMany(@AllowedStereotypes({KillingStereotype.class, DrugKillingStereotype.class}) Chain killOperations,
-                       CompletionCallback<String, Void> callback, String reason)
-      throws Exception {
-    //TODO MULE-13440
   }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
