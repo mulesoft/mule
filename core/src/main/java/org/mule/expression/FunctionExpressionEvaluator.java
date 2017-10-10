@@ -75,6 +75,11 @@ public class FunctionExpressionEvaluator extends AbstractExpressionEvaluator
             {
                 return DateUtils.getTimeStamp(DEFAULT_DATE_FORMAT);
             }
+            else if(temp.contains(")"))
+            {
+                temp=temp.substring(1,temp.length()-1);
+                return DateUtils.getTimeStamp(temp);
+            }
             else
             {
                 temp = temp.substring(1);

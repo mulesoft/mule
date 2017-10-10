@@ -25,6 +25,15 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleContextTest
 {
 
     @Test
+    public void evaluateReturnDate()
+    {
+        MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
+        Object o;
+        assertEquals(muleContext.getExpressionManager().evaluate("function:datestamp(yyyyMMdd)", message),muleContext.getExpressionManager().evaluate("server.dateTime.format('yyyyMMdd')", message));
+
+    }
+
+    @Test
     public void testFunctions() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
