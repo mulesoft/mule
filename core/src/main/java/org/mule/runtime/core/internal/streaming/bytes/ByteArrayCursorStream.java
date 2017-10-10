@@ -38,7 +38,15 @@ public class ByteArrayCursorStream extends AbstractCursorStream {
 
   @Override
   protected int doRead() throws IOException {
-    return content[toIntExact(getPosition())];
+    final int position = toIntExact(getPosition());
+    if (position >= content.length) {
+      return -1;
+    }
+    
+    int value = unsigned(content[position]);
+    this.position++;
+
+    return value;
   }
 
   @Override
