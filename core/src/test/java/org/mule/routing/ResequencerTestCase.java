@@ -6,10 +6,14 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -31,13 +35,29 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.Comparator;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ResequencerTestCase extends AbstractMuleContextTestCase
 {
 
+    @Mock
+    private EventGroup eventGroup;
+    
     public ResequencerTestCase()
     {
         setStartContext(true);
+    }
+    
+    @Test
+    public void returnNullWhenEventGroupHasNoEventToAggregate() throws Exception
+    {
+        ResequenceMessagesCorrelatorCallback callback = new ResequenceMessagesCorrelatorCallback(new CorrelationSequenceComparator(), muleContext, "dummy");
+        when(eventGroup.toArray(false)).thenReturn(new MuleEvent[0]);
+        MuleEvent event = callback.aggregateEvents(eventGroup);
+        assertThat(event, is(nullValue()));
     }
 
     @Test
