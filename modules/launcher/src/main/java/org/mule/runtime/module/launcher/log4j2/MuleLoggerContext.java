@@ -104,9 +104,9 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   }
 
   /**
-   * Override to return a {<@UNVERIFIED|@link> DispatchingLogger} instead of a simple logger {@inheritDoc}
+   * Override to return a {@link DispatchingLogger} instead of a simple logger {@inheritDoc}
    *
-   * @return a {<@UNVERIFIED|@link> DispatchingLogger}
+   * @return a {@link DispatchingLogger}
    */
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
@@ -115,7 +115,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
                                  messageFactory) {
 
       // force the name due to log4j2's cyclic constructor dependencies
-      // aren?t a friend of the wrapper pattern
+      // aren't a friend of the wrapper pattern
       @Override
       public String getName() {
         return name;
