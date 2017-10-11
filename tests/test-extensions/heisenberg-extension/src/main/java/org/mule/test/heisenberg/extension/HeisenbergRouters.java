@@ -8,12 +8,14 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.test.heisenberg.extension.model.Attribute;
 import org.mule.test.heisenberg.extension.route.AfterCall;
 import org.mule.test.heisenberg.extension.route.BeforeCall;
@@ -22,11 +24,46 @@ import org.mule.test.heisenberg.extension.route.WhenRoute;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class HeisenbergRouters {
 
+  public void concurrentRouteExecutor(WhenRoute when, RouterCompletionCallback callback) {
+
+    Consumer<Chain> processor = (chain) -> {
+      final Latch latch = new Latch();
+      chain.process((result -> {
+        System.out.println("Finished running " + result);
+        latch.release();
+      }), (error, result) -> {
+        System.out.println("Finished with error " + error);
+        latch.release();
+      });
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+
+      }
+    };
+
+    Thread first = new Thread(() -> processor.accept(when.getChain()));
+    Thread second = new Thread(() -> processor.accept(when.getChain()));
+    first.start();
+    second.start();
+    try {
+      first.join();
+      second.join();
+    } catch (Exception e) {
+      callback.error(e);
+    }
+    callback.success(Result.builder().output("SUCCESS").build());
+  }
+
   public void simpleRouter(WhenRoute when, RouterCompletionCallback callback) {
-    when.getChain().process(callback::success, (e, r) -> callback.error(e));
+    when.getChain()
+        .process(callback::success,
+                 (e, r) -> callback.error(e));
   }
 
   public void twoRoutesRouter(String processorName,

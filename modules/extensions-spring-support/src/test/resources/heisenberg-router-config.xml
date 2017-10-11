@@ -45,6 +45,14 @@
         </heisenberg:simple-router>
     </flow>
 
+    <flow name="concurrentRouteExecutor">
+        <heisenberg:concurrent-route-executor>
+            <heisenberg:when message="myString">
+                <set-variable variableName="newPayload" value="#[payload]"/>
+            </heisenberg:when>
+        </heisenberg:concurrent-route-executor>
+    </flow>
+
     <flow name="twoRoutesRouter">
         <heisenberg:two-routes-router processorName="mule:set-payload">
             <heisenberg:when message="myString" execute="#[vars.executeWhen]">
