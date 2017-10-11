@@ -37,7 +37,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -53,7 +52,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -280,13 +279,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                            "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
       }
     }
-  }
-
-  protected boolean isRedeliveryPolicyConfigured() {
-    if (getProcessors().isEmpty()) {
-      return false;
-    }
-    return getProcessors().get(0) instanceof IdempotentRedeliveryPolicy;
   }
 
   @Override

@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.exception;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
 import org.reactivestreams.Publisher;
 
