@@ -15,6 +15,7 @@ import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -23,6 +24,8 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 
@@ -38,6 +41,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default exception strategy must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private String name;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -109,8 +115,10 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
             .warn("Default 'error-handler' should include a final \"catch-all\" 'on-error-propagate'. Attempting implicit injection.");
       }
       OnErrorPropagateHandler acceptsAllOnErrorPropagate = new OnErrorPropagateHandler();
+      acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerName());
+      acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
       initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
-      this.exceptionListeners.add(new OnErrorPropagateHandler());
+      this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(acceptsAllOnErrorPropagate));
     }
   }
 
