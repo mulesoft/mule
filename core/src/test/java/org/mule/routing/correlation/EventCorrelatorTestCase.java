@@ -210,9 +210,13 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase
         when(mockProcessedGroups.contains(1L)).thenReturn(true);
         when(mockEventGroup.getGroupId()).thenReturn(1L);
         when(mockEventGroup.getCreated()).thenReturn(currentTimeMillis());
+        when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+        doReturn(memoryObjectStore).when(mockObjectStoreManager).getObjectStore(OBJECT_STOR_NAME_PREFIX + ".eventGroups", USE_PERSISTENT_STORE);
+        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".expiredAndDispatchedGroups", USE_PERSISTENT_STORE)).thenReturn(mockExpireGroupsObjectStore);
+        when(mockObjectStoreManager.getObjectStore(OBJECT_STOR_NAME_PREFIX + ".processedGroups", USE_PERSISTENT_STORE, EventCorrelator.MAX_PROCESSED_GROUPS, -1, 1000)).thenReturn(mockProcessedGroups);
         when(mockEventCorrelatorCallback.aggregateEvents(mockEventGroup)).thenReturn(null);
-        EventCorrelator eventCorrelator = new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, memoryObjectStore,
-                "prefix", mockProcessedGroups);
+        EventCorrelator eventCorrelator = new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMessagingInfoMapping, mockMuleContext, mockFlowConstruct, false,
+                "prefix");
         eventCorrelator.setFailOnTimeout(false);
         eventCorrelator.handleGroupExpiry(mockEventGroup);
     }

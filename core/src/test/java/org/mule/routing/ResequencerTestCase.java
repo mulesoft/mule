@@ -54,7 +54,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase
     @Test
     public void returnNullWhenEventGroupHasNoEventToAggregate() throws Exception
     {
-        ResequenceMessagesCorrelatorCallback callback = new ResequenceMessagesCorrelatorCallback(new CorrelationSequenceComparator(), muleContext, "dummy");
+        ResequenceMessagesCorrelatorCallback callback = new ResequenceMessagesCorrelatorCallback(new CorrelationSequenceComparator(), muleContext, false, "dummy");
         when(eventGroup.toArray(false)).thenReturn(new MuleEvent[0]);
         MuleEvent event = callback.aggregateEvents(eventGroup);
         assertThat(event, is(nullValue()));
