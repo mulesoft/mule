@@ -173,7 +173,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void nonAppendersForMutedApplication() throws Exception {
+  public void noAppendersForMutedApplication() throws Exception {
     when(context.isArtifactClassloader()).thenReturn(true);
     when(context.isApplicationClassloader()).thenReturn(true);
     ArtifactDescriptor descriptor = mock(ArtifactDescriptor.class);
