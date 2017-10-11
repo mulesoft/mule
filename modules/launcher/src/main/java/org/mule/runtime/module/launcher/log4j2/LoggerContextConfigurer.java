@@ -92,13 +92,11 @@ final class LoggerContextConfigurer {
   }
 
   protected void update(MuleLoggerContext context) {
-    boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
-
     if (mute(context)) {
-      removeConsoleAppender(context);
       return;
     }
 
+    boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
     if (context.getConfigFile() == null && !forceConsoleLog) {
       removeConsoleAppender(context);
     }
