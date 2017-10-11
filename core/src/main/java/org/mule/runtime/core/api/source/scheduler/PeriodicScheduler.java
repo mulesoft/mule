@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.source.polling;
+package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.internal.source.SchedulingStrategy;
 
 import java.util.concurrent.ScheduledFuture;
 

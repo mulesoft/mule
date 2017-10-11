@@ -57,7 +57,7 @@ import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.internal.source.SchedulingStrategy;
+import org.mule.runtime.core.api.source.scheduler.SchedulingStrategy;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Iterator;
