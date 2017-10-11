@@ -18,8 +18,8 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import java.util.List;
 
 /**
- * A chain of {@link Processor}'s. All implementioans should propagate {@link MuleContext}, {@link FlowConstruct} and lifecycle to
- * {@link Processor}'s in the chains.
+ * A chain of {@link Processor}'s. All implementations should propagate {@link MuleContext}, {@link FlowConstruct} and lifecycle
+ * to {@link Processor}'s in the chains.
  */
 public interface MessageProcessorChain extends ExecutableComponent, Lifecycle, MuleContextAware, Scope {
 
