@@ -6,13 +6,25 @@
  */
 package org.mule.test.module.extension;
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +57,59 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     assertThat(internalEvent.getMessage().getPayload().getValue(), is("message"));
     assertThat(internalEvent.getVariables().get("newPayload").getValue(), is("message"));
     assertThat(internalEvent.getVariables().get("newAttributes").getValue(), is("other"));
+  }
+
+  /**
+   * Executes once a router that internally calls concurrently the same Chain
+   */
+  @Test
+  public void concurrentRouter() throws Exception {
+    CoreEvent internalEvent = flowRunner("concurrentRouteExecutor").run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("SUCCESS"));
+  }
+
+  /**
+   * Executes the same flow concurrently to check that no race condition exists because
+   * two different instances of Chain are being used
+   */
+  @Test
+  public void concurrentRouterExecution() throws Exception {
+
+    final ExecutorService executor = newFixedThreadPool(2);
+
+    final Latch beginLatch = new Latch();
+    final CountDownLatch assertLatch = new CountDownLatch(2);
+    final Consumer<Reference<CoreEvent>> runner = reference -> {
+      try {
+        beginLatch.await(10000, MILLISECONDS);
+        reference.set(flowRunner("singleRouteRouter")
+            .withPayload("CustomPayload")
+            .run());
+        assertLatch.countDown();
+      } catch (Exception e) {
+        fail(e.getMessage());
+      }
+    };
+
+    final Reference<CoreEvent> first = new Reference<>();
+    final Reference<CoreEvent> second = new Reference<>();
+
+    executor.submit(() -> runner.accept(first));
+    executor.submit(() -> runner.accept(second));
+
+    beginLatch.release();
+    assertLatch.await(10000, MILLISECONDS);
+
+    CoreEvent firstResult = first.get();
+    assertThat(firstResult, is(notNullValue()));
+    CoreEvent secondResult = second.get();
+    assertThat(secondResult, is(notNullValue()));
+
+    assertThat(secondResult, is(not(sameInstance(firstResult))));
+
+    assertThat(firstResult.getMessage().getPayload().getValue(), is("CustomPayload"));
+    assertThat(secondResult.getMessage().getPayload().getValue(), is("CustomPayload"));
   }
 
   @Test

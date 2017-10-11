@@ -17736,6 +17736,115 @@
         "namespace": "MULE"
       },
       "parameterGroupModels": [],
+      "name": "concurrentRouteExecutor",
+      "description": "",
+      "modelProperties": {},
+      "kind": "construct"
+    },
+    {
+      "allowsTopLevelDefinition": false,
+      "nestedComponents": [
+        {
+          "minOccurs": 1,
+          "childComponents": [
+            {
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "killingOperation",
+                  "namespace": "HEISENBERG",
+                  "parent": {
+                    "type": "heisenberg-empire",
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "PROCESSOR",
+                      "namespace": "MULE"
+                    }
+                  }
+                }
+              ],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "parameterGroupModels": [
+            {
+              "parameters": [
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "Boolean",
+                    "annotations": {
+                      "typeId": "boolean"
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "execute",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": true,
+                    "allowsReferences": true,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "message",
+                  "description": "",
+                  "modelProperties": {}
+                }
+              ],
+              "exclusiveParametersModels": [],
+              "showInDsl": false,
+              "name": "General",
+              "description": "",
+              "modelProperties": {}
+            }
+          ],
+          "name": "when",
+          "description": "",
+          "modelProperties": {},
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "PROCESSOR",
+        "namespace": "MULE"
+      },
+      "parameterGroupModels": [],
       "name": "simpleRouter",
       "description": "",
       "modelProperties": {},

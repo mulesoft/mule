@@ -2262,6 +2262,30 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConcurrentRouteExecutorType" substitutionGroup="mule:abstract-operator" name="concurrent-route-executor"></xs:element>
+  <xs:complexType name="ConcurrentRouteExecutorType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:element minOccurs="1" maxOccurs="1" name="when">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                  <xs:sequence minOccurs="1">
+                    <xs:choice minOccurs="1" maxOccurs="unbounded">
+                      <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="killing-operation"></xs:element>
+                    </xs:choice>
+                  </xs:sequence>
+                  <xs:attribute type="mule:expressionBoolean" use="optional" name="execute"></xs:attribute>
+                  <xs:attribute type="mule:expressionString" use="required" name="message"></xs:attribute>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SimpleRouterType" substitutionGroup="mule:abstract-operator" name="simple-router"></xs:element>
   <xs:complexType name="SimpleRouterType">
     <xs:complexContent>
