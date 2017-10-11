@@ -22,14 +22,14 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.FlowAssert;
 
-import org.junit.After;
+import javax.inject.Inject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import org.junit.After;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
@@ -70,16 +70,16 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   protected ConfigurationBuilder getBuilder() throws Exception {
     String configResources = getConfigResources();
     if (configResources != null) {
-      return createConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
     }
     configResources = getConfigFile();
     if (configResources != null) {
       if (configResources.contains(",")) {
         throw new RuntimeException("Do not use this method when the config is composed of several files. Use getConfigFiles method instead.");
       }
-      return createConfigurationBuilder(configResources, emptyMap(), APP);
+      return createConfigurationBuilder(configResources, emptyMap(), APP, enableLazyInit(), disableXmlValidations());
     }
-    return createConfigurationBuilder(getConfigFiles(), emptyMap(), APP);
+    return createConfigurationBuilder(getConfigFiles(), emptyMap(), APP, enableLazyInit(), disableXmlValidations());
   }
 
   /**
@@ -166,5 +166,20 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
   @After
   public final void clearFlowAssertions() throws Exception {
     FlowAssert.reset();
+  }
+
+  /**
+   * @return a boolean indicating if the Mule App should start in lazy mode. This means that the Mule App components
+   * will be initialized on demand.
+   */
+  public boolean enableLazyInit() {
+    return false;
+  }
+
+  /**
+   * @return a boolean indicating if the Mule App should start without XML Validations.
+   */
+  public boolean disableXmlValidations() {
+    return false;
   }
 }
