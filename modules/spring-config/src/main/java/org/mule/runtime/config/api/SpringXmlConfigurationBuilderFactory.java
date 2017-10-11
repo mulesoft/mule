@@ -61,4 +61,20 @@ public final class SpringXmlConfigurationBuilderFactory {
       throws ConfigurationException {
     return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, false, false);
   }
+
+  public static ConfigurationBuilder createConfigurationBuilder(String configResource, Map<String, String> artifactProperties,
+                                                                ArtifactType artifactType, boolean enableLazyInit,
+                                                                boolean disableXmlValidations)
+      throws ConfigurationException {
+    return new SpringXmlConfigurationBuilder(new String[] {configResource}, artifactProperties, artifactType, enableLazyInit,
+                                             disableXmlValidations);
+  }
+
+  public static ConfigurationBuilder createConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
+                                                                ArtifactType artifactType, boolean enableLazyInit,
+                                                                boolean disableXmlValidations)
+      throws ConfigurationException {
+    return new SpringXmlConfigurationBuilder(configResources, artifactProperties, artifactType, enableLazyInit,
+                                             disableXmlValidations);
+  }
 }
