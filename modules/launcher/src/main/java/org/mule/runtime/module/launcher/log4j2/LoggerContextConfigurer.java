@@ -21,6 +21,15 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -84,6 +93,11 @@ final class LoggerContextConfigurer {
   protected void update(MuleLoggerContext context) {
     boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
 
+    if (mute(context)) {
+      removeConsoleAppender(context);
+      return;
+    }
+
     if (context.getConfigFile() == null && !forceConsoleLog) {
       removeConsoleAppender(context);
     }
@@ -97,6 +111,19 @@ final class LoggerContextConfigurer {
     if (forceConsoleLog && !hasAppender(context, ConsoleAppender.class)) {
       forceConsoleAppender(context);
     }
+  }
+
+  private boolean mute(MuleLoggerContext context) {
+    if (!context.isApplicationClassloader()) {
+      return false;
+    }
+
+    ArtifactDescriptor descriptor = context.getArtifactDescriptor();
+    if (descriptor == null || !descriptor.getDeploymentProperties().isPresent()) {
+      return false;
+    }
+    Properties properties = descriptor.getDeploymentProperties().get();
+    return Boolean.parseBoolean(properties.getProperty("mutedApp", "false"));
   }
 
   private void disableShutdownHook(LoggerContext context) {
