@@ -651,53 +651,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="reconnect" type="reconnectSimpleStrategyType"
-                 substitutionGroup="abstract-reconnection-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                A reconnection strategy that allows the user to configure how many times a reconnection should be attempted and how long to wait between attempts.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="reconnectSimpleStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractReconnectionStrategyType">
-                <xsd:attribute name="frequency" type="substitutableLong" default="2000">
-                    <xsd:annotation>
-                        <xsd:documentation>How often (in ms) to reconnect</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="count" type="substitutableInt" default="2">
-                    <xsd:annotation>
-                        <xsd:documentation>How many reconnection attempts to make</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="reconnect-forever" type="reconnectForeverStrategyType"
-                 substitutionGroup="abstract-reconnection-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                A reconnection strategy that retries an infinite number of times at the specified frequency.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="reconnectForeverStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractReconnectionStrategyType">
-                <xsd:attribute name="frequency" type="substitutableLong" default="2000">
-                    <xsd:annotation>
-                        <xsd:documentation>How often (in ms) to reconnect</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
