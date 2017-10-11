@@ -136,7 +136,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
-            muleContext.getRegistry().applyLifecycle(object, Startable.PHASE_NAME);
+            muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
           }
