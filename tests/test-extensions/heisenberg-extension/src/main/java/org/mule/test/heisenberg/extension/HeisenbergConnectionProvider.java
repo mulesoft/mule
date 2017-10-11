@@ -12,7 +12,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_NAME;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -20,13 +19,15 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.test.heisenberg.extension.model.BarberPreferences;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ExternalLib(name = HEISENBERG_LIB_NAME,
     description = HEISENBERG_LIB_DESCRIPTION,
@@ -50,6 +51,9 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
   @Parameter
   @Optional
   private TlsContextFactory tlsContextFactory;
+
+  @ParameterGroup(name = "look", showInDsl = true)
+  private BarberPreferences look;
 
   @Override
   public HeisenbergConnection connect() throws ConnectionException {

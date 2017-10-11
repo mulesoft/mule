@@ -31,7 +31,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
-
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -44,15 +43,15 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -247,7 +246,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertParameter(configParameters, "brotherInLaw", is(notNullValue()));
 
     Map<String, Object> connectionParameters = configurationState.getConnectionParameters();
-    assertThat(connectionParameters.size(), is(1));
+    assertThat(connectionParameters.size(), is(2));
     assertParameter(connectionParameters, "saulPhoneNumber", equalTo(SAUL_OFFICE_NUMBER));
   }
 

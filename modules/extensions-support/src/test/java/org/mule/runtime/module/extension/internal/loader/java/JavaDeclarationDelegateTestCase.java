@@ -464,7 +464,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(39));
+    assertThat(extensionDeclaration.getOperations(), hasSize(40));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(14));
@@ -730,7 +730,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(connectionProvider.getName(), is(DEFAULT_CONNECTION_PROVIDER_NAME));
 
     List<ParameterDeclaration> parameters = connectionProvider.getAllParameters();
-    assertThat(parameters, hasSize(2));
+    assertThat(parameters, hasSize(4));
 
     assertParameter(parameters, "saulPhoneNumber", "", STRING_TYPE, false, SUPPORTED, SAUL_OFFICE_NUMBER);
     assertParameter(parameters, TLS_PARAMETER_NAME, "", toMetadataType(TlsContextFactory.class), false, NOT_SUPPORTED, null);

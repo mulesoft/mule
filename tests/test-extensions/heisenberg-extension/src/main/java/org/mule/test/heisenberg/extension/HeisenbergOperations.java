@@ -13,7 +13,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -56,7 +55,7 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -65,7 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -158,6 +157,11 @@ public class HeisenbergOperations implements Disposable {
   public PersonalInfo getInlinePersonalInfo(@ParameterGroup(name = "Personal Info Argument",
       showInDsl = true) PersonalInfo info) {
     return info;
+  }
+
+  public void disguice(@ParameterGroup(name = "currentLook") BarberPreferences currentLook,
+                       @ParameterGroup(name = "disguise", showInDsl = true) BarberPreferences disguise) {
+
   }
 
   public List<String> knockMany(@Summary(KNOCKEABLE_DOORS_SUMMARY) List<KnockeableDoor> doors) {
