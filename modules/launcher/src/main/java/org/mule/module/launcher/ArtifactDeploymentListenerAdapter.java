@@ -7,6 +7,8 @@
 package org.mule.module.launcher;
 
 
+import static java.lang.String.format;
+import static org.mule.config.bootstrap.ArtifactType.ALL;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.api.MuleContext;
@@ -37,15 +39,17 @@ public class ArtifactDeploymentListenerAdapter
         return adaptedApplicationDeploymentListener;
     }
 
-    private static class AdaptedDeploymentListener implements DeploymentListener
+    static class AdaptedDeploymentListener implements DeploymentListener
     {
+
+        public static final String UNSUPPORTED_ARTIFACT_TYPE_ERROR = format("ArtifactListeners only supports %s and %s artifact types.", APP, DOMAIN);
 
         private final ArtifactDeploymentListener artifactDeploymentListener;
         private final ArtifactType artifactType;
 
         public AdaptedDeploymentListener(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType artifactType)
         {
-            this.artifactType = artifactType;
+            this.artifactType = validateArtifactType(artifactType);
             this.artifactDeploymentListener = artifactDeploymentListener;
         }
 
@@ -101,6 +105,16 @@ public class ArtifactDeploymentListenerAdapter
         public void onMuleContextConfigured(String artifactName, MuleContext context)
         {
             artifactDeploymentListener.onMuleContextConfigured(artifactName, context);
+        }
+
+        private ArtifactType validateArtifactType(ArtifactType type)
+        {
+            if (type.equals(ALL))
+            {
+                throw new IllegalStateException(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
+            }
+
+            return type;
         }
     }
 }

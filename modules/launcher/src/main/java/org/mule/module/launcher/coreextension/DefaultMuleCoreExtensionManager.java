@@ -164,8 +164,13 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
         this.pluginClassLoaderManager = pluginClassLoaderManager;
     }
 
-
-    protected ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener)
+    /**
+     * Creates a {@link ArtifactDeploymentListenerAdapter}.
+     *
+     * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
+     * @return an ArtifactDeploymentListenerAdapter.
+     */
+    ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener)
     {
         return new ArtifactDeploymentListenerAdapter(artifactDeploymentListener);
     }

@@ -9,8 +9,10 @@ package org.mule.module.launcher;
 
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mule.config.bootstrap.ArtifactType.ALL;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.module.launcher.ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
@@ -18,7 +20,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -29,6 +33,9 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
 {
 
     private static final String ARTIFACT_NAME = "artifactName";
+
+    @Rule
+    public  ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private ArtifactDeploymentListener listener;
@@ -51,6 +58,14 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
         DeploymentListener domainDeploymentListener = adapter.getDomainDeploymentListener();
         assertDeploymentListenerInvocations(applicationDeploymentListener, APP);
         assertDeploymentListenerInvocations(domainDeploymentListener, DOMAIN);
+    }
+
+    @Test
+    public void invalidArtifactType()
+    {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
+        ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener  adaptedDeploymentListener = new ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener(listener, ALL);
     }
 
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)

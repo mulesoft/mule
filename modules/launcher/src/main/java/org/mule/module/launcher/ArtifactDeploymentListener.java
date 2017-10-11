@@ -11,6 +11,7 @@ import org.mule.config.bootstrap.ArtifactType;
 
 /**
  * Defines a listener for deployment events for all Mule artifacts.
+ * Use {@link ArtifactDeploymentListenerAdapter} to make this listener work as a {@link DeploymentListener}
  */
 public interface ArtifactDeploymentListener
 {

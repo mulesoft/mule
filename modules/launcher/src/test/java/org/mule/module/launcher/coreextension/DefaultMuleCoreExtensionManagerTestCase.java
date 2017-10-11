@@ -328,7 +328,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        protected ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
+        ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
         {
             adapter = super.getArtifactDeploymentListenerAdapter(artifactDeploymentListener);
             return adapter;
