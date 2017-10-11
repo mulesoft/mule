@@ -5989,15 +5989,15 @@
                   "name": "tlsContext",
                   "description": "",
                   "modelProperties": {
-                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                      "sequence": 8
-                    },
                     "org.mule.runtime.extension.api.property.QNameModelProperty": {
                       "value": {
                         "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                         "localPart": "context",
                         "prefix": "tls"
                       }
+                    },
+                    "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                      "sequence": 8
                     }
                   }
                 }
@@ -18736,15 +18736,15 @@
               "name": "tlsContext",
               "description": "",
               "modelProperties": {
-                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
-                  "sequence": 8
-                },
                 "org.mule.runtime.extension.api.property.QNameModelProperty": {
                   "value": {
                     "namespaceURI": "http://www.mulesoft.org/schema/mule/tls",
                     "localPart": "context",
                     "prefix": "tls"
                   }
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 8
                 }
               }
             }

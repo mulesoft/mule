@@ -24,6 +24,7 @@ import org.mule.test.heisenberg.extension.route.WhenRoute;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class HeisenbergRouters {
@@ -32,18 +33,11 @@ public class HeisenbergRouters {
 
     Consumer<Chain> processor = (chain) -> {
       final Latch latch = new Latch();
-      chain.process((result -> {
-        System.out.println("Finished running " + result);
-        latch.release();
-      }), (error, result) -> {
-        System.out.println("Finished with error " + error);
-        latch.release();
-      });
+      chain.process((result -> latch.release()), (error, result) -> latch.release());
       try {
-        latch.await();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-
+        latch.await(60000, TimeUnit.MILLISECONDS);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
     };
 

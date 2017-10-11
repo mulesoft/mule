@@ -23,6 +23,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.junit.Rule;
@@ -81,13 +82,12 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     final CountDownLatch assertLatch = new CountDownLatch(2);
     final Consumer<Reference<CoreEvent>> runner = reference -> {
       try {
-        beginLatch.await();
+        beginLatch.await(60000, TimeUnit.MILLISECONDS);
         reference.set(flowRunner("singleRouteRouter")
             .withPayload("CustomPayload")
             .run());
         assertLatch.countDown();
       } catch (Exception e) {
-        e.printStackTrace();
         fail(e.getMessage());
       }
     };
