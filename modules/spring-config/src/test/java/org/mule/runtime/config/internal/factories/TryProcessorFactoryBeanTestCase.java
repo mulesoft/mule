@@ -11,9 +11,8 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
-import org.mule.runtime.config.internal.factories.TryProcessorFactoryBean;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
@@ -34,7 +33,8 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws RegistrationException {
-    registry = new SimpleRegistry(muleContextMock);
+    registry =
+        new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor());
     registry.registerObject("txFactory", new TransactionFactoryLocator());
   }
 

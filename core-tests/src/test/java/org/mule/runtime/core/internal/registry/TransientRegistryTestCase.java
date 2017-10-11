@@ -12,11 +12,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createInitDisposeLifecycleInterceptor;
+import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createStartStopLifecycleInterceptor;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -153,7 +157,7 @@ public class TransientRegistryTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception {
-    TransientRegistry reg = new TransientRegistry(muleContext);
+    TransientRegistry reg = new TransientRegistry(UUID.getUUID(), muleContext, new MuleLifecycleInterceptor());
 
     reg.fireLifecycle(Disposable.PHASE_NAME);
 

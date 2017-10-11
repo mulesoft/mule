@@ -11,14 +11,17 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +29,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -47,7 +47,7 @@ public class SpringLifecycleCallbackTestCase extends AbstractMuleTestCase {
   public void before() throws RegistrationException {
     springRegistry = mock(SpringRegistry.class, RETURNS_DEEP_STUBS);
     springRegistryLifecycleManager =
-        new SpringRegistryLifecycleManager("id", springRegistry, muleContext);
+        new SpringRegistryLifecycleManager("id", springRegistry, muleContext, new MuleLifecycleInterceptor());
     springRegistryLifecycleManager.registerPhases(springRegistry);
 
     callback = new SpringLifecycleCallback(springRegistryLifecycleManager, springRegistry);

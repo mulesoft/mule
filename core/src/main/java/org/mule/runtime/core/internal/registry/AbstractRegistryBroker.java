@@ -11,6 +11,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.RegistryBrokerLifecycleManager;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
@@ -30,8 +31,8 @@ public abstract class AbstractRegistryBroker implements RegistryBroker, Registry
   private RegistryBrokerLifecycleManager lifecycleManager;
 
 
-  public AbstractRegistryBroker(MuleContext muleContext) {
-    lifecycleManager = new RegistryBrokerLifecycleManager("mule.registry.broker", this, muleContext);
+  public AbstractRegistryBroker(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
+    lifecycleManager = new RegistryBrokerLifecycleManager("mule.registry.broker", this, muleContext, lifecycleInterceptor);
   }
 
   @Override

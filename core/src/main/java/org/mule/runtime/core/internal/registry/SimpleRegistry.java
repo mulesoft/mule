@@ -16,6 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
@@ -42,8 +43,8 @@ public class SimpleRegistry extends TransientRegistry implements LifecycleRegist
 
   private static final String REGISTRY_ID = "org.mule.runtime.core.Registry.Simple";
 
-  public SimpleRegistry(MuleContext muleContext) {
-    super(REGISTRY_ID, muleContext);
+  public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
+    super(REGISTRY_ID, muleContext, lifecycleInterceptor);
   }
 
   @Override

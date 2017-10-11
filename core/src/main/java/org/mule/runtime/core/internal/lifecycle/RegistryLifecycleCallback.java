@@ -94,31 +94,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
         LOGGER.debug("lifecycle phase: " + phase.getName() + " for object: " + target);
       }
 
-      try {
-        if (interceptor.beforePhaseExecution(phase, target)) {
-          phase.applyLifecycle(target);
-          duplicates.add(target);
-          interceptor.afterPhaseExecution(phase, target, empty());
-        } else {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(format(
-                                "Skipping the application of the '%s' lifecycle phase over a certain object "
-                                    + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                                phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                                interceptor.getClass().getName(), target));
-          }
-        }
-      } catch (Exception e) {
-        interceptor.afterPhaseExecution(phase, target, of(e));
-        if (phase.equals(Disposable.PHASE_NAME) || phase.equals(Stoppable.PHASE_NAME)) {
-          LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase, target), e.getMessage());
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(e.getMessage(), e);
-          }
-        } else {
-          throw e;
-        }
-      }
+      applyLifecycle(phase, duplicates, target);
     }
 
     // the target object might have created and registered a new object
@@ -128,6 +104,36 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     targetObjects = lookupObjectsForLifecycle(lifecycleObject);
     if (targetObjects.size() > originalTargetCount) {
       doApplyLifecycle(phase, duplicates, lifecycleObject, targetObjects);
+    }
+  }
+
+  private void applyLifecycle(LifecyclePhase phase, Set<Object> duplicates, Object target) throws LifecycleException {
+    try {
+      if (interceptor.beforePhaseExecution(phase, target)) {
+        phase.applyLifecycle(target);
+        duplicates.add(target);
+        interceptor.afterPhaseExecution(phase, target, empty());
+      } else {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format(
+                              "Skipping the application of the '%s' lifecycle phase over a certain object "
+                                  + "because a %s interceptor of type [%s] indicated so. Object is: %s",
+                              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                              interceptor.getClass().getName(), target));
+        }
+      }
+    } catch (Exception e) {
+      interceptor.afterPhaseExecution(phase, target, of(e));
+      if (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME)) {
+        LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase.getName(), target,
+                           e.getMessage()),
+                    e.getMessage());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(e.getMessage(), e);
+        }
+      } else {
+        throw e;
+      }
     }
   }
 

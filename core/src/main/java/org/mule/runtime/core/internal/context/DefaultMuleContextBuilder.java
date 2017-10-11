@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.core.internal.context;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import java.util.Optional;
-import java.util.Properties;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -32,10 +29,14 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.RegistryDelegatingInjector;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+
+import java.util.Optional;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
+    DefaultRegistryBroker registryBroker =
+        new DefaultRegistryBroker(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistryBroker(registryBroker);
     MuleRegistryHelper muleRegistry = new MuleRegistryHelper(registryBroker, muleContext);
     muleContext.setMuleRegistry(muleRegistry);

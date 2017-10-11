@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.registry;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 
 import com.google.common.collect.ImmutableList;
 
@@ -24,9 +26,9 @@ public class DefaultRegistryBroker extends AbstractRegistryBroker {
   private final List<Registry> registries = new CopyOnWriteArrayList<>();
   private final AtomicReference<LifecycleRegistry> lifecycleRegistry = new AtomicReference<>(null);
 
-  public DefaultRegistryBroker(MuleContext context) {
-    super(context);
-    addRegistry(new SimpleRegistry(context));
+  public DefaultRegistryBroker(MuleContext context, LifecycleInterceptor lifecycleInterceptor) {
+    super(context, lifecycleInterceptor);
+    addRegistry(new SimpleRegistry(context, lifecycleInterceptor));
   }
 
   @Override

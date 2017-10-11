@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.lifecycle;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -28,8 +29,9 @@ import org.mule.runtime.core.internal.registry.RegistryBroker;
 @Deprecated
 public class RegistryBrokerLifecycleManager extends RegistryLifecycleManager {
 
-  public RegistryBrokerLifecycleManager(String id, Registry object, MuleContext muleContext) {
-    super(id, object, muleContext);
+  public RegistryBrokerLifecycleManager(String id, Registry object, MuleContext muleContext,
+                                        LifecycleInterceptor lifecycleInterceptor) {
+    super(id, object, muleContext, lifecycleInterceptor);
   }
 
   @Override

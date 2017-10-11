@@ -13,19 +13,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
-import org.junit.Test;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
 
 public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
 
@@ -45,9 +46,9 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testCrossRegistryLifecycleOrder() throws MuleException {
 
-    TransientRegistry reg1 = new TransientRegistry(muleContext);
+    TransientRegistry reg1 = new TransientRegistry(getUUID(), muleContext, new MuleLifecycleInterceptor());
     reg1.initialise();
-    TransientRegistry reg2 = new TransientRegistry(muleContext);
+    TransientRegistry reg2 = new TransientRegistry(getUUID(), muleContext, new MuleLifecycleInterceptor());
     reg2.initialise();
 
     reg1.registerObject("flow", new LifecycleTrackerFlow("flow", muleContext));
@@ -89,17 +90,19 @@ public class RegistryBrokerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testConcurrentRegistryAddRemove() throws Exception {
-    final RegistryBroker broker = new DefaultRegistryBroker(muleContext);
+    MuleLifecycleInterceptor lifecycleInterceptor = new MuleLifecycleInterceptor();
+    final RegistryBroker broker =
+        new DefaultRegistryBroker(muleContext, lifecycleInterceptor);
 
     final int N = 50;
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch end = new CountDownLatch(N);
     final AtomicInteger errors = new AtomicInteger(0);
     for (int i = 0; i < N; i++) {
-      new Thread((Runnable) () -> {
+      new Thread(() -> {
         try {
           start.await();
-          broker.addRegistry(new TransientRegistry(muleContext));
+          broker.addRegistry(new TransientRegistry(getUUID(), muleContext, lifecycleInterceptor));
           broker.lookupByType(Object.class);
         } catch (Exception e) {
           errors.incrementAndGet();

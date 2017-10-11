@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -20,9 +22,9 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhas
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 import org.mule.runtime.core.internal.registry.AbstractRegistryBroker;
 import org.mule.runtime.core.internal.registry.Registry;
+import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,14 +38,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   protected Map<String, LifecyclePhase> phases = new HashMap<>();
   protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
   protected MuleContext muleContext;
-  private final LifecycleInterceptor initDisposeLifecycleInterceptor =
-      new PhaseErrorLifecycleInterceptor(Initialisable.PHASE_NAME, Disposable.PHASE_NAME, Initialisable.class);
-  private final LifecycleInterceptor startstopLifecycleInterceptor =
-      new PhaseErrorLifecycleInterceptor(Startable.PHASE_NAME, Stoppable.PHASE_NAME, Startable.class);
+  private final LifecycleInterceptor lifecycleInterceptor;
 
-  public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext) {
+  public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext,
+                                  LifecycleInterceptor lifecycleInterceptor) {
     super(id, object);
     this.muleContext = muleContext;
+    this.lifecycleInterceptor = lifecycleInterceptor;
 
     registerPhases(object);
   }
@@ -57,17 +58,6 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), emptyCallback);
     registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), emptyCallback);
     registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
-  }
-
-  public RegistryLifecycleManager(String id, Registry object, Map<String, LifecyclePhase> phases) {
-    super(id, object);
-    RegistryLifecycleCallback callback = new RegistryLifecycleCallback(this);
-
-    registerPhase(NotInLifecyclePhase.PHASE_NAME, new NotInLifecyclePhase(), new EmptyLifecycleCallback<>());
-
-    for (Map.Entry<String, LifecyclePhase> entry : phases.entrySet()) {
-      registerPhase(entry.getKey(), entry.getValue(), callback);
-    }
   }
 
   @Override
@@ -92,10 +82,10 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
   protected void registerPhase(String phaseName, LifecyclePhase phase, LifecycleCallback callback) {
     if (callback instanceof HasLifecycleInterceptor) {
       if (Initialisable.PHASE_NAME.equals(phaseName) || Disposable.PHASE_NAME.equals(phaseName)) {
-        ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(initDisposeLifecycleInterceptor);
+        ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(lifecycleInterceptor);
       }
       if (Startable.PHASE_NAME.equals(phaseName) || Stoppable.PHASE_NAME.equals(phaseName)) {
-        ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(startstopLifecycleInterceptor);
+        ((HasLifecycleInterceptor) callback).setLifecycleInterceptor(lifecycleInterceptor);
       }
     }
 
@@ -151,7 +141,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     boolean started = false;
     for (String phaseName : phaseNames) {
       if (started) {
-        phases.get(phaseName).applyLifecycle(object);
+        doApplyLifecycle(object, phaseName);
       }
       if (toPhase.equals(phaseName)) {
         break;
@@ -170,10 +160,21 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
     String lastPhase = NotInLifecyclePhase.PHASE_NAME;
     for (String phase : completedPhases) {
       if (isDirectTransition(lastPhase, phase)) {
-        LifecyclePhase lp = phases.get(phase);
-        lp.applyLifecycle(object);
+        doApplyLifecycle(object, phase);
         lastPhase = phase;
       }
+    }
+  }
+
+  private void doApplyLifecycle(Object object, String phase) throws LifecycleException {
+    LifecyclePhase lp = phases.get(phase);
+    lifecycleInterceptor.beforePhaseExecution(lp, object);
+    try {
+      lp.applyLifecycle(object);
+      lifecycleInterceptor.afterPhaseExecution(lp, object, empty());
+    } catch (Exception e) {
+      lifecycleInterceptor.afterPhaseExecution(lp, object, of(e));
+      throw e;
     }
   }
 }

@@ -16,6 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
@@ -43,12 +44,8 @@ public class TransientRegistry extends AbstractRegistry {
 
   private final RegistryMap registryMap = new RegistryMap(logger);
 
-  public TransientRegistry(MuleContext muleContext) {
-    this(REGISTRY_ID, muleContext);
-  }
-
-  public TransientRegistry(String id, MuleContext muleContext) {
-    super(id, muleContext);
+  public TransientRegistry(String id, MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
+    super(id, muleContext, lifecycleInterceptor);
     putDefaultEntriesIntoRegistry();
   }
 

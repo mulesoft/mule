@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
@@ -44,13 +45,14 @@ public abstract class AbstractRegistry implements Registry {
   protected MuleContext muleContext;
   private RegistryLifecycleManager lifecycleManager;
 
-  protected AbstractRegistry(String id, MuleContext muleContext) {
+  protected AbstractRegistry(String id, MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     if (id == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull("RegistryID"));
     }
     this.id = id;
     this.muleContext = muleContext;
-    lifecycleManager = (RegistryLifecycleManager) createLifecycleManager();
+    lifecycleManager =
+        (RegistryLifecycleManager) createLifecycleManager(lifecycleInterceptor);
   }
 
   @Override
@@ -77,9 +79,9 @@ public abstract class AbstractRegistry implements Registry {
     }
   }
 
-  protected LifecycleManager createLifecycleManager() {
+  protected LifecycleManager createLifecycleManager(LifecycleInterceptor lifecycleInterceptor) {
     // TODO(pablo.kraan): MULE-12609 - using LifecycleManager to avoid exposing RegistryLifecycleManager
-    return new RegistryLifecycleManager(getRegistryId(), this, muleContext);
+    return new RegistryLifecycleManager(getRegistryId(), this, muleContext, lifecycleInterceptor);
   }
 
   abstract protected void doInitialise() throws InitialisationException;

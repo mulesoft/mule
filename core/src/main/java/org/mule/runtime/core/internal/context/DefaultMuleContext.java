@@ -106,7 +106,9 @@ import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.internal.registry.RegistryBroker;
@@ -234,6 +236,8 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
 
   private Properties deploymentProperties;
+
+  private LifecycleInterceptor lifecycleInterceptor = new MuleLifecycleInterceptor();
 
   @Inject
   private ComponentInitialStateManager componentInitialStateManager;
@@ -518,8 +522,7 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   }
 
   /**
-   * Fires a server notification to all registered
-   * {@link CustomNotificationListener} notificationManager.
+   * Fires a server notification to all registered {@link CustomNotificationListener} notificationManager.
    *
    * @param notification the notification to fire. This must be of type {@link CustomNotification} otherwise an exception will be
    *        thrown.
@@ -609,6 +612,10 @@ public class DefaultMuleContext implements MuleContextWithRegistries, Privileged
   @Override
   public ExtensionManager getExtensionManager() {
     return extensionManager;
+  }
+
+  public LifecycleInterceptor getLifecycleInterceptor() {
+    return lifecycleInterceptor;
   }
 
   @Override
