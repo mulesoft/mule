@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.util.concurrent.ScheduledFuture;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.source.polling;
+package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.source.polling.PeriodicScheduler;
+import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
