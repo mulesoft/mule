@@ -118,7 +118,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       acceptsAllOnErrorPropagate.setRootContainerName(getRootContainerName());
       acceptsAllOnErrorPropagate.setNotificationFirer(notificationDispatcher);
       initialiseIfNeeded(acceptsAllOnErrorPropagate, muleContext);
-      this.exceptionListeners.add(new MessagingExceptionStrategyAcceptorDelegate(acceptsAllOnErrorPropagate));
+      this.exceptionListeners.add(acceptsAllOnErrorPropagate);
     }
   }
 

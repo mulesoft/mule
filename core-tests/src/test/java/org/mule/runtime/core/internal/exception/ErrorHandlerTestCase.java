@@ -163,9 +163,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
     assertThat(errorHandler.getExceptionListeners().get(1), is(mockTestExceptionStrategy1));
     MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
-    assertThat(injected, is(instanceOf(MessagingExceptionStrategyAcceptorDelegate.class)));
-    FlowExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
-    assertThat(defaultHandler, is(instanceOf(OnErrorPropagateHandler.class)));
+    assertThat(injected, is(instanceOf(OnErrorPropagateHandler.class)));
   }
 
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
