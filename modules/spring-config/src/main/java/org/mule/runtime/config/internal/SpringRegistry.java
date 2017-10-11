@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
 import org.mule.runtime.core.internal.registry.LifecycleRegistry;
@@ -67,8 +68,9 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   private final Map<String, BeanDefinition> registeredBeanDefinitionsBeforeInitialization = new HashMap<>();
 
   public SpringRegistry(ApplicationContext applicationContext, MuleContext muleContext,
-                        ConfigurationDependencyResolver dependencyResolver) {
-    super(REGISTRY_ID, muleContext);
+                        ConfigurationDependencyResolver dependencyResolver,
+                        LifecycleInterceptor lifecycleInterceptor) {
+    super(REGISTRY_ID, muleContext, lifecycleInterceptor);
     setApplicationContext(applicationContext);
     this.beanDependencyResolver = new DefaultBeanDependencyResolver(dependencyResolver, this);
   }
@@ -134,8 +136,8 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   }
 
   @Override
-  protected LifecycleManager createLifecycleManager() {
-    return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext);
+  protected LifecycleManager createLifecycleManager(LifecycleInterceptor lifecycleInterceptor) {
+    return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext, lifecycleInterceptor);
   }
 
   /**

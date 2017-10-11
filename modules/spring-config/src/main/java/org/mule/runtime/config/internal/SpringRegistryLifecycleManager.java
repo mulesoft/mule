@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -35,6 +34,7 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
+import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextDisposePhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextInitialisePhase;
@@ -54,8 +54,9 @@ import java.util.Set;
 
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
-  public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext) {
-    super(id, springRegistry, muleContext);
+  public SpringRegistryLifecycleManager(String id, SpringRegistry springRegistry, MuleContext muleContext,
+                                        LifecycleInterceptor lifecycleInterceptor) {
+    super(id, springRegistry, muleContext, lifecycleInterceptor);
   }
 
   @Override

@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 
 import java.util.Map;
@@ -17,31 +21,33 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LifecycleInterceptor} which tracks the completion of the a phase so that if it fails to complete, the another phase is
- * only applied on the target objects on which it could be successfully applied.
+ * only applied on the target objects on which it could be successfully applied. It also checks that the final phase is only
+ * applied if the initial phase was applied.
  *
  * @since 3.8
  */
-public class PhaseErrorLifecycleInterceptor implements LifecycleInterceptor {
+public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PhaseErrorLifecycleInterceptor.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLifecycleInterceptor.class);
 
   private Map<Object, Object> trackingPhaseFailureObjects = new WeakHashMap<>();
+  private Map<Object, Object> processedObjects = new WeakHashMap<>();
 
-  private final String trackingPhase;
-  private final String phaseToPreventOnTrackingPhaseError;
-  private final Class trackingPhaseClass;
+  private final String initialPhase;
+  private final String finalPhase;
+  private final Class initialPhaseLifecycleClass;
 
   /**
    * Creates a new instance.
    * 
-   * @param trackingPhase the phase to track for execution failures.
-   * @param phaseToPreventOnTrackingPhaseError the phase to prevent if the {@code trackingPhase} finished with errors.
-   * @param lifecycleClass the {@code trackingPhase} interface.
+   * @param initialPhase the phase to track for execution failures.
+   * @param finalPhase the phase to prevent if the {@code trackingPhase} finished with errors.
+   * @param initialPhaseLifecycleClass the {@code trackingPhase} interface.
    */
-  public PhaseErrorLifecycleInterceptor(String trackingPhase, String phaseToPreventOnTrackingPhaseError, Class lifecycleClass) {
-    this.trackingPhase = trackingPhase;
-    this.phaseToPreventOnTrackingPhaseError = phaseToPreventOnTrackingPhaseError;
-    this.trackingPhaseClass = lifecycleClass;
+  public DefaultLifecycleInterceptor(String initialPhase, String finalPhase, Class initialPhaseLifecycleClass) {
+    this.initialPhase = initialPhase;
+    this.finalPhase = finalPhase;
+    this.initialPhaseLifecycleClass = initialPhaseLifecycleClass;
   }
 
   /**
@@ -57,15 +63,19 @@ public class PhaseErrorLifecycleInterceptor implements LifecycleInterceptor {
    */
   @Override
   public boolean beforePhaseExecution(LifecyclePhase phase, Object object) {
-    if (isPhaseToPrevent(phase) && (trackingPhaseClass.isAssignableFrom(object.getClass()))) {
+    if (isFinalPhase(phase) && (initialPhaseLifecycleClass.isAssignableFrom(object.getClass()))) {
       if (trackingPhaseFailureObjects.containsKey(object)) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug(String.format("Skipping %s lifecycle phase on object because %s phase failed before it could be applied "
-              + "on it. Object is: %s", phaseToPreventOnTrackingPhaseError, trackingPhase, object));
+              + "on it. Object is: %s", finalPhase, initialPhase, object));
         }
         return false;
       }
     }
+    if (isFinalPhase(phase) && (initialPhaseLifecycleClass.isAssignableFrom(object.getClass()))) {
+      return processedObjects.containsKey(object);
+    }
+    processedObjects.put(object, object);
     return true;
   }
 
@@ -99,10 +109,18 @@ public class PhaseErrorLifecycleInterceptor implements LifecycleInterceptor {
   }
 
   private boolean isTrackingPhase(LifecyclePhase phase) {
-    return trackingPhase.equals(phase.getName());
+    return initialPhase.equals(phase.getName());
   }
 
-  private boolean isPhaseToPrevent(LifecyclePhase phase) {
-    return phaseToPreventOnTrackingPhaseError.equals(phase.getName());
+  private boolean isFinalPhase(LifecyclePhase phase) {
+    return finalPhase.equals(phase.getName());
+  }
+
+  public static LifecycleInterceptor createInitDisposeLifecycleInterceptor() {
+    return new DefaultLifecycleInterceptor(Initialisable.PHASE_NAME, Disposable.PHASE_NAME, Initialisable.class);
+  }
+
+  public static LifecycleInterceptor createStartStopLifecycleInterceptor() {
+    return new DefaultLifecycleInterceptor(Startable.PHASE_NAME, Stoppable.PHASE_NAME, Startable.class);
   }
 }

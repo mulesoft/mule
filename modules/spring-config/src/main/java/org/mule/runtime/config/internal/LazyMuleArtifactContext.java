@@ -25,7 +25,11 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -38,6 +42,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecyclePhase;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
@@ -66,12 +72,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext                   the {@link MuleContext} that own this context
-   * @param artifactDeclaration           the mule configuration defined programmatically
-   * @param optionalObjectsController     the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                      org.mule.runtime.config.internal.SpringRegistry
+   * @param muleContext the {@link MuleContext} that own this context
+   * @param artifactDeclaration the mule configuration defined programmatically
+   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *        org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
-   * @param disableXmlValidations         {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -120,8 +126,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
-            initialiseIfNeeded(object, true, muleContext);
-          } catch (InitialisationException e) {
+            muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
+          } catch (MuleException e) {
             throw new RuntimeException(e);
           }
         }
@@ -130,7 +136,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
         for (String createdComponentModelName : createdComponentModels) {
           Object object = getRegistry().lookupByName(createdComponentModelName).get();
           try {
-            startIfNeeded(object);
+            muleContext.getRegistry().applyLifecycle(object, Startable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
           }

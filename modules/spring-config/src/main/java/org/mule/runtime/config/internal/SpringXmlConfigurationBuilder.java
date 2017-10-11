@@ -10,13 +10,14 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createInitDisposeLifecycleInterceptor;
+import static org.mule.runtime.core.internal.lifecycle.DefaultLifecycleInterceptor.createStartStopLifecycleInterceptor;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
-
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -25,7 +26,9 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.config.ParentMuleContextAwareConfigurationBuilder;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.List;
@@ -173,7 +176,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (parentContext != null) {
       createRegistryWithParentContext(muleContext, applicationContext, parentContext);
     } else {
-      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver());
+      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver(),
+                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
     }
 
     // Note: The SpringRegistry must be created before
@@ -188,7 +192,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       throws ConfigurationException {
     if (applicationContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) applicationContext).setParent(parentContext);
-      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver());
+      registry = new SpringRegistry(applicationContext, muleContext, muleArtifactContext.getDependencyResolver(),
+                                    ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
     } else {
       throw new ConfigurationException(I18nMessageFactory
           .createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
