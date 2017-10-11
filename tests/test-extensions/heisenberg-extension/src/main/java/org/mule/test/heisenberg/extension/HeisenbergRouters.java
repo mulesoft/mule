@@ -35,7 +35,7 @@ public class HeisenbergRouters {
       final Latch latch = new Latch();
       chain.process((result -> latch.release()), (error, result) -> latch.release());
       try {
-        latch.await(1000, MILLISECONDS);
+        latch.await(10000, MILLISECONDS);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

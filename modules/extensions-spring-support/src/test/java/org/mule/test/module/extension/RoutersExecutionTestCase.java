@@ -82,7 +82,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     final CountDownLatch assertLatch = new CountDownLatch(2);
     final Consumer<Reference<CoreEvent>> runner = reference -> {
       try {
-        beginLatch.await(1000, MILLISECONDS);
+        beginLatch.await(10000, MILLISECONDS);
         reference.set(flowRunner("singleRouteRouter")
             .withPayload("CustomPayload")
             .run());
@@ -99,7 +99,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     executor.submit(() -> runner.accept(second));
 
     beginLatch.release();
-    assertLatch.await(5000, MILLISECONDS);
+    assertLatch.await(10000, MILLISECONDS);
 
     CoreEvent firstResult = first.get();
     assertThat(firstResult, is(notNullValue()));
