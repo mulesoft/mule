@@ -65,7 +65,7 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
     {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
-        ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener  adaptedDeploymentListener = new ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener(listener, ALL);
+        new ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener(listener, ALL);
     }
 
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)
