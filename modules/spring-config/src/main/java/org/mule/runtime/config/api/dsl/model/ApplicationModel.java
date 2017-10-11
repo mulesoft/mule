@@ -30,9 +30,31 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.lang3.ClassUtils;
+
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
@@ -54,33 +76,16 @@ import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationExc
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+
 import org.w3c.dom.Node;
 
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -822,30 +827,35 @@ public class ApplicationModel {
   }
 
   private void validateSingleElementsExistence() {
-    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:before-suite"));
-    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:after-suite"));
-    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:before-test"));
-    validateSingleElementExistence(ComponentIdentifier.buildFromStringRepresentation("munit:after-test"));
-
+    validateSingleElementExistence(MUNIT_AFTER_SUITE_IDENTIFIER);
+    validateSingleElementExistence(MUNIT_AFTER_SUITE_IDENTIFIER);
+    validateSingleElementExistence(MUNIT_BEFORE_TEST_IDENTIFIER);
+    validateSingleElementExistence(MUNIT_AFTER_TEST_IDENTIFIER);
   }
 
   private void validateSingleElementExistence(ComponentIdentifier componentIdentifier) {
-    Map<ComponentIdentifier, ComponentModel> existingObjectsWithName = new HashMap<>();
+    Map<String, Map<ComponentIdentifier, ComponentModel>> existingComponentsPerFile = new HashMap<>();
 
     executeOnEveryMuleComponentTree(componentModel -> {
+      String configFileName = componentModel.getConfigFileName().get();
       ComponentIdentifier identifier = componentModel.getIdentifier();
+
       if (componentIdentifier.getNamespace().equals(identifier.getNamespace())
           && componentIdentifier.getName().equals(identifier.getName())) {
 
-        if (existingObjectsWithName.containsKey(identifier)) {
+        if (existingComponentsPerFile.containsKey(configFileName)
+            && existingComponentsPerFile.get(configFileName).containsKey(identifier)) {
           throw new MuleRuntimeException(createStaticMessage(
                                                              "Two configuration elements %s have been defined. Element [%s] must be unique. Clashing components are %s and %s",
                                                              identifier.getNamespace() + ":" + identifier.getName(),
                                                              identifier.getNamespace() + ":" + identifier.getName(),
                                                              componentModel.getNameAttribute(),
-                                                             existingObjectsWithName.get(identifier).getNameAttribute()));
+                                                             existingComponentsPerFile.get(configFileName).get(identifier)
+                                                                 .getNameAttribute()));
         }
-        existingObjectsWithName.put(identifier, componentModel);
+        Map<ComponentIdentifier, ComponentModel> existingComponentWithName = new HashMap<>();
+        existingComponentWithName.put(identifier, componentModel);
+        existingComponentsPerFile.put(configFileName, existingComponentWithName);
       }
 
     });
