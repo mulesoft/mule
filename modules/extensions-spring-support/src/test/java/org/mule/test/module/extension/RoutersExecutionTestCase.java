@@ -7,6 +7,7 @@
 package org.mule.test.module.extension;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -23,7 +24,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.junit.Rule;
@@ -82,7 +82,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     final CountDownLatch assertLatch = new CountDownLatch(2);
     final Consumer<Reference<CoreEvent>> runner = reference -> {
       try {
-        beginLatch.await(60000, TimeUnit.MILLISECONDS);
+        beginLatch.await(1000, MILLISECONDS);
         reference.set(flowRunner("singleRouteRouter")
             .withPayload("CustomPayload")
             .run());
@@ -99,7 +99,7 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
     executor.submit(() -> runner.accept(second));
 
     beginLatch.release();
-    assertLatch.await();
+    assertLatch.await(5000, MILLISECONDS);
 
     CoreEvent firstResult = first.get();
     assertThat(firstResult, is(notNullValue()));

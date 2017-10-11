@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -24,7 +25,6 @@ import org.mule.test.heisenberg.extension.route.WhenRoute;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class HeisenbergRouters {
@@ -35,7 +35,7 @@ public class HeisenbergRouters {
       final Latch latch = new Latch();
       chain.process((result -> latch.release()), (error, result) -> latch.release());
       try {
-        latch.await(60000, TimeUnit.MILLISECONDS);
+        latch.await(1000, MILLISECONDS);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
