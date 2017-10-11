@@ -37,7 +37,6 @@ import java.util.Set;
  */
 final public class ExportedArtifactsCollector {
 
-  private static final String META_INF_PREFIX = "/META-INF";
   private final Set<String> filteredPackages =
       ImmutableSet.<String>builder().add("java.", "javax.", "org.mule.runtime.", "com.mulesoft.mule.runtime").build();
 
@@ -45,7 +44,6 @@ final public class ExportedArtifactsCollector {
   private final Set<Class<?>> exportedClasses = new LinkedHashSet<>();
   private final Set<String> privilegedExportedPackages = new LinkedHashSet<>();
   private final Set<String> privilegedArtifacts = new LinkedHashSet<>();
-  private final ImmutableSet.Builder<String> exportedResources = ImmutableSet.builder();
   private final ClassLoader extensionClassloader;
 
   /**
@@ -62,7 +60,7 @@ final public class ExportedArtifactsCollector {
    * @return The {@link Set} of default resource paths that the extension should export
    */
   public Set<String> getExportedResources() {
-    return exportedResources.build();
+    return extensionModel.getResources();
   }
 
   /**
@@ -94,10 +92,6 @@ final public class ExportedArtifactsCollector {
     privilegedArtifacts.addAll(extensionModel.getPrivilegedArtifacts());
 
     return privilegedArtifacts;
-  }
-
-  private void addMetaInfResource(String resource) {
-    exportedResources.add(META_INF_PREFIX + "/" + resource);
   }
 
   private Set<String> filterExportedPackages(Set<String> exportedPackages) {

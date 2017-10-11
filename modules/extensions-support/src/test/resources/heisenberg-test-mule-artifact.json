@@ -19,7 +19,9 @@
         "org.mule.test.heisenberg.extension",
         "org.mule.test.heisenberg.extension.model"
       ],
-      "exportedResources": []
+      "exportedResources": [
+          "methRecipe.json"
+      ]
     }
   },
   "bundleDescriptorLoader": {
