@@ -8,16 +8,20 @@ package org.mule.tck;
 
 import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -77,8 +81,9 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
    * @return function that performs request processing
    */
   protected ReactiveProcessor processRequest() {
-    return stream -> from(stream).map(event -> {
+    return stream -> from(stream).cast(PrivilegedEvent.class).map(event -> {
       try {
+        setCurrentEvent(event);
         return processRequest(event);
       } catch (MuleException e) {
         throw propagate(e);

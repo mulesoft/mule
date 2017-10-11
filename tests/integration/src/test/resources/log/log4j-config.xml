@@ -2,7 +2,7 @@
 <Configuration>
     <Appenders>
         <Console name="consoleForApp" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{MM-dd HH:mm:ss}] %-5p %c{1} [%t]: %m%n"/>
+            <PatternLayout pattern="[%d{MM-dd HH:mm:ss}] %-5p [%t] %X{correlationId}%c{1}: %m%n"/>
         </Console>
     </Appenders>
 

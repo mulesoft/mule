@@ -21,6 +21,8 @@ import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 
+import org.apache.logging.log4j.ThreadContext;
+
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +33,8 @@ import java.util.Optional;
  * @since 4.0
  */
 public interface PrivilegedEvent extends CoreEvent {
+
+  public static final String CORRELATION_ID_MDC_KEY = "correlationId";
 
   class CurrentEventHolder {
 
@@ -91,6 +95,12 @@ public interface PrivilegedEvent extends CoreEvent {
    */
   static void setCurrentEvent(PrivilegedEvent event) {
     CurrentEventHolder.currentEvent.set(event);
+
+    if (event == null) {
+      ThreadContext.remove(CORRELATION_ID_MDC_KEY);
+    } else {
+      ThreadContext.put(CORRELATION_ID_MDC_KEY, "[event: " + event.getCorrelationId() + "] ");
+    }
   }
 
   /**

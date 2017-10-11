@@ -6,23 +6,21 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.String.format;
+import static java.util.zip.Deflater.NO_COMPRESSION;
+import static org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy.createStrategy;
+import static org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy.createPolicy;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.zip.Deflater;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -33,9 +31,7 @@ import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
 import org.apache.logging.log4j.core.appender.rolling.RolloverStrategy;
-import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.appender.rolling.TriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -45,6 +41,13 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
@@ -68,7 +71,7 @@ final class LoggerContextConfigurer {
 
   private static final String MULE_APP_LOG_FILE_TEMPLATE = "mule-app-%s.log";
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
-  private static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
+  private static final String PATTERN_LAYOUT = "%-5p %d [%t] %X{" + CORRELATION_ID_MDC_KEY + "}%c: %m%n";
   private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
@@ -79,7 +82,7 @@ final class LoggerContextConfigurer {
   }
 
   protected void update(MuleLoggerContext context) {
-    boolean forceConsoleLog = System.getProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG) != null;
+    boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
 
     if (context.getConfigFile() == null && !forceConsoleLog) {
       removeConsoleAppender(context);
@@ -100,8 +103,7 @@ final class LoggerContextConfigurer {
     try {
       ClassUtils.setFieldValue(context.getConfiguration(), "isShutdownHookEnabled", false, true);
     } catch (Exception e) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
+      throw new MuleRuntimeException(createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
     }
 
   }
@@ -126,8 +128,7 @@ final class LoggerContextConfigurer {
     try {
       return ClassUtils.getFieldValue(configuration, "listeners", true);
     } catch (Exception e) {
-      throw new MuleRuntimeException(I18nMessageFactory
-          .createStaticMessage("Could not get listeners. Unexpected configuration type"),
+      throw new MuleRuntimeException(createStaticMessage("Could not get listeners. Unexpected configuration type"),
                                      e);
     }
   }
@@ -152,9 +153,9 @@ final class LoggerContextConfigurer {
 
   private RollingFileAppender createRollingFileAppender(String logFilePath, String filePattern, String appenderName,
                                                         Configuration configuration) {
-    TriggeringPolicy triggeringPolicy = TimeBasedTriggeringPolicy.createPolicy("1", "true");
-    RolloverStrategy rolloverStrategy = DefaultRolloverStrategy
-        .createStrategy("30", "1", null, String.valueOf(Deflater.NO_COMPRESSION), null, true, configuration);
+    TriggeringPolicy triggeringPolicy = createPolicy("1", "true");
+    RolloverStrategy rolloverStrategy =
+        createStrategy("30", "1", null, String.valueOf(NO_COMPRESSION), null, true, configuration);
 
     return RollingFileAppender.createAppender(logFilePath, logFilePath + filePattern, "true", appenderName, "true", null, null,
                                               triggeringPolicy, rolloverStrategy, createLayout(configuration), null, null, null,
@@ -180,8 +181,8 @@ final class LoggerContextConfigurer {
 
     String artifactName = context.getArtifactName();
 
-    String logName = String.format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
-    File logDir = new File(MuleContainerBootstrapUtils.getMuleBase(), "logs");
+    String logName = format(logFileNameTemplate, (artifactName != null ? artifactName : ""));
+    File logDir = new File(getMuleBase(), "logs");
     File logFile = new File(logDir, logName);
 
     if (context.getConfigLocation() == null) {
@@ -229,7 +230,7 @@ final class LoggerContextConfigurer {
     try {
       url = uri.toURL();
     } catch (MalformedURLException e) {
-      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not locate file " + uri), e);
+      throw new MuleRuntimeException(createStaticMessage("Could not locate file " + uri), e);
     }
 
     if (directory != null && FileUtils.isFile(url)) {
