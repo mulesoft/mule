@@ -24,7 +24,7 @@
     </flow>
 
     <flow name="injectInOperationJoinNotSupported">
-        <tx:inject-transactional-action config-ref="localTx1" action="NOT_SUPPORTED"/>
+        <tx:inject-transactional-action config-ref="localTx1" transactionalAction="NOT_SUPPORTED"/>
     </flow>
 
     <flow name="injectInOperationDefaultValue">
