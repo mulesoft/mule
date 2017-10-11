@@ -201,4 +201,9 @@ public class MuleProperties {
   public static final String MULE_LOG_VERBOSE_CLASSLOADING = SYSTEM_PROPERTY_PREFIX + "classloading.verbose";
   public static final String MULE_MEL_AS_DEFAULT = SYSTEM_PROPERTY_PREFIX + "test.mel.default";
   public static final String MULE_DISABLE_RESPONSE_TIMEOUT = SYSTEM_PROPERTY_PREFIX + "timeout.disable";
+
+  /**
+   * Deployment properties used
+   */
+  public static final String MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY = "_mutedApp";
 }

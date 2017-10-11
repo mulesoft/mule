@@ -12,6 +12,7 @@ import static org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStra
 import static org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy.createPolicy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
@@ -123,7 +124,7 @@ final class LoggerContextConfigurer {
       return false;
     }
     Properties properties = descriptor.getDeploymentProperties().get();
-    return Boolean.parseBoolean(properties.getProperty("mutedApp", "false"));
+    return Boolean.parseBoolean(properties.getProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "false"));
   }
 
   private void disableShutdownHook(LoggerContext context) {
