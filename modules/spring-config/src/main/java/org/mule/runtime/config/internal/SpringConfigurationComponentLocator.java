@@ -7,9 +7,9 @@
 package org.mule.runtime.config.internal;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Spring implementation of {@link ConfigurationComponentLocator}.
@@ -31,8 +32,13 @@ import java.util.Set;
  */
 public class SpringConfigurationComponentLocator implements ConfigurationComponentLocator {
 
-  private Map<String, Component> componentsMap = new HashMap<>();
-  private Set<ComponentLocation> componentLocations = new HashSet<>();
+  private final Function<String, Boolean> isTemplateLocationFunction;
+  private final Map<String, Component> componentsMap = new HashMap<>();
+  private final Set<ComponentLocation> componentLocations = new HashSet<>();
+
+  public SpringConfigurationComponentLocator(Function<String, Boolean> isTemplateComponentFunction) {
+    this.isTemplateLocationFunction = isTemplateComponentFunction;
+  }
 
   /**
    * Adds a new component to the locator.
@@ -81,6 +87,9 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    */
   @Override
   public Optional<Component> find(Location location) {
+    if (isTemplateLocationFunction.apply(location.getGlobalName())) {
+      return empty();
+    }
     return ofNullable(componentsMap.get(location.toString()));
   }
 

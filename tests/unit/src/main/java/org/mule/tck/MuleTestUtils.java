@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -22,17 +21,18 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
-
-import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -194,6 +194,25 @@ public final class MuleTestUtils {
       return (List<FlowExceptionHandler>) exceptionListeners;
     } catch (Exception e) {
       throw new IllegalStateException("Cannot obtain exception listener for flow");
+    }
+  }
+
+  /**
+   * Returns the object message processors
+   * <p/>
+   * Invokes {@code getMessageProcessors} method on the provided object to avoid exposing that method on the public API.
+   *
+   * @param object the object owning the list of {@link Processor}s
+   * @return the list of configured processors
+   * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
+   */
+  public static List<Processor> getMessageProcessors(Object object) {
+    try {
+      Method getExceptionListenersMethod = object.getClass().getMethod("getMessageProcessors");
+      Object processors = getExceptionListenersMethod.invoke(object);
+      return (List<Processor>) processors;
+    } catch (Exception e) {
+      throw new IllegalStateException("Cannot obtain processors from the object");
     }
   }
 }

@@ -9,6 +9,8 @@ package org.mule.runtime.config.internal.processor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 
+import java.util.function.Function;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
