@@ -95,22 +95,6 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void nonMatchThenCallDefault() throws Exception {
-    ErrorHandler errorHandler = new ErrorHandler();
-    when(mockMuleContext.getDefaultErrorHandler(any())).thenReturn(defaultMessagingExceptionHandler);
-    errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-    errorHandler.setMuleContext(mockMuleContext);
-    errorHandler.setRootContainerName("root");
-    errorHandler.initialise();
-    when(mockTestExceptionStrategy1.accept(any(CoreEvent.class))).thenReturn(false);
-    when(mockTestExceptionStrategy2.accept(any(CoreEvent.class))).thenReturn(false);
-    errorHandler.handleException(mockException, event);
-    verify(mockTestExceptionStrategy1, times(0)).apply(any(MessagingException.class));
-    verify(mockTestExceptionStrategy2, times(0)).apply(any(MessagingException.class));
-    verify(defaultMessagingExceptionHandler, times(1)).handleException(eq(mockException), any(CoreEvent.class));
-  }
-
-  @Test
   public void secondMatches() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
     errorHandler.setExceptionListeners(new ArrayList<>(asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
@@ -179,12 +163,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
     assertThat(errorHandler.getExceptionListeners().get(1), is(mockTestExceptionStrategy1));
     MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
-    assertThat(injected, is(instanceOf(MessagingExceptionStrategyAcceptorDelegate.class)));
-    FlowExceptionHandler defaultHandler = ((MessagingExceptionStrategyAcceptorDelegate) injected).getExceptionListener();
-    assertThat(defaultHandler, is(instanceOf(ErrorHandler.class)));
-    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasSize(2));
-    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnCriticalErrorHandler.class)));
-    assertThat(((ErrorHandler) defaultHandler).getExceptionListeners(), hasItem(instanceOf(OnErrorPropagateHandler.class)));
+    assertThat(injected, is(instanceOf(OnErrorPropagateHandler.class)));
   }
 
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {

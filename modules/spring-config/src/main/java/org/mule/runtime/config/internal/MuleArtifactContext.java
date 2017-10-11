@@ -100,6 +100,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -147,7 +148,14 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
-  protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator();
+  protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
+    try {
+      BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
+      return beanDefinition.isPrototype();
+    } catch (NoSuchBeanDefinitionException e) {
+      return false;
+    }
+  });
   private List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
 
   /**

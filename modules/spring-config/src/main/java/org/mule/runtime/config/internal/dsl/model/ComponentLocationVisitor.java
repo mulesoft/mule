@@ -14,6 +14,8 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.HTTP_PROXY_OPERATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.HTTP_PROXY_POLICY_IDENTIFIER;
@@ -32,8 +34,6 @@ import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.i
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -98,7 +98,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                            componentModel.getLineNumber()))
               .build();
       componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts);
-    } else if (existsWithinRootContainer(componentModel) || existsWithinSubflow(componentModel)) {
+    } else if (existsWithinRootContainer(componentModel)) {
       ComponentModel parentComponentModel = componentModel.getParent();
       DefaultComponentLocation parentComponentLocation = parentComponentModel.getComponentLocation();
       if (isHttpProxyPart(componentModel)) {
@@ -340,7 +340,19 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         || existsWithin(componentModel, MUNIT_BEFORE_TEST_IDENTIFIER)
         || existsWithin(componentModel, MUNIT_AFTER_SUITE_IDENTIFIER)
         || existsWithin(componentModel, MUNIT_AFTER_TEST_IDENTIFIER)
-        || existsWithin(componentModel, HTTP_PROXY_POLICY_IDENTIFIER);
+        || existsWithin(componentModel, HTTP_PROXY_POLICY_IDENTIFIER)
+        || existsWithinRootErrorHandler(componentModel)
+        || existsWithinSubflow(componentModel);
+  }
+
+  private boolean existsWithinRootErrorHandler(ComponentModel componentModel) {
+    while (componentModel.getParent() != null) {
+      if (componentModel.getParent().getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && componentModel.getParent().isRoot()) {
+        return true;
+      }
+      componentModel = componentModel.getParent();
+    }
+    return false;
   }
 
   private boolean existsWithinSubflow(ComponentModel componentModel) {
