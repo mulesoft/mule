@@ -189,6 +189,12 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
    */
   @Override
   public List<Transformer> lookupTransformers(DataType source, DataType result) {
+    //To maintain the previous behaviour, we don't want to consider the result mimeType when resolving a transformer
+    //and only find transformers with a targetType the same as or a super class of the expected one.
+    //The same could be done for the source but since if the source expected by the transformer is more generic that
+    //the provided, it will be found.
+    result = builder(result).mediaType(ANY).charset((Charset) null).build();
+
     final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
 
     List<Transformer> results = (List<Transformer>) transformerListCache.get(dataTypePairHash);

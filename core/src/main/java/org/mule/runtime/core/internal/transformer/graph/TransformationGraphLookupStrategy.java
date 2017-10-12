@@ -105,7 +105,7 @@ public class TransformationGraphLookupStrategy {
       for (TransformationEdge transformationEdge : transformationEdges) {
         DataType edgeTarget = graph.getEdgeTarget(transformationEdge);
 
-        if (edgeTarget.isCompatibleWith(target)) {
+        if (target.isCompatibleWith(edgeTarget)) {
           LinkedList<TransformationEdge> transformationEdges1 = new LinkedList<>();
           transformationEdges1.add(transformationEdge);
           validTransformationEdges.add(transformationEdges1);

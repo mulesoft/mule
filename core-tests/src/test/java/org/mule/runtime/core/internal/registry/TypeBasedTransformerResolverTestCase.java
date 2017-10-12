@@ -108,7 +108,4 @@ public class TypeBasedTransformerResolverTestCase extends AbstractMuleTestCase {
 
     verify(muleContext, never()).getRegistry();
   }
-
-
-
 }
