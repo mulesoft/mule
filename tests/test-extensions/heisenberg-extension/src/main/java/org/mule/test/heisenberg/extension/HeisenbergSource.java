@@ -19,6 +19,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -36,6 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -69,6 +71,9 @@ public class HeisenbergSource extends Source<String, Object> {
   public static boolean executedOnTerminate;
   public static long gatheredMoney;
 
+  public static String configName;
+  public static String location;
+
   @Inject
   private SchedulerService schedulerService;
 
@@ -88,6 +93,11 @@ public class HeisenbergSource extends Source<String, Object> {
   @Optional(defaultValue = "1")
   private int corePoolSize;
 
+  @RefName
+  private String refName;
+
+  private ComponentLocation componentLocation;
+
   private HeisenbergConnection connection;
 
   public HeisenbergSource() {
@@ -101,12 +111,16 @@ public class HeisenbergSource extends Source<String, Object> {
     executedOnError = false;
     executedOnTerminate = false;
     gatheredMoney = 0;
+    location = null;
+    configName = null;
   }
 
   @Override
   public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
     checkArgument(heisenberg != null, "config not injected");
     HeisenbergExtension.sourceTimesStarted++;
+    configName = refName;
+    location = componentLocation.getLocation();
 
     if (corePoolSize < 0) {
       throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);

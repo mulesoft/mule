@@ -31,7 +31,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
-
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -44,15 +43,14 @@ import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+
+import org.hamcrest.Matcher;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -69,9 +67,18 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     return "heisenberg-source-config.xml";
   }
 
-  @Before
-  public void setUp() throws Exception {
+  @Override
+  protected void doSetUp() throws Exception {
     sourceTimesStarted = 0;
+    reset();
+  }
+
+  @Override
+  protected void doTearDown() throws Exception {
+    reset();
+  }
+
+  private void reset() {
     HeisenbergSource.receivedGroupOnSource = false;
     HeisenbergSource.receivedInlineOnError = false;
     HeisenbergSource.receivedInlineOnSuccess = false;
@@ -80,6 +87,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     HeisenbergSource.executedOnTerminate = false;
     HeisenbergSource.error = Optional.empty();
     HeisenbergSource.gatheredMoney = 0;
+    HeisenbergSource.configName = null;
+    HeisenbergSource.location = null;
   }
 
   @Test
@@ -249,6 +258,18 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     Map<String, Object> connectionParameters = configurationState.getConnectionParameters();
     assertThat(connectionParameters.size(), is(1));
     assertParameter(connectionParameters, "saulPhoneNumber", equalTo(SAUL_OFFICE_NUMBER));
+  }
+
+  @Test
+  public void componentLocationInjected() throws Exception {
+    startFlow("source");
+    assertThat(HeisenbergSource.location, is("source/source"));
+  }
+
+  @Test
+  public void configNameInjected() throws Exception {
+    startFlow("source");
+    assertThat(HeisenbergSource.configName, is("heisenberg"));
   }
 
   private void assertParameter(Map<String, Object> parameters, String propertyName, Matcher matcher) {
