@@ -15,6 +15,9 @@ import java.util.List;
  */
 public class ListDataType<T> extends CollectionDataType<T>
 {
+
+    private static final long serialVersionUID = -8040893093471811031L;
+
     public ListDataType()
     {
         super(List.class);

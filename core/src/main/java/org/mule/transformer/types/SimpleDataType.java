@@ -25,6 +25,8 @@ import org.apache.commons.beanutils.MethodUtils;
 public class SimpleDataType<T> implements DataType<T>, Cloneable
 {
 
+    private static final long serialVersionUID = 734974842501135657L;
+
     public static final String CHARSET_PARAM = "charset";
 
     protected final Class<?> type;
