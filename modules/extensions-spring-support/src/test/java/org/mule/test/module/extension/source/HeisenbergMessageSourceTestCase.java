@@ -256,7 +256,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertParameter(configParameters, "brotherInLaw", is(notNullValue()));
 
     Map<String, Object> connectionParameters = configurationState.getConnectionParameters();
-    assertThat(connectionParameters.size(), is(1));
+    assertThat(connectionParameters.size(), is(2));
     assertParameter(connectionParameters, "saulPhoneNumber", equalTo(SAUL_OFFICE_NUMBER));
   }
 
