@@ -12,14 +12,13 @@ import static org.mockito.Mockito.verify;
 import static org.mule.config.bootstrap.ArtifactType.ALL;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.module.launcher.ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
+import static org.mule.module.launcher.AdaptedDeploymentListener.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestCase
+public class AdaptedDeploymentListenerTestCase extends AbstractMuleTestCase
 {
 
     private static final String ARTIFACT_NAME = "artifactName";
@@ -43,19 +42,12 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
     @Mock
     private MuleContext context;
 
-    private ArtifactDeploymentListenerAdapter adapter;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        adapter = new ArtifactDeploymentListenerAdapter(listener);
-    }
 
     @Test
     public void adapt() throws Exception
     {
-        DeploymentListener applicationDeploymentListener = adapter.getApplicationDeploymentListener();
-        DeploymentListener domainDeploymentListener = adapter.getDomainDeploymentListener();
+        DeploymentListener applicationDeploymentListener = new AdaptedDeploymentListener(listener, APP);
+        DeploymentListener domainDeploymentListener = new AdaptedDeploymentListener(listener, DOMAIN);
         assertDeploymentListenerInvocations(applicationDeploymentListener, APP);
         assertDeploymentListenerInvocations(domainDeploymentListener, DOMAIN);
     }
@@ -65,7 +57,7 @@ public class ArtifactDeploymentListenerAdapterTestCase extends AbstractMuleTestC
     {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
-        new ArtifactDeploymentListenerAdapter.AdaptedDeploymentListener(listener, ALL);
+        new AdaptedDeploymentListener(listener, ALL);
     }
 
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)

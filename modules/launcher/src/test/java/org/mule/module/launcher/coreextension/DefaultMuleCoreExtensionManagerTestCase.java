@@ -13,12 +13,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.config.bootstrap.ArtifactType.APP;
 import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
+import org.mule.config.bootstrap.ArtifactType;
 import org.mule.module.launcher.AbstractArtifactDeploymentListener;
 import org.mule.module.launcher.AbstractDeploymentListener;
+import org.mule.module.launcher.AdaptedDeploymentListener;
 import org.mule.module.launcher.ArtifactDeploymentListener;
-import org.mule.module.launcher.ArtifactDeploymentListenerAdapter;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
@@ -279,8 +281,8 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         testCoreExtensionManager.setDeploymentService(deploymentService);
         testCoreExtensionManager.initialise();
 
-        verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.adapter.getDomainDeploymentListener());
-        verify(deploymentService).addDeploymentListener(testCoreExtensionManager.adapter.getApplicationDeploymentListener());
+        verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.domainDeploymentListener);
+        verify(deploymentService).addDeploymentListener(testCoreExtensionManager.applicationDeploymentListener);
     }
 
     public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware
@@ -318,9 +320,11 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
     }
 
-    private class TestMuleCoreExtensionManager extends DefaultMuleCoreExtensionManager
+    private static class TestMuleCoreExtensionManager extends DefaultMuleCoreExtensionManager
     {
-        ArtifactDeploymentListenerAdapter adapter ;
+
+        AdaptedDeploymentListener applicationDeploymentListener;
+        AdaptedDeploymentListener domainDeploymentListener;
 
         public TestMuleCoreExtensionManager(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
         {
@@ -328,10 +332,17 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        ArtifactDeploymentListenerAdapter getArtifactDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener)
+        AdaptedDeploymentListener getAdaptedArtifactDeploymentListener(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
         {
-            adapter = super.getArtifactDeploymentListenerAdapter(artifactDeploymentListener);
-            return adapter;
+            if (type == APP)
+            {
+                applicationDeploymentListener = super.getAdaptedArtifactDeploymentListener(artifactDeploymentListener, type);
+                return applicationDeploymentListener;
+            }
+
+            domainDeploymentListener = super.getAdaptedArtifactDeploymentListener(artifactDeploymentListener, type);
+
+            return domainDeploymentListener;
         }
     }
 

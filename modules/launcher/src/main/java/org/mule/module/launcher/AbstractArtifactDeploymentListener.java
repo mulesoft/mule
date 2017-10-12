@@ -10,7 +10,7 @@ import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
 
 /**
- * Default implementation of {@link ArtifactDeploymentListener}).
+ * Base class for implementing {@link ArtifactDeploymentListener}).
  * Method implementations are no-op.
  * Use it for implementing the ArtifactDeploymentListener interface
  * without having to override all methods.
