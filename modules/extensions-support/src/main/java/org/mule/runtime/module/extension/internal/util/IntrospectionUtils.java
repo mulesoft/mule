@@ -42,6 +42,7 @@ import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -1018,11 +1019,7 @@ public final class IntrospectionUtils {
     });
   }
 
-  private static void injectField(Object target, String value, Class<? extends Annotation> annotationClass) {
-    if (value == null) {
-      return;
-    }
-
+  private static void injectAnnotatedField(Object target, Object value, Class<? extends Annotation> annotationClass) {
     final Class<?> type = target.getClass();
     List<Field> fields = getAnnotatedFields(type, annotationClass);
     if (fields.isEmpty()) {
@@ -1031,6 +1028,20 @@ public final class IntrospectionUtils {
       throw new IllegalModelDefinitionException(format(
                                                        "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
                                                        type.getName(), fields.size(), annotationClass));
+    }
+
+    new FieldSetter<>(fields.get(0)).set(target, value);
+  }
+
+  private static void injectFieldOfType(Object target, Object value, Class<?> fieldType) {
+    final Class<?> type = target.getClass();
+    List<Field> fields = getFieldsOfType(type, fieldType);
+    if (fields.isEmpty()) {
+      return;
+    } else if (fields.size() > 1) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "Class '%s' has %d fields of type with @%s. Only one field of that type was expected",
+                                                       type.getName(), fields.size(), fieldType));
     }
 
     new FieldSetter<>(fields.get(0)).set(target, value);
@@ -1051,8 +1062,8 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model} contains the {@link DeclaringMemberModelProperty} property
-   * and the value is not {@code null}.
+   * Sets the {@code encoding} value into the field of the {@code target} annotated {@link DefaultEncoding} if the {@code model}
+   * contains the {@link DeclaringMemberModelProperty} property and the value is not {@code null}.
    *
    * @param model    enriched with {@link DefaultEncodingModelProperty}
    * @param target   object in which the fields are going to be set
@@ -1074,7 +1085,21 @@ public final class IntrospectionUtils {
    */
   public static void injectFields(Object target, String configName, String encoding) {
     injectDefaultEncoding(target, encoding);
-    injectField(target, configName, RefName.class);
+    injectAnnotatedField(target, configName, RefName.class);
+  }
+
+  /**
+   * Introspects the {@code target} object for a field annotated with {@link RefName}. If found, it injects the
+   * {@code configName} value into it.
+   * <p>
+   * The {@code target} object is expected to have only one field annotated with {@link RefName} and that field is
+   * required to be a String.
+   *
+   * @param target     object in which the value are going to be set
+   * @param configName the value to be injected
+   */
+  public static void injectRefName(Object target, String configName) {
+    injectAnnotatedField(target, configName, RefName.class);
   }
 
   /**
@@ -1085,6 +1110,19 @@ public final class IntrospectionUtils {
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static void injectDefaultEncoding(Object target, String encoding) {
-    injectField(target, encoding, DefaultEncoding.class);
+    injectAnnotatedField(target, encoding, DefaultEncoding.class);
+  }
+
+  /**
+   * Introspects the {@code target} object for a field of type {@link ComponentLocation}. If found, it injects the
+   * {@code componentLocation} value into it.
+   * <p>
+   * The {@code target} object is expected to have only one field of such type.
+   *
+   * @param target            object in which the value are going to be set
+   * @param componentLocation the value to be injected
+   */
+  public static void injectComponentLocation(Object target, ComponentLocation componentLocation) {
+    injectFieldOfType(target, componentLocation, ComponentLocation.class);
   }
 }

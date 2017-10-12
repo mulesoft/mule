@@ -7,9 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectRefName;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -34,6 +37,7 @@ public final class SourceConfigurer {
 
   private final SourceModel model;
   private final ResolverSet resolverSet;
+  private final ComponentLocation componentLocation;
   private final MuleContext muleContext;
 
   /**
@@ -44,9 +48,11 @@ public final class SourceConfigurer {
    * @param resolverSet the {@link ResolverSet} used to resolve the parameters
    * @param muleContext the current {@link MuleContext}
    */
-  public SourceConfigurer(SourceModel model, ResolverSet resolverSet, MuleContext muleContext) {
+  public SourceConfigurer(SourceModel model, ComponentLocation componentLocation, ResolverSet resolverSet,
+                          MuleContext muleContext) {
     this.model = model;
     this.resolverSet = resolverSet;
+    this.componentLocation = componentLocation;
     this.muleContext = muleContext;
   }
 
@@ -71,6 +77,8 @@ public final class SourceConfigurer {
           public Source build(ValueResolvingContext context) throws MuleException {
             Source source = build(resolverSet.resolve(context));
             injectDefaultEncoding(model, source, muleContext.getConfiguration().getDefaultEncoding());
+            injectComponentLocation(source, componentLocation);
+            config.ifPresent(c -> injectRefName(source, c.getName()));
             return source;
           }
 
