@@ -21,6 +21,9 @@ import java.util.Collection;
  */
 public class CollectionDataType<T> extends SimpleDataType<T>
 {
+
+    private static final long serialVersionUID = -393707022190139261L;
+    
     private Class<? extends Collection> collectionType;
 
     /**

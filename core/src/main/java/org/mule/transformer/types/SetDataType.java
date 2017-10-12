@@ -15,6 +15,9 @@ import java.util.Set;
  */
 public class SetDataType<T> extends CollectionDataType<T>
 {
+
+    private static final long serialVersionUID = -2258741498017858219L;
+
     public SetDataType()
     {
         super(Set.class);
