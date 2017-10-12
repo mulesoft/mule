@@ -8,8 +8,8 @@ package org.mule.runtime.core.api.source.scheduler;
 
 import static java.lang.String.format;
 import static java.util.TimeZone.getDefault;
-import static java.util.TimeZone.getTimeZone;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.source.CronSchedulerConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Scheduler for Cron scheduled jobs.
  *
- * @since 3.5.0, moved from {@link org.mule.runtime.modules.schedulers.cron.CronSchedulerFactory}.
+ * @since 3.5.0
  */
 @Alias("cron")
-public class CronScheduler extends PeriodicScheduler {
+public class CronScheduler extends PeriodicScheduler implements CronSchedulerConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(CronScheduler.class);
 
@@ -34,10 +34,6 @@ public class CronScheduler extends PeriodicScheduler {
   @Parameter
   private String expression;
 
-  /**
-   * The ID of the time zone in which the expression will be based.
-   * Refer to {@code java.util.TimeZone} for the format and possible values of the timeZone ID.
-   */
   @Parameter
   private String timeZone;
 
@@ -47,8 +43,8 @@ public class CronScheduler extends PeriodicScheduler {
   }
 
   protected TimeZone resolveTimeZone(String name) {
-    TimeZone resolvedTimeZone = timeZone == null ? getDefault() : getTimeZone(timeZone);
-    if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(getTimeZone(TZ_GMT_ID))) {
+    TimeZone resolvedTimeZone = timeZone == null ? getDefault() : java.util.TimeZone.getTimeZone(timeZone);
+    if (!TZ_GMT_ID.equals(timeZone) && resolvedTimeZone.equals(java.util.TimeZone.getTimeZone(TZ_GMT_ID))) {
       logger.warn(format("Configured timezone '%s' is invalid in scheduler '%s'. Defaulting to %s", timeZone, name, TZ_GMT_ID));
     }
     return resolvedTimeZone;
@@ -60,5 +56,13 @@ public class CronScheduler extends PeriodicScheduler {
 
   public void setTimeZone(String timeZone) {
     this.timeZone = timeZone;
+  }
+
+  public String getExpression() {
+    return expression;
+  }
+
+  public String getTimeZone() {
+    return timeZone;
   }
 }
