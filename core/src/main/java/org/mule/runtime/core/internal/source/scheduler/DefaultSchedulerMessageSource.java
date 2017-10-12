@@ -23,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -44,7 +45,8 @@ import java.util.concurrent.ScheduledFuture;
  * <p>
  * The {@link DefaultSchedulerMessageSource} is responsible of creating a {@link org.mule.runtime.api.scheduler.Scheduler} at the
  * initialization phase. This {@link org.mule.runtime.api.scheduler.Scheduler} can be stopped/started and executed by using the
- * {@link org.mule.runtime.core.internal.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule server.
+ * {@link org.mule.runtime.core.internal.registry.MuleRegistry} interface, this way users can manipulate poll from outside mule
+ * server.
  * </p>
  */
 public class DefaultSchedulerMessageSource extends AbstractComponent
@@ -107,6 +109,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   @Override
   public boolean isStarted() {
     return started;
+  }
+
+  @Override
+  public SchedulerConfiguration getConfiguration() {
+    return scheduler;
   }
 
   /**

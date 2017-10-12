@@ -7,8 +7,7 @@
 package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
-
-import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.source.SchedulerConfiguration;
 
 import java.util.concurrent.ScheduledFuture;
 
@@ -17,13 +16,13 @@ import java.util.concurrent.ScheduledFuture;
  *
  * @since 3.5.0, moved from {@link org.mule.runtime.core.api.schedule.SchedulerFactory}.
  */
-public abstract class PeriodicScheduler implements SchedulingStrategy {
+public abstract class PeriodicScheduler implements Scheduler, SchedulerConfiguration {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public final ScheduledFuture<?> schedule(Scheduler executor, Runnable job) {
+  public final ScheduledFuture<?> schedule(org.mule.runtime.api.scheduler.Scheduler executor, Runnable job) {
     ScheduledFuture<?> scheduler = doSchedule(executor, job);
     checkNull(scheduler);
     return scheduler;
@@ -32,11 +31,11 @@ public abstract class PeriodicScheduler implements SchedulingStrategy {
   /**
    * Template method to delegate the scheduling of the job.
    *
-   * @param executor the corresponding {@link Scheduler} instance.
+   * @param executor the corresponding {@link org.mule.runtime.api.scheduler.Scheduler} instance.
    * @param job The {@link Runnable} job that has to be executed.
    * @return the newly scheduled job.
    */
-  protected abstract ScheduledFuture<?> doSchedule(Scheduler executor, Runnable job);
+  protected abstract ScheduledFuture<?> doSchedule(org.mule.runtime.api.scheduler.Scheduler executor, Runnable job);
 
   private void checkNull(ScheduledFuture<?> postProcessedScheduler) {
     if (postProcessedScheduler == null) {

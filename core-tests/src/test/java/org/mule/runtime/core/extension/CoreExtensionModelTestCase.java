@@ -57,7 +57,7 @@ import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.api.source.scheduler.SchedulingStrategy;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Iterator;
@@ -98,7 +98,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     SubTypesModel subTypesModel = coreExtensionModel.getSubTypes().iterator().next();
     assertThat(subTypesModel.getBaseType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(SchedulingStrategy.class.getName()));
+               is(Scheduler.class.getName()));
 
     assertThat(subTypesModel.getSubTypes(), hasSize(2));
     Iterator<ObjectType> iterator = subTypesModel.getSubTypes().iterator();
@@ -544,6 +544,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(SchedulingStrategy.class.getName()));
+               is(Scheduler.class.getName()));
   }
 }

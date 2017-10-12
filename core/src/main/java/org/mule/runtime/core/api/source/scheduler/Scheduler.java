@@ -6,24 +6,22 @@
  */
 package org.mule.runtime.core.api.source.scheduler;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * Strategy used by the {@link Scheduler} for executing jobs.
+ * Strategy used by the {@link org.mule.runtime.api.scheduler.Scheduler} for executing jobs.
  *
  * @since 4.0
  */
-public interface SchedulingStrategy {
+public interface Scheduler {
 
   /**
    * Schedules a job.
    *
-   * @param executor the corresponding {@link Scheduler} instance.
+   * @param executor the corresponding {@link org.mule.runtime.api.scheduler.Scheduler} instance.
    * @param job The {@link Runnable} job that has to be executed.
    * @return the newly scheduled job.
    * @throws NullPointerException In case the scheduled job handler is null.
    */
-  ScheduledFuture<?> schedule(Scheduler executor, Runnable job);
+  ScheduledFuture<?> schedule(org.mule.runtime.api.scheduler.Scheduler executor, Runnable job);
 }

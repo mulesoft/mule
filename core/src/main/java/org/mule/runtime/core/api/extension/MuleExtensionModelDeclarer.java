@@ -73,7 +73,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.core.api.source.scheduler.SchedulingStrategy;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
@@ -149,7 +149,7 @@ class MuleExtensionModelDeclarer {
     scheduler.withOutput().ofType(typeLoader.load(Object.class));
     scheduler.withOutputAttributes().ofType(typeLoader.load(Object.class));
 
-    MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
+    MetadataType baseSchedulingStrategy = typeLoader.load(Scheduler.class);
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(baseSchedulingStrategy)
@@ -451,7 +451,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
     declareOnErrorRoute(typeLoader, onErrorPropagate);
 
-    //TODO MULE-13277 errorHandler.isOneRouteRequired(true);
+    // TODO MULE-13277 errorHandler.isOneRouteRequired(true);
   }
 
   private void declareOnErrorRoute(ClassTypeLoader typeLoader, NestedRouteDeclarer onError) {

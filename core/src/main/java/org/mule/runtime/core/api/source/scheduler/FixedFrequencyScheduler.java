@@ -10,6 +10,7 @@ package org.mule.runtime.core.api.source.scheduler;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.source.FixedFrequencySchedulerConfiguration;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -21,25 +22,16 @@ import java.util.concurrent.TimeUnit;
  * Implementation of {@link PeriodicScheduler} for a fixed-frequency job.
  */
 @Alias("fixed-frequency")
-public class FixedFrequencyScheduler extends PeriodicScheduler {
+public class FixedFrequencyScheduler extends PeriodicScheduler implements FixedFrequencySchedulerConfiguration {
 
-  /**
-   * The {@link TimeUnit} of the scheduler
-   */
   @Parameter
   @Optional(defaultValue = "MILLISECONDS")
   private TimeUnit timeUnit = MILLISECONDS;
 
-  /**
-   * The frequency of the scheduler in timeUnit
-   */
   @Parameter
   @Optional(defaultValue = "1000")
   private long frequency = 1000l;
 
-  /**
-   * The time in timeUnit that it has to wait before executing the first task
-   */
   @Parameter
   @Optional(defaultValue = "0")
   private long startDelay = 1000l;
@@ -66,5 +58,15 @@ public class FixedFrequencyScheduler extends PeriodicScheduler {
     this.startDelay = startDelay;
   }
 
+  public TimeUnit getTimeUnit() {
+    return timeUnit;
+  }
 
+  public long getFrequency() {
+    return frequency;
+  }
+
+  public long getStartDelay() {
+    return startDelay;
+  }
 }
