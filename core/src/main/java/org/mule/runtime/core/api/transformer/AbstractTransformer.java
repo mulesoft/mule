@@ -331,7 +331,8 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof AbstractTransformer)) {
+
+    if (!(getClass().equals(obj.getClass()))) {
       return false;
     }
 
