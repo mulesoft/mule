@@ -13,6 +13,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -152,5 +153,13 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     super.stop();
     // Clean up reference to avoid class loader leaks
     this.artifactDescriptor = null;
+  }
+
+  @Override
+  public boolean stop(long timeout, TimeUnit timeUnit) {
+    boolean result = super.stop(timeout, timeUnit);
+    // Clean up reference to avoid class loader leaks
+    this.artifactDescriptor = null;
+    return result;
   }
 }
