@@ -7,7 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forMethodParameter;
+
+import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.internal.loader.java.type.ParameterElement;
 
 import java.lang.annotation.Annotation;
@@ -63,6 +66,15 @@ public final class ParameterWrapper implements ParameterElement {
   @Override
   public <A extends Annotation> Optional<A> getAnnotation(Class<A> annotationClass) {
     return Optional.ofNullable(parameter.getAnnotation(annotationClass));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getAlias() {
+    return ofNullable(InfrastructureTypeMapping.getMap().get(parameter.getType()))
+        .map(InfrastructureTypeMapping.InfrastructureType::getName).orElse(ParameterElement.super.getAlias());
   }
 
   /**
