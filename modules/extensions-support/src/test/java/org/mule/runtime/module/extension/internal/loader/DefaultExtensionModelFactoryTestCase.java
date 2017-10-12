@@ -199,7 +199,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     StereotypeModel stereotypeModel = operation.getStereotype();
     assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
 
-    assertThat(stereotypeModel.getName(), is(new EmpireStereotype().getName()));
+    assertThat(stereotypeModel.getName(), is(new EmpireStereotype().getName().toUpperCase()));
     assertThat(stereotypeModel.getNamespace(), is(HEISENBERG.toUpperCase()));
     assertThat(stereotypeModel.getParent().get(), is(PROCESSOR));
   }

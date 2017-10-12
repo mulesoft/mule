@@ -2899,7 +2899,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
           "stereotype": {
-            "type": "CONNECTION",
+            "type": "NON-POOLING",
             "namespace": "TX",
             "parent": {
               "type": "CONNECTION",
@@ -3377,10 +3377,12 @@
                         },
                         "annotations": {
                           "stereotype": {
-                            "stereotypeModel": {
-                              "type": "OBJECT_STORE",
-                              "namespace": "OS"
-                            }
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
                           },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
@@ -3817,10 +3819,12 @@
                         },
                         "annotations": {
                           "stereotype": {
-                            "stereotypeModel": {
-                              "type": "OBJECT_STORE",
-                              "namespace": "OS"
-                            }
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
                           },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
@@ -4525,7 +4529,7 @@
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
       "stereotype": {
-        "type": "CONNECTION",
+        "type": "NON-POOLING",
         "namespace": "TX",
         "parent": {
           "type": "CONNECTION",

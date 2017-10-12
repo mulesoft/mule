@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypeDefinition.NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
@@ -100,30 +101,32 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
           declaration.getModelProperty(ImplementingTypeModelProperty.class);
 
       final String namespace = getStereotypePrefix(extensionDeclarer);
-      final StereotypeModel defaultConfigStereotype = newStereotype("CONFIG", namespace)
-          .withParent(CONFIG).build();
-      final StereotypeModel defaultConnectionStereotype = newStereotype("CONNECTION", namespace)
-          .withParent(CONNECTION).build();
 
       if (implementingType.isPresent()) {
         new IdempotentDeclarationWalker() {
 
           @Override
           protected void onConfiguration(ConfigurationDeclaration declaration) {
-            declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                .map(ImplementingTypeModelProperty::getType)
-                .ifPresent(declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
-                                                                        defaultConfigStereotype, stereotypes)
-                                                                            .resolveStereotype());
+            final StereotypeModel defaultConfigStereotype = newStereotype(declaration.getName(), namespace)
+                .withParent(CONFIG).build();
+            ifPresent(
+                      declaration.getModelProperty(ImplementingTypeModelProperty.class)
+                          .map(ImplementingTypeModelProperty::getType),
+                      declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
+                                                                   defaultConfigStereotype, stereotypes).resolveStereotype(),
+                      () -> declaration.withStereotype(defaultConfigStereotype));
           }
 
           @Override
           protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-            declaration.getModelProperty(ImplementingTypeModelProperty.class)
-                .map(ImplementingTypeModelProperty::getType)
-                .ifPresent(declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
-                                                                        defaultConnectionStereotype, stereotypes)
-                                                                            .resolveStereotype());
+            final StereotypeModel defaultConnectionStereotype = newStereotype(declaration.getName(), namespace)
+                .withParent(CONNECTION).build();
+            ifPresent(
+                      declaration.getModelProperty(ImplementingTypeModelProperty.class)
+                          .map(ImplementingTypeModelProperty::getType),
+                      declaringType -> new ClassStereotypeResolver(new TypeWrapper(declaringType), declaration, namespace,
+                                                                   defaultConnectionStereotype, stereotypes).resolveStereotype(),
+                      () -> declaration.withStereotype(defaultConnectionStereotype));
           }
 
           @Override
@@ -173,7 +176,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotype(resolver));
+          objectType.getAnnotation(StereotypeTypeAnnotation.class).ifPresent(a -> a.resolveStereotypes(resolver));
           objectType.getFields().forEach(f -> f.getValue().accept(this));
         }
 
@@ -198,6 +201,7 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
       return extensionDeclarer.getDeclaration().getXmlDslModel().getPrefix().toUpperCase();
     }
   }
+
 
   private static abstract class StereotypeResolver<T extends WithAnnotations> {
 
