@@ -9,9 +9,11 @@ package org.mule.runtime.module.launcher.log4j2;
 import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -45,6 +47,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   private final boolean applicationClassloader;
   private final String artifactName;
   private final int ownerClassLoaderHash;
+  private ArtifactDescriptor artifactDescriptor;
 
   MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone) {
     this(name, null, null, contextSelector, standalone);
@@ -62,12 +65,17 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     if (ownerClassLoader instanceof ArtifactClassLoader) {
       artifactClassloader = true;
       artifactName = getArtifactName((ArtifactClassLoader) ownerClassLoader);
+      artifactDescriptor = getArtifactDescriptor((ArtifactClassLoader) ownerClassLoader);
       applicationClassloader = ownerClassLoader instanceof RegionClassLoader;
     } else {
       artifactClassloader = false;
       applicationClassloader = false;
       artifactName = null;
     }
+  }
+
+  private ArtifactDescriptor getArtifactDescriptor(ArtifactClassLoader ownerClassLoader) {
+    return ownerClassLoader.getArtifactDescriptor();
   }
 
   private String getArtifactName(ArtifactClassLoader ownerClassLoader) {
@@ -132,7 +140,26 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     return applicationClassloader;
   }
 
+  protected ArtifactDescriptor getArtifactDescriptor() {
+    return artifactDescriptor;
+  }
+
   protected String getArtifactName() {
     return artifactName;
+  }
+
+  @Override
+  public void stop() {
+    super.stop();
+    // Clean up reference to avoid class loader leaks
+    this.artifactDescriptor = null;
+  }
+
+  @Override
+  public boolean stop(long timeout, TimeUnit timeUnit) {
+    boolean result = super.stop(timeout, timeUnit);
+    // Clean up reference to avoid class loader leaks
+    this.artifactDescriptor = null;
+    return result;
   }
 }

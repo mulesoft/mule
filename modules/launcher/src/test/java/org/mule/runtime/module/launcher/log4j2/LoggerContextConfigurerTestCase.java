@@ -20,10 +20,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -31,6 +33,8 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Level;
@@ -165,6 +169,22 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
     LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
     verify(rootLogger).addAppender(perAppAppender, Level.ALL, null);
+  }
+
+  @Test
+  public void noAppendersForMutedApplication() throws Exception {
+    when(context.isArtifactClassloader()).thenReturn(true);
+    when(context.isApplicationClassloader()).thenReturn(true);
+    ArtifactDescriptor descriptor = mock(ArtifactDescriptor.class);
+
+    Properties properties = new Properties();
+    properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "true");
+    when(descriptor.getDeploymentProperties()).thenReturn(Optional.of(properties));
+    when(context.getArtifactDescriptor()).thenReturn(descriptor);
+
+    contextConfigurer.update(context);
+
+    verify(context.getConfiguration(), never()).addAppender(any(Appender.class));
   }
 
   @Test

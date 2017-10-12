@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.zip.Deflater.NO_COMPRESSION;
 import static org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy.createStrategy;
 import static org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy.createPolicy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
@@ -21,6 +23,15 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -41,13 +52,6 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
@@ -82,8 +86,11 @@ final class LoggerContextConfigurer {
   }
 
   protected void update(MuleLoggerContext context) {
-    boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
+    if (!shouldConfigureContext(context)) {
+      return;
+    }
 
+    boolean forceConsoleLog = System.getProperty(MULE_FORCE_CONSOLE_LOG) != null;
     if (context.getConfigFile() == null && !forceConsoleLog) {
       removeConsoleAppender(context);
     }
@@ -97,6 +104,19 @@ final class LoggerContextConfigurer {
     if (forceConsoleLog && !hasAppender(context, ConsoleAppender.class)) {
       forceConsoleAppender(context);
     }
+  }
+
+  private boolean shouldConfigureContext(MuleLoggerContext context) {
+    if (!context.isApplicationClassloader()) {
+      return true;
+    }
+
+    ArtifactDescriptor descriptor = context.getArtifactDescriptor();
+    if (descriptor == null || !descriptor.getDeploymentProperties().isPresent()) {
+      return true;
+    }
+    Properties properties = descriptor.getDeploymentProperties().get();
+    return !parseBoolean(properties.getProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "false"));
   }
 
   private void disableShutdownHook(LoggerContext context) {

@@ -35,6 +35,9 @@ public interface ToolingService {
    * Only requested components will be executed. All sources for flows will be stop unless
    * they are requested to be started by the client.
    *
+   * The application will be deployed using {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY}
+   * so the application logs are muted
+   *
    * @param applicationLocation location of the application content. The application content
    *                            may be a folder holding an exploded structure for an application
    *                            or may be a zip file containing the resources of the application.
