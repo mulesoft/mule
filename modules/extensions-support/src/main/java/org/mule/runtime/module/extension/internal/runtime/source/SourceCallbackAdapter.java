@@ -42,4 +42,14 @@ public interface SourceCallbackAdapter<T, A> extends SourceCallback<T, A> {
    */
   SourceConnectionManager getSourceConnectionManager();
 
+  /**
+   * @return the name of the owning {@link Source}
+   */
+  String getOwningSourceName();
+
+  /**
+   * @return the name of the owning Extension
+   */
+  String getOwningExtensionName();
+
 }

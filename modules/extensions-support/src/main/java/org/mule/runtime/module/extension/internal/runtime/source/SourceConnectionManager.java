@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -16,6 +18,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -98,9 +101,10 @@ public class SourceConnectionManager {
    *
    * @param connection a connection
    * @param <T>        the connection's generic type
-   * @return a {@link ConnectionHandler} or {@code null} if the connection was not obtained through this component
+   * @return an {@link Optional} {@link ConnectionHandler}, {@link Optional#empty()} if the connection was not obtained
+   * through this component
    */
-  <T> ConnectionHandler<T> getConnectionHandler(T connection) {
-    return (ConnectionHandler<T>) connections.get(new Reference<>(connection));
+  <T> Optional<ConnectionHandler<T>> getConnectionHandler(T connection) {
+    return ofNullable((ConnectionHandler<T>) connections.get(new Reference<>(connection)));
   }
 }

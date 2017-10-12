@@ -238,4 +238,20 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   public SourceConnectionManager getSourceConnectionManager() {
     return messageSource.getSourceConnectionManager();
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwningSourceName() {
+    return sourceModel.getName();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwningExtensionName() {
+    return messageSource.getExtensionModel().getName();
+  }
 }
