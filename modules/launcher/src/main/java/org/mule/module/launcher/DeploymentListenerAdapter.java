@@ -8,32 +8,39 @@ package org.mule.module.launcher;
 
 
 import static java.lang.String.format;
-import static org.mule.config.bootstrap.ArtifactType.ALL;
+import static java.util.Arrays.asList;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
+import org.mule.util.Preconditions;
 
-import java.util.Arrays;
+import java.util.Collection;
 
 
 /**
  * Adapts an {@link ArtifactDeploymentListener} to work as a {@link DeploymentListener}.
  */
-public class AdaptedDeploymentListener implements DeploymentListener
+public class DeploymentListenerAdapter implements DeploymentListener
 {
 
-    private static final ArtifactType[] DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES = {DOMAIN, APP};
+    private static final Collection<ArtifactType> DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES = asList(DOMAIN, APP);
 
-    public static final String UNSUPPORTED_ARTIFACT_TYPE_ERROR = format("DeploymentListener only supports %s artifact types.", Arrays.toString(DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES));
+    public static final String UNSUPPORTED_ARTIFACT_TYPE_ERROR = format("DeploymentListener only supports %s artifact types.", DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES);
 
     private final ArtifactDeploymentListener artifactDeploymentListener;
     private final ArtifactType artifactType;
 
-    public AdaptedDeploymentListener(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType artifactType)
+    /**
+     *
+     * @param artifactDeploymentListener the artifactDeploymentListener to adapt.
+     * @param artifactType the artifact type.
+     */
+    public DeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType artifactType)
     {
-        this.artifactType = validateArtifactType(artifactType);
+        Preconditions.checkArgument(DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES.contains(artifactType), UNSUPPORTED_ARTIFACT_TYPE_ERROR);
+        this.artifactType = artifactType;
         this.artifactDeploymentListener = artifactDeploymentListener;
     }
 
@@ -91,14 +98,5 @@ public class AdaptedDeploymentListener implements DeploymentListener
         artifactDeploymentListener.onMuleContextConfigured(artifactName, context);
     }
 
-    private ArtifactType validateArtifactType(ArtifactType type)
-    {
-        if (type.equals(ALL))
-        {
-            throw new IllegalStateException(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
-        }
-
-        return type;
-    }
 }
 

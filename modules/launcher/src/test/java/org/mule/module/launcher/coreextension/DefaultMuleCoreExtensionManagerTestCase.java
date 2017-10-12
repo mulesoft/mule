@@ -19,7 +19,6 @@ import org.mule.MuleCoreExtension;
 import org.mule.config.bootstrap.ArtifactType;
 import org.mule.module.launcher.AbstractArtifactDeploymentListener;
 import org.mule.module.launcher.AbstractDeploymentListener;
-import org.mule.module.launcher.AdaptedDeploymentListener;
 import org.mule.module.launcher.ArtifactDeploymentListener;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
@@ -323,8 +322,8 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     private static class TestMuleCoreExtensionManager extends DefaultMuleCoreExtensionManager
     {
 
-        AdaptedDeploymentListener applicationDeploymentListener;
-        AdaptedDeploymentListener domainDeploymentListener;
+        DeploymentListener applicationDeploymentListener;
+        DeploymentListener domainDeploymentListener;
 
         public TestMuleCoreExtensionManager(MuleCoreExtensionDiscoverer coreExtensionDiscoverer, MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver)
         {
@@ -332,15 +331,15 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        AdaptedDeploymentListener getAdaptedArtifactDeploymentListener(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
+        DeploymentListener getDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
         {
             if (type == APP)
             {
-                applicationDeploymentListener = super.getAdaptedArtifactDeploymentListener(artifactDeploymentListener, type);
+                applicationDeploymentListener = super.getDeploymentListenerAdapter(artifactDeploymentListener, type);
                 return applicationDeploymentListener;
             }
 
-            domainDeploymentListener = super.getAdaptedArtifactDeploymentListener(artifactDeploymentListener, type);
+            domainDeploymentListener = super.getDeploymentListenerAdapter(artifactDeploymentListener, type);
 
             return domainDeploymentListener;
         }

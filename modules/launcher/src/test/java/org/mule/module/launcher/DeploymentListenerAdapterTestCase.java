@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.config.bootstrap.ArtifactType.ALL;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.module.launcher.AdaptedDeploymentListener.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
+import static org.mule.module.launcher.DeploymentListenerAdapter.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
@@ -28,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class AdaptedDeploymentListenerTestCase extends AbstractMuleTestCase
+public class DeploymentListenerAdapterTestCase extends AbstractMuleTestCase
 {
 
     private static final String ARTIFACT_NAME = "artifactName";
@@ -46,8 +46,8 @@ public class AdaptedDeploymentListenerTestCase extends AbstractMuleTestCase
     @Test
     public void adapt() throws Exception
     {
-        DeploymentListener applicationDeploymentListener = new AdaptedDeploymentListener(listener, APP);
-        DeploymentListener domainDeploymentListener = new AdaptedDeploymentListener(listener, DOMAIN);
+        DeploymentListener applicationDeploymentListener = new DeploymentListenerAdapter(listener, APP);
+        DeploymentListener domainDeploymentListener = new DeploymentListenerAdapter(listener, DOMAIN);
         assertDeploymentListenerInvocations(applicationDeploymentListener, APP);
         assertDeploymentListenerInvocations(domainDeploymentListener, DOMAIN);
     }
@@ -55,9 +55,9 @@ public class AdaptedDeploymentListenerTestCase extends AbstractMuleTestCase
     @Test
     public void invalidArtifactType()
     {
-        expectedException.expect(IllegalStateException.class);
+        expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage(UNSUPPORTED_ARTIFACT_TYPE_ERROR);
-        new AdaptedDeploymentListener(listener, ALL);
+        new DeploymentListenerAdapter(listener, ALL);
     }
 
     private void assertDeploymentListenerInvocations(DeploymentListener deploymentListener, ArtifactType artifactType)

@@ -14,7 +14,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.bootstrap.ArtifactType;
-import org.mule.module.launcher.AdaptedDeploymentListener;
+import org.mule.module.launcher.DeploymentListenerAdapter;
 import org.mule.module.launcher.ArtifactDeploymentListener;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
@@ -136,8 +136,8 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
 
             if (extension instanceof ArtifactDeploymentListener)
             {
-                deploymentService.addDeploymentListener(getAdaptedArtifactDeploymentListener((ArtifactDeploymentListener) extension, APP));
-                deploymentService.addDomainDeploymentListener(getAdaptedArtifactDeploymentListener((ArtifactDeploymentListener) extension, DOMAIN));
+                deploymentService.addDeploymentListener(getDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
+                deploymentService.addDomainDeploymentListener(getDeploymentListenerAdapter((ArtifactDeploymentListener) extension, DOMAIN));
             }
 
             if (extension instanceof PluginClassLoaderManagerAware)
@@ -167,14 +167,14 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     }
 
     /**
-     * Creates a {@link AdaptedDeploymentListener}.
+     * Creates a {@link DeploymentListenerAdapter}.
      *
      * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
      * @param type: the artifact type.
-     * @return an AdaptedDeploymentListener.
+     * @return an DeploymentListener.
      */
-    AdaptedDeploymentListener getAdaptedArtifactDeploymentListener (ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
+    DeploymentListener getDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
     {
-        return new AdaptedDeploymentListener(artifactDeploymentListener, type);
+        return new DeploymentListenerAdapter(artifactDeploymentListener, type);
     }
 }
