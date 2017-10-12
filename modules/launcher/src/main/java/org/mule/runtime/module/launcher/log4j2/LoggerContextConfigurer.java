@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.zip.Deflater.NO_COMPRESSION;
 import static org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy.createStrategy;
 import static org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy.createPolicy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
@@ -52,13 +53,6 @@ import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
 
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
  * configuration changes to it so that it complies with mule's logging strategy.
@@ -92,7 +86,7 @@ final class LoggerContextConfigurer {
   }
 
   protected void update(MuleLoggerContext context) {
-    if (mute(context)) {
+    if (!shouldConfigureContext(context)) {
       return;
     }
 
@@ -112,17 +106,17 @@ final class LoggerContextConfigurer {
     }
   }
 
-  private boolean mute(MuleLoggerContext context) {
+  private boolean shouldConfigureContext(MuleLoggerContext context) {
     if (!context.isApplicationClassloader()) {
-      return false;
+      return true;
     }
 
     ArtifactDescriptor descriptor = context.getArtifactDescriptor();
     if (descriptor == null || !descriptor.getDeploymentProperties().isPresent()) {
-      return false;
+      return true;
     }
     Properties properties = descriptor.getDeploymentProperties().get();
-    return Boolean.parseBoolean(properties.getProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "false"));
+    return !parseBoolean(properties.getProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "false"));
   }
 
   private void disableShutdownHook(LoggerContext context) {

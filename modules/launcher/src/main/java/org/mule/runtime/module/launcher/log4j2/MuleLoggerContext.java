@@ -149,7 +149,8 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
 
   @Override
   public void close() {
-    this.artifactDescriptor = null;
     super.close();
+    // Clean up reference to avoid class loader leaks
+    this.artifactDescriptor = null;
   }
 }

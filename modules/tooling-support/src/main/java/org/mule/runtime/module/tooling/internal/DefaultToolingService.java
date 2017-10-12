@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static java.util.Optional.of;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
@@ -48,14 +47,14 @@ public class DefaultToolingService implements ToolingService {
    */
   @Override
   public Application createApplication(File applicationLocation) throws IOException {
-    Application application = applicationFactory.createArtifact(applicationLocation, ofNullable(createApplicationProperties()));
+    Application application = applicationFactory.createArtifact(applicationLocation, of(createApplicationProperties()));
     application.install();
     application.lazyInit();
     application.start();
     return application;
   }
 
-  private Properties createApplicationProperties() {
+  private static Properties createApplicationProperties() {
     Properties properties = new Properties();
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "true");
     return properties;

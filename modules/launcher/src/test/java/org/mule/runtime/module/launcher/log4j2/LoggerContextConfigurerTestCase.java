@@ -20,12 +20,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
