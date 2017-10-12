@@ -139,7 +139,7 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="action">
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" name="transactionalAction">
           <xs:annotation>
             <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
           </xs:annotation>
