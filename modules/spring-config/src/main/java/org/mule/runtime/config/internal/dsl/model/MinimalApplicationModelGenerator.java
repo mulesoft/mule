@@ -7,6 +7,9 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyNavigableSet;
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.api.dsl.model.ApplicationModel;
@@ -84,7 +87,15 @@ public class MinimalApplicationModelGenerator {
         && dependencyResolver.getApplicationModel().findTopLevelNamedElement(requestComponentModelName).isPresent()) {
       otherRequiredGlobalComponents.add(requestedComponentModel.getNameAttribute());
     }
-    Set<String> allRequiredComponentModels = dependencyResolver.findComponentModelsDependencies(otherRequiredGlobalComponents);
+
+    Set<String> lastCall = emptySet();
+    Set<String> allRequiredComponentModels = otherRequiredGlobalComponents;
+
+    while (!allRequiredComponentModels.equals(lastCall)) {
+      lastCall = allRequiredComponentModels;
+      allRequiredComponentModels = dependencyResolver.findComponentModelsDependencies(allRequiredComponentModels);
+    }
+
     Iterator<ComponentModel> iterator =
         dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
