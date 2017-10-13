@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
@@ -23,17 +22,13 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.MuleTestUtils.createFlow;
-
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.internal.routing.correlation.EventCorrelatorCallback;
@@ -43,8 +38,6 @@ import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Comparator;
@@ -52,12 +45,16 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.junit.Test;
+
 
 public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
   public ResequencerTestCase() {
     setStartContext(true);
   }
+
+
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -104,10 +101,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     Flow flow = createFlow(muleContext, "test");
     assertNotNull(flow);
 
-    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
-    when(configurationComponentLocator.find(any(Location.class))).thenReturn(of(flow));
-    ((MuleContextWithRegistries) muleContext).getRegistry().registerObject(ConfigurationComponentLocator.REGISTRY_KEY,
-                                                                           configurationComponentLocator);
+    when(componentLocator.find(any(Location.class))).thenReturn(of(flow));
 
     TestEventResequencer router = new TestEventResequencer(3);
     Map<QName, Object> fakeComponentLocationAnnotations =
