@@ -88,30 +88,22 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
     Transformer trans =
         ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(FRUIT_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
-
     assertThat(trans, is(notNullValue()));
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
     //The same should be returned if we ask for it with compatible data types
-
     trans = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(FRUIT_DATA_TYPE, ORANGE_DATA_TYPE);
-
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
     trans = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(PEACH_DATA_TYPE, BLOOD_ORANGE_DATA_TYPE);
-
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
 
     trans = ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(PEACH_DATA_TYPE, ORANGE_DATA_TYPE);
-
     assertThat(trans, instanceOf(CompositeConverter.class));
     assertThat(trans.getName(), is("fruitToSeedseedToAppleappleToBananabananaToBloodOrange"));
-
-
-
   }
 
   @Test

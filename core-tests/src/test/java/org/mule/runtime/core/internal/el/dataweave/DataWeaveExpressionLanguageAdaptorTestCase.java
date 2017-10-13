@@ -48,6 +48,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.compatibleWith;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
@@ -107,14 +108,14 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void stringExpression() throws Exception {
     TypedValue result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
-    assertThat(STRING.isCompatibleWith(result.getDataType()), is(true));
+    assertThat(STRING, is(compatibleWith(result.getDataType())));
   }
 
   @Test
   public void withPrefixExpression() throws Exception {
     TypedValue result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
-    assertThat(STRING.isCompatibleWith(result.getDataType()), is(true));
+    assertThat(STRING, is(compatibleWith(result.getDataType())));
   }
 
   @Test
@@ -268,7 +269,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     TypedValue result = expressionLanguage.evaluate(DATA_TYPE, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(equalTo(STRING)));
-    assertThat(fromType(DataType.class).isCompatibleWith(result.getDataType()), is(true));
+    assertThat(fromType(DataType.class), is(compatibleWith(result.getDataType())));
   }
 
   @Test
@@ -386,7 +387,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     TypedValue result =
         expressionLanguage.evaluate("flow.name", event, fromSingleComponent(flowName), BindingContext.builder().build());
-    assertThat(STRING.isCompatibleWith(result.getDataType()), is(true));
+    assertThat(STRING, is(compatibleWith(result.getDataType())));
     assertThat(result.getValue(), is(flowName));
   }
 

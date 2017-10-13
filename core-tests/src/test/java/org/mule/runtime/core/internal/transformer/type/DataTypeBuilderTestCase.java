@@ -19,6 +19,7 @@ import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.compatibleWith;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import static java.util.Collections.singletonList;
@@ -207,7 +208,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(dataType, instanceOf(DefaultCollectionDataType.class));
     assertThat(dataType.getType(), is(equalTo(List.class)));
-    assertThat(STRING.isCompatibleWith(((DefaultCollectionDataType) dataType).getItemDataType()), is(true));
+    assertThat(STRING, is(compatibleWith(((DefaultCollectionDataType) dataType).getItemDataType())));
     assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getPrimaryType(), is("application"));
     assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getSubType(), is("json"));
     assertThat(((DefaultCollectionDataType) dataType).getItemDataType().getMediaType().getCharset().get(), is(UTF_8));
@@ -244,11 +245,11 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
     assertThat(dataType, instanceOf(DefaultMapDataType.class));
     assertThat(dataType.getType(), is(equalTo(HashMap.class)));
-    assertThat(TEXT_STRING.isCompatibleWith(((DefaultMapDataType) dataType).getKeyDataType()), is(true));
+    assertThat(TEXT_STRING, is(compatibleWith(((DefaultMapDataType) dataType).getKeyDataType())));
     assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getPrimaryType(), is("text"));
     assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getSubType(), is("plain"));
     assertThat(((DefaultMapDataType) dataType).getKeyDataType().getMediaType().getCharset().get(), is(UTF_8));
-    assertThat(NUMBER.isCompatibleWith(((DefaultMapDataType) dataType).getValueDataType()), is(true));
+    assertThat(NUMBER, is(compatibleWith(((DefaultMapDataType) dataType).getValueDataType())));
     assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getPrimaryType(), is("application"));
     assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getSubType(), is("json"));
     assertThat(((DefaultMapDataType) dataType).getValueDataType().getMediaType().getCharset().get(), is(ISO_8859_1));

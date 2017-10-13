@@ -28,6 +28,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.compatibleWith;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -137,7 +138,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     Message messageCopy = InternalMessage.builder(createTestMessage()).value(true).attributesValue(BASE_ATTRIBUTES).build();
 
     assertThat(messageCopy.getPayload().getValue(), is(true));
-    assertThat(BOOLEAN.isCompatibleWith(messageCopy.getPayload().getDataType()), is(true));
+    assertThat(BOOLEAN, is(compatibleWith(messageCopy.getPayload().getDataType())));
     assertThat(messageCopy.getAttributes().getValue(), is(BASE_ATTRIBUTES));
     assertThat(messageCopy.getAttributes().getDataType(), is(BASE_ATTRIBUTES_DATATYPE));
   }

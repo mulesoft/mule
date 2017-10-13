@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.transformer.graph;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -126,9 +128,9 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractTransform
 
     List<Converter> converters = lookupStrategyTransformation.lookupConverters(UTF_16_DATA_TYPE, JSON_DATA_TYPE);
 
-    assertThat(converters.size(), is(1));
+    assertThat(converters, hasSize(1));
 
-    assertThat(converters.contains(utf16ToJson), is(true));
+    assertThat(converters, contains(utf16ToJson));
   }
 
   @Test
@@ -140,7 +142,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractTransform
 
     List<Converter> converters = lookupStrategyTransformation.lookupConverters(JSON_DATA_TYPE, UTF_16_DATA_TYPE);
 
-    assertThat(converters.size(), is(0));
+    assertThat(converters, hasSize(0));
   }
 
   @Test
@@ -150,7 +152,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractTransform
     graph.addConverter(jsonToTextString);
 
     List<Converter> converters = lookupStrategyTransformation.lookupConverters(JSON_STRING, STRING);
-    assertThat(converters.size(), is(1));
+    assertThat(converters, hasSize(1));
     assertThat(converters.get(0).getName(), is("jsonToTextString"));
   }
 
@@ -161,7 +163,7 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractTransform
     graph.addConverter(xmlToTextString);
 
     List<Converter> converters = lookupStrategyTransformation.lookupConverters(XML_DATA_TYPE, STRING);
-    assertThat(converters.size(), is(1));
+    assertThat(converters, hasSize(1));
     assertThat(converters.get(0).getName(), is("textStringToXML"));
   }
 

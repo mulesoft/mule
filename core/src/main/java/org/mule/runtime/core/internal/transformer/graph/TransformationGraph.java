@@ -103,7 +103,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
     if (super.containsVertex(vertex)) {
       return asList(vertex);
     }
-    return vertexSet().stream().filter((graphVertex) -> graphVertex.isCompatibleWith(vertex)).collect(toList());
+    return vertexSet().stream().filter(graphVertex -> graphVertex.isCompatibleWith(vertex)).collect(toList());
   }
 
   //Checks the graph and returns vertexes which vertex is compatible with.
