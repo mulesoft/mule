@@ -27,6 +27,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleUtils;
+import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.Flow;
 import org.mule.context.notification.ConnectorMessageNotification;
@@ -268,7 +269,8 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             {
                 try
                 {
-                    Object originalPayload = muleEvent.getMessage().getPayload();
+
+                    MuleMessage originalMuleMessage = muleEvent.getMessage();
                     httpResponseToMuleEvent.convert(muleEvent, httpResponse);
                     notificationHelper.fireNotification(muleEvent, httpRequest.getUri(),
                                                         muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
@@ -278,7 +280,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                     if (resendRequest(muleEvent, retryCount, authentication))
                     {
                         consumePayload(muleEvent);
-                        muleEvent.getMessage().setPayload(originalPayload);
+                        muleEvent.setMessage(originalMuleMessage);
                         innerProcessNonBlocking(muleEvent, originalCompletionHandler, 0);
                     }
                     else
@@ -360,14 +362,14 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             }
         }
 
-        Object originalPayload = muleEvent.getMessage().getPayload();
+        MuleMessage originalMuleMessage = muleEvent.getMessage();
         httpResponseToMuleEvent.convert(muleEvent, response);
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
         if (resendRequest(muleEvent, retryCount, authentication))
         {
             consumePayload(muleEvent);
-            muleEvent.getMessage().setPayload(originalPayload);
+            muleEvent.setMessage(originalMuleMessage);
             muleEvent = innerProcess(muleEvent, 0);
         }
         else

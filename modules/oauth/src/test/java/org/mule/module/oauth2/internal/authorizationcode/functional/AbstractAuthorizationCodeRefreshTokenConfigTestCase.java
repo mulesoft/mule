@@ -41,6 +41,13 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
     public static final String RESOURCE_RESULT = "resource result";
     public static final String REFRESHED_ACCESS_TOKEN = "rbBQLgJXBEYo83K4Fqs4guasdfsdfa";
 
+    public static final String TEST_PROPERTY_NAME = "test_name";
+    public static final String TEST_PROPERTY_VALUE = "test_value";
+
+    @Rule
+    public SystemProperty originalPropertyName = new SystemProperty("property.name", TEST_PROPERTY_NAME);
+    @Rule
+    public SystemProperty originalPropertyValue = new SystemProperty("property.value", TEST_PROPERTY_VALUE);
     @Rule
     public SystemProperty originalPayload = new SystemProperty("payload.original", TEST_PAYLOAD);
     @Rule
@@ -78,6 +85,7 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
                                     .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "=" + URLEncoder.encode(OAuthConstants.GRANT_TYPE_REFRESH_TOKEN, StandardCharsets.UTF_8.name()))));
         
         wireMockRule.verify(2, postRequestedFor(urlEqualTo(RESOURCE_PATH)).withRequestBody(equalTo(TEST_PAYLOAD)));
+        wireMockRule.verify(2, postRequestedFor(urlEqualTo(RESOURCE_PATH)).withHeader(TEST_PROPERTY_NAME, containing(TEST_PROPERTY_VALUE)));
     }
 
     protected void executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers(String flowName, String oauthConfigName, String userId, int resourceFailureStatusCode, int tokenFailureStatusCode) throws Exception
