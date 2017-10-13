@@ -37,7 +37,7 @@
   "configurations": [
     {
       "stereotype": {
-        "type": "PEAR-CONFIG",
+        "type": "PEAR_CONFIG",
         "namespace": "VEGAN",
         "parent": {
           "type": "MODULE_CONFIG",
@@ -4110,7 +4110,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
           "stereotype": {
-            "type": "BANANA-PLANTAIN",
+            "type": "BANANA_PLANTAIN",
             "namespace": "VEGAN",
             "parent": {
               "type": "CONNECTION",

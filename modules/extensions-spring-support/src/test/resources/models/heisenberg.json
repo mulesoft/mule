@@ -7325,7 +7325,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "ASYNC-SOURCE",
+            "type": "ASYNC_SOURCE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "SOURCE",
@@ -14240,7 +14240,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -14427,7 +14427,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -14624,7 +14624,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -14810,7 +14810,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -15000,7 +15000,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -15191,7 +15191,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "DRUG-KILLING",
+        "type": "DRUG_KILLING",
         "namespace": "HEISENBERG"
       },
       "parameterGroupModels": [
@@ -15362,7 +15362,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "KILLING-OPERATION",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "HEISENBERG-EMPIRE",
@@ -17935,7 +17935,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING-OPERATION",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "HEISENBERG-EMPIRE",
@@ -18044,7 +18044,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING-OPERATION",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "HEISENBERG-EMPIRE",
@@ -18292,7 +18292,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING-OPERATION",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "HEISENBERG-EMPIRE",
@@ -18386,7 +18386,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "DRUG-KILLING",
+                  "type": "DRUG_KILLING",
                   "namespace": "HEISENBERG"
                 }
               ],
@@ -18462,7 +18462,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "KILLING-OPERATION",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
                     "type": "HEISENBERG-EMPIRE",
@@ -18556,7 +18556,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "DRUG-KILLING",
+                  "type": "DRUG_KILLING",
                   "namespace": "HEISENBERG"
                 }
               ],

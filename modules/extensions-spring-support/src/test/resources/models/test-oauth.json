@@ -21,7 +21,7 @@
     {
       "stereotype": {
         "type": "CONFIG",
-        "namespace": "TEST--OAUTH",
+        "namespace": "TEST-OAUTH",
         "parent": {
           "type": "MODULE_CONFIG",
           "namespace": "MULE"
@@ -815,7 +815,7 @@
           "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "CONNECTION",
-            "namespace": "TEST--OAUTH",
+            "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
               "namespace": "MULE"
@@ -1334,7 +1334,7 @@
                   },
                   "allowedStereotypeModels": [
                     {
-                      "type": "LISTENER--CONFIG",
+                      "type": "LISTENER_CONFIG",
                       "namespace": "HTTP",
                       "parent": {
                         "type": "MODULE_CONFIG",
@@ -1471,7 +1471,7 @@
           "supportsConnectivityTesting": true,
           "stereotype": {
             "type": "SCOPELESS",
-            "namespace": "TEST--OAUTH",
+            "namespace": "TEST-OAUTH",
             "parent": {
               "type": "CONNECTION",
               "namespace": "MULE"
@@ -1989,7 +1989,7 @@
                   },
                   "allowedStereotypeModels": [
                     {
-                      "type": "LISTENER--CONFIG",
+                      "type": "LISTENER_CONFIG",
                       "namespace": "HTTP",
                       "parent": {
                         "type": "MODULE_CONFIG",
@@ -2136,7 +2136,7 @@
       "supportsConnectivityTesting": true,
       "stereotype": {
         "type": "CONNECTION",
-        "namespace": "TEST--OAUTH",
+        "namespace": "TEST-OAUTH",
         "parent": {
           "type": "CONNECTION",
           "namespace": "MULE"
@@ -2655,7 +2655,7 @@
               },
               "allowedStereotypeModels": [
                 {
-                  "type": "LISTENER--CONFIG",
+                  "type": "LISTENER_CONFIG",
                   "namespace": "HTTP",
                   "parent": {
                     "type": "MODULE_CONFIG",
@@ -2792,7 +2792,7 @@
       "supportsConnectivityTesting": true,
       "stereotype": {
         "type": "SCOPELESS",
-        "namespace": "TEST--OAUTH",
+        "namespace": "TEST-OAUTH",
         "parent": {
           "type": "CONNECTION",
           "namespace": "MULE"
@@ -3310,7 +3310,7 @@
               },
               "allowedStereotypeModels": [
                 {
-                  "type": "LISTENER--CONFIG",
+                  "type": "LISTENER_CONFIG",
                   "namespace": "HTTP",
                   "parent": {
                     "type": "MODULE_CONFIG",

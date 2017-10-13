@@ -20,7 +20,7 @@
   "configurations": [
     {
       "stereotype": {
-        "type": "VALUE-WITH-REQUIRED-PARAM",
+        "type": "VALUE_WITH_REQUIRED_PARAM",
         "namespace": "VALUES",
         "parent": {
           "type": "MODULE_CONFIG",
@@ -494,7 +494,7 @@
     },
     {
       "stereotype": {
-        "type": "VALUES-WITH-REQUIRED-PARAMS-FROM-PARAM-GROUP",
+        "type": "VALUES_WITH_REQUIRED_PARAMS_FROM_PARAM_GROUP",
         "namespace": "VALUES",
         "parent": {
           "type": "MODULE_CONFIG",
@@ -990,7 +990,7 @@
     },
     {
       "stereotype": {
-        "type": "VALUES-WITH-REQUIRED-PARAMS-FROM-SHOW-IN-DSL-GROUP",
+        "type": "VALUES_WITH_REQUIRED_PARAMS_FROM_SHOW_IN_DSL_GROUP",
         "namespace": "VALUES",
         "parent": {
           "type": "MODULE_CONFIG",
@@ -2169,7 +2169,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
           "stereotype": {
-            "type": "WITH-VALUE-WITH-REQUIRED-PARAM",
+            "type": "WITH_VALUE_WITH_REQUIRED_PARAM",
             "namespace": "VALUES",
             "parent": {
               "type": "CONNECTION",
@@ -2469,7 +2469,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
           "stereotype": {
-            "type": "WITH-VALUES-WITH-REQUIRED-PARAMS-FROM-PARAM-GROUP",
+            "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_PARAM_GROUP",
             "namespace": "VALUES",
             "parent": {
               "type": "CONNECTION",
@@ -2791,7 +2791,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
           "stereotype": {
-            "type": "WITH-VALUES-WITH-REQUIRED-PARAMS-FROM-SHOW-IN-DSL-GROUP",
+            "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_SHOW_IN_DSL_GROUP",
             "namespace": "VALUES",
             "parent": {
               "type": "CONNECTION",

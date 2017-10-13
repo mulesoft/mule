@@ -21,7 +21,7 @@
     {
       "stereotype": {
         "type": "CONFIG",
-        "namespace": "TYPED--VALUE",
+        "namespace": "TYPED-VALUE",
         "parent": {
           "type": "MODULE_CONFIG",
           "namespace": "MULE"

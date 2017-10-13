@@ -53,7 +53,7 @@
               },
               "allowedStereotypeModels": [
                 {
-                  "type": "IRON-MAN",
+                  "type": "IRON_MAN",
                   "namespace": "MARVEL",
                   "parent": {
                     "type": "MODULE_CONFIG",
@@ -1650,7 +1650,7 @@
                       }
                     },
                     {
-                      "type": "IRON-MAN",
+                      "type": "IRON_MAN",
                       "namespace": "MARVEL",
                       "parent": {
                         "type": "MODULE_CONFIG",
@@ -2373,7 +2373,7 @@
     },
     {
       "stereotype": {
-        "type": "IRON-MAN",
+        "type": "IRON_MAN",
         "namespace": "MARVEL",
         "parent": {
           "type": "MODULE_CONFIG",
