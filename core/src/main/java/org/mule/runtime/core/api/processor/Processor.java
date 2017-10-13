@@ -16,21 +16,22 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
 
 /**
- * Processes {@link CoreEvent}'s. Implementations that do not mutate the {@link CoreEvent} or pass it on to another MessageProcessor
- * should return the MuleEvent they receive.
- *
+ * Processes {@link CoreEvent}'s. Implementations that do not mutate the {@link CoreEvent} or pass it on to another
+ * MessageProcessor should return the MuleEvent they receive.
+ * <p>
  * From 4.0 this interface also extends {@link ReactiveProcessor} and implementations of this interface can be used in
- * {@link CoreEvent} stream processing via the default implementation of {@link #apply(Publisher)} that performs a map function on the
- * stream using the result of the invocation of the blocking {@link #process(CoreEvent)} method. Using this approach simple processor
- * implementations that don't block or perform blocking IO can continue to implement {@link Processor} and require no changes.
- * 
+ * {@link CoreEvent} stream processing via the default implementation of {@link #apply(Publisher)} that performs a map function on
+ * the stream using the result of the invocation of the blocking {@link #process(CoreEvent)} method. Using this approach simple
+ * processor implementations that don't block or perform blocking IO can continue to implement {@link Processor} and require no
+ * changes.
+ *
  * @since 3.0
  */
 public interface Processor extends ReactiveProcessor {
 
   /**
    * Invokes the MessageProcessor.
-   * 
+   *
    * @param event MuleEvent to be processed
    * @return optional response MuleEvent
    * @throws MuleException

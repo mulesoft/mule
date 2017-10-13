@@ -10,6 +10,7 @@ import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
@@ -149,11 +150,13 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       }
 
       try {
-        interceptor.before(((Component) component).getLocation(), getResolvedParams(eventWithResolvedParams),
-                           interceptionEvent);
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.before(((Component) component).getLocation(),
+                                                        getResolvedParams(eventWithResolvedParams),
+                                                        interceptionEvent));
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e, (Component) component));
+        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component));
       }
     };
   }
@@ -174,19 +177,21 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
     }
 
     try {
-      return interceptor
-          .around(((Component) component).getLocation(), getResolvedParams(eventWithResolvedParams), interceptionEvent,
-                  reactiveInterceptionAction)
-          .exceptionally(t -> {
-            if (t instanceof MessagingException) {
-              throw new CompletionException(t);
-            } else {
-              throw new CompletionException(createMessagingException(eventWithResolvedParams,
-                                                                     t instanceof CompletionException ? t.getCause() : t,
-                                                                     ((Component) component)));
-            }
-          })
-          .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
+      return withContextClassLoader(interceptor.getClass().getClassLoader(), () -> interceptor
+          .around(((Component) component).getLocation(),
+                  getResolvedParams(eventWithResolvedParams), interceptionEvent,
+                  reactiveInterceptionAction))
+                      .exceptionally(t -> {
+                        if (t instanceof MessagingException) {
+                          throw new CompletionException(t);
+                        } else {
+                          throw new CompletionException(createMessagingException(eventWithResolvedParams,
+                                                                                 t instanceof CompletionException ? t.getCause()
+                                                                                     : t,
+                                                                                 ((Component) component)));
+                        }
+                      })
+                      .thenApply(interceptedEvent -> ((DefaultInterceptionEvent) interceptedEvent).resolve());
     } catch (Exception e) {
       throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
     }
@@ -209,10 +214,11 @@ public class ReactiveInterceptorAdapter implements BiFunction<Processor, Reactiv
       }
 
       try {
-        interceptor.after(((Component) component).getLocation(), interceptionEvent, thrown);
+        withContextClassLoader(interceptor.getClass().getClassLoader(),
+                               () -> interceptor.after(((Component) component).getLocation(), interceptionEvent, thrown));
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component));
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), (Component) component));
       }
     };
   }

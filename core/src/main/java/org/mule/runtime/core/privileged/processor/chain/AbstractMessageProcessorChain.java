@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
@@ -23,6 +24,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
@@ -69,6 +71,9 @@ import reactor.core.publisher.Mono;
  */
 abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
+  private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
+  private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
+
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private final String name;
@@ -103,7 +108,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       // along with the interceptors that decorate it.
       stream = stream.transform(applyInterceptors(interceptors, processor));
     }
-    return stream;
+    return stream.subscriberContext(ctx -> {
+      if (currentThread().getContextClassLoader() == null || currentThread().getContextClassLoader().getParent() == null) {
+        return ctx;
+      } else {
+        return ctx
+            .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, currentThread().getContextClassLoader())
+            .put(TCCL_REACTOR_CTX_KEY, currentThread().getContextClassLoader().getParent());
+      }
+    });
   }
 
   private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
@@ -120,7 +133,24 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors =
         new ArrayList<>();
 
-    // #1 Update MessagingException with failing processor if required, create Error and set error context.
+    // #1 Update TCCL with the one from the Region of the processor to execute
+    interceptors.add((processor, next) -> stream -> from(stream)
+        .zipWith(subscriberContext()
+            .map(ctx -> ctx.getOrEmpty(TCCL_REACTOR_CTX_KEY)))
+        .doOnNext(t -> {
+          t.getT2().ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
+        })
+        .map(t -> t.getT1())
+        .transform(next)
+
+        .doOnEach(signal -> {
+          if (signal.isOnError() || signal.isOnNext()) {
+            subscriberContext().map(ctx -> ctx.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY))
+                .doOnNext(cl -> cl.ifPresent(cl2 -> currentThread().setContextClassLoader((ClassLoader) cl2)));
+          }
+        }));
+
+    // #2 Update MessagingException with failing processor if required, create Error and set error context.
     interceptors.add((processor, next) -> stream -> from(stream)
         .concatMap(event -> just(event)
             .transform(next)
@@ -128,7 +158,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             .onErrorMap(t -> !(t instanceof MessagingException),
                         t -> resolveException((Component) processor, event, t))));
 
-    // #2 Update ThreadLocal event before processor execution once on processor thread.
+    // #3 Update ThreadLocal event before processor execution once on processor thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(event -> currentMuleContext.set(muleContext))
@@ -136,7 +166,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .cast(CoreEvent.class)
         .transform(next));
 
-    // #3 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
+    // #4 Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
     // threads which may be limited to avoid deadlocks.
     // Use anonymous ReactiveProcessor to apply processing strategy to processor + previous interceptors
     // while using the processing type of the processor itself.
@@ -156,14 +186,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           }));
     }
 
-    // #4 Update ThreadLocal event after processor execution once back on flow thread.
+    // #5 Update ThreadLocal event after processor execution once back on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
         .cast(PrivilegedEvent.class)
         .doOnNext(result -> setCurrentEvent(result))
         .cast(CoreEvent.class));
 
-    // #5 Fire MessageProcessor notifications before and after processor execution.
+    // #6 Fire MessageProcessor notifications before and after processor execution.
     interceptors.add((processor, next) -> stream -> from(stream)
         .cast(PrivilegedEvent.class)
         .doOnNext(preNotification(processor))
@@ -174,15 +204,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .doOnError(MessagingException.class, errorNotification(processor))
         .cast(CoreEvent.class));
 
-    // #6 If the processor returns a CursorProvider, then have the StreamingManager manage it
+    // #7 If the processor returns a CursorProvider, then have the StreamingManager manage it
     interceptors.add((processor, next) -> stream -> from(stream)
         .transform(next)
         .map(updateEventForStreaming(streamingManager)));
 
-    // #7 Apply processor interceptors.
+    // #8 Apply processor interceptors.
     interceptors.addAll(0, additionalInterceptors);
 
-    // #8 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
+    // #9 Handle errors that occur during Processor execution. This is done outside to any scheduling to ensure errors in
     // scheduling such as RejectedExecutionException's can be handled cleanly.
     interceptors.add((processor, next) -> stream -> from(stream)
         .concatMap(event -> just(event)

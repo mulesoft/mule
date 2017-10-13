@@ -69,6 +69,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -85,6 +86,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 /**
  * Contains test for application deployment on the default domain
@@ -1205,6 +1209,121 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  @Issue("MULE-13756")
+  @Description("Tests that code called form plugin's Processor cannot access internal resources/packages of the application")
+  public void deploysAppWithNotExportedPackageAndPlugin() throws Exception {
+    ArtifactPluginFileBuilder loadsAppResourcePlugin = new ArtifactPluginFileBuilder("loadsAppResourcePlugin")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
+
+    ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("non-exposing-app")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
+        .definedBy("app-with-loads-app-resource-plugin-config.xml")
+        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingResource("test-resource.txt", "test-resource.txt")
+        .containingResource("test-resource.txt", "test-resource-not-exported.txt")
+        .dependingOn(loadsAppResourcePlugin);
+
+    addPackedAppFromBuilder(nonExposingAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-13756")
+  @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
+  public void deploysAppWithNotExportedPackage() throws Exception {
+    ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("non-exposing-app")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
+        .definedBy("app-with-loads-app-resource-plugin-config.xml")
+        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
+        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingResource("test-resource.txt", "test-resource.txt")
+        .containingResource("test-resource.txt", "test-resource-not-exported.txt");
+
+    addPackedAppFromBuilder(nonExposingAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-13756")
+  @Description("Tests that code called form plugin's ProcessorInterceptor cannot access internal resources/packages of the application")
+  public void deploysAppWithNotExportedPackageAndPluginWithInterceptors() throws Exception {
+    File loadsAppResourceInterceptorFactoryClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptorFactory.java"));
+    File loadsAppResourceInterceptorClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptor.java"));
+
+    ArtifactPluginFileBuilder loadsAppResourceInterceptorPlugin =
+        new ArtifactPluginFileBuilder("loadsAppResourceInterceptorPlugin")
+            .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.lalala")
+            .containingClass(loadsAppResourceInterceptorFactoryClassFile, "org/foo/LoadsAppResourceInterceptorFactory.class")
+            .containingClass(loadsAppResourceInterceptorClassFile, "org/foo/LoadsAppResourceInterceptor.class")
+            .containingResource("registry-bootstrap-loads-app-resource-pif.properties",
+                                "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties");
+
+    ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("non-exposing-app")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
+        .definedBy("app-with-plugin-bootstrap.xml")
+        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingResource("test-resource.txt", "test-resource.txt")
+        .containingResource("test-resource.txt", "test-resource-not-exported.txt")
+        .dependingOn(loadsAppResourceInterceptorPlugin);
+
+    addPackedAppFromBuilder(nonExposingAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("MULE-13756")
+  @Description("Tests that code called form application's ProcessorInterceptor can access internal resources/packages of the application")
+  public void deploysAppWithInterceptorsAndNotExportedPackage() throws Exception {
+    File loadsOwnResourceInterceptorFactoryClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptorFactory.java"));
+    File loadsOwnResourceInterceptorClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptor.java"));
+
+    ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("non-exposing-app")
+        .configuredWith(EXPORTED_PACKAGES, "org.bar1")
+        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
+        .definedBy("app-with-interceptor.xml")
+        .containingClass(loadsOwnResourceInterceptorFactoryClassFile, "org/foo/LoadsOwnResourceInterceptorFactory.class")
+        .containingClass(loadsOwnResourceInterceptorClassFile, "org/foo/LoadsOwnResourceInterceptor.class")
+        .containingClass(barUtils1ClassFile, "/org/bar1/BarUtils.class")
+        .containingClass(barUtils2ClassFile, "/org/bar2/BarUtils.class")
+        .containingResource("test-resource.txt", "test-resource.txt")
+        .containingResource("test-resource.txt", "test-resource-not-exported.txt");
+
+    addPackedAppFromBuilder(nonExposingAppFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
   public void deploysAppZipWithExtensionPlugin() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin);
@@ -1547,9 +1666,9 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
       executeApplicationFlow("main");
       fail("Expected to fail as there should be a missing class");
     } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(MuleFatalException.class));
-      assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
-      assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
+      assertThat(e.getCause().getCause(), instanceOf(MuleFatalException.class));
+      assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
   }
 

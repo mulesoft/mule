@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static java.lang.String.format;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -21,6 +23,7 @@ public class DirectoryResourceLocator implements LocalResourceLocator {
     this.directories = directories;
   }
 
+  @Override
   public URL findLocalResource(String resourceName) {
     if (directories != null && resourceName != null) {
       for (String directory : directories) {
@@ -29,8 +32,7 @@ public class DirectoryResourceLocator implements LocalResourceLocator {
           try {
             return resourceFile.toURI().toURL();
           } catch (MalformedURLException e) {
-            throw new MuleRuntimeException(CoreMessages
-                .createStaticMessage(String.format("Can not load resource with name %s.", resourceName)), e);
+            throw new MuleRuntimeException(createStaticMessage(format("Can not load resource with name %s.", resourceName)), e);
           }
         }
       }
