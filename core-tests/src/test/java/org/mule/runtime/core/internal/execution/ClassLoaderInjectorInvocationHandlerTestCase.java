@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.execution;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertSame;
@@ -68,7 +69,7 @@ public class ClassLoaderInjectorInvocationHandlerTestCase extends AbstractMuleTe
   }
 
   private ClassLoader getContextClassLoader() {
-    return Thread.currentThread().getContextClassLoader();
+    return currentThread().getContextClassLoader();
   }
 
   public interface TestDelegate {
