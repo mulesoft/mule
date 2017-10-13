@@ -6,11 +6,16 @@
  */
 package org.mule.module.launcher.coreextension;
 
+import static org.mule.config.bootstrap.ArtifactType.APP;
+import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.CoreExtensionsAware;
 import org.mule.MuleCoreExtension;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.bootstrap.ArtifactType;
+import org.mule.module.launcher.DeploymentListenerAdapter;
+import org.mule.module.launcher.ArtifactDeploymentListener;
 import org.mule.module.launcher.DeploymentListener;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentServiceAware;
@@ -129,6 +134,12 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
                 deploymentService.addDeploymentListener((DeploymentListener) extension);
             }
 
+            if (extension instanceof ArtifactDeploymentListener)
+            {
+                deploymentService.addDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
+                deploymentService.addDomainDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, DOMAIN));
+            }
+
             if (extension instanceof PluginClassLoaderManagerAware)
             {
                 ((PluginClassLoaderManagerAware) extension).setPluginClassLoaderManager(pluginClassLoaderManager);
@@ -153,5 +164,17 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
     public void setPluginClassLoaderManager(PluginClassLoaderManager pluginClassLoaderManager)
     {
         this.pluginClassLoaderManager = pluginClassLoaderManager;
+    }
+
+    /**
+     * Creates a {@link DeploymentListenerAdapter}.
+     *
+     * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
+     * @param type: the artifact type.
+     * @return an DeploymentListener.
+     */
+    DeploymentListener createDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
+    {
+        return new DeploymentListenerAdapter(artifactDeploymentListener, type);
     }
 }
