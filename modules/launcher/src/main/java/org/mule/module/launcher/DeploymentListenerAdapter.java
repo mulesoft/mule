@@ -37,7 +37,7 @@ public class DeploymentListenerAdapter implements DeploymentListener
      *
      * @param artifactDeploymentListener the artifactDeploymentListener to adapt.
      * @param artifactType any of the artifact types present in {@link #DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES}
-     * @throws IllegalArgumentException if
+     * @throws IllegalArgumentException if the artifact type is invalid.
      */
     public DeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType artifactType)
     {
