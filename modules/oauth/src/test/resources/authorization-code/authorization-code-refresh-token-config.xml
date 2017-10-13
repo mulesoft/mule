@@ -27,6 +27,7 @@
     </http:request-config>
 
     <flow name="testFlow">
+        <set-property propertyName="${property.name}" value="${property.value}"/>
     	<set-payload value="${payload.original}"/>
         <http:request host="localhost" port="${oauth.server.port}" path="/resource" method="POST"
                       config-ref="requestConfig"/>
