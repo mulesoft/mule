@@ -6,7 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
@@ -19,6 +18,7 @@ import static org.mule.test.metadata.extension.query.MetadataExtensionEntityReso
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.SQUARE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
@@ -33,7 +33,6 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.test.metadata.extension.model.shapes.Circle;
 
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -103,16 +102,6 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
     assertThat(entityMetadata.isSuccess(), is(true));
     MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
     assertCircleType((ObjectType) generatedType);
-  }
-
-  @Test
-  public void queryWithExpression() throws Exception {
-    List<String> result = (List<String>) flowRunner("queryWithExpression")
-        .withVariable("diameter", 18)
-        .run().getMessage().getPayload().getValue();
-
-    assertThat(result, hasSize(1));
-    assertThat(result.get(0), equalTo("SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18"));
   }
 
   private void assertCircleType(ObjectType fields) {

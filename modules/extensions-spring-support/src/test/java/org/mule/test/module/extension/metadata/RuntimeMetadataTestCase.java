@@ -6,6 +6,8 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
@@ -15,9 +17,12 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
 
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.metadata.extension.LocationKey;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
+
+import java.util.List;
 
 import org.junit.Test;
 
@@ -28,8 +33,18 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
   }
 
   @Override
+  public boolean enableLazyInit() {
+    return false;
+  }
+
+  @Override
+  public boolean disableXmlValidations() {
+    return false;
+  }
+
+  @Override
   protected String getConfigFile() {
-    return METADATA_TEST;
+    return RUNTIME_METADATA_CONFIG;
   }
 
   @Test
@@ -80,5 +95,29 @@ public class RuntimeMetadataTestCase extends AbstractMetadataOperationTestCase {
   public void metadataKeyDefaultValue() throws Exception {
     CoreEvent event = flowRunner(METADATA_KEY_DEFAULT_VALUE).run();
     assertThat(event.getMessage().getPayload().getValue(), is(CAR));
+  }
+
+  @Test
+  public void queryWithExpression() throws Exception {
+    List<String> result = (List<String>) flowRunner("queryWithExpression")
+        .withVariable("diameter", 18)
+        .run().getMessage().getPayload().getValue();
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0), equalTo("SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18"));
+  }
+
+  @Test
+  public void injectComposedMetadataKeyIdInstanceInSource() throws Exception {
+    Flow flow = (Flow) getFlowConstruct(SOURCE_METADATA_WITH_MULTILEVEL);
+    flow.start();
+    flow.stop();
+  }
+
+  @Test
+  public void injectSimpleMetadataKeyIdInstanceInSource() throws Exception {
+    Flow flow = (Flow) getFlowConstruct(SOURCE_METADATA);
+    flow.start();
+    flow.stop();
   }
 }

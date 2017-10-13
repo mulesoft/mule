@@ -25,10 +25,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.util.Reference;
@@ -42,8 +39,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigResource;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecyclePhase;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 
@@ -102,7 +97,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
                                                                          .get()));
     muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_METADATA_SERVICE, MuleMetadataService.class);
     muleContext.getCustomizationService().overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
-                                                                     new LazyValueProviderService(this, this, () -> getRegistry()
+                                                                     new LazyValueProviderService(this, () -> getRegistry()
                                                                          .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
                                                                          .get(),
                                                                                                   muleContext::getConfigurationComponentLocator));

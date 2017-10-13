@@ -25,15 +25,10 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
-import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.TIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
-import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
-import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
-import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 
@@ -48,10 +43,8 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
@@ -68,16 +61,12 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import javax.inject.Inject;
 
 import org.junit.Test;
 
@@ -90,12 +79,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   private static final String PAGED_OPERATION_METADATA_RESULT_WITH_ATTRIBUTES =
       "pagedOperationMetadataResultWithAttributesResolver";
 
-  private static final String CONFIG = "config";
-  private static final String ALTERNATIVE_CONFIG = "alternative-config";
-
-  @Inject
-  private MetadataService metadataManager;
-
   public MetadataOperationTestCase(ResolutionType resolutionType) {
     super(resolutionType);
   }
@@ -103,11 +86,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;
-  }
-
-  @Override
-  protected boolean isDisposeContextPerClass() {
-    return true;
   }
 
   @Test
@@ -382,29 +360,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
-  public void multipleCaches() throws Exception {
-    Map<String, ? extends MetadataCache> caches = getMetadataCaches(metadataManager);
-    caches.keySet().forEach(metadataManager::disposeCache);
-
-    // using config
-    location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
-
-    location = Location.builder().globalName(OUTPUT_METADATA_WITHOUT_KEY_PARAM).addProcessorsPart().addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
-
-    // using alternative-config
-    location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
-        .addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
-
-    caches = getMetadataCaches(metadataManager);
-
-    assertThat(caches.keySet(), hasSize(2));
-    assertThat(caches.keySet(), hasItems(CONFIG, ALTERNATIVE_CONFIG));
-  }
-
-  @Test
   public void pagedOperationMetadataTestCase() throws Exception {
     location = Location.builder().globalName(PAGED_OPERATION_METADATA).addProcessorsPart().addIndexPart(0).build();
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
@@ -431,37 +386,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(param, is(instanceOf(ArrayType.class)));
     assertThat(getId(param).get(), is(Iterator.class.getName()));
     assertMessageType(((ArrayType) param).getType(), personType, personType);
-  }
-
-  @Test
-  public void elementsAreStoredInCaches() throws Exception {
-    // using config
-    location = Location.builder().globalName(OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    metadataService.getMetadataKeys(location);
-    getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
-
-    // using alternative-config
-    location = Location.builder().globalName(CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG).addProcessorsPart()
-        .addIndexPart(0).build();
-    getSuccessComponentDynamicMetadata();
-
-    MetadataCache configCache = getMetadataCaches(metadataManager).get(CONFIG);
-
-    assertThat(configCache.get(AGE).get(), is(AGE_VALUE));
-    assertThat(configCache.get(NAME).get(), is(NAME_VALUE));
-    assertThat(configCache.get(BRAND).get(), is(BRAND_VALUE));
-
-    MetadataCache alternativeConfigCache = getMetadataCaches(metadataManager).get(ALTERNATIVE_CONFIG);
-    assertThat(alternativeConfigCache.get(BRAND).get(), is(BRAND_VALUE));
-  }
-
-  private Map<String, ? extends MetadataCache> getMetadataCaches(MetadataService metadataManager) {
-    try {
-      Method getMetadataCachesMethod = metadataManager.getClass().getMethod("getMetadataCaches");
-      return (Map<String, ? extends MetadataCache>) getMetadataCachesMethod.invoke(metadataManager);
-    } catch (Exception e) {
-      throw new IllegalStateException("Cannot obtain metadata caches", e);
-    }
   }
 
   @Test

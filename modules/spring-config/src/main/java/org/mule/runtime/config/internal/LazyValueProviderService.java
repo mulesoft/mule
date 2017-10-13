@@ -17,6 +17,7 @@ import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtili
 import static org.mule.runtime.core.internal.value.MuleValueProviderServiceUtility.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,13 +30,12 @@ import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
-import org.mule.runtime.extension.api.values.ValueResolvingException;
-
-import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -53,7 +53,6 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
   private Supplier<ConfigurationComponentLocator> componentLocatorSupplier;
 
-  private LazyComponentCreator lazyComponentCreator;
   private LazyComponentInitializer lazyComponentInitializer;
 
   @Inject
@@ -62,10 +61,9 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   private ConfigurationComponentLocator componentLocator;
 
-  LazyValueProviderService(LazyMuleArtifactContext lazyComponentCreator, LazyComponentInitializer lazyComponentInitializer,
+  LazyValueProviderService(LazyComponentInitializer lazyComponentInitializer,
                            Supplier<ValueProviderService> valueProviderServiceSupplier,
                            Supplier<ConfigurationComponentLocator> componentLocatorSupplier) {
-    this.lazyComponentCreator = lazyComponentCreator;
     this.lazyComponentInitializer = lazyComponentInitializer;
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
     this.componentLocatorSupplier = componentLocatorSupplier;
@@ -76,31 +74,15 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
    */
   @Override
   public ValueResult getValues(Location location, String providerName) {
-    return initializeComponent(location, providerName)
+    return initializeComponent(location)
         .orElseGet(() -> providerService.getValues(location, providerName));
   }
 
-  private Optional<ValueResult> initializeComponent(Location location, String providerName) {
+  private Optional<ValueResult> initializeComponent(Location location) {
     Location locationWithOutConnection = locationWithOutConnection(location);
 
     try {
-      lazyComponentCreator.createComponent(locationWithOutConnection);
-
-      ValueProviderModel valueProviderModel = getModel(location, providerName)
-          .orElseThrow(() -> new ValueResolvingException(format("Unable to retrieve the model for the provider: [%s] in the location: [%s]",
-                                                                providerName, location),
-                                                         INVALID_LOCATION));
-
-      if (valueProviderModel.requiresConnection() || valueProviderModel.requiresConfiguration()) {
-        // All components are initialized to be able to retrieve the configuration or connection
-        lazyComponentInitializer.initializeComponent(location);
-      }
-
-    } catch (ValueResolvingException e) {
-      return of(resultFrom(newFailure(e)
-          .withFailureCode(e.getFailureCode())
-          .build()));
-
+      lazyComponentInitializer.initializeComponent(locationWithOutConnection);
     } catch (Exception e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof NoSuchComponentModelException) {

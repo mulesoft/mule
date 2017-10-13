@@ -8,15 +8,20 @@ package org.mule.runtime.module.extension.internal.value;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -55,9 +60,9 @@ public class ValueProviderFactory {
       ValueProvider resolver = instantiateClass(resolverClass);
       initialiseIfNeeded(resolver, true, muleContext);
 
-      for (String requiredParam : factoryModelProperty.getRequiredParameters()) {
-        Object parameterValue = parameterValueResolver.getParameterValue(requiredParam);
-        injectValueIntoField(resolver, parameterValue, requiredParam);
+      Optional<ValueResolvingException> optionalException = injectValueProviderFields(resolver);
+      if (optionalException.isPresent()) {
+        throw optionalException.get();
       }
 
       if (factoryModelProperty.usesConnection()) {
@@ -68,9 +73,32 @@ public class ValueProviderFactory {
         injectValueIntoField(resolver, configurationSupplier.get(), configField);
       }
       return resolver;
+    } catch (ValueResolvingException e) {
+      throw e;
     } catch (Exception e) {
       throw new ValueResolvingException("An error occurred trying to create a ValueProvider", UNKNOWN, e);
     }
+  }
+
+  private Optional<ValueResolvingException> injectValueProviderFields(ValueProvider resolver)
+      throws org.mule.runtime.module.extension.internal.runtime.ValueResolvingException {
+    List<String> missingParameters = new ArrayList<>();
+    for (InjectableParameterInfo injectableParam : factoryModelProperty.getInjectableParameters()) {
+      String parameterName = injectableParam.getParameterName();
+      try {
+        Object parameterValue = parameterValueResolver.getParameterValue(parameterName);
+        injectValueIntoField(resolver, parameterValue, parameterName);
+      } catch (org.mule.runtime.module.extension.internal.runtime.ValueResolvingException e) {
+        if (injectableParam.isRequired()) {
+          missingParameters.add(parameterName);
+        }
+      }
+    }
+    return missingParameters.isEmpty()
+        ? Optional.empty()
+        : Optional
+            .of(new ValueResolvingException("Unable to retrieve values. There are missing required parameters for the resolution: "
+                + missingParameters, MISSING_REQUIRED_PARAMETERS));
   }
 
   private static void injectValueIntoField(ValueProvider fieldContainer, Object valueToInject, String requiredParamName) {

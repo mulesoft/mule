@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -52,13 +53,14 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiConsumer;
-
-import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;
@@ -68,6 +70,7 @@ import org.junit.runners.Parameterized;
 public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends AbstractExtensionFunctionalTestCase {
 
   protected static final String METADATA_TEST = "metadata-tests.xml";
+  protected static final String RUNTIME_METADATA_CONFIG = "metadata-runtime-tests.xml";
   protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
 
   protected static final String METADATA_TEST_STATIC_NO_REF_CONFIGURATION = "metadata-tests-static-no-ref-configuration.xml";
@@ -131,7 +134,18 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
   @Inject
+  @Named(METADATA_SERVICE_KEY)
   protected MetadataService metadataService;
+
+  @Override
+  public boolean enableLazyInit() {
+    return true;
+  }
+
+  @Override
+  public boolean disableXmlValidations() {
+    return true;
+  }
 
   protected MetadataType personType;
   protected Location location;
