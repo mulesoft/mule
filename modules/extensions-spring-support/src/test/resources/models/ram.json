@@ -993,7 +993,7 @@
           "externalLibraryModels": [],
           "supportsConnectivityTesting": false,
           "stereotype": {
-            "type": "CONNECTION",
+            "type": "RICK-AND-MORTY-CONNECTION",
             "namespace": "RAM",
             "parent": {
               "type": "CONNECTION",

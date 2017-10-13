@@ -11,12 +11,14 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate;
 import org.mule.runtime.extension.internal.loader.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.validator.CorrectXmlNamesValidator;
+import org.mule.runtime.module.extension.internal.loader.enricher.StereotypesDeclarationEnricher;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,8 @@ import java.util.Optional;
  * @since 4.0
  */
 public class XmlExtensionModelLoader extends ExtensionModelLoader {
+
+  private final List<DeclarationEnricher> customEnrichers = unmodifiableList(asList(new StereotypesDeclarationEnricher()));
 
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
                                                                                          new CorrectXmlNamesValidator()));
@@ -77,5 +81,6 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(customValidators);
+    context.addCustomDeclarationEnrichers(customEnrichers);
   }
 }

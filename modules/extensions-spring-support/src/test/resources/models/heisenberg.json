@@ -1548,7 +1548,7 @@
             "HEISENBERG:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -1801,7 +1801,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -1857,7 +1857,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -2296,7 +2296,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -2760,7 +2760,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -2869,7 +2869,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -2984,7 +2984,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -3165,7 +3165,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -3597,7 +3597,7 @@
             "HEISENBERG:CONNECTIVITY"
           ],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -3865,7 +3865,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -4050,7 +4050,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -4430,7 +4430,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -4853,7 +4853,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -5221,7 +5221,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "heisenberg-empire",
+            "type": "HEISENBERG-EMPIRE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "PROCESSOR",
@@ -7325,7 +7325,7 @@
           "nestedComponents": [],
           "errors": [],
           "stereotype": {
-            "type": "AsyncSource",
+            "type": "ASYNC_SOURCE",
             "namespace": "HEISENBERG",
             "parent": {
               "type": "SOURCE",
@@ -7510,10 +7510,12 @@
                         },
                         "annotations": {
                           "stereotype": {
-                            "stereotypeModel": {
-                              "type": "OBJECT_STORE",
-                              "namespace": "OS"
-                            }
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
                           },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
@@ -9129,10 +9131,12 @@
                         },
                         "annotations": {
                           "stereotype": {
-                            "stereotypeModel": {
-                              "type": "OBJECT_STORE",
-                              "namespace": "OS"
-                            }
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
                           },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
@@ -10778,10 +10782,12 @@
                         },
                         "annotations": {
                           "stereotype": {
-                            "stereotypeModel": {
-                              "type": "OBJECT_STORE",
-                              "namespace": "OS"
-                            }
+                            "allowedStereotypes": [
+                              {
+                                "type": "OBJECT_STORE",
+                                "namespace": "OS"
+                              }
+                            ]
                           },
                           "description": {
                             "value": "The object store where the redelivery counter for each message is going to be stored."
@@ -11212,7 +11218,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -11669,7 +11675,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -11917,7 +11923,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -12099,7 +12105,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -12217,7 +12223,7 @@
         "HEISENBERG:HEALTH"
       ],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -12326,7 +12332,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -12537,7 +12543,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -12790,7 +12796,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -13138,7 +13144,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -13359,7 +13365,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -13468,7 +13474,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -13659,7 +13665,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -14053,7 +14059,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -14234,10 +14240,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -14421,10 +14427,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -14618,10 +14624,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -14804,10 +14810,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -14994,10 +15000,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -15185,7 +15191,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "drugKilling",
+        "type": "DRUG_KILLING",
         "namespace": "HEISENBERG"
       },
       "parameterGroupModels": [
@@ -15356,10 +15362,10 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "killingOperation",
+        "type": "KILLING_OPERATION",
         "namespace": "HEISENBERG",
         "parent": {
-          "type": "heisenberg-empire",
+          "type": "HEISENBERG-EMPIRE",
           "namespace": "HEISENBERG",
           "parent": {
             "type": "PROCESSOR",
@@ -15578,7 +15584,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -15746,7 +15752,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -15923,7 +15929,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -16222,7 +16228,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -16666,7 +16672,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -16854,7 +16860,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17024,7 +17030,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17192,7 +17198,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17378,7 +17384,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17547,7 +17553,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17704,7 +17710,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17857,7 +17863,7 @@
       "nestedComponents": [],
       "errors": [],
       "stereotype": {
-        "type": "heisenberg-empire",
+        "type": "HEISENBERG-EMPIRE",
         "namespace": "HEISENBERG",
         "parent": {
           "type": "PROCESSOR",
@@ -17929,10 +17935,10 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "killingOperation",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
-                    "type": "heisenberg-empire",
+                    "type": "HEISENBERG-EMPIRE",
                     "namespace": "HEISENBERG",
                     "parent": {
                       "type": "PROCESSOR",
@@ -18038,10 +18044,10 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "killingOperation",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
-                    "type": "heisenberg-empire",
+                    "type": "HEISENBERG-EMPIRE",
                     "namespace": "HEISENBERG",
                     "parent": {
                       "type": "PROCESSOR",
@@ -18286,10 +18292,10 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "killingOperation",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
-                    "type": "heisenberg-empire",
+                    "type": "HEISENBERG-EMPIRE",
                     "namespace": "HEISENBERG",
                     "parent": {
                       "type": "PROCESSOR",
@@ -18380,7 +18386,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "drugKilling",
+                  "type": "DRUG_KILLING",
                   "namespace": "HEISENBERG"
                 }
               ],
@@ -18456,10 +18462,10 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "killingOperation",
+                  "type": "KILLING_OPERATION",
                   "namespace": "HEISENBERG",
                   "parent": {
-                    "type": "heisenberg-empire",
+                    "type": "HEISENBERG-EMPIRE",
                     "namespace": "HEISENBERG",
                     "parent": {
                       "type": "PROCESSOR",
@@ -18550,7 +18556,7 @@
               "isRequired": true,
               "allowedStereotypes": [
                 {
-                  "type": "drugKilling",
+                  "type": "DRUG_KILLING",
                   "namespace": "HEISENBERG"
                 }
               ],
@@ -19535,10 +19541,12 @@
                     },
                     "annotations": {
                       "stereotype": {
-                        "stereotypeModel": {
-                          "type": "OBJECT_STORE",
-                          "namespace": "OS"
-                        }
+                        "allowedStereotypes": [
+                          {
+                            "type": "OBJECT_STORE",
+                            "namespace": "OS"
+                          }
+                        ]
                       },
                       "description": {
                         "value": "The object store where the redelivery counter for each message is going to be stored."
