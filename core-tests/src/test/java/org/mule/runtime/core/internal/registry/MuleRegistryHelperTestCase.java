@@ -113,4 +113,21 @@ public class MuleRegistryHelperTestCase extends AbstractMuleContextTestCase {
 
 
   }
+
+  @Test
+  public void closestToTypesTransformerIsFoundEvenIfWeightIsLess() throws Exception {
+    Transformer bananaToBloodOrange = new MockConverterBuilder().named("bananaToBloodOrange").from(BANANA_DATA_TYPE)
+        .to(BLOOD_ORANGE_DATA_TYPE).weighting(10).build();
+    Transformer bananaToOrange =
+        new MockConverterBuilder().named("bananaToOrange").from(BANANA_DATA_TYPE).to(ORANGE_DATA_TYPE).weighting(1).build();
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(bananaToBloodOrange);
+    ((MuleContextWithRegistries) muleContext).getRegistry().registerTransformer(bananaToOrange);
+
+    Transformer trans =
+        ((MuleContextWithRegistries) muleContext).getRegistry().lookupTransformer(BANANA_DATA_TYPE, ORANGE_DATA_TYPE);
+
+    assertThat(trans, is(notNullValue()));
+    assertThat(trans.getName(), is("bananaToOrange"));
+  }
+
 }
