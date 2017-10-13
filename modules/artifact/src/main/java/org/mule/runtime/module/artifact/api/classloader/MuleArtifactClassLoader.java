@@ -41,12 +41,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
   private final String artifactId;
-  private LocalResourceLocator localResourceLocator;
+  private final Object localResourceLocatorLock = new Object();
+  private volatile LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
   private ArtifactDescriptor artifactDescriptor;
 
   /**
-   * Constructs a new {@link MuleArtifactClassLoader } for the given URLs
+   * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
    *
    * @param artifactId artifact unique ID. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.
@@ -144,7 +145,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private LocalResourceLocator getLocalResourceLocator() {
     if (localResourceLocator == null) {
-      localResourceLocator = new DirectoryResourceLocator(getLocalResourceLocations());
+      synchronized (localResourceLocatorLock) {
+        if (localResourceLocator == null) {
+          localResourceLocator = new DirectoryResourceLocator(getLocalResourceLocations());
+        }
+      }
     }
     return localResourceLocator;
   }

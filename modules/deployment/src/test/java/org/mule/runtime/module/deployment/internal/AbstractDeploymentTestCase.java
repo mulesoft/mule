@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -22,6 +23,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertArrayEquals;
@@ -44,6 +46,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
@@ -75,6 +78,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -114,6 +118,15 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -129,15 +142,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 /**
@@ -190,8 +194,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   // Dynamically compiled classes and jars
+  protected static File barUtils1ClassFile;
   protected static File barUtils1_0JarFile;
 
+  protected static File barUtils2ClassFile;
   protected static File barUtils2_0JarFile;
 
   protected static File echoTestJarFile;
@@ -206,15 +212,18 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File echoTestClassFile;
 
+  protected static File loadsAppResourceCallbackClassFile;
   protected static File pluginEcho1TestClassFile;
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException {
+    barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile =
         new JarFileBuilder("barUtils1",
                            new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java")).compile("bar-1.0.jar"))
                                .getArtifactFile();
 
+    barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
     barUtils2_0JarFile = new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar");
 
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
@@ -239,6 +248,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
 
+    loadsAppResourceCallbackClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceCallback.java"));
     pluginEcho1TestClassFile =
         new SingleClassCompiler().dependingOn(barUtils1_0JarFile).compile(getResourceFile("/org/foo/Plugin1Echo.java"));
   }
@@ -968,9 +979,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void executeApplicationFlow(String flowName) throws Exception {
-    final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName);
-    flowRunner.withPayload(TEST_MESSAGE).run();
-    flowRunner.dispose();
+    ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
+    withContextClassLoader(appClassLoader, () -> {
+      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName);
+      CoreEvent result = flowRunner.withPayload(TEST_MESSAGE).run();
+      flowRunner.dispose();
+
+      assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
+
+      return result;
+    });
   }
 
   protected void assertNoZombiePresent(Map<String, Map<URI, Long>> zombieMap) {

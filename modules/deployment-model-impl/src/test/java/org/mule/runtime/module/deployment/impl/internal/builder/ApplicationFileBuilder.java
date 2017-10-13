@@ -17,9 +17,11 @@ import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
+
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
@@ -148,13 +150,14 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
         : ofNullable(Boolean
             .valueOf((String) redeploymentEnabled)),
                                                                      Optional.ofNullable((String) configResources),
+                                                                     ofNullable((String) properties.get(EXPORTED_PACKAGES)),
                                                                      ofNullable((String) properties.get(EXPORTED_RESOURCES)));
     customResources.add(new ZipResource(applicationDescriptor.getAbsolutePath(), MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION));
     return customResources;
   }
 
-  private File createApplicationJsonDescriptorFile(Optional<Boolean> redeploymentEnabled,
-                                                   Optional<String> configResources, Optional<String> exportedResources) {
+  private File createApplicationJsonDescriptorFile(Optional<Boolean> redeploymentEnabled, Optional<String> configResources,
+                                                   Optional<String> exportedPackages, Optional<String> exportedResources) {
     File applicationDescriptor = new File(getTempFolder(), getArtifactId() + "application.json");
     applicationDescriptor.deleteOnExit();
     MuleApplicationModel.MuleApplicationModelBuilder muleApplicationModelBuilder =
@@ -170,9 +173,14 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     });
     MuleArtifactLoaderDescriptorBuilder muleArtifactLoaderDescriptorBuilder =
         new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID);
+
+    exportedPackages.ifPresent(packages -> {
+      muleArtifactLoaderDescriptorBuilder.addProperty(EXPORTED_PACKAGES, packages.split(","));
+    });
     exportedResources.ifPresent(resources -> {
       muleArtifactLoaderDescriptorBuilder.addProperty(EXPORTED_RESOURCES, resources.split(","));
     });
+
     muleApplicationModelBuilder.withClassLoaderModelDescriptorLoader(muleArtifactLoaderDescriptorBuilder.build());
     muleApplicationModelBuilder.withBundleDescriptorLoader(muleArtifactLoaderDescriptorBuilder.build());
     String applicationDescriptorContent = new MuleApplicationModelJsonSerializer().serialize(muleApplicationModelBuilder.build());

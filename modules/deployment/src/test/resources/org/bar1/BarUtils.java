@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.bar;
+package org.bar1;
 
 public class BarUtils {
     public BarUtils() {
