@@ -11,8 +11,8 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
@@ -32,9 +32,9 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -65,16 +65,15 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 
@@ -95,6 +94,7 @@ public class ModuleFlowProcessingPhase
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
   private ErrorType sourceErrorResponseSendErrorType;
+  private ConfigurationComponentLocator componentLocator;
 
   private final PolicyManager policyManager;
 
@@ -105,6 +105,7 @@ public class ModuleFlowProcessingPhase
   @Override
   public void initialise() throws InitialisationException {
     final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
+    componentLocator = muleContext.getConfigurationComponentLocator();
 
     sourceResponseErrorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
 
@@ -124,7 +125,7 @@ public class ModuleFlowProcessingPhase
                        final PhaseResultNotifier phaseResultNotifier) {
     try {
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final FlowConstruct flowConstruct = (FlowConstruct) muleContext.getConfigurationComponentLocator().find(Location.builder()
+      final FlowConstruct flowConstruct = (FlowConstruct) componentLocator.find(Location.builder()
           .globalName(messageSource.getRootContainerName()).build()).get();
       final ComponentLocation sourceLocation = messageSource.getLocation();
       final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
