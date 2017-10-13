@@ -1212,8 +1212,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-13756")
   @Description("Tests that code called form plugin's Processor cannot access internal resources/packages of the application")
   public void deploysAppWithNotExportedPackageAndPlugin() throws Exception {
-    // TODO
-
     ArtifactPluginFileBuilder loadsAppResourcePlugin = new ArtifactPluginFileBuilder("loadsAppResourcePlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
@@ -1241,7 +1239,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-13756")
   @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
   public void deploysAppWithNotExportedPackage() throws Exception {
-    // TODO
     ApplicationFileBuilder nonExposingAppFileBuilder = new ApplicationFileBuilder("non-exposing-app")
         .configuredWith(EXPORTED_PACKAGES, "org.bar1")
         .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
