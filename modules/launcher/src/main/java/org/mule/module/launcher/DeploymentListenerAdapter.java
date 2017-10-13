@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static org.mule.config.bootstrap.ArtifactType.APP;
 import static org.mule.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.util.Preconditions.checkArgument;
 
 import org.mule.api.MuleContext;
 import org.mule.config.bootstrap.ArtifactType;
@@ -35,11 +36,12 @@ public class DeploymentListenerAdapter implements DeploymentListener
     /**
      *
      * @param artifactDeploymentListener the artifactDeploymentListener to adapt.
-     * @param artifactType the artifact type.
+     * @param artifactType any of the artifact types present in {@link #DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES}
+     * @throws IllegalArgumentException if
      */
     public DeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType artifactType)
     {
-        Preconditions.checkArgument(DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES.contains(artifactType), UNSUPPORTED_ARTIFACT_TYPE_ERROR);
+        checkArgument(DEPLOYMENT_LISTENER_ARTIFACT_SUPPORTED_TYPES.contains(artifactType), UNSUPPORTED_ARTIFACT_TYPE_ERROR);
         this.artifactType = artifactType;
         this.artifactDeploymentListener = artifactDeploymentListener;
     }

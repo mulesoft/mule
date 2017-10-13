@@ -331,15 +331,15 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        DeploymentListener getDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
+        DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
         {
             if (type == APP)
             {
-                applicationDeploymentListener = super.getDeploymentListenerAdapter(artifactDeploymentListener, type);
+                applicationDeploymentListener = super.createDeploymentListenerAdapter(artifactDeploymentListener, type);
                 return applicationDeploymentListener;
             }
 
-            domainDeploymentListener = super.getDeploymentListenerAdapter(artifactDeploymentListener, type);
+            domainDeploymentListener = super.createDeploymentListenerAdapter(artifactDeploymentListener, type);
 
             return domainDeploymentListener;
         }

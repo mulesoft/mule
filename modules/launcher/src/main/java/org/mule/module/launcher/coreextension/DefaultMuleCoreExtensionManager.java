@@ -136,8 +136,8 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
 
             if (extension instanceof ArtifactDeploymentListener)
             {
-                deploymentService.addDeploymentListener(getDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
-                deploymentService.addDomainDeploymentListener(getDeploymentListenerAdapter((ArtifactDeploymentListener) extension, DOMAIN));
+                deploymentService.addDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
+                deploymentService.addDomainDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, DOMAIN));
             }
 
             if (extension instanceof PluginClassLoaderManagerAware)
@@ -173,7 +173,7 @@ public class DefaultMuleCoreExtensionManager implements MuleCoreExtensionManager
      * @param type: the artifact type.
      * @return an DeploymentListener.
      */
-    DeploymentListener getDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
+    DeploymentListener createDeploymentListenerAdapter (ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type)
     {
         return new DeploymentListenerAdapter(artifactDeploymentListener, type);
     }
