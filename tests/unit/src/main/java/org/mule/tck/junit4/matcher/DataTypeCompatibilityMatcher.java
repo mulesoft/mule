@@ -15,20 +15,20 @@ import org.hamcrest.TypeSafeMatcher;
 
 public class DataTypeCompatibilityMatcher extends TypeSafeMatcher<DataType> {
 
-  private final DataType otherDataType;
+  private final DataType dataType;
 
-  public DataTypeCompatibilityMatcher(DataType otherDataType) {
-    this.otherDataType = otherDataType;
+  public DataTypeCompatibilityMatcher(DataType dataType) {
+    this.dataType = dataType;
   }
 
   @Override
-  protected boolean matchesSafely(DataType dataType) {
+  protected boolean matchesSafely(DataType otherDataType) {
     return dataType.isCompatibleWith(otherDataType);
   }
 
   @Override
   public void describeTo(Description description) {
-    description.appendText("a dataType compatible with ").appendValue(otherDataType);
+    description.appendText("a dataType assignable to ").appendValue(dataType);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class DataTypeCompatibilityMatcher extends TypeSafeMatcher<DataType> {
   }
 
   @Factory
-  public static Matcher<DataType> compatibleWith(DataType dataType) {
+  public static Matcher<DataType> assignableTo(DataType dataType) {
     return new DataTypeCompatibilityMatcher(dataType);
   }
 }

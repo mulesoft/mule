@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.charset.StandardCharsets.UTF_16;
-import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.compatibleWith;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -62,7 +62,7 @@ public class DataTypeMatchingTestCase extends AbstractMuleTestCase {
   @Test
   public void sameDataTypeIsCompatibleWithItself() throws Exception {
     for (int i = 0; i < dataTypes.length; i++) {
-      assertThat(dataTypes[i], is(compatibleWith((dataTypes[i]))));
+      assertThat(dataTypes[i], is(assignableTo(dataTypes[i])));
     }
   }
 
@@ -81,47 +81,47 @@ public class DataTypeMatchingTestCase extends AbstractMuleTestCase {
 
   @Test
   public void genericDataTypeShouldBeCompatibleWithEveryDataType() throws Exception {
-    assertThat(GENERIC_DATA_TYPE, is(compatibleWith(JSON_PARENT_DATA_TYPE)));
-    assertThat(GENERIC_DATA_TYPE, is(compatibleWith(JSON_SON_DATA_TYPE)));
-    assertThat(GENERIC_DATA_TYPE, is(compatibleWith(TEXT_DATA_TYPE)));
-    assertThat(GENERIC_DATA_TYPE, is(compatibleWith(GENERIC_TYPE_GENERIC_DATA_TYPE)));
-    assertThat(GENERIC_DATA_TYPE, is(compatibleWith(GENERIC_MEDIA_TYPE_GENERIC_DATA_TYPE)));
+    assertThat(JSON_PARENT_DATA_TYPE, is(assignableTo(GENERIC_DATA_TYPE)));
+    assertThat(JSON_SON_DATA_TYPE, is(assignableTo(GENERIC_DATA_TYPE)));
+    assertThat(TEXT_DATA_TYPE, is(assignableTo(GENERIC_DATA_TYPE)));
+    assertThat(GENERIC_TYPE_GENERIC_DATA_TYPE, is(assignableTo(GENERIC_DATA_TYPE)));
+    assertThat(GENERIC_MEDIA_TYPE_GENERIC_DATA_TYPE, is(assignableTo(GENERIC_DATA_TYPE)));
   }
 
   @Test
   public void noDataTypeShouldBeCompatibleWithTheGenericOne() throws Exception {
-    assertThat(JSON_PARENT_DATA_TYPE, is(not(compatibleWith(GENERIC_DATA_TYPE))));
-    assertThat(JSON_SON_DATA_TYPE, is(not(compatibleWith(GENERIC_DATA_TYPE))));
-    assertThat(TEXT_DATA_TYPE, is(not(compatibleWith(GENERIC_DATA_TYPE))));
+    assertThat(GENERIC_DATA_TYPE, is(not(assignableTo(JSON_PARENT_DATA_TYPE))));
+    assertThat(GENERIC_DATA_TYPE, is(not(assignableTo(JSON_SON_DATA_TYPE))));
+    assertThat(GENERIC_DATA_TYPE, is(not(assignableTo(TEXT_DATA_TYPE))));
   }
 
   @Test
   public void nonGenericDataTypesShouldNotBeCompatible() throws Exception {
-    assertThat(JSON_PARENT_DATA_TYPE, is(not(compatibleWith(TEXT_DATA_TYPE))));
-    assertThat(TEXT_DATA_TYPE, is(not(compatibleWith(JSON_PARENT_DATA_TYPE))));
-    assertThat(JSON_SON_DATA_TYPE, is(not(compatibleWith(TEXT_DATA_TYPE))));
-    assertThat(TEXT_DATA_TYPE, is(not(compatibleWith(JSON_SON_DATA_TYPE))));
+    assertThat(JSON_PARENT_DATA_TYPE, is(not(assignableTo(TEXT_DATA_TYPE))));
+    assertThat(TEXT_DATA_TYPE, is(not(assignableTo(JSON_PARENT_DATA_TYPE))));
+    assertThat(JSON_SON_DATA_TYPE, is(not(assignableTo(TEXT_DATA_TYPE))));
+    assertThat(TEXT_DATA_TYPE, is(not(assignableTo(JSON_SON_DATA_TYPE))));
   }
 
   @Test
   public void inheritedTypeDataTypesShouldBeCompatibleOneWay() throws Exception {
-    assertThat(JSON_PARENT_DATA_TYPE, is(compatibleWith(JSON_SON_DATA_TYPE)));
-    assertThat(JSON_SON_DATA_TYPE, is(not(compatibleWith(JSON_PARENT_DATA_TYPE))));
+    assertThat(JSON_PARENT_DATA_TYPE, is(not(assignableTo(JSON_SON_DATA_TYPE))));
+    assertThat(JSON_SON_DATA_TYPE, is(assignableTo(JSON_PARENT_DATA_TYPE)));
   }
 
   @Test
   public void ifCharsetItsNotSpecifiedItShouldBeCompatibleWithAny() throws Exception {
     DataType jsonWithCharset = builder(JSON_PARENT_DATA_TYPE).charset(UTF_8).build();
-    assertThat(JSON_PARENT_DATA_TYPE, is(compatibleWith(jsonWithCharset)));
-    assertThat(jsonWithCharset, is(not(compatibleWith(JSON_PARENT_DATA_TYPE))));
+    assertThat(JSON_PARENT_DATA_TYPE, is(not(assignableTo(jsonWithCharset))));
+    assertThat(jsonWithCharset, is(assignableTo(JSON_PARENT_DATA_TYPE)));
   }
 
   @Test
   public void differentCharsetsShouldNotBeCompatible() throws Exception {
     DataType jsonUtf8 = builder(JSON_PARENT_DATA_TYPE).charset(UTF_8).build();
     DataType jsonUtf16 = builder(JSON_PARENT_DATA_TYPE).charset(UTF_16).build();
-    assertThat(jsonUtf8, is(not(compatibleWith(jsonUtf16))));
-    assertThat(jsonUtf16, is(not(compatibleWith(jsonUtf8))));
+    assertThat(jsonUtf8, is(not(assignableTo(jsonUtf16))));
+    assertThat(jsonUtf16, is(not(assignableTo(jsonUtf8))));
   }
 
 

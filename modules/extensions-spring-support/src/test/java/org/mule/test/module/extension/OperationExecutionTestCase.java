@@ -24,7 +24,7 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.compatibleWith;
+import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -172,7 +172,7 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Test
   public void operationWhichReturnsListOfMessages() throws Exception {
     TypedValue<List<Message>> payload = runFlow("getAllEnemies").getMessage().getPayload();
-    assertThat(MULE_MESSAGE_COLLECTION, is(compatibleWith(payload.getDataType())));
+    assertThat(payload.getDataType(), is(assignableTo(MULE_MESSAGE_COLLECTION)));
 
     List<Message> enemies = payload.getValue();
     HeisenbergExtension heisenberg = getConfig(HEISENBERG);
