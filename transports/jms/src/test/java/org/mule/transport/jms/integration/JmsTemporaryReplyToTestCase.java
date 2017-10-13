@@ -12,6 +12,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.functional.FlowAssert.verify;
+
+import org.jruby.RubyProcess;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.transport.NullPayload;
 
@@ -128,6 +131,13 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase
     private void assertNullPayloadResponse(MuleMessage response)
     {
         assertThat(response.getPayload(), CoreMatchers.<Object>is(NullPayload.getInstance()));
+    }
+
+    @Test
+    public void JmsSetMuleReplyToStop() throws Exception
+    {
+        MuleEvent response = runFlow("ReplyTo", TEST_MESSAGE);
+        verify("batchErrorFlow");
     }
 
 }

@@ -625,8 +625,16 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         // Some JMS implementations might not support the ReplyTo property.
         if (isHandleReplyTo(message, event))
         {
-
+            String replyStopProperty=(String) event.getMessage().getInvocationProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY);
+            if("true".equalsIgnoreCase(replyStopProperty))
+            {
+                return replyTo;
+            }
             Object tempReplyTo = event.getMessage().getOutboundProperty(JmsConstants.JMS_REPLY_TO);
+            if(tempReplyTo==null)
+            {
+                tempReplyTo = event.getMessage().getOutboundProperty(JmsConstants.JMS_REPLY_TO);
+            }
             if (tempReplyTo == null)
             {
                 //It may be a Mule URI or global endpoint Ref
