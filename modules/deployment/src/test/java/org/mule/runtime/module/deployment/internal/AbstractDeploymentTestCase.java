@@ -172,7 +172,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String APP_WITH_EXTENSION_PLUGIN_CONFIG = "app-with-extension-plugin-config.xml";
 
   protected static final String BAR_POLICY_NAME = "barPolicy";
-  private static final String BAZ_POLICY_NAME = "bazPolicy";
+  protected static final String BAZ_POLICY_NAME = "bazPolicy";
   protected static final String FOO_POLICY_ID = "fooPolicy";
 
   protected static final String MIN_MULE_VERSION = "4.0.0";

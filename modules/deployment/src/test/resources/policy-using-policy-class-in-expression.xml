@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test-policy="http://www.mulesoft.org/schema/mule/test-policy"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:hello="http://www.mulesoft.org/schema/mule/hello"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd
+               http://www.mulesoft.org/schema/mule/hello http://www.mulesoft.org/schema/mule/hello/current/mule-hello.xsd">
+
+    <hello:config name="default" message="Hello from policy!!!"/>
+
+    <test-policy:proxy>
+        <test-policy:operation>
+            <logger level="INFO" message="#[mel:new org.foo.EchoTest()]"/>
+
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+
+            <test-policy:execute-next/>
+        </test-policy:operation>
+    </test-policy:proxy>
+</mule>
