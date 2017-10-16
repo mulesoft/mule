@@ -42,6 +42,7 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
+            <version>${activemqVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
