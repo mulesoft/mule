@@ -112,6 +112,18 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   @Test
+  public void duplicatesInConfigsAreRemoved() throws Exception {
+    DeployableFileBuilder artifactFileBuilder = createArtifactFileBuilder()
+        .deployedWith("config.resources", "config1.xml,config2.xml,config1.xml");
+    unzip(artifactFileBuilder.getArtifactFile(), getArtifactFolder());
+
+    D desc = createArtifactDescriptor();
+
+    assertThat(desc.getConfigResources(), hasSize(2));
+    assertThat(desc.getConfigResources(), hasItems("config1.xml", "config2.xml"));
+  }
+
+  @Test
   public void readsSharedLibs() throws Exception {
     DeployableFileBuilder artifactFileBuilder = (DeployableFileBuilder) createArtifactFileBuilder()
         .dependingOnSharedLibrary(new JarFileBuilder("shared", echoTestJarFile));
