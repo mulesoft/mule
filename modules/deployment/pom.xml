@@ -142,7 +142,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tools.maven</groupId>
-            <artifactId>mule-packager</artifactId>
+            <artifactId>mule-classloader-model</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

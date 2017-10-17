@@ -14,7 +14,7 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMav
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFolder;
 import static org.mule.runtime.module.deployment.impl.internal.maven.MavenUtils.getPomModelFromJar;
-import static org.mule.tools.api.packager.sources.MuleContentGenerator.createClassLoaderModelFromJson;
+import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -55,8 +55,7 @@ public class MavenBundleDescriptorLoader implements BundleDescriptorLoader {
     if (isHeavyPackage(artifactFile)) {
       File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
 
-      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
-          createClassLoaderModelFromJson(classLoaderModelDescriptor);
+      org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel = deserialize(classLoaderModelDescriptor);
 
       return new BundleDescriptor.Builder()
           .setArtifactId(packagerClassLoaderModel.getArtifactCoordinates().getArtifactId())
