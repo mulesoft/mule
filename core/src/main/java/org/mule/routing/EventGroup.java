@@ -228,40 +228,32 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                 return EMPTY_EVENTS_ARRAY;
             }
 
-            Collection<WrapperOrderEvent> wrapperOrderEvents = getWrapperEventsFromStore();
-
-            if (sortByArrival)
-            {
-                return convertWrapperOrderEventCollectionToMuleEventArray(orderWrapperOrderEvents(wrapperOrderEvents));
-            }
-
-            return convertWrapperOrderEventCollectionToMuleEventArray(wrapperOrderEvents);
+            return convertWrapperOrderEventCollectionToMuleEventArray(getWrapperEventsFromStore(sortByArrival));
         }
     }
 
-    private Collection<WrapperOrderEvent> getWrapperEventsFromStore() throws ObjectStoreException
+    private Collection<WrapperOrderEvent> getWrapperEventsFromStore(boolean orderByArrival) throws ObjectStoreException
     {
-        Collection<WrapperOrderEvent> wrapperOrderEvents = new ArrayList<>();
+        Collection<WrapperOrderEvent> wrapperOrderEvents ;
 
-        for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey))
+        if (orderByArrival)
         {
-            wrapperOrderEvents.add(eventsObjectStore.retrieve(key, eventsPartitionKey));
+            wrapperOrderEvents =  new TreeSet<>(new ArrivalOrderEventComparator());
+        }
+        else
+        {
+            wrapperOrderEvents = new ArrayList<>();
+        }
+
+        synchronized (this)
+        {
+            for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey))
+            {
+                wrapperOrderEvents.add(eventsObjectStore.retrieve(key, eventsPartitionKey));
+            }
         }
 
         return wrapperOrderEvents;
-    }
-
-    /**
-     * Orders a collection of wrapperOrderEvents using the {@link ArrivalOrderEventComparator}
-     *
-     * @param wrapperOrderEvents the collection of wrapperOrderEvents to order.
-     * @return a ordered collection of wrapperOrderEvents
-     */
-    private Collection <WrapperOrderEvent> orderWrapperOrderEvents (Collection<WrapperOrderEvent> wrapperOrderEvents)
-    {
-        Set<WrapperOrderEvent> wrapperOrderEventsSet = new TreeSet<>(new ArrivalOrderEventComparator());
-        wrapperOrderEventsSet.addAll(wrapperOrderEvents);
-        return wrapperOrderEventsSet;
     }
 
     /**
@@ -460,17 +452,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public MuleMessageCollection toMessageCollection(boolean sortByArrival) throws ObjectStoreException
     {
-        Collection<WrapperOrderEvent> wrapperOrderEvents = getWrapperEventsFromStore();
-
-        synchronized (this)
-        {
-            if (sortByArrival)
-            {
-                return convertWrapperOrderEventCollectionToMuleMessageCollection(orderWrapperOrderEvents(wrapperOrderEvents));
-            }
-
-            return convertWrapperOrderEventCollectionToMuleMessageCollection(wrapperOrderEvents);
-        }
+        return convertWrapperOrderEventCollectionToMuleMessageCollection(getWrapperEventsFromStore(sortByArrival));
     }
 
     public String getCommonRootId()
