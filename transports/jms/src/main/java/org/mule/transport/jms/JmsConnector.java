@@ -7,6 +7,9 @@
 package org.mule.transport.jms;
 
 import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_QUEUE_PREFETCH;
+import static org.mule.api.config.MuleProperties.MULE_JMS_REDELIVERY_DELAY;
+import static org.mule.api.config.MuleProperties.MULE_JMS_MAX_REDELIVERY_DELAY;
+import static org.mule.api.config.MuleProperties.MULE_JMS_INITIAL_REDELIVERY_DELAY;
 
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
@@ -84,6 +87,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public static final int REDELIVERY_IGNORE = -1;
     
     public static final int PREFETCH_DEFAULT = -1;
+    
+    public static final int DEFAULT_MAX_REDELIVERY_DELAY = -1;
+    
+    public static final int DEFAULT_INITIAL_REDELIVERY_DELAY = -1;
+    
+    public static final int DEFAULT_REDELIVERY_DELAY = -1;
 
     public static final String CONNECTION_STOPPING_ERROR_MESSAGE = "It is not possible to create a session since connection is being stopped.";
 
@@ -107,8 +116,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
     
-    private int maxQueuePrefetch = PREFETCH_DEFAULT;
+    private int maximumRedeliveryDelay = DEFAULT_MAX_REDELIVERY_DELAY;
+    
+    private int initialRedeliveryDelay  = DEFAULT_INITIAL_REDELIVERY_DELAY;
 
+    private int redeliveryDelay = DEFAULT_REDELIVERY_DELAY;
+    
     private boolean cacheJmsSessions = true;
 
     /**
@@ -1507,5 +1520,38 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
     {
         responseTimeoutTimer.schedule(timerTask, timeout);
+    }
+
+    public int getMaximumRedeliveryDelay()
+    {
+        String maximumRedeliveryDelay = System.getProperty(MULE_JMS_MAX_REDELIVERY_DELAY, "-1");
+        return Integer.parseInt(maximumRedeliveryDelay);
+    }
+
+    public void setMaximumRedeliveryDelay(int maximumRedeliveryDelay)
+    {
+        this.maximumRedeliveryDelay = maximumRedeliveryDelay;
+    }
+
+    public int getInitialRedeliveryDelay()
+    {
+        String initialRedeliveryDelay = System.getProperty(MULE_JMS_INITIAL_REDELIVERY_DELAY, "-1");
+        return Integer.parseInt(initialRedeliveryDelay);
+    }
+
+    public void setInitialRedeliveryDelay(int initialRedeliveryDelay)
+    {
+        this.initialRedeliveryDelay = initialRedeliveryDelay;
+    }
+
+    public int getRedeliveryDelay()
+    {
+        String redeliveryDelay = System.getProperty(MULE_JMS_REDELIVERY_DELAY, "-1");
+        return Integer.parseInt(redeliveryDelay);
+    }
+
+    public void setRedeliveryDelay(int redeliveryDelay)
+    {
+        this.redeliveryDelay = redeliveryDelay;
     }
 }
