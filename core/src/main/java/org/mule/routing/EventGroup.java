@@ -12,7 +12,6 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -24,12 +23,10 @@ import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -245,11 +242,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     private Collection<WrapperOrderEvent> getWrapperEventsFromStore() throws ObjectStoreException
     {
         Collection<WrapperOrderEvent> wrapperOrderEvents = new ArrayList<>();
-        List<Serializable> keys = eventsObjectStore.allKeys(eventsPartitionKey);
 
-        for (int i = 0; i < keys.size(); i++)
+        for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey))
         {
-            wrapperOrderEvents.add(eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey));
+            wrapperOrderEvents.add(eventsObjectStore.retrieve(key, eventsPartitionKey));
         }
 
         return wrapperOrderEvents;
@@ -263,7 +259,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
      */
     private Collection <WrapperOrderEvent> orderWrapperOrderEvents (Collection<WrapperOrderEvent> wrapperOrderEvents)
     {
-        TreeSet<WrapperOrderEvent> wrapperOrderEventsSet = new TreeSet<>(new ArrivalOrderEventComparator());
+        Set<WrapperOrderEvent> wrapperOrderEventsSet = new TreeSet<>(new ArrivalOrderEventComparator());
         wrapperOrderEventsSet.addAll(wrapperOrderEvents);
         return wrapperOrderEventsSet;
     }
