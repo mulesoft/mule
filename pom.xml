@@ -128,7 +128,7 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <activemqVersion>5.11.1</activemqVersion>
+        <activemqVersion>5.15.1</activemqVersion>
         <antVersion>1.9.6</antVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <aspectjVersion>1.8.10</aspectjVersion>
