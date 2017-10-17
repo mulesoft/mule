@@ -10,8 +10,13 @@ import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
+import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
+import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,17 +34,16 @@ import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.internal.exception.MessagingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the base class for exception strategies which contains several helper methods. However, you should probably inherit
@@ -118,9 +122,18 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   protected String createMessageToLog(Throwable t) {
-    MuleException muleException = ExceptionHelper.getRootMuleException(t);
+    MuleException muleException = getRootMuleException(t);
+
     if (muleException != null) {
-      return muleException.getDetailedMessage();
+      if (!isVerboseExceptions() && t instanceof EventProcessingException
+          && ((EventProcessingException) t).getEvent().getError()
+              .map(e -> CORE_NAMESPACE_NAME.equals(e.getErrorType().getNamespace())
+                  && UNKNOWN_ERROR_IDENTIFIER.equals(e.getErrorType().getIdentifier()))
+              .orElse(false)) {
+        return ((MuleException) sanitize(muleException)).getVerboseMessage();
+      } else {
+        return muleException.getDetailedMessage();
+      }
     }
     return null;
   }

@@ -14,12 +14,12 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.compatibleWith;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 
 
 public class StacktraceLogChecker extends AbstractLogChecker {
@@ -69,9 +69,14 @@ public class StacktraceLogChecker extends AbstractLogChecker {
     if (stackTraceMatcher.matches()) {
       actualCalls.add(createMethodCallFromMatcher(stackTraceMatcher));
     } else {
-      java.util.regex.Matcher exceptionCauseMatcher = STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line);
-      if (exceptionCauseMatcher.matches()) {
-        actualCauses.add(createExceptionCauseFromMatcher(exceptionCauseMatcher));
+      java.util.regex.Matcher filteredStackEntryMatcher = STACKTRACE_FILTERED_ENTRY_REGEX_PATTERN.matcher(line);
+      if (filteredStackEntryMatcher.matches()) {
+        actualCalls.add(createMethodCallFromMatcher(filteredStackEntryMatcher));
+      } else {
+        java.util.regex.Matcher exceptionCauseMatcher = STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line);
+        if (exceptionCauseMatcher.matches()) {
+          actualCauses.add(createExceptionCauseFromMatcher(exceptionCauseMatcher));
+        }
       }
     }
   }

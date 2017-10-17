@@ -13,15 +13,17 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 
+import org.hamcrest.Matcher;
+
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.hamcrest.Matcher;
 
 public abstract class AbstractLogChecker implements LogChecker {
 
   protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
       compile("^.*at ([^A-Z]*)\\.([0-9A-Z]+[^\\.]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");
+  protected static final Pattern STACKTRACE_FILTERED_ENTRY_REGEX_PATTERN =
+      compile("^.*at ([^A-Z]*)\\.\\* \\(([0-9]+) elements filtered from stack()().*");
   protected static final Pattern STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN =
       compile("\\s*(Caused by: )?([a-zA-Z0-9\\.]+(Exception|Error)+)(: .*|\\z)");
   protected static final Pattern STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN = compile(".*\\.\\.\\. [0-9]* more.*");
@@ -61,6 +63,7 @@ public abstract class AbstractLogChecker implements LogChecker {
 
   private boolean isStacktrace(String line) {
     return (STACKTRACE_METHOD_CALL_REGEX_PATTERN.matcher(line).matches()
+        || STACKTRACE_FILTERED_ENTRY_REGEX_PATTERN.matcher(line).matches()
         || STACKTRACE_EXCEPTION_CAUSE_REGEX_PATTERN.matcher(line).matches()
         || STACKTRACE_COLLAPSED_INFORMATION_REGEX_PATTERN.matcher(line).matches());
   }
