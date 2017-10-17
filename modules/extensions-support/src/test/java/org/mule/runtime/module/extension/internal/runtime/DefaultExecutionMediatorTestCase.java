@@ -29,6 +29,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -41,11 +42,12 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
@@ -53,12 +55,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMed
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,6 +65,13 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.verification.VerificationMode;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
@@ -137,12 +140,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(configurationInstance.getName()).thenReturn(DUMMY_NAME);
     when(configurationInstance.getModel()).thenReturn(configurationModel);
     when(extensionModel.getName()).thenReturn(DUMMY_NAME);
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(empty());
     mockExceptionEnricher(extensionModel, null);
     mockExceptionEnricher(operationModel, null);
     when(operationExecutor.execute(operationContext)).thenReturn(just(result));
     when(operationExceptionExecutor.execute(operationContext)).thenReturn(error(exception));
     when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
-    when(operationContext.getExtensionModel().getName()).thenReturn(DUMMY_NAME);
+    when(operationContext.getExtensionModel()).thenReturn(extensionModel);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(empty());
 
