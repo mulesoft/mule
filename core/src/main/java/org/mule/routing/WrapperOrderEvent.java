@@ -7,11 +7,16 @@
 
 package org.mule.routing;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
-public class WrapperOrderEvent implements Serializable
+/**
+ * Wraps the {@link MuleEvent} and saves the arrivalOrder of this to an {@link EventGroup}.
+ */
+class WrapperOrderEvent implements Serializable, DeserializationPostInitialisable
 {
 
     final MuleEvent event;
@@ -32,4 +37,11 @@ public class WrapperOrderEvent implements Serializable
     {
         return arrivalOrder;
     }
+
+    @SuppressWarnings({"unused"})
+    private void initAfterDeserialisation(MuleContext muleContext) throws Exception
+    {
+        DeserializationPostInitialisable.Implementation.init(event, muleContext);
+    }
+
 }
