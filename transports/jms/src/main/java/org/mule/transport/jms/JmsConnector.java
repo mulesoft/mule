@@ -82,6 +82,12 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public static final int REDELIVERY_IGNORE = -1;
     
     public static final int PREFETCH_DEFAULT = -1;
+    
+    public static final int DEFAULT_MAX_REDELIVERY_DELAY = -1;
+    
+    public static final int DEFAULT_INITIAL_REDELIVERY_DELAY = -1;
+    
+    public static final int DEFAULT_REDELIVERY_DELAY = -1;
 
     public static final String CONNECTION_STOPPING_ERROR_MESSAGE = "It is not possible to create a session since connection is being stopped.";
 
@@ -106,7 +112,13 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private int maxRedelivery = REDELIVERY_FAIL_ON_FIRST;
     
     private int maxQueuePrefetch = PREFETCH_DEFAULT;
+    
+    private int maximumRedeliveryDelay = DEFAULT_MAX_REDELIVERY_DELAY;
+    
+    private int initialRedeliveryDelay  = DEFAULT_INITIAL_REDELIVERY_DELAY;
 
+    private int redeliveryDelay = DEFAULT_REDELIVERY_DELAY;
+    
     private boolean cacheJmsSessions = true;
 
     /**
@@ -1162,6 +1174,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         this.maxQueuePrefetch = maxPrefetch;
     }
+    
+    
 
     @Override
     public boolean isResponseEnabled()
@@ -1509,5 +1523,35 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
     {
         responseTimeoutTimer.schedule(timerTask, timeout);
+    }
+
+    public int getMaximumRedeliveryDelay()
+    {
+        return maximumRedeliveryDelay;
+    }
+
+    public void setMaximumRedeliveryDelay(int maximumRedeliveryDelay)
+    {
+        this.maximumRedeliveryDelay = maximumRedeliveryDelay;
+    }
+
+    public int getInitialRedeliveryDelay()
+    {
+        return initialRedeliveryDelay;
+    }
+
+    public void setInitialRedeliveryDelay(int initialRedeliveryDelay)
+    {
+        this.initialRedeliveryDelay = initialRedeliveryDelay;
+    }
+
+    public int getRedeliveryDelay()
+    {
+        return redeliveryDelay;
+    }
+
+    public void setRedeliveryDelay(int redeliveryDelay)
+    {
+        this.redeliveryDelay = redeliveryDelay;
     }
 }

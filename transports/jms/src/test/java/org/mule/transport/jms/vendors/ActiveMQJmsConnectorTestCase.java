@@ -6,11 +6,16 @@
  */
 package org.mule.transport.jms.vendors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static javax.jms.Session.AUTO_ACKNOWLEDGE;
+import static javax.jms.Session.DUPS_OK_ACKNOWLEDGE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.mule.transport.jms.activemq.ActiveMQJmsConnector.DEFAULT_BROKER_URL;
+
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
@@ -41,17 +46,16 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     public void testConfigurationDefaults() throws Exception
     {
         JmsConnector c = (JmsConnector)muleContext.getRegistry().lookupConnector("jmsConnector");
-        assertNotNull(c);
+        assertThat(c, is(not(nullValue())));
 
-        assertFalse(c.isEagerConsumer());
+        assertThat(c.isEagerConsumer(), equalTo(false));
         
         ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQConnectionFactory);
-        assertEquals(ActiveMQJmsConnector.DEFAULT_BROKER_URL, ((ActiveMQConnectionFactory) cf).getBrokerURL());
+        assertThat(cf, instanceOf(ActiveMQConnectionFactory.class));
+        assertThat(DEFAULT_BROKER_URL, equalTo(((ActiveMQConnectionFactory) cf).getBrokerURL()));
         
-        assertNotNull(c.getTopicResolver());
-        assertTrue("Wrong topic resolver configured on the connector.",
-                   c.getTopicResolver() instanceof DefaultJmsTopicResolver);
+        assertThat(c.getTopicResolver(), is(not(nullValue())));
+        assertThat(c.getTopicResolver(), instanceOf(DefaultJmsTopicResolver.class));
     }
     
     @Test
@@ -59,27 +63,30 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnector");
 
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
+        assertThat(c, is(not(nullValue())));
+        assertThat(c, instanceOf(ActiveMQJmsConnector.class));
         
-        assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof ActiveMQConnectionFactory);
-        assertEquals(Session.AUTO_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertNull(c.getUsername());
-        assertNull(c.getPassword());
+        assertThat(c.getConnectionFactory(), is(not(nullValue())));
+        assertThat(c.getConnectionFactory(), instanceOf(ActiveMQConnectionFactory.class));
+        assertThat(c.getAcknowledgementMode(), equalTo(AUTO_ACKNOWLEDGE));
+        assertThat(c.getUsername(), is(nullValue()));
+        assertThat(c.getPassword(), is(nullValue()));
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof JmsXRedeliveryHandler);
+        assertThat(c.getRedeliveryHandlerFactory(), is(not(nullValue())));
+        assertThat(c.getRedeliveryHandlerFactory().create(), instanceOf(JmsXRedeliveryHandler.class));
         
-        assertFalse(c.isDurable());
-        assertFalse(c.isNoLocal());
-        assertFalse(c.isPersistentDelivery());
-        assertEquals(0, c.getMaxRedelivery());
-        assertEquals(-1, c.getMaxQueuePrefetch());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
+        assertThat(c.isDurable(), equalTo(false));
+        assertThat(c.isNoLocal(), equalTo(false));
+        assertThat(c.isPersistentDelivery(), equalTo(false));
+        assertThat(c.getMaxRedelivery(), equalTo(0));
+        assertThat(c.getMaxQueuePrefetch(), equalTo(-1));
+        assertThat(c.getMaximumRedeliveryDelay(), equalTo(-1));
+        assertThat(c.getInitialRedeliveryDelay(), equalTo(-1));
+        assertThat(c.getRedeliveryDelay(), equalTo(-1));
+        assertThat(c.isCacheJmsSessions(), equalTo(true));
+        assertThat(c.isEagerConsumer(), equalTo(false));
 
-        assertEquals("1.0.2b", c.getSpecification());
+        assertThat(c.getSpecification(), equalTo("1.0.2b"));
     }
     
     @Test
@@ -87,29 +94,32 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("customActiveMqJmsConnector");
 
-        assertNotNull(c);
-        assertTrue(c instanceof ActiveMQJmsConnector);
+        assertThat(c, is(not(nullValue())));
+        assertThat(c, instanceOf(ActiveMQJmsConnector.class));
 
-        assertNotNull(c.getConnectionFactory());
-        assertTrue(c.getConnectionFactory() instanceof CachingConnectionFactory);
-        assertTrue(((CachingConnectionFactory) c.getConnectionFactory()).getTargetConnectionFactory() instanceof ActiveMQConnectionFactory);
-        assertEquals(Session.DUPS_OK_ACKNOWLEDGE, c.getAcknowledgementMode());
-        assertNull(c.getUsername());
-        assertNull(c.getPassword());
+        assertThat(c.getConnectionFactory(), is(not(nullValue())));
+        assertThat(c.getConnectionFactory(), instanceOf(CachingConnectionFactory.class));
+        assertThat(((CachingConnectionFactory) c.getConnectionFactory()).getTargetConnectionFactory(), instanceOf(ActiveMQConnectionFactory.class));
+        assertThat(c.getAcknowledgementMode(), equalTo(DUPS_OK_ACKNOWLEDGE));
+        assertThat(c.getUsername(), is(nullValue()));
+        assertThat(c.getPassword(), is(nullValue()));
 
-        assertNotNull(c.getRedeliveryHandlerFactory());
-        assertTrue(c.getRedeliveryHandlerFactory().create() instanceof TestRedeliveryHandler);
+        assertThat(c.getRedeliveryHandlerFactory(), is(not(nullValue())));
+        assertThat(c.getRedeliveryHandlerFactory().create(), instanceOf(TestRedeliveryHandler.class));
 
-        assertEquals("myClient", c.getClientId());
-        assertTrue(c.isDurable());
-        assertTrue(c.isNoLocal());
-        assertTrue(c.isPersistentDelivery());
-        assertEquals(5, c.getMaxRedelivery());
-        assertEquals(5, c.getMaxQueuePrefetch());
-        assertTrue(c.isCacheJmsSessions());
-        assertFalse(c.isEagerConsumer());
+        assertThat("myClient", equalTo(c.getClientId()));
+        assertThat(c.isDurable(), equalTo(true));
+        assertThat(c.isNoLocal(), equalTo(true));
+        assertThat(c.isPersistentDelivery(), equalTo(true));
+        assertThat(c.getMaxRedelivery(), equalTo(5));
+        assertThat(c.getMaxQueuePrefetch(), equalTo(5));
+        assertThat(c.getMaximumRedeliveryDelay(), equalTo(2000));
+        assertThat(c.getRedeliveryDelay(), equalTo(2000));
+        assertThat(c.getInitialRedeliveryDelay(), equalTo(2000));
+        assertThat(c.isCacheJmsSessions(), equalTo(true));
+        assertThat(c.isEagerConsumer(), equalTo(false));
 
-        assertEquals("1.1", c.getSpecification()); // 1.0.2b is the default, should be changed in the config
+        assertThat(c.getSpecification(), equalTo("1.1")); // 1.0.2b is the default, should be changed in the config
     }
 
     /**
@@ -120,14 +130,14 @@ public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase
     {
         JmsConnector c = (JmsConnector) muleContext.getRegistry().lookupConnector("activeMqJmsConnectorWithUsernameAndPassword");
 
-        assertTrue(c instanceof ActiveMQJmsConnector);
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
+        assertThat(c, instanceOf(ActiveMQJmsConnector.class));
+        assertThat(c.isConnected(), equalTo(true));
+        assertThat(c.isStarted(), equalTo(true));
 
-        assertEquals(USERNAME, c.getUsername());
-        assertEquals(PASSWORD, c.getPassword());
-        assertTrue(c.isCacheJmsSessions());
-        assertEquals("1.1", c.getSpecification());
+        assertThat(c.getUsername(), equalTo((USERNAME)));
+        assertThat(c.getPassword(), equalTo(PASSWORD));
+        assertThat(c.isCacheJmsSessions(), equalTo(true));
+        assertThat(c.getSpecification(), equalTo("1.1"));
     }
 
 }
