@@ -54,7 +54,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
       enableXmlValidations = valueOf((String) deploymentProperties.getOrDefault(
                                                                                 MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
-                                                                                false));
+                                                                                "false"));
     }
 
     if (lazyInit) {
