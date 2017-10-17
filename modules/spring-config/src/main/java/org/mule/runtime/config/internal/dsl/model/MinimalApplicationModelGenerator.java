@@ -7,14 +7,11 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyNavigableSet;
-import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.api.dsl.model.ApplicationModel;
 import org.mule.runtime.config.api.dsl.model.ComponentModel;
-import org.mule.runtime.core.privileged.util.CollectionUtils;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.Iterator;
@@ -89,18 +86,7 @@ public class MinimalApplicationModelGenerator {
       otherRequiredGlobalComponents.add(requestedComponentModel.getNameAttribute());
     }
 
-    Set<String> difference = otherRequiredGlobalComponents;
-    Set<String> allRequiredComponentModels = otherRequiredGlobalComponents;
-
-    // While there are new dependencies resolved, calculate their dependencies
-    // This fixes bugs related to not resolving dependencies of dependencies, such as a config for a config
-    // e.g. tlsContext for http request, or a flow-ref inside a flow that is being referenced in another flow.
-    while (difference.size() > 0) {
-      Set<String> newDependencies = dependencyResolver.findComponentModelsDependencies(difference);
-      newDependencies.removeAll(allRequiredComponentModels);
-      allRequiredComponentModels.addAll(newDependencies);
-      difference = newDependencies;
-    }
+    Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponents);
 
     Iterator<ComponentModel> iterator =
         dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
@@ -129,6 +115,29 @@ public class MinimalApplicationModelGenerator {
     requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
     // Mule root component model has to be enabled too
     this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
+  }
+
+  /**
+   * Resolve all the dependencies for an initial components set.
+   *
+   * @param initialComponents {@ling Set} of initial components to retrieve their dependencies
+   * @return a new {@ling Set} with all the dependencies needed to run all the initial components
+   */
+  private Set<String> resolveDependencies(Set<String> initialComponents) {
+    Set<String> difference = initialComponents;
+    Set<String> allRequiredComponentModels = initialComponents;
+
+    // While there are new dependencies resolved, calculate their dependencies
+    // This fixes bugs related to not resolving dependencies of dependencies, such as a config for a config
+    // e.g. tlsContext for http request, or a flow-ref inside a flow that is being referenced in another flow.
+    while (difference.size() > 0) {
+      // Only calculate the dependencies for the difference, to avoid recalculating
+      Set<String> newDependencies = dependencyResolver.findComponentModelsDependencies(difference);
+      newDependencies.removeAll(allRequiredComponentModels);
+      allRequiredComponentModels.addAll(newDependencies);
+      difference = newDependencies;
+    }
+    return allRequiredComponentModels;
   }
 
 }
