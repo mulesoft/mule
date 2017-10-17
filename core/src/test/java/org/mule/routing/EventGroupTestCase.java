@@ -6,15 +6,19 @@
  */
 package org.mule.routing;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.PartitionableObjectStore;
@@ -22,9 +26,11 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 import org.mule.util.store.DefaultObjectStoreFactoryBean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -34,7 +40,7 @@ import org.junit.Test;
 public class EventGroupTestCase extends AbstractMuleContextTestCase
 {
 
-    private PartitionableObjectStore<MuleEvent> objectStore;
+    private PartitionableObjectStore<WrapperOrderEvent> objectStore;
 
     @Before
     public void before() throws RegistrationException
@@ -210,7 +216,7 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertTrue(es.contains(firstId));
         assertTrue(es.contains(secondId));
     }
-    
+
     @Test
     public void mergedSessions() throws Exception
     {
@@ -218,23 +224,23 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         eg.initEventsStore(objectStore);
         assertFalse(eg.iterator().hasNext());
 
-        MuleEvent event1 = getTestEvent("foo1"); 
-        MuleEvent event2 = getTestEvent("foo2"); 
-        MuleEvent event3 = getTestEvent("foo3"); 
-        
+        MuleEvent event1 = getTestEvent("foo1");
+        MuleEvent event2 = getTestEvent("foo2");
+        MuleEvent event3 = getTestEvent("foo3");
+
         event1.getSession().setProperty("key1", "value1");
         event1.getSession().setProperty("key2", "value2");
         event2.getSession().setProperty("KEY2", "value2NEW");
         event2.getSession().setProperty("key3", "value3");
         event3.getSession().setProperty("key4", "value4");
-        
+
         eg.addEvent(event1);
         System.out.println(event1.getSession());
         eg.addEvent(event2);
         System.out.println(event2.getSession());
         eg.addEvent(event3);
         System.out.println(event3.getSession());
-        
+
         MuleEvent result = eg.getMessageCollectionEvent();
         assertEquals("value1", result.getSession().getProperty("key1"));
         // Cannot assert this because the ordering of events aren't ordered. See MULE-5998
@@ -242,6 +248,38 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase
         assertEquals("value3", result.getSession().getProperty("key3"));
         assertEquals("value4", result.getSession().getProperty("key4"));
     }
+
+
+    @Test
+    public void arrivalOrderEvents() throws Exception
+    {
+        EventGroup eventGroup = new EventGroup(UUID.getUUID(),muleContext);
+        eventGroup.initEventsStore(objectStore);
+        addMuleEventsWithSharedFlowVarsToEventGroup(eventGroup);
+        MuleEvent result = eventGroup.getMessageCollectionEvent();
+        DefaultMessageCollection messageCollection = (DefaultMessageCollection) result.getMessage();
+        MuleMessage messages [] =  messageCollection.getMessagesAsArray();
+
+        assertThat(messages.length, is(3));
+        assertThat(messages[0].getPayloadAsString(), is("foo0"));
+        assertThat(messages[1].getPayloadAsString(), is("foo1"));
+        assertThat(messages[2].getPayloadAsString(), is("foo2"));
+    }
+
+    private void addMuleEventsWithSharedFlowVarsToEventGroup(EventGroup group) throws Exception
+    {
+        MuleEvent testEvent = getTestEvent(null);
+
+        for (int i = 0; i < 3; i++)
+        {
+            MuleMessage messageCopy = new DefaultMuleMessage(testEvent.getMessage());
+            messageCopy.setPayload("foo" + i);
+            messageCopy.setCorrelationSequence(i);
+            group.addEvent(new DefaultMuleEvent(messageCopy, testEvent, true, true));
+        }
+
+    }
+
     private static class MyEventGroup extends EventGroup
     {
         private static final long serialVersionUID = 1L;
