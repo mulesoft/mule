@@ -9,6 +9,7 @@ package org.mule.test.module.extension.values;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
@@ -20,9 +21,10 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-import java.util.Set;
-
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.util.Set;
 
 import org.hamcrest.Matcher;
 
@@ -30,7 +32,18 @@ import org.hamcrest.Matcher;
 public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
+  @Named(VALUE_PROVIDER_SERVICE_KEY)
   private ValueProviderService valueProviderService;
+
+  @Override
+  public boolean enableLazyInit() {
+    return true;
+  }
+
+  @Override
+  public boolean disableXmlValidations() {
+    return true;
+  }
 
   @Override
   protected boolean isDisposeContextPerClass() {
@@ -49,13 +62,23 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
   }
 
   Set<Value> getValuesFromSource(String flowName, String parameterName) throws Exception {
-    return valueProviderService.getValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName)
+    ValueResult valueResult =
+        valueProviderService.getValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName);
+    if (valueResult.getFailure().isPresent()) {
+      ResolvingFailure resolvingFailure = valueResult.getFailure().get();
+      throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
+    }
+    return valueResult
         .getValues();
   }
 
   Set<Value> getValues(String flowName, String parameterName) throws Exception {
+    return checkResultAndRetrieveValues(getValueResult(flowName, parameterName));
+  }
+
+  ValueResult getValueResult(String flowName, String parameterName) throws Exception {
     Location location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
-    return checkResultAndRetrieveValues(valueProviderService.getValues(location, parameterName));
+    return valueProviderService.getValues(location, parameterName);
   }
 
   Set<Value> getValuesFromConfig(String configName, String parameterName) throws Exception {

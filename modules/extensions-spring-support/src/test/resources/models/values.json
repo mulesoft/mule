@@ -5303,7 +5303,6 @@
               "isConfigOverride": false,
               "valueProviderModel": {
                 "actingParameters": [
-                  "requiredString",
                   "requiredInteger",
                   "requiredBoolean",
                   "strings"
@@ -7258,7 +7257,6 @@
               "isConfigOverride": false,
               "valueProviderModel": {
                 "actingParameters": [
-                  "requiredString",
                   "requiredInteger",
                   "requiredBoolean",
                   "strings"

@@ -8,10 +8,13 @@ package org.mule.test.module.extension.values;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import org.mule.runtime.api.value.Value;
-import org.junit.Test;
 
 import java.util.Set;
+
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
 
@@ -42,6 +45,7 @@ public class ConfigurationValuesTestCase extends AbstractValuesTestCase {
   }
 
   @Test
+  @Ignore("MULE-13786")
   public void configWithValuesWithRequiredParamsFromShowInDslGroup() throws Exception {
     Set<Value> channels = getValuesFromConfig("values-with-required-params-from-show-in-dsl-group", "valueParam");
     assertThat(channels, hasSize(1));

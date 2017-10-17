@@ -6,14 +6,19 @@
  */
 package org.mule.test.module.extension.values;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.tck.junit4.matcher.ValueMatcher.valueWithId;
+
 import org.mule.runtime.api.value.Value;
+import org.mule.runtime.api.value.ValueResult;
 import org.mule.tck.junit4.matcher.ValueMatcher;
-import org.junit.Test;
 
 import java.util.Set;
+
+import org.junit.Test;
 
 public class OperationValuesTestCase extends AbstractValuesTestCase {
 
@@ -48,6 +53,27 @@ public class OperationValuesTestCase extends AbstractValuesTestCase {
     Set<Value> channels = getValues("singleValuesEnabledParameterWithRequiredParameters", "channels");
     assertThat(channels, hasSize(4));
     assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
+  }
+
+  @Test
+  public void singleOptionsEnabledParameterWithRequiredParametersUsingExpressions() throws Exception {
+    Set<Value> channels = getValues("singleOptionsEnabledParameterWithRequiredParametersUsingExpressions", "channels");
+    assertThat(channels, hasSize(4));
+    assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:aString"));
+  }
+
+  @Test
+  public void singleOptionsEnabledParameterWithMissingRequiredParameters() throws Exception {
+    ValueResult valueResult = getValueResult("singleOptionsEnabledParameterWithMissingRequiredParameters", "channels");
+    assertThat(valueResult.isSuccess(), is(false));
+    assertThat(valueResult.getFailure().get().getFailureCode(), is(MISSING_REQUIRED_PARAMETERS));
+  }
+
+  @Test
+  public void singleOptionsEnabledParameterWithOptionalParameter() throws Exception {
+    Set<Value> channels = getValues("singleOptionsEnabledParameterWithOptionalParameter", "channels");
+    assertThat(channels, hasSize(4));
+    assertThat(channels, hasValues("requiredInteger:2", "requiredBoolean:false", "strings:[1, 2]", "requiredString:null"));
   }
 
   @Test

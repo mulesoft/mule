@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/metadata http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd">
+
+    <metadata:config name="config" dataWithDefault="staticOverride">
+        <metadata:connection/>
+    </metadata:config>
+
+    <metadata:config name="alternative-config" dataWithDefault="staticOverride">
+        <metadata:connection/>
+    </metadata:config>
+
+    <metadata:config name="dynamic-config" data="#[mel:'dynamic']">
+        <metadata:connection/>
+    </metadata:config>
+
+    <flow name="sourceMetadata" initialState="stopped">
+        <metadata:metadata-source config-ref="config" type="PERSON">
+            <redelivery-policy useSecureHash="true" maxRedeliveryCount="3"/>
+        </metadata:metadata-source>
+        <logger/>
+    </flow>
+
+    <flow name="sourceMetadataWithMultilevel" initialState="stopped">
+        <metadata:metadata-source-with-multilevel continent="AMERICA" country="ARGENTINA" city="BA"/>
+        <logger/>
+    </flow>
+
+    <flow name="enumMetadataKey">
+        <metadata:enum-metadata-key config-ref="config" type="MAMMAL"/>
+    </flow>
+
+    <flow name="booleanMetadataKey">
+        <metadata:boolean-metadata-key config-ref="config" type="true"/>
+    </flow>
+
+    <flow name="simpleMultiLevelKeyResolver">
+        <metadata:simple-multi-level-key-resolver config-ref="config" continent="AMERICA" country="USA" city="SFO"/>
+    </flow>
+
+    <flow name="queryWithExpression">
+        <metadata:do-query>
+            <metadata:query><![CDATA[#["dsql:SELECT id FROM Circle WHERE diameter < " ++ vars.diameter]]]></metadata:query>
+        </metadata:do-query>
+    </flow>
+
+    <flow name="metadataKeyDefaultValue">
+        <metadata:metadata-key-with-default-value config-ref="config"/>
+    </flow>
+
+    <flow name="nativeQueryOperation">
+        <metadata:return-query>
+            <metadata:query><![CDATA[SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18]]></metadata:query>
+        </metadata:return-query>
+    </flow>
+
+    <flow name="outputOnlyWithoutContentParam">
+        <metadata:output-only-without-content-param config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="queryOperation">
+        <metadata:return-query>
+            <metadata:query><![CDATA[dsql:SELECT id FROM Circle WHERE diameter < 18]]></metadata:query>
+        </metadata:return-query>
+    </flow>
+
+    <flow name="outputAndMetadataKeyCacheResolver">
+        <metadata:output-and-metadata-key-cache-resolver config-ref="config" type="PERSON"/>
+    </flow>
+
+    <flow name="outputMetadataWithoutKeyId">
+        <metadata:output-metadata-without-key-id config-ref="config"/>
+    </flow>
+
+    <flow name="contentAndOutputWithCacheResolverWithSpecificConfig">
+        <metadata:content-and-output-cache-resolver config-ref="alternative-config" type="PERSON"/>
+    </flow>
+
+</mule>

@@ -14,19 +14,16 @@
         </values:config-values>
     </values:config>
 
-    <flow name="simple-source">
+    <flow name="simple-source" >
         <values:simple-source channel="dummyValue"/>
-        <logger/>
     </flow>
 
     <flow name="source-with-connection">
         <values:source-with-connection config-ref="config" channel="dummyValue"/>
-        <logger/>
     </flow>
 
     <flow name="source-with-configuration">
         <values:source-with-configuration config-ref="config" channel="dummyValues"/>
-        <logger/>
     </flow>
 
     <flow name="source-with-values-with-required-parameters">
@@ -37,30 +34,25 @@
                 <values:string value="2"/>
             </values:strings>
         </values:source-with-values-with-required-parameters>
-        <logger/>
     </flow>
 
     <flow name="source-with-values-with-required-parameter-inside-param-group">
         <values:source-with-values-with-required-parameter-inside-param-group anyParameter="aParam"
                                                                               channels="dummyValue"/>
-        <logger/>
     </flow>
 
     <flow name="source-with-multi-level-value">
         <values:source-with-multi-level-value/>
-        <logger/>
     </flow>
 
     <flow name="source-with-required-parameter-with-alias">
         <values:source-with-required-parameter-with-alias channels="dummyValue" superString="dummyValue"/>
-        <logger/>
     </flow>
 
     <flow name="source-with-required-parameter-inside-show-in-dsl-group">
         <values:source-with-required-parameter-inside-show-in-dsl-group values="dummyValue">
             <values:values-group channels="dummyValue" anyParameter="someValue"/>
         </values:source-with-required-parameter-inside-show-in-dsl-group>
-        <logger/>
     </flow>
 
 </mule>

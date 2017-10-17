@@ -15,13 +15,13 @@ import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.tck.message.StringAttributes;
 
 import java.util.Set;
@@ -54,16 +54,6 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(3));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR), metadataKeyWithId(HOUSE)));
-  }
-
-  @Test
-  public void injectComposedMetadataKeyIdInstanceInSource() throws Exception {
-    ((Flow) getFlowConstruct(SOURCE_METADATA_WITH_MULTILEVEL)).start();
-  }
-
-  @Test
-  public void injectSimpleMetadataKeyIdInstanceInSource() throws Exception {
-    ((Flow) getFlowConstruct(SOURCE_METADATA)).start();
   }
 
   @Test

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
@@ -41,9 +43,12 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   @Override
   public Flow getObject() throws Exception {
     Builder flowBuilder = Flow.builder(name, muleContext)
-        .processors(messageProcessors)
         .messagingExceptionHandler(exceptionListener)
         .initialState(initialState);
+
+    flowBuilder.processors(messageProcessors != null
+        ? messageProcessors
+        : emptyList());
 
     if (messageSource != null) {
       flowBuilder.source(messageSource);

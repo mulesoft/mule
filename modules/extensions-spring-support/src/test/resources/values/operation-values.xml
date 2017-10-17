@@ -6,7 +6,6 @@
                http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
 
     <values:config name="config">
-        <values:connection></values:connection>
         <values:config-values>
             <values:config-value value="config1"/>
             <values:config-value value="config2"/>
@@ -35,6 +34,28 @@
         </values:single-values-enabled-parameter-with-required-parameters>
     </flow>
 
+    <flow name="singleOptionsEnabledParameterWithRequiredParametersUsingExpressions">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2" requiredString="aString">
+            <values:strings>
+                <values:string value="#[1]"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleOptionsEnabledParameterWithOptionalParameter">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2">
+            <values:strings>
+                <values:string value="1"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleOptionsEnabledParameterWithMissingRequiredParameters">
+        <values:single-values-enabled-parameter-with-required-parameters />
+    </flow>
+
     <flow name="singleValuesEnabledParameterInsideParameterGroup">
         <values:single-values-enabled-parameter-inside-parameter-group anyParameter="aParam" channels="dummyValue"/>
     </flow>
@@ -60,5 +81,4 @@
             <values:values-group channels="dummyValue" anyParameter="someValue"/>
         </values:values-inside-show-in-dsl-group>
     </flow>
-
 </mule>

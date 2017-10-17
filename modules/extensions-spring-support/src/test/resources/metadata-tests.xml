@@ -110,7 +110,6 @@
         <metadata:metadata-source config-ref="config" type="PERSON">
             <redelivery-policy useSecureHash="true" maxRedeliveryCount="3"/>
         </metadata:metadata-source>
-        <logger/>
     </flow>
 
     <flow name="flowWithoutSource">
@@ -159,7 +158,6 @@
 
     <flow name="sourceMetadataWithMultilevel" initialState="stopped">
         <metadata:metadata-source-with-multilevel continent="AMERICA" country="ARGENTINA" city="BA"/>
-        <logger/>
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">

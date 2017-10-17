@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -43,15 +44,19 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
    * {@inheritDoc}
    */
   @Override
-  public Object getParameterValue(String parameterName) {
-    return getParameterGroup(parameterName)
-        .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext))
-        .orElseGet(() -> {
-          String showInDslGroupName = showInDslParameters.get(parameterName);
-          return showInDslGroupName != null
-              ? getShowInDslParameterValue(parameterName, showInDslGroupName)
-              : executionContext.getParameter(parameterName);
-        });
+  public Object getParameterValue(String parameterName) throws ValueResolvingException {
+    try {
+      return getParameterGroup(parameterName)
+          .map(group -> new ParameterGroupArgumentResolver<>(group).resolve(executionContext))
+          .orElseGet(() -> {
+            String showInDslGroupName = showInDslParameters.get(parameterName);
+            return showInDslGroupName != null
+                ? getShowInDslParameterValue(parameterName, showInDslGroupName)
+                : executionContext.getParameter(parameterName);
+          });
+    } catch (Exception e) {
+      throw new ValueResolvingException("Unable to resolve value for the parameter: " + parameterName, e);
+    }
   }
 
   private Optional<ParameterGroupDescriptor> getParameterGroup(String parameterGroupName) {
