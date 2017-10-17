@@ -8,9 +8,14 @@ package org.mule.transport.sftp;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.sftp.notification.SftpNotifier;
@@ -186,6 +191,28 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
         String[] completedFiles = requesterUtil.getAvailableFiles(false);
 
         assertThat(completedFiles.length, is(0));
+    }
+
+    @Test
+    public void testClientIsReleasedAfterRetrieveFileInExceptionScenario() throws Exception
+    {
+        expectedException.expect(Throwable.class);
+        SftpNotifier sftpNotifier = mock(SftpNotifier.class);
+        when(connector.createSftpClient(endpoint, sftpNotifier)).thenReturn(sftpClient);
+        when(sftpUtil.getTempDirInbound()).thenReturn("temp");
+        when(endpoint.getEndpointURI()).thenReturn(mock(EndpointURI.class));
+        doThrow(Throwable.class).when(sftpClient).rename(anyString(), anyString());
+        SftpReceiverRequesterUtil receiverRequesterUtil = new TestSftpReceiverRequesterUtil(endpoint);
+
+        try
+        {
+            receiverRequesterUtil.retrieveFile("fileName", sftpNotifier);
+            fail("A mock exception should have been thrown.");
+        }
+        finally
+        {
+            verify(connector).releaseClient(endpoint, sftpClient);
+        }
     }
 
     private class TestSftpReceiverRequesterUtil extends SftpReceiverRequesterUtil
