@@ -193,9 +193,10 @@ public class SftpReceiverRequesterUtilTestCase extends AbstractMuleContextTestCa
         assertThat(completedFiles.length, is(0));
     }
 
-    @Test(expected = Throwable.class)
+    @Test
     public void testClientIsReleasedAfterRetrieveFileInExceptionScenario() throws Exception
     {
+        expectedException.expect(Throwable.class);
         SftpNotifier sftpNotifier = mock(SftpNotifier.class);
         when(connector.createSftpClient(endpoint, sftpNotifier)).thenReturn(sftpClient);
         when(sftpUtil.getTempDirInbound()).thenReturn("temp");
