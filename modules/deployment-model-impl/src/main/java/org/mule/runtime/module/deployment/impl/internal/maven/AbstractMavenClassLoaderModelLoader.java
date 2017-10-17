@@ -26,7 +26,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.isStandalone;
-import static org.mule.tools.api.packager.sources.MuleContentGenerator.createClassLoaderModelFromJson;
+import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 import org.mule.maven.client.api.LocalRepositorySupplierFactory;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -123,7 +123,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File classLoaderModelDescriptor = getClassLoaderModelDescriptor(artifactFile);
 
     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
-        createClassLoaderModelFromJson(classLoaderModelDescriptor);
+        deserialize(classLoaderModelDescriptor);
     File deployableArtifactRepositoryFolder = getDeployableArtifactRepositoryFolder(artifactFile);
 
     final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
@@ -158,7 +158,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File classLoaderModelPatchDescriptor = getClassLoaderModelPatchDescriptor(artifactFile);
     if (classLoaderModelPatchDescriptor.exists()) {
       org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModelPatch =
-          createClassLoaderModelFromJson(classLoaderModelPatchDescriptor);
+          deserialize(classLoaderModelPatchDescriptor);
       patchBundleDependencies.addAll(packagerClassLoaderModelPatch.getDependencies().stream()
           .map(artifact -> createBundleDependencyFromPackagerDependency(deployableArtifactRepositoryFolder).apply(artifact))
           .collect(toSet()));

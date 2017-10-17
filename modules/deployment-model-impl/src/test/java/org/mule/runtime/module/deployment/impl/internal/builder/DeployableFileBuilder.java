@@ -12,10 +12,11 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
-import static org.mule.tools.api.packager.structure.FolderNames.META_INF;
-import static org.mule.tools.api.packager.structure.FolderNames.MULE_ARTIFACT;
+import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
@@ -23,7 +24,6 @@ import org.mule.tck.ZipUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
-import org.mule.tools.api.packager.sources.MuleContentGenerator;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -138,7 +138,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
       }
     }
 
-    return MuleContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, repository.toFile());
+    return serializeToFile(classLoaderModel, repository.toFile());
   }
 
   private File getClassLoaderModelFile() {
@@ -152,12 +152,12 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
-    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF.value()).resolve(MULE_ARTIFACT.value()).toFile();
+    File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
 
     if (!destinationFolder.exists()) {
       assertThat(destinationFolder.mkdirs(), is(true));
     }
-    return MuleContentGenerator.createClassLoaderModelJsonFile(classLoaderModel, destinationFolder);
+    return serializeToFile(classLoaderModel, destinationFolder);
   }
 
   private Artifact getArtifact(AbstractDependencyFileBuilder builder) {
