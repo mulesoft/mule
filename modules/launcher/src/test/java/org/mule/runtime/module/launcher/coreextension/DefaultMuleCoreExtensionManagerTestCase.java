@@ -11,9 +11,12 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
@@ -205,6 +208,11 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     }
   }
 
+  @Test
+  public void initializesArtifactDeploymentListenerCoreExtension() throws Exception {
+    assertArtifactDeploymentListener(mock(TestArtifactDeploymentListenerExtension.class));
+  }
+
   private <ServiceType, CoreExtensionType extends MuleCoreExtension> void testServiceInjection(Class<ServiceType> serviceType,
                                                                                                Class<CoreExtensionType> coreExtensionType,
                                                                                                Consumer<ServiceType> setServiceFunction,
@@ -221,6 +229,23 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     verificationFunction.accept((List<CoreExtensionType>) extensions, service);
   }
 
+  private void assertArtifactDeploymentListener(ArtifactDeploymentListener extension) throws Exception {
+    List<MuleCoreExtension> extensions = new LinkedList<>();
+    extensions.add((MuleCoreExtension) extension);
+
+    when(coreExtensionDiscoverer.discover()).thenReturn(extensions);
+    when(coreExtensionDependencyResolver.resolveDependencies(extensions)).thenReturn(extensions);
+    DeploymentService deploymentService = mock(DeploymentService.class);
+
+    TestMuleCoreExtensionManager testCoreExtensionManager =
+        new TestMuleCoreExtensionManager(coreExtensionDiscoverer, coreExtensionDependencyResolver);
+    testCoreExtensionManager.setDeploymentService(deploymentService);
+    testCoreExtensionManager.initialise();
+
+    verify(deploymentService).addDomainDeploymentListener(testCoreExtensionManager.domainDeploymentListener);
+    verify(deploymentService).addDeploymentListener(testCoreExtensionManager.applicationDeploymentListener);
+  }
+
   public interface TestDeploymentServiceAwareExtension extends MuleCoreExtension, DeploymentServiceAware {
 
   }
@@ -235,6 +260,33 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   public interface TestCoreExtensionsAwareExtension extends MuleCoreExtension, CoreExtensionsAware {
 
+  }
+
+  public interface TestArtifactDeploymentListenerExtension extends MuleCoreExtension, ArtifactDeploymentListener {
+
+  }
+
+  private static class TestMuleCoreExtensionManager extends DefaultMuleCoreExtensionManagerServer {
+
+    DeploymentListener applicationDeploymentListener;
+    DeploymentListener domainDeploymentListener;
+
+    public TestMuleCoreExtensionManager(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
+                                        MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
+      super(coreExtensionDiscoverer, coreExtensionDependencyResolver);
+    }
+
+    @Override
+    DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type) {
+      if (type == APP) {
+        applicationDeploymentListener = super.createDeploymentListenerAdapter(artifactDeploymentListener, type);
+        return applicationDeploymentListener;
+      }
+
+      domainDeploymentListener = super.createDeploymentListenerAdapter(artifactDeploymentListener, type);
+
+      return domainDeploymentListener;
+    }
   }
 
 }
