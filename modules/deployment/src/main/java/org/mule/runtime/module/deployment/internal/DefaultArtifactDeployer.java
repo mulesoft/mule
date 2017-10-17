@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
-import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +24,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   public void deploy(T artifact) {
     try {
       artifact.install();
-      artifact.init();
+      doInit(artifact);
       artifact.start();
     } catch (Throwable t) {
       artifact.dispose();
@@ -31,6 +35,31 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
       final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
       throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
+    }
+  }
+
+  /**
+   * Initializes the artifact by taking into account deployment properties
+   * {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_DEPLOYMENT_PROPERTY}
+   * and {@link org.mule.runtime.core.api.config.MuleDeploymentProperties#MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY}.
+   * 
+   * @param artifact the T artifact to be initialized
+   */
+  private void doInit(T artifact) {
+    boolean lazyInit = false;
+    boolean enableXmlValidations = false;
+    if (artifact.getDescriptor().getDeploymentProperties().isPresent()) {
+      Properties deploymentProperties = artifact.getDescriptor().getDeploymentProperties().get();
+      lazyInit = (Boolean) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, false);
+      enableXmlValidations = (Boolean) deploymentProperties.getOrDefault(
+                                                                         MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
+                                                                         false);
+    }
+
+    if (lazyInit) {
+      artifact.lazyInit(!enableXmlValidations);
+    } else {
+      artifact.init();
     }
   }
 
