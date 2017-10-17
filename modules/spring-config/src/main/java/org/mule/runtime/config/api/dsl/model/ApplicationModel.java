@@ -62,6 +62,7 @@ import org.mule.runtime.config.api.dsl.processor.ConfigFile;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesComponent;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesProvider;
@@ -108,6 +109,8 @@ public class ApplicationModel {
   public static final String IMPORT_ELEMENT = "import";
   public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ERROR_HANDLER = "error-handler";
+  public static final String ON_ERROR_CONTINUE = "on-error-continue";
+  public static final String ON_ERROR_PROPAGATE = "on-error-propagate";
   public static final String ERROR_MAPPING = "error-mapping";
   public static final String RAISE_ERROR = "raise-error";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
@@ -151,6 +154,10 @@ public class ApplicationModel {
 
   public static final ComponentIdentifier ERROR_HANDLER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_HANDLER).build();
+  public static final ComponentIdentifier ON_ERROR_CONTINE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ON_ERROR_CONTINUE).build();
+  public static final ComponentIdentifier ON_ERROR_PROPAGATE_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ON_ERROR_PROPAGATE).build();
   public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)
           .build();
@@ -341,7 +348,7 @@ public class ApplicationModel {
       expandModules(extensionModels);
     }
     resolveComponentTypes();
-    executeOnEveryMuleComponentTree(new ComponentLocationVisitor());
+    executeOnEveryMuleComponentTree(new ComponentLocationVisitor(new ExtensionModelHelper(extensionModels)));
   }
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,

@@ -122,7 +122,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(6));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(7));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(9));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -175,6 +175,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void scheduler() {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
+    assertThat(schedulerModel.getStereotype(), is(SOURCE));
 
     assertThat(schedulerModel.getErrorModels(), empty());
     assertThat(schedulerModel.hasResponse(), is(false));
@@ -191,6 +192,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void logger() {
     final OperationModel loggerModel = coreExtensionModel.getOperationModel("logger").get();
+    assertThat(loggerModel.getStereotype(), is(PROCESSOR));
 
     assertThat(loggerModel.getErrorModels(), empty());
     assertThat(loggerModel.getExecutionType(), is(CPU_LITE));
@@ -219,6 +221,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void raiseError() {
     final OperationModel raiseErrorModel = coreExtensionModel.getOperationModel("raiseError").get();
+    assertThat(raiseErrorModel.getStereotype(), is(PROCESSOR));
 
     assertThat(raiseErrorModel.getErrorModels(), empty());
     assertThat(raiseErrorModel.getExecutionType(), is(CPU_LITE));
@@ -281,6 +284,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void flowRef() {
     final OperationModel flowRefModel = coreExtensionModel.getOperationModel("flowRef").get();
+    assertThat(flowRefModel.getStereotype(), is(PROCESSOR));
 
     assertAssociatedProcessorsChangeOutput(flowRefModel);
 
@@ -297,6 +301,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void idempotentMessageValidator() {
     final OperationModel filterModel = coreExtensionModel.getOperationModel("idempotentMessageValidator").get();
+    assertThat(filterModel.getStereotype(), is(PROCESSOR));
 
     assertOutputSameAsInput(filterModel);
 
@@ -354,6 +359,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void scatterGather() {
     final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
+
 
     assertThat(scatterGatherModel.getAllParameterModels(), hasSize(4));
 
@@ -420,6 +426,36 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
     assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(type.isRequired(), is(false));
+  }
+
+  @Test
+  public void untilSuccessful() {
+    final ConstructModel tryModel = coreExtensionModel.getConstructModel("untilSuccessful").get();
+
+    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(2));
+
+    ParameterModel action = allParameterModels.get(0);
+    assertThat(action.getName(), is("maxRetries"));
+    assertThat(action.getType(), is(instanceOf(DefaultNumberType.class)));
+    assertThat(action.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(action.getDefaultValue(), is(5));
+    assertThat(action.isRequired(), is(false));
+
+    ParameterModel type = allParameterModels.get(1);
+    assertThat(type.getName(), is("millisBetweenRetries"));
+    assertThat(type.getType(), is(instanceOf(DefaultNumberType.class)));
+    assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(type.getDefaultValue(), is(60000));
+    assertThat(type.isRequired(), is(false));
+  }
+
+  @Test
+  public void firstSuccessful() {
+    final ConstructModel tryModel = coreExtensionModel.getConstructModel("firstSuccessful").get();
+
+    List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
+    assertThat(allParameterModels, hasSize(0));
   }
 
   @Test

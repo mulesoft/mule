@@ -34,6 +34,7 @@ import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.i
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isRouter;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -72,6 +73,11 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
   private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
       buildFromStringRepresentation("mule:otherwise");
+  private final ExtensionModelHelper extensionModelHelper;
+
+  public ComponentLocationVisitor(ExtensionModelHelper extensionModelHelper) {
+    this.extensionModelHelper = extensionModelHelper;
+  }
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -87,7 +93,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
     }
     DefaultComponentLocation componentLocation;
     Optional<TypedComponentIdentifier> typedComponentIdentifier =
-        of(builder().identifier(componentModel.getIdentifier()).type(resolveComponentType(componentModel)).build());
+        of(builder().identifier(componentModel.getIdentifier()).type(resolveComponentType(componentModel, extensionModelHelper))
+            .build());
     if (componentModel.isRoot()) {
       String componentModelNameAttribute = componentModel.getNameAttribute();
       ImmutableList<DefaultLocationPart> parts =

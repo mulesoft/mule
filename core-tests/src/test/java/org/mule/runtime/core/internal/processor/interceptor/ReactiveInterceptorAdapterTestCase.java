@@ -33,8 +33,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.PROCESSOR;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
@@ -1637,7 +1637,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static DefaultComponentLocation buildLocation(final String componentIdentifier) {
     final TypedComponentIdentifier part =
-        builder().identifier(buildFromStringRepresentation(componentIdentifier)).type(PROCESSOR).build();
+        builder().identifier(buildFromStringRepresentation(componentIdentifier)).type(OPERATION).build();
     return new DefaultComponentLocation(of("flowName"), singletonList(new DefaultLocationPart("0", of(part), empty(), empty())));
   }
 

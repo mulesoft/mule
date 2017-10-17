@@ -33,6 +33,7 @@ import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.XmlExtensionModelProperty;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -96,6 +97,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
 
+    if (extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class).isPresent()) {
+      return;
+    }
+
     if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
       registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
     } else {
@@ -152,9 +157,9 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   /**
    * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
    * the macro expanded code, so that
-   * {@link org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper#isProcessor(ComponentModel)}
-   * can properly determine it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as
-   * those will be properly handled by the {@link ComponentLocationVisitor}.
+   * {@link org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper#isProcessor(ComponentModel)} can properly determine
+   * it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as those will be properly
+   * handled by the {@link ComponentLocationVisitor}.
    *
    * @param definitionBuilder builder to generate the {@link ComponentBuildingDefinition} from the operation.
    * @param extensionModel to introspect

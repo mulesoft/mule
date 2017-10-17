@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -71,6 +71,9 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import java.util.List;
 import java.util.Map;
@@ -226,9 +229,12 @@ class ConfigurationBasedElementModelFactory {
     });
   }
 
-  private Map<ComponentIdentifier, ComponentConfiguration> geteNestedComponents(ComponentConfiguration configuration) {
-    return configuration.getNestedComponents().stream()
-        .collect(toMap(ComponentConfiguration::getIdentifier, e -> e));
+  private Multimap<ComponentIdentifier, ComponentConfiguration> getNestedComponents(ComponentConfiguration configuration) {
+    Multimap<ComponentIdentifier, ComponentConfiguration> result = ArrayListMultimap.create();
+    configuration.getNestedComponents().forEach(componentConfiguration -> {
+      result.put(componentConfiguration.getIdentifier(), componentConfiguration);
+    });
+    return result;
   }
 
   private MetadataTypeVisitor getComponentChildVisitor(final DslElementModel.Builder typeBuilder,
@@ -250,7 +256,7 @@ class ConfigurationBasedElementModelFactory {
         String value = parameters.get(name);
         if (isBlank(value)) {
           if (identifier.isPresent()) {
-            ComponentConfiguration nested = geteNestedComponents(configuration).get(identifier.get());
+            ComponentConfiguration nested = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
             if (nested != null && nested.getValue().isPresent() && !isBlank(nested.getValue().get())) {
               value = nested.getValue().get().trim();
             }
@@ -269,7 +275,7 @@ class ConfigurationBasedElementModelFactory {
       public void visitArrayType(ArrayType arrayType) {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         if (identifier.isPresent()) {
-          ComponentConfiguration fieldComponent = geteNestedComponents(configuration).get(identifier.get());
+          ComponentConfiguration fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
           if (fieldComponent != null) {
             DslElementModel.Builder<Object> list = DslElementModel.builder()
                 .withModel(model)
@@ -311,7 +317,9 @@ class ConfigurationBasedElementModelFactory {
             return;
           }
 
-          ComponentConfiguration fieldComponent = geteNestedComponents(configuration).get(identifier.get());
+          Multimap<ComponentIdentifier, ComponentConfiguration> nestedComponents = getNestedComponents(configuration);
+          ComponentConfiguration fieldComponent =
+              nestedComponents.containsKey(identifier.get()) ? nestedComponents.get(identifier.get()).iterator().next() : null;
           fieldComponent = fieldComponent == null ? configuration : fieldComponent;
 
           String value = fieldComponent.getParameters().get(modelDsl.getAttributeName());
@@ -434,7 +442,7 @@ class ConfigurationBasedElementModelFactory {
   private void populateParameterizedElements(ParameterizedModel model, DslElementSyntax elementDsl,
                                              DslElementModel.Builder builder, ComponentConfiguration configuration) {
 
-    Map<ComponentIdentifier, ComponentConfiguration> innerComponents = geteNestedComponents(configuration);
+    Multimap<ComponentIdentifier, ComponentConfiguration> innerComponents = getNestedComponents(configuration);
     Map<String, String> parameters = configuration.getParameters();
 
     List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
@@ -476,7 +484,12 @@ class ConfigurationBasedElementModelFactory {
 
                   populateParameterizedElements((ParameterizedModel) nestedModel, routeDsl, routeBuilder, nestedComponentConfig);
                   nestedComponentConfig.getNestedComponents()
-                      .forEach(routeElement -> routeBuilder.containing(createIdentifiedElement(routeElement)));
+                      .forEach(routeElement -> {
+                        DslElementModel nestableElementModel = createIdentifiedElement(routeElement);
+                        if (nestableElementModel != null) {
+                          routeBuilder.containing(nestableElementModel);
+                        }
+                      });
 
                   builder.containing(routeBuilder.build());
                 });
@@ -485,7 +498,7 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private void addInlineGroup(DslElementSyntax elementDsl,
-                              Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
+                              Multimap<ComponentIdentifier, ComponentConfiguration> innerComponents,
                               Map<String, String> parameters,
                               DslElementModel.Builder parent, ParameterGroupModel group) {
     elementDsl.getChild(group.getName())
@@ -495,14 +508,14 @@ class ConfigurationBasedElementModelFactory {
             return;
           }
 
-          ComponentConfiguration groupComponent = identifier.map(innerComponents::get).orElse(null);
+          ComponentConfiguration groupComponent = getSingleComponentConfiguration(innerComponents, identifier);
           if (groupComponent != null) {
             DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
                 .withModel(group)
                 .withDsl(groupDsl)
                 .withConfig(groupComponent);
 
-            Map<ComponentIdentifier, ComponentConfiguration> groupInnerComponents = geteNestedComponents(groupComponent);
+            Multimap<ComponentIdentifier, ComponentConfiguration> groupInnerComponents = getNestedComponents(groupComponent);
             group.getParameterModels()
                 .forEach(p -> addElementParameter(groupInnerComponents, parameters, groupDsl, groupElementBuilder, p));
 
@@ -512,6 +525,14 @@ class ConfigurationBasedElementModelFactory {
             builDefaultInlineGroupElement(parent, group, groupDsl, identifier.get());
           }
         });
+  }
+
+  private ComponentConfiguration getSingleComponentConfiguration(Multimap<ComponentIdentifier, ComponentConfiguration> innerComponents,
+                                                                 Optional<ComponentIdentifier> identifier) {
+    return identifier.filter(innerComponents::containsKey)
+        .map(innerComponents::get)
+        .map(collection -> collection.iterator().next())
+        .orElse(null);
   }
 
   private void builDefaultInlineGroupElement(DslElementModel.Builder parent, ParameterGroupModel group, DslElementSyntax groupDsl,
@@ -553,7 +574,7 @@ class ConfigurationBasedElementModelFactory {
     return !isRequired(group) && group.getParameterModels().stream().anyMatch(p -> getDefaultValue(p).isPresent());
   }
 
-  private void addElementParameter(Map<ComponentIdentifier, ComponentConfiguration> innerComponents,
+  private void addElementParameter(Multimap<ComponentIdentifier, ComponentConfiguration> innerComponents,
                                    Map<String, String> parameters,
                                    DslElementSyntax groupDsl, DslElementModel.Builder<ParameterGroupModel> groupElementBuilder,
                                    ParameterModel paramModel) {
@@ -566,7 +587,7 @@ class ConfigurationBasedElementModelFactory {
             return;
           }
 
-          ComponentConfiguration paramComponent = getIdentifier(paramDsl).map(innerComponents::get).orElse(null);
+          ComponentConfiguration paramComponent = getSingleComponentConfiguration(innerComponents, getIdentifier(paramDsl));
 
           if (paramDsl.isWrapped()) {
             resolveWrappedElement(groupElementBuilder, paramModel, paramDsl, paramComponent);
@@ -662,14 +683,15 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private void handleInfrastructure(final ParameterModel paramModel, final DslElementSyntax paramDsl,
-                                    final Map<ComponentIdentifier, ComponentConfiguration> nested,
+                                    final Multimap<ComponentIdentifier, ComponentConfiguration> nested,
                                     final Map<String, String> parameters,
                                     final DslElementModel.Builder<ParameterGroupModel> groupElementBuilder) {
 
     switch (paramModel.getName()) {
       case RECONNECTION_CONFIG_PARAMETER_NAME:
-        ComponentConfiguration reconnection = nested.get(newIdentifier(RECONNECTION_CONFIG_PARAMETER_NAME,
-                                                                       paramDsl.getPrefix()));
+        ComponentConfiguration reconnection =
+            getSingleComponentConfiguration(nested, of(newIdentifier(RECONNECTION_CONFIG_PARAMETER_NAME,
+                                                                     paramDsl.getPrefix())));
 
         if (reconnection != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, reconnection));
@@ -681,8 +703,9 @@ class ConfigurationBasedElementModelFactory {
                                                         paramDsl.getPrefix());
 
         ComponentConfiguration config = nested.containsKey(reconnectId)
-            ? nested.get(reconnectId)
-            : nested.get(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix()));
+            ? getSingleComponentConfiguration(nested, of(reconnectId))
+            : getSingleComponentConfiguration(nested,
+                                              of(newIdentifier(RECONNECT_FOREVER_ELEMENT_IDENTIFIER, paramDsl.getPrefix())));
 
         if (config != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, config));
@@ -690,23 +713,25 @@ class ConfigurationBasedElementModelFactory {
         return;
 
       case REDELIVERY_POLICY_PARAMETER_NAME:
-        ComponentConfiguration redelivery = nested.get(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getPrefix()));
+        ComponentConfiguration redelivery =
+            getSingleComponentConfiguration(nested, of(newIdentifier(REDELIVERY_POLICY_ELEMENT_IDENTIFIER,
+                                                                     paramDsl.getPrefix())));
         if (redelivery != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, redelivery));
         }
         return;
 
       case EXPIRATION_POLICY_PARAMETER_NAME:
-        ComponentConfiguration expiration = nested.get(newIdentifier(EXPIRATION_POLICY_ELEMENT_IDENTIFIER,
-                                                                     paramDsl.getPrefix()));
+        ComponentConfiguration expiration =
+            getSingleComponentConfiguration(nested, of(newIdentifier(EXPIRATION_POLICY_ELEMENT_IDENTIFIER,
+                                                                     paramDsl.getPrefix())));
         if (expiration != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, expiration));
         }
         return;
 
       case POOLING_PROFILE_PARAMETER_NAME:
-        ComponentConfiguration pooling = nested.get(getIdentifier(paramDsl).get());
+        ComponentConfiguration pooling = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
         if (pooling != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, pooling));
         }
@@ -722,11 +747,12 @@ class ConfigurationBasedElementModelFactory {
                        newIdentifier(NON_REPEATABLE_OBJECTS_STREAM_ALIAS, CORE_PREFIX));
 
         streaming.stream().filter(nested::containsKey).findFirst()
-            .ifPresent(s -> groupElementBuilder.containing(newElementModel(paramModel, paramDsl, nested.get(s))));
+            .ifPresent(s -> groupElementBuilder
+                .containing(newElementModel(paramModel, paramDsl, getSingleComponentConfiguration(nested, of(s)))));
         return;
 
       case TLS_PARAMETER_NAME:
-        ComponentConfiguration tls = nested.get(getIdentifier(paramDsl).get());
+        ComponentConfiguration tls = getSingleComponentConfiguration(nested, getIdentifier(paramDsl));
         if (tls != null) {
           groupElementBuilder.containing(newElementModel(paramModel, paramDsl, tls));
         } else if (!isBlank(parameters.get(TLS_PARAMETER_NAME))) {
