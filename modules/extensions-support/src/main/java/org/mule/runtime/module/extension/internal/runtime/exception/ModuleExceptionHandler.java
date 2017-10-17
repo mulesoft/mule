@@ -12,11 +12,11 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -67,13 +67,6 @@ public class ModuleExceptionHandler {
   }
 
   private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition errorDefinition) {
-    if (!isAllowedError(errorDefinition)) {
-      throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
-          + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
-                                                         extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
-                                     exception.getCause());
-    }
-
     ErrorType errorType = typeRepository.lookupErrorType(builder()
         .namespace(extensionNamespace)
         .name(errorDefinition.getType())
@@ -83,15 +76,30 @@ public class ModuleExceptionHandler {
                                                                         extensionNamespace + ":" + errorDefinition),
                                                     getExceptionCause(exception)));
 
+    if (!isAllowedError(errorType)) {
+      throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
+          + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
+                                                         extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
+                                     exception.getCause());
+    }
+
     return new TypedException(getExceptionCause(exception), errorType);
   }
 
 
-  private boolean isAllowedError(ErrorTypeDefinition errorTypeDefinition) {
+  private boolean isAllowedError(ErrorType errorType) {
     return allowedErrorTypes
         .stream()
-        .anyMatch(errorModel -> errorModel.getType().equals(errorTypeDefinition.getType())
-            && errorModel.getNamespace().equals(extensionNamespace));
+        .anyMatch(errorModel -> {
+          boolean isAllowed = false;
+          ErrorType currentError = errorType;
+          while (currentError != null && !isAllowed) {
+            isAllowed = errorModel.getType().equals(currentError.getIdentifier())
+                && errorModel.getNamespace().equals(currentError.getNamespace());
+            currentError = currentError.getParentErrorType();
+          }
+          return isAllowed;
+        });
   }
 
   private Throwable getExceptionCause(Throwable throwable) {
