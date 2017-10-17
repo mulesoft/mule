@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.Boolean.valueOf;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
@@ -50,10 +51,10 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     boolean enableXmlValidations = false;
     if (artifact.getDescriptor().getDeploymentProperties().isPresent()) {
       Properties deploymentProperties = artifact.getDescriptor().getDeploymentProperties().get();
-      lazyInit = (Boolean) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, false);
-      enableXmlValidations = (Boolean) deploymentProperties.getOrDefault(
-                                                                         MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
-                                                                         false);
+      lazyInit = valueOf((String) deploymentProperties.getOrDefault(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "false"));
+      enableXmlValidations = valueOf((String) deploymentProperties.getOrDefault(
+                                                                                MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
+                                                                                false));
     }
 
     if (lazyInit) {
