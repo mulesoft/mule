@@ -532,8 +532,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         {
             if (!key.equals(lastStoredEventKey))
             {
-                MuleEvent event = eventsObjectStore.retrieve(key, eventsPartitionKey).event;
-                addAndOverrideSessionProperties(session, event);
+                addAndOverrideSessionProperties(session, eventsObjectStore.retrieve(key, eventsPartitionKey).event);
             }
         }
         addAndOverrideSessionProperties(session, lastStoredEvent);

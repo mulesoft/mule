@@ -438,7 +438,6 @@ public class PersistentObjectStorePartition<T extends Serializable>
             {
                 DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
             }
-
             return storedValue;
         }
         catch (FileNotFoundException e)
