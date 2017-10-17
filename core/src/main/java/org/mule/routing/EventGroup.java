@@ -12,7 +12,6 @@ import org.mule.VoidMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
@@ -24,11 +23,11 @@ import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.collections.IteratorUtils;
 
@@ -49,7 +48,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     public static final String MULE_ARRIVAL_ORDER_PROPERTY = MuleProperties.PROPERTY_PREFIX + "ARRIVAL_ORDER";
 
     private final Object groupId;
-    private transient PartitionableObjectStore<MuleEvent> eventsObjectStore;
+    private transient PartitionableObjectStore<WrapperOrderEvent> eventsObjectStore;
     private final String storePrefix;
     private final String eventsPartitionKey;
     private final long created;
@@ -228,18 +227,69 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             {
                 return EMPTY_EVENTS_ARRAY;
             }
-            List<Serializable> keys = eventsObjectStore.allKeys(eventsPartitionKey);
-            MuleEvent[] eventArray = new MuleEvent[keys.size()];
-            for (int i = 0; i < keys.size(); i++)
-            {
-                eventArray[i] = eventsObjectStore.retrieve(keys.get(i), eventsPartitionKey);
-            }
-            if (sortByArrival)
-            {
-                Arrays.sort(eventArray, new ArrivalOrderEventComparator());
-            }
-            return eventArray;
+
+            return convertWrapperOrderEventCollectionToMuleEventArray(getWrapperEventsFromStore(sortByArrival));
         }
+    }
+
+    private Collection<WrapperOrderEvent> getWrapperEventsFromStore(boolean orderByArrival) throws ObjectStoreException
+    {
+        Collection<WrapperOrderEvent> wrapperOrderEvents ;
+
+        if (orderByArrival)
+        {
+            wrapperOrderEvents =  new TreeSet<>(new ArrivalOrderEventComparator());
+        }
+        else
+        {
+            wrapperOrderEvents = new ArrayList<>();
+        }
+
+        synchronized (this)
+        {
+            for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey))
+            {
+                wrapperOrderEvents.add(eventsObjectStore.retrieve(key, eventsPartitionKey));
+            }
+        }
+
+        return wrapperOrderEvents;
+    }
+
+    /**
+     *
+     * @param wrapperOrderEvents a collection of wrapperOrderEvents.
+     * @return an array of MuleEvents.
+     */
+    private MuleEvent [] convertWrapperOrderEventCollectionToMuleEventArray (Collection <WrapperOrderEvent> wrapperOrderEvents)
+    {
+        MuleEvent events [] = new MuleEvent[wrapperOrderEvents.size()];
+
+        int i = 0;
+
+        for (WrapperOrderEvent wrapperOrderEvent : wrapperOrderEvents)
+        {
+            events [i++] = wrapperOrderEvent.event;
+        }
+
+        return events ;
+    }
+
+    /**
+     *
+     * @param wrapperOrderEvents a collection of wrapperOrderEvents.
+     * @return a MuleMessageCollection.
+     */
+    private MuleMessageCollection convertWrapperOrderEventCollectionToMuleMessageCollection (Collection <WrapperOrderEvent> wrapperOrderEvents)
+    {
+        MuleMessageCollection muleMessageCollection = new DefaultMessageCollection(muleContext);
+
+        for (WrapperOrderEvent wrapperOrderEvent : wrapperOrderEvents)
+        {
+            muleMessageCollection.addMessage(wrapperOrderEvent.event.getMessage());
+        }
+
+        return muleMessageCollection;
     }
 
     /**
@@ -255,9 +305,8 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             //Using both event ID and CorrelationSequence since in certain instances
             //when an event is split up, the same event IDs are used.
             Serializable key= getEventKey(event);
-            event.getMessage().setInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
             lastStoredEventKey = key;
-            eventsObjectStore.store(key, event, eventsPartitionKey);
+            eventsObjectStore.store(key, new WrapperOrderEvent(event, ++arrivalOrderCounter), eventsPartitionKey);
 
             if (!hasNoCommonRootId)
             {
@@ -376,7 +425,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                     while (i.hasNext())
                     {
                         Serializable id = i.next();
-                        buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage().getUniqueId());
+                        buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).event.getMessage().getUniqueId());
                         if (i.hasNext())
                         {
                             buf.append(", ");
@@ -403,24 +452,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
     public MuleMessageCollection toMessageCollection(boolean sortByArrival) throws ObjectStoreException
     {
-        DefaultMessageCollection col = new DefaultMessageCollection(muleContext);
-        List<MuleMessage> messages = new ArrayList<MuleMessage>();
-
-        synchronized (this)
-        {
-            for (Serializable id : eventsObjectStore.allKeys(eventsPartitionKey))
-            {
-                MuleMessage message = eventsObjectStore.retrieve(id, eventsPartitionKey).getMessage();
-                messages.add(message);
-            }
-        }
-
-        if (sortByArrival)
-        {
-            Collections.sort(messages, new ArrivalOrderMessageComparator());
-        }
-        col.addMessages(messages);
-        return col;
+        return convertWrapperOrderEventCollectionToMuleMessageCollection(getWrapperEventsFromStore(sortByArrival));
     }
 
     public String getCommonRootId()
@@ -465,7 +497,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
                 lastStoredEventKey = findLastStoredEventKey();
             }
 
-            return eventsObjectStore.retrieve(lastStoredEventKey, eventsPartitionKey);
+            return eventsObjectStore.retrieve(lastStoredEventKey, eventsPartitionKey).event;
         }
     }
 
@@ -478,8 +510,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         {
             if (!key.equals(lastStoredEventKey))
             {
-                MuleEvent event = eventsObjectStore.retrieve(key, eventsPartitionKey);
-                addAndOverrideSessionProperties(session, event);
+                addAndOverrideSessionProperties(session, eventsObjectStore.retrieve(key, eventsPartitionKey).event);
             }
         }
         addAndOverrideSessionProperties(session, lastStoredEvent);
@@ -499,7 +530,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         this.muleContext = context;
     }
 
-    public void initEventsStore(PartitionableObjectStore<MuleEvent> events) throws ObjectStoreException
+    public void initEventsStore(PartitionableObjectStore<WrapperOrderEvent> events) throws ObjectStoreException
     {
         this.eventsObjectStore = events;
         events.open(eventsPartitionKey);
@@ -536,27 +567,17 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
         return muleContext != null;
     }
 
-    public final class ArrivalOrderMessageComparator implements Comparator<MuleMessage>
+
+    public final class ArrivalOrderEventComparator implements Comparator<WrapperOrderEvent>
     {
         @Override
-        public int compare(MuleMessage message1, MuleMessage message2)
+        public int compare(WrapperOrderEvent wrapperOrderEvent1, WrapperOrderEvent wrapperOrderEvent2)
         {
-            int val1 = message1.getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-            int val2 = message2.getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
+            int val1 = wrapperOrderEvent1.arrivalOrder;
+            int val2 = wrapperOrderEvent2.arrivalOrder;
 
             return val1 - val2;
         }
     }
 
-    public final class ArrivalOrderEventComparator implements Comparator<MuleEvent>
-    {
-        @Override
-        public int compare(MuleEvent event1, MuleEvent event2)
-        {
-            int val1 = event1.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-            int val2 = event2.getMessage().getInvocationProperty(MULE_ARRIVAL_ORDER_PROPERTY, -1);
-
-            return val1 - val2;
-        }
-    }
 }
