@@ -8,12 +8,9 @@ package org.mule.runtime.core.internal.transformer.graph;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.privileged.transformer.CompositeConverter;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
@@ -24,12 +21,7 @@ import java.util.List;
 import org.junit.Test;
 
 @SmallTest
-public class ShortestTransformationLengthTransformerFilterTestCase extends AbstractMuleTestCase {
-
-  private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-  private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
-  private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
-  private static final DataType UNUSED_DATA_TYPE = null;
+public class ShortestTransformationLengthTransformerFilterTestCase extends AbstractTransformationGraphTestCase {
 
   private TransformationLengthConverterFilter filter = new TransformationLengthConverterFilter();
 

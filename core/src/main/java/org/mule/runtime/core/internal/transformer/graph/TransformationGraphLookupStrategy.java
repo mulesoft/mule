@@ -10,12 +10,12 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.privileged.transformer.CompositeConverter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.jgrapht.DirectedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +26,18 @@ public class TransformationGraphLookupStrategy {
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private DirectedGraph<DataType, TransformationEdge> graph;
+  private TransformationGraph graph;
 
-  public TransformationGraphLookupStrategy(DirectedGraph<DataType, TransformationEdge> graph) {
+  public TransformationGraphLookupStrategy(TransformationGraph graph) {
     this.graph = graph;
   }
 
   /**
    * Looks for {@link Converter} to convert from the source to the target data types.
+   * All {@link Converter}s found will have a source that is compatible with {@param source}
+   * (since if a converter can convert a super type, it should be able to convert any type that extends it)
+   * and a target such that {@param target} isCompatibleWith() the {@link Converter}'s one
+   * (since if we want a converter that returns an specific type, it should return exactly that type or any type that extends it.)
    *
    * @param source data type to be converted
    * @param target data type to be converted to
@@ -41,18 +45,24 @@ public class TransformationGraphLookupStrategy {
    */
   public List<Converter> lookupConverters(DataType source, DataType target) {
     List<Converter> converters = new LinkedList<>();
-    if (!graph.containsVertex(source)) {
+    if (!graph.containsVertexOrSuper(source)) {
       return converters;
     }
 
-    // Checks if there is a converter with the specified output data type
-    if (!graph.containsVertex(target)) {
+    if (!graph.containsVertexOrSub(target)) {
       return converters;
     }
 
-    Set<DataType> visited = new HashSet<>();
+    //Since we should have all possible transformations we should check for them all.
+    List<DataType> compatibleSourceVertexes = graph.getSuperVertexes(source);
+    List<DataType> compatibleTargetVertexes = graph.getSubVertexes(target);
 
-    List<List<TransformationEdge>> transformationPaths = findTransformationPaths(source, target, visited);
+    List<List<TransformationEdge>> transformationPaths = new LinkedList<>();
+    for (DataType sourceVertex : compatibleSourceVertexes) {
+      for (DataType targetVertex : compatibleTargetVertexes) {
+        transformationPaths.addAll(findTransformationPaths(sourceVertex, targetVertex, new HashSet<>()));
+      }
+    }
 
     converters = createConverters(transformationPaths);
 
@@ -60,7 +70,8 @@ public class TransformationGraphLookupStrategy {
   }
 
   private List<Converter> createConverters(List<List<TransformationEdge>> transformationPaths) {
-    List<Converter> converters = new LinkedList<>();
+    //Using a set instead of a list for when a path of just one converter is found multiple times.
+    Set<Converter> converters = new HashSet<>();
 
     for (List<TransformationEdge> transformationPath : transformationPaths) {
       Converter[] pathConverters = new Converter[transformationPath.size()];
@@ -79,7 +90,7 @@ public class TransformationGraphLookupStrategy {
       converters.add(converter);
     }
 
-    return converters;
+    return new ArrayList<>(converters);
   }
 
   private List<List<TransformationEdge>> findTransformationPaths(DataType source, DataType target, Set<DataType> visited) {
@@ -94,7 +105,7 @@ public class TransformationGraphLookupStrategy {
       for (TransformationEdge transformationEdge : transformationEdges) {
         DataType edgeTarget = graph.getEdgeTarget(transformationEdge);
 
-        if (edgeTarget.equals(target)) {
+        if (target.isCompatibleWith(edgeTarget)) {
           LinkedList<TransformationEdge> transformationEdges1 = new LinkedList<>();
           transformationEdges1.add(transformationEdge);
           validTransformationEdges.add(transformationEdges1);
@@ -114,4 +125,5 @@ public class TransformationGraphLookupStrategy {
 
     return validTransformationEdges;
   }
+
 }

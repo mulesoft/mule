@@ -23,7 +23,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.privileged.transformer.TransformerChain;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +76,6 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     }
   }
 
-  @Override
   public Transformer resolve(DataType source, DataType result) throws ResolverException {
     Transformer transformer = exactTransformerCache.get(source.toString() + result.toString());
     if (transformer != null) {
@@ -95,33 +93,6 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     }
 
     transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
-    // If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
-    // byte[]
-    Transformer secondPass;
-
-    if (transformer == null) {
-      // If no transformers were found but the outputType type is String or byte[] we can perform a more general search
-      // using Object.class and then convert to String or byte[] using the second pass transformer
-      if (result.getType().equals(String.class)) {
-        secondPass = objectToString;
-      } else if (result.getType().equals(byte[].class)) {
-        secondPass = objectToByteArray;
-      } else {
-        return null;
-      }
-      // Perform a more general search
-      trans = registry.lookupTransformers(source, DataType.OBJECT);
-
-      transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
-      if (transformer != null) {
-        transformer = new TransformerChain(transformer, secondPass);
-        try {
-          registry.registerTransformer(transformer);
-        } catch (MuleException e) {
-          throw new ResolverException(e.getI18nMessage(), e);
-        }
-      }
-    }
 
     if (transformer != null) {
       exactTransformerCache.put(source.toString() + result.toString(), transformer);

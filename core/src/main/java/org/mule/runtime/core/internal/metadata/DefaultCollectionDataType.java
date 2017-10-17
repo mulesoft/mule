@@ -10,6 +10,8 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.util.Objects;
+
 /**
  * A data type that represents a generified collection.
  * <p>
@@ -59,26 +61,14 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
 
     DefaultCollectionDataType that = (DefaultCollectionDataType) o;
 
-    if (!getItemDataType().equals(that.getItemDataType())) {
-      return false;
-    }
-
-    // TODO MULE-9987 Fix this
-    if ((mimeType != null ? !mimeType.matches(that.mimeType) : that.mimeType != null) && !MediaType.ANY.matches(that.mimeType)
-        && !MediaType.ANY.matches(this.mimeType)) {
-      return false;
-    }
-
-    return getType().equals(that.getType());
-
+    return Objects.equals(this.getItemDataType(), that.getItemDataType()) &&
+        Objects.equals(this.getType(), that.getType()) &&
+        Objects.equals(this.getMediaType(), that.getMediaType());
   }
 
   @Override
   public int hashCode() {
-    int result = getType().hashCode();
-    result = 31 * result + getItemDataType().hashCode();
-    result = 31 * result + (getMediaType() != null ? getMediaType().hashCode() : 0);
-    return result;
+    return Objects.hash(getType(), getItemDataType(), getMediaType());
   }
 
   @Override

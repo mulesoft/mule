@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.datetime;
 
+import static java.util.Objects.hash;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
@@ -121,6 +122,12 @@ public abstract class AbstractInstant implements Instant {
 
   private int getTimeZoneOffset() {
     return calendar.get(Calendar.ZONE_OFFSET);
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(calendar.getTimeInMillis(), calendar.getFirstDayOfWeek(), calendar.getMinimalDaysInFirstWeek(),
+                getTimeZoneOffset());
   }
 
   @Override

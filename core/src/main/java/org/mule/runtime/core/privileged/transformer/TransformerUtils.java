@@ -7,11 +7,14 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.mule.runtime.api.metadata.DataType.builder;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
@@ -98,7 +101,7 @@ public class TransformerUtils {
    *
    * @param transformer the transformer used to validate
    * @param value the output value
-   * @throws TransformerException if the out[ut value is of a unexpected type.
+   * @throws TransformerException if the output value is of a unexpected type.
    */
   public static void checkTransformerReturnClass(Transformer transformer, Object value) throws TransformerException {
     if (value == null
@@ -108,6 +111,9 @@ public class TransformerUtils {
 
     if (transformer.getReturnDataType() != null) {
       DataType dt = DataType.fromObject(value);
+      if (ANY.matches(dt.getMediaType())) { //To avoid getting an error because the DataType was constructed with a default mediaType
+        dt = builder(dt).mediaType(transformer.getReturnDataType().getMediaType()).build();
+      }
       if (!transformer.getReturnDataType().isCompatibleWith(dt)) {
         throw new TransformerException(CoreMessages.transformUnexpectedType(dt, transformer.getReturnDataType()), transformer);
       }

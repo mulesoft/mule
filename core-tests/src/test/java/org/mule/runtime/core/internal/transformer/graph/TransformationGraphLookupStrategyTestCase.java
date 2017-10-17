@@ -8,11 +8,16 @@ package org.mule.runtime.core.internal.transformer.graph;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.api.metadata.DataType.builder;
 
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.privileged.transformer.CompositeConverter;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
@@ -23,15 +28,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SmallTest
-public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestCase {
+public class TransformationGraphLookupStrategyTestCase extends AbstractTransformationGraphTestCase {
 
-  private static final DataType XML_DATA_TYPE = mock(DataType.class, "XML_DATA_TYPE");
-  private static final DataType JSON_DATA_TYPE = mock(DataType.class, "JSON_DATA_TYPE");
-  private static final DataType INPUT_STREAM_DATA_TYPE = mock(DataType.class, "INPUT_STREAM_DATA_TYPE");
-  private static final DataType STRING_DATA_TYPE = mock(DataType.class, "STRING_DATA_TYPE");
 
   private TransformationGraph graph = new TransformationGraph();
   private TransformationGraphLookupStrategy lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
+
 
   @Test
   public void lookupTransformersNoSourceInGraph() throws Exception {
@@ -115,6 +117,54 @@ public class TransformationGraphLookupStrategyTestCase extends AbstractMuleTestC
     assertContainsCompositeTransformer(converters, inputStreamToString, stringToXml);
     assertContainsCompositeTransformer(converters, inputStreamToJson, jsonToXml);
     assertContainsCompositeTransformer(converters, inputStreamToString, stringToJson, jsonToXml);
+  }
+
+  @Test
+  public void transformerWithNoCharsetDataTypeAsSourceFoundEvenWhenSpecified() throws Exception {
+    Converter utf16ToJson =
+        new MockConverterBuilder().from(builder(UTF_16_DATA_TYPE).charset((String) null).build()).to(JSON_DATA_TYPE).build();
+
+    graph.addConverter(utf16ToJson);
+
+    List<Converter> converters = lookupStrategyTransformation.lookupConverters(UTF_16_DATA_TYPE, JSON_DATA_TYPE);
+
+    assertThat(converters, hasSize(1));
+
+    assertThat(converters, contains(utf16ToJson));
+  }
+
+  @Test
+  public void transformerWithNoCharsetDataTypeAsTargetNotFoundSinceIsMoreSpecific() throws Exception {
+    Converter jsonToUtf16 =
+        new MockConverterBuilder().from(JSON_DATA_TYPE).to(builder(UTF_16_DATA_TYPE).charset((String) null).build()).build();
+
+    graph.addConverter(jsonToUtf16);
+
+    List<Converter> converters = lookupStrategyTransformation.lookupConverters(JSON_DATA_TYPE, UTF_16_DATA_TYPE);
+
+    assertThat(converters, hasSize(0));
+  }
+
+  @Test
+  public void compatibleConverterShouldBeReturnedEvenIfTargetDataTypeDoesNotExist() throws Exception {
+    Converter jsonToTextString = new MockConverterBuilder().named("jsonToTextString").from(JSON_STRING).to(TEXT_STRING).build();
+
+    graph.addConverter(jsonToTextString);
+
+    List<Converter> converters = lookupStrategyTransformation.lookupConverters(JSON_STRING, STRING);
+    assertThat(converters, hasSize(1));
+    assertThat(converters.get(0).getName(), is("jsonToTextString"));
+  }
+
+  @Test
+  public void compatibleConverterShouldBeReturnedEvenIfTSourceDataTypeDoesNotExist() throws Exception {
+    Converter xmlToTextString = new MockConverterBuilder().named("textStringToXML").from(XML_DATA_TYPE).to(TEXT_STRING).build();
+
+    graph.addConverter(xmlToTextString);
+
+    List<Converter> converters = lookupStrategyTransformation.lookupConverters(XML_DATA_TYPE, STRING);
+    assertThat(converters, hasSize(1));
+    assertThat(converters.get(0).getName(), is("textStringToXML"));
   }
 
   private void assertContainsCompositeTransformer(List<Converter> converters, Converter... composedConverters) {
