@@ -175,81 +175,79 @@ public class SftpReceiverRequesterUtil
         // Getting a new SFTP client dedicated to the SftpInputStream below
         SftpClient client = connector.createSftpClient(endpoint, notifier);
 
-        // Check usage of tmpSendingDir
-        String tmpSendingDir = sftpUtil.getTempDirInbound();
-        if (tmpSendingDir != null)
-        {
-            // Check usage of unique names of files during transfer
-            boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
-
-            // TODO: is it possibly to move this to some kind of init method?
-            client.createSftpDirIfNotExists(endpoint, tmpSendingDir);
-            String tmpSendingFileName = tmpSendingDir + "/" + fileName;
-
-            if (addUniqueSuffix)
-            {
-                tmpSendingFileName = sftpUtil.createUniqueSuffix(tmpSendingFileName);
-            }
-            String fullTmpSendingPath = endpoint.getEndpointURI().getPath() + "/" + tmpSendingFileName;
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Move " + fileName + " to " + fullTmpSendingPath);
-            }
-            client.rename(fileName, fullTmpSendingPath);
-            fileName = tmpSendingFileName;
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Move done");
-            }
-        }
-
-        // Archive functionality...
-        String archive = sftpUtil.getArchiveDir();
-
-        // Retrieve the file stream
-        InputStream fileInputStream;
         try
         {
-            fileInputStream = client.retrieveFile(fileName);
+            // Check usage of tmpSendingDir
+            String tmpSendingDir = sftpUtil.getTempDirInbound();
+            if (tmpSendingDir != null)
+            {
+                // Check usage of unique names of files during transfer
+                boolean addUniqueSuffix = sftpUtil.isUseTempFileTimestampSuffix();
+
+                // TODO: is it possibly to move this to some kind of init method?
+                client.createSftpDirIfNotExists(endpoint, tmpSendingDir);
+                String tmpSendingFileName = tmpSendingDir + "/" + fileName;
+
+                if (addUniqueSuffix)
+                {
+                    tmpSendingFileName = sftpUtil.createUniqueSuffix(tmpSendingFileName);
+                }
+                String fullTmpSendingPath = endpoint.getEndpointURI().getPath() + "/" + tmpSendingFileName;
+
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Move " + fileName + " to " + fullTmpSendingPath);
+                }
+                client.rename(fileName, fullTmpSendingPath);
+                fileName = tmpSendingFileName;
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Move done");
+                }
+            }
+
+            // Archive functionality...
+            String archive = sftpUtil.getArchiveDir();
+
+            // Retrieve the file stream
+            InputStream fileInputStream = client.retrieveFile(fileName);
+
+            if (!"".equals(archive))
+            {
+                String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
+                String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
+
+                SftpInputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
+                                                         endpoint);
+
+                // TODO ML FIX. Refactor to util-class...
+                int idx = fileName.lastIndexOf('/');
+                String fileNamePart = fileName.substring(idx + 1);
+
+                // don't use new File() directly, see MULE-1112
+                File archiveFile = FileUtils.newFile(archive, fileNamePart);
+
+                // Should temp dirs be used when handling the archive file?
+                if ("".equals(archiveTmpReceivingDir) || "".equals(archiveTmpSendingDir))
+                {
+                    return archiveFile(is, archiveFile);
+                }
+                else
+                {
+                    return archiveFileUsingTempDirs(archive, archiveTmpReceivingDir, archiveTmpSendingDir, is,
+                                                    fileNamePart, archiveFile);
+                }
+            }
+
+            // This special InputStream closes the SftpClient when the stream is closed.
+            // The stream will be materialized in a Message Dispatcher or Service
+            // Component
+            return new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(), endpoint);
         }
-        catch (IOException e)
+        finally
         {
             connector.releaseClient(endpoint, client);
-            throw e;
         }
-
-        if (!"".equals(archive))
-        {
-            String archiveTmpReceivingDir = sftpUtil.getArchiveTempReceivingDir();
-            String archiveTmpSendingDir = sftpUtil.getArchiveTempSendingDir();
-
-            SftpInputStream is = new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(),
-                                                     endpoint);
-
-            // TODO ML FIX. Refactor to util-class...
-            int idx = fileName.lastIndexOf('/');
-            String fileNamePart = fileName.substring(idx + 1);
-
-            // don't use new File() directly, see MULE-1112
-            File archiveFile = FileUtils.newFile(archive, fileNamePart);
-
-            // Should temp dirs be used when handling the archive file?
-            if ("".equals(archiveTmpReceivingDir) || "".equals(archiveTmpSendingDir))
-            {
-                return archiveFile(is, archiveFile);
-            }
-            else
-            {
-                return archiveFileUsingTempDirs(archive, archiveTmpReceivingDir, archiveTmpSendingDir, is,
-                                                fileNamePart, archiveFile);
-            }
-        }
-
-        // This special InputStream closes the SftpClient when the stream is closed.
-        // The stream will be materialized in a Message Dispatcher or Service
-        // Component
-        return new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(), endpoint);
     }
 
     private boolean determineAutoDelete()
