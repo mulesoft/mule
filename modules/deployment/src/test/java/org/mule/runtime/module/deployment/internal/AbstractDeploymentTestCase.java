@@ -37,6 +37,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
@@ -47,6 +48,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
@@ -64,7 +66,6 @@ import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.in
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -118,15 +119,6 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.test.runner.classloader.TestModuleDiscoverer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.verification.VerificationMode;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -142,6 +134,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
 /**
@@ -548,7 +550,83 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void assertApplicationDeploymentSuccess(DeploymentListener listener, String artifactName) {
     assertDeploymentSuccess(listener, artifactName);
-    assertStatus(artifactName, ApplicationStatus.STARTED);
+    assertStatus(artifactName, STARTED);
+  }
+
+  private void assertRedeploymentSuccess(DeploymentListener listener, String artifactName,
+                                         Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertDeploymentSuccess(listener, artifactName);
+    verify(listener, times(1)).onUndeploymentStart(artifactName);
+    verify(listener, times(1)).onUndeploymentSuccess(artifactName);
+
+    assertArtifactIsNotRegisteredAsZombie(artifactName, zombieSupplier.get());
+  }
+
+  private void assertRedeploymentFailure(DeploymentListener listener, String artifactName,
+                                         Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertDeploymentFailure(listener, artifactName);
+    verify(listener, times(1)).onUndeploymentStart(artifactName);
+    verify(listener, times(1)).onUndeploymentSuccess(artifactName);
+
+    assertArtifactIsRegisteredAsZombie(artifactName, zombieSupplier.get());
+  }
+
+  private void assertFailedArtifactRedeploymentSuccess(DeploymentListener listener, String artifactName,
+                                                       Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertDeploymentSuccess(listener, artifactName);
+    verify(listener, never()).onUndeploymentStart(artifactName);
+    verify(listener, never()).onUndeploymentSuccess(artifactName);
+
+    assertArtifactIsNotRegisteredAsZombie(artifactName, zombieSupplier.get());
+  }
+
+  private void assertFailedArtifactRedeploymentFailure(DeploymentListener listener, String artifactName,
+                                                       Supplier<Map<String, Map<URI, Long>>> zombieSupplier) {
+    assertDeploymentFailure(listener, artifactName);
+    verify(listener, times(0)).onUndeploymentStart(artifactName);
+    verify(listener, times(0)).onUndeploymentSuccess(artifactName);
+
+    assertArtifactIsRegisteredAsZombie(artifactName, zombieSupplier.get());
+  }
+
+  protected void assertFailedApplicationRedeploymentSuccess(String artifactName) {
+    assertFailedArtifactRedeploymentSuccess(applicationDeploymentListener, artifactName,
+                                            deploymentService::getZombieApplications);
+
+    assertStatus(artifactName, STARTED);
+  }
+
+  protected void assertApplicationRedeploymentSuccess(String artifactName) {
+    assertRedeploymentSuccess(applicationDeploymentListener, artifactName, deploymentService::getZombieApplications);
+
+    assertStatus(artifactName, STARTED);
+  }
+
+  protected void assertApplicationRedeploymentFailure(String artifactName) {
+    assertRedeploymentFailure(applicationDeploymentListener, artifactName, deploymentService::getZombieApplications);
+
+    assertStatus(artifactName, ApplicationStatus.DEPLOYMENT_FAILED);
+  }
+
+  protected void assertFailedApplicationRedeploymentFailure(DeploymentListener listener, String artifactName) {
+    assertFailedArtifactRedeploymentFailure(listener, artifactName, deploymentService::getZombieApplications);
+    assertStatus(artifactName, ApplicationStatus.DEPLOYMENT_FAILED);
+  }
+
+  protected void assertFailedDomainRedeploymentSuccess(String artifactName) {
+    assertFailedArtifactRedeploymentSuccess(domainDeploymentListener, artifactName, deploymentService::getZombieDomains);
+  }
+
+  protected void assertDomainRedeploymentSuccess(String artifactName) {
+    assertRedeploymentSuccess(domainDeploymentListener, artifactName, deploymentService::getZombieDomains);
+  }
+
+  protected void assertDomainRedeploymentFailure(String artifactName) {
+    assertRedeploymentFailure(domainDeploymentListener, artifactName, deploymentService::getZombieDomains);
+  }
+
+  protected void assertFailedDomainRedeploymentFailure(String artifactName) {
+    assertFailedArtifactRedeploymentFailure(domainDeploymentListener, artifactName, deploymentService::getZombieDomains);
   }
 
   protected void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName) {
@@ -1001,6 +1079,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       Map.Entry<URI, Long> zombieEntry =
           getZombieFromMap((entry) -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
       assertThat("Wrong URL tagged as zombie.", zombieEntry, is(notNullValue()));
+    }
+  }
+
+  protected void assertArtifactIsNotRegisteredAsZombie(String artifactName, Map<String, Map<URI, Long>> zombieMap) {
+    if (zombieMap.containsKey(artifactName)) {
+      Map.Entry<URI, Long> zombieEntry =
+          getZombieFromMap((entry) -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
+      assertThat("Artifact tagged as zombie.", zombieEntry, is(notNullValue()));
     }
   }
 

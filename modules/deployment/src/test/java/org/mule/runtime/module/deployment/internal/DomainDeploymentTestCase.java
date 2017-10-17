@@ -389,8 +389,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(emptyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, emptyDomainFileBuilder.getId()}, true);
   }
@@ -413,8 +412,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(emptyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
     Domain secondDomain = findADomain(emptyDomainFileBuilder.getId());
 
@@ -441,8 +439,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
     assertUndeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
   }
 
@@ -464,8 +461,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
     alterTimestampIfNeeded(dummyDomainFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
     assertEquals("Domain has not been properly registered with Mule", 2, deploymentService.getDomains().size());
     assertDomainDir(NONE, new String[] {DEFAULT_DOMAIN_NAME, dummyDomainFileBuilder.getId()}, true);
   }
@@ -925,9 +921,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Deploys another domain to confirm that DeploymentService has execute the updater thread
     addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
-    assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
-
-    assertNoZombiePresent(deploymentService.getZombieDomains());
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -945,9 +939,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
     addPackedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getZipPath());
-    assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertNoZombiePresent(deploymentService.getZombieDomains());
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -1036,9 +1029,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder, emptyDomainFileBuilder.getZipPath());
 
-    assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
-
-    assertArtifactIsRegisteredAsZombie(emptyDomainFileBuilder.getId(), deploymentService.getZombieDomains());
+    assertDomainRedeploymentFailure(emptyDomainFileBuilder.getId());
   }
 
   @Test
@@ -1049,9 +1040,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder, emptyDomainFileBuilder.getZipPath());
-    assertDeploymentFailure(domainDeploymentListener, emptyDomainFileBuilder.getId());
-
-    assertArtifactIsRegisteredAsZombie(emptyDomainFileBuilder.getId(), deploymentService.getZombieDomains());
+    assertDomainRedeploymentFailure(emptyDomainFileBuilder.getId());
   }
 
   @Test
@@ -1066,9 +1055,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
 
-    assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
-
-    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
+    assertFailedDomainRedeploymentFailure(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -1081,9 +1068,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     reset(domainDeploymentListener);
 
     addPackedDomainFromBuilder(incompleteDomainFileBuilder);
-    assertDeploymentFailure(domainDeploymentListener, incompleteDomainFileBuilder.getId());
 
-    assertArtifactIsRegisteredAsZombie(incompleteDomainFileBuilder.getId(), deploymentService.getZombieDomains());
+    assertFailedDomainRedeploymentFailure(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -1102,8 +1088,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     // Redeploys a fixed version for incompleteDomain
     addExplodedDomainFromBuilder(emptyDomainFileBuilder, incompleteDomainFileBuilder.getId());
 
-    assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
-    assertNoZombiePresent(deploymentService.getZombieDomains());
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
   }
 
   @Test
@@ -1143,7 +1128,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     doRedeployDummyDomainByChangingConfigFileWithGoodOne();
 
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
@@ -1189,7 +1174,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     doRedeployDummyDomainByChangingConfigFileWithBadOne();
 
-    assertDeploymentFailure(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentFailure(dummyDomainFileBuilder.getId());
 
     assertNoDeploymentInvoked(applicationDeploymentListener);
   }
@@ -1221,7 +1206,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentService.getLock().unlock();
     }
 
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
@@ -1253,7 +1238,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentService.getLock().unlock();
     }
 
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
+    assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
@@ -1375,7 +1360,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     URL url = getClass().getResource("/empty-domain-config.xml");
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    assertDeploymentSuccess(domainDeploymentListener, incompleteDomainFileBuilder.getId());
+    assertFailedDomainRedeploymentSuccess(incompleteDomainFileBuilder.getId());
 
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
     assertDeploymentSuccess(domainDeploymentListener, emptyDomainFileBuilder.getId());
