@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.api.dsl.model.ApplicationModel;
@@ -84,7 +85,9 @@ public class MinimalApplicationModelGenerator {
         && dependencyResolver.getApplicationModel().findTopLevelNamedElement(requestComponentModelName).isPresent()) {
       otherRequiredGlobalComponents.add(requestedComponentModel.getNameAttribute());
     }
-    Set<String> allRequiredComponentModels = dependencyResolver.findComponentModelsDependencies(otherRequiredGlobalComponents);
+
+    Set<String> allRequiredComponentModels = resolveDependencies(otherRequiredGlobalComponents);
+
     Iterator<ComponentModel> iterator =
         dependencyResolver.getApplicationModel().getRootComponentModel().getInnerComponents().iterator();
     while (iterator.hasNext()) {
@@ -112,6 +115,29 @@ public class MinimalApplicationModelGenerator {
     requestedComponentModel.executedOnEveryInnerComponent(componentModel -> componentModel.setEnabled(true));
     // Mule root component model has to be enabled too
     this.dependencyResolver.getApplicationModel().getRootComponentModel().setEnabled(true);
+  }
+
+  /**
+   * Resolve all the dependencies for an initial components set.
+   *
+   * @param initialComponents {@ling Set} of initial components to retrieve their dependencies
+   * @return a new {@ling Set} with all the dependencies needed to run all the initial components
+   */
+  private Set<String> resolveDependencies(Set<String> initialComponents) {
+    Set<String> difference = initialComponents;
+    Set<String> allRequiredComponentModels = initialComponents;
+
+    // While there are new dependencies resolved, calculate their dependencies
+    // This fixes bugs related to not resolving dependencies of dependencies, such as a config for a config
+    // e.g. tlsContext for http request, or a flow-ref inside a flow that is being referenced in another flow.
+    while (difference.size() > 0) {
+      // Only calculate the dependencies for the difference, to avoid recalculating
+      Set<String> newDependencies = dependencyResolver.findComponentModelsDependencies(difference);
+      newDependencies.removeAll(allRequiredComponentModels);
+      allRequiredComponentModels.addAll(newDependencies);
+      difference = newDependencies;
+    }
+    return allRequiredComponentModels;
   }
 
 }
