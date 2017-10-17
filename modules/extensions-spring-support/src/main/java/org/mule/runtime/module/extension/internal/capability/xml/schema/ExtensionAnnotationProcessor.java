@@ -13,12 +13,13 @@ import static java.util.Optional.of;
 import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.parseJavaDoc;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocModel;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
@@ -31,14 +32,15 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Annotation processing class that uses the {@link Processor} API to introspect and extract information from the extension
@@ -48,13 +50,7 @@ import java.util.stream.Stream;
  */
 public final class ExtensionAnnotationProcessor {
 
-  private static final String PARAM = "@param";
   private static final String VALUE = "value";
-  private static final char AT_CHAR = '@';
-  private static final char NEW_LINE_CHAR = '\n';
-  private static final char SPACE_CHAR = ' ';
-  private static final char CLOSING_BRACKET_CHAR = '}';
-  private static final char OPENING_BRACKET_CHAR = '{';
 
   /**
    * Returns the {@link Class} object that is associated to the {@code typeElement}
@@ -147,23 +143,9 @@ public final class ExtensionAnnotationProcessor {
   }
 
   public MethodDocumentation getMethodDocumentation(ProcessingEnvironment processingEnv, Element element) {
-    final StringBuilder parsedComment = new StringBuilder();
-    final Map<String, String> parameters = new HashMap<>();
-    parseJavaDoc(processingEnv, element, new JavadocParseHandler() {
-
-      @Override
-      public void onParam(String param) {
-        parseMethodParameter(parameters, param);
-      }
-
-      @Override
-      public void onBodyLine(String bodyLine) {
-        parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
-      }
-    });
-
-    parseOperationParameterGroups(processingEnv, (ExecutableElement) element, parameters);
-    return new MethodDocumentation(stripTags(parsedComment.toString()), parameters);
+    JavaDocModel javadocModel = parseJavaDoc(processingEnv, element);
+    parseOperationParameterGroups(processingEnv, (ExecutableElement) element, javadocModel.getParameters());
+    return new MethodDocumentation(javadocModel.getBody(), javadocModel.getParameters());
   }
 
   /**
@@ -212,102 +194,7 @@ public final class ExtensionAnnotationProcessor {
   }
 
   public String getJavaDocSummary(ProcessingEnvironment processingEnv, Element element) {
-    final StringBuilder parsedComment = new StringBuilder();
-    parseJavaDoc(processingEnv, element, new JavadocParseHandler() {
-
-      @Override
-      public void onParam(String param) {}
-
-      @Override
-      public void onBodyLine(String bodyLine) {
-        parsedComment.append(bodyLine).append(NEW_LINE_CHAR);
-      }
-    });
-
-    return stripTags(parsedComment.toString());
-  }
-
-  private static String stripTags(String comment) {
-    StringBuilder builder = new StringBuilder();
-    boolean insideTag = false;
-    comment = comment.trim();
-
-    final int length = comment.length();
-    for (int i = 0; i < length; i++) {
-      if (comment.charAt(i) == OPENING_BRACKET_CHAR) {
-        int nextCharIndex = i + 1;
-        if (nextCharIndex < length && comment.charAt(nextCharIndex) == AT_CHAR) {
-          while (comment.charAt(nextCharIndex) != SPACE_CHAR && comment.charAt(nextCharIndex) != CLOSING_BRACKET_CHAR) {
-            nextCharIndex = i++;
-          }
-          insideTag = true;
-          i = nextCharIndex;
-          continue;
-        }
-      } else if (comment.charAt(i) == CLOSING_BRACKET_CHAR && insideTag) {
-        insideTag = false;
-        continue;
-      }
-
-      builder.append(comment.charAt(i));
-    }
-
-    String strippedComments = builder.toString().trim();
-    while (strippedComments.length() > 0 && strippedComments.charAt(strippedComments.length() - 1) == NEW_LINE_CHAR) {
-      strippedComments = StringUtils.chomp(strippedComments);
-    }
-
-    return strippedComments;
-  }
-
-  private void parseJavaDoc(ProcessingEnvironment processingEnv, Element element, JavadocParseHandler handler) {
-    String comment = extractJavadoc(processingEnv, element);
-
-    StringTokenizer st = new StringTokenizer(comment, "\n\r");
-    while (st.hasMoreTokens()) {
-      String nextToken = st.nextToken().trim();
-      if (nextToken.isEmpty()) {
-        continue;
-      }
-      if (nextToken.startsWith(PARAM)) {
-        handler.onParam(nextToken);
-      } else if (!(nextToken.charAt(0) == AT_CHAR)) {
-        handler.onBodyLine(nextToken);
-      }
-    }
-  }
-
-  private void parseMethodParameter(Map<String, String> parameters, String param) {
-    param = param.replaceFirst(PARAM, StringUtils.EMPTY).trim();
-    int descriptionIndex = param.indexOf(" ");
-    String paramName;
-    String description;
-    if (descriptionIndex != -1) {
-      paramName = param.substring(0, descriptionIndex).trim();
-      description = param.substring(descriptionIndex).trim();
-    } else {
-      paramName = param;
-      description = "";
-    }
-
-    parameters.put(paramName, stripTags(description));
-  }
-
-  private String extractJavadoc(ProcessingEnvironment processingEnv, Element element) {
-    String comment = processingEnv.getElementUtils().getDocComment(element);
-
-    if (StringUtils.isBlank(comment)) {
-      return StringUtils.EMPTY;
-    }
-
-    return comment.trim();
-  }
-
-  private interface JavadocParseHandler {
-
-    void onParam(String param);
-
-    void onBodyLine(String bodyLine);
+    return parseJavaDoc(processingEnv, element).getBody();
   }
 
   /**
