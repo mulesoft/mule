@@ -46,6 +46,12 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
+  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
+  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
+  private static final String COMPATIBILITY_XSD =
+      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
+
   private final Set<ExtensionModel> extensions;
   private final EntityResolver muleEntityResolver;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
@@ -112,11 +118,6 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
   }
 
   private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
-    final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
-    final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-    final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-    final String COMPATIBILITY_XSD = "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
-
     if (systemId.equals(CORE_XSD)) {
       Boolean useDeprecated = muleEntityResolver.resolveEntity(publicId, CORE_DEPRECATED_XSD) != null;
       Boolean usingCompatibility = muleEntityResolver.resolveEntity(publicId, COMPATIBILITY_XSD) != null;
