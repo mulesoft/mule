@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
@@ -33,17 +34,28 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergErrors;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.heisenberg.extension.HeisenbergOperations;
+import org.mule.test.heisenberg.extension.HeisenbergRouters;
+import org.mule.test.heisenberg.extension.HeisenbergScopes;
+import org.mule.test.heisenberg.extension.KillingOperations;
+import org.mule.test.heisenberg.extension.MoneyLaunderingOperation;
 
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private static final String HEISENBERG = "HEISENBERG";
   private static final String MULE_NAMESPACE = "MULE";
   private static final String TYPE = "type";
+
+  @Rule
+  public ExpectedException expectedException = none();
+
   private ExtensionModel extensionModel;
 
   @Test
@@ -117,10 +129,21 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void operationInheritsExtensionErrorThrows() {
     extensionModel = loadExtension(HeisenbergWithExtensionThrows.class);
+
     OperationModel someOperation = extensionModel.getOperationModel("someOperation").get();
     Optional<ErrorModel> operationError = someOperation.getErrorModels().stream()
         .filter(errorModel -> errorModel.getType().equals(EXTENSION.getType())).findFirst();
     assertThat(operationError.isPresent(), is(true));
+  }
+
+  @Test
+  public void operationsWithErrorTypesButExtensionWithNone() throws Exception {
+    expectedException.expect(IllegalModelDefinitionException.class);
+    expectedException.expectMessage("There are 2 operations annotated with @Throws, but class "
+        + "org.mule.runtime.module.extension.internal.loader.enricher.ErrorsDeclarationEnricherTestCase$HeisenbergWithoutErrorTypes "
+        + "does not specify any error type through the @ErrorTypes annotation");
+
+    loadExtension(HeisenbergWithoutErrorTypes.class);
   }
 
   @ErrorTypes(CyclicErrorTypes.class)
@@ -141,6 +164,14 @@ public class ErrorsDeclarationEnricherTestCase extends AbstractMuleTestCase {
   @Extension(name = "Heisenberg")
   @ErrorTypes(OrphanErrorTypes.class)
   public static class HeisenbergWithOrphanErrors extends HeisenbergExtension {
+
+  }
+
+
+  @Extension(name = "Heisenberg")
+  @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
+      KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class})
+  public static class HeisenbergWithoutErrorTypes extends HeisenbergExtension {
 
   }
 

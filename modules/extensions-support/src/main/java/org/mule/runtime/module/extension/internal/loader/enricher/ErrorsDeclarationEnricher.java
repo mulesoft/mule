@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -37,6 +38,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,6 +72,7 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
       ExtensionElement extensionElement = new ExtensionTypeWrapper<>(implementingType.get().getType());
       Optional<ErrorTypes> errorAnnotation = extensionElement.getAnnotation(ErrorTypes.class);
+      List<Pair<OperationDeclaration, MethodElement>> errorOperations = collectErrorOperations(declaration);
 
       if (errorAnnotation.isPresent()) {
         ErrorTypeDefinition<?>[] errorTypes = (ErrorTypeDefinition<?>[]) errorAnnotation.get().value().getEnumConstants();
@@ -77,23 +81,48 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
           ErrorsModelFactory operationErrorModelDescriber = new ErrorsModelFactory(errorTypes, extensionNamespace);
           operationErrorModelDescriber.getErrorModels().forEach(declaration::addErrorModel);
 
-          new IdempotentDeclarationWalker() {
-
-            @Override
-            public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
-              Optional<ImplementingMethodModelProperty> modelProperty =
-                  declaration.getModelProperty(ImplementingMethodModelProperty.class);
-
-              if (modelProperty.isPresent()) {
-                MethodElement methodElement = new MethodWrapper(modelProperty.get().getMethod());
-                registerOperationErrorTypes(methodElement, declaration, operationErrorModelDescriber, errorTypes,
-                                            extensionElement, typeWrapperCache);
-              }
-            }
-          }.walk(declaration);
+          errorOperations.stream().forEach(pair -> registerOperationErrorTypes(pair.getSecond(), pair.getFirst(),
+                                                                               operationErrorModelDescriber, errorTypes,
+                                                                               extensionElement, typeWrapperCache));
+        } else {
+          handleNoErrorTypes(extensionElement, errorOperations);
         }
+      } else {
+        handleNoErrorTypes(extensionElement, errorOperations);
       }
     }
+  }
+
+  private void handleNoErrorTypes(ExtensionElement extensionElement,
+                                  List<Pair<OperationDeclaration, MethodElement>> errorOperations)
+      throws IllegalModelDefinitionException {
+
+    long illegalOps = errorOperations.stream().filter(p -> p.getSecond().isAnnotatedWith(Throws.class)).count();
+    if (illegalOps > 0) {
+      throw new IllegalModelDefinitionException(format(
+                                                       "There are %d operations annotated with @%s, but class %s does not specify any error type through the @%s annotation",
+                                                       illegalOps, Throws.class.getSimpleName(),
+                                                       extensionElement.getDeclaringClass().getName(),
+                                                       ErrorTypes.class.getSimpleName()));
+    }
+  }
+
+  private List<Pair<OperationDeclaration, MethodElement>> collectErrorOperations(ExtensionDeclaration declaration) {
+    List<Pair<OperationDeclaration, MethodElement>> operations = new LinkedList<>();
+    new IdempotentDeclarationWalker() {
+
+      @Override
+      public void onOperation(WithOperationsDeclaration owner, OperationDeclaration declaration) {
+        Optional<ImplementingMethodModelProperty> modelProperty =
+            declaration.getModelProperty(ImplementingMethodModelProperty.class);
+
+        if (modelProperty.isPresent()) {
+          operations.add(new Pair<>(declaration, new MethodWrapper(modelProperty.get().getMethod())));
+        }
+      }
+    }.walk(declaration);
+
+    return operations;
   }
 
   private void registerOperationErrorTypes(MethodElement operationMethod, OperationDeclaration operation,
@@ -138,7 +167,8 @@ public class ErrorsDeclarationEnricher implements DeclarationEnricher {
 
     if (!error.getClass().equals(extensionErrorType) && !error.getClass().getSuperclass().equals(extensionErrorType)) {
       throw new IllegalModelDefinitionException(format("Invalid operation throws detected, the extension declared" +
-          " to throw errors of %s type, but an error of %s type has been detected", extensionErrorType, error.getClass()));
+          " to throw errors of %s type, but an error of %s type has been detected",
+                                                       extensionErrorType, error.getClass()));
     } else {
       return error;
     }
