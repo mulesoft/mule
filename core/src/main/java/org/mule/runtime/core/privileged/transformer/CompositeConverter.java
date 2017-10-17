@@ -10,7 +10,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -33,7 +32,6 @@ public class CompositeConverter extends AbstractComponent implements Converter, 
   private String name;
 
   private LinkedList<Converter> chain;
-  private TransformationService transformationService;
 
   private MuleContext muleContext;
 
@@ -50,7 +48,6 @@ public class CompositeConverter extends AbstractComponent implements Converter, 
     chain = new LinkedList<>();
 
     name = compositeConverterName(converters);
-    this.transformationService = transformationService;
   }
 
   private String compositeConverterName(Converter[] converters) {
