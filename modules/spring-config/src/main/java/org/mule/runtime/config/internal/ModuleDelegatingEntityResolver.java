@@ -121,14 +121,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     if (systemId.equals(CORE_XSD)) {
       Boolean useDeprecated = muleEntityResolver.resolveEntity(publicId, CORE_DEPRECATED_XSD) != null;
       Boolean usingCompatibility = muleEntityResolver.resolveEntity(publicId, COMPATIBILITY_XSD) != null;
-      Boolean runningTests = false;
-
-      try {
-        Class.forName("org.mule.tck.junit4.AbstractMuleTestCase", true, currentThread().getContextClassLoader());
-        runningTests = true;
-      } catch (ClassNotFoundException e) {
-
-      }
+      Boolean runningTests = isRunningTests(new Throwable().getStackTrace());
 
       if (useDeprecated && (usingCompatibility || runningTests)) {
         return CORE_DEPRECATED_XSD;
@@ -138,6 +131,16 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
     }
 
     return systemId;
+  }
+
+  private Boolean isRunningTests(StackTraceElement[] stackTrace) {
+    for (StackTraceElement element : stackTrace) {
+      System.out.println(element.getClassName());
+      if (element.getClassName().startsWith("org.mule.tck.junit4")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private InputSource generateFromExtensions(String publicId, String systemId) {
