@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.model.ComponentModel;
@@ -56,7 +57,7 @@ public class ExtensionModelHelper {
         ConcurrentMap<org.mule.runtime.config.api.dsl.model.ComponentModel, Optional<DslElementModel<Object>>> cacheAsMap =
             modelByComponentIdentifier.asMap();
         ComponentModel parent = componentModel.getParent();
-        while (parent != null) {
+        while (parent != null && !parent.getIdentifier().equals(MODULE_OPERATION_CHAIN)) {
           if (cacheAsMap.containsKey(parent)) {
             Optional<DslElementModel<Object>> parentElementModel = cacheAsMap.get(parent);
             if (parentElementModel.isPresent()) {

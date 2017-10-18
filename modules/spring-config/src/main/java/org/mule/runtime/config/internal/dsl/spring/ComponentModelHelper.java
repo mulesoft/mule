@@ -16,6 +16,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_PROPAGATE_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
@@ -40,6 +41,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -64,7 +66,9 @@ public class ComponentModelHelper {
    */
   public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel,
                                                                             ExtensionModelHelper extensionModelHelper) {
-
+    if (componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN)) {
+      return OPERATION;
+    }
     Optional<DslElementModel<Object>> elementModelOptional = extensionModelHelper.findDslElementModel(componentModel);
     if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
         || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
