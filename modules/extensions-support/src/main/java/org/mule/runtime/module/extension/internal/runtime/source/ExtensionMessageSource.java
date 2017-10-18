@@ -61,14 +61,13 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
-import org.slf4j.Logger;
+import javax.inject.Inject;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Inject;
-
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -187,13 +186,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
             .debug(format("Message source '%s' on root component '%s' threw a '%s' but a reconnection is already in progress. "
                 + "Exception was: %s"
                 + "No action will be taken since this is most likely a bug in the Source",
-                          sourceAdapter.getName(),
+                          //sourceModel's name is used because at this point is very likely that the "sourceAdapter is null
+                          sourceModel.getName(),
                           getLocation().getRootContainerName(),
                           ConnectionException.class.getSimpleName(),
                           exception.getMessage()),
                    exception);
-        return;
       }
+      return;
     }
 
     LOGGER.warn(format("Message source '%s' on root component '%s' threw exception. Attempting to reconnect...",
