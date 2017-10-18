@@ -74,7 +74,19 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
   private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
 
+  private static Class<ClassLoader> appClClass;
+
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
+
+  static {
+    try {
+      appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
+          .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");
+    } catch (ClassNotFoundException e) {
+      LOGGER.warn("ApplicationClassLoader interfac not avialable in current context", e);
+    }
+
+  }
 
   private final String name;
   private final List<Processor> processors;
@@ -109,12 +121,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       stream = stream.transform(applyInterceptors(interceptors, processor));
     }
     return stream.subscriberContext(ctx -> {
-      if (currentThread().getContextClassLoader() == null || currentThread().getContextClassLoader().getParent() == null) {
+      ClassLoader tccl = currentThread().getContextClassLoader();
+      if (tccl == null || tccl.getParent() == null
+          || appClClass == null || !appClClass.isAssignableFrom(tccl.getClass())) {
         return ctx;
       } else {
         return ctx
-            .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, currentThread().getContextClassLoader())
-            .put(TCCL_REACTOR_CTX_KEY, currentThread().getContextClassLoader().getParent());
+            .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, tccl)
+            .put(TCCL_REACTOR_CTX_KEY, tccl.getParent());
       }
     });
   }
