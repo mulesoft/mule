@@ -13,14 +13,11 @@ import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -32,8 +29,7 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  private ConcurrentHashMap<ServerNotificationManager, NotificationHelper> notificationHelpers = new ConcurrentHashMap<>();
-
+  private NotificationHelper notificationHelper;
   protected MuleContext muleContext;
 
   protected void fireNotification(Component source, CoreEvent event, FlowConstruct flow, int action) {
@@ -48,23 +44,16 @@ public abstract class NotificationFiringProcessingPhase<Template extends Message
           return;
         }
       }
-      getNotificationHelper(muleContext.getNotificationManager()).fireNotification(source, event, flow, action);
+      notificationHelper.fireNotification(source, event, ((Component) flow).getLocation(), action);
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }
   }
 
-  protected NotificationHelper getNotificationHelper(ServerNotificationManager serverNotificationManager) {
-    NotificationHelper notificationHelper = notificationHelpers.get(serverNotificationManager);
-    if (notificationHelper == null) {
-      notificationHelper = new NotificationHelper(serverNotificationManager, ConnectorMessageNotification.class, false);
-      notificationHelpers.putIfAbsent(serverNotificationManager, notificationHelper);
-    }
-    return notificationHelper;
-  }
-
   @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 }
