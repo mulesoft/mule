@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 
 import java.io.InputStream;
 import java.util.Iterator;
@@ -54,12 +54,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   @Override
   public <K> Map<K, Object> resolveCursors(Map<K, Object> map, boolean recursive) {
-    return resolveMap(map, recursive, value -> {
-      if (value instanceof CursorProvider) {
-        value = ((CursorProvider) value).openCursor();
-      }
-      return value;
-    });
+    return resolveMap(map, recursive, ResolverUtils::resolveCursor);
   }
 
   /**
@@ -75,11 +70,7 @@ public class DefaultStreamingHelper implements StreamingHelper {
    */
   @Override
   public Object resolveCursor(Object value) {
-    if (value instanceof CursorProvider) {
-      value = ((CursorProvider) value).openCursor();
-    }
-
-    return value;
+    return ResolverUtils.resolveCursor(value);
   }
 
   /**

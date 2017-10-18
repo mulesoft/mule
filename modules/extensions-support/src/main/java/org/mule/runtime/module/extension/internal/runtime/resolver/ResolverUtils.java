@@ -19,6 +19,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
@@ -85,6 +89,37 @@ public class ResolverUtils {
       resolve = resolveRecursively((ValueResolver<T>) resolve, resolvingContext);
     }
     return resolve;
+  }
+
+  public static <T> T resolveValue(ValueResolver<T> resolver, ValueResolvingContext context)
+      throws MuleException {
+    T value = resolveRecursively(resolver, context);
+
+    if (value instanceof CursorProvider) {
+      return (T) ((CursorProvider) value).openCursor();
+
+    } else if (value instanceof TypedValue) {
+      TypedValue typedValue = (TypedValue) value;
+      Object objectValue = typedValue.getValue();
+
+      if (objectValue instanceof CursorProvider) {
+        Cursor cursor = ((CursorProvider) objectValue).openCursor();
+        return (T) new TypedValue<>(cursor, DataType.builder()
+            .type(cursor.getClass())
+            .mediaType(typedValue.getDataType().getMediaType())
+            .build(), typedValue.getLength());
+      }
+    }
+
+    return value;
+  }
+
+  public static Object resolveCursor(Object value) {
+    if (value instanceof CursorProvider) {
+      value = ((CursorProvider) value).openCursor();
+    }
+
+    return value;
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
