@@ -456,6 +456,7 @@
                 <xsd:attribute name="ref" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
+                            @Deprecated since 4.0. Only meant to be used for backward compatibility.
                             Reference to another object defined in the mule configuration or any other provider of objects.
                         </xsd:documentation>
                     </xsd:annotation>
