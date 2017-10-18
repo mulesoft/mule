@@ -7,9 +7,11 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -32,6 +34,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class EventGroupTestCase extends AbstractMuleContextTestCase {
@@ -233,6 +236,24 @@ public class EventGroupTestCase extends AbstractMuleContextTestCase {
     // assertEquals("value2NEW", result.getSession().getProperty("key2"));
     assertEquals("value3", result.getSession().getProperty("key3"));
     assertEquals("value4", result.getSession().getProperty("key4"));
+  }
+
+  @Test
+  public void arrivalOrderEvents() throws Exception {
+    EventGroup eventGroup = new EventGroup(UUID.getUUID(), muleContext);
+    eventGroup.initEventsStore(objectStore);
+
+    for (int i = 0; i < 3; i++) {
+      eventGroup.addEvent(eventBuilder(muleContext).message(Message.of("foo" + i)).build());
+    }
+
+    CoreEvent result = eventGroup.getMessageCollectionEvent();
+    Message message = result.getMessage();
+    List<Message> messages = (List<Message>) message.getPayload().getValue();
+    assertThat(messages.size(), is(3));
+    assertThat(messages.get(0).getPayload().getValue(), is("foo0"));
+    assertThat(messages.get(1).getPayload().getValue(), is("foo1"));
+    assertThat(messages.get(2).getPayload().getValue(), is("foo2"));
   }
 
   private static class MyEventGroup extends EventGroup {
