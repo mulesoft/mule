@@ -10,6 +10,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -68,18 +69,6 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    */
   public void removeComponent(Location location) {
     this.componentsMap.remove(location.toString());
-  }
-
-  /**
-   * Removes a {@Link ComponentLocation}, and all that have the same root container mame
-   *
-   * @param rootLocation the rootLocation that will be removed.
-   */
-  public void removeComponentLocation(ComponentLocation rootLocation) {
-    List<ComponentLocation> locationsToRemove = this.findAllLocations().stream()
-        .filter(componentLocation -> rootLocation.getRootContainerName().equals(componentLocation.getRootContainerName()))
-        .collect(toList());
-    locationsToRemove.stream().forEach(locationToRemove -> this.componentLocations.remove(locationToRemove));
   }
 
   /**

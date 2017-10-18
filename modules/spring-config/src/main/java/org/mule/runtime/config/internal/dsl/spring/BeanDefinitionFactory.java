@@ -166,10 +166,8 @@ public class BeanDefinitionFactory {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
-        if (innerComponent.isEnabled()) {
-          resolveComponentRecursively(componentModel, (SpringComponentModel) innerComponent, registry,
-                                      componentModelPostProcessor, oldParsingMechanism, componentLocator);
-        }
+        resolveComponentRecursively(componentModel, (SpringComponentModel) innerComponent, registry,
+                                    componentModelPostProcessor, oldParsingMechanism, componentLocator);
       }
     }
     return resolveComponent(parentComponentModel, componentModel, registry, componentModelPostProcessor, componentLocator);
@@ -179,9 +177,16 @@ public class BeanDefinitionFactory {
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor,
                                           SpringConfigurationComponentLocator componentLocator) {
-    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier()) || !componentModel.isEnabled()) {
+    if (ignoredMuleCoreComponentIdentifiers.contains(componentModel.getIdentifier())) {
       return null;
     }
+
+    if (!componentModel.isEnabled()) {
+      // Just register the location, for support of lazyInit scenarios
+      componentLocator.addComponentLocation(componentModel.getComponentLocation());
+      return null;
+    }
+
     resolveComponentBeanDefinition(parentComponentModel, componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
 
