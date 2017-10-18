@@ -82,7 +82,7 @@ public class ResolverUtils {
     return null;
   }
 
-  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
+  static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
       throws MuleException {
     T resolve = valueResolver.resolve(resolvingContext);
     if (resolve instanceof ValueResolver) {
@@ -91,12 +91,30 @@ public class ResolverUtils {
     return resolve;
   }
 
+  /**
+   * Executes the {@code resolver} using the given {@code context},
+   * applying all the required resolution rules that may apply for
+   * the given {@code T} type.
+   *
+   * @param resolver the {@link ValueResolver} to execute
+   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @return the resolved value
+   * @throws MuleException
+   */
   public static <T> T resolveValue(ValueResolver<T> resolver, ValueResolvingContext context)
       throws MuleException {
     T value = resolveRecursively(resolver, context);
+    return (T) resolveCursor(value);
+  }
 
+  /**
+   * Obtains a {@link Cursor} based on the {@code value}, if one is available.
+   *
+   * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static Object resolveCursor(Object value) {
     if (value instanceof CursorProvider) {
-      return (T) ((CursorProvider) value).openCursor();
+      return ((CursorProvider) value).openCursor();
 
     } else if (value instanceof TypedValue) {
       TypedValue typedValue = (TypedValue) value;
@@ -104,19 +122,11 @@ public class ResolverUtils {
 
       if (objectValue instanceof CursorProvider) {
         Cursor cursor = ((CursorProvider) objectValue).openCursor();
-        return (T) new TypedValue<>(cursor, DataType.builder()
+        return new TypedValue<>(cursor, DataType.builder()
             .type(cursor.getClass())
             .mediaType(typedValue.getDataType().getMediaType())
             .build(), typedValue.getLength());
       }
-    }
-
-    return value;
-  }
-
-  public static Object resolveCursor(Object value) {
-    if (value instanceof CursorProvider) {
-      value = ((CursorProvider) value).openCursor();
     }
 
     return value;
