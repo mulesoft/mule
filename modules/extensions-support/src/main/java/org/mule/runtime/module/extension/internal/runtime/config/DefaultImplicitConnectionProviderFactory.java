@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getFirstIm
 import static org.mule.runtime.module.extension.internal.loader.utils.ImplicitObjectUtils.buildImplicitResolverSet;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAllConnectionProviders;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -62,7 +63,6 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
       }
     };
   }
-
 
   /**
    * {@inheritDoc}

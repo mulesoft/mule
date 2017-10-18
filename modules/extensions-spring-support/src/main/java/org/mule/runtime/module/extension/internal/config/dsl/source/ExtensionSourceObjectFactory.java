@@ -60,7 +60,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
   }
 
   protected ParametersResolver getParametersResolver(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext);
+    return ParametersResolver.fromValues(parameters, muleContext, lazyInitEnabled);
   }
 
   @Override

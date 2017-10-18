@@ -7,10 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -30,12 +33,19 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  *  Base class for creating MessageProcessor instances of a given {@link ComponentModel}
  *
  * @since 4.0
  */
 public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel, P extends ExtensionComponent> {
+
+  @Inject
+  private ConfigurationProperties properties;
+
+  private final boolean lazyModeEnabled;
 
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
@@ -63,13 +73,23 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     checkArgument(policyManager != null, "PolicyManager cannot be null");
     checkArgument(muleContext != null, "muleContext cannot be null");
 
+    inject(muleContext);
+    this.muleContext = muleContext;
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.policyManager = policyManager;
-    this.muleContext = muleContext;
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
     this.oauthManager = registry.lookupByType(ExtensionsOAuthManager.class).get();
+    this.lazyModeEnabled = properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+  }
+
+  private void inject(MuleContext muleContext) {
+    try {
+      muleContext.getInjector().inject(this);
+    } catch (MuleException e) {
+      throw new IllegalStateException("Could not inject Object Factory instance.", e);
+    }
   }
 
   public P build() {
@@ -92,10 +112,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
     final ResolverSet parametersResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext).getParametersAsResolverSet(operationModel, muleContext);
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled).getParametersAsResolverSet(operationModel,
+                                                                                                           muleContext);
 
     final ResolverSet childsResolverSet =
-        ParametersResolver.fromValues(parameters, muleContext).getNestedComponentsAsResolverSet(operationModel);
+        ParametersResolver.fromValues(parameters, muleContext, lazyModeEnabled).getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);
   }

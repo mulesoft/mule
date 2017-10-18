@@ -40,16 +40,15 @@ public final class ImplicitObjectUtils {
    * <p>
    * If a {@link ParameterModel} returns {@code null} for {@link ParameterModel#getDefaultValue()} then it's ignored
    *
-   * @param parameterizedModel a model holding the {@link ParameterModel}s to consider
+   * @param model a model holding the {@link ParameterModel}s to consider
    * @param muleContext the Mule node.
    * @return a {@link ResolverSet}
    */
-  public static ResolverSet buildImplicitResolverSet(ParameterizedModel parameterizedModel, MuleContext muleContext) {
+  public static ResolverSet buildImplicitResolverSet(ParameterizedModel model, MuleContext muleContext) {
     ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    ParametersResolver parametersResolver =
-        ParametersResolver.fromDefaultValues(parameterizedModel, muleContext);
+    ParametersResolver parametersResolver = ParametersResolver.fromDefaultValues(model, muleContext);
 
-    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+    for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
       Optional<ParameterGroupDescriptor> descriptor = parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class)
           .map(ParameterGroupModelProperty::getDescriptor);
 

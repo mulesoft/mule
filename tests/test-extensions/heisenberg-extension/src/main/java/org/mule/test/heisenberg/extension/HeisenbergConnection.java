@@ -6,10 +6,13 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
+
 public class HeisenbergConnection {
 
   private boolean connected = true;
   private final String saulPhoneNumber;
+  private TlsContextFactory tlsContextFactory;
 
   private int initialise = 0;
   private int start = 0;
@@ -34,5 +37,13 @@ public class HeisenbergConnection {
 
   public String getSaulPhoneNumber() {
     return saulPhoneNumber;
+  }
+
+  public TlsContextFactory getTlsContextFactory() {
+    return tlsContextFactory;
+  }
+
+  public void setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+    this.tlsContextFactory = tlsContextFactory;
   }
 }

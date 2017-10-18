@@ -15,7 +15,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -47,10 +46,6 @@ public class HeisenbergConnectionProvider implements ConnectionProvider<Heisenbe
   @Parameter
   @Optional(defaultValue = SAUL_OFFICE_NUMBER)
   private String saulPhoneNumber;
-
-  @Parameter
-  @Optional
-  private TlsContextFactory tlsContextFactory;
 
   @ParameterGroup(name = "look", showInDsl = true)
   private BarberPreferences look;

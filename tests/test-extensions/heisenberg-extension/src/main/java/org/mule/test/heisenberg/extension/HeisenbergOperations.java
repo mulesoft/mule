@@ -198,6 +198,10 @@ public class HeisenbergOperations implements Disposable {
     return healthByYear;
   }
 
+  public HeisenbergConnection getConnection(@Connection HeisenbergConnection connection) {
+    return connection;
+  }
+
   @MediaType(TEXT_PLAIN)
   public String getSaulPhone(@Connection HeisenbergConnection connection) {
     return connection.getSaulPhoneNumber();

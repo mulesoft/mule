@@ -7,7 +7,12 @@
 package org.mule.test.module.extension.connector;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
 import org.junit.rules.ExpectedException;
@@ -20,8 +25,7 @@ public class PetStoreMissingRequiredParameterInsidePojoTestCase extends InvalidE
   }
 
   @Override
-  protected void additionalExceptionAssertions(ExpectedException expectedException) {
-    expectedException
-        .expectMessage(is(containsString("The object 'PhoneNumber' requires the parameter 'areaCodes' but is not set")));
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    expectedException.expectMessage(is(containsString("Parameter 'area-codes' is required but was not found")));
   }
 }
