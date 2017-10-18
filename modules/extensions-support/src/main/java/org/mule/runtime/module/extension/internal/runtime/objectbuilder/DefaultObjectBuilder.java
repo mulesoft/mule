@@ -9,15 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilderUtils.createInstance;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
@@ -82,22 +80,12 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T> {
     T object = createInstance(prototypeClass);
 
     for (Map.Entry<Field, ValueResolver<Object>> entry : resolvers.entrySet()) {
-      setField(entry.getKey(), object, resolve(entry.getValue(), context));
+      setField(entry.getKey(), object, resolveValue(entry.getValue(), context));
     }
 
     injectFields(object, name, encoding);
 
     return object;
-  }
-
-  protected Object resolve(ValueResolver resolver, ValueResolvingContext context) throws MuleException {
-    Object value = resolveRecursively(resolver, context);
-
-    if (value instanceof CursorStreamProvider) {
-      value = ((CursorStreamProvider) value).openCursor();
-    }
-
-    return value;
   }
 
   public void setName(String name) {

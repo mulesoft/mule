@@ -19,6 +19,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 
@@ -78,13 +82,54 @@ public class ResolverUtils {
     return null;
   }
 
-  public static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
+  static <T> T resolveRecursively(ValueResolver<T> valueResolver, ValueResolvingContext resolvingContext)
       throws MuleException {
     T resolve = valueResolver.resolve(resolvingContext);
     if (resolve instanceof ValueResolver) {
       resolve = resolveRecursively((ValueResolver<T>) resolve, resolvingContext);
     }
     return resolve;
+  }
+
+  /**
+   * Executes the {@code resolver} using the given {@code context},
+   * applying all the required resolution rules that may apply for
+   * the given {@code T} type.
+   *
+   * @param resolver the {@link ValueResolver} to execute
+   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @return the resolved value
+   * @throws MuleException
+   */
+  public static <T> T resolveValue(ValueResolver<T> resolver, ValueResolvingContext context)
+      throws MuleException {
+    T value = resolveRecursively(resolver, context);
+    return (T) resolveCursor(value);
+  }
+
+  /**
+   * Obtains a {@link Cursor} based on the {@code value}, if one is available.
+   *
+   * @return the given {@code value} but converting a {@link CursorProvider} to a {@link Cursor} if any is present.
+   */
+  public static Object resolveCursor(Object value) {
+    if (value instanceof CursorProvider) {
+      return ((CursorProvider) value).openCursor();
+
+    } else if (value instanceof TypedValue) {
+      TypedValue typedValue = (TypedValue) value;
+      Object objectValue = typedValue.getValue();
+
+      if (objectValue instanceof CursorProvider) {
+        Cursor cursor = ((CursorProvider) objectValue).openCursor();
+        return new TypedValue<>(cursor, DataType.builder()
+            .type(cursor.getClass())
+            .mediaType(typedValue.getDataType().getMediaType())
+            .build(), typedValue.getLength());
+      }
+    }
+
+    return value;
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,

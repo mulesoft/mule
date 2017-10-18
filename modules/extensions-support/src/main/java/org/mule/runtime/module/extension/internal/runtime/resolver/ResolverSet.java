@@ -8,23 +8,18 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
-
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * A {@link ValueResolver} which is based on associating a set of keys -&gt; {@link ValueResolver} pairs. The result of evaluating
@@ -114,27 +109,6 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     }
 
     return builder.build();
-  }
-
-  private Object resolveValue(ValueResolver<?> resolver, ValueResolvingContext context)
-      throws MuleException {
-    Object value = resolveRecursively(resolver, context);
-
-    if (value instanceof CursorProvider) {
-      return ((CursorProvider) value).openCursor();
-    } else if (value instanceof TypedValue) {
-      TypedValue typedValue = (TypedValue) value;
-      Object objectValue = typedValue.getValue();
-      if (objectValue instanceof CursorProvider) {
-        Cursor cursor = ((CursorProvider) objectValue).openCursor();
-        return new TypedValue<>(cursor, DataType.builder()
-            .type(cursor.getClass())
-            .mediaType(typedValue.getDataType().getMediaType())
-            .build(), typedValue.getLength());
-      }
-    }
-
-    return value;
   }
 
   /**
