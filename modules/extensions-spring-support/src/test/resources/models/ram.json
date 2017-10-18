@@ -1571,8 +1571,15 @@
       "parent": "MULE:ANY"
     },
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "RAM:INVALID_WSDL",
       "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:ANY"
     },
     {
       "error": "RAM:RETRY_EXHAUSTED",
@@ -1580,6 +1587,10 @@
     },
     {
       "error": "RAM:BAD_RESPONSE",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY"
     },
     {
