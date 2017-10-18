@@ -244,9 +244,10 @@ public class SftpReceiverRequesterUtil
             // Component
             return new SftpInputStream(client, fileInputStream, fileName, determineAutoDelete(), endpoint);
         }
-        finally
+        catch (Exception e)
         {
             connector.releaseClient(endpoint, client);
+            throw e;
         }
     }
 
