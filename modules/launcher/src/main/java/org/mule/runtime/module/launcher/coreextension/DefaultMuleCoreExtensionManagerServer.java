@@ -6,15 +6,20 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
+import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
+import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingService;
@@ -111,6 +116,12 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         ((ToolingServiceAware) extension).setToolingService(toolingService);
       }
 
+      if (extension instanceof ArtifactDeploymentListener) {
+        deploymentService.addDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
+        deploymentService
+            .addDomainDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, DOMAIN));
+      }
+
       if (extension instanceof DeploymentListener) {
         deploymentService.addDeploymentListener((DeploymentListener) extension);
       }
@@ -145,4 +156,16 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   public void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager) {
     this.artifactClassLoaderManager = artifactClassLoaderManager;
   }
+
+  /**
+   * Creates a {@link DeploymentListenerAdapter}.
+   *
+   * @param artifactDeploymentListener the artifactDeploymentListener to be adapted.
+   * @param type: the artifact type.
+   * @return an DeploymentListener.
+   */
+  DeploymentListener createDeploymentListenerAdapter(ArtifactDeploymentListener artifactDeploymentListener, ArtifactType type) {
+    return new DeploymentListenerAdapter(artifactDeploymentListener, type);
+  }
+
 }
