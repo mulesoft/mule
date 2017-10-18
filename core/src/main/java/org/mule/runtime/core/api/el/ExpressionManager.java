@@ -204,4 +204,18 @@ public interface ExpressionManager extends MuleExpressionLanguage {
   Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
+  /**
+   * Parses a logging expression template by iterating through each expression and evaluating it. If a user needs to evaluate a
+   * single expression they can use {@link #evaluate(String, CoreEvent, ComponentLocation, BindingContext)}.
+   *
+   * @param template the string template featuring inner expressions to parse
+   * @param event the current event being processed
+   * @param componentLocation the location of the component where the event is being processed
+   * @param bindingContext the bindings to consider
+   * @return the result of the evaluation
+   * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
+   */
+  String parseLogTemplate(String template, CoreEvent event, ComponentLocation componentLocation, BindingContext bindingContext)
+      throws ExpressionRuntimeException;
+
 }

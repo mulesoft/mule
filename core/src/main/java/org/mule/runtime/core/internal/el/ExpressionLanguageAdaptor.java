@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.el;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
@@ -86,6 +87,21 @@ public interface ExpressionLanguageAdaptor {
   TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, ComponentLocation componentLocation,
                       BindingContext context,
                       boolean failOnNull)
+      throws ExpressionRuntimeException;
+
+  /**
+   * Evaluates an expression according to a given {@link BindingContext} and the global one, doing a best effort to avoid failing
+   * when the result value can not be represented in the corresponding format.
+   *
+   * @param expression         the EL expression
+   * @param event the current event being processed
+   * @param componentLocation the location of the component where the event is being processed
+   * @param bindingContext            the current dynamic binding context to consider
+   * @return the result of the expression plus its type
+   * @throws ExpressionExecutionException when an error occurs during evaluation
+   */
+  TypedValue<?> evaluateLogExpression(String expression, CoreEvent event, ComponentLocation componentLocation,
+                                      BindingContext bindingContext)
       throws ExpressionRuntimeException;
 
   /**
