@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.find;
@@ -418,13 +417,14 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       logger.info(miniSplash(format("Redeploying artifact '%s'", artifact.getArtifactName())));
     }
 
-    deploymentListener.onUndeploymentStart(artifact.getArtifactName());
-    try {
-      deployer.undeploy(artifact);
-      deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
-    } catch (Throwable e) {
-      // TODO make the exception better
-      deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+    if (!artifactZombieMap.containsKey(artifact.getArtifactName())) {
+      deploymentListener.onUndeploymentStart(artifact.getArtifactName());
+      try {
+        deployer.undeploy(artifact);
+        deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
+      } catch (Throwable e) {
+        deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
+      }
     }
 
     deploymentListener.onDeploymentStart(artifact.getArtifactName());

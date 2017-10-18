@@ -47,7 +47,6 @@ import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -71,10 +70,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -89,6 +84,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
@@ -316,8 +314,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
-    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
 
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
@@ -338,8 +335,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
-    assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
   }
@@ -473,7 +469,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
   }
 
   @Test
@@ -493,7 +489,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertThat("Could not update last updated time in configuration file",
                configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS), is(true));
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -521,7 +517,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
       lock.unlock();
     }
 
-    assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
   }
 
   @Test
@@ -543,7 +539,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertThat(configFile.exists(), is(true));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
-    assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
   }
 
   @Test
@@ -564,8 +560,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
 
-    assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertStatus(dummyAppDescriptorFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
+    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
   }
 
   @Test
@@ -586,8 +581,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
 
-    assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertStatus(dummyAppDescriptorFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
+    assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
   }
 
   @Test
@@ -606,7 +600,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     URL url = getClass().getResource(EMPTY_APP_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     addPackedAppFromBuilder(emptyAppFileBuilder);
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -636,7 +630,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
       deploymentLock.unlock();
     }
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     addPackedAppFromBuilder(emptyAppFileBuilder);
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
@@ -662,8 +656,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
-    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
     assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
   }
@@ -864,7 +857,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
     copyFile(new File(url.toURI()), configFile);
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -1030,7 +1023,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
     addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     assertNoZombiePresent(deploymentService.getZombieApplications());
   }
@@ -1049,7 +1042,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // Deploys another app to confirm that DeploymentService has execute the updater thread
     addPackedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getZipPath());
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
 
     assertNoZombiePresent(deploymentService.getZombieApplications());
   }
@@ -1062,10 +1055,11 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
+    reset(applicationDeploymentListener);
+
     addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
 
-    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertArtifactIsRegisteredAsZombie(emptyAppFileBuilder.getId(), deploymentService.getZombieApplications());
+    assertApplicationRedeploymentFailure(emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -1076,8 +1070,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
     addPackedAppFromBuilder(incompleteAppFileBuilder, emptyAppFileBuilder.getZipPath());
-    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
-    assertArtifactIsRegisteredAsZombie(emptyAppFileBuilder.getId(), deploymentService.getZombieApplications());
+    assertApplicationRedeploymentFailure(emptyAppFileBuilder.getId());
   }
 
   @Test
@@ -1092,8 +1085,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
-    assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
-    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
+    assertFailedApplicationRedeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
   }
 
   @Test
@@ -1106,8 +1098,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     reset(applicationDeploymentListener);
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
-    assertDeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
-    assertArtifactIsRegisteredAsZombie(incompleteAppFileBuilder.getId(), deploymentService.getZombieApplications());
+
+    assertFailedApplicationRedeploymentFailure(applicationDeploymentListener, incompleteAppFileBuilder.getId());
   }
 
   @Test
@@ -1126,7 +1118,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     // Redeploys a fixed version for incompleteApp
     addExplodedAppFromBuilder(emptyAppFileBuilder, incompleteAppFileBuilder.getId());
 
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, incompleteAppFileBuilder.getId());
+    assertFailedApplicationRedeploymentSuccess(incompleteAppFileBuilder.getId());
     assertNoZombiePresent(deploymentService.getZombieApplications());
   }
 
