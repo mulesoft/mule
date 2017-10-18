@@ -12,7 +12,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.processMuleProperties;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
-
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 
@@ -41,13 +40,13 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     String refParameterValue = componentModel.getParameters().get(REF_PARAMETER);
     String classParameterValue = componentModel.getParameters().get(CLASS_PARAMETER);
     if (refParameterValue != null && classParameterValue != null) {
-      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameter. Offending resource is '%s'",
-                                                                         refParameterValue, classParameterValue,
+      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameters. Offending resource is '%s'",
+                                                                         REF_PARAMETER, CLASS_PARAMETER,
                                                                          componentModel.getComponentLocation())));
     }
     if (refParameterValue == null && classParameterValue == null) {
-      throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameter empty. Offending resource is '%s'",
-                                                                         refParameterValue, classParameterValue,
+      throw new RuntimeConfigurationException(createStaticMessage(format("Object must contain '%s' or '%s' parameter. Offending resource is '%s'",
+                                                                         REF_PARAMETER, CLASS_PARAMETER,
                                                                          componentModel.getComponentLocation())));
     }
 

@@ -422,7 +422,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   public void close() {
-    super.close();
+    if (isRunning()) {
+      super.close();
+    }
     beanDefinitionFactory.destroy();
   }
 
