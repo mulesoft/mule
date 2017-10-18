@@ -443,6 +443,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
           new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
 
+
       for (ArtifactClassificationNode pluginClassifiedNode : pluginsClassified.values()) {
         List<URL> urls = generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
                                                    pluginClassifiedNode.getUrls(), rootArtifactRemoteRepositories);
@@ -463,7 +464,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       InputStream servicePropertiesStream =
           new URLClassLoader(node.getUrls().toArray(new URL[0]), null).getResourceAsStream(SERVICE_PROPERTIES_FILE_NAME);
 
-      // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file format
+      // TODO(pablo.kraan): MULE-13281 - remove properties descriptor support once all the services are migrated to the new file
+      // format
       if (servicePropertiesStream != null) {
         try {
           Properties serviceProperties = loadProperties(servicePropertiesStream);

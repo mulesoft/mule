@@ -9,23 +9,42 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-
-import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
-import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
-import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_CONTINE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_PROPAGATE_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
+import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.TemplateOnErrorHandler;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.routing.AbstractSelectiveRouter;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,53 +59,90 @@ public class ComponentModelHelper {
 
   /**
    * Resolves the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} from a {@link ComponentModel}.
-   * 
+   *
    * @param componentModel a {@link ComponentModel} that represents a component in the configuration.
+   * @param extensionModelHelper helper to access components in extension model
    * @return the componentModel type.
    */
-  public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel) {
-    if (isMessageSource(componentModel)) {
-      return TypedComponentIdentifier.ComponentType.SOURCE;
-    } else if (isErrorHandler(componentModel)) {
-      return TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
-    } else if (isTemplateOnErrorHandler(componentModel)) {
-      return TypedComponentIdentifier.ComponentType.ON_ERROR;
-    } else if (isFlow(componentModel)) {
-      return TypedComponentIdentifier.ComponentType.FLOW;
-    } else if (isProcessor(componentModel)) {
-      if (isOperationMessageProcessor(componentModel)) {
-        return OPERATION;
-      } else if (isInterceptingProcessor(componentModel)) {
-        return TypedComponentIdentifier.ComponentType.INTERCEPTING;
-      } else if (isRouterProcessor(componentModel)) {
-        return TypedComponentIdentifier.ComponentType.ROUTER;
-      } else if (isScopeProcessor(componentModel)) {
-        return TypedComponentIdentifier.ComponentType.SCOPE;
-      } else {
-        return TypedComponentIdentifier.ComponentType.PROCESSOR;
-      }
+  public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel,
+                                                                            ExtensionModelHelper extensionModelHelper) {
+    if (componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN)) {
+      return OPERATION;
     }
-    return TypedComponentIdentifier.ComponentType.UNKNOWN;
+    Optional<DslElementModel<Object>> elementModelOptional = extensionModelHelper.findDslElementModel(componentModel);
+    if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
+        || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
+      return ON_ERROR;
+    }
+    return elementModelOptional.map(elementModel -> {
+      Object model = elementModel.getModel();
+      Reference<TypedComponentIdentifier.ComponentType> typeReference = new Reference<>(UNKNOWN);
+      if (model instanceof org.mule.runtime.api.meta.model.ComponentModel) {
+        ((org.mule.runtime.api.meta.model.ComponentModel) model).accept(new ComponentModelVisitor() {
+
+          @Override
+          public void visit(OperationModel model) {
+            typeReference.set(OPERATION);
+          }
+
+          @Override
+          public void visit(SourceModel model) {
+            typeReference.set(SOURCE);
+          }
+
+          @Override
+          public void visit(ConstructModel model) {
+            StereotypeModel stereotype = model.getStereotype();
+            if (stereotype.equals(MuleStereotypes.ERROR_HANDLER)) {
+              typeReference.set(TypedComponentIdentifier.ComponentType.ERROR_HANDLER);
+              return;
+            } else if (stereotype.equals(MuleStereotypes.FLOW)) {
+              typeReference.set(TypedComponentIdentifier.ComponentType.FLOW);
+              return;
+            } else if (stereotype.equals(SOURCE)) {
+              typeReference.set(TypedComponentIdentifier.ComponentType.SOURCE);
+              return;
+            }
+            model.getNestedComponents()
+                .forEach(nestedElementModel -> nestedElementModel.accept(new NestedComponentVisitor(typeReference)));
+
+            if (typeReference.get() == null && stereotype.equals(MuleStereotypes.PROCESSOR)) {
+              typeReference.set(OPERATION);
+            }
+          }
+        });
+      }
+      return typeReference.get();
+    }).orElse(UNKNOWN);
   }
 
-  private static boolean isOperationMessageProcessor(ComponentModel componentModel) {
-    return isOfType(componentModel, OperationMessageProcessor.class);
+  static class NestedComponentVisitor implements NestableElementModelVisitor {
+
+    private Reference<TypedComponentIdentifier.ComponentType> reference;
+
+    public NestedComponentVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
+      this.reference = reference;
+    }
+
+    @Override
+    public void visit(NestedComponentModel component) {
+
+    }
+
+    @Override
+    public void visit(NestedChainModel component) {
+      reference.set(SCOPE);
+    }
+
+    @Override
+    public void visit(NestedRouteModel component) {
+      reference.set(ROUTER);
+    }
   }
+
 
   public static boolean isAnnotatedObject(ComponentModel componentModel) {
     return isOfType(componentModel, Component.class);
-  }
-
-  private static boolean isScopeProcessor(ComponentModel componentModel) {
-    return isOfType(componentModel, Scope.class);
-  }
-
-  private static boolean isRouterProcessor(ComponentModel componentModel) {
-    return isOfType(componentModel, Router.class);
-  }
-
-  private static boolean isInterceptingProcessor(ComponentModel componentModel) {
-    return isOfType(componentModel, InterceptingMessageProcessor.class);
   }
 
   public static boolean isProcessor(ComponentModel componentModel) {

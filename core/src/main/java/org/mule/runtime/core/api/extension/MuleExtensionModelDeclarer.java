@@ -11,6 +11,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -40,6 +41,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.CRITICAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -52,11 +54,12 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONF
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-
+import static org.mule.runtime.internal.dsl.DslConstants.SUBFLOW_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -72,10 +75,14 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.store.ObjectStore;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
+import org.mule.runtime.core.api.source.scheduler.Scheduler;
+import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
@@ -102,11 +109,12 @@ class MuleExtensionModelDeclarer {
         .createTypeLoader(MuleExtensionModelDeclarer.class.getClassLoader());
 
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
-        .named(MuleExtensionModelProvider.MULE_NAME)
+        .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
         .onVersion(MuleExtensionModelProvider.MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
+        .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(CORE_PREFIX)
             .setNamespace(CORE_NAMESPACE)
@@ -117,19 +125,27 @@ class MuleExtensionModelDeclarer {
 
     // constructs
     declareFlow(extensionDeclarer, typeLoader);
+    declareSubflow(extensionDeclarer);
     declareChoice(extensionDeclarer, typeLoader);
     declareErrorHandler(extensionDeclarer, typeLoader);
     declareTry(extensionDeclarer, typeLoader);
     declareScatterGather(extensionDeclarer, typeLoader);
+    declareFirstSuccessful(extensionDeclarer);
+    declareRoundRobin(extensionDeclarer);
     declareConfiguration(extensionDeclarer, typeLoader);
     declareConfigurationProperties(extensionDeclarer, typeLoader);
-
-    // operations
     declareAsync(extensionDeclarer, typeLoader);
     declareForEach(extensionDeclarer, typeLoader);
+    declareUntilSuccessful(extensionDeclarer, typeLoader);
+
+    // operations
     declareFlowRef(extensionDeclarer, typeLoader);
     declareIdempotentValidator(extensionDeclarer, typeLoader);
     declareLogger(extensionDeclarer, typeLoader);
+    declareSetPayload(extensionDeclarer, typeLoader);
+    declareSetVariable(extensionDeclarer, typeLoader);
+    declareRemoveVariable(extensionDeclarer, typeLoader);
+    declareParseTemplate(extensionDeclarer, typeLoader);
     declareRaiseError(extensionDeclarer, typeLoader);
 
     // sources
@@ -211,7 +227,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    OperationDeclarer async = extensionDeclarer.withOperation("async")
+    ConstructDeclarer async = extensionDeclarer.withConstruct("async")
         .describedAs("Processes the nested list of message processors asynchronously using a thread pool");
 
     async.withChain();
@@ -221,8 +237,6 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .describedAs("Name that will be used to name the async scheduler");
 
-    async.withOutput().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
-    async.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -274,6 +288,102 @@ class MuleExtensionModelDeclarer {
 
   }
 
+  private void declareSetPayload(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    OperationDeclarer setPayload = extensionDeclarer.withOperation("setPayload")
+        .describedAs("A transformer that sets the payload with the provided value.");
+
+    setPayload.withOutput().ofType(typeLoader.load(void.class));
+    setPayload.withOutputAttributes().ofType(typeLoader.load(void.class));
+
+    setPayload.onDefaultParameterGroup()
+        .withOptionalParameter("encoding")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The encoding of the value assigned to the payload.");
+
+    setPayload.onDefaultParameterGroup()
+        .withRequiredParameter("value")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The value to be set on the payload. Supports expressions.");
+
+    setPayload.onDefaultParameterGroup()
+        .withOptionalParameter("mimeType")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The mime type, e.g. text/plain or application/json");
+
+  }
+
+  private void declareSetVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    OperationDeclarer setVariable = extensionDeclarer.withOperation("setVariable")
+        .describedAs("A processor that adds variables.");
+
+    setVariable.withOutput().ofType(typeLoader.load(void.class));
+    setVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
+
+    setVariable.onDefaultParameterGroup()
+        .withOptionalParameter("variableName")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The variable name.");
+
+    setVariable.onDefaultParameterGroup()
+        .withRequiredParameter("value")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(SUPPORTED)
+        .describedAs("The variable value.");
+
+    setVariable.onDefaultParameterGroup()
+        .withOptionalParameter("encoding")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The encoding of the value assigned to the payload.");
+
+    setVariable.onDefaultParameterGroup()
+        .withOptionalParameter("mimeType")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The mime type, e.g. text/plain or application/json");
+  }
+
+  private void declareParseTemplate(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
+        .describedAs("A transformer that parses a template defined inline.");
+
+    parseTemplate.withOutput().ofType(typeLoader.load(String.class));
+    parseTemplate.withOutputAttributes().ofType(typeLoader.load(void.class));
+
+    parseTemplate.onDefaultParameterGroup()
+        .withOptionalParameter("content")
+        .ofType(typeLoader.load(String.class))
+        .withRole(ParameterRole.PRIMARY_CONTENT)
+        .withExpressionSupport(SUPPORTED)
+        .describedAs("Template to be processed.");
+
+    parseTemplate.onDefaultParameterGroup()
+        .withOptionalParameter("location")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The location of the template. The order in which the transformer will attempt to load the file are: from the file system, from a URL or from the classpath.");
+
+  }
+
+  private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
+        .describedAs("A processor that remove variables by name or regular expression.");
+
+    removeVariable.withOutput().ofType(typeLoader.load(void.class));
+    removeVariable.withOutputAttributes().ofType(typeLoader.load(void.class));
+
+    removeVariable.onDefaultParameterGroup()
+        .withOptionalParameter("variableName")
+        .ofType(typeLoader.load(String.class))
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The variable name.");
+
+  }
+
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
         .describedAs("Throws an error with the specified type and description.");
@@ -295,7 +405,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
 
-    OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
+    ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
 
@@ -330,8 +440,30 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Property name used to store the number of message being iterated.");
 
-    forEach.withOutput().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
-    forEach.withOutputAttributes().ofType(BaseTypeBuilder.create(JAVA).voidType().build());
+  }
+
+  private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+    ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
+        .describedAs("Attempts to route a message to the message processor it contains in an asynchronous manner. " +
+            "Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression");
+
+    untilSuccessful.withChain();
+
+    untilSuccessful.onDefaultParameterGroup()
+        .withOptionalParameter("maxRetries")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(5)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Specifies the maximum number of processing retries that will be performed.");
+
+    untilSuccessful.onDefaultParameterGroup()
+        .withOptionalParameter("millisBetweenRetries")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(60000)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Specifies the minimum time interval between two process retries in milliseconds.\n" +
+            " The actual time interval depends on the previous execution but should not exceed twice this number.\n" +
+            " Default value is 60000 (one minute)");
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -367,6 +499,27 @@ class MuleExtensionModelDeclarer {
     flow.withComponent("errorHandler")
         .withAllowedStereotypes(ERROR_HANDLER);
 
+  }
+
+  private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer flow = extensionDeclarer.withConstruct(SUBFLOW_ELEMENT_IDENTIFIER)
+        .allowingTopLevelDefinition();
+
+    flow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
+  }
+
+  private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
+        .describedAs("Sends a message to a list of message processors until one processes it successfully.");
+
+    firstSuccessful.withRoute("route").withChain();
+  }
+
+  private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
+    ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
+        .describedAs("Send each message received to the next message processor in the circular list of targets.");
+
+    roundRobin.withRoute("route").withChain();
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {

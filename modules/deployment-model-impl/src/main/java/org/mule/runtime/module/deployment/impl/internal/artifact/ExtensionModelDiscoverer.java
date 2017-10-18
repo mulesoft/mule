@@ -12,15 +12,17 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.LoaderDescriber;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +44,8 @@ public class ExtensionModelDiscoverer {
    * @return {@link Set} of {@link Pair} carrying the {@link ArtifactPluginDescriptor} and it's corresponding
    *         {@link ExtensionModel}.
    */
-  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverExtensionModels(ExtensionModelLoaderRepository loaderRepository,
-                                                                                     List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
+  public Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> discoverPluginsExtensionModels(ExtensionModelLoaderRepository loaderRepository,
+                                                                                            List<Pair<ArtifactPluginDescriptor, ArtifactClassLoader>> artifactPlugins) {
     final Set<Pair<ArtifactPluginDescriptor, ExtensionModel>> descriptorsWithExtensions = new HashSet<>();
     artifactPlugins.forEach(artifactPlugin -> {
       Set<ExtensionModel> extensions = descriptorsWithExtensions.stream().map(Pair::getSecond).collect(toSet());
@@ -61,6 +63,22 @@ public class ExtensionModelDiscoverer {
       }
     });
     return descriptorsWithExtensions;
+  }
+
+  /**
+   * Discover the extension models provided by the runtime.
+   *
+   * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
+   */
+  public Set<ExtensionModel> discoverRuntimeExtensionModels() {
+    final Set<ExtensionModel> extensionModels = new HashSet<>();
+
+    Collection<RuntimeExtensionModelProvider> runtimeExtensionModelProviders = new SpiServiceRegistry()
+        .lookupProviders(RuntimeExtensionModelProvider.class, Thread.currentThread().getContextClassLoader());
+    for (RuntimeExtensionModelProvider runtimeExtensionModelProvider : runtimeExtensionModelProviders) {
+      extensionModels.add(runtimeExtensionModelProvider.createExtensionModel());
+    }
+    return extensionModels;
   }
 
   /**
