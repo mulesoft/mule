@@ -2348,7 +2348,14 @@
                   "allowedStereotypeModels": [],
                   "name": "food",
                   "description": "",
-                  "modelProperties": {}
+                  "modelProperties": {
+                    "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
+                      "defaultType": {
+                        "format": "java",
+                        "type": "@ref:org.mule.test.vegan.extension.RottenFood"
+                      }
+                    }
+                  }
                 }
               ],
               "exclusiveParametersModels": [],
@@ -6668,7 +6675,14 @@
               "allowedStereotypeModels": [],
               "name": "food",
               "description": "",
-              "modelProperties": {}
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
+                  "defaultType": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.vegan.extension.RottenFood"
+                  }
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -7469,7 +7483,14 @@
               "allowedStereotypeModels": [],
               "name": "food",
               "description": "",
-              "modelProperties": {}
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty": {
+                  "defaultType": {
+                    "format": "java",
+                    "type": "@ref:org.mule.test.vegan.extension.HealthyFood"
+                  }
+                }
+              }
             }
           ],
           "exclusiveParametersModels": [],
@@ -9100,6 +9121,38 @@
           "annotations": {
             "expressionSupport": {
               "value": "SUPPORTED"
+            },
+            "defaultImplementingType": {
+              "defaultType": {
+                "fields": [],
+                "ordered": false,
+                "annotations": {
+                  "class org.mule.metadata.api.annotation.TypeIdAnnotation": "org.mule.test.vegan.extension.RottenFood",
+                  "class org.mule.metadata.java.api.annotation.ClassInformationAnnotation": {
+                    "classname": "org.mule.test.vegan.extension.RottenFood",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "org.mule.test.vegan.extension.FarmedFood"
+                    ],
+                    "parent": "",
+                    "genericTypes": []
+                  },
+                  "class org.mule.metadata.api.annotation.TypeAliasAnnotation": {
+                    "value": "RottenFood"
+                  }
+                },
+                "metadataFormat": {
+                  "label": "Java",
+                  "id": "java",
+                  "validMimeTypes": [
+                    "application/java"
+                  ]
+                }
+              }
             }
           }
         }
