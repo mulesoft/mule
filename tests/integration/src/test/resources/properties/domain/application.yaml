@@ -1,3 +1,0 @@
-http:
-  path: service
-  port: "10000"
