@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -48,7 +47,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
@@ -61,7 +59,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   protected static final String COMPATILIBILITY_PLUGIN_INSTALLED = "_compatilibilityPluginInstalled";
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
-                                                                 "Expression parsing is deprecated, regular evaluations should be used instead.");
+                                                                 "Expression parsing is deprecated, regular expressions should be used instead.");
 
   private AtomicBoolean initialized = new AtomicBoolean();
 
@@ -160,8 +158,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public TypedValue<?> evaluateLogExpression(String expression, BindingContext context) throws ExpressionExecutionException {
-    // TODO MULE-13715 - Logger component does not support parse in DW
-    throw new NotImplementedException("temporary until MULE-13715 is done");
+    return expressionLanguage.evaluateLogExpression(expression, null, null, context);
   }
 
   @Override
@@ -237,16 +234,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public String parse(String expression, CoreEvent event, ComponentLocation componentLocation)
       throws ExpressionRuntimeException {
     Builder eventBuilder = CoreEvent.builder(event);
-    parseWarning.warn();
     if (hasMelExpression(expression) || melDefault) {
-      return parser.parse(token -> {
-        Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
-        if (result instanceof Message) {
-          return ((Message) result).getPayload().getValue();
-        } else {
-          return result;
-        }
-      }, expression);
+      parseWarning.warn();
+      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), expression);
     } else if (isExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
       try {
@@ -275,6 +265,41 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return expressionLanguage.split(expression, event, bindingContext);
+  }
+
+  @Override
+  public String parseLogTemplate(String template, CoreEvent event, ComponentLocation componentLocation,
+                                 BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    if (hasMelExpression(template) || melDefault) {
+      Builder eventBuilder = CoreEvent.builder(event);
+      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), template);
+    } else {
+      return parser.parse(token -> {
+        TypedValue<?> evaluation = expressionLanguage.evaluateLogExpression(token, event, componentLocation, bindingContext);
+        if (evaluation.getValue() instanceof Message) {
+          evaluation = ((Message) evaluation.getValue()).getPayload();
+        }
+        try {
+          return transform(evaluation, evaluation.getDataType(), STRING).getValue();
+        } catch (TransformerException e) {
+          throw new ExpressionRuntimeException(
+                                               createStaticMessage(format("Failed to transform %s to %s.",
+                                                                          evaluation.getDataType(),
+                                                                          STRING)),
+                                               e);
+        }
+      }, template);
+    }
+  }
+
+  private Object melParseEvaluation(CoreEvent event, ComponentLocation componentLocation, Builder eventBuilder, String token) {
+    Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
+    if (result instanceof Message) {
+      return ((Message) result).getPayload().getValue();
+    } else {
+      return result;
+    }
   }
 
   @Override

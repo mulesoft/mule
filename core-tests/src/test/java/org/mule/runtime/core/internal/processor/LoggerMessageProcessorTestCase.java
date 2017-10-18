@@ -17,9 +17,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -95,8 +97,9 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.log(muleEvent);
-    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parse("some expression", muleEvent,
-                                                                                    ((Component) flow).getLocation());
+    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parseLogTemplate("some expression", muleEvent,
+                                                                                               ((Component) flow).getLocation(),
+                                                                                               NULL_BINDING_CONTEXT);
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -161,7 +164,6 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private LoggerMessageProcessor buildLoggerMessageProcessorForExpressionEvaluation(String level) {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     loggerMessageProcessor.expressionManager = buildExpressionManager();
     loggerMessageProcessor.setMessage("some expression");
     return loggerMessageProcessor;
@@ -177,8 +179,9 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExtendedExpressionManager buildExpressionManager() {
     ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
-    when(expressionLanguage.parse(anyString(), any(CoreEvent.class), eq(((Component) flow).getLocation())))
-        .thenReturn("text to log");
+    when(expressionLanguage.parseLogTemplate(anyString(), any(CoreEvent.class), eq(((Component) flow).getLocation()), any(
+                                                                                                                          BindingContext.class)))
+                                                                                                                              .thenReturn("text to log");
     return expressionLanguage;
   }
 

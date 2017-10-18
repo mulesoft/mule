@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.util.StreamingUtils.withCursoredEvent;
-
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -71,7 +71,7 @@ public class LoggerMessageProcessor extends AbstractComponent implements Process
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
         if (LogLevel.valueOf(level).isEnabled(logger)) {
-          logLevel.log(logger, expressionManager.parse(message, event, getLocation()));
+          logLevel.log(logger, expressionManager.parseLogTemplate(message, event, getLocation(), NULL_BINDING_CONTEXT));
         }
       }
     }

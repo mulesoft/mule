@@ -9,11 +9,14 @@ package org.mule.runtime.core.internal.el;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -23,24 +26,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.COMPATILIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -55,14 +60,7 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleContextUtils;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +68,13 @@ import java.util.Optional;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_MVEL_DW)
@@ -229,6 +234,46 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   public void parse() throws MuleException {
     String expression = "this is a test";
     assertThat(expressionManager.parse(expression, testEvent(), TEST_CONNECTOR_LOCATION), is(expression));
+  }
+
+  @Test
+  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
+  public void parseLog() throws MuleException {
+    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", testEvent(), TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is(String.format("this is %s", TEST_PAYLOAD)));
+    assertThat(expressionManager.parseLogTemplate("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is(String.format("this is %s", TEST_PAYLOAD)));
+  }
+
+  @Test
+  @Description("Verifies that XML content can be used for logging in DW.")
+  public void parseLogXml() throws MuleException {
+    CoreEvent event = getEventBuilder().message(Message.builder().value("<?xml version='1.0' encoding='US-ASCII'?>\n"
+        + "<wsc_fields>\n"
+        + "  <operation>echo</operation>\n"
+        + "  <body_test>test</body_test>\n"
+        + "</wsc_fields>")
+        .mediaType(XML)
+        .build())
+        .build();
+    assertThat(expressionManager.parseLogTemplate("this is #[payload.wsc_fields.operation]", event, TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is("this is \"echo\""));
+  }
+
+  @Test
+  @Description("Verifies that streams are logged in DW but not in MVEL.")
+  public void parseLogStream() throws MuleException {
+    ByteArrayInputStream stream = new ByteArrayInputStream("hello".getBytes());
+    CoreEvent event = getEventBuilder().message(Message.of(stream)).build();
+    assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               is("this is hello"));
+    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", event, TEST_CONNECTOR_LOCATION,
+                                                  NULL_BINDING_CONTEXT),
+               both(startsWith("this is ")).and(containsString(stream.getClass().getSimpleName())));
   }
 
   @Test

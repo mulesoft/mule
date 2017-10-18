@@ -245,6 +245,13 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
     }
   }
 
+  @Override
+  public TypedValue<?> evaluateLogExpression(String expression, CoreEvent event, ComponentLocation componentLocation,
+                                             BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return evaluate(expression, event, componentLocation, bindingContext);
+  }
+
   @SuppressWarnings("unchecked")
   protected <T> T evaluateInternal(String expression, MVELExpressionLanguageContext variableResolverFactory) {
     validate(expression);

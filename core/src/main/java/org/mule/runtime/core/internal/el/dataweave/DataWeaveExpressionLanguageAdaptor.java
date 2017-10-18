@@ -137,6 +137,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
+  public TypedValue<?> evaluateLogExpression(String expression, CoreEvent event, ComponentLocation componentLocation,
+                                             BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return expressionExecutor.evaluateLogExpression(sanitize(expression),
+                                                    bindingContextBuilderFor(componentLocation, event, bindingContext).build());
+  }
+
+  @Override
   public ValidationResult validate(String expression) {
     return expressionExecutor.validate(sanitize(expression));
   }

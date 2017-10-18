@@ -99,6 +99,13 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   }
 
   @Override
+  public TypedValue<?> evaluateLogExpression(String expression, CoreEvent event, ComponentLocation componentLocation,
+                                             BindingContext bindingContext)
+      throws ExpressionRuntimeException {
+    return selectExpressionLanguage(expression).evaluateLogExpression(expression, event, componentLocation, bindingContext);
+  }
+
+  @Override
   public ValidationResult validate(String expression) {
     return selectExpressionLanguage(expression).validate(expression);
   }
