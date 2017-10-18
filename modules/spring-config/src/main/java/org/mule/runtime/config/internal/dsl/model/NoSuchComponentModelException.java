@@ -8,7 +8,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 
 /**
  * Exception thrown when a requested {@link ComponentModel} in the configuration

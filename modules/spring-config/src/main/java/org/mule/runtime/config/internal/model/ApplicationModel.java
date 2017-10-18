@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model;
+package org.mule.runtime.config.internal.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
@@ -57,6 +57,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.api.dsl.processor.ConfigFile;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
@@ -77,6 +80,7 @@ import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationExc
 import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -92,7 +96,7 @@ import com.google.common.collect.ImmutableSet;
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
  * configuration option.
  * <p/>
- * This model is represented by a set of {@link org.mule.runtime.config.api.dsl.model.ComponentModel}. Each {@code ComponentModel}
+ * This model is represented by a set of {@link ComponentModel}. Each {@code ComponentModel}
  * holds a piece of configuration and may have children {@code ComponentModel}s as defined in the artifact configuration.
  * <p/>
  * Once the set of {@code ComponentModel} gets created from the application
@@ -753,7 +757,7 @@ public class ApplicationModel {
   private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
-        Node componentNode = from(component).getNode();
+        Node componentNode = XmlCustomAttributeHandler.from(component).getNode();
         if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
             && !componentNode.getParentNode().getLocalName().equals(ERROR_HANDLER)
             && !componentNode.getParentNode().getLocalName().equals(MULE_ROOT_ELEMENT)) {
@@ -822,7 +826,7 @@ public class ApplicationModel {
 
   private ComponentModel innerFindComponentDefinitionModel(Node element, List<ComponentModel> componentModels) {
     for (ComponentModel componentModel : componentModels) {
-      if (from(componentModel).getNode().equals(element)) {
+      if (XmlCustomAttributeHandler.from(componentModel).getNode().equals(element)) {
         return componentModel;
       }
       ComponentModel childComponentModel = innerFindComponentDefinitionModel(element, componentModel.getInnerComponents());

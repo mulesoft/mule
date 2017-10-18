@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.dsl.model.extension.xml.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**

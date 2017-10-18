@@ -35,8 +35,8 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import com.google.common.cache.Cache;
@@ -123,7 +123,7 @@ public class ExtensionModelHelper {
   /**
    * Finds a {@link org.mule.runtime.api.meta.model.ComponentModel} within the provided set of {@link ExtensionModel}s by a
    * {@link ComponentIdentifier}.
-   * 
+   *
    * @param componentIdentifier the identifier to use for the search.
    * @return the found {@link org.mule.runtime.api.meta.model.ComponentModel} or {@link Optional#empty()} if it couldn't be found.
    */

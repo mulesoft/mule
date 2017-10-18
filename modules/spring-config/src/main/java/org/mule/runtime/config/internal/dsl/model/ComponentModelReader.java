@@ -7,14 +7,14 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_ROOT_ELEMENT;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.POLICY_ROOT_ELEMENT;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_DOMAIN_ROOT_ELEMENT;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_ROOT_ELEMENT;
+import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.to;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.processor.ConfigLine;
 import org.mule.runtime.config.api.dsl.processor.SimpleConfigAttribute;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;

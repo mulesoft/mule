@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.REFERENCE_ATTRIBUTE;
+import static org.mule.runtime.config.internal.model.ApplicationModel.EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 

@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.VALUE_ATTRIBUTE;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.VALUE_ATTRIBUTE;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.BEAN_REF_ATTRIBUTE;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.KEY_ELEMENT;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.KEY_REF_ATTRIBUTE;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.MAP_ELEMENT;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 
 import java.util.HashMap;

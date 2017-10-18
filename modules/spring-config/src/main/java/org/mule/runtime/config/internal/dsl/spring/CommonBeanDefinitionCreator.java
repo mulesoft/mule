@@ -10,10 +10,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME;
 import static org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
@@ -29,7 +29,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.processor.xml.XmlCustomAttributeHandler;
@@ -259,7 +259,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     final SpringPostProcessorIocHelper iocHelper =
         new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition);
-    beanDefinitionPostProcessor.postProcess(componentModel, iocHelper);
+    beanDefinitionPostProcessor.postProcess(componentModel.getConfiguration(), iocHelper);
     componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
   }
 
@@ -327,7 +327,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     } else {
       final SpringPostProcessorIocHelper iocHelper =
           new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition);
-      beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel, beanClass, iocHelper);
+      beanDefinitionPostProcessor.adaptBeanDefinition(parentComponentModel.getConfiguration(), beanClass, iocHelper);
       return iocHelper.getBeanDefinition();
     }
   }

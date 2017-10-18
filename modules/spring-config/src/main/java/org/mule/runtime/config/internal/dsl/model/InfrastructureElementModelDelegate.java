@@ -39,6 +39,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import com.google.common.collect.ImmutableSet;
@@ -64,7 +65,7 @@ class InfrastructureElementModelDelegate {
   public void addParameter(String parameterName, ParameterValue value,
                            ParameterModel parameterModel,
                            DslElementSyntax paramDsl,
-                           ComponentConfiguration.Builder parentConfig,
+                           InternalComponentConfiguration.Builder parentConfig,
                            DslElementModel.Builder parentElement) {
 
     switch (parameterName) {
@@ -121,7 +122,7 @@ class InfrastructureElementModelDelegate {
   private void createTlsContext(ParameterValue value,
                                 ParameterModel parameterModel,
                                 DslElementSyntax paramDsl,
-                                ComponentConfiguration.Builder parentConfig,
+                                InternalComponentConfiguration.Builder parentConfig,
                                 DslElementModel.Builder parentElement) {
 
     value.accept(new ParameterValueVisitor() {
@@ -138,7 +139,7 @@ class InfrastructureElementModelDelegate {
       @Override
       public void visitObjectValue(ParameterObjectValue objectValue) {
 
-        ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
+        InternalComponentConfiguration.Builder tlsConfig = InternalComponentConfiguration.builder()
             .withIdentifier(builder()
                 .namespace(TLS_PREFIX)
                 .name(TLS_CONTEXT_ELEMENT_IDENTIFIER)
@@ -161,7 +162,7 @@ class InfrastructureElementModelDelegate {
                   return;
                 }
 
-                ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
+                InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()
                     .withIdentifier(builder()
                         .namespace(TLS_PREFIX)
                         .name(name)
@@ -181,10 +182,10 @@ class InfrastructureElementModelDelegate {
   private void createReconnectionConfig(ParameterValue value,
                                         ParameterModel parameterModel,
                                         DslElementSyntax paramDsl,
-                                        ComponentConfiguration.Builder parentConfig,
+                                        InternalComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement) {
 
-    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
+    InternalComponentConfiguration.Builder config = InternalComponentConfiguration.builder()
         .withIdentifier(builder()
             .namespace(CORE_PREFIX)
             .name(RECONNECTION_CONFIG_PARAMETER_NAME)
@@ -223,7 +224,7 @@ class InfrastructureElementModelDelegate {
   private void createReconnectionStrategy(ParameterValue value,
                                           Object parameterModel,
                                           DslElementSyntax paramDsl,
-                                          ComponentConfiguration.Builder parentConfig,
+                                          InternalComponentConfiguration.Builder parentConfig,
                                           DslElementModel.Builder parentElement) {
 
     ParameterObjectValue objectValue = (ParameterObjectValue) value;
@@ -239,7 +240,7 @@ class InfrastructureElementModelDelegate {
   private void createStreamingStrategy(ParameterValue value,
                                        ParameterModel parameterModel,
                                        DslElementSyntax paramDsl,
-                                       ComponentConfiguration.Builder parentConfig,
+                                       InternalComponentConfiguration.Builder parentConfig,
                                        DslElementModel.Builder parentElement) {
 
     ParameterObjectValue objectValue = (ParameterObjectValue) value;
@@ -251,10 +252,11 @@ class InfrastructureElementModelDelegate {
   }
 
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
-                                         ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
+                                         InternalComponentConfiguration.Builder parentConfig,
+                                         DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName, String customNamespace) {
 
-    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
+    InternalComponentConfiguration.Builder config = InternalComponentConfiguration.builder()
         .withIdentifier(builder()
             .namespace(isBlank(customNamespace) ? CORE_PREFIX : customNamespace)
             .name(elementName)
@@ -266,7 +268,7 @@ class InfrastructureElementModelDelegate {
   }
 
   private void addParameterElement(Object parameterModel, DslElementSyntax paramDsl,
-                                   ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
+                                   InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                    ComponentConfiguration result) {
     parentConfig.withNestedComponent(result);
     parentElement.containing(DslElementModel.builder()
@@ -275,7 +277,7 @@ class InfrastructureElementModelDelegate {
         .withConfig(result).build());
   }
 
-  private void cloneParameters(ParameterObjectValue objectValue, final ComponentConfiguration.Builder redeliveryConfig) {
+  private void cloneParameters(ParameterObjectValue objectValue, final InternalComponentConfiguration.Builder redeliveryConfig) {
     objectValue.getParameters()
         .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
 

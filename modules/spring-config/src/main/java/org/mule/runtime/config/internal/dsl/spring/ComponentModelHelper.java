@@ -10,14 +10,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_CONTINE_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_PROPAGATE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.ON_ERROR_CONTINE_IDENTIFIER;
+import static org.mule.runtime.config.internal.model.ApplicationModel.ON_ERROR_PROPAGATE_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -96,7 +96,7 @@ public class ComponentModelHelper {
 
   public static void updateAnnotationValue(QName annotationKey, Object annotationValue, BeanDefinition beanDefinition) {
     PropertyValue propertyValue =
-        beanDefinition.getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
+            beanDefinition.getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       annotations = new HashMap<>();
@@ -113,7 +113,7 @@ public class ComponentModelHelper {
       return empty();
     }
     PropertyValue propertyValue =
-        componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
+            componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       return empty();
@@ -125,7 +125,7 @@ public class ComponentModelHelper {
 
   public static boolean isRouter(ComponentModel componentModel) {
     return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class)
-        || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-        || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
+           || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
+           || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
   }
 }

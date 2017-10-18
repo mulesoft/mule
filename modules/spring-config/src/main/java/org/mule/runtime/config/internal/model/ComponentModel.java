@@ -4,20 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model;
+package org.mule.runtime.config.internal.model;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +45,8 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 public abstract class ComponentModel {
+
+  public static String COMPONENT_MODEL_KEY = "ComponentModel";
 
   private boolean root = false;
   private ComponentIdentifier identifier;
@@ -146,7 +148,7 @@ public abstract class ComponentModel {
    * @return the value of the name attribute.
    */
   public String getNameAttribute() {
-    return parameters.get(NAME_ATTRIBUTE);
+    return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
   }
 
   /**
@@ -217,13 +219,15 @@ public abstract class ComponentModel {
 
   // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
   public ComponentConfiguration getConfiguration() {
-    ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
+    InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
         .withIdentifier(this.getIdentifier())
         .withValue(textContent);
 
     parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
     innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
     customAttributes.forEach(builder::withProperty);
+    builder.withComponentLocation(this.componentLocation);
+    builder.withProperty(COMPONENT_MODEL_KEY, this);
 
     return builder.build();
   }

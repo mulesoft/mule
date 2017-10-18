@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 
-import org.mule.runtime.config.api.dsl.model.ComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.AttributeDefinitionVisitor;
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 
 /**
  * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} and
- * the user configuration defined in {@link org.mule.runtime.config.api.dsl.model.ComponentModel} it populates all the
+ * the user configuration defined in {@link ComponentModel} it populates all the
  * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
  * {@link BeanDefinitionBuilderHelper}.
  * {@link BeanDefinitionBuilderHelper}.
