@@ -6,89 +6,159 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
-import org.mule.runtime.api.dsl.DslResolvingContext;
+import static org.apache.commons.lang3.text.WordUtils.capitalize;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.api.util.NameUtils.sanitizeName;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.construct.HasConstructModels;
+import org.mule.runtime.api.meta.model.function.FunctionModel;
+import org.mule.runtime.api.meta.model.function.HasFunctionModels;
+import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
+import org.mule.runtime.api.meta.model.operation.HasOperationModels;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.HasSourceModels;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.ComponentModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
  * <p/>
  * Contains a cache for searches within the extension models so we avoid processing each extension model twice.
- * 
+ *
  * since 4.0
  */
 public class ExtensionModelHelper {
 
-  private final DslElementModelFactory modelResolverFactory;
-  private Cache<org.mule.runtime.config.api.dsl.model.ComponentModel, Optional<DslElementModel<Object>>> modelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+  private final Set<ExtensionModel> extensionsModels;
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
    *        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
-    this.modelResolverFactory = DslElementModelFactory.getDefault(DslResolvingContext.getDefault(extensionModels));
+    this.extensionsModels = extensionModels;
   }
 
   /**
    * Find a {@link DslElementModel} for a given {@link ComponentModel}
-   * 
+   *
    * @param componentModel the component model from the configuration.
    * @return the {@link DslElementModel} associated with the configuration or an {@link Optional#empty()} if there isn't one.
    */
-  public Optional<DslElementModel<Object>> findDslElementModel(org.mule.runtime.config.api.dsl.model.ComponentModel componentModel) {
-    try {
-      return modelByComponentIdentifier.get(componentModel, () -> {
-        ConcurrentMap<org.mule.runtime.config.api.dsl.model.ComponentModel, Optional<DslElementModel<Object>>> cacheAsMap =
-            modelByComponentIdentifier.asMap();
-        ComponentModel parent = componentModel.getParent();
-        while (parent != null && !parent.getIdentifier().equals(MODULE_OPERATION_CHAIN)) {
-          if (cacheAsMap.containsKey(parent)) {
-            Optional<DslElementModel<Object>> parentElementModel = cacheAsMap.get(parent);
-            if (parentElementModel.isPresent()) {
-              return findComponentModelWithinDslElementModel(componentModel, parentElementModel.get());
+  public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
+    Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
+    resolveComponentName(componentModel.getIdentifier().getName());
+    for (ExtensionModel extensionsModel : extensionsModels) {
+      if (extensionsModel.getXmlDslModel().getPrefix().equals(componentModel.getIdentifier().getNamespace())) {
+        new ExtensionWalker() {
+
+          @Override
+          protected void onOperation(HasOperationModels owner, OperationModel model) {
+            if (!resolveComponentName(model.getName()).equals(componentModel.getIdentifier().getName())) {
+              return;
             }
+            componentTypeReference.set(OPERATION);
+            stop();
           }
-          parent = parent.getParent();
-        }
-        return modelResolverFactory.create(componentModel.getConfiguration());
-      });
-    } catch (ExecutionException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
-  private Optional<DslElementModel<Object>>
+          @Override
+          protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+            if (!resolveComponentName(model.getName()).equals(componentModel.getIdentifier().getName())) {
+              return;
+            }
+            model.getNestedComponents().forEach(nestedComponentType -> {
+              nestedComponentType.accept(new NestedComponentVisitor(componentTypeReference));
+            });
+            stop();
+          }
 
-      findComponentModelWithinDslElementModel(org.mule.runtime.config.api.dsl.model.ComponentModel componentModel,
-                                              DslElementModel<Object> dslElementModel) {
-    if (dslElementModel.getConfiguration().isPresent()
-        && dslElementModel.getConfiguration().get().equals(componentModel.getConfiguration())) {
-      return of(dslElementModel);
-    }
-    List<DslElementModel> containedElements = dslElementModel.getContainedElements();
-    for (DslElementModel containedElement : containedElements) {
-      Optional<DslElementModel<Object>> foundElementModel =
-          findComponentModelWithinDslElementModel(componentModel, containedElement);
-      if (foundElementModel.isPresent()) {
-        return foundElementModel;
+          @Override
+          protected void onSource(HasSourceModels owner, SourceModel model) {
+            if (!resolveComponentName(model.getName()).equals(componentModel.getIdentifier().getName())) {
+              return;
+            }
+            componentTypeReference.set(SOURCE);
+            stop();
+          }
+
+          @Override
+          protected void onConfiguration(ConfigurationModel model) {
+            return;
+          }
+
+          @Override
+          protected void onFunction(HasFunctionModels owner, FunctionModel model) {
+            return;
+          }
+
+          @Override
+          protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+            return;
+          }
+
+          @Override
+          protected void onParameterGroup(ParameterizedModel owner, ParameterGroupModel model) {
+            return;
+          }
+
+          @Override
+          protected void onParameter(ParameterizedModel owner, ParameterGroupModel groupModel, ParameterModel model) {
+            return;
+          }
+        }.walk(extensionsModel);
       }
     }
-    return empty();
+    return componentTypeReference.get() != null ? componentTypeReference.get() : UNKNOWN;
   }
+
+  public String resolveComponentName(String componentModelName) {
+    return hyphenize(sanitizeName(capitalize(componentModelName))).replaceAll("\\s+", "");
+  }
+
+  static class NestedComponentVisitor implements NestableElementModelVisitor {
+
+    private Reference<TypedComponentIdentifier.ComponentType> reference;
+
+    public NestedComponentVisitor(Reference<TypedComponentIdentifier.ComponentType> reference) {
+      this.reference = reference;
+    }
+
+    @Override
+    public void visit(NestedComponentModel component) {
+
+    }
+
+    @Override
+    public void visit(NestedChainModel component) {
+      reference.set(SCOPE);
+    }
+
+    @Override
+    public void visit(NestedRouteModel component) {
+      reference.set(ROUTER);
+    }
+  }
+
 }
