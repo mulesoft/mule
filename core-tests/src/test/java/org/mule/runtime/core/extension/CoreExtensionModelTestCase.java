@@ -121,8 +121,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(6));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(9));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(13));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -244,7 +244,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void foreach() {
-    final OperationModel foreach = coreExtensionModel.getOperationModel("foreach").get();
+    final ConstructModel foreach = coreExtensionModel.getConstructModel("foreach").get();
 
     assertThat(foreach.getNestedComponents().size(), is(1));
     NestableElementModel processorsChain = foreach.getNestedComponents().get(0);
@@ -394,7 +394,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void async() {
-    final OperationModel asyncModel = coreExtensionModel.getOperationModel("async").get();
+    final ConstructModel asyncModel = coreExtensionModel.getConstructModel("async").get();
 
     assertThat(asyncModel.getNestedComponents(), hasSize(1));
     NestableElementModel processors = asyncModel.getNestedComponents().get(0);
