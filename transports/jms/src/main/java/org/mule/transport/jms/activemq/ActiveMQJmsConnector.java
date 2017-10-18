@@ -53,29 +53,76 @@ public class ActiveMQJmsConnector extends JmsConnector
     {
         try
         {
-            Method getPrefetchPolicy = connectionFactory.getClass().getMethod("getPrefetchPolicy");
-            Object prefetchPolicy = getPrefetchPolicy.invoke(connectionFactory);
-            Method setQueuePrefetch = prefetchPolicy.getClass().getMethod("setQueuePrefetch", Integer.TYPE);
-            int maxQueuePrefetch = getMaxQueuePrefetch();
-            if (maxQueuePrefetch != PREFETCH_DEFAULT)
-            {
-                setQueuePrefetch.invoke(prefetchPolicy, maxQueuePrefetch);
-            }
+            configurePrefetchPolicy(connectionFactory);
 
             Method getRedeliveryPolicyMethod = connectionFactory.getClass().getMethod("getRedeliveryPolicy");
             Object redeliveryPolicy = getRedeliveryPolicyMethod.invoke(connectionFactory);
-            Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", Integer.TYPE);
-            int maxRedelivery = getMaxRedelivery();
-            if (maxRedelivery != REDELIVERY_IGNORE )
-            {
-                // redelivery = deliveryCount - 1, but AMQ is considering the first delivery attempt as a redelivery (wrong!). adjust for it
-                maxRedelivery++;
-            }
-            setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, maxRedelivery);
+           
+            configureMaximumRedeliveriesMethod(redeliveryPolicy);
+            
+            configureMaximumRedeliveryDelay(redeliveryPolicy);
+            
+            configureInitialRedeliveryDelay(redeliveryPolicy);
+           
+            configureRedeliveryDelay(redeliveryPolicy);
         }
         catch (Exception e)
         {
             logger.error("Can not set MaxRedelivery parameter to RedeliveryPolicy " + e);
+        }
+    }
+
+    private void configurePrefetchPolicy(ConnectionFactory connectionFactory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        Method getPrefetchPolicy = connectionFactory.getClass().getMethod("getPrefetchPolicy");
+        Object prefetchPolicy = getPrefetchPolicy.invoke(connectionFactory);
+        Method setQueuePrefetch = prefetchPolicy.getClass().getMethod("setQueuePrefetch", Integer.TYPE);
+        int maxQueuePrefetch = getMaxQueuePrefetch();
+        if (maxQueuePrefetch != PREFETCH_DEFAULT)
+        {
+            setQueuePrefetch.invoke(prefetchPolicy, maxQueuePrefetch);
+        }
+    }
+
+    private void configureMaximumRedeliveriesMethod(Object redeliveryPolicy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        Method setMaximumRedeliveriesMethod = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveries", Integer.TYPE);
+        int maxRedelivery = getMaxRedelivery();
+        if (maxRedelivery != REDELIVERY_IGNORE )
+        {
+            // redelivery = deliveryCount - 1, but AMQ is considering the first delivery attempt as a redelivery (wrong!). adjust for it
+            maxRedelivery++;
+        }
+        setMaximumRedeliveriesMethod.invoke(redeliveryPolicy, maxRedelivery);
+    }
+
+    private void configureRedeliveryDelay(Object redeliveryPolicy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        int redeliveryDelay = getRedeliveryDelay();
+        Method setRedeliveryDelay = redeliveryPolicy.getClass().getMethod("setRedeliveryDelay", Long.TYPE);
+        if (redeliveryDelay != DEFAULT_REDELIVERY_DELAY)
+        {
+            setRedeliveryDelay.invoke(redeliveryPolicy, 0L);
+        }
+    }
+
+    private void configureInitialRedeliveryDelay(Object redeliveryPolicy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        Method setInitialRedeliveryDelay = redeliveryPolicy.getClass().getMethod("setInitialRedeliveryDelay", Long.TYPE);
+        int initialRedeliveryDelay = getInitialRedeliveryDelay();
+        if (initialRedeliveryDelay != DEFAULT_INITIAL_REDELIVERY_DELAY)
+        {
+            setInitialRedeliveryDelay.invoke(redeliveryPolicy, 0L);
+        }
+    }
+
+    private void configureMaximumRedeliveryDelay(Object redeliveryPolicy) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        Method setMaximumRedeliveryDelay = redeliveryPolicy.getClass().getMethod("setMaximumRedeliveryDelay", Long.TYPE);           
+        int  maximumRedeliveryDelay = getMaximumRedeliveryDelay();
+        if (maximumRedeliveryDelay != DEFAULT_MAX_REDELIVERY_DELAY)
+        {
+            setMaximumRedeliveryDelay.invoke(redeliveryPolicy, 0L);                
         }
     }
 
