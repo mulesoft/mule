@@ -22,6 +22,8 @@ import java.util.Collection;
 
 /**
  * Adapts an {@link ArtifactDeploymentListener} to work as a {@link DeploymentListener}.
+ *
+ * @since 4.0
  */
 public class DeploymentListenerAdapter implements DeploymentListener {
 

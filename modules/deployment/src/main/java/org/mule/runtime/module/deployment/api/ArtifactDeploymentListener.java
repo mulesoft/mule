@@ -15,6 +15,8 @@ import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
 /**
  * Defines a listener for deployment events for all Mule deployable artifacts. Use {@link DeploymentListenerAdapter} to make this
  * listener work as a {@link DeploymentListener}
+ *
+ * @since 4.0
  */
 public interface ArtifactDeploymentListener {
 
