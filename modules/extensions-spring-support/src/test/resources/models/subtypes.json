@@ -3067,8 +3067,19 @@
   ],
   "errors": [
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "SUBTYPES:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY"
+    },
+    {
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
     },
     {
       "error": "SUBTYPES:RETRY_EXHAUSTED",

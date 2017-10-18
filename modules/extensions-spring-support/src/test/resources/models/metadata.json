@@ -13690,6 +13690,17 @@
   ],
   "errors": [
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "METADATA:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY"
     },

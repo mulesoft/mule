@@ -19610,12 +19610,27 @@
   ],
   "errors": [
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "HEISENBERG:VALIDATION",
       "parent": "MULE:VALIDATION"
     },
     {
+      "error": "MULE:ANY"
+    },
+    {
       "error": "HEISENBERG:OAUTH2",
       "parent": "HEISENBERG:CONNECTIVITY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:VALIDATION",
+      "parent": "MULE:ANY"
     },
     {
       "error": "HEISENBERG:RETRY_EXHAUSTED",

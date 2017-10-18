@@ -1075,6 +1075,17 @@
       "parent": "MULE:CONNECTIVITY"
     },
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "FN:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED"
     }

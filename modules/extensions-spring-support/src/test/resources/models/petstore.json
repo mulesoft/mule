@@ -13230,6 +13230,17 @@
       "parent": "MULE:ANY"
     },
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY"
+    },
+    {
+      "error": "MULE:ANY"
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY"
+    },
+    {
       "error": "PETSTORE:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED"
     },
