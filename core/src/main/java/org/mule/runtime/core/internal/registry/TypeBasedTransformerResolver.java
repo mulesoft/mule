@@ -95,7 +95,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
 
     transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
     // If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
-    // byt
+    // byte[]
     Transformer secondPass;
     if (transformer == null) {
       // If no transformers were found but the outputType type is String or byte[] we can perform a more general search
