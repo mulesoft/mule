@@ -275,6 +275,7 @@
         <semver4jVersion>2.0.3</semver4jVersion>
         <powermockVersion>1.6.5</powermockVersion>
         <allure.maven.plugin.version>2.8</allure.maven.plugin.version>
+        <jacoco.version>0.7.9</jacoco.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
         <jetty.maven.plugin.version>9.2.10.v20150310</jetty.maven.plugin.version>
 
@@ -1577,8 +1578,7 @@
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <workingDirectory>${project.build.directory}</workingDirectory>
-                        <argLine>-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar" -Xmx1024m -Xms256m</argLine>
-                        <argLine>-Dfile.encoding=UTF-8</argLine>
+                        <argLine>-Dfile.encoding=UTF-8 -Xmx1024m -Xms256m -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${project.build.directory}/jacoco.exec</argLine>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
@@ -1611,6 +1611,11 @@
                             <groupId>org.aspectj</groupId>
                             <artifactId>aspectjweaver</artifactId>
                             <version>${aspectjVersion}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>org.jacoco.agent</artifactId>
+                            <version>${jacoco.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
