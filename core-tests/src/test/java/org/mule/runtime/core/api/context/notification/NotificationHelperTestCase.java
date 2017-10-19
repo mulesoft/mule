@@ -16,10 +16,10 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -32,8 +32,6 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,12 +39,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
+
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationHelperTestCase extends AbstractMuleTestCase {
-
-  @Mock
-  private ServerNotificationHandler defaultNotificationHandler;
 
   @Mock
   private ServerNotificationManager eventNotificationHandler;
@@ -71,9 +68,8 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     when(event.getMessage()).thenReturn(message);
     when(message.getPayload()).thenReturn(new TypedValue("", DataType.STRING));
     initMocks(eventNotificationHandler);
-    initMocks(defaultNotificationHandler);
 
-    helper = new NotificationHelper(defaultNotificationHandler, TestServerNotification.class, false);
+    helper = new NotificationHelper(eventNotificationHandler, TestServerNotification.class, false);
   }
 
   private void initMocks(ServerNotificationHandler notificationHandler) {
@@ -84,12 +80,12 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   @Test
   public void isNotificationEnabled() {
     assertThat(helper.isNotificationEnabled(), is(true));
-    verify(defaultNotificationHandler).isNotificationEnabled(TestServerNotification.class);
+    verify(eventNotificationHandler).isNotificationEnabled(TestServerNotification.class);
   }
 
   @Test
   public void isNotificationEnabledForEvent() {
-    assertThat(helper.isNotificationEnabled(muleContext), is(true));
+    assertThat(helper.isNotificationEnabled(), is(true));
     verify(eventNotificationHandler).isNotificationEnabled(TestServerNotification.class);
   }
 
@@ -100,14 +96,14 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, TEST_CONNECTOR_LOCATION, muleContext, action);
+    helper.fireNotification(messageSource, event, TEST_CONNECTOR_LOCATION, action);
     assertConnectorMessageNotification(eventNotificationHandler, messageSource, TEST_CONNECTOR_LOCATION, action);
   }
 
   @Test
   public void fireSpecificNotificationForEvent() {
     TestServerNotification notification = new TestServerNotification();
-    helper.fireNotification(notification, muleContext);
+    helper.fireNotification(notification);
     verify(eventNotificationHandler).fireNotification(notification);
   }
 
@@ -115,7 +111,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void fireSpecificNotificationOnDefaultHandler() {
     TestServerNotification notification = new TestServerNotification();
     helper.fireNotification(notification);
-    verify(defaultNotificationHandler).fireNotification(notification);
+    verify(eventNotificationHandler).fireNotification(notification);
   }
 
   @Test
@@ -133,7 +129,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);
     final int action = 100;
 
-    helper.fireNotification(messageSource, event, location, muleContext, action);
+    helper.fireNotification(messageSource, event, location, action);
     assertConnectorMessageNotification(eventNotificationHandler, messageSource, location, action);
   }
 
