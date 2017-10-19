@@ -522,6 +522,8 @@ public final class XmlExtensionLoaderDelegate {
                                                       connectionProviderDeclarer
                                                           .withModelProperty(new TestConnectionGlobalElementModelProperty(testConnectionGlobalElementName));
                                                     });
+      //TODO until MULE-12734, all test connection must be shut down in smart connectors
+      connectionProviderDeclarer.supportsConnectivityTesting(false);
     }
 
   }
