@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.policy.PolicyNextActionMessageProcessor;
 import org.mule.runtime.core.api.policy.PolicyStateHandler;
 import org.mule.runtime.core.api.policy.PolicyStateId;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.reactivestreams.Publisher;
@@ -113,7 +114,10 @@ public class SourcePolicyProcessor implements Processor {
                 .cast(CoreEvent.class)
                 .transform(nextProcessor)
                 .cast(PrivilegedEvent.class)
-                .map(result -> policyEventConverter.createEvent(result, event)));
+                .map(result -> policyEventConverter.createEvent(result, event))
+                .onErrorMap(MessagingException.class,
+                            e -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) e.getEvent(), event),
+                                                        e)));
       }
     };
   }
