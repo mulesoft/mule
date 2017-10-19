@@ -10,7 +10,6 @@ import static com.google.common.io.Files.createTempDir;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
@@ -107,15 +106,15 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   @Override
   public final ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    return createClassLoaderModel(artifactFile, attributes);
+    return createClassLoaderModel(artifactFile, attributes, artifactType);
   }
 
-  private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes)
+  private ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
     if (isHeavyPackage(artifactFile)) {
       return createHeavyPackageClassLoaderModel(artifactFile, attributes);
     } else {
-      return createLightPackageClassLoaderModel(artifactFile, attributes);
+      return createLightPackageClassLoaderModel(artifactFile, attributes, artifactType);
     }
   }
 
@@ -213,7 +212,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     return new File(artifactFile, CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION);
   }
 
-  private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes) {
+  private ClassLoaderModel createLightPackageClassLoaderModel(File artifactFile, Map<String, Object> attributes,
+                                                              ArtifactType artifactType) {
     File containerRepository;
     if (isStandalone() && !getBoolean("mule.mode.embedded")) {
       containerRepository = new File(getMuleHomeFolder(), "repository");
@@ -240,7 +240,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     File temporaryDirectory = createTempDir();
     try {
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
-          mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes), of(mavenRepository),
+          mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
+                                                  includeProvidedDependencies(artifactType), of(mavenRepository),
                                                   of(temporaryDirectory));
       final ClassLoaderModel.ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModel.ClassLoaderModelBuilder();
       classLoaderModelBuilder
@@ -262,6 +263,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     }
   }
 
+  protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);
+
   protected BundleDependency convertBundleDependency(org.mule.maven.client.api.model.BundleDependency mavenClientDependency) {
     BundleDependency.Builder builder = new BundleDependency.Builder()
         .setScope(BundleScope.valueOf(mavenClientDependency.getScope().name()))
@@ -278,17 +281,6 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         .setType(descriptor.getType());
     descriptor.getClassifier().ifPresent(builder::setClassifier);
     return builder.build();
-  }
-
-  /**
-   * Loads the {@link ClassLoaderModel} from an artifact with the provided maven pom model.
-   *
-   * @param artifactFile the artifact folder
-   * @return a {@link ClassLoaderModel} loaded with all its dependencies and URLs.
-   * @throws InvalidDescriptorLoaderException
-   */
-  public final ClassLoaderModel load(File artifactFile) throws InvalidDescriptorLoaderException {
-    return createClassLoaderModel(artifactFile, emptyMap());
   }
 
   /**
