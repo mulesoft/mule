@@ -22,6 +22,10 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
 
   private final List<ArtifactClassLoader> artifactPluginClassLoaders;
 
+  static {
+    registerAsParallelCapable();
+  }
+
   /**
    * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
    *
