@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -45,6 +46,12 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDelegatingEntityResolver.class);
 
+  private static final String CORE_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule.xsd";
+  private static final String CORE_CURRENT_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
+  private static final String CORE_DEPRECATED_XSD = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
+  private static final String COMPATIBILITY_XSD =
+      "http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd";
+
   private final Set<ExtensionModel> extensions;
   private final EntityResolver muleEntityResolver;
   // TODO(fernandezlautaro): MULE-11024 once implemented, extensionSchemaFactory must not be Optional
@@ -59,7 +66,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
    *                   {@link #muleEntityResolver} delegates return null when resolving the entity.
    */
   public ModuleDelegatingEntityResolver(Set<ExtensionModel> extensions) {
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    ClassLoader classLoader = currentThread().getContextClassLoader();
     this.muleEntityResolver = new MuleCustomEntityResolver(classLoader);
     this.extensions = extensions;
     this.checkedEntities = new HashMap<>();
@@ -90,15 +97,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
                           systemId));
     }
 
-    Boolean useDeprecated = muleEntityResolver
-        .resolveEntity(publicId, "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd") != null;
-    if (systemId.equals("http://www.mulesoft.org/schema/mule/core/current/mule.xsd")) {
-      if (useDeprecated) {
-        systemId = "http://www.mulesoft.org/schema/mule/core/current/mule-core-deprecated.xsd";
-      } else {
-        systemId = "http://www.mulesoft.org/schema/mule/core/current/mule-core.xsd";
-      }
-    }
+    systemId = overrideSystemIdForCompatibility(publicId, systemId);
 
     InputSource inputSource;
     inputSource = muleEntityResolver.resolveEntity(publicId, systemId);
@@ -116,6 +115,31 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
       }
     }
     return inputSource;
+  }
+
+  private String overrideSystemIdForCompatibility(String publicId, String systemId) throws SAXException, IOException {
+    if (systemId.equals(CORE_XSD)) {
+      Boolean useDeprecated = muleEntityResolver.resolveEntity(publicId, CORE_DEPRECATED_XSD) != null;
+      Boolean usingCompatibility = muleEntityResolver.resolveEntity(publicId, COMPATIBILITY_XSD) != null;
+      Boolean runningTests = isRunningTests(new Throwable().getStackTrace());
+
+      if (useDeprecated && (usingCompatibility || runningTests)) {
+        return CORE_DEPRECATED_XSD;
+      } else {
+        return CORE_CURRENT_XSD;
+      }
+    }
+
+    return systemId;
+  }
+
+  private Boolean isRunningTests(StackTraceElement[] stackTrace) {
+    for (StackTraceElement element : stackTrace) {
+      if (element.getClassName().startsWith("org.junit.runners.")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private InputSource generateFromExtensions(String publicId, String systemId) {
