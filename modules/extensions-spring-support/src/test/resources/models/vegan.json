@@ -9123,36 +9123,28 @@
               "value": "SUPPORTED"
             },
             "defaultImplementingType": {
-              "defaultType": {
-                "fields": [],
-                "ordered": false,
-                "annotations": {
-                  "class org.mule.metadata.api.annotation.TypeIdAnnotation": "org.mule.test.vegan.extension.RottenFood",
-                  "class org.mule.metadata.java.api.annotation.ClassInformationAnnotation": {
-                    "classname": "org.mule.test.vegan.extension.RottenFood",
-                    "hasDefaultConstructor": true,
-                    "isInterface": false,
-                    "isInstantiable": true,
-                    "isAbstract": false,
-                    "isFinal": false,
-                    "implementedInterfaces": [
-                      "org.mule.test.vegan.extension.FarmedFood"
-                    ],
-                    "parent": "",
-                    "genericTypes": []
-                  },
-                  "class org.mule.metadata.api.annotation.TypeAliasAnnotation": {
-                    "value": "RottenFood"
-                  }
+              "format": "java",
+              "type": "Object",
+              "annotations": {
+                "typeId": "org.mule.test.vegan.extension.RottenFood",
+                "classInformation": {
+                  "classname": "org.mule.test.vegan.extension.RottenFood",
+                  "hasDefaultConstructor": true,
+                  "isInterface": false,
+                  "isInstantiable": true,
+                  "isAbstract": false,
+                  "isFinal": false,
+                  "implementedInterfaces": [
+                    "org.mule.test.vegan.extension.FarmedFood"
+                  ],
+                  "parent": "",
+                  "genericTypes": []
                 },
-                "metadataFormat": {
-                  "label": "Java",
-                  "id": "java",
-                  "validMimeTypes": [
-                    "application/java"
-                  ]
+                "typeAlias": {
+                  "value": "RottenFood"
                 }
-              }
+              },
+              "fields": []
             }
           }
         }
