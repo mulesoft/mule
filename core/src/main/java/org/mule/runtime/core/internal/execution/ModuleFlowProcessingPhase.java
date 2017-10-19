@@ -53,6 +53,7 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
@@ -125,8 +126,8 @@ public class ModuleFlowProcessingPhase
                        final PhaseResultNotifier phaseResultNotifier) {
     try {
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final FlowConstruct flowConstruct = (FlowConstruct) componentLocator.find(Location.builder()
-          .globalName(messageSource.getRootContainerName()).build()).get();
+      FlowConstruct flowConstruct =
+          ((MuleContextWithRegistries) muleContext).getRegistry().lookupObject(messageSource.getRootContainerName());
       final ComponentLocation sourceLocation = messageSource.getLocation();
       final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer = getTerminateConsumer(messageSource, template);
       final MonoProcessor<Void> responseCompletion = MonoProcessor.create();
