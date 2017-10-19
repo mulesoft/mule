@@ -9,13 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ERROR_HANDLER_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.FLOW_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ApplicationModel.ON_ERROR_PROPAGATE_IDENTIFIER;
 import org.mule.runtime.api.component.Component;
@@ -52,15 +46,6 @@ public class ComponentModelHelper {
    */
   public static TypedComponentIdentifier.ComponentType resolveComponentType(ComponentModel componentModel,
                                                                             ExtensionModelHelper extensionModelHelper) {
-    if (componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN)) {
-      return OPERATION;
-    }
-    if (componentModel.getIdentifier().equals(FLOW_IDENTIFIER)) {
-      return FLOW;
-    }
-    if (componentModel.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
-      return ERROR_HANDLER;
-    }
     if (componentModel.getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
         || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
       return ON_ERROR;
@@ -86,10 +71,6 @@ public class ComponentModelHelper {
 
   public static boolean isTemplateOnErrorHandler(ComponentModel componentModel) {
     return isOfType(componentModel, TemplateOnErrorHandler.class);
-  }
-
-  public static boolean isFlow(ComponentModel componentModel) {
-    return componentModel.getIdentifier().equals(FLOW_IDENTIFIER);
   }
 
   private static boolean isOfType(ComponentModel componentModel, Class type) {
