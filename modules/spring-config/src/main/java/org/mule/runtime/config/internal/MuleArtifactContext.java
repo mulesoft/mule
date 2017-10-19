@@ -34,6 +34,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -85,17 +86,6 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -120,6 +110,17 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -472,30 +473,42 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
       SpringComponentModel componentModel = (SpringComponentModel) cm;
       if (!mustBeRoot || componentModel.isRoot()) {
-        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER) || !componentModel.isEnabled()) {
+        if (componentModel.getIdentifier().equals(MULE_IDENTIFIER)) {
           return;
         }
-        if (componentModel.getNameAttribute() != null && componentModel.isRoot()) {
-          createdComponentModels.add(componentModel.getNameAttribute());
-        }
-        beanDefinitionFactory.resolveComponentRecursively(componentModel.getParent() != null
-            ? (SpringComponentModel) componentModel.getParent()
-            : (SpringComponentModel) applicationModel
-                .getRootComponentModel(), componentModel, beanFactory, (resolvedComponentModel, registry) -> {
-                  SpringComponentModel resolvedSpringComponentModel = (SpringComponentModel) resolvedComponentModel;
-                  if (resolvedComponentModel.isRoot()) {
-                    String nameAttribute = resolvedComponentModel.getNameAttribute();
-                    if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-                      nameAttribute = OBJECT_MULE_CONFIGURATION;
-                    } else if (nameAttribute == null) {
-                      // This may be a configuration that does not requires a name.
-                      nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition().getBeanClassName());
-                    }
-                    registry.registerBeanDefinition(nameAttribute, resolvedSpringComponentModel.getBeanDefinition());
-                    postProcessBeanDefinition(componentModel, registry, nameAttribute);
-                  }
-                }, null, componentLocator);
 
+        SpringComponentModel parentComponentModel = componentModel.getParent() != null
+            ? (SpringComponentModel) componentModel.getParent()
+            : (SpringComponentModel) applicationModel.getRootComponentModel();
+
+        if (componentModel.isEnabled()) {
+          if (componentModel.getNameAttribute() != null && componentModel.isRoot()) {
+            createdComponentModels.add(componentModel.getNameAttribute());
+          }
+          beanDefinitionFactory
+              .resolveComponentRecursively(parentComponentModel, componentModel, beanFactory,
+                                           (resolvedComponentModel, registry) -> {
+                                             SpringComponentModel resolvedSpringComponentModel =
+                                                 (SpringComponentModel) resolvedComponentModel;
+                                             if (resolvedComponentModel.isRoot()) {
+                                               String nameAttribute = resolvedComponentModel.getNameAttribute();
+                                               if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
+                                                 nameAttribute = OBJECT_MULE_CONFIGURATION;
+                                               } else if (nameAttribute == null) {
+                                                 // This may be a configuration that does not requires a name.
+                                                 nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition()
+                                                     .getBeanClassName());
+                                               }
+                                               registry.registerBeanDefinition(nameAttribute,
+                                                                               resolvedSpringComponentModel.getBeanDefinition());
+                                               postProcessBeanDefinition(componentModel, registry, nameAttribute);
+                                             }
+                                           }, null, componentLocator);
+
+        } else {
+          beanDefinitionFactory.resolveComponentRecursively(parentComponentModel, componentModel, beanFactory, null, null,
+                                                            componentLocator);
+        }
         componentLocator.addComponentLocation(cm.getComponentLocation());
       }
     });
