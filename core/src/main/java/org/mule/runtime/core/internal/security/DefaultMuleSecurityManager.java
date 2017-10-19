@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.security;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationAttemptFailed;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,8 +55,8 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
 
   @Override
   public void initialise() throws InitialisationException {
-    List<Initialisable> all = new LinkedList<>(providers.values());
-    // ordering: appends
+    List<Initialisable> all = providers.values().stream().filter(provider -> provider instanceof Initialisable)
+        .map(provider -> (Initialisable) provider).collect(toList());
     all.addAll(cryptoStrategies.values());
     LifecycleTransitionResult.initialiseAll(all.iterator());
   }

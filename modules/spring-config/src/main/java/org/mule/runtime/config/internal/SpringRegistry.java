@@ -184,16 +184,18 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
         }
         return null;
       }
-
-      if (applyLifecycle && !isSingleton(key)) {
-        try {
-          getLifecycleManager().applyCompletedPhases(object);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(createStaticMessage("Could not apply lifecycle into prototype object " + key), e);
-        }
-      }
-
+      applyLifecycleIfPrototype(object, key, applyLifecycle);
       return object;
+    }
+  }
+
+  private void applyLifecycleIfPrototype(Object object, String key, boolean applyLifecycle) {
+    if (applyLifecycle && !isSingleton(key)) {
+      try {
+        getLifecycleManager().applyCompletedPhases(object);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not apply lifecycle into prototype object " + key), e);
+      }
     }
   }
 
@@ -302,7 +304,11 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
 
   protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit) {
     try {
-      return BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+      Map<String, T> beans = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, type, nonSingletons, eagerInit);
+      if (nonSingletons && eagerInit) {
+        beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
+      }
+      return beans;
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
       String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);
@@ -316,8 +322,12 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
   protected <T> Map<String, T> internalLookupByTypeWithoutAncestorsAndObjectProviders(Class<T> type, boolean nonSingletons,
                                                                                       boolean eagerInit) {
     try {
-      return ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
+      Map<String, T> beans = ((ObjectProviderAwareBeanFactory) applicationContext.getAutowireCapableBeanFactory())
           .getBeansOfTypeWithObjectProviderObjects(type, nonSingletons, eagerInit);
+      if (nonSingletons && eagerInit) {
+        beans.forEach((key, value) -> applyLifecycleIfPrototype(value, key, true));
+      }
+      return beans;
     } catch (FatalBeanException fbex) {
       // FBE is a result of a broken config, propagate it (see MULE-3297 for more details)
       String message = String.format("Failed to lookup beans of type %s from the Spring registry", type);

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.security.Authentication;
@@ -13,7 +14,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 
-public abstract class AbstractSecurityProvider extends AbstractComponent implements SecurityProvider {
+public abstract class AbstractSecurityProvider extends AbstractComponent implements SecurityProvider, Initialisable {
 
   private String name;
   private SecurityContextFactory securityContextFactory;
@@ -62,4 +63,5 @@ public abstract class AbstractSecurityProvider extends AbstractComponent impleme
   public void setSecurityContextFactory(SecurityContextFactory securityContextFactory) {
     this.securityContextFactory = securityContextFactory;
   }
+
 }
