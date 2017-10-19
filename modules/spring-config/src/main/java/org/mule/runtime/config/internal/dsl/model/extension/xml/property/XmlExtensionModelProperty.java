@@ -45,6 +45,6 @@ public class XmlExtensionModelProperty implements ModelProperty {
 
   @Override
   public boolean isPublic() {
-    return false;
+    return true;
   }
 }
