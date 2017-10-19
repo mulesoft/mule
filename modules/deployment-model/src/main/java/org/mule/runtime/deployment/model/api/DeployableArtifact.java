@@ -70,6 +70,8 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   void dispose();
 
   /**
+   * Do not use this method if the artifact initialization wasn't successful or the artifact has been destroyed.
+   *
    * @return the registry of the artifact.
    */
   Registry getRegistry();
@@ -80,17 +82,26 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
   File getLocation();
 
   /**
+   * Do not use this method if the artifact initialization wasn't successful or the artifact has been destroyed.
+   *
    * @return a service to test connection over configuration components.
    */
   ConnectivityTestingService getConnectivityTestingService();
 
   /**
+   * Do not use this method if the artifact initialization wasn't successful or the artifact has been destroyed.
+   *
    * @return the {@link MetadataService} which can resolve the metadata of the components inside the current
    *         {@link DeployableArtifact}
    * @see MetadataService
    */
   MetadataService getMetadataService();
 
+  /**
+   * Do not use this method if the artifact initialization wasn't successful or the artifact has been destroyed.
+   *
+   * @return the {@link ValueProviderService} which can resolve possible values for a component configuration.
+   */
   ValueProviderService getValueProviderService();
 
   /**
