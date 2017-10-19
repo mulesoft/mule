@@ -29,19 +29,19 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.requestreply.SimpleAsyncRequestReplyRequester.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -283,15 +283,12 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      super.configurePreProcessors(builder);
-      builder.chain(new FlowConstructStatisticsMessageProcessor(getStatistics()));
-    }
-
-    @Override
-    protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      builder.chain(new AsyncReplyToPropertyRequestReplyReplier(getSource()));
-      super.configurePostProcessors(builder);
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
+      super.configureMessageProcessors(builder);
+      if (getSource() instanceof LegacyImmutableEndpoint
+          && !((LegacyImmutableEndpoint) getSource()).getExchangePattern().hasResponse()) {
+        builder.chain(new AsyncReplyToPropertyRequestReplyReplier(getSource()));
+      }
     }
 
     /**
