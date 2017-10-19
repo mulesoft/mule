@@ -18,6 +18,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
+import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+@SmallTest
 public class TypeMatchingVertexesFilterTestCase {
 
   private static final DataType ORANGE_DATA_TYPE = DataType.fromType(Orange.class);
