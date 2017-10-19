@@ -41,6 +41,16 @@ public class EncryptStreamTransformer implements StreamTransformer
     private ByteArrayOutputStream outputStream;
     private PGPOutputMode pgpOutputMode;
     private OutputStream result ;
+    private String streamName = "stream";
+    
+    public EncryptStreamTransformer(PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode, String streamName) throws IOException
+    {
+        this(publicKey, provider, algorithm, pgpOutputMode);
+        if (streamName != null)
+        {
+            this.streamName = streamName;
+        }
+    }
 
     public EncryptStreamTransformer(PGPPublicKey publicKey, Provider provider, int algorithm, PGPOutputMode pgpOutputMode) throws IOException
     {
@@ -75,7 +85,7 @@ public class EncryptStreamTransformer implements StreamTransformer
         compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream, new byte[1 << 16]);
 
         PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
-        pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, "stream",
+        pgpOutputStream = lData.open(compressedEncryptedOutputStream, PGPLiteralData.BINARY, streamName,
                                      new Date(), new byte[1 << 16]);
 
         write(data);
