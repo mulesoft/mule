@@ -30,8 +30,10 @@ public class GraphTransformerResolver implements TransformerResolver {
     this.readWriteLock = new ReentrantReadWriteLock();
     this.graph = new TransformationGraph();
     lookupStrategyTransformation = new TransformationGraphLookupStrategy(graph);
-    converterFilter = new CompositeConverterFilter(new TransformationLengthConverterFilter(),
-                                                   new PriorityWeightingConverterFilter(), new NameConverterFilter());
+    converterFilter = new CompositeConverterFilter(new TypeMatchingVertexesFilter(),
+                                                   new TransformationLengthConverterFilter(),
+                                                   new PriorityWeightingConverterFilter(),
+                                                   new NameConverterFilter());
     cache = new LRUMap();
   }
 
