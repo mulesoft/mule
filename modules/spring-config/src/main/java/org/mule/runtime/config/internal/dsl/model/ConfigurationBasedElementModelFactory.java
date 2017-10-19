@@ -28,6 +28,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
@@ -75,6 +76,8 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -181,13 +184,23 @@ class ConfigurationBasedElementModelFactory {
 
   private Optional<DslElementModel<ObjectType>> resolveBasedOnTypes(ComponentConfiguration configuration) {
     return currentExtension.getTypes().stream()
-        .map(type -> resolveBasedOnType(type, configuration))
+        .map(type -> resolveBasedOnType(type, configuration, new ArrayDeque<>()))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .findFirst();
   }
 
-  private Optional<DslElementModel<ObjectType>> resolveBasedOnType(ObjectType type, ComponentConfiguration configuration) {
+  private void withStackControl(Deque<String> typeResolvingStack, String stackId, Runnable action) {
+    if (!typeResolvingStack.contains(stackId)) {
+      typeResolvingStack.push(stackId);
+      action.run();
+      typeResolvingStack.pop();
+    }
+  }
+
+  private Optional<DslElementModel<ObjectType>> resolveBasedOnType(ObjectType type,
+                                                                   ComponentConfiguration configuration,
+                                                                   Deque<String> typeResolvingStack) {
     Optional<DslElementSyntax> typeDsl = dsl.resolve(type);
     if (typeDsl.isPresent()) {
       Optional<ComponentIdentifier> elementIdentifier = getIdentifier(typeDsl.get());
@@ -197,7 +210,9 @@ class ConfigurationBasedElementModelFactory {
             .withDsl(typeDsl.get())
             .withConfig(configuration);
 
-        populateObjectFields(type, configuration, typeDsl.get(), typeBuilder);
+        getId(type).ifPresent(id -> withStackControl(typeResolvingStack, id,
+                                                     () -> populateObjectFields(type, configuration, typeDsl.get(),
+                                                                                typeBuilder, typeResolvingStack)));
 
         return Optional.of(typeBuilder.build());
       }
@@ -206,25 +221,26 @@ class ConfigurationBasedElementModelFactory {
   }
 
   private void populateObjectFields(ObjectType type, ComponentConfiguration configuration, DslElementSyntax typeDsl,
-                                    DslElementModel.Builder typeBuilder) {
+                                    DslElementModel.Builder typeBuilder, Deque<String> typeResolvingStack) {
     type.getFields().forEach(field -> {
 
       if (field.getValue() instanceof ObjectType && field.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
         ((ObjectType) field.getValue()).getFields().forEach(nested -> {
           final String name = getLocalPart(nested);
-          final DslElementSyntax fieldDsl = typeDsl.getContainedElement(name).get();
-          final Optional<String> defaultValue = getDefaultValue(name, type);
+          typeDsl.getContainedElement(name)
+              .ifPresent(fieldDsl -> nested.getValue()
+                  .accept(getComponentChildVisitor(typeBuilder, configuration, nested, name, fieldDsl,
+                                                   getDefaultValue(name, field.getValue()),
+                                                   typeResolvingStack)));
 
-          nested.getValue()
-              .accept(getComponentChildVisitor(typeBuilder, configuration, nested, name, fieldDsl, defaultValue));
         });
 
       } else {
         final String name = getLocalPart(field);
-        final DslElementSyntax fieldDsl = typeDsl.getContainedElement(name).get();
-        final Optional<String> defaultValue = getDefaultValue(name, type);
-
-        field.getValue().accept(getComponentChildVisitor(typeBuilder, configuration, field, name, fieldDsl, defaultValue));
+        typeDsl.getContainedElement(name)
+            .ifPresent(fieldDsl -> field.getValue()
+                .accept(getComponentChildVisitor(typeBuilder, configuration, field, name, fieldDsl,
+                                                 getDefaultValue(name, type), typeResolvingStack)));
       }
     });
   }
@@ -240,7 +256,8 @@ class ConfigurationBasedElementModelFactory {
   private MetadataTypeVisitor getComponentChildVisitor(final DslElementModel.Builder typeBuilder,
                                                        final ComponentConfiguration configuration,
                                                        final MetadataType model, final String name,
-                                                       final DslElementSyntax modelDsl, final Optional<String> defaultValue) {
+                                                       final DslElementSyntax modelDsl, final Optional<String> defaultValue,
+                                                       Deque<String> typeResolvingStack) {
 
     final Map<String, String> parameters = configuration.getParameters();
 
@@ -289,7 +306,8 @@ class ConfigurationBasedElementModelFactory {
                   fieldComponent.getNestedComponents()
                       .forEach(c -> {
                         if (c.getIdentifier().equals(itemIdentifier)) {
-                          getComponentChildVisitor(list, c, arrayType.getType(), VALUE_ATTRIBUTE_NAME, itemdsl, defaultValue);
+                          getComponentChildVisitor(list, c, arrayType.getType(), VALUE_ATTRIBUTE_NAME, itemdsl, defaultValue,
+                                                   typeResolvingStack);
                         }
                       });
 
@@ -330,7 +348,8 @@ class ConfigurationBasedElementModelFactory {
                 .withValue(value)
                 .build());
           } else {
-            resolveBasedOnType(objectType, fieldComponent).ifPresent(typeBuilder::containing);
+            resolveBasedOnType(objectType, fieldComponent, typeResolvingStack)
+                .ifPresent(typeBuilder::containing);
           }
 
           return;
@@ -380,7 +399,7 @@ class ConfigurationBasedElementModelFactory {
         if (isBlank(value)) {
           getComponentChildVisitor(entry, entryConfig, entryType,
                                    VALUE_ATTRIBUTE_NAME, entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME).get(),
-                                   empty());
+                                   empty(), new ArrayDeque<>());
         } else {
           entry.containing(DslElementModel.builder()
               .withModel(typeLoader.load(String.class))
@@ -618,7 +637,8 @@ class ConfigurationBasedElementModelFactory {
                             itemType.accept(
                                             getComponentChildVisitor(paramElementBuilder, c, itemType, VALUE_ATTRIBUTE_NAME,
                                                                      itemdsl,
-                                                                     defaultValue));
+                                                                     defaultValue,
+                                                                     new ArrayDeque<>()));
                           }
                         });
 
@@ -632,7 +652,7 @@ class ConfigurationBasedElementModelFactory {
                     return;
                   }
 
-                  populateObjectFields(objectType, paramComponent, paramDsl, paramElementBuilder);
+                  populateObjectFields(objectType, paramComponent, paramDsl, paramElementBuilder, new ArrayDeque<>());
                 }
               });
 
