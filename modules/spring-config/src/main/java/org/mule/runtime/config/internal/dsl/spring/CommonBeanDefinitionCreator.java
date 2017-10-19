@@ -91,6 +91,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         }
       } catch (Exception | ServiceConfigurationError e) {
         // Nothing to do, we just don't have compatibility plugin in the app
+        System.out.println("");
       }
     }
     return (componentModel, helper) -> {

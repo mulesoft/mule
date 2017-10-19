@@ -130,22 +130,34 @@ public class InternalComponentConfiguration extends ComponentConfiguration {
 
     InternalComponentConfiguration that = (InternalComponentConfiguration) o;
 
-    if (!identifier.equals(that.identifier)) {
+    if (!getIdentifier().equals(that.getIdentifier())) {
       return false;
     }
-    if (!parameters.equals(that.parameters)) {
+    if (getComponentLocation() != null ? !getComponentLocation().equals(that.getComponentLocation())
+        : that.getComponentLocation() != null) {
       return false;
     }
-    return nestedComponents.equals(that.nestedComponents);
-
+    if (!properties.equals(that.properties)) {
+      return false;
+    }
+    if (!getParameters().equals(that.getParameters())) {
+      return false;
+    }
+    if (!getNestedComponents().equals(that.getNestedComponents())) {
+      return false;
+    }
+    return getValue() != null ? getValue().equals(that.getValue()) : that.getValue() == null;
   }
 
   @Override
   public int hashCode() {
-    int result = 0;
-    result = 31 * result + identifier.hashCode();
-    result = 31 * result + parameters.hashCode();
-    result = 31 * result + nestedComponents.hashCode();
+    int result = getIdentifier().hashCode();
+    result = 31 * result + (getComponentLocation() != null ? getComponentLocation().hashCode() : 0);
+    result = 31 * result + properties.hashCode();
+    result = 31 * result + getParameters().hashCode();
+    result = 31 * result + getNestedComponents().hashCode();
+    result = 31 * result + (getValue() != null ? getValue().hashCode() : 0);
     return result;
   }
+
 }

@@ -19,7 +19,8 @@ import java.util.Set;
  */
 public interface BeanDefinitionPostProcessor {
 
-  default void adaptBeanDefinition(ComponentConfiguration parentComponentConfiguration, Class beanClass, PostProcessorIocHelper iocHelper) {
+  default void adaptBeanDefinition(ComponentConfiguration parentComponentConfiguration, Class beanClass,
+                                   PostProcessorIocHelper iocHelper) {
     // Nothing to do
   }
 

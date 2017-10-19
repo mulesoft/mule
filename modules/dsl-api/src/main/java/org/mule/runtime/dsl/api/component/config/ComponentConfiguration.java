@@ -10,7 +10,6 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ import java.util.Optional;
  */
 // TODO MULE-11496 Delete this configuration once everything has an ExtensionModel and can be represented with
 // ComponentDeclaration
-public class ComponentConfiguration {
+public abstract class ComponentConfiguration {
 
   protected ComponentIdentifier identifier;
   protected ComponentLocation componentLocation;

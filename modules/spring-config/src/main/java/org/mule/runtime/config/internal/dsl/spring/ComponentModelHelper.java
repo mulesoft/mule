@@ -96,7 +96,7 @@ public class ComponentModelHelper {
 
   public static void updateAnnotationValue(QName annotationKey, Object annotationValue, BeanDefinition beanDefinition) {
     PropertyValue propertyValue =
-            beanDefinition.getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
+        beanDefinition.getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       annotations = new HashMap<>();
@@ -113,7 +113,7 @@ public class ComponentModelHelper {
       return empty();
     }
     PropertyValue propertyValue =
-            componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
+        componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
     Map<QName, Object> annotations;
     if (propertyValue == null) {
       return empty();
@@ -125,7 +125,7 @@ public class ComponentModelHelper {
 
   public static boolean isRouter(ComponentModel componentModel) {
     return isOfType(componentModel, Router.class) || isOfType(componentModel, AbstractSelectiveRouter.class)
-           || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-           || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
+        || ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
+        || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
   }
 }
