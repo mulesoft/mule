@@ -10,21 +10,18 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
-import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
-import org.mule.runtime.module.extension.internal.runtime.transaction.XaTransactionHandle;
 
-import javax.transaction.TransactionManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -37,9 +34,9 @@ import java.util.Optional;
 class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
 
   private static final TransactionHandle NULL_TRANSACTION_HANDLE = new NullTransactionHandle();
+  private static final TransactionHandle DEFAULT_TRANSACTION_HANDLE = new DefaultTransactionHandle();
 
   private final SourceCallbackAdapter sourceCallback;
-  private final MuleContext muleContext;
   private final Map<String, Object> variables = new HashMap<>();
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;
@@ -48,11 +45,9 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
    * Creates a new instance
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
-   * @param muleContext    the current application {@link MuleContext}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, MuleContext muleContext) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback) {
     this.sourceCallback = sourceCallback;
-    this.muleContext = muleContext;
   }
 
   /**
@@ -74,15 +69,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
       sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
                                                                     sourceCallback.getConfigurationInstance(),
                                                                     connectionHandler);
-
-      if (connection instanceof XATransactionalConnection) {
-        TransactionManager transactionManager = muleContext.getTransactionManager();
-        transactionHandle = transactionManager != null
-            ? new XaTransactionHandle(transactionManager)
-            : new DefaultTransactionHandle((TransactionalConnection) connection);
-      } else {
-        transactionHandle = new DefaultTransactionHandle((TransactionalConnection) connection);
-      }
+      transactionHandle = DEFAULT_TRANSACTION_HANDLE;
     }
 
     return transactionHandle;
