@@ -73,10 +73,10 @@ public class JavaDocReader {
       } else if (!(token.charAt(0) == AT_CHAR)) {
         switch (readingState) {
           case ON_BODY:
-            body.append(token);
+            body.append(SPACE_CHAR).append(token);
             break;
           case ON_PARAM:
-            params.get(paramName).append(token);
+            params.get(paramName).append(SPACE_CHAR).append(token);
             break;
           case UNSUPPORTED:
             break;
