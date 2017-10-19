@@ -199,11 +199,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
         return event;
       });
       super.configureMessageProcessors(builder);
-    }
-
-    @Override
-    protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      super.configurePostProcessors(builder);
       builder.chain((Processor) event -> {
         latch.countDown();
         return event;

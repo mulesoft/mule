@@ -131,9 +131,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     if (processingStrategy != null) {
       builder.setProcessingStrategy(processingStrategy);
     }
-    configurePreProcessors(builder);
     configureMessageProcessors(builder);
-    configurePostProcessors(builder);
     return builder.build();
   }
 
@@ -156,14 +154,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     } else {
       return defaultProcessingStrategyFactory;
     }
-  }
-
-  protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    builder.chain(new ProcessorStartCompleteProcessor());
-  }
-
-  protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    builder.chain(new ProcessEndProcessor());
   }
 
   @Override
@@ -262,10 +252,50 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected ReactiveProcessor processFlowFunction() {
     return stream -> from(stream)
+        .doOnNext(beforeProcessors())
         .transform(processingStrategy.onPipeline(pipeline))
-        .doOnNext(response -> ((BaseEventContext) response.getContext()).success(response))
+        .doOnNext(afterProcessors())
         .doOnError(throwable -> !(throwable instanceof RejectedExecutionException),
                    throwable -> LOGGER.error("Unhandled exception in Flow ", throwable));
+  }
+
+  private Consumer<CoreEvent> beforeProcessors() {
+    return event -> {
+      if (getStatistics().isEnabled()) {
+        getStatistics().incReceivedEvents();
+      }
+      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
+                                                                 AbstractPipeline.this.getName(), PROCESS_START));
+
+      long startTime = currentTimeMillis();
+
+      // Fire COMPLETE notification on async response
+      Mono.from(((BaseEventContext) event.getContext()).getBeforeResponsePublisher())
+          .doOnSuccess(result -> fireCompleteNotification(result, null))
+          .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
+          .doOnError(throwable -> !(throwable instanceof MessagingException),
+                     throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
+                                                                                        AbstractPipeline.this))
+
+          )
+          .doOnSuccessOrError((result, throwable) -> ((BaseEventContext) event.getContext()).getProcessingTime()
+              .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
+          .subscribe(requestUnbounded());
+    };
+  }
+
+  private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
+    notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
+                                                               AbstractPipeline.this.getName(), PROCESS_COMPLETE));
+  }
+
+  private Consumer<CoreEvent> afterProcessors() {
+    return response -> {
+      notificationFirer
+          .dispatch(new PipelineMessageNotification(createInfo(response, null, AbstractPipeline.this),
+                                                    AbstractPipeline.this.getName(), PROCESS_END));
+      ((BaseEventContext) response.getContext()).success(response);
+    };
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
@@ -348,48 +378,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public int getMaxConcurrency() {
     return maxConcurrency;
-  }
-
-  private class ProcessEndProcessor extends AbstractComponent implements Processor, InternalProcessor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
-                                                                 AbstractPipeline.this.getName(), PROCESS_END));
-      return event;
-    }
-  }
-
-
-  private class ProcessorStartCompleteProcessor implements Processor, InternalProcessor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
-                                                                 AbstractPipeline.this.getName(), PROCESS_START));
-
-      long startTime = currentTimeMillis();
-
-      // Fire COMPLETE notification on async response
-      Mono.from(((BaseEventContext) event.getContext()).getBeforeResponsePublisher())
-          .doOnSuccess(result -> fireCompleteNotification(result, null))
-          .doOnError(MessagingException.class, messagingException -> fireCompleteNotification(null, messagingException))
-          .doOnError(throwable -> !(throwable instanceof MessagingException),
-                     throwable -> fireCompleteNotification(null, new MessagingException(event, throwable,
-                                                                                        AbstractPipeline.this))
-
-          )
-          .doOnSuccessOrError((result, throwable) -> ((BaseEventContext) event.getContext()).getProcessingTime()
-              .ifPresent(time -> time.addFlowExecutionBranchTime(startTime)))
-          .subscribe(requestUnbounded());
-
-      return event;
-    }
-
-    private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
-      notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
-                                                                 AbstractPipeline.this.getName(), PROCESS_COMPLETE));
-    }
   }
 
 }
