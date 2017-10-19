@@ -62,5 +62,4 @@ public final class AnnotationProcessorResourceGenerator extends AbstractResource
   private RuntimeException wrapException(Exception e, GeneratedResource resource) {
     return new RuntimeException(String.format("Could not write generated resource '%s'", resource.getPath()), e);
   }
-
 }
