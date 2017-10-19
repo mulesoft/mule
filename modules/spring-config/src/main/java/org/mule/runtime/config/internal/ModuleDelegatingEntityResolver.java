@@ -135,7 +135,7 @@ public class ModuleDelegatingEntityResolver implements EntityResolver {
 
   private Boolean isRunningTests(StackTraceElement[] stackTrace) {
     for (StackTraceElement element : stackTrace) {
-      if (element.getClassName().startsWith("org.mule.tck.junit4")) {
+      if (element.getClassName().startsWith("org.junit.runners.")) {
         return true;
       }
     }
