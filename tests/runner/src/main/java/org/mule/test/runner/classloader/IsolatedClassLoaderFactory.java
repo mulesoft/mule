@@ -52,6 +52,8 @@ import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -59,14 +61,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
 
 /**
  * Factory that creates a class loader hierarchy to emulate the one used in a mule standalone container.
@@ -354,11 +353,10 @@ public class IsolatedClassLoaderFactory {
    * @param artifactsUrlClassification the classifications to get plugins {@link URL}s
    * @return an {@link ArtifactClassLoader} for the container
    */
-  protected ArtifactClassLoader createContainerArtifactClassLoader(
-                                                                   TestContainerClassLoaderFactory testContainerClassLoaderFactory,
+  protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
                                                                    ArtifactsUrlClassification artifactsUrlClassification) {
     MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
-    final List<MuleModule> muleModules = Collections.<MuleModule>emptyList();
+    final List<MuleModule> muleModules = emptyList();
     ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
         .create(testContainerClassLoaderFactory.getBootPackages(), muleModules);
 
@@ -376,7 +374,7 @@ public class IsolatedClassLoaderFactory {
   protected MuleArtifactClassLoader createLauncherArtifactClassLoader() {
     ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
 
-    return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
+    return new MuleArtifactClassLoader("mule", new ArtifactDescriptor("mule"), new URL[0], launcherClassLoader,
                                        new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
 
       @Override

@@ -7,8 +7,8 @@
 
 package org.mule.functional.junit4;
 
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;

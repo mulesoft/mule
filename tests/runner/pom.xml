@@ -85,6 +85,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- 3rd party dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>

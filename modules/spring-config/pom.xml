@@ -36,6 +36,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
+        
+        <!-- Add logging libraries required by spring -->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
@@ -49,6 +56,13 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Unit tests -->

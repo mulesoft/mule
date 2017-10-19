@@ -20,6 +20,9 @@ import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -27,9 +30,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Defines a {@link ClassLoader} that filter which classes and resources can be resolved based on a {@link ClassLoaderFilter}
@@ -44,7 +44,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     registerAsParallelCapable();
   }
 
-  protected static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+  private static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
 
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
@@ -53,7 +53,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   /**
    * Creates a new filtering classLoader
-   * 
+   *
    * @param artifactClassLoader artifact classLoader to filter. Non null
    * @param filter filters access to classes and resources from the artifact classLoader. Non null
    * @param exportedServices service providers that will be available from the filtered class loader. Non null.
