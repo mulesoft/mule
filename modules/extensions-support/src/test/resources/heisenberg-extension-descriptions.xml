@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="config">
+            <description><![CDATA[Default configuration]]></description>
+            <parameters>
+                <parameter name="familyInformations">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="enemies">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="monthlyIncomes">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="cancer">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="recipe">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="deathsBySeasons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="money">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="weapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="wildCardWeapons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="wildCards">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="weaponValueMap">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="candidateDoors">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="initialHealth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="finalHealth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="labAddress">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="firstEndevour">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="healthProgressions">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+                <parameter name="labeledRicin">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="nextDoor">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="ricinPacks">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="worksAtDEA">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="lovesMinerals">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="connection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="saulPhoneNumber">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tlsContext">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="connection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="saulPhoneNumber">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tlsContext">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Heisenberg">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="callSaul">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="die">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="emptyPagedOperation">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="failingPagedOperation">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getAllEnemies">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getBarberPreferences">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getEnemy">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="index">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getPagedPersonalInfo">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getSaulPhone">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="launder">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="amount">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="nameAsStream">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="outputMimeType">
+                    <description><![CDATA[The mime type of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="outputEncoding">
+                    <description><![CDATA[The encoding of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="pagedOperationUsingConnection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="sayMyName">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="outputMimeType">
+                    <description><![CDATA[The mime type of the payload that this operation outputs.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="stickyPagedOperation">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="alias">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="greeting">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="alwaysFailsWrapper">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="approve">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="investment">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="recursivePojo">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="recursiveChainB">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="recursiveChainA">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="byPassWeapon">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="awesomeWeapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="awesomeName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="callGusFring">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="cureCancer">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="disguice">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="echo">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="literalExpression">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="exceptionOnCallbacks">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="executeAnything">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="failToExecute">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="getChain">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getCounter">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getGramsInStorage">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="grams">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getInjectedExtensionManager">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getInlineInfo">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="fullyBald">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="beardTrimming">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getInlinePersonalInfo">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getMedicalHistory">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="healthByYear">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="kill">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="victim">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="goodbyeMessage">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithCustomMessage">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="victim">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="goodbyeMessage">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithId">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="id">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithMultipleWildCardWeapons">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="wildCardWeapons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithMultiplesWeapons">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithRicins">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="ricins">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="killWithWeapon">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="type">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="attributesOfWeapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="knock">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="knockedDoor">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="knockMany">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="doors">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="literalEcho">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="literalExpression">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="neverFailsWrapper">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="operationWithInputStreamContentParam">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="inputStreamContent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="payloadModifier">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="payload">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="attributes">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processAddressBook">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="phoneNumbers">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processSale">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="sales">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processWeapon">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processWeaponList">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processWeaponListWithDefaultValue">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapons">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="processWeaponWithDefaultValue">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="weapon">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="resolverEcho">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="literalExpression">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="throwError">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+        <operation name="validateMoney">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </operation>
+    </operations>
+    <sources>
+        <source name="AsyncListenPayments">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="initialBatchNumber">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="corePoolSize">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="payment">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sameNameParameter">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fail">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="labeledRicin">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="nextDoor">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="ricinPacks">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="methylamine">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="propagateError">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="ListenPayments">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="initialBatchNumber">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="corePoolSize">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="payment">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sameNameParameter">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fail">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="labeledRicin">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="nextDoor">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="ricinPacks">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="methylamine">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="propagateError">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="ReconnectableListenPayments">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="initialBatchNumber">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="corePoolSize">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnectable">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="payment">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="sameNameParameter">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="fail">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="labeledRicin">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="nextDoor">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="ricinPacks">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="myName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="age">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfConception">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfBirth">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfDeath">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="dateOfGraduation">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="knownAddresses">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="methylamine">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="propagateError">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="dea-radio">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+</extension-documentation>
