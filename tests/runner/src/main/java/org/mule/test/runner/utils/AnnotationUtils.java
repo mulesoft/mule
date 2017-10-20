@@ -7,12 +7,19 @@
 
 package org.mule.test.runner.utils;
 
+import static java.util.Collections.addAll;
 import static org.apache.commons.lang3.ClassUtils.getAllInterfaces;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility for annotations related stuff.
@@ -20,6 +27,8 @@ import java.util.List;
  * @since 4.0
  */
 public class AnnotationUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AnnotationUtils.class);
 
   private AnnotationUtils() {}
 
@@ -78,11 +87,47 @@ public class AnnotationUtils {
       currentClass = currentClass.getSuperclass();
     }
     getAllInterfaces(klass).forEach(currentInterfaceClass -> {
-      T attributeFrom = getAnnotationAttributeFrom((Class<?>) currentInterfaceClass, annotationClass, methodName);
+      T attributeFrom = getAnnotationAttributeFrom(currentInterfaceClass, annotationClass, methodName);
       if (attributeFrom != null) {
         list.add(attributeFrom);
       }
     });
     return list;
   }
+
+  /**
+   * Finds the first class in a class hierarchy that is annotated with {@link ArtifactClassLoaderRunnerConfig}.
+   * <p/>
+   * Annotated class is searched by levels, in a Breadth-first search (BFS) way. Starting from the class received as a parameter,
+   * first the class is checked and return if annotated. Otherwise interface directly implemented by the class will be added to
+   * review and finally its super class.
+   * <p/>
+   * Implemented interfaces have priority over class hierarchy as base classes can be imported from other modules with different
+   * runner configurations.
+   *
+   * @param testClass class of the test begin executed by the test runner.
+   * @return the first class found in the hierarchy that is annotated, null if no class in the hierarchy is annotated.
+   */
+  public static Class findConfiguredClass(Class<?> testClass) {
+    Deque<Class> classesToReview = new LinkedList<>();
+    classesToReview.push(testClass);
+
+    while (!classesToReview.isEmpty()) {
+      Class currentClass = classesToReview.pop();
+
+      if (currentClass.getDeclaredAnnotation(ArtifactClassLoaderRunnerConfig.class) != null) {
+        LOGGER.info("Reading test runner configuration for test '{}' from '{}'", testClass.getName(), currentClass.getName());
+        return currentClass;
+      }
+
+      addAll(classesToReview, currentClass.getInterfaces());
+
+      if (currentClass.getSuperclass() != null && currentClass.getSuperclass() != Object.class) {
+        classesToReview.add(currentClass.getSuperclass());
+      }
+    }
+
+    return null;
+  }
+
 }

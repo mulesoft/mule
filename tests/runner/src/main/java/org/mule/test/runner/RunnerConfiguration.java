@@ -7,9 +7,14 @@
 
 package org.mule.test.runner;
 
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static org.mule.test.runner.utils.AnnotationUtils.findConfiguredClass;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFromHierarchy;
+
+import org.mule.test.runner.utils.AnnotationUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -71,22 +76,30 @@ public class RunnerConfiguration {
 
   /**
    * Creates an instance of the the configuration by reading the class annotated with {@link ArtifactClassLoaderRunnerConfig}.
+   * <p/>
+   * Configuration is created by searching in the class hierarchy for {@code testClass} which classes are annotated with {@link ArtifactClassLoaderRunnerConfig}
+   * and creating a new configuration for the test. Some configuration attributes, as {@value PROVIDED_EXCLUSIONS}, {@value TEST_EXCLUSIONS} and {@value TEST_INCLUSIONS}, are
+   * the result of collecting the same attribute from all the configured classes/interfaces in the test class's hierarchy.
+   * <p/>
+   * The rest of the attributes, {@value EXPORT_PLUGIN_CLASSES}, {@value SHARED_RUNTIME_LIBS} and {@value EXTRA_PRIVILEGED_ARTIFACTS},
+   * are taken from the first class in the hierarchy that is configured.
    *
-   * @param klass Test {@link Class} annotated
+   * @param testClass Test {@link Class} annotated
    * @return a {@link RunnerConfiguration}
+   * @see AnnotationUtils#findConfiguredClass(java.lang.Class)
    */
-  public static RunnerConfiguration readConfiguration(Class klass) {
-    RunnerConfiguration runnerConfiguration = new RunnerConfiguration(klass);
-    Class testClass = klass;
+  public static RunnerConfiguration readConfiguration(Class testClass) {
+    RunnerConfiguration runnerConfiguration = new RunnerConfiguration(testClass);
 
-    runnerConfiguration.providedExclusions = new HashSet<>(readAttribute(PROVIDED_EXCLUSIONS, testClass));
-    runnerConfiguration.testExclusions = new HashSet<>(readAttribute(TEST_EXCLUSIONS, testClass));
-    runnerConfiguration.testInclusions = new HashSet<>(readAttribute(TEST_INCLUSIONS, testClass));
+    runnerConfiguration.providedExclusions = new HashSet<>(readAttributeFromHierarchy(PROVIDED_EXCLUSIONS, testClass));
+    runnerConfiguration.testExclusions = new HashSet<>(readAttributeFromHierarchy(TEST_EXCLUSIONS, testClass));
+    runnerConfiguration.testInclusions = new HashSet<>(readAttributeFromHierarchy(TEST_INCLUSIONS, testClass));
 
-    runnerConfiguration.exportPluginClasses = new HashSet<>(readAttribute(EXPORT_PLUGIN_CLASSES, testClass));
-
-    runnerConfiguration.sharedRuntimeLibs = new HashSet<>(readAttribute(SHARED_RUNTIME_LIBS, testClass));
-    runnerConfiguration.extraPrivilegedArtifacts = new HashSet<>(readAttribute(EXTRA_PRIVILEGED_ARTIFACTS, testClass));
+    Class configuredClass = findConfiguredClass(testClass);
+    runnerConfiguration.exportPluginClasses = new HashSet<>(readAttributeFromClass(EXPORT_PLUGIN_CLASSES, configuredClass));
+    runnerConfiguration.sharedRuntimeLibs = new HashSet<>(readAttributeFromClass(SHARED_RUNTIME_LIBS, configuredClass));
+    runnerConfiguration.extraPrivilegedArtifacts =
+        new HashSet<>(readAttributeFromClass(EXTRA_PRIVILEGED_ARTIFACTS, configuredClass));
 
     return runnerConfiguration;
   }
@@ -99,10 +112,15 @@ public class RunnerConfiguration {
    * @param <E> generic type
    * @return {@link List} of values
    */
-  private static <E> List<E> readAttribute(String name, Class<?> klass) {
+  private static <E> List<E> readAttributeFromHierarchy(String name, Class<?> klass) {
     List<E[]> valuesList =
         getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class,
                                             name);
+    return valuesList.stream().flatMap(Arrays::stream).distinct().collect(toList());
+  }
+
+  private static <E> List<E> readAttributeFromClass(String name, Class<?> klass) {
+    List<E[]> valuesList = singletonList(getAnnotationAttributeFrom(klass, ArtifactClassLoaderRunnerConfig.class, name));
     return valuesList.stream().flatMap(Arrays::stream).distinct().collect(toList());
   }
 
@@ -129,6 +147,9 @@ public class RunnerConfiguration {
     if (!exportPluginClasses.equals(that.exportPluginClasses)) {
       return false;
     }
+    if (!extraPrivilegedArtifacts.equals(that.extraPrivilegedArtifacts)) {
+      return false;
+    }
     return sharedRuntimeLibs.equals(that.sharedRuntimeLibs);
   }
 
@@ -139,6 +160,7 @@ public class RunnerConfiguration {
     result = 31 * result + testInclusions.hashCode();
     result = 31 * result + exportPluginClasses.hashCode();
     result = 31 * result + sharedRuntimeLibs.hashCode();
+    result = 31 * result + extraPrivilegedArtifacts.hashCode();
     return result;
   }
 
