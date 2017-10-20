@@ -7,10 +7,10 @@
 package org.mule.runtime.core.internal.transformer.graph;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 
 import java.util.List;

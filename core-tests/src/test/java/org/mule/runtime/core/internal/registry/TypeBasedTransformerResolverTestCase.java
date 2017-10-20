@@ -16,10 +16,10 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

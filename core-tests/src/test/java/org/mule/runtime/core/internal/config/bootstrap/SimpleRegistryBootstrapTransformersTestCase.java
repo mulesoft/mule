@@ -15,7 +15,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.config.bootstrap.TestBootstrapServiceDiscoverer;
@@ -23,6 +22,7 @@ import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuild
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

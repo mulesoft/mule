@@ -9,8 +9,8 @@ package org.mule.runtime.core.internal.transformer.graph;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
 import org.mule.tck.size.SmallTest;
 
