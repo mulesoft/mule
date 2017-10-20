@@ -6,6 +6,7 @@
  */
 package org.mule.routing;
 
+import static java.lang.System.nanoTime;
 import org.mule.DefaultMessageCollection;
 import org.mule.DefaultMuleEvent;
 import org.mule.VoidMuleEvent;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.IteratorUtils;
@@ -56,7 +56,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     transient private MuleContext muleContext;
     private String commonRootId = null;
     private static boolean hasNoCommonRootId = false;
-    private int arrivalOrderCounter = 0;
     private Serializable lastStoredEventKey;
 
     public static final String DEFAULT_STORE_PREFIX = "DEFAULT_STORE";
@@ -238,7 +237,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
         if (orderByArrival)
         {
-            wrapperOrderEvents =  new TreeSet<>(new ArrivalOrderEventComparator());
+            wrapperOrderEvents =  new TreeSet<>(new TimeOrderEventComparator());
         }
         else
         {
@@ -306,7 +305,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
             //when an event is split up, the same event IDs are used.
             Serializable key= getEventKey(event);
             lastStoredEventKey = key;
-            eventsObjectStore.store(key, new WrapperOrderEvent(event, ++arrivalOrderCounter), eventsPartitionKey);
+            eventsObjectStore.store(key, new WrapperOrderEvent(event, nanoTime()), eventsPartitionKey);
 
             if (!hasNoCommonRootId)
             {
@@ -568,15 +567,14 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
 
-    public final class ArrivalOrderEventComparator implements Comparator<WrapperOrderEvent>
+    public final class TimeOrderEventComparator implements Comparator<WrapperOrderEvent>
     {
         @Override
         public int compare(WrapperOrderEvent wrapperOrderEvent1, WrapperOrderEvent wrapperOrderEvent2)
         {
-            int val1 = wrapperOrderEvent1.arrivalOrder;
-            int val2 = wrapperOrderEvent2.arrivalOrder;
-
-            return val1 - val2;
+            long time1= wrapperOrderEvent1.timeOrder;
+            long time2= wrapperOrderEvent2.timeOrder;
+            return (time1 - time2) > 0 ? 1 : -1;
         }
     }
 
