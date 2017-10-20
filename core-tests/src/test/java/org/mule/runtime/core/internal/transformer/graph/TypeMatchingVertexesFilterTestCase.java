@@ -69,7 +69,7 @@ public class TypeMatchingVertexesFilterTestCase {
 
     List<Converter> filtered = filter.filter(converters, STRING, PEACH_DATA_TYPE);
 
-    assertThat(filtered, hasSize((2)));
+    assertThat(filtered, hasSize(2));
     assertThat(filtered, contains(stringToOrange, stringToSeed));
 
   }
@@ -85,7 +85,7 @@ public class TypeMatchingVertexesFilterTestCase {
 
     List<Converter> filtered = filter.filter(converters, STRING, PEACH_DATA_TYPE);
 
-    assertThat(filtered, hasSize((2)));
+    assertThat(filtered, hasSize(2));
     assertThat(filtered, contains(stringToOrange, stringToSeed));
 
   }
@@ -101,7 +101,7 @@ public class TypeMatchingVertexesFilterTestCase {
 
     List<Converter> filtered = filter.filter(converters, SEED_DATA_TYPE, ORANGE_DATA_TYPE);
 
-    assertThat(filtered, hasSize((1)));
+    assertThat(filtered, hasSize(1));
     assertThat(filtered, contains(stringToOrange));
 
   }

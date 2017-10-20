@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Converter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -45,12 +44,8 @@ public class TypeMatchingVertexesFilter implements ConverterFilter {
   }
 
   private List<Converter> filterBySource(List<Converter> converters, Predicate<DataType> matcher) {
-    List<Converter> filteredConvertersBySource = new ArrayList<>();
-    for (Converter converter : converters) {
-      if (converter.getSourceDataTypes().stream().anyMatch(matcher)) {
-        filteredConvertersBySource.add(converter);
-      }
-    }
+    List<Converter> filteredConvertersBySource =
+        converters.stream().filter(converter -> converter.getSourceDataTypes().stream().anyMatch(matcher)).collect(toList());
 
     if (filteredConvertersBySource.isEmpty()) {
       filteredConvertersBySource = converters;

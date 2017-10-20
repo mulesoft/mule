@@ -100,9 +100,9 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     if (transformer == null) {
       // If no transformers were found but the outputType type is String or byte[] we can perform a more general search
       // using Object.class and then convert to String or byte[] using the second pass transformer
-      if (result.getType().equals(String.class)) {
+      if (String.class.equals(result.getType())) {
         secondPass = objectToString;
-      } else if (result.getType().equals(byte[].class)) {
+      } else if (byte[].class.equals(result.getType())) {
         secondPass = objectToByteArray;
       } else {
         return null;
