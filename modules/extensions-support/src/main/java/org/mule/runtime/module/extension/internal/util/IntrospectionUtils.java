@@ -442,7 +442,7 @@ public final class IntrospectionUtils {
 
   public static Optional<Field> getField(Class<?> clazz, String name) {
     Collection<Field> candidates = getAllFields(clazz, withName(name));
-    return isEmpty(candidates) ? Optional.empty() : Optional.of(candidates.iterator().next());
+    return isEmpty(candidates) ? empty() : Optional.of(candidates.iterator().next());
   }
 
   /**
@@ -1019,18 +1019,19 @@ public final class IntrospectionUtils {
     });
   }
 
-  private static void injectAnnotatedField(Object target, Object value, Class<? extends Annotation> annotationClass) {
+  private static Optional<FieldSetter> getFieldSetterForAnnotatedField(Object target,
+                                                                       Class<? extends Annotation> annotationClass) {
     final Class<?> type = target.getClass();
     List<Field> fields = getAnnotatedFields(type, annotationClass);
     if (fields.isEmpty()) {
-      return;
+      return empty();
     } else if (fields.size() > 1) {
       throw new IllegalModelDefinitionException(format(
                                                        "Class '%s' has %d fields annotated with @%s. Only one field may carry that annotation",
                                                        type.getName(), fields.size(), annotationClass));
     }
 
-    new FieldSetter<>(fields.get(0)).set(target, value);
+    return of(new FieldSetter<>(fields.get(0)));
   }
 
   private static void injectFieldOfType(Object target, Object value, Class<?> fieldType) {
@@ -1085,7 +1086,7 @@ public final class IntrospectionUtils {
    */
   public static void injectFields(Object target, String configName, String encoding) {
     injectDefaultEncoding(target, encoding);
-    injectAnnotatedField(target, configName, RefName.class);
+    set(getFieldSetterForAnnotatedField(target, RefName.class), target, configName);
   }
 
   /**
@@ -1099,7 +1100,7 @@ public final class IntrospectionUtils {
    * @param configName the value to be injected
    */
   public static void injectRefName(Object target, String configName) {
-    injectAnnotatedField(target, configName, RefName.class);
+    set(getFieldSetterForAnnotatedField(target, RefName.class), target, configName);
   }
 
   /**
@@ -1110,7 +1111,17 @@ public final class IntrospectionUtils {
    * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
    */
   public static void injectDefaultEncoding(Object target, String encoding) {
-    injectAnnotatedField(target, encoding, DefaultEncoding.class);
+    set(getDefaultEncodingFieldSetter(target), target, encoding);
+  }
+
+  /**
+   * Returns a {@link FieldSetter} for a field in the {@code target} annotated {@link DefaultEncoding} (if present)
+   *
+   * @param target   object in which the fields are going to be set
+   * @throws {@link IllegalModelDefinitionException} if there is more than one field annotated with {@link DefaultEncoding}
+   */
+  public static Optional<FieldSetter> getDefaultEncodingFieldSetter(Object target) {
+    return getFieldSetterForAnnotatedField(target, DefaultEncoding.class);
   }
 
   /**
@@ -1124,5 +1135,9 @@ public final class IntrospectionUtils {
    */
   public static void injectComponentLocation(Object target, ComponentLocation componentLocation) {
     injectFieldOfType(target, componentLocation, ComponentLocation.class);
+  }
+
+  private static void set(Optional<FieldSetter> setter, Object target, Object value) {
+    setter.ifPresent(s -> s.set(target, value));
   }
 }
