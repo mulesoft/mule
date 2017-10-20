@@ -31,6 +31,7 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
@@ -63,7 +64,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,14 +102,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    String muleVersion;
-    try {
-      Properties properties = new Properties();
-      properties.load(AetherClassPathClassifierTestCase.class.getResourceAsStream("/runner.properties"));
-      muleVersion = properties.getProperty("mule.version");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    String muleVersion = getMuleVersion();
 
     this.rootArtifact = new DefaultArtifact("org.foo:foo-root:1.0-SNAPSHOT");
 

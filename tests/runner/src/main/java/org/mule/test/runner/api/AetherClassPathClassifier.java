@@ -110,6 +110,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
   private ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
 
+  static String getMuleVersion() {
+    try {
+      Properties properties = new Properties();
+      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
+      return properties.getProperty("mule.version");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /**
    * Creates an instance of the classifier.
    *
@@ -124,13 +134,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
 
-    try {
-      Properties properties = new Properties();
-      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
-      muleVersion = properties.getProperty("mule.version");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    muleVersion = getMuleVersion();
   }
 
   /**
