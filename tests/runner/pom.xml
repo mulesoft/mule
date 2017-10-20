@@ -20,7 +20,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${shade.plugin.version}</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar>
                     <artifactSet>

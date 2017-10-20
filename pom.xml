@@ -242,7 +242,7 @@
         <site.plugin.version>3.5.1</site.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
         <war.plugin.version>2.6</war.plugin.version>
-        <shade.plugin.version>2.4.3</shade.plugin.version>
+        <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>1.10</build.helper.maven.plugin.version>
         <assembly.verifier.version>1.4</assembly.verifier.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
